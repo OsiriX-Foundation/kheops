@@ -10,20 +10,20 @@ apply plugin: 'idea'
 // So parse the JVM args that IDEA uses from that init script and set them as JVM args to be used by gretty:
 def debugArgs = []
 if (gradle.startParameter.initScripts) {
-    def line = file(gradle.startParameter.initScripts[0]).readLines().findAll({x -> x ==~ /.*-agentlib:jdwp=.*/ })[0]
+    def line = file(gradle.startParameter.initScripts[0]).readLines().findAll({ x -> x ==~ /.*-agentlib:jdwp=.*/ })[0]
     if (line) {
         debugArgs = ((line =~ /.*'(.*)'.*/)[0][1] as String).split(' ')
     }
 }
 
 repositories {
- mavenCentral()
-   jcenter()
+    mavenCentral()
+    jcenter()
 }
 
 dependencies {
-   compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.26'
-   compile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.26'
+    compile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
 
 }
 
