@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'jetty'
+
+repositories {
+ mavenCentral()
+}
+
+dependencies {
+   compile "javax.ws.rs:jsr311-api:1.1"
+   compile "com.sun.jersey:jersey-core:1.9.1"
+   compile "com.sun.jersey:jersey-server:1.9.1"
+   compile "com.sun.jersey:jersey-json:1.9.1"
+ 
+   // Dependency needed for interceptors and filters.
+   compile 'com.sun.jersey.contribs:jersey-contribs:1.19'
+}
