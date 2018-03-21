@@ -4,10 +4,10 @@
  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
  id="WebApp_ID" version="2.5">
  
- <display-name>Jersey Example</display-name>
+ <display-name>Kheops Authentication</display-name>
  <servlet>
-   <servlet-name>JerseyServlet</servlet-name>
-   <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+   <servlet-name>Kheops Servlet</servlet-name>
+   <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
  
  <!-- Services package configuration. -->
    <init-param>
@@ -16,7 +16,7 @@
    </init-param> 
  </servlet>
  <servlet-mapping>
-   <servlet-name>JerseyServlet</servlet-name>
+   <servlet-name>Kheops Servlet</servlet-name>
    <url-pattern>/rest/*</url-pattern>
  </servlet-mapping>
 </web-app>

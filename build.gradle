@@ -4,14 +4,11 @@ apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.p
 
 repositories {
  mavenCentral()
+   jcenter()
 }
 
 dependencies {
-   compile "javax.ws.rs:jsr311-api:1.1"
-   compile "com.sun.jersey:jersey-core:1.9.1"
-   compile "com.sun.jersey:jersey-server:1.9.1"
-   compile "com.sun.jersey:jersey-json:1.9.1"
- 
-   // Dependency needed for interceptors and filters.
-   compile 'com.sun.jersey.contribs:jersey-contribs:1.19'
+   compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.26'
+   compile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
+
 }
