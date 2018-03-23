@@ -1,4 +1,4 @@
-package co.kheops.auth_server;
+package online.kheops.auth_server;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
