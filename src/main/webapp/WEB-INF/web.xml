@@ -12,7 +12,7 @@
         <!-- Services package configuration. -->
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>online.kheops.auth_server.resources</param-value>
+            <param-value>online.kheops.auth_server.services</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

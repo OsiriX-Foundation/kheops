@@ -9,6 +9,7 @@ public class HibernateUtil {
     static {
         Configuration configuration = new Configuration().configure();
         configuration.addAnnotatedClass(Person.class);
+        configuration.addAnnotatedClass(Series.class);
         StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
         sessionFactory = configuration.buildSessionFactory(builder.build());
     }

@@ -12,5 +12,6 @@
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <mapping class="online.kheops.auth_server.Person"/>
+        <mapping class="online.kheops.auth_server.Series"/>
     </session-factory>
 </hibernate-configuration>
