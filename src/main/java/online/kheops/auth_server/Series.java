@@ -53,9 +53,9 @@ public class Series {
         studyInstanceUID = newStudyInstanceUID;
         seriesInstanceUID = newSeriesInstanceUID;
 
-        Date now = new Date();
-        createdTime = now;
-        updatedTime = now;
+//        Date now = new Date();
+//        createdTime = now;
+//        updatedTime = now;
 
     }
 

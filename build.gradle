@@ -25,7 +25,11 @@ dependencies {
     compile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
 
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
+
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
+
     compile 'org.hibernate:hibernate-core:5.2.16.Final'
+    // and annotations?
 }
 
 gretty {
