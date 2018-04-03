@@ -8,7 +8,6 @@ import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.auth0.jwk.JwkException;
@@ -18,6 +17,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 
@@ -34,17 +34,17 @@ import java.util.Date;
 public class TokenService
 {
     static class TokenResponse {
-        @XmlAttribute(name="access_token")
+        @XmlElement(name = "access_token")
         public String accessToken;
-        @XmlAttribute(name="token_type")
+        @XmlElement(name = "token_type")
         public String tokenType;
-        @XmlAttribute(name="expires_in")
+        @XmlElement(name = "expires_in")
         public Long expiresIn;
     }
 
     static class ErrorResponse {
         public String error;
-        @XmlAttribute(name="error_description")
+        @XmlElement(name = "error_description")
         public String errorDescription;
     }
 
@@ -55,8 +55,6 @@ public class TokenService
     public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertion, @FormParam("scope") String scope)
             throws MalformedURLException, UnsupportedEncodingException
     {
-        System.out.println("Processing a token request");
-
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
 
@@ -106,7 +104,7 @@ public class TokenService
                 tokenResponse.expiresIn = new Long(3600);
                 return Response.ok(tokenResponse).build();
 
-            } catch (JWTDecodeException exception) {
+            } catch (JWTVerificationException exception) {
                 errorResponse.errorDescription = "Unable to validate JWT";
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             }
