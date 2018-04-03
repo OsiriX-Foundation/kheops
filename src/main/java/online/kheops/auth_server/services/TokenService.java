@@ -11,10 +11,20 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+import com.auth0.jwk.JwkException;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import online.kheops.auth_server.Series;
+import com.auth0.jwt.interfaces.RSAKeyProvider;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 
 @Path("/")
 public class TokenService
@@ -38,15 +48,46 @@ public class TokenService
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertion, @FormParam("scope") String scope) {
+    public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertion, @FormParam("scope") String scope)
+            throws MalformedURLException
+    {
         System.out.println("Processing a token request");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.error = "invalid_grant";
+
+        // FIXME: we should be gettig the jwks_uri from https://accounts.google.com/.well-known/openid-configuration
+        JwkProvider jwkProvider = new UrlJwkProvider(new URL("https://www.googleapis.com/oauth2/v3/certs"));
+
         if (grant_type.equals("urn:ietf:params:oauth:grant-type:jwt-bearer")) {
+
             try {
-                DecodedJWT jwt = JWT.decode(assertion);
+                RSAKeyProvider keyProvider = new RSAKeyProvider() {
+                    @Override
+                    public RSAPublicKey getPublicKeyById(String kid) {
+                        try {
+                            return (RSAPublicKey) jwkProvider.get(kid).getPublicKey();
+                        } catch (JwkException exception) {
+                            System.err.println(exception);
+                            return null;
+                        }
+                    }
+                    // implemented to get rid of warnings
+                    @Override public RSAPrivateKey getPrivateKey() {return null;}
+                    @Override public String getPrivateKeyId() {return null;}
+                };
+
+                Algorithm algorithm = Algorithm.RSA256(keyProvider);
+                JWTVerifier verifier = JWT.require(algorithm)
+                        .withAudience("795653095144-nhfclj7mrb1h9n6tmdq2ugtj7ohkl3jq.apps.googleusercontent.com")
+                        .withIssuer("accounts.google.com")
+                        .build();
+                DecodedJWT jwt = verifier.verify(assertion);
+
                 String subject = jwt.getSubject();
                 System.out.println("token from: " + subject);
-            } catch (JWTDecodeException exception){
-                //Invalid token
+            } catch (JWTDecodeException exception) {
+                System.out.println("JWTDecodeException");
             }
 
             TokenResponse tokenResponse = new TokenResponse();
@@ -57,10 +98,7 @@ public class TokenService
             return Response.ok(tokenResponse).build();
         }
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.error = "invalid_grant";
         errorResponse.errorDescription = "Unknown grant type";
-
         return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
     }
 
