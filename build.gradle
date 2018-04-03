@@ -30,6 +30,11 @@ dependencies {
 
     compile 'org.hibernate:hibernate-core:5.2.16.Final'
     // and annotations?
+
+    compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
+    compile 'com.auth0:jwks-rsa:0.3.0'
+
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
 }
 
 gretty {
