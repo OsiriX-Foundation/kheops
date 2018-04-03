@@ -8,15 +8,12 @@ import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import online.kheops.auth_server.Actor;
 import online.kheops.auth_server.Series;
 
 @Path("/")
@@ -32,15 +29,9 @@ public class TokenService
     }
 
     static class ErrorResponse {
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
-
-        private String error;
+        public String error;
+        @XmlAttribute(name="error_description")
+        public String errorDescription;
     }
 
     @POST
@@ -67,7 +58,8 @@ public class TokenService
         }
 
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError("invalid_grant");
+        errorResponse.error = "invalid_grant";
+        errorResponse.errorDescription = "Unknown grant type";
 
         return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
     }

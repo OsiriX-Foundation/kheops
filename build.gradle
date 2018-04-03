@@ -32,7 +32,7 @@ dependencies {
     // and annotations?
 
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
-    compile 'com.auth0:jwks-rsa:0.3.0'
+    compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
 
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
 }
