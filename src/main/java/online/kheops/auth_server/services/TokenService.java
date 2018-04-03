@@ -21,10 +21,14 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 @Path("/")
 public class TokenService
@@ -49,14 +53,14 @@ public class TokenService
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertion, @FormParam("scope") String scope)
-            throws MalformedURLException
+            throws MalformedURLException, UnsupportedEncodingException
     {
         System.out.println("Processing a token request");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
 
-        // FIXME: we should be gettig the jwks_uri from https://accounts.google.com/.well-known/openid-configuration
+        // FIXME: we should be getting the jwks_uri from https://accounts.google.com/.well-known/openid-configuration
         JwkProvider jwkProvider = new UrlJwkProvider(new URL("https://www.googleapis.com/oauth2/v3/certs"));
 
         if (grant_type.equals("urn:ietf:params:oauth:grant-type:jwt-bearer")) {
@@ -77,25 +81,35 @@ public class TokenService
                     @Override public String getPrivateKeyId() {return null;}
                 };
 
-                Algorithm algorithm = Algorithm.RSA256(keyProvider);
-                JWTVerifier verifier = JWT.require(algorithm)
+                Algorithm algorithmRSA = Algorithm.RSA256(keyProvider);
+                JWTVerifier verifier = JWT.require(algorithmRSA)
                         .withAudience("795653095144-nhfclj7mrb1h9n6tmdq2ugtj7ohkl3jq.apps.googleusercontent.com")
                         .withIssuer("accounts.google.com")
                         .build();
                 DecodedJWT jwt = verifier.verify(assertion);
 
-                String subject = jwt.getSubject();
-                System.out.println("token from: " + subject);
+                // try to generate a new token
+
+                String HMAC256Secret = "P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==";
+                Algorithm algorithmHMAC = Algorithm.HMAC256(HMAC256Secret);
+                String token = JWT.create()
+                        .withIssuer("auth.kheops.online")
+                        .withSubject(jwt.getSubject())
+                        .withAudience("dicom.kheops.online")
+                        .withExpiresAt(Date.from(Instant.now().plus( 1 , ChronoUnit.HOURS )))
+                        .withNotBefore(new Date())
+                        .sign(algorithmHMAC);
+
+                TokenResponse tokenResponse = new TokenResponse();
+                tokenResponse.accessToken = token;
+                tokenResponse.tokenType = "Bearer";
+                tokenResponse.expiresIn = new Long(3600);
+                return Response.ok(tokenResponse).build();
+
             } catch (JWTDecodeException exception) {
-                System.out.println("JWTDecodeException");
+                errorResponse.errorDescription = "Unable to validate JWT";
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             }
-
-            TokenResponse tokenResponse = new TokenResponse();
-            tokenResponse.accessToken = "eyJhbGciOiJIUzI1NiIsImtpZCI6IjEifQ.eyJzdWIiOiIxMDQzOTE0ODIzNDkxNzE4Mzc1NzYifQ.zkqemWjCKVUqoRpPtoxUrocAw8uo63Q49";
-            tokenResponse.tokenType = "Bearer";
-            tokenResponse.expiresIn = new Long(3600);
-
-            return Response.ok(tokenResponse).build();
         }
 
         errorResponse.errorDescription = "Unknown grant type";
