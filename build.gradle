@@ -21,20 +21,19 @@ repositories {
 }
 
 dependencies {
-    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.26'
-    compile 'org.glassfish.jersey.inject:jersey-hk2:2.26'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.26'
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
 
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
 
     compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
-
-    compile 'org.hibernate:hibernate-core:5.2.16.Final'
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.16.Final'
     // and annotations?
 
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
     compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
 
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
 }
 
 gretty {
@@ -42,4 +41,5 @@ gretty {
 
     httpPort = 7575
     contextPath = ''
+    servletContainer = 'tomcat8'
 }
