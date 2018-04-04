@@ -1,10 +1,7 @@
 package online.kheops.auth_server.services;
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -16,10 +13,10 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import online.kheops.auth_server.User;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -29,6 +26,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 @Path("/")
 public class TokenService
@@ -85,6 +83,34 @@ public class TokenService
                         .withIssuer("accounts.google.com")
                         .build();
                 DecodedJWT jwt = verifier.verify(assertion);
+
+                // test to see if the user already exists,
+                // add the user if the user does not exist
+
+                EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+                EntityManager em = factory.createEntityManager();
+                EntityTransaction tx = em.getTransaction();
+
+                tx.begin();
+
+                User user = null;
+                try {
+                    TypedQuery<User> query = em.createQuery("select u from User u where u.username = :username", User.class);
+                    user = query.setParameter("username", jwt.getSubject()).getSingleResult();
+                } catch (Exception e) {
+                    System.out.println("User not found");
+                    System.out.println(e);
+                }
+
+                if (user == null) {
+                    System.out.println("Creating a new User");
+                    user = new User(jwt.getSubject());
+                    em.persist(user);
+                }
+
+                tx.commit();
+                em.close();
+                factory.close();
 
                 // try to generate a new token
 

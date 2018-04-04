@@ -2,6 +2,8 @@ package online.kheops.auth_server;
 
 import javax.persistence.*;
 
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -10,6 +12,12 @@ public class User {
 
     @Basic(optional = false)
     private String username;
+
+    public User() {}
+
+    public User(String username) {
+        this.username = username;
+    }
 
     public long getPk() {
         return pk;

@@ -48,11 +48,6 @@ public class Series {
     public Series(String newStudyInstanceUID, String newSeriesInstanceUID) {
         studyInstanceUID = newStudyInstanceUID;
         seriesInstanceUID = newSeriesInstanceUID;
-
-//        Date now = new Date();
-//        createdTime = now;
-//        updatedTime = now;
-
     }
 
     @Override
