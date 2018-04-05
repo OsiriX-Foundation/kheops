@@ -6,7 +6,6 @@ import java.util.Date;
 @Entity
 @Table(name = "series")
 public class Series {
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")
@@ -33,20 +32,9 @@ public class Series {
     @Column(name = "series_size")
     private long size = -1L;
 
-    @Basic(optional = false) // this might need to be populated
-    @Column(name = "study_uid", updatable = false)
-    private String studyInstanceUID;
+    public Series() {}
 
-// needed parameters
-    // if I'm not going to have a Study object (or I'm going to need a study object per user) I'm going to store the study related info in the series.
-
-    // StudyInstanceUID
-    // StudyID
-    // Study Date
-    //
-
-    public Series(String newStudyInstanceUID, String newSeriesInstanceUID) {
-        studyInstanceUID = newStudyInstanceUID;
+    public Series(String newSeriesInstanceUID) {
         seriesInstanceUID = newSeriesInstanceUID;
     }
 

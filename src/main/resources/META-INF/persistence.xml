@@ -5,6 +5,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>online.kheops.auth_server.User</class>
         <class>online.kheops.auth_server.Series</class>
+        <class>online.kheops.auth_server.Study</class>
         <class>online.kheops.auth_server.UserStudy</class>
         <properties>
             <property name="javax.persistence.jdbc.user" value="root"/>
