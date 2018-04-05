@@ -19,59 +19,33 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-        // Get the HTTP Authorization header from the request
-        String authorizationHeader =
-                requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-
-        // Check if the HTTP Authorization header is present and formatted correctly
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new NotAuthorizedException("Authorization header must be provided");
+            throw new NotAuthorizedException("Bearer authorization header must be provided");
         }
 
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
+        String username = "me";
+
         try {
-
-            // Validate the token
             validateToken(token);
-
         } catch (Exception e) {
-            requestContext.abortWith(
-                    Response.status(Response.Status.UNAUTHORIZED).build());
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
 
+        boolean isSecured = requestContext.getSecurityContext().isSecure();
         requestContext.setSecurityContext(new SecurityContext() {
-
             @Override
             public Principal getUserPrincipal() {
-
-                return new Principal() {
-
-                    @Override
-                    public String getName() {
-                        return "me";
-                    }
-                };
+                return () -> username;
             }
-
-            @Override
-            public boolean isUserInRole(String role) {
-                return true;
-            }
-
-            @Override
-            public boolean isSecure() {
-                return false;
-            }
-
-            @Override
-            public String getAuthenticationScheme() {
-                return "BEARER";
-            }
+            @Override public boolean isUserInRole(String role) { return true; }
+            @Override public boolean isSecure() { return isSecured; }
+            @Override public String getAuthenticationScheme() { return "BEARER"; }
         });
-
     }
 
     private void validateToken(String token) throws Exception {
