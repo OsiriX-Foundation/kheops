@@ -1,6 +1,9 @@
 package online.kheops.auth_server;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -12,6 +15,10 @@ public class User {
 
     @Basic(optional = false)
     private String username;
+
+    @OneToMany
+    @JoinColumn (name = "user_fk", nullable=false)
+    Set<UserStudy> userStudies = new HashSet<UserStudy>();
 
     public User() {}
 
@@ -29,5 +36,9 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Set<UserStudy> getUserStudies() {
+        return userStudies;
     }
 }

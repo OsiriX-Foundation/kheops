@@ -3,13 +3,15 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
     <persistence-unit name="online.kheops">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>online.kheops.auth_server.Series</class>
         <class>online.kheops.auth_server.User</class>
+        <class>online.kheops.auth_server.Series</class>
+        <class>online.kheops.auth_server.UserStudy</class>
         <properties>
             <property name="javax.persistence.jdbc.user" value="root"/>
             <property name="javax.persistence.jdbc.password" value="root"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/test"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/kheops?useUnicode=yes&amp;characterEncoding=UTF-8"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.show_sql" value="true"/>
