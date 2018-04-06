@@ -1,4 +1,4 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.annotation;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;

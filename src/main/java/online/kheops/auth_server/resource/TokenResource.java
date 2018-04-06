@@ -1,4 +1,4 @@
-package online.kheops.auth_server.services;
+package online.kheops.auth_server.resource;
 
 
 import javax.persistence.*;
@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.AssertionVerifier;
-import online.kheops.auth_server.User;
+import online.kheops.auth_server.entity.User;
 
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
@@ -18,7 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Path("/")
-public class TokenService
+public class TokenResource
 {
     static class TokenResponse {
         @XmlElement(name = "access_token")

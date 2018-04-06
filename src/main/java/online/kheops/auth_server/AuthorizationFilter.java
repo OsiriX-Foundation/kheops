@@ -1,5 +1,11 @@
 package online.kheops.auth_server;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.annotation.Secured;
+
 import javax.annotation.Priority;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
@@ -16,7 +22,6 @@ import java.security.Principal;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
-
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
@@ -28,28 +33,26 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
-        String username = "me";
-
+        final DecodedJWT jwt;
         try {
-            validateToken(token);
+            final String kheopsHMAC256Secret = "P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==";
+            final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(kheopsHMAC256Secret);
+            JWTVerifier verifier = JWT.require(kheopsAlgorithmHMAC)
+                    .withIssuer("authorization.kheops.online")
+                    .build();
+            jwt = verifier.verify(token);
         } catch (Exception e) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
         }
+        final String username = jwt.getSubject();
 
         boolean isSecured = requestContext.getSecurityContext().isSecure();
         requestContext.setSecurityContext(new SecurityContext() {
-            @Override
-            public Principal getUserPrincipal() {
-                return () -> username;
-            }
+            @Override public Principal getUserPrincipal() { return () -> username; }
             @Override public boolean isUserInRole(String role) { return true; }
             @Override public boolean isSecure() { return isSecured; }
             @Override public String getAuthenticationScheme() { return "BEARER"; }
         });
-    }
-
-    private void validateToken(String token) throws Exception {
-        // Check if it was issued by the server and if it's not expired
-        // Throw an Exception if the token is invalid
     }
 }

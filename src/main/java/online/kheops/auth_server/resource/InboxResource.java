@@ -1,4 +1,4 @@
-package online.kheops.auth_server.services;
+package online.kheops.auth_server.resource;
 
 
 import javax.persistence.*;
@@ -9,13 +9,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import online.kheops.auth_server.Secured;
-import online.kheops.auth_server.Series;
-import online.kheops.auth_server.User;
-import online.kheops.auth_server.UserStudy;
+import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.entity.UserStudy;
 
 @Path("/users")
-public class InboxService
+public class InboxResource
 {
     @PUT
     @Secured

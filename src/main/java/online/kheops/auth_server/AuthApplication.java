@@ -1,8 +1,6 @@
 package online.kheops.auth_server;
 
-
-import online.kheops.auth_server.services.InboxService;
-import online.kheops.auth_server.services.TokenService;
+import online.kheops.auth_server.resource.*;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -15,8 +13,8 @@ public class AuthApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         HashSet<Class<?>> set = new HashSet<Class<?>>();
-        set.add(InboxService.class);
-        set.add(TokenService.class);
+        set.add(InboxResource.class);
+        set.add(TokenResource.class);
         return super.getClasses();
     }
 }

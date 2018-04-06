@@ -1,4 +1,4 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
 import java.util.HashSet;
