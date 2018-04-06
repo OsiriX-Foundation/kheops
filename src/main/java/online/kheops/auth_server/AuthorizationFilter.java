@@ -5,8 +5,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.entity.User;
 
 import javax.annotation.Priority;
+import javax.persistence.*;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -46,6 +48,20 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             return;
         }
         final String username = jwt.getSubject();
+
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+            userQuery.setParameter("username", username).getSingleResult();
+        } catch (Exception exception) {
+            requestContext.abortWith(Response.status(403, "Unknown subject").build());
+        } finally {
+            em.close();
+            factory.close();
+        }
 
         boolean isSecured = requestContext.getSecurityContext().isSecure();
         requestContext.setSecurityContext(new SecurityContext() {

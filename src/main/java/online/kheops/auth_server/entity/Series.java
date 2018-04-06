@@ -32,6 +32,10 @@ public class Series {
     @Column(name = "series_size")
     private long size = -1L;
 
+    @ManyToOne
+    @JoinColumn(name = "study_fk")
+    private Study study;
+
     public Series() {}
 
     public Series(String newSeriesInstanceUID) {
@@ -91,5 +95,13 @@ public class Series {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
     }
 }
