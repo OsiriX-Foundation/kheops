@@ -10,7 +10,9 @@ CREATE TABLE users (
   username VARCHAR(255) NOT NULL,
 
   PRIMARY KEY (pk),
-  INDEX username_index (username)
+  INDEX username_index (username),
+
+  UNIQUE username_unique (username)
 );
 
 CREATE TABLE studies (
@@ -18,7 +20,9 @@ CREATE TABLE studies (
   study_uid VARCHAR(255) NOT NULL,
 
   PRIMARY KEY (pk),
-  INDEX study_uid_index (study_uid)
+  INDEX study_uid_index (study_uid),
+
+  UNIQUE study_uid_unique (study_uid)
 );
 
 CREATE TABLE user_studies (
@@ -35,7 +39,9 @@ CREATE TABLE user_studies (
     ON DELETE RESTRICT,
   FOREIGN KEY (study_fk)
     REFERENCES studies(pk)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+
+  UNIQUE user_fk_study_fk_unique (user_fk, study_fk)
 );
 
 CREATE TABLE series (
@@ -53,7 +59,9 @@ CREATE TABLE series (
 
   FOREIGN KEY (study_fk)
     REFERENCES studies(pk)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+
+  UNIQUE series_uid_unique (series_uid)
 );
 
 CREATE TABLE user_studies_series (
