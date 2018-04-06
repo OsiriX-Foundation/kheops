@@ -2,17 +2,18 @@ package online.kheops.auth_server.resource;
 
 
 import javax.persistence.*;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.UserStudy;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.Oid;
 
 @Path("/users")
 public class InboxResource
@@ -24,7 +25,7 @@ public class InboxResource
                              @PathParam("studyInstanceUID") String studyInstanceUID,
                              @Context SecurityContext securityContext) {
 
-        System.out.println(securityContext.getUserPrincipal());
+        System.out.println(securityContext.getUserPrincipal().getName());
 
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
         EntityManager em = factory.createEntityManager();
@@ -60,39 +61,75 @@ public class InboxResource
     }
 
     @PUT
+    @Secured
     @Path("/{user}/studies/{studyInstanceUID}/series/{seriesInstanceUID}")
-    public String putSeries(@PathParam("user") String user, @PathParam("studyInstanceUID") String studyInstanceUID, @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
-        EntityManager em = factory.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+    public Response putSeries(@PathParam("user") String username,
+                            @PathParam("studyInstanceUID") String studyInstanceUID,
+                            @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                            @Context SecurityContext securityContext) {
+        // validate the UIDs
+        try {
+            new Oid(studyInstanceUID);
+        } catch (GSSException exception) {
+            throw new BadRequestException("Invalidly formed studyInstanceUID");
+        }
+        try {
+            new Oid(seriesInstanceUID);
+        } catch (GSSException exception) {
+            throw new BadRequestException("Invalidly formed seriesInstanceUID");
+        }
 
-        tx.begin();
+        final String callerUsername = securityContext.getUserPrincipal().getName();
+        // is the user sharing a series, or requesting access to a new series
 
-        // find the user
+        if (callerUsername.equals(username)) { // the user is requesting access to a new series
+            EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+            EntityManager em = factory.createEntityManager();
+            EntityTransaction tx = em.getTransaction();
 
+            try {
+                tx.begin();
 
-        // if the user doesn't exist blow out
+                // find if the series already exists
+                try {
+                    TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :seriesInstanceUID", Series.class);
+                    query.setParameter("seriesInstanceUID", seriesInstanceUID).getSingleResult();
+                    throw new ForbiddenException("Series already known");
+                } catch (NoResultException ignored) {}
 
+                // find if the study already exists
+                Study study = null;
+                try {
+                    TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
+                    study = query.setParameter("studyInstanceUID", studyInstanceUID).getSingleResult();
+                } catch (NoResultException ignored) {}
 
-        Series series = new Series(seriesInstanceUID);
+                if (study == null) { // the study doesn't exist, we need to create it
+                    study = new Study();
+                    study.setStudyInstanceUID(studyInstanceUID);
+                    em.persist(study);
+                }
 
-        em.persist(series);
+                Series series = new Series(seriesInstanceUID);
+                study.getSeries().add(series);
 
-        tx.commit();
-        em.close();;
-        factory.close();
+                em.persist(study);
+                em.persist(series);
 
+                // find if the user has a userStudy for this study
+//                try {
+//                    TypedQuery<UserStudy> query = em.createQuery("select us from UserStudy us where us.study = :studyInstanceUID", Study.class);
+//                    study = query.setParameter("studyInstanceUID", studyInstanceUID).getSingleResult();
+//
+//
+                tx.commit();
+            } finally {
+                em.close();
+                factory.close();
+            }
 
-//        Series series = new Series(studyInstanceUID, seriesInstanceUID);
-//        Session session = HibernateUtil.getSessionFactory().openSession();
-//        session.beginTransaction();
-//        session.save(series);
-//        session.getTransaction().commit();
-//        session.close();
-        System.out.println("Done");
+        }
 
-        String output = "Hi from putSeries: " + seriesInstanceUID + " studyInstanceIUD: " + studyInstanceUID + " for user: " + user;
-        return output;
+        return Response.ok().build();
     }
-
 }

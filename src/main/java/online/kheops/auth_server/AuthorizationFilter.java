@@ -38,7 +38,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             final String kheopsHMAC256Secret = "P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==";
             final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(kheopsHMAC256Secret);
             JWTVerifier verifier = JWT.require(kheopsAlgorithmHMAC)
-                    .withIssuer("authorization.kheops.online")
+                    .withIssuer("auth.kheops.online")
                     .build();
             jwt = verifier.verify(token);
         } catch (Exception e) {

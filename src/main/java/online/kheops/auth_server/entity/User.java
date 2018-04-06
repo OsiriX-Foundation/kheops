@@ -17,7 +17,7 @@ public class User {
 
     @OneToMany
     @JoinColumn (name = "user_fk", nullable=false)
-    Set<UserStudy> userStudies = new HashSet<UserStudy>();
+    private Set<UserStudy> userStudies = new HashSet<UserStudy>();
 
     public User() {}
 
