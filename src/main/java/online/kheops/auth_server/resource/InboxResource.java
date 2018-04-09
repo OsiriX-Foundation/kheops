@@ -25,40 +25,86 @@ public class InboxResource
                              @PathParam("studyInstanceUID") String studyInstanceUID,
                              @Context SecurityContext securityContext) {
 
-        System.out.println(securityContext.getUserPrincipal().getName());
+        // this call can only be used to send.
+
+        // validate the UIDs
+        try {
+            new Oid(studyInstanceUID);
+        } catch (GSSException exception) {
+            return Response.status(400, "StudyInstanceUID is not a valid UID").build();
+        }
+
+        final String callingUsername = securityContext.getUserPrincipal().getName();
 
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
-        tx.begin();
+        TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+        User callingUser = userQuery.setParameter("username", callingUsername).getSingleResult();
 
-        User user = null;
+        if (callingUsername.equals(username)) {
+            return Response.status(400, "Can't send a study to yourself").build();
+        }
+
         try {
-            TypedQuery<User> query = em.createQuery("select u from User u where u.username = :username", User.class);
-            user = query.setParameter("username", username).getSingleResult();
-        } catch (Exception exception) {
-            System.out.println("User not found");
+            tx.begin();
+
+            final User targetUser;
+            try {
+                targetUser = userQuery.setParameter("username", username).getSingleResult();
+            } catch (Exception exception) {
+                return Response.status(404, "Unknown target user").build();
+            }
+
+            // does the Study even exist
+            final Study study;
+            try {
+                TypedQuery<Study> studyQuery = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
+                studyQuery.setParameter("studyInstanceUID", studyInstanceUID);
+                study = studyQuery.getSingleResult();
+            } catch (Exception exception) {
+                return Response.status(404, "No study with the given studyInstanceUID").build();
+            }
+
+            // find if a UserStudy
+            final UserStudy callingUserStudy;
+            try {
+                TypedQuery<UserStudy> userStudyQuery = em.createQuery("select userStudy from UserStudy userStudy where userStudy.study = :study and userStudy.user = :user", UserStudy.class);
+                userStudyQuery.setParameter("study", study);
+                userStudyQuery.setParameter("user", callingUser);
+                callingUserStudy = userStudyQuery.getSingleResult();
+            } catch (Exception exception) {
+                return Response.status(403, "The user does not have access to the study").build();
+            }
+
+            UserStudy targetUserStudy = null;
+            try {
+                TypedQuery<UserStudy> userStudyQuery = em.createQuery("select userStudy from UserStudy userStudy where userStudy.study = :study and userStudy.user = :user", UserStudy.class);
+                userStudyQuery.setParameter("study", study);
+                userStudyQuery.setParameter("user", targetUser);
+                targetUserStudy = userStudyQuery.getSingleResult();
+            } catch (NoResultException ignored) {
+            }
+
+            if (targetUserStudy == null) {
+                targetUserStudy = new UserStudy();
+                targetUserStudy.setStudy(study);
+                targetUser.getUserStudies().add(targetUserStudy);
+            }
+
+            targetUserStudy.getSeries().addAll(callingUserStudy.getSeries());
+            em.persist(targetUserStudy);
+
+            tx.commit();
+        } finally {
+            em.close();
+            factory.close();
         }
 
-        if (user == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-
-        UserStudy userStudy = new UserStudy();
-        user.getUserStudies().add(userStudy);
-
-        em.persist(user);
-        em.persist(userStudy);
-
-        tx.commit();
-        em.close();
-        factory.close();
-
-        String output = "Hi from putStudy: " + studyInstanceUID + " for user: " + user;
-        return Response.ok(output).build();
+        return Response.status(201).build();
     }
+
 
     @PUT
     @Secured
@@ -175,13 +221,12 @@ public class InboxResource
                 }
 
                 // find if a UserStudy
-                final UserStudy callingUserStudy;
                 try {
                     TypedQuery<UserStudy> userStudyQuery = em.createQuery("select userStudy from UserStudy userStudy where userStudy.study = :study and :series member of userStudy.series and userStudy.user = :user", UserStudy.class);
                     userStudyQuery.setParameter("study", study);
                     userStudyQuery.setParameter("user", callingUser);
                     userStudyQuery.setParameter("series", series);
-                    callingUserStudy = userStudyQuery.getSingleResult();
+                    userStudyQuery.getSingleResult();
                 } catch (Exception exception) {
                     return Response.status(403, "The user does not have access to the series").build();
                 }
