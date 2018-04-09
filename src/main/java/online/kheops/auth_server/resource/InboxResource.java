@@ -151,7 +151,7 @@ public class InboxResource
                 try {
                     targetUser = userQuery.setParameter("username", username).getSingleResult();
                 } catch (Exception exception) {
-                    return Response.status(400, "Unknown target user").build();
+                    return Response.status(404, "Unknown target user").build();
                 }
 
                 // does the Study even exist
@@ -161,7 +161,7 @@ public class InboxResource
                     studyQuery.setParameter("studyInstanceUID", studyInstanceUID);
                     study = studyQuery.getSingleResult();
                 } catch (Exception exception) {
-                    return Response.status(400, "No study with the given studyInstanceUID").build();
+                    return Response.status(404, "No study with the given studyInstanceUID").build();
                 }
 
                 final Series series;
@@ -171,7 +171,7 @@ public class InboxResource
                     seriesQuery.setParameter("study", study);
                     series = seriesQuery.getSingleResult();
                 } catch (Exception exception) {
-                    return Response.status(400, "Unknown series").build();
+                    return Response.status(404, "Unknown series").build();
                 }
 
                 // find if a UserStudy
@@ -183,7 +183,7 @@ public class InboxResource
                     userStudyQuery.setParameter("series", series);
                     callingUserStudy = userStudyQuery.getSingleResult();
                 } catch (Exception exception) {
-                    return Response.status(400, "The user does not have access to the series").build();
+                    return Response.status(403, "The user does not have access to the series").build();
                 }
 
                 UserStudy targetUserStudy = null;

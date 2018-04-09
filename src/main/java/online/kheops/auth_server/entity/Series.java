@@ -33,7 +33,7 @@ public class Series {
     private long size = -1L;
 
     @ManyToOne
-    @JoinColumn(name = "study_fk")
+    @JoinColumn(name = "study_fk", insertable=false, updatable=false)
     private Study study;
 
     public Series() {}

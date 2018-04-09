@@ -54,6 +54,7 @@ public class TokenResource
             tx.begin();
 
             User user = null;
+            boolean newUser = false;
             try {
                 TypedQuery<User> query = em.createQuery("select u from User u where u.username = :username", User.class);
                 user = query.setParameter("username", assertionVerifier.getUsername()).getSingleResult();
@@ -63,6 +64,7 @@ public class TokenResource
             }
 
             if (user == null) {
+                newUser = true;
                 System.out.println("Creating a new User");
                 user = new User(assertionVerifier.getUsername());
                 em.persist(user);
@@ -89,7 +91,11 @@ public class TokenResource
             tokenResponse.accessToken = token;
             tokenResponse.tokenType = "Bearer";
             tokenResponse.expiresIn = new Long(3600);
-            return Response.ok(tokenResponse).build();
+            if (newUser) {
+                return Response.status(201).build();
+            } else {
+                return Response.ok(tokenResponse).build();
+            }
         } else {
             errorResponse.errorDescription = assertionVerifier.getErrorDescription();
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
