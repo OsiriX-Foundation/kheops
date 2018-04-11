@@ -22,17 +22,17 @@ public class TokenResource
 {
     static class TokenResponse {
         @XmlElement(name = "access_token")
-        public String accessToken;
+        String accessToken;
         @XmlElement(name = "token_type")
-        public String tokenType;
+        String tokenType;
         @XmlElement(name = "expires_in")
-        public Long expiresIn;
+        Long expiresIn;
     }
 
     static class ErrorResponse {
-        public String error;
+        String error;
         @XmlElement(name = "error_description")
-        public String errorDescription;
+        String errorDescription;
     }
 
     @POST
@@ -49,30 +49,31 @@ public class TokenResource
         if (assertionVerifier.isVerfified()) {
             EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
             EntityManager em = factory.createEntityManager();
-            EntityTransaction tx = em.getTransaction();
 
-            tx.begin();
-
-            User user = null;
             boolean newUser = false;
             try {
-                TypedQuery<User> query = em.createQuery("select u from User u where u.username = :username", User.class);
-                user = query.setParameter("username", assertionVerifier.getUsername()).getSingleResult();
-            } catch (Exception e) {
-                System.out.println("User not found");
-                System.out.println(e);
-            }
+                EntityTransaction tx = em.getTransaction();
+                tx.begin();
 
-            if (user == null) {
-                newUser = true;
-                System.out.println("Creating a new User");
-                user = new User(assertionVerifier.getUsername());
-                em.persist(user);
-            }
+                User user = null;
+                try {
+                    TypedQuery<User> query = em.createQuery("select u from User u where u.username = :username", User.class);
+                    user = query.setParameter("username", assertionVerifier.getUsername()).getSingleResult();
+                } catch (Exception e) {
+                    System.out.println("User not found");
+                }
 
-            tx.commit();
-            em.close();
-            factory.close();
+                if (user == null) {
+                    newUser = true;
+                    System.out.println("Creating a new User");
+                    user = new User(assertionVerifier.getUsername());
+                    em.persist(user);
+                }
+                tx.commit();
+            } finally {
+                em.close();
+                factory.close();
+            }
 
             // try to generate a new token
 
@@ -90,7 +91,7 @@ public class TokenResource
             TokenResponse tokenResponse = new TokenResponse();
             tokenResponse.accessToken = token;
             tokenResponse.tokenType = "Bearer";
-            tokenResponse.expiresIn = new Long(3600);
+            tokenResponse.expiresIn = 3600L;
             if (newUser) {
                 return Response.status(201).build();
             } else {
