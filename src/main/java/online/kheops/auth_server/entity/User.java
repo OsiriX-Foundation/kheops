@@ -17,9 +17,11 @@ public class User {
     @Basic(optional = false)
     private String username;
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
-    private Set<UserStudy> userStudies = new HashSet<UserStudy>();
+    @ManyToMany
+    @JoinTable (name = "user_series",
+            joinColumns = @JoinColumn(name = "user_fk"),
+            inverseJoinColumns = @JoinColumn(name = "series_fk"))
+    private Set<Series> series = new HashSet<Series>();
 
     public User() {}
 
@@ -39,7 +41,7 @@ public class User {
         this.username = username;
     }
 
-    public Set<UserStudy> getUserStudies() {
-        return userStudies;
+    public Set<Series> getSeries() {
+        return series;
     }
 }

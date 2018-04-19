@@ -2,6 +2,8 @@ package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "series")
@@ -35,6 +37,9 @@ public class Series {
     @ManyToOne
     @JoinColumn(name = "study_fk", insertable=false, updatable=false)
     private Study study;
+
+    @ManyToMany(mappedBy = "series")
+    private Set<User> users = new HashSet<>();
 
     public Series() {}
 
@@ -107,5 +112,9 @@ public class Series {
 
     public void setStudy(Study study) {
         this.study = study;
+    }
+
+    public Set<User> getUsers() {
+        return users;
     }
 }

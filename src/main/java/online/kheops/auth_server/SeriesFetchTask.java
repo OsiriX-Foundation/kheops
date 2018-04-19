@@ -39,7 +39,7 @@ public class SeriesFetchTask implements Runnable {
 
                     List<SeriesDTO> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<SeriesDTO>>() {});
 
-                    if (seriesList.size() > 0) {
+                    if (seriesList != null && seriesList.size() > 0) {
                         series.setModality(seriesList.get(0).getModality());
                         em.persist(series);
                     }
