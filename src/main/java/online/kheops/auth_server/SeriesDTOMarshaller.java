@@ -19,7 +19,7 @@ import java.util.List;
 
 @Provider
 @Consumes("application/dicom+json")
-public class SeriesJSONUnmarshaller implements MessageBodyReader<List<SeriesDTO>> {
+public class SeriesDTOMarshaller implements MessageBodyReader<List<SeriesDTO>> {
 
     @Override
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {

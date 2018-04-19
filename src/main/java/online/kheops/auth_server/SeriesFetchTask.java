@@ -32,12 +32,17 @@ public class SeriesFetchTask implements Runnable {
             for (Series series: unpopulatedSeries) {
                 // TODO acquire a token to access the server
                 Client client = ClientBuilder.newClient();
-                client.register(SeriesJSONUnmarshaller.class);
+                client.register(SeriesDTOMarshaller.class);
 
                 URI uri = uriBuilder.build(series.getStudy().getStudyInstanceUID(), series.getSeriesInstanceUID());
                 try {
 
                     List<SeriesDTO> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<SeriesDTO>>() {});
+
+                    if (seriesList.size() > 0) {
+                        series.setModality(seriesList.get(0).getModality());
+                        em.persist(series);
+                    }
 
                     System.out.println("seriesUID: " + series.getSeriesInstanceUID() + " studyUID: " + series.getStudy().getStudyInstanceUID());
                 } catch (Exception exception) {

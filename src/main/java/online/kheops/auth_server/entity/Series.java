@@ -85,6 +85,10 @@ public class Series {
         return modality;
     }
 
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
+
     public void resetSize() {
         this.size = -1L;
     }
