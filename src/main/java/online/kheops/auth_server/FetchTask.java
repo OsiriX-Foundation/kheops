@@ -45,6 +45,7 @@ public class FetchTask implements Runnable {
         System.out.println("fetching series");
 
         fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
+        fetchUnpopulatedStudies(unpopulatedStudyUIDs());
     }
 
     private List<UIDPair> unpopulatedSeriesUIDs() {
@@ -132,20 +133,45 @@ public class FetchTask implements Runnable {
         }
     }
 
-    private void fetchUnpopulatedStudies(List<String> UnpopulatedStudyUIDs) {
+    private void fetchUnpopulatedStudies(List<String> unpopulatedStudyUIDs) {
+        UriBuilder uriBuilder = UriBuilder.fromUri("http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies?StudyInstanceUID={StudyInstanceUID}");
+
+        Client client = ClientBuilder.newClient();
+        client.register(StudyDTOListMarshaller.class);
+
+        for (String studyInstanceUID: unpopulatedStudyUIDs) {
+            URI uri = uriBuilder.build(studyInstanceUID);
+
+            try {
+                List<StudyDTO> studyList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<StudyDTO>>() {});
+                if (studyList == null || studyList.size() < 1) {
+                    continue;
+                }
+                StudyDTO studyDTO = studyList.get(0);
+
+                EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+                EntityManager em = factory.createEntityManager();
+                try {
+                    EntityTransaction tx = em.getTransaction();
+                    tx.begin();
+
+                    TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
+                    query.setParameter("studyInstanceUID", studyInstanceUID);
+                    query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+
+                    Study study = query.getSingleResult();
+                    study.mergeStudyDTO(studyDTO);
+
+                    tx.commit();
+                } finally {
+                    em.close();
+                    factory.close();
+                }
+            } catch (Throwable t) {
+                System.out.println(t.getLocalizedMessage());
+            }
+        }
 
     }
 
-    private void fetchSeries(Series series) {
-
-    }
-
-    private void fetchUninitializedStudies() {
-
-    }
-
-
-    private void fetchStudy(Study study) {
-
-    }
 }

@@ -3,9 +3,11 @@ package online.kheops.auth_server.resource;
 import javax.persistence.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import online.kheops.auth_server.StudyDTO;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
@@ -13,6 +15,7 @@ import online.kheops.auth_server.entity.User;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("/users")
@@ -204,10 +207,11 @@ public class InboxResource
     @Secured
     @Path("/{user}/studies")
     @Produces("application/dicom+json")
-    public Response getSstudies(@PathParam("user") String username,
+    public Response getStudies(@PathParam("user") String username,
                                 @Context SecurityContext securityContext) {
 
         // for now don't use any parameters
+        List<StudyDTO> studyDTOs = new ArrayList<>();
 
         // get a list of all the studies
         final String callingUsername = securityContext.getUserPrincipal().getName();
@@ -221,19 +225,28 @@ public class InboxResource
             tx.begin();
 
             TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
-            userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            userQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
             User callingUser = userQuery.setParameter("username", callingUsername).getSingleResult();
 
-            TypedQuery<Study> studyQuery = em.createQuery("select distinct s.study from Series s where :callingUser member of s.users", Study.class);
+            TypedQuery<Study> studyQuery = em.createQuery("select distinct s.study from Series s where :callingUser member of s.users and s.populated = true ", Study.class);
             studyQuery.setParameter("callingUser", callingUser);
-            studyQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            studyQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
 
             List<Study> userStudies = studyQuery.getResultList();
 
-            if (userStudies != null && userStudies.size() > 0) {
-                System.out.println(userStudies);
-            }
+            for (Study study: userStudies) {
+                TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where :callingUser member of s.users and :study = s.study and s.populated = true", Series.class);
+                seriesQuery.setParameter("callingUser", callingUser);
+                seriesQuery.setParameter("study", study);
+                seriesQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
+                List<Series> seriesList = seriesQuery.getResultList();
 
+                StudyDTO studyDTO = study.createStudyDTO();
+                for (Series series: seriesList) {
+                    studyDTO.getSeries().add(series.createSeriesDTO());
+                }
+                studyDTOs.add(studyDTO);
+            }
 
             tx.commit();
         } finally {
@@ -241,7 +254,8 @@ public class InboxResource
             factory.close();
         }
 
-        return Response.status(201).build();
+        GenericEntity<List<StudyDTO>> genericStudyDTOs = new GenericEntity<List<StudyDTO>>(studyDTOs) {};
+        return Response.ok(genericStudyDTOs).build();
     }
 
 }

@@ -31,6 +31,12 @@ public class Study {
         setPopulated(true);
     }
 
+    public StudyDTO createStudyDTO() {
+        StudyDTO studyDTO = new StudyDTO();
+
+        return studyDTO;
+    }
+
     public long getPk() {
         return pk;
     }

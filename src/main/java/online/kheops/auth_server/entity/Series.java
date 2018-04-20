@@ -81,6 +81,14 @@ public class Series {
         setPopulated(true);
     }
 
+    public SeriesDTO createSeriesDTO() {
+        SeriesDTO seriesDTO = new SeriesDTO();
+
+        seriesDTO.setModality(getModality());
+
+        return seriesDTO;
+    }
+
     public long getPk() {
         return pk;
     }
