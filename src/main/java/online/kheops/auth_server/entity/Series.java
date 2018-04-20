@@ -1,5 +1,7 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.SeriesDTO;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
@@ -33,6 +35,10 @@ public class Series {
     @Basic(optional = false)
     @Column(name = "series_size")
     private long size = -1L;
+
+    @Basic(optional = false)
+    @Column(name = "populated")
+    private boolean populated = false;
 
     @ManyToOne
     @JoinColumn(name = "study_fk", insertable=false, updatable=false)
@@ -68,6 +74,11 @@ public class Series {
     @PreUpdate
     public void onPreUpdate() {
         updatedTime = new Date();
+    }
+
+    public void mergeSeriesDTO(SeriesDTO seriesDTO) {
+        setModality(seriesDTO.getModality());
+        setPopulated(true);
     }
 
     public long getPk() {
@@ -112,6 +123,14 @@ public class Series {
 
     public void setStudy(Study study) {
         this.study = study;
+    }
+
+    public boolean isPopulated() {
+        return populated;
+    }
+
+    public void setPopulated(boolean populated) {
+        this.populated = populated;
     }
 
     public Set<User> getUsers() {

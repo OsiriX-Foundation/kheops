@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-
 import javax.persistence.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -96,9 +95,9 @@ public class InboxResource
     @Secured
     @Path("/{user}/studies/{studyInstanceUID}/series/{seriesInstanceUID}")
     public Response putSeries(@PathParam("user") String username,
-                            @PathParam("studyInstanceUID") String studyInstanceUID,
-                            @PathParam("seriesInstanceUID") String seriesInstanceUID,
-                            @Context SecurityContext securityContext) {
+                             @PathParam("studyInstanceUID") String studyInstanceUID,
+                             @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                             @Context SecurityContext securityContext) {
         // validate the UIDs
         try {
             new Oid(studyInstanceUID);
@@ -183,6 +182,10 @@ public class InboxResource
                     return Response.status(404, "Unknown series").build();
                 }
 
+                if (series.getUsers().contains(targetUser)) {
+                    return Response.status(200, "User already has access to the series").build();
+                }
+
                 series.getUsers().add(targetUser);
                 em.persist(series);
                 em.persist(targetUser);
@@ -196,4 +199,49 @@ public class InboxResource
 
         return Response.status(201).build();
     }
+
+    @GET
+    @Secured
+    @Path("/{user}/studies")
+    @Produces("application/dicom+json")
+    public Response getSstudies(@PathParam("user") String username,
+                                @Context SecurityContext securityContext) {
+
+        // for now don't use any parameters
+
+        // get a list of all the studies
+        final String callingUsername = securityContext.getUserPrincipal().getName();
+        // is the user sharing a series, or requesting access to a new series
+
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+            userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            User callingUser = userQuery.setParameter("username", callingUsername).getSingleResult();
+
+            TypedQuery<Study> studyQuery = em.createQuery("select distinct s.study from Series s where :callingUser member of s.users", Study.class);
+            studyQuery.setParameter("callingUser", callingUser);
+            studyQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+
+            List<Study> userStudies = studyQuery.getResultList();
+
+            if (userStudies != null && userStudies.size() > 0) {
+                System.out.println(userStudies);
+            }
+
+
+            tx.commit();
+        } finally {
+            em.close();
+            factory.close();
+        }
+
+        return Response.status(201).build();
+    }
+
 }

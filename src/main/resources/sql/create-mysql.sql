@@ -17,9 +17,11 @@ CREATE TABLE users (
 CREATE TABLE studies (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   study_uid VARCHAR(255) NOT NULL,
+  populated BOOLEAN,
 
   PRIMARY KEY (pk),
   INDEX study_uid_index (study_uid),
+  INDEX populated_index (populated),
 
   UNIQUE study_uid_unique (study_uid)
 );
@@ -32,10 +34,12 @@ CREATE TABLE series (
   series_uid VARCHAR(255) NOT NULL,
   series_size BIGINT NOT NULL,
   study_fk BIGINT NOT NULL,
+  populated BOOLEAN,
 
   PRIMARY KEY (pk),
   INDEX series_uid_index (series_uid),
   INDEX study_fk_index (study_fk),
+  INDEX populated_index (populated),
 
   FOREIGN KEY (study_fk)
     REFERENCES studies(pk)

@@ -1,6 +1,14 @@
 package online.kheops.auth_server;
 
+import online.kheops.auth_server.entity.Series;
+
 public class SeriesDTO {
+
+    public SeriesDTO() {}
+
+    public SeriesDTO(Series series) {
+        this.modality = series.getModality();
+    }
 
     private String modality;
 
