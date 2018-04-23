@@ -55,6 +55,14 @@ public class StudyDTOListMarshaller implements MessageBodyReader<List<StudyDTO>>
             jsonReader.readDatasets((fmi, dataset) -> {
                 StudyDTO studyDTO = new StudyDTO();
 
+                studyDTO.setStudyDate(dataset.getString(Tag.StudyDate, ""));
+                studyDTO.setStudyTime(dataset.getString(Tag.StudyTime, ""));
+                studyDTO.setAccessionNumber(dataset.getString(Tag.AccessionNumber, ""));
+                studyDTO.setReferringPhysicianName(dataset.getString(Tag.ReferringPhysicianName, ""));
+                studyDTO.setPatientName(dataset.getString(Tag.PatientName, ""));
+                studyDTO.setPatientID(dataset.getString(Tag.PatientID, ""));
+                studyDTO.setStudyID(dataset.getString(Tag.StudyID, ""));
+
                 list.add(studyDTO);
             });
         } catch (Throwable t) {
@@ -86,7 +94,15 @@ public class StudyDTOListMarshaller implements MessageBodyReader<List<StudyDTO>>
 
         for (StudyDTO studyDTO: studyDTOList) {
             Attributes attributes = new Attributes();
+            attributes.setString(Tag.StudyDate, VR.DA, studyDTO.getStudyDate());
+            attributes.setString(Tag.StudyTime, VR.TM, studyDTO.getStudyTime());
+            attributes.setString(Tag.AccessionNumber, VR.SH, studyDTO.getAccessionNumber());
             attributes.setString(Tag.ModalitiesInStudy, VR.CS, StringUtils.concat(studyDTO.getModalities(), '\\'));
+            attributes.setString(Tag.ReferringPhysicianName, VR.PN, studyDTO.getReferringPhysicianName());
+            attributes.setString(Tag.PatientName, VR.PN, studyDTO.getPatientName());
+            attributes.setString(Tag.PatientID, VR.LO, studyDTO.getPatientID());
+            attributes.setString(Tag.StudyInstanceUID, VR.UI, studyDTO.getStudyInstanceUID());
+            attributes.setString(Tag.StudyID, VR.SH, studyDTO.getStudyID());
 
             jsonWriter.write(attributes);
         }

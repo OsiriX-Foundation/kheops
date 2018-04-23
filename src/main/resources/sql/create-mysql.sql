@@ -17,10 +17,24 @@ CREATE TABLE users (
 CREATE TABLE studies (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   study_uid VARCHAR(255) NOT NULL,
+  study_date VARCHAR(255),
+  study_time VARCHAR(255),
+  accession_number VARCHAR(255),
+  referring_physician_name VARCHAR(4095),
+  patient_name VARCHAR(4095),
+  patient_id VARCHAR(255),
+  study_id VARCHAR(255),
+
   populated BOOLEAN,
 
   PRIMARY KEY (pk),
   INDEX study_uid_index (study_uid),
+  INDEX study_date_index (study_date),
+  INDEX study_time_index (study_time),
+  INDEX accession_number_index (accession_number),
+  INDEX patient_id_index (patient_id),
+  INDEX study_id_index (study_id),
+
   INDEX populated_index (populated),
 
   UNIQUE study_uid_unique (study_uid)
