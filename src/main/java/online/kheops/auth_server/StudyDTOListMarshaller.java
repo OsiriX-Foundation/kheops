@@ -55,13 +55,16 @@ public class StudyDTOListMarshaller implements MessageBodyReader<List<StudyDTO>>
             jsonReader.readDatasets((fmi, dataset) -> {
                 StudyDTO studyDTO = new StudyDTO();
 
-                studyDTO.setStudyDate(dataset.getString(Tag.StudyDate, ""));
-                studyDTO.setStudyTime(dataset.getString(Tag.StudyTime, ""));
-                studyDTO.setAccessionNumber(dataset.getString(Tag.AccessionNumber, ""));
-                studyDTO.setReferringPhysicianName(dataset.getString(Tag.ReferringPhysicianName, ""));
-                studyDTO.setPatientName(dataset.getString(Tag.PatientName, ""));
-                studyDTO.setPatientID(dataset.getString(Tag.PatientID, ""));
-                studyDTO.setStudyID(dataset.getString(Tag.StudyID, ""));
+                studyDTO.setStudyDate(dataset.getString(Tag.StudyDate));
+                studyDTO.setStudyTime(dataset.getString(Tag.StudyTime));
+                studyDTO.setTimezoneOffsetFromUTC(dataset.getString(Tag.TimezoneOffsetFromUTC));
+                studyDTO.setAccessionNumber(dataset.getString(Tag.AccessionNumber));
+                studyDTO.setReferringPhysicianName(dataset.getString(Tag.ReferringPhysicianName));
+                studyDTO.setPatientName(dataset.getString(Tag.PatientName));
+                studyDTO.setPatientID(dataset.getString(Tag.PatientID));
+                studyDTO.setPatientBirthDate(dataset.getString(Tag.PatientBirthDate));
+                studyDTO.setPatientSex(dataset.getString(Tag.PatientSex));
+                studyDTO.setStudyID(dataset.getString(Tag.StudyID));
 
                 list.add(studyDTO);
             });
@@ -94,21 +97,33 @@ public class StudyDTOListMarshaller implements MessageBodyReader<List<StudyDTO>>
 
         for (StudyDTO studyDTO: studyDTOList) {
             Attributes attributes = new Attributes();
-            attributes.setString(Tag.StudyDate, VR.DA, studyDTO.getStudyDate());
-            attributes.setString(Tag.StudyTime, VR.TM, studyDTO.getStudyTime());
-            attributes.setString(Tag.AccessionNumber, VR.SH, studyDTO.getAccessionNumber());
-            attributes.setString(Tag.ModalitiesInStudy, VR.CS, StringUtils.concat(studyDTO.getModalities(), '\\'));
-            attributes.setString(Tag.ReferringPhysicianName, VR.PN, studyDTO.getReferringPhysicianName());
-            attributes.setString(Tag.PatientName, VR.PN, studyDTO.getPatientName());
-            attributes.setString(Tag.PatientID, VR.LO, studyDTO.getPatientID());
-            attributes.setString(Tag.StudyInstanceUID, VR.UI, studyDTO.getStudyInstanceUID());
-            attributes.setString(Tag.StudyID, VR.SH, studyDTO.getStudyID());
+            safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, studyDTO.getStudyDate());
+            safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, studyDTO.getStudyTime());
+            safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, studyDTO.getTimezoneOffsetFromUTC());
+            safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, studyDTO.getAccessionNumber());
+            safeAttributeSetString(attributes, Tag.ModalitiesInStudy, VR.CS, StringUtils.concat(studyDTO.getModalities(), '\\'));
+            safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, studyDTO.getReferringPhysicianName());
+            safeAttributeSetString(attributes, Tag.PatientName, VR.PN, studyDTO.getPatientName());
+            safeAttributeSetString(attributes, Tag.PatientID, VR.LO, studyDTO.getPatientID());
+            safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, studyDTO.getPatientBirthDate());
+            safeAttributeSetString(attributes, Tag.PatientSex, VR.CS, studyDTO.getPatientSex());
+            safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, studyDTO.getStudyInstanceUID());
+            safeAttributeSetString(attributes, Tag.StudyID, VR.SH, studyDTO.getStudyID());
+            safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
+            attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, studyDTO.getSeries().size());
+            attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, studyDTO.getNumberOfInstances());
 
             jsonWriter.write(attributes);
         }
 
         generator.writeEnd();
         generator.flush();
+    }
+
+    private void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
+        if (string != null) {
+            attributes.setString(tag, vr, string);
+        }
     }
 
 }

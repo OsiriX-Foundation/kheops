@@ -1,5 +1,6 @@
 package online.kheops.auth_server;
 
+import org.dcm4che3.data.Tag;
 import org.dcm4che3.json.JSONReader;
 
 import javax.json.Json;
@@ -45,7 +46,11 @@ public class SeriesDTOListMarshaller implements MessageBodyReader<List<SeriesDTO
             jsonReader.readDatasets((fmi, dataset) -> {
                 SeriesDTO seriesDTO = new SeriesDTO();
 
-                seriesDTO.setModality(dataset.getString(0x00080060));
+                seriesDTO.setModality(dataset.getString(Tag.Modality));
+                seriesDTO.setTimezoneOffsetFromUTC(dataset.getString(Tag.TimezoneOffsetFromUTC));
+                seriesDTO.setSeriesDescription(dataset.getString(Tag.SeriesDescription));
+                seriesDTO.setSeriesNumber(dataset.getInt(Tag.SeriesNumber, 0));
+                seriesDTO.setNumberOfSeriesRelatedInstances(dataset.getInt(Tag.NumberOfSeriesRelatedInstances, 0));
 
                 list.add(seriesDTO);
             });

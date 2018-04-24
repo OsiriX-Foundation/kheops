@@ -24,6 +24,9 @@ public class Study {
     @Column(name = "study_time")
     private String studyTime;
 
+    @Column(name = "timezone_offset_from_utc")
+    private String timezoneOffsetFromUtc;
+
     @Column(name = "accession_number")
     private String accessionNumber;
 
@@ -35,6 +38,12 @@ public class Study {
 
     @Column(name = "patient_id")
     private String patientID;
+
+    @Column(name = "patient_birth_date")
+    private String patientBirthDate;
+
+    @Column(name = "patient_sex")
+    private String patientSex;
 
     @Column(name = "study_id")
     private String studyID;
@@ -103,6 +112,14 @@ public class Study {
         this.studyTime = studyTime;
     }
 
+    public String getTimezoneOffsetFromUtc() {
+        return timezoneOffsetFromUtc;
+    }
+
+    public void setTimezoneOffsetFromUtc(String timezoneOffsetFromUtc) {
+        this.timezoneOffsetFromUtc = timezoneOffsetFromUtc;
+    }
+
     public String getAccessionNumber() {
         return accessionNumber;
     }
@@ -133,6 +150,22 @@ public class Study {
 
     public void setPatientID(String patientID) {
         this.patientID = patientID;
+    }
+
+    public String getPatientBirthDate() {
+        return patientBirthDate;
+    }
+
+    public void setPatientBirthDate(String patientBirthDate) {
+        this.patientBirthDate = patientBirthDate;
+    }
+
+    public String getPatientSex() {
+        return patientSex;
+    }
+
+    public void setPatientSex(String patientSex) {
+        this.patientSex = patientSex;
     }
 
     public String getStudyID() {

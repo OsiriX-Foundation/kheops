@@ -32,9 +32,17 @@ public class Series {
     @Column(name = "modality")
     private String modality;
 
-    @Basic(optional = false)
-    @Column(name = "series_size")
-    private long size = -1L;
+    @Column(name = "timezone_offset_from_utc")
+    private String timezoneOffsetFromUTC;
+
+    @Column(name = "series_description")
+    private String seriesDescription;
+
+    @Column(name = "series_number")
+    private long seriesNumber;
+
+    @Column(name = "number_of_series_related_instances")
+    private long numberOfSeriesRelatedInstances;
 
     @Basic(optional = false)
     @Column(name = "populated")
@@ -78,6 +86,10 @@ public class Series {
 
     public void mergeSeriesDTO(SeriesDTO seriesDTO) {
         setModality(seriesDTO.getModality());
+        setTimezoneOffsetFromUTC(seriesDTO.getTimezoneOffsetFromUTC());
+        setSeriesDescription(seriesDTO.getSeriesDescription());
+        setSeriesNumber(seriesDTO.getSeriesNumber());
+        setNumberOfSeriesRelatedInstances(seriesDTO.getNumberOfSeriesRelatedInstances());
         setPopulated(true);
     }
 
@@ -85,6 +97,12 @@ public class Series {
         SeriesDTO seriesDTO = new SeriesDTO();
 
         seriesDTO.setModality(getModality());
+        seriesDTO.setTimezoneOffsetFromUTC(getTimezoneOffsetFromUTC());
+        seriesDTO.setSeriesDescription(getSeriesDescription());
+        seriesDTO.setSeriesInstanceUID(getSeriesInstanceUID());
+        seriesDTO.setSeriesNumber(getSeriesNumber());
+        seriesDTO.setNumberOfSeriesRelatedInstances(getNumberOfSeriesRelatedInstances());
+
 
         return seriesDTO;
     }
@@ -113,18 +131,6 @@ public class Series {
         this.modality = modality;
     }
 
-    public void resetSize() {
-        this.size = -1L;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
     public Study getStudy() {
         return study;
     }
@@ -139,6 +145,38 @@ public class Series {
 
     public void setPopulated(boolean populated) {
         this.populated = populated;
+    }
+
+    public String getTimezoneOffsetFromUTC() {
+        return timezoneOffsetFromUTC;
+    }
+
+    public void setTimezoneOffsetFromUTC(String timezoneOffsetFromUTC) {
+        this.timezoneOffsetFromUTC = timezoneOffsetFromUTC;
+    }
+
+    public String getSeriesDescription() {
+        return seriesDescription;
+    }
+
+    public void setSeriesDescription(String seriesDescription) {
+        this.seriesDescription = seriesDescription;
+    }
+
+    public long getSeriesNumber() {
+        return seriesNumber;
+    }
+
+    public void setSeriesNumber(long seriesNumber) {
+        this.seriesNumber = seriesNumber;
+    }
+
+    public long getNumberOfSeriesRelatedInstances() {
+        return numberOfSeriesRelatedInstances;
+    }
+
+    public void setNumberOfSeriesRelatedInstances(long numberOfSeriesRelatedInstances) {
+        this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
 
     public Set<User> getUsers() {

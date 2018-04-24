@@ -190,6 +190,7 @@ public class InboxResource
                 }
 
                 series.getUsers().add(targetUser);
+                targetUser.getSeries().add(series);
                 em.persist(series);
                 em.persist(targetUser);
             }

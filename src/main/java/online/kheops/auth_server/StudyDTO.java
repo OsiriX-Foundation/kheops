@@ -12,10 +12,13 @@ public class StudyDTO {
     private String studyDate;
     private String studyInstanceUID;
     private String studyTime;
+    private String timezoneOffsetFromUTC;
     private String accessionNumber;
     private String referringPhysicianName;
     private String patientName;
     private String patientID;
+    private String patientBirthDate;
+    private String patientSex;
     private String studyID;
 
     public String[] getModalities() {
@@ -26,6 +29,16 @@ public class StudyDTO {
         }
 
         return modalities;
+    }
+
+    public int getNumberOfInstances() {
+        int instances = 0;
+
+        for (SeriesDTO seriesDTO: getSeries()) {
+            instances += seriesDTO.getNumberOfSeriesRelatedInstances();
+        }
+
+        return instances;
     }
 
     private List<SeriesDTO> series = new ArrayList<>();
@@ -52,6 +65,14 @@ public class StudyDTO {
 
     public void setStudyTime(String studyTime) {
         this.studyTime = studyTime;
+    }
+
+    public String getTimezoneOffsetFromUTC() {
+        return timezoneOffsetFromUTC;
+    }
+
+    public void setTimezoneOffsetFromUTC(String timezoneOffsetFromUTC) {
+        this.timezoneOffsetFromUTC = timezoneOffsetFromUTC;
     }
 
     public String getAccessionNumber() {
@@ -84,6 +105,22 @@ public class StudyDTO {
 
     public void setPatientID(String patientID) {
         this.patientID = patientID;
+    }
+
+    public String getPatientBirthDate() {
+        return patientBirthDate;
+    }
+
+    public void setPatientBirthDate(String patientBirthDate) {
+        this.patientBirthDate = patientBirthDate;
+    }
+
+    public String getPatientSex() {
+        return patientSex;
+    }
+
+    public void setPatientSex(String patientSex) {
+        this.patientSex = patientSex;
     }
 
     public String getStudyID() {
