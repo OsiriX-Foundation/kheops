@@ -271,7 +271,7 @@ public class InboxResource
     }
 
     private List<String> availableSeriesUIDs(String username, String studyInstanceUID) {
-        List<String> availableSeriesUIDs = new ArrayList<>();
+        List<String> availableSeriesUIDs;
 
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
         EntityManager em = factory.createEntityManager();
@@ -285,7 +285,6 @@ public class InboxResource
             User callingUser = userQuery.setParameter("username", username).getSingleResult();
 
             TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", String.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("studyInstanceUID", studyInstanceUID);
             query.setParameter("user", callingUser);
             availableSeriesUIDs = query.getResultList();
@@ -303,16 +302,13 @@ public class InboxResource
     @Secured
     @Path("/{user}/studies/{studyInstanceUID}/metadata")
     @Produces("application/dicom+json")
-    public Response getStudies(@PathParam("user") String username,
-                               @PathParam("studyInstanceUID") String studyInstanceUID,
-                               @Context SecurityContext securityContext) {
+    public Response getStudiesMetadata(@PathParam("user") String username,
+                                       @PathParam("studyInstanceUID") String studyInstanceUID,
+                                       @Context SecurityContext securityContext) {
 
         UriBuilder uriBuilder = UriBuilder.fromUri("http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{StudyInstanceUID}/metadata");
         URI uri = uriBuilder.build(studyInstanceUID);
-
         Client client = ClientBuilder.newClient();
-        client.register(StudyDTOListMarshaller.class);
-
         InputStream is = client.target(uri).request("application/dicom+json").get(InputStream.class);
 
         JsonParser parser = Json.createParser(is);
@@ -320,25 +316,60 @@ public class InboxResource
 
         List<String> availableSeriesUIDs = this.availableSeriesUIDs(securityContext.getUserPrincipal().getName(), studyInstanceUID);
 
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream os) throws IOException, WebApplicationException {
-                JsonGenerator generator = Json.createGenerator(os);
-                JSONWriter jsonWriter = new JSONWriter(generator);
+        StreamingOutput stream = os -> {
+            JsonGenerator generator = Json.createGenerator(os);
+            JSONWriter jsonWriter = new JSONWriter(generator);
 
-                generator.writeStartArray();
+            generator.writeStartArray();
 
-                jsonReader.readDatasets((fmi, dataset) -> {
-                    if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
-                        jsonWriter.write(dataset);
-                    }
-                });
+            jsonReader.readDatasets((fmi, dataset) -> {
+                if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
+                    jsonWriter.write(dataset);
+                }
+            });
 
-                generator.writeEnd();
-                generator.flush();
-            }
+            generator.writeEnd();
+            generator.flush();
         };
 
         return Response.ok(stream).build();
+    }
+
+    @DELETE
+    @Secured
+    @Path("/{user}/studies/{studyInstanceUID}")
+    @Produces("application/dicom+json")
+    public Response deleteStudy(@PathParam("user") String username,
+                                @PathParam("studyInstanceUID") String studyInstanceUID,
+                                @Context SecurityContext securityContext) {
+
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+            userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            User callingUser = userQuery.setParameter("username", username).getSingleResult();
+
+            TypedQuery<Series> query = em.createQuery("select s from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", Series.class);
+            query.setParameter("studyInstanceUID", studyInstanceUID);
+            query.setParameter("user", callingUser);
+            List<Series> seriesList = query.getResultList();
+
+            for (Series series: seriesList) {
+                series.getUsers().remove(callingUser);
+                callingUser.getSeries().remove(series);
+            }
+
+            tx.commit();
+        } finally {
+            em.close();
+            factory.close();
+        }
+
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }
