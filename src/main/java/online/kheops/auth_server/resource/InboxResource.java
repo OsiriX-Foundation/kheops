@@ -1,20 +1,31 @@
 package online.kheops.auth_server.resource;
 
+import javax.json.Json;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
 import javax.persistence.*;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.*;
 
+import online.kheops.auth_server.SeriesDTO;
 import online.kheops.auth_server.StudyDTO;
+import online.kheops.auth_server.StudyDTOListMarshaller;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
+import org.dcm4che3.data.Tag;
+import org.dcm4che3.json.JSONReader;
+import org.dcm4che3.json.JSONWriter;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -259,4 +270,75 @@ public class InboxResource
         return Response.ok(genericStudyDTOs).build();
     }
 
+    private List<String> availableSeriesUIDs(String username, String studyInstanceUID) {
+        List<String> availableSeriesUIDs = new ArrayList<>();
+
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+            userQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
+            User callingUser = userQuery.setParameter("username", username).getSingleResult();
+
+            TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", String.class);
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            query.setParameter("studyInstanceUID", studyInstanceUID);
+            query.setParameter("user", callingUser);
+            availableSeriesUIDs = query.getResultList();
+
+            tx.commit();
+        } finally {
+            em.close();
+            factory.close();
+        }
+
+        return availableSeriesUIDs;
+    }
+
+    @GET
+    @Secured
+    @Path("/{user}/studies/{studyInstanceUID}/metadata")
+    @Produces("application/dicom+json")
+    public Response getStudies(@PathParam("user") String username,
+                               @PathParam("studyInstanceUID") String studyInstanceUID,
+                               @Context SecurityContext securityContext) {
+
+        UriBuilder uriBuilder = UriBuilder.fromUri("http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{StudyInstanceUID}/metadata");
+        URI uri = uriBuilder.build(studyInstanceUID);
+
+        Client client = ClientBuilder.newClient();
+        client.register(StudyDTOListMarshaller.class);
+
+        InputStream is = client.target(uri).request("application/dicom+json").get(InputStream.class);
+
+        JsonParser parser = Json.createParser(is);
+        JSONReader jsonReader = new JSONReader(parser);
+
+        List<String> availableSeriesUIDs = this.availableSeriesUIDs(securityContext.getUserPrincipal().getName(), studyInstanceUID);
+
+        StreamingOutput stream = new StreamingOutput() {
+            @Override
+            public void write(OutputStream os) throws IOException, WebApplicationException {
+                JsonGenerator generator = Json.createGenerator(os);
+                JSONWriter jsonWriter = new JSONWriter(generator);
+
+                generator.writeStartArray();
+
+                jsonReader.readDatasets((fmi, dataset) -> {
+                    if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
+                        jsonWriter.write(dataset);
+                    }
+                });
+
+                generator.writeEnd();
+                generator.flush();
+            }
+        };
+
+        return Response.ok(stream).build();
+    }
 }
