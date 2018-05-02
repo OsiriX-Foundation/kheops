@@ -2,7 +2,9 @@ package online.kheops.auth_server.resource;
 
 
 import javax.persistence.*;
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
@@ -20,6 +22,9 @@ import java.util.Date;
 @Path("/")
 public class TokenResource
 {
+    @Context
+    ServletContext context;
+
     static class TokenResponse {
         @XmlElement(name = "access_token")
         String accessToken;
@@ -44,7 +49,8 @@ public class TokenResource
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
 
-        AssertionVerifier assertionVerifier = new AssertionVerifier(assertion, grant_type);
+        final String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
+        AssertionVerifier assertionVerifier = new AssertionVerifier(assertion, grant_type, superuserSecret);
 
         if (assertionVerifier.isVerfified()) {
             EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
@@ -75,10 +81,10 @@ public class TokenResource
                 factory.close();
             }
 
-            // try to generate a new token
+            // Generate a new token
 
-            final String HMAC256Secret = "P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==";
-            final Algorithm algorithmHMAC = Algorithm.HMAC256(HMAC256Secret);
+            final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
+            final Algorithm algorithmHMAC = Algorithm.HMAC256(authSecret);
 
             String token = JWT.create()
                     .withIssuer("auth.kheops.online")

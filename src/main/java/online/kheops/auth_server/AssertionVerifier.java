@@ -26,7 +26,7 @@ public class AssertionVerifier {
 
     private AssertionVerifier() {}
 
-    public AssertionVerifier(String assertion, String grantType) {
+    public AssertionVerifier(final String assertion, final String grantType, final String superuserSecret) {
 
         if (grantType.equals("urn:ietf:params:oauth:grant-type:jwt-bearer")) {
 
@@ -46,8 +46,7 @@ public class AssertionVerifier {
             switch (issuer) {
                 case "authorization.kheops.online":
                     try {
-                        final String kheopsHMAC256Secret = "P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==";
-                        final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(kheopsHMAC256Secret);
+                        final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(superuserSecret);
                         JWTVerifier verifier = JWT.require(kheopsAlgorithmHMAC)
                                 .withIssuer("authorization.kheops.online")
                                 .build();

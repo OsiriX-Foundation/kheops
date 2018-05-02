@@ -9,10 +9,12 @@ import online.kheops.auth_server.entity.User;
 
 import javax.annotation.Priority;
 import javax.persistence.*;
+import javax.servlet.ServletContext;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -24,6 +26,9 @@ import java.security.Principal;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class SecuredFilter implements ContainerRequestFilter {
+    @Context
+    ServletContext context;
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
@@ -35,10 +40,11 @@ public class SecuredFilter implements ContainerRequestFilter {
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
+
         final DecodedJWT jwt;
         try {
-            final String kheopsHMAC256Secret = "P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==";
-            final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(kheopsHMAC256Secret);
+            final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
+            final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(authSecret);
             JWTVerifier verifier = JWT.require(kheopsAlgorithmHMAC)
                     .withIssuer("auth.kheops.online")
                     .build();

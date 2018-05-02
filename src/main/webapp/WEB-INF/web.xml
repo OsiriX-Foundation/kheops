@@ -11,5 +11,15 @@
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>online.kheops.auth_server.AuthApplication</param-value>
         </init-param>
+        <init-param>
+            <description>All JWT Assertions signed by issuer superuser.khoeps.online are considered valid</description>
+            <param-name>online.kheops.superuser.hmacsecret</param-name>
+            <param-value>null</param-value>
+        </init-param>
+        <init-param>
+            <description>HMAC shared secret used to sign tokens</description>
+            <param-name>online.kheops.auth.hmacsecret</param-name>
+            <param-value>null</param-value>
+        </init-param>
     </servlet>
 </web-app>
