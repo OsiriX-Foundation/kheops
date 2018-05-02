@@ -46,8 +46,19 @@ public class TokenResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertion, @FormParam("scope") String scope)
         throws UnsupportedEncodingException {
+
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
+
+
+        if (grant_type == null) {
+            errorResponse.errorDescription = "Missing grant_type";
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+        if (assertion == null) {
+            errorResponse.errorDescription = "Missing assertion";
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
 
         final String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
         AssertionVerifier assertionVerifier = new AssertionVerifier(assertion, grant_type, superuserSecret);
