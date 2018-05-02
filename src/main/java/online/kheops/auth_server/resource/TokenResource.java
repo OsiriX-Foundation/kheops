@@ -66,7 +66,7 @@ public class TokenResource
                 if (user == null) {
                     newUser = true;
                     System.out.println("Creating a new User");
-                    user = new User(assertionVerifier.getUsername());
+                    user = new User(assertionVerifier.getUsername(), assertionVerifier.getEmail());
                     em.persist(user);
                 }
                 tx.commit();

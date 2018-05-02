@@ -8,6 +8,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 
@@ -20,6 +21,7 @@ import java.security.interfaces.RSAPublicKey;
 public class AssertionVerifier {
     private boolean verified = false;
     private String username = null;
+    private String email = null;
     private String errorDescription = "Verification error";
 
     private AssertionVerifier() {}
@@ -50,7 +52,16 @@ public class AssertionVerifier {
                                 .withIssuer("authorization.kheops.online")
                                 .build();
                         DecodedJWT jwt = verifier.verify(assertion);
+
+                        if (jwt.getSubject() == null) {
+                            throw new JWTVerificationException("No subject present in the token");
+                        }
+                        Claim emailClaim = jwt.getClaim("email");
+                        if (emailClaim.isNull()) {
+                            throw new JWTVerificationException("No email present in the token");
+                        }
                         this.username = jwt.getSubject();
+                        this.email = emailClaim.asString();
                         this.verified = true;
                     } catch (JWTVerificationException | UnsupportedEncodingException exception) {
                         return;
@@ -81,7 +92,15 @@ public class AssertionVerifier {
                                 .withIssuer("accounts.google.com")
                                 .build();
                         DecodedJWT jwt = verifier.verify(assertion);
+                        if (jwt.getSubject() == null) {
+                            throw new JWTVerificationException("No subject present in the token");
+                        }
+                        Claim emailClaim = jwt.getClaim("email");
+                        if (emailClaim.isNull()) {
+                            throw new JWTVerificationException("No email present in the token");
+                        }
                         this.username = jwt.getSubject();
+                        this.email = emailClaim.asString();
                         this.verified = true;
                     } catch (JWTVerificationException | MalformedURLException exception) {
                         return;
@@ -101,6 +120,10 @@ public class AssertionVerifier {
 
     public String getUsername() {
         return this.username;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getErrorDescription() {

@@ -17,6 +17,9 @@ public class User {
     @Basic(optional = false)
     private String username;
 
+    @Basic(optional = false)
+    private String email;
+
     @ManyToMany
     @JoinTable (name = "user_series",
             joinColumns = @JoinColumn(name = "user_fk"),
@@ -25,8 +28,13 @@ public class User {
 
     public User() {}
 
-    public User(String username) {
+    public User(String username, String email) {
         this.username = username;
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public long getPk() {

@@ -7,11 +7,14 @@ USE kheops;
 CREATE TABLE users (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
 
   PRIMARY KEY (pk),
   INDEX username_index (username),
+  INDEX email_index (email),
 
-  UNIQUE username_unique (username)
+  UNIQUE username_unique (username),
+  UNIQUE email_unique (email)
 );
 
 CREATE TABLE studies (
