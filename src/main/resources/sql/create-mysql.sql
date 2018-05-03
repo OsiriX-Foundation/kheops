@@ -50,7 +50,7 @@ CREATE TABLE series (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   created_time DATETIME NOT NULL,
   updated_time DATETIME NOT NULL,
-  modality VARCHAR(255),
+  modality_bitfield BIGINT,
   timezone_offset_from_utc VARCHAR(255),
   series_description VARCHAR(255),
   series_uid VARCHAR(255) NOT NULL,

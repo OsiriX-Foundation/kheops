@@ -1,10 +1,11 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.ModalityBitfield;
 import online.kheops.auth_server.SeriesDTO;
 import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Code;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
-import org.dcm4che3.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -33,8 +34,8 @@ public class Series {
     @Column(name = "series_uid", updatable = false)
     private String seriesInstanceUID;
 
-    @Column(name = "modality")
-    private String modality;
+    @Column(name = "modality_bitfield")
+    private long modalityBitfield;
 
     @Column(name = "timezone_offset_from_utc")
     private String timezoneOffsetFromUTC;
@@ -65,14 +66,14 @@ public class Series {
         seriesInstanceUID = newSeriesInstanceUID;
     }
 
-    @Override
-    public String toString() {
-        return "Series[pk=" + pk
-                + ", uid=" + seriesInstanceUID
-                + ", StudyInstanceUID=" + seriesInstanceUID
-                + ", mod=" + modality
-                + "]";
-    }
+//    @Override
+//    public String toString() {
+//        return "Series[pk=" + pk
+//                + ", uid=" + seriesInstanceUID
+//                + ", StudyInstanceUID=" + seriesInstanceUID
+//                + ", mod=" + modality
+//                + "]";
+//    }
 
     @PrePersist
     public void onPrePersist() {
@@ -159,12 +160,22 @@ public class Series {
         return seriesInstanceUID;
     }
 
+    private long getModalityBitfield() {
+        return modalityBitfield;
+    }
+
+    private void setModalityBitfield(long modalityBitfield) {
+        this.modalityBitfield = modalityBitfield;
+    }
+
     public String getModality() {
-        return modality;
+        Set<Code> modalities = ModalityBitfield.getModalities(getModalityBitfield());
+
+        return ModalityBitfield.getOnlyModality(getModalityBitfield()).getCodeValue();
     }
 
     public void setModality(String modality) {
-        this.modality = modality;
+        setModalityBitfield(ModalityBitfield.getBitfield(modality));
     }
 
     public Study getStudy() {

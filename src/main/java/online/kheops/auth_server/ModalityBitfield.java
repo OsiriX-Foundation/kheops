@@ -62,11 +62,23 @@ public class ModalityBitfield {
         Set<Code> modalities = new HashSet<>();
 
         for (int i = 0; i < MODALITY_LIST.size(); i++) {
-            if ((bitfield | (1 << i)) != 0) {
+            if ((bitfield & (1 << i)) != 0) {
                 modalities.add(MODALITY_LIST.get(i));
             }
         }
 
         return modalities;
+    }
+
+    public static Code getOnlyModality(long bitfield) {
+        Set<Code> modalities = getModalities(bitfield);
+
+        if (modalities.size() > 1) {
+            throw new IllegalArgumentException("Bitfield contains more than one modality");
+        } else if (modalities.size() == 0) {
+            return null;
+        }
+
+        return modalities.iterator().next();
     }
 }
