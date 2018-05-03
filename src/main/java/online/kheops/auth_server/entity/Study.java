@@ -1,16 +1,27 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.ModalityBitfield;
 import online.kheops.auth_server.StudyDTO;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
+import org.dcm4che3.util.StringUtils;
+import org.hibernate.query.NativeQuery;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "studies")
+// Used a native query because Hibernate was not handling the distinct in SUM(DISTINCT s.modalityBitfield)
+@NamedNativeQuery(
+        name = "Study.AttributesByUserPK",
+        query = "SELECT s2.study_uid, s2.study_date, s2.study_time, s2.timezone_offset_from_utc, s2.accession_number, s2.referring_physician_name, s2.patient_name, s2.patient_id, s2.patient_birth_date, s2.patient_sex, s2.study_id, COUNT(s.pk), SUM(s.number_of_series_related_instances), SUM(DISTINCT s.modality_bitfield) FROM users u JOIN user_series us ON u.pk = us.user_fk JOIN series s ON us.series_fk = s.pk JOIN studies s2 on s.study_fk = s2.pk WHERE :userPK = u.pk AND s.populated = TRUE AND s2.populated = TRUE GROUP BY s2.pk")
 public class Study {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -58,6 +69,42 @@ public class Study {
     @OneToMany
     @JoinColumn (name = "study_fk", nullable=false)
     private Set<Series> series = new HashSet<Series>();
+
+    public static List<Attributes> findAttributesByUserPK(long userPK, EntityManager em) {
+        List<Attributes> attributesList = new ArrayList<>();
+
+        Query query = em.createNamedQuery("Study.AttributesByUserPK");
+        query.setParameter("userPK", userPK);
+        List<Object[]> resultsList = (List<Object[]>) query.getResultList();
+
+        // query = "SELECT s2.study_uid, s2.study_date, s2.study_time, s2.timezone_offset_from_utc, s2.accession_number, s2.referring_physician_name, s2.patient_name, s2.patient_id, s2.patient_birth_date, s2.patient_sex, s2.study_id, COUNT(s.pk), SUM(s.number_of_series_related_instances), SUM(DISTINCT s.modality_bitfield) FROM users u JOIN user_series us ON u.pk = us.user_fk JOIN series s ON us.series_fk = s.pk JOIN studies s2 on s.study_fk = s2.pk WHERE :userPK = u.pk AND s.populated = TRUE AND s2.populated = TRUE GROUP BY s2.pk")
+        for (Object[] results: resultsList) {
+            Attributes attributes = new Attributes();
+
+            safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, (String)results[0]);
+            safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, (String)results[1]);
+            safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, (String)results[2]);
+            safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, (String)results[3]);
+            safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, (String)results[4]);
+            safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, (String)results[5]);
+            safeAttributeSetString(attributes, Tag.PatientName, VR.PN, (String)results[6]);
+            safeAttributeSetString(attributes, Tag.PatientID, VR.LO, (String)results[7]);
+            safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, (String)results[8]);
+            safeAttributeSetString(attributes, Tag.PatientSex, VR.CS, (String)results[9]);
+            safeAttributeSetString(attributes, Tag.StudyID, VR.SH, (String)results[10]);
+            attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((BigInteger)results[11]).intValue());
+            attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal)results[12]).intValue());
+
+            String modalities = StringUtils.concat(ModalityBitfield.getModalityCodeValues(((BigDecimal)results[13]).intValue()), '\\');
+            attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
+
+            safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
+
+            attributesList.add(attributes);
+        }
+
+        return attributesList;
+    }
 
     // only merges values pertaining to the study, not the series list
     public void mergeStudyDTO(StudyDTO studyDTO) {
@@ -111,7 +158,7 @@ public class Study {
         return attributes;
     }
 
-    private void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
+    private static void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
         if (string != null) {
             attributes.setString(tag, vr, string);
         }

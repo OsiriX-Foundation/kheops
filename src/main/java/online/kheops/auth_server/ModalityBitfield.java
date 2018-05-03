@@ -4,6 +4,7 @@ import org.dcm4che3.data.Code;
 import org.dcm4che3.dcmr.AcquisitionModality;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ModalityBitfield {
     private static final List<Code> MODALITY_LIST = new ArrayList<>();
@@ -68,6 +69,10 @@ public class ModalityBitfield {
         }
 
         return modalities;
+    }
+
+    public static Set<String> getModalityCodeValues(long bitfield) {
+        return getModalities(bitfield).stream().map(Code::getCodeValue).collect(Collectors.toSet());
     }
 
     public static Code getOnlyModality(long bitfield) {

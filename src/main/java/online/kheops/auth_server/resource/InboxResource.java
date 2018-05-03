@@ -9,6 +9,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 
+import online.kheops.auth_server.ModalityBitfield;
 import online.kheops.auth_server.SeriesDTO;
 import online.kheops.auth_server.StudyDTO;
 import online.kheops.auth_server.StudyDTOListMarshaller;
@@ -16,9 +17,13 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
+import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
+import org.dcm4che3.data.VR;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
+import org.dcm4che3.util.StringUtils;
+import org.hibernate.query.NativeQuery;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
@@ -233,32 +238,15 @@ public class InboxResource
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
+        List<Attributes> attributesList = new ArrayList<>();
+
         try {
             tx.begin();
 
-            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
-            userQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
-            User callingUser = userQuery.setParameter("username", callingUsername).getSingleResult();
+            TypedQuery<Long> userQuery = em.createQuery("select u.pk from User u where u.username = :username", Long.class);
+            Long callingUserPK = userQuery.setParameter("username", callingUsername).getSingleResult();
 
-            TypedQuery<Study> studyQuery = em.createQuery("select distinct s.study from Series s where :callingUser member of s.users and s.populated = true ", Study.class);
-            studyQuery.setParameter("callingUser", callingUser);
-            studyQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
-
-            List<Study> userStudies = studyQuery.getResultList();
-
-            for (Study study: userStudies) {
-                TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where :callingUser member of s.users and :study = s.study and s.populated = true", Series.class);
-                seriesQuery.setParameter("callingUser", callingUser);
-                seriesQuery.setParameter("study", study);
-                seriesQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
-                List<Series> seriesList = seriesQuery.getResultList();
-
-                StudyDTO studyDTO = study.createStudyDTO();
-                for (Series series: seriesList) {
-                    studyDTO.getSeries().add(series.createSeriesDTO());
-                }
-                studyDTOs.add(studyDTO);
-            }
+            attributesList.addAll(Study.findAttributesByUserPK(callingUserPK, em));
 
             tx.commit();
         } finally {
@@ -266,8 +254,8 @@ public class InboxResource
             factory.close();
         }
 
-        GenericEntity<List<StudyDTO>> genericStudyDTOs = new GenericEntity<List<StudyDTO>>(studyDTOs) {};
-        return Response.ok(genericStudyDTOs).build();
+        GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
+        return Response.ok(genericAttributesList).build();
     }
 
     private List<String> availableSeriesUIDs(String username, String studyInstanceUID) {

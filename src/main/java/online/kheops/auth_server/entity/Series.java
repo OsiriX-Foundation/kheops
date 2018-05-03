@@ -8,8 +8,10 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
