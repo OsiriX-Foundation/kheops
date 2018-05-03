@@ -32,7 +32,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Path("/users")
 public class InboxResource
@@ -258,8 +260,8 @@ public class InboxResource
         return Response.ok(genericAttributesList).build();
     }
 
-    private List<String> availableSeriesUIDs(String username, String studyInstanceUID) {
-        List<String> availableSeriesUIDs;
+    private Set<String> availableSeriesUIDs(String username, String studyInstanceUID) {
+        Set<String> availableSeriesUIDs = new HashSet<>();
 
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
         EntityManager em = factory.createEntityManager();
@@ -275,7 +277,7 @@ public class InboxResource
             TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", String.class);
             query.setParameter("studyInstanceUID", studyInstanceUID);
             query.setParameter("user", callingUser);
-            availableSeriesUIDs = query.getResultList();
+            availableSeriesUIDs.addAll(query.getResultList());
 
             tx.commit();
         } finally {
@@ -302,7 +304,7 @@ public class InboxResource
         JsonParser parser = Json.createParser(is);
         JSONReader jsonReader = new JSONReader(parser);
 
-        List<String> availableSeriesUIDs = this.availableSeriesUIDs(securityContext.getUserPrincipal().getName(), studyInstanceUID);
+        Set<String> availableSeriesUIDs = this.availableSeriesUIDs(securityContext.getUserPrincipal().getName(), studyInstanceUID);
 
         StreamingOutput stream = os -> {
             JsonGenerator generator = Json.createGenerator(os);
