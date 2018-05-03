@@ -112,11 +112,11 @@ public class Series {
     }
 
     public Attributes getAttributes() throws IllegalStateException {
-        Attributes attributes = new Attributes();
-
         if (!isPopulated()) {
             throw new IllegalStateException();
         }
+
+        Attributes attributes = new Attributes();
 
         safeAttributeSetString(attributes, Tag.Modality, VR.CS, getModality());
         safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, getTimezoneOffsetFromUTC());
