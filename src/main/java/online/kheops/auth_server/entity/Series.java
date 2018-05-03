@@ -1,6 +1,10 @@
 package online.kheops.auth_server.entity;
 
 import online.kheops.auth_server.SeriesDTO;
+import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Tag;
+import org.dcm4che3.data.VR;
+import org.dcm4che3.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -39,10 +43,10 @@ public class Series {
     private String seriesDescription;
 
     @Column(name = "series_number")
-    private long seriesNumber;
+    private int seriesNumber;
 
     @Column(name = "number_of_series_related_instances")
-    private long numberOfSeriesRelatedInstances;
+    private int numberOfSeriesRelatedInstances;
 
     @Basic(optional = false)
     @Column(name = "populated")
@@ -107,6 +111,38 @@ public class Series {
         return seriesDTO;
     }
 
+    public Attributes getAttributes() throws IllegalStateException {
+        Attributes attributes = new Attributes();
+
+        if (!isPopulated()) {
+            throw new IllegalStateException();
+        }
+
+        safeAttributeSetString(attributes, Tag.Modality, VR.CS, getModality());
+        safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, getTimezoneOffsetFromUTC());
+        safeAttributeSetString(attributes, Tag.SeriesDescription, VR.LO, getSeriesDescription());
+
+        attributes.setInt(Tag.SeriesNumber, VR.IS, getSeriesNumber());
+        attributes.setInt(Tag.NumberOfSeriesRelatedInstances, VR.IS, getNumberOfSeriesRelatedInstances());
+
+        return attributes;
+    }
+
+    private void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
+        if (string != null) {
+            attributes.setString(tag, vr, string);
+        }
+    }
+
+    // doesn't set populated, but the caller probably will want to set populated after calling this method
+    public void mergeAttributes(Attributes attributes) {
+        setModality(attributes.getString(Tag.Modality, getModality()));
+        setSeriesDescription(attributes.getString(Tag.SeriesDescription, getSeriesDescription()));
+        setTimezoneOffsetFromUTC(attributes.getString(Tag.TimezoneOffsetFromUTC, getTimezoneOffsetFromUTC()));
+        setSeriesNumber(attributes.getInt(Tag.SeriesNumber, getSeriesNumber()));
+        setNumberOfSeriesRelatedInstances(attributes.getInt(Tag.NumberOfSeriesRelatedInstances, getNumberOfSeriesRelatedInstances()));
+    }
+
     public long getPk() {
         return pk;
     }
@@ -163,19 +199,19 @@ public class Series {
         this.seriesDescription = seriesDescription;
     }
 
-    public long getSeriesNumber() {
+    public int getSeriesNumber() {
         return seriesNumber;
     }
 
-    public void setSeriesNumber(long seriesNumber) {
+    public void setSeriesNumber(int seriesNumber) {
         this.seriesNumber = seriesNumber;
     }
 
-    public long getNumberOfSeriesRelatedInstances() {
+    public int getNumberOfSeriesRelatedInstances() {
         return numberOfSeriesRelatedInstances;
     }
 
-    public void setNumberOfSeriesRelatedInstances(long numberOfSeriesRelatedInstances) {
+    public void setNumberOfSeriesRelatedInstances(int numberOfSeriesRelatedInstances) {
         this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
 

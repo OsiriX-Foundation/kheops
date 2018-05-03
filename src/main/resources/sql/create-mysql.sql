@@ -55,7 +55,7 @@ CREATE TABLE series (
   series_description VARCHAR(255),
   series_uid VARCHAR(255) NOT NULL,
   series_number INT,
-  number_of_series_related_instances BIGINT,
+  number_of_series_related_instances INT,
   study_fk BIGINT NOT NULL,
   populated BOOLEAN,
 

@@ -8,8 +8,8 @@ public class SeriesDTO {
     private String timezoneOffsetFromUTC;
     private String seriesDescription;
     private String seriesInstanceUID;
-    private long seriesNumber;
-    private long numberOfSeriesRelatedInstances;
+    private int seriesNumber;
+    private int numberOfSeriesRelatedInstances;
 
     public SeriesDTO() {}
 
@@ -49,19 +49,19 @@ public class SeriesDTO {
         this.seriesInstanceUID = seriesInstanceUID;
     }
 
-    public long getSeriesNumber() {
+    public int getSeriesNumber() {
         return seriesNumber;
     }
 
-    public void setSeriesNumber(long seriesNumber) {
+    public void setSeriesNumber(int seriesNumber) {
         this.seriesNumber = seriesNumber;
     }
 
-    public long getNumberOfSeriesRelatedInstances() {
+    public int getNumberOfSeriesRelatedInstances() {
         return numberOfSeriesRelatedInstances;
     }
 
-    public void setNumberOfSeriesRelatedInstances(long numberOfSeriesRelatedInstances) {
+    public void setNumberOfSeriesRelatedInstances(int numberOfSeriesRelatedInstances) {
         this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
 }
