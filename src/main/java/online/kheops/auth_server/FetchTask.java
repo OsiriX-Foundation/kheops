@@ -57,6 +57,7 @@ public class FetchTask implements Runnable {
             EntityTransaction tx = em.getTransaction();
             tx.begin();
 
+            //noinspection JpaQlInspection
             TypedQuery<UIDPair> query = em.createQuery("select new online.kheops.auth_server.FetchTask$UIDPair(s.study.studyInstanceUID, s.seriesInstanceUID) from Series s where s.populated = false", UIDPair.class);
             query.setMaxResults(30);
             unpopulatedSeriesUIDs = query.getResultList();
