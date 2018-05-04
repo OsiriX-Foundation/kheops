@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlElement;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.AssertionVerifier;
+import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.entity.User;
 
 import java.io.UnsupportedEncodingException;
@@ -64,7 +65,7 @@ public class TokenResource
         AssertionVerifier assertionVerifier = new AssertionVerifier(assertion, grant_type, superuserSecret);
 
         if (assertionVerifier.isVerfified()) {
-            EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
             EntityManager em = factory.createEntityManager();
 
             boolean newUser = false;

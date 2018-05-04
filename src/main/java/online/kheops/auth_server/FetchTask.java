@@ -14,6 +14,12 @@ import java.util.List;
 
 public class FetchTask implements Runnable {
 
+    private final URI dicomWebURI;
+
+    public FetchTask(URI dicomWebURI) {
+        this.dicomWebURI = dicomWebURI;
+    }
+
     private static class UIDPair {
         private String studyInstanceUID;
         private String seriesInstanceUID;
@@ -49,7 +55,7 @@ public class FetchTask implements Runnable {
     }
 
     private List<UIDPair> unpopulatedSeriesUIDs() {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         List<UIDPair> unpopulatedSeriesUIDs = new ArrayList<>();
 
@@ -72,7 +78,7 @@ public class FetchTask implements Runnable {
     }
 
     private List<String> unpopulatedStudyUIDs() {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         List<String> unpopulatedStudyUIDs = new ArrayList<>();
 
@@ -94,8 +100,8 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedSeries(List<UIDPair> unpopulatedSeriesUIDs) {
-
-        UriBuilder uriBuilder = UriBuilder.fromUri("http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{StudyInstanceUID}/series?SeriesInstanceUID={SeriesInstanceUID}");
+        URI resolvedURI = dicomWebURI.resolve("/studies/{StudyInstanceUID}/series?SeriesInstanceUID={SeriesInstanceUID}");
+        UriBuilder uriBuilder = UriBuilder.fromUri(resolvedURI);
 
         Client client = ClientBuilder.newClient();
         client.register(SeriesDTOListMarshaller.class);
@@ -110,7 +116,7 @@ public class FetchTask implements Runnable {
                 }
                 SeriesDTO seriesDTO = seriesList.get(0);
 
-                EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+                EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
                 EntityManager em = factory.createEntityManager();
                 try {
                     EntityTransaction tx = em.getTransaction();
@@ -135,7 +141,8 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedStudies(List<String> unpopulatedStudyUIDs) {
-        UriBuilder uriBuilder = UriBuilder.fromUri("http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies?StudyInstanceUID={StudyInstanceUID}");
+        URI resolvedURI = dicomWebURI.resolve("/studies?StudyInstanceUID={StudyInstanceUID}");
+        UriBuilder uriBuilder = UriBuilder.fromUri(resolvedURI);
 
         Client client = ClientBuilder.newClient();
         client.register(StudyDTOListMarshaller.class);
@@ -150,7 +157,7 @@ public class FetchTask implements Runnable {
                 }
                 StudyDTO studyDTO = studyList.get(0);
 
-                EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+                EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
                 EntityManager em = factory.createEntityManager();
                 try {
                     EntityTransaction tx = em.getTransaction();

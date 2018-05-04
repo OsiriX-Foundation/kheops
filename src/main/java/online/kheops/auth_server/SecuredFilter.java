@@ -54,7 +54,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         }
         final String username = jwt.getSubject();
 
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 

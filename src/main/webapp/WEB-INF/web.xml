@@ -11,15 +11,37 @@
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>online.kheops.auth_server.AuthApplication</param-value>
         </init-param>
-        <init-param>
-            <description>All JWT Assertions signed by issuer superuser.khoeps.online are considered valid</description>
-            <param-name>online.kheops.superuser.hmacsecret</param-name>
-            <param-value>null</param-value>
-        </init-param>
-        <init-param>
-            <description>HMAC shared secret used to sign tokens</description>
-            <param-name>online.kheops.auth.hmacsecret</param-name>
-            <param-value>null</param-value>
-        </init-param>
     </servlet>
+    <context-param>
+        <description>All JWT Assertions signed by issuer superuser.kheops.online are considered valid</description>
+        <param-name>online.kheops.superuser.hmacsecret</param-name>
+        <param-value>null</param-value>
+    </context-param>
+    <context-param>
+        <description>HMAC shared secret used to sign tokens</description>
+        <param-name>online.kheops.auth.hmacsecret</param-name>
+        <param-value>null</param-value>
+    </context-param>
+    <context-param>
+        <description>Base URI for the pacs from which study and series metadata can be acquired</description>
+        <param-name>online.kheops.pacs.uri</param-name>
+        <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
+    </context-param>
+    <context-param>
+        <description>URL for the connection to the MySQL database</description>
+        <param-name>online.kheops.jdbc.url</param-name>
+        <param-value>jdbc:mysql://localhost/kheops</param-value>
+    </context-param>
+    <context-param>
+        <description>User name for the mySQL databse</description>
+        <param-name>online.kheops.jdbc.user</param-name>
+        <param-value>root</param-value>
+    </context-param>
+    <context-param>
+        <description>Password for the mySQL databse</description>
+        <param-name>online.kheops.jdbc.password</param-name>
+        <param-value>root</param-value>
+    </context-param>
+
+
 </web-app>

@@ -9,6 +9,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 
+import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
@@ -48,7 +49,7 @@ public class InboxResource
 
         final String callingUsername = securityContext.getUserPrincipal().getName();
 
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -125,7 +126,7 @@ public class InboxResource
         final String callingUsername = securityContext.getUserPrincipal().getName();
         // is the user sharing a series, or requesting access to a new series
 
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -226,7 +227,7 @@ public class InboxResource
         final String callingUsername = securityContext.getUserPrincipal().getName();
         // is the user sharing a series, or requesting access to a new series
 
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -253,7 +254,7 @@ public class InboxResource
     private Set<String> availableSeriesUIDs(String username, String studyInstanceUID) {
         Set<String> availableSeriesUIDs = new HashSet<>();
 
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -323,7 +324,7 @@ public class InboxResource
                                 @PathParam("studyInstanceUID") String studyInstanceUID,
                                 @Context SecurityContext securityContext) {
 
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("online.kheops");
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 

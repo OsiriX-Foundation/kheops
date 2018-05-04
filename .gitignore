@@ -2,4 +2,5 @@
 .idea/
 .gradle/
 build/
+/webapp-config/tomcat-context.xml
 *.iml

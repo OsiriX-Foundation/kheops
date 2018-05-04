@@ -18,7 +18,6 @@ if (gradle.startParameter.initScripts) {
 
 repositories {
     mavenCentral()
-//    jcenter()
 
     maven {
         //noinspection GroovyAssignabilityCheck
@@ -53,11 +52,4 @@ gretty {
     httpPort = 7575
     contextPath = ''
     servletContainer = 'tomcat8'
-
-    initParameter 'online.kheops.superuser.hmacsecret', 'P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA=='
-    initParameter 'online.kheops.auth.hmacsecret', 'P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA=='
-}
-
-if (file('user_settings.gradle').exists()) {
-    apply from: 'user_settings.gradle'
 }
