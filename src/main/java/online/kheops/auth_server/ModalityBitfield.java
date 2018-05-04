@@ -6,6 +6,7 @@ import org.dcm4che3.dcmr.AcquisitionModality;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 public class ModalityBitfield {
     private static final List<Code> MODALITY_LIST = new ArrayList<>();
     static {

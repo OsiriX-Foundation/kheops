@@ -40,7 +40,6 @@ public class SecuredFilter implements ContainerRequestFilter {
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
-
         final DecodedJWT jwt;
         try {
             final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");

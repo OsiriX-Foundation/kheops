@@ -4,8 +4,7 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static javax.persistence.CascadeType.ALL;
-
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "users")
 public class User {
@@ -24,7 +23,7 @@ public class User {
     @JoinTable (name = "user_series",
             joinColumns = @JoinColumn(name = "user_fk"),
             inverseJoinColumns = @JoinColumn(name = "series_fk"))
-    private Set<Series> series = new HashSet<Series>();
+    private Set<Series> series = new HashSet<>();
 
     public User() {}
 

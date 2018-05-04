@@ -8,12 +8,11 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
 @Table(name = "series")
 public class Series {
@@ -171,9 +170,12 @@ public class Series {
     }
 
     public String getModality() {
-        Set<Code> modalities = ModalityBitfield.getModalities(getModalityBitfield());
-
-        return ModalityBitfield.getOnlyModality(getModalityBitfield()).getCodeValue();
+        Code modality = ModalityBitfield.getOnlyModality(getModalityBitfield());
+        if (modality != null) {
+            return modality.getCodeValue();
+        } else {
+            return null;
+        }
     }
 
     public void setModality(String modality) {

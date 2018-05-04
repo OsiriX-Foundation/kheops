@@ -6,7 +6,6 @@ import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.dcm4che3.util.StringUtils;
-import org.hibernate.query.NativeQuery;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -16,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
 @Table(name = "studies")
 // Used a native query because Hibernate was not handling the distinct in SUM(DISTINCT s.modalityBitfield)
@@ -68,13 +68,14 @@ public class Study {
 
     @OneToMany
     @JoinColumn (name = "study_fk", nullable=false)
-    private Set<Series> series = new HashSet<Series>();
+    private Set<Series> series = new HashSet<>();
 
     public static List<Attributes> findAttributesByUserPK(long userPK, EntityManager em) {
         List<Attributes> attributesList = new ArrayList<>();
 
         Query query = em.createNamedQuery("Study.AttributesByUserPK");
         query.setParameter("userPK", userPK);
+        //noinspection unchecked
         List<Object[]> resultsList = (List<Object[]>) query.getResultList();
 
         // query = "SELECT s2.study_uid, s2.study_date, s2.study_time, s2.timezone_offset_from_utc, s2.accession_number, s2.referring_physician_name, s2.patient_name, s2.patient_id, s2.patient_birth_date, s2.patient_sex, s2.study_id, COUNT(s.pk), SUM(s.number_of_series_related_instances), SUM(DISTINCT s.modality_bitfield) FROM users u JOIN user_series us ON u.pk = us.user_fk JOIN series s ON us.series_fk = s.pk JOIN studies s2 on s.study_fk = s2.pk WHERE :userPK = u.pk AND s.populated = TRUE AND s2.populated = TRUE GROUP BY s2.pk")

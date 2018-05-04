@@ -11,6 +11,7 @@ def debugArgs = []
 if (gradle.startParameter.initScripts) {
     def line = file(gradle.startParameter.initScripts[0]).readLines().findAll({ x -> x ==~ /.*-agentlib:jdwp=.*/ })[0]
     if (line) {
+        //noinspection GroovyAssignabilityCheck
         debugArgs = ((line =~ /.*'(.*)'.*/)[0][1] as String).split(' ')
     }
 }
@@ -20,6 +21,7 @@ repositories {
 //    jcenter()
 
     maven {
+        //noinspection GroovyAssignabilityCheck
         url "https://www.dcm4che.org/maven2/"
     }
 }
@@ -54,4 +56,8 @@ gretty {
 
     initParameter 'online.kheops.superuser.hmacsecret', 'P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA=='
     initParameter 'online.kheops.auth.hmacsecret', 'P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA=='
+}
+
+if (file('user_settings.gradle').exists()) {
+    apply from: 'user_settings.gradle'
 }

@@ -18,6 +18,7 @@ import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+@SuppressWarnings("unused")
 public class AssertionVerifier {
     private boolean verified = false;
     private String username = null;

@@ -9,27 +9,18 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 
-import online.kheops.auth_server.ModalityBitfield;
-import online.kheops.auth_server.SeriesDTO;
-import online.kheops.auth_server.StudyDTO;
-import online.kheops.auth_server.StudyDTOListMarshaller;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
-import org.dcm4che3.data.VR;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
-import org.dcm4che3.util.StringUtils;
-import org.hibernate.query.NativeQuery;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,7 +71,7 @@ public class InboxResource
             }
 
             // find all the series that the use has access to
-            List<Series> availableSeries = null;
+            List<Series> availableSeries;
             try {
                 TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where :callingUser MEMBER OF s.users and s.study.studyInstanceUID = :studyInstanceUID", Series.class);
                 seriesQuery.setParameter("callingUser", callingUser);
@@ -230,7 +221,6 @@ public class InboxResource
                                 @Context SecurityContext securityContext) {
 
         // for now don't use any parameters
-        List<StudyDTO> studyDTOs = new ArrayList<>();
 
         // get a list of all the studies
         final String callingUsername = securityContext.getUserPrincipal().getName();

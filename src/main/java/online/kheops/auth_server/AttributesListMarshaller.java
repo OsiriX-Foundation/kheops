@@ -8,6 +8,7 @@ import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -24,6 +25,7 @@ import java.util.List;
 
 @Provider
 @Consumes("application/dicom+json")
+@Produces("application/dicom+json")
 public class AttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
     @Override
@@ -45,10 +47,7 @@ public class AttributesListMarshaller implements MessageBodyReader<List<Attribut
         try {
             JsonParser parser = Json.createParser(inputStream);
             JSONReader jsonReader = new JSONReader(parser);
-
-            jsonReader.readDatasets((fmi, dataset) -> {
-                list.add(dataset);
-            });
+            jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Throwable t) {
             t.printStackTrace();
         }
