@@ -92,8 +92,7 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedSeries(List<UIDPair> unpopulatedSeriesUIDs) {
-        URI resolvedURI = dicomWebURI.resolve("/studies/{StudyInstanceUID}/series?SeriesInstanceUID={SeriesInstanceUID}");
-        UriBuilder uriBuilder = UriBuilder.fromUri(resolvedURI);
+        UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
 
         Client client = ClientBuilder.newClient();
         client.register(SeriesDTOListMarshaller.class);
@@ -133,8 +132,7 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedStudies(List<String> unpopulatedStudyUIDs) {
-        URI resolvedURI = dicomWebURI.resolve("/studies?StudyInstanceUID={StudyInstanceUID}");
-        UriBuilder uriBuilder = UriBuilder.fromUri(resolvedURI);
+        UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
 
         Client client = ClientBuilder.newClient();
         client.register(StudyDTOListMarshaller.class);

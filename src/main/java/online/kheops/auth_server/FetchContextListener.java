@@ -20,6 +20,10 @@ public class FetchContextListener implements ServletContextListener {
         System.out.println("contextInitialized");
         executor = new ScheduledThreadPoolExecutor(MAXIMUM_CONCURRENT);
 
+        PersistenceUtils.setUser(sce.getServletContext().getInitParameter("online.kheops.jdbc.user"));
+        PersistenceUtils.setPassword(sce.getServletContext().getInitParameter("online.kheops.jdbc.password"));
+        PersistenceUtils.setUrl(sce.getServletContext().getInitParameter("online.kheops.jdbc.url"));
+
         try {
             FetchTask task = new FetchTask(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));
             executor.scheduleAtFixedRate(task, 0, 10, TimeUnit.SECONDS);
