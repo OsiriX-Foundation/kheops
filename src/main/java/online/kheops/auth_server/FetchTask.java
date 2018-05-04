@@ -2,6 +2,7 @@ package online.kheops.auth_server;
 
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
+import org.dcm4che3.data.Attributes;
 
 import javax.persistence.*;
 import javax.ws.rs.client.Client;
@@ -95,17 +96,17 @@ public class FetchTask implements Runnable {
         UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
 
         Client client = ClientBuilder.newClient();
-        client.register(SeriesDTOListMarshaller.class);
+        client.register(AttributesListMarshaller.class);
 
         for (UIDPair seriesUID: unpopulatedSeriesUIDs) {
             URI uri = uriBuilder.build(seriesUID.getStudyInstanceUID(), seriesUID.getSeriesInstanceUID());
 
             try {
-                List<SeriesDTO> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<SeriesDTO>>() {});
+                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {});
                 if (seriesList == null || seriesList.size() < 1) {
                     continue;
                 }
-                SeriesDTO seriesDTO = seriesList.get(0);
+                Attributes attributes = seriesList.get(0);
 
                 EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
                 EntityManager em = factory.createEntityManager();
@@ -118,7 +119,7 @@ public class FetchTask implements Runnable {
                     query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
                     Series series = query.getSingleResult();
-                    series.mergeSeriesDTO(seriesDTO);
+                    series.mergeAttributes(attributes);
 
                     tx.commit();
                 } finally {
@@ -135,17 +136,17 @@ public class FetchTask implements Runnable {
         UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
 
         Client client = ClientBuilder.newClient();
-        client.register(StudyDTOListMarshaller.class);
+        client.register(AttributesListMarshaller.class);
 
         for (String studyInstanceUID: unpopulatedStudyUIDs) {
             URI uri = uriBuilder.build(studyInstanceUID);
 
             try {
-                List<StudyDTO> studyList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<StudyDTO>>() {});
+                List<Attributes> studyList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {});
                 if (studyList == null || studyList.size() < 1) {
                     continue;
                 }
-                StudyDTO studyDTO = studyList.get(0);
+                Attributes attributes = studyList.get(0);
 
                 EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
                 EntityManager em = factory.createEntityManager();
@@ -158,7 +159,7 @@ public class FetchTask implements Runnable {
                     query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
                     Study study = query.getSingleResult();
-                    study.mergeStudyDTO(studyDTO);
+                    study.mergeAttributes(attributes);
 
                     tx.commit();
                 } finally {
