@@ -120,6 +120,7 @@ public class FetchTask implements Runnable {
 
                     Series series = query.getSingleResult();
                     series.mergeAttributes(attributes);
+                    series.setPopulated(true);
 
                     tx.commit();
                 } finally {
@@ -160,6 +161,7 @@ public class FetchTask implements Runnable {
 
                     Study study = query.getSingleResult();
                     study.mergeAttributes(attributes);
+                    study.setPopulated(true);
 
                     tx.commit();
                 } finally {

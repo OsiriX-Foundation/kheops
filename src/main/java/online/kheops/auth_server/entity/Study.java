@@ -1,7 +1,6 @@
 package online.kheops.auth_server.entity;
 
 import online.kheops.auth_server.ModalityBitfield;
-import online.kheops.auth_server.StudyDTO;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -105,34 +104,6 @@ public class Study {
         }
 
         return attributesList;
-    }
-
-    // only merges values pertaining to the study, not the series list
-    public void mergeStudyDTO(StudyDTO studyDTO) {
-        setStudyDate(studyDTO.getStudyDate());
-        setStudyTime(studyDTO.getStudyTime());
-        setAccessionNumber(studyDTO.getAccessionNumber());
-        setReferringPhysicianName(studyDTO.getReferringPhysicianName());
-        setPatientName(studyDTO.getPatientName());
-        setPatientID(studyDTO.getPatientID());
-        setStudyID(studyDTO.getStudyID());
-
-        setPopulated(true);
-    }
-
-    public StudyDTO createStudyDTO() {
-        StudyDTO studyDTO = new StudyDTO();
-
-        studyDTO.setStudyInstanceUID(this.getStudyInstanceUID());
-        studyDTO.setStudyDate(this.getStudyDate());
-        studyDTO.setStudyTime(this.getStudyTime());
-        studyDTO.setAccessionNumber(this.getAccessionNumber());
-        studyDTO.setReferringPhysicianName(this.getReferringPhysicianName());
-        studyDTO.setPatientName(this.getPatientName());
-        studyDTO.setPatientID(this.getPatientID());
-        studyDTO.setStudyID(this.getStudyID());
-
-        return studyDTO;
     }
 
     // This method does not set Tag.NumberOfStudyRelatedSeries, Tag.NumberOfStudyRelatedInstances, Tag.ModalitiesInStudy

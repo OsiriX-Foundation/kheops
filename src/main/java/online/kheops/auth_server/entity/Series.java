@@ -1,7 +1,6 @@
 package online.kheops.auth_server.entity;
 
 import online.kheops.auth_server.ModalityBitfield;
-import online.kheops.auth_server.SeriesDTO;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Code;
 import org.dcm4che3.data.Tag;
@@ -88,29 +87,6 @@ public class Series {
     @PreUpdate
     public void onPreUpdate() {
         updatedTime = new Date();
-    }
-
-    public void mergeSeriesDTO(SeriesDTO seriesDTO) {
-        setModality(seriesDTO.getModality());
-        setTimezoneOffsetFromUTC(seriesDTO.getTimezoneOffsetFromUTC());
-        setSeriesDescription(seriesDTO.getSeriesDescription());
-        setSeriesNumber(seriesDTO.getSeriesNumber());
-        setNumberOfSeriesRelatedInstances(seriesDTO.getNumberOfSeriesRelatedInstances());
-        setPopulated(true);
-    }
-
-    public SeriesDTO createSeriesDTO() {
-        SeriesDTO seriesDTO = new SeriesDTO();
-
-        seriesDTO.setModality(getModality());
-        seriesDTO.setTimezoneOffsetFromUTC(getTimezoneOffsetFromUTC());
-        seriesDTO.setSeriesDescription(getSeriesDescription());
-        seriesDTO.setSeriesInstanceUID(getSeriesInstanceUID());
-        seriesDTO.setSeriesNumber(getSeriesNumber());
-        seriesDTO.setNumberOfSeriesRelatedInstances(getNumberOfSeriesRelatedInstances());
-
-
-        return seriesDTO;
     }
 
     public Attributes getAttributes() throws IllegalStateException {
