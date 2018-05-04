@@ -6,6 +6,7 @@
          version="3.1">
     <servlet>
         <display-name>Kheops Authentication</display-name>
+        <!--suppress ServletWithoutMappingInspection -->
         <servlet-name>online.kheops.auth_server.AuthApplication</servlet-name>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>

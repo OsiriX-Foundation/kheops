@@ -9,9 +9,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class FetchTask implements Runnable {
 
     private final URI dicomWebURI;
@@ -33,16 +33,8 @@ public class FetchTask implements Runnable {
             return studyInstanceUID;
         }
 
-        void setStudyInstanceUID(String studyInstanceUID) {
-            this.studyInstanceUID = studyInstanceUID;
-        }
-
         String getSeriesInstanceUID() {
             return seriesInstanceUID;
-        }
-
-        void setSeriesInstanceUID(String seriesInstanceUID) {
-            this.seriesInstanceUID = seriesInstanceUID;
         }
     }
 
@@ -57,7 +49,7 @@ public class FetchTask implements Runnable {
     private List<UIDPair> unpopulatedSeriesUIDs() {
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
-        List<UIDPair> unpopulatedSeriesUIDs = new ArrayList<>();
+        List<UIDPair> unpopulatedSeriesUIDs;
 
         try {
             EntityTransaction tx = em.getTransaction();
@@ -80,7 +72,7 @@ public class FetchTask implements Runnable {
     private List<String> unpopulatedStudyUIDs() {
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
-        List<String> unpopulatedStudyUIDs = new ArrayList<>();
+        List<String> unpopulatedStudyUIDs;
 
         try {
             EntityTransaction tx = em.getTransaction();

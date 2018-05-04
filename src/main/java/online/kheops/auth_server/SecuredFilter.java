@@ -19,7 +19,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
 import java.security.Principal;
 
 @Secured
@@ -30,7 +29,7 @@ public class SecuredFilter implements ContainerRequestFilter {
     ServletContext context;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -56,11 +55,13 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
 
         try {
+            EntityTransaction tx = em.getTransaction();
+            tx.begin();
             TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
             userQuery.setParameter("username", username).getSingleResult();
+            tx.commit();
         } catch (Exception exception) {
             requestContext.abortWith(Response.status(403, "Unknown subject").build());
         } finally {

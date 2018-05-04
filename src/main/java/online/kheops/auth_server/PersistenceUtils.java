@@ -1,9 +1,7 @@
 package online.kheops.auth_server;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 
