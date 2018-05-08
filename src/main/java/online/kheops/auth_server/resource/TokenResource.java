@@ -111,7 +111,7 @@ public class TokenResource
             tokenResponse.tokenType = "Bearer";
             tokenResponse.expiresIn = 3600L;
             if (newUser) {
-                return Response.status(201).build();
+                return Response.status(Response.Status.CREATED).entity(tokenResponse).build();
             } else {
                 return Response.ok(tokenResponse).build();
             }
