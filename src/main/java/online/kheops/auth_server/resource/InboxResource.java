@@ -4,6 +4,7 @@ import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.persistence.*;
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,6 +24,7 @@ import org.ietf.jgss.Oid;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +33,9 @@ import java.util.Set;
 @Path("/users")
 public class InboxResource
 {
+    @Context
+    ServletContext context;
+
     @PUT
     @Secured
     @Path("/{user}/studies/{studyInstanceUID}")
@@ -285,9 +290,10 @@ public class InboxResource
     @Produces("application/dicom+json")
     public Response getStudiesMetadata(@PathParam("user") String username,
                                        @PathParam("studyInstanceUID") String studyInstanceUID,
-                                       @Context SecurityContext securityContext) {
+                                       @Context SecurityContext securityContext) throws URISyntaxException {
 
-        UriBuilder uriBuilder = UriBuilder.fromUri("http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{StudyInstanceUID}/metadata");
+        URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
+        UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/metadata");
         URI uri = uriBuilder.build(studyInstanceUID);
         Client client = ClientBuilder.newClient();
         InputStream is = client.target(uri).request("application/dicom+json").get(InputStream.class);
