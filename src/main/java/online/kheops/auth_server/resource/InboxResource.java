@@ -244,7 +244,7 @@ public class InboxResource
             TypedQuery<Long> userQuery = em.createQuery("select u.pk from User u where u.username = :username", Long.class);
             Long callingUserPK = userQuery.setParameter("username", callingUsername).getSingleResult();
 
-            attributesList.addAll(Study.findAttributesByUserPK(callingUserPK, em));dfasdf
+            attributesList.addAll(Study.findAttributesByUserPK(callingUserPK, em));
 
             tx.commit();
         } finally {
