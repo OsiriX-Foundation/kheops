@@ -1,6 +1,9 @@
 #!/bin/bash
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker build ./docker/ -t test/test
+
+mv build/libs/KheopsAuthorization.war docker/KheopsAuthorization.war
+
+docker build ./docker/ -t test
 docker image ls
-#.build/libs/KheopsAuthorization.war
+
 find -name "*.war"
