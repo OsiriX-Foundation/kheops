@@ -5,5 +5,4 @@ services:
   - docker
   
 after_success:
-  - ./bash docker_push.sh
-
+  - ./docker_push.sh
