@@ -9,7 +9,7 @@ after_success:
   
 deploy:
   provider: script
-  script: bash docker_push
+  script: bash docker_push.sh
   on:
     branch: master
  
