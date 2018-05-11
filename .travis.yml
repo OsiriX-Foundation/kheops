@@ -4,8 +4,8 @@ sudo: required
 services:
   - docker
   
-before_install:
-  - docker build ./docker/ -t test/test
+after_success:
+  - docker build ./docker/ -t osirixfoundation/test
   
 deploy:
   provider: script
