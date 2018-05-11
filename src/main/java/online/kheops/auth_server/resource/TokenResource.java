@@ -73,21 +73,15 @@ public class TokenResource
                 EntityTransaction tx = em.getTransaction();
                 tx.begin();
 
-                User user = null;
-                try {
-                    TypedQuery<User> query = em.createQuery("select u from User u where u.username = :username", User.class);
-                    user = query.setParameter("username", assertionVerifier.getUsername()).getSingleResult();
-                } catch (Exception e) {
-                    System.out.println("User not found");
-                }
-
-                if (user == null) {
+                long userPk = User.findPkByUsername(assertionVerifier.getUsername(), em);
+                if (userPk == -1) {
+                    System.out.println("User not found, creating a new User");
                     newUser = true;
-                    System.out.println("Creating a new User");
-                    user = new User(assertionVerifier.getUsername(), assertionVerifier.getEmail());
-                    em.persist(user);
+                    em.persist(new User(assertionVerifier.getUsername(), assertionVerifier.getEmail()));
                 }
                 tx.commit();
+            } catch (Throwable t) {
+                t.printStackTrace();
             } finally {
                 em.close();
                 factory.close();

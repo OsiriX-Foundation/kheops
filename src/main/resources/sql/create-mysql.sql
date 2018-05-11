@@ -6,15 +6,15 @@ USE kheops;
 
 CREATE TABLE users (
   pk BIGINT NOT NULL AUTO_INCREMENT,
-  username VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
+  google_id VARCHAR(255) NOT NULL,
+  google_email VARCHAR(255) NOT NULL,
 
   PRIMARY KEY (pk),
-  INDEX username_index (username),
-  INDEX email_index (email),
+  INDEX google_id_index (google_id),
+  INDEX google_email_index (google_email),
 
-  UNIQUE username_unique (username),
-  UNIQUE email_unique (email)
+  UNIQUE google_id_unique (google_id),
+  UNIQUE google_email_unique (google_email)
 );
 
 CREATE TABLE studies (

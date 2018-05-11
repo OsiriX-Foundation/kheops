@@ -10,6 +10,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 
+import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
@@ -43,8 +44,6 @@ public class InboxResource
                              @PathParam("studyInstanceUID") String studyInstanceUID,
                              @Context SecurityContext securityContext) {
 
-        // this call can only be used to send.
-
         // validate the UIDs
         try {
             new Oid(studyInstanceUID);
@@ -52,28 +51,23 @@ public class InboxResource
             return Response.status(400, "StudyInstanceUID is not a valid UID").build();
         }
 
-        final String callingUsername = securityContext.getUserPrincipal().getName();
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
-        if (callingUsername.equals(username)) {
-            return Response.status(400, "Can't send a study to yourself").build();
-        }
-
         try {
             tx.begin();
 
-            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.pk = :userPk", User.class);
             userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-            User callingUser = userQuery.setParameter("username", callingUsername).getSingleResult();
+            User callingUser = userQuery.setParameter("userPk", callingUserPk).getSingleResult();
 
-            final User targetUser;
-            try {
-                targetUser = userQuery.setParameter("username", username).getSingleResult();
-            } catch (Exception exception) {
-                return Response.status(404, "Unknown target user").build();
+            final User targetUser = User.findByUsername(username, em);
+
+            if (callingUserPk == targetUser.getPk()) {
+                return Response.status(400, "Can't send a study to yourself").build();
             }
 
             // find all the series that the use has access to
@@ -128,8 +122,7 @@ public class InboxResource
             return Response.status(400, "SeriesInstanceUID is not a valid UID").build();
         }
 
-        final String callingUsername = securityContext.getUserPrincipal().getName();
-        // is the user sharing a series, or requesting access to a new series
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
@@ -139,11 +132,18 @@ public class InboxResource
         try {
             tx.begin();
 
-            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
+            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.pk = :pk", User.class);
             userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-            User callingUser = userQuery.setParameter("username", callingUsername).getSingleResult();
+            User callingUser = userQuery.setParameter("pk", callingUserPk).getSingleResult();
 
-            if (callingUsername.equals(username)) { // the user is requesting access to a new series
+            User targetUser;
+            try {
+                targetUser = User.findByUsername(username, em);
+            } catch (NoResultException exception) {
+                return Response.status(404, "Unknown target user").build();
+            }
+
+            if (targetUser.getPk() == callingUserPk) { // the user is requesting access to a new series
 
                 // find if the series already exists
                 try {
@@ -181,13 +181,6 @@ public class InboxResource
                 em.persist(series);
                 em.persist(callingUser);
             } else { // the user wants to share
-                final User targetUser;
-                try {
-                    targetUser = userQuery.setParameter("username", username).getSingleResult();
-                } catch (Exception exception) {
-                    return Response.status(404, "Unknown target user").build();
-                }
-
                 final Series series;
                 try {
                     TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where s.study.studyInstanceUID = :studyInstanceUID and s.seriesInstanceUID = :seriesInstanceUID and :callingUser member of s.users", Series.class);
@@ -229,22 +222,24 @@ public class InboxResource
         // for now don't use any parameters
 
         // get a list of all the studies
-        final String callingUsername = securityContext.getUserPrincipal().getName();
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         // is the user sharing a series, or requesting access to a new series
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
-        List<Attributes> attributesList = new ArrayList<>();
+        List<Attributes> attributesList;
 
         try {
             tx.begin();
 
-            TypedQuery<Long> userQuery = em.createQuery("select u.pk from User u where u.username = :username", Long.class);
-            Long callingUserPK = userQuery.setParameter("username", callingUsername).getSingleResult();
+            long targetUserPk = User.findPkByUsername(username, em);
+            if (callingUserPk != targetUserPk) {
+                return Response.status(403, "Access to study denied").build();
+            }
 
-            attributesList.addAll(Study.findAttributesByUserPK(callingUserPK, em));
+            attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
 
             tx.commit();
         } finally {
@@ -256,7 +251,7 @@ public class InboxResource
         return Response.ok(genericAttributesList).build();
     }
 
-    private Set<String> availableSeriesUIDs(String username, String studyInstanceUID) {
+    private Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID) {
         Set<String> availableSeriesUIDs = new HashSet<>();
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
@@ -266,9 +261,7 @@ public class InboxResource
         try {
             tx.begin();
 
-            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
-            userQuery.setLockMode(LockModeType.PESSIMISTIC_READ);
-            User callingUser = userQuery.setParameter("username", username).getSingleResult();
+            User callingUser = User.findByPk(userPk, em);
 
             TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", String.class);
             query.setParameter("studyInstanceUID", studyInstanceUID);
@@ -292,6 +285,28 @@ public class InboxResource
                                        @PathParam("studyInstanceUID") String studyInstanceUID,
                                        @Context SecurityContext securityContext) throws URISyntaxException {
 
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        long targetUserPk;
+        try {
+            tx.begin();
+
+            targetUserPk = User.findPkByUsername(username, em);
+
+            tx.commit();
+        } finally {
+            em.close();
+            factory.close();
+        }
+
+        if (callingUserPk != targetUserPk) {
+            return Response.status(403, "Access to study denied").build();
+        }
+
         URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
         UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/metadata");
         URI uri = uriBuilder.build(studyInstanceUID);
@@ -301,7 +316,8 @@ public class InboxResource
         JsonParser parser = Json.createParser(is);
         JSONReader jsonReader = new JSONReader(parser);
 
-        Set<String> availableSeriesUIDs = this.availableSeriesUIDs(securityContext.getUserPrincipal().getName(), studyInstanceUID);
+
+        Set<String> availableSeriesUIDs = this.availableSeriesUIDs(((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID(), studyInstanceUID);
 
         StreamingOutput stream = os -> {
             JsonGenerator generator = Json.createGenerator(os);
@@ -330,6 +346,8 @@ public class InboxResource
                                 @PathParam("studyInstanceUID") String studyInstanceUID,
                                 @Context SecurityContext securityContext) {
 
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -337,18 +355,19 @@ public class InboxResource
         try {
             tx.begin();
 
-            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
-            userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-            User callingUser = userQuery.setParameter("username", username).getSingleResult();
+            User targetUser = User.findByUsername(username, em);
+            if (callingUserPk != targetUser.getPk()) {
+                return Response.status(403, "Access to study denied").build();
+            }
 
             TypedQuery<Series> query = em.createQuery("select s from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", Series.class);
             query.setParameter("studyInstanceUID", studyInstanceUID);
-            query.setParameter("user", callingUser);
+            query.setParameter("user", targetUser);
             List<Series> seriesList = query.getResultList();
 
             for (Series series: seriesList) {
-                series.getUsers().remove(callingUser);
-                callingUser.getSeries().remove(series);
+                series.getUsers().remove(targetUser);
+                targetUser.getSeries().remove(series);
             }
 
             tx.commit();

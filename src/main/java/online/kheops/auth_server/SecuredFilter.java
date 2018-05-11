@@ -19,7 +19,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import java.security.Principal;
 
 @Secured
 @Provider
@@ -52,6 +51,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
         final String username = jwt.getSubject();
+        long userPK = -1;
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
@@ -59,22 +59,38 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             EntityTransaction tx = em.getTransaction();
             tx.begin();
-            TypedQuery<User> userQuery = em.createQuery("select u from User u where u.username = :username", User.class);
-            userQuery.setParameter("username", username).getSingleResult();
+            userPK = User.findPkByUsername(username, em);
+            if (userPK == -1) {
+                requestContext.abortWith(Response.status(403, "Unknown subject").build());
+            }
             tx.commit();
-        } catch (Exception exception) {
-            requestContext.abortWith(Response.status(403, "Unknown subject").build());
         } finally {
             em.close();
             factory.close();
         }
 
-        boolean isSecured = requestContext.getSecurityContext().isSecure();
+        final boolean isSecured = requestContext.getSecurityContext().isSecure();
+        final long finalUserPk = userPK;
         requestContext.setSecurityContext(new SecurityContext() {
-            @Override public Principal getUserPrincipal() { return () -> username; }
-            @Override public boolean isUserInRole(String role) { return true; }
-            @Override public boolean isSecure() { return isSecured; }
-            @Override public String getAuthenticationScheme() { return "BEARER"; }
+            @Override
+            public KheopsPrincipal getUserPrincipal() {
+                return new KheopsPrincipal(finalUserPk);
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+
+            @Override
+            public boolean isSecure() {
+                return isSecured;
+            }
+
+            @Override
+            public String getAuthenticationScheme() {
+                return "BEARER";
+            }
         });
     }
 }
