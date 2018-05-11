@@ -5,7 +5,5 @@ services:
   - docker
   
 after_success:
-  provider: script
-  script: bash docker_push.sh
-  on:
-    branch: master
+  - ./bash docker_push.sh
+
