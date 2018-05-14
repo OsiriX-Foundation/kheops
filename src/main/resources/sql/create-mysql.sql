@@ -89,7 +89,7 @@ CREATE TABLE capabilities (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   created_time DATETIME NOT NULL,
   updated_time DATETIME NOT NULL,
-  expiration_time DATETIME NOT NULL,
+  expiration_time DATETIME,
   revoked BOOLEAN,
   description VARCHAR(255),
   secret VARCHAR(255),

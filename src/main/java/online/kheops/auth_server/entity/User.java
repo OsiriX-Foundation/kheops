@@ -46,6 +46,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "series_fk"))
     private Set<Series> series = new HashSet<>();
 
+    @OneToMany
+    @JoinColumn (name = "user_fk", nullable=false)
+    private Set<Capability> capabilities = new HashSet<>();
+
     // returns -1 if the user does not exist
     public static long findPkByUsername(String username, EntityManager em) {
         try {
@@ -104,5 +108,9 @@ public class User {
 
     public Set<Series> getSeries() {
         return series;
+    }
+
+    public Set<Capability> getCapabilities() {
+        return capabilities;
     }
 }

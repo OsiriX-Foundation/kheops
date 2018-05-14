@@ -34,6 +34,7 @@ dependencies {
 
     compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.16.Final'
+    compile group: 'org.hibernate', name: 'hibernate-java8', version: '5.2.16.Final'
 
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
     compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
