@@ -84,3 +84,25 @@ CREATE TABLE user_series (
     REFERENCES series(pk)
     ON DELETE RESTRICT
 );
+
+CREATE TABLE capabilities (
+  pk BIGINT NOT NULL AUTO_INCREMENT,
+  created_time DATETIME NOT NULL,
+  updated_time DATETIME NOT NULL,
+  expiration_time DATETIME NOT NULL,
+  revoked BOOLEAN,
+  description VARCHAR(255),
+  secret VARCHAR(255),
+  user_fk BIGINT NOT NULL,
+
+  PRIMARY KEY (pk),
+  INDEX revoked_index (revoked),
+  INDEX secret_index (secret),
+  INDEX user_fk_index (user_fk),
+
+  UNIQUE secret_unique (secret),
+
+  FOREIGN KEY (user_fk)
+    REFERENCES users(pk)
+    ON DELETE RESTRICT
+)
