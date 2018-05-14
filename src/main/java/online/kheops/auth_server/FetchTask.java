@@ -43,8 +43,13 @@ public class FetchTask implements Runnable {
     public void run() {
         System.out.println("fetching series");
 
-        fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
-        fetchUnpopulatedStudies(unpopulatedStudyUIDs());
+        try {
+            fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
+            fetchUnpopulatedStudies(unpopulatedStudyUIDs());
+        } catch (Throwable t) {
+            System.out.println("Caught throwable while running the fetch task");
+            t.printStackTrace();
+        }
     }
 
     private List<UIDPair> unpopulatedSeriesUIDs() {
