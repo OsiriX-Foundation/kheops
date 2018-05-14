@@ -9,4 +9,8 @@ notifications:
   
 after_success:
   - chmod +x docker/docker_push.sh
-  - ./docker/docker_push.sh
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: docker/docker_push.sh 
