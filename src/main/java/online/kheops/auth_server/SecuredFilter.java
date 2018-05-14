@@ -51,7 +51,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
         final String username = jwt.getSubject();
-        long userPK = -1;
+        long userPK;
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
