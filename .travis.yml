@@ -9,4 +9,4 @@ notifications:
   
 after_success:
   - chmod +x docker_push.sh
-  - ./docker_push.sh
+  - ./docker/docker_push.sh
