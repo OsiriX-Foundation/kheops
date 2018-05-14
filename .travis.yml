@@ -7,6 +7,7 @@ services:
 notifications:
   email: false
   
-after_success:
+deploy:
+  skip_cleanup: true
   - chmod +x docker/docker_push.sh
   - ./docker/docker_push.sh
