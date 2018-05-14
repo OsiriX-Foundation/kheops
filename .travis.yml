@@ -8,5 +8,5 @@ notifications:
   email: false
   
 after_success:
-  - chmod +x docker_push.sh
+  - chmod +x docker/docker_push.sh
   - ./docker/docker_push.sh
