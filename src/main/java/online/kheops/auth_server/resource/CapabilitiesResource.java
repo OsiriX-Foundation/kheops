@@ -28,6 +28,8 @@ public class CapabilitiesResource {
         String description;
         @XmlElement(name = "expiration")
         String expiration;
+        @XmlElement(name = "revoked")
+        boolean revoked;
     }
 
     @POST
@@ -84,6 +86,7 @@ public class CapabilitiesResource {
             capabilityResponse.secret = capability.getSecret();
             capabilityResponse.description = capability.getDescription();
             capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
+            capabilityResponse.revoked = capability.isRevoked();
 
             tx.commit();
         } finally {
@@ -93,6 +96,58 @@ public class CapabilitiesResource {
 
         return Response.status(201).entity(capabilityResponse).build();
     }
+
+    @POST
+    @Secured
+    @Path("/{user}/capabilities/{secret}/revoke")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createCapability(@PathParam("user") String username, @PathParam("secret") String secret,
+                                     @Context SecurityContext securityContext) {
+
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        CapabilityResponse capabilityResponse;
+
+        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
+        EntityManager em = factory.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final User targetUser = User.findByUsername(username, em);
+
+            if (callingUserPk != targetUser.getPk()) {
+                return Response.status(400, "Can't revoke a different user's capability").build();
+            }
+
+            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :targetUser = c.user AND :secret = c.secret", Capability.class);
+            query.setParameter("targetUser", targetUser);
+            query.setParameter("secret", secret);
+            Capability capability;
+            try {
+                capability = query.getSingleResult();
+            } catch (NoResultException e) {
+                return Response.status(404, "Unknown capability").build();
+            }
+
+            capability.setRevoked(true);
+            em.persist(capability);
+
+            capabilityResponse = new CapabilityResponse();
+            capabilityResponse.secret = capability.getSecret();
+            capabilityResponse.description = capability.getDescription();
+            capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
+            capabilityResponse.revoked = capability.isRevoked();
+
+        } finally {
+            em.close();
+            factory.close();
+        }
+
+        return Response.status(201).entity(capabilityResponse).build();
+    }
+
 
     @GET
     @Secured
@@ -125,7 +180,8 @@ public class CapabilitiesResource {
                 CapabilityResponse capabilityResponse = new CapabilityResponse();
                 capabilityResponse.secret = capability.getSecret();
                 capabilityResponse.description = capability.getDescription();
-                capabilityResponse.expiration = capability.getExpiration().toString();
+                capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
+                capabilityResponse.revoked = capability.isRevoked();
 
                 capabilityResponses.add(capabilityResponse);
             }
