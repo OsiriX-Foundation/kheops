@@ -140,6 +140,7 @@ public class CapabilitiesResource {
             capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
             capabilityResponse.revoked = capability.isRevoked();
 
+            tx.commit();
         } finally {
             em.close();
             factory.close();

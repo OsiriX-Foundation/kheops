@@ -11,12 +11,16 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.User;
 
+import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.*;
 
 @SuppressWarnings("unused")
 public class AssertionVerifier {
@@ -109,6 +113,46 @@ public class AssertionVerifier {
                 default:
                     this.errorDescription = "Unknown JWT issuer";
             }
+        } else if (grantType.equals("urn:x-kheops:params:oauth:grant-type:capability")) {
+            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
+            EntityManager em = factory.createEntityManager();
+            EntityTransaction tx = em.getTransaction();
+            try {
+                tx.begin();
+
+                TypedQuery<Capability> query = em.createQuery("SELECT c FROM Capability c where c.secret = :secret", Capability.class);
+                query.setParameter("secret", assertion);
+
+                Capability capability;
+                try {
+                    capability = query.getSingleResult();
+                } catch (NoResultException e) {
+                    this.errorDescription = "Unknown capability";
+                    return;
+                }
+
+                if (capability.isRevoked()) {
+                    this.errorDescription = "Capability is revoked";
+                    return;
+                }
+
+                if (ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
+                    this.errorDescription = "Capability is expired";
+                    return;
+                }
+
+                this.username = capability.getUser().getGoogle_id();
+                this.email = capability.getUser().getGoogle_email();
+                this.verified = true;
+
+                tx.commit();
+            } catch (Throwable t) {
+                t.printStackTrace();
+            } finally {
+                em.close();
+                factory.close();
+            }
+
         } else {
             this.errorDescription = "Unknown grant type";
         }
