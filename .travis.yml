@@ -9,10 +9,12 @@ notifications:
   
 after_success:
   - chmod +x docker/docker_push.sh
-  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+  - export BRANCH=$TRAVIS_BRANCH
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
 
-#deploy:
-#  skip_cleanup: true
-#  provider: script
-#  script: docker/docker_push.sh 
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: docker/docker_push.sh 
+  on:
+    all_branches: true
