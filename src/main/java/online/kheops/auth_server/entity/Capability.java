@@ -24,9 +24,8 @@ public class Capability {
     @Column(name = "expiration_time")
     private LocalDateTime expiration;
 
-    @Basic(optional = false)
-    @Column(name = "revoked")
-    private boolean revoked = false;
+    @Column(name = "revoked_time")
+    private LocalDateTime revokedTime;
 
     @Basic(optional = false)
     @Column(name = "description")
@@ -72,11 +71,26 @@ public class Capability {
     }
 
     public boolean isRevoked() {
-        return revoked;
+        return revokedTime != null;
     }
 
     public void setRevoked(boolean revoked) {
-        this.revoked = revoked;
+        if (!revoked && this.revokedTime != null) {
+            throw new IllegalStateException("Can't unrevoke a revoked capability");
+        } else if (revoked && this.revokedTime == null) {
+            this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
+        }
+    }
+
+    public LocalDateTime getRevokedTime() {
+        return revokedTime;
+    }
+
+    public void setRevokedTime(LocalDateTime revokedTime) {
+        if (this.revokedTime != null) {
+            throw new IllegalStateException("Can't update the revokedTime on an already revoked capability");
+        }
+        this.revokedTime = revokedTime;
     }
 
     public String getDescription() {

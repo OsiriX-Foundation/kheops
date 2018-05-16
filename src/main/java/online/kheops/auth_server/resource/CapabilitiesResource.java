@@ -149,9 +149,8 @@ public class CapabilitiesResource {
             factory.close();
         }
 
-        return Response.status(201).entity(capabilityResponse).build();
+        return Response.status(200).entity(capabilityResponse).build();
     }
-
 
     @GET
     @Secured
@@ -200,6 +199,4 @@ public class CapabilitiesResource {
         GenericEntity<List<CapabilityResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilityResponse>>(capabilityResponses) {};
         return Response.status(200).entity(genericCapabilityResponsesList).build();
     }
-
-
 }

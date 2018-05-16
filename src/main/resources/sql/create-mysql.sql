@@ -90,13 +90,12 @@ CREATE TABLE capabilities (
   created_time DATETIME NOT NULL,
   updated_time DATETIME NOT NULL,
   expiration_time DATETIME,
-  revoked BOOLEAN,
+  revoked_time DATETIME,
   description VARCHAR(255),
   secret VARCHAR(255),
   user_fk BIGINT NOT NULL,
 
   PRIMARY KEY (pk),
-  INDEX revoked_index (revoked),
   INDEX secret_index (secret),
   INDEX user_fk_index (user_fk),
 
