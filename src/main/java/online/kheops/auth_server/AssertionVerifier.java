@@ -12,7 +12,6 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.entity.Capability;
-import online.kheops.auth_server.entity.User;
 
 import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
