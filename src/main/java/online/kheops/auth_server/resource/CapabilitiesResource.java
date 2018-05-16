@@ -2,6 +2,7 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.PersistenceUtils;
+import online.kheops.auth_server.annotation.CapabilitySecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
@@ -34,6 +35,7 @@ public class CapabilitiesResource {
 
     @POST
     @Secured
+    @CapabilitySecured
     @Path("/{user}/capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -99,6 +101,7 @@ public class CapabilitiesResource {
 
     @POST
     @Secured
+    @CapabilitySecured
     @Path("/{user}/capabilities/{secret}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -152,6 +155,7 @@ public class CapabilitiesResource {
 
     @GET
     @Secured
+    @CapabilitySecured
     @Path("/{user}/capabilities")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createCapability(@PathParam("user") String username,

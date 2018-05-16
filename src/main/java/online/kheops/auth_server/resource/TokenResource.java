@@ -96,6 +96,7 @@ public class TokenResource
                     .withIssuer("auth.kheops.online")
                     .withSubject(assertionVerifier.getUsername())
                     .withAudience("dicom.kheops.online")
+                    .withClaim("capability", !assertionVerifier.isCapabilityAssertion()) // don't give capability access for capability assertions
                     .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                     .withNotBefore(new Date())
                     .sign(algorithmHMAC);

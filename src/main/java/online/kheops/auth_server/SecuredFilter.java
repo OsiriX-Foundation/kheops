@@ -3,6 +3,7 @@ package online.kheops.auth_server;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.User;
@@ -71,6 +72,14 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final long finalUserPk = userPK;
+        final boolean capabilityAccess;
+        Claim capabilityClaim = jwt.getClaim("capability");
+        if (capabilityClaim.asBoolean() != null) {
+            capabilityAccess = capabilityClaim.asBoolean();
+        } else {
+            capabilityAccess = false;
+        }
+
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public KheopsPrincipal getUserPrincipal() {
@@ -79,6 +88,9 @@ public class SecuredFilter implements ContainerRequestFilter {
 
             @Override
             public boolean isUserInRole(String role) {
+                if (role.equals("capability")) {
+                    return capabilityAccess;
+                }
                 return false;
             }
 

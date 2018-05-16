@@ -28,6 +28,7 @@ public class AssertionVerifier {
     private String username = null;
     private String email = null;
     private String errorDescription = "Verification error";
+    private boolean capabilityAssertion = false;
 
     private AssertionVerifier() {}
 
@@ -144,6 +145,7 @@ public class AssertionVerifier {
                 this.username = capability.getUser().getGoogle_id();
                 this.email = capability.getUser().getGoogle_email();
                 this.verified = true;
+                this.capabilityAssertion = true;
 
                 tx.commit();
             } catch (Throwable t) {
@@ -172,6 +174,10 @@ public class AssertionVerifier {
 
     public String getErrorDescription() {
         return errorDescription;
+    }
+
+    public boolean isCapabilityAssertion() {
+        return capabilityAssertion;
     }
 }
 
