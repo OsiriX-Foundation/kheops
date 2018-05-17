@@ -2,22 +2,30 @@ package online.kheops.auth_server.resource;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Sequence;
 import org.dcm4che3.data.Tag;
+import org.dcm4che3.io.SAXTransformer;
+import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletInputStream;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Path("proxy")
 public class CapabilitiesProxy {
@@ -25,6 +33,7 @@ public class CapabilitiesProxy {
     @Context
     ServletContext context;
 
+    @SuppressWarnings("unused")
     static class tokenResponse {
         @XmlElement(name = "access_token")
         String accessToken;
@@ -34,25 +43,81 @@ public class CapabilitiesProxy {
         String expiresIn;
     }
 
-    @POST
-    @Path("capabilities/{capabilitySecret}/studies/{studyInstanceUID}")
-    public Response STOWWithStudy(InputStream requestBody,
-                         @PathParam("capabilitySecret") String capabilitySecret,
-                         @PathParam("studyInstanceUID") String studyInstanceUID,
-                         @HeaderParam("Content-Type") String contentType /*,
-                     @Suspended AsyncResponse response*/) throws URISyntaxException {
-        return Response.status(Response.Status.CREATED).build();
+    private enum Output {
+        DICOM_XML {
+            @Override
+            StreamingOutput entity(final Attributes response) {
+                return out -> {
+                    try {
+                        SAXTransformer.getSAXWriter(new StreamResult(out)).write(response);
+                    } catch (Exception e) {
+                        throw new WebApplicationException(errResponseAsTextPlain(e));
+                    }
+                };
+            }
+        },
+        DICOM_JSON {
+            @Override
+            StreamingOutput entity(final Attributes response) {
+                return out -> {
+                    JsonGenerator gen = Json.createGenerator(out);
+                    new JSONWriter(gen).write(response);
+                    gen.flush();
+                };
+            }
+        };
 
+        abstract StreamingOutput entity(Attributes response);
+    }
+
+    private static Response errResponseAsTextPlain(Exception e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String exceptionAsString = sw.toString();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(exceptionAsString).type("text/plain").build();
     }
 
 
     @POST
-    @Path("capabilities/{capabilitySecret}/studies")
-    public Response STOW(InputStream requestBody,
-                     @PathParam("capabilitySecret") String capabilitySecret,
-                     @HeaderParam("Content-Type") String contentType /*,
-                     @Suspended AsyncResponse response*/) throws URISyntaxException {
+    @Path("/capabilities/{capabilitySecret}/studies")
+    @Produces("application/dicom+xml")
+    public Response storeInstancesXML(InputStream in,
+                                      @PathParam("capabilitySecret") String capabilitySecret,
+                                      @HeaderParam("Content-Type") String contentType) throws Exception {
+        return store(in, contentType, capabilitySecret, null, Output.DICOM_XML);
+    }
 
+    @POST
+    @Path("/capabilities/{capabilitySecret}/studies/{StudyInstanceUID}")
+    @Produces("application/dicom+xml")
+    public Response storeInstancesXML(InputStream in,
+                                      @PathParam("capabilitySecret") String capabilitySecret,
+                                      @HeaderParam("Content-Type") String contentType,
+                                      @PathParam("StudyInstanceUID") String studyInstanceUID) throws Exception {
+        return store(in, contentType, capabilitySecret, studyInstanceUID, Output.DICOM_XML);
+    }
+
+    @POST
+    @Path("/capabilities/{capabilitySecret}/studies")
+    @Produces("application/dicom+json")
+    public Response storeInstancesJSON(InputStream in,
+                                      @PathParam("capabilitySecret") String capabilitySecret,
+                                      @HeaderParam("Content-Type") String contentType) throws Exception {
+        return store(in, contentType, capabilitySecret, null, Output.DICOM_JSON);
+    }
+
+    @POST
+    @Path("/capabilities/{capabilitySecret}/studies/{StudyInstanceUID}")
+    @Produces("application/dicom+json")
+    public Response storeInstancesJSON(InputStream in,
+                                      @PathParam("capabilitySecret") String capabilitySecret,
+                                      @HeaderParam("Content-Type") String contentType,
+                                      @PathParam("StudyInstanceUID") String studyInstanceUID) throws Exception {
+        return store(in, contentType, capabilitySecret, studyInstanceUID, Output.DICOM_JSON);
+    }
+
+
+    private Response store(InputStream requestBody, String contentType, String capabilitySecret, String studyInstanceUID, Output output)  throws Exception {
         URI authenticationServerURI = new URI(context.getInitParameter("online.kheops.auth_server.uri"));
         URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
 
@@ -78,31 +143,43 @@ public class CapabilitiesProxy {
         };
 
         UriBuilder dicomWebUriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies");
+        if (studyInstanceUID != null) {
+            dicomWebUriBuilder = dicomWebUriBuilder.path("/" + studyInstanceUID);
+        }
         URI dicomWebUri = dicomWebUriBuilder.build();
 
         Entity<StreamingOutput> stowEntity = Entity.entity(stream, contentType);
         Client stowClient = ClientBuilder.newClient();
-//        Response stowResponse = stowClient.target(dicomWebUri).request().post(stowEntity);
+        InputStream is = stowClient.target(dicomWebUri).request("application/dicom+json").post(stowEntity, InputStream.class);
 
+        JsonParser parser = Json.createParser(is);
+        JSONReader jsonReader = new JSONReader(parser);
 
+        Attributes attributes = jsonReader.readDataset(null);
+        Sequence instanceSequence = attributes.getSequence(Tag.ReferencedSOPSequence);
 
-        // get the input stream
-//        request
+        Set<String> sentSeries = new HashSet<>();
+        for (Attributes instance: instanceSequence) {
+            String instanceURL = instance.getString(Tag.RetrieveURL);
 
+            // this is a total hack, get the study and series UIDs out of the returned URL
+            int studiesIndex = instanceURL.indexOf("/studies/");
+            int seriesIndex = instanceURL.indexOf("/series/");
+            int instancesIndex = instanceURL.indexOf("/instances/");
 
+            String studyUID = instanceURL.substring(studiesIndex + 9, seriesIndex);
+            String seriesUID = instanceURL.substring(seriesIndex + 8, instancesIndex);
+            String combinedUID = studyUID + "/" + seriesUID;
 
-//        Client client = ClientBuilder.newClient();
-//        tokenResponse tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), tokenResponse.class);
+            if (!sentSeries.contains(combinedUID)) {
+                UriBuilder claimUriBuilder = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}");
+                URI claimURI = claimUriBuilder.build(sub, studyUID, seriesUID);
+                ClientBuilder.newClient().target(claimURI).request().header("Authorization", "Bearer " + tokenResponse.accessToken).put(Entity.text(""));
 
+                sentSeries.add(combinedUID);
+            }
+        }
 
-
-
-
-        // get a token from the auth server
-        return Response.status(Response.Status.CREATED).build();
-
+        return Response.ok(output.entity(attributes)).build();
     }
-
-//
-//
 }
