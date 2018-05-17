@@ -89,7 +89,7 @@ public class CapabilitiesProxy {
 
         Entity<StreamingOutput> stowEntity = Entity.entity(stream, contentType);
         Client stowClient = ClientBuilder.newClient();
-        Response stowResponse = stowClient.target(dicomWebUri).request().post(stowEntity);
+//        Response stowResponse = stowClient.target(dicomWebUri).request().post(stowEntity);
 
 
 
