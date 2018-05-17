@@ -2,6 +2,7 @@ package online.kheops.auth_server.resource;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+//import online.kheops.auth_server.annotation.FixTypeQuote;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.json.JSONWriter;
 
@@ -39,6 +40,20 @@ public class CapabilitiesProxy {
     }
 
     @POST
+//    @FixTypeQuote
+    @Path("capabilities/{capabilitySecret}/studies/{studyInstanceUID}")
+    public Response STOWWithStudy(InputStream requestBody,
+                         @PathParam("capabilitySecret") String capabilitySecret,
+                         @PathParam("studyInstanceUID") String studyInstanceUID,
+                         @HeaderParam("Content-Type") String contentType /*,
+                     @Suspended AsyncResponse response*/) throws URISyntaxException {
+        return Response.status(Response.Status.CREATED).build();
+
+    }
+
+
+    @POST
+//    @FixTypeQuote
     @Path("capabilities/{capabilitySecret}/studies")
     public Response STOW(InputStream requestBody,
                      @PathParam("capabilitySecret") String capabilitySecret,
