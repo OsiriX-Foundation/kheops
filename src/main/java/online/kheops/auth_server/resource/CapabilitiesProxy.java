@@ -2,7 +2,6 @@ package online.kheops.auth_server.resource;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-//import online.kheops.auth_server.annotation.FixTypeQuote;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.json.JSONWriter;
 
@@ -14,15 +13,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.Future;
 
 @Path("proxy")
 public class CapabilitiesProxy {
@@ -40,7 +35,6 @@ public class CapabilitiesProxy {
     }
 
     @POST
-//    @FixTypeQuote
     @Path("capabilities/{capabilitySecret}/studies/{studyInstanceUID}")
     public Response STOWWithStudy(InputStream requestBody,
                          @PathParam("capabilitySecret") String capabilitySecret,
@@ -53,7 +47,6 @@ public class CapabilitiesProxy {
 
 
     @POST
-//    @FixTypeQuote
     @Path("capabilities/{capabilitySecret}/studies")
     public Response STOW(InputStream requestBody,
                      @PathParam("capabilitySecret") String capabilitySecret,
