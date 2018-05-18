@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'war'
 apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+apply plugin: 'org.sonarqube'
 
 // Enable debugging of gretty started webapp in IDEA
 // For debuging a gradle task, IDEA creates a gradle init script (in /tmp/ijinit#.gradle), that sets JVM arguments
@@ -53,10 +54,4 @@ gretty {
     httpPort = 7575
     contextPath = ''
     servletContainer = 'tomcat8'
-}
-
-gradlePlugin {
-  plugins {
-    id 'org.sonarqube' version '2.6'
-  }
 }
