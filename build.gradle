@@ -3,7 +3,7 @@ apply plugin: 'war'
 apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 plugins {
-  id "org.sonarqube" version "2.6"
+  id 'org.sonarqube' version '2.6'
 }
 
 // Enable debugging of gretty started webapp in IDEA
