@@ -61,7 +61,7 @@ public class User {
             Query googleEmailQuery = em.createNamedQuery("User.findPkByGoogleEmail");
             googleEmailQuery.setParameter("google_email", username);
             return ((BigInteger) googleEmailQuery.getSingleResult()).longValue();
-        } catch (NoResultException ignored) {}
+        } catch (NoResultException ignored) {/*empty*/}
 
         return -1;
     }
