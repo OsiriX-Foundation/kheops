@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Sequence;
 import org.dcm4che3.data.Tag;
@@ -34,7 +33,7 @@ public class CapabilitiesProxy {
     ServletContext context;
 
     @SuppressWarnings("unused")
-    static class tokenResponse {
+    static class TokenResponse {
         @XmlElement(name = "access_token")
         String accessToken;
         @XmlElement(name = "token_type")
@@ -118,20 +117,17 @@ public class CapabilitiesProxy {
 
 
     private Response store(InputStream requestBody, String contentType, String capabilitySecret, String studyInstanceUID, Output output)  throws Exception {
+        Client client = ClientBuilder.newClient();
         URI authenticationServerURI = new URI(context.getInitParameter("online.kheops.auth_server.uri"));
         URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
 
-        Form form = new Form();
-        form.param("assertion", capabilitySecret).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
+        Form form = new Form().param("assertion", capabilitySecret).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
+        URI uri = UriBuilder.fromUri(authenticationServerURI).path("token").build();
 
-        UriBuilder uriBuilder = UriBuilder.fromUri(authenticationServerURI).path("token");
-        URI uri = uriBuilder.build();
-        Client client = ClientBuilder.newClient();
-        tokenResponse tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), tokenResponse.class);
+        TokenResponse tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
 
         // get the user from the token
-        DecodedJWT jwt = JWT.decode(tokenResponse.accessToken);
-        String sub = jwt.getSubject();
+        String sub = JWT.decode(tokenResponse.accessToken).getSubject();
 
         byte[] buffer = new byte[4096];
         StreamingOutput stream = os -> {
@@ -148,9 +144,7 @@ public class CapabilitiesProxy {
         }
         URI dicomWebUri = dicomWebUriBuilder.build();
 
-        Entity<StreamingOutput> stowEntity = Entity.entity(stream, contentType);
-        Client stowClient = ClientBuilder.newClient();
-        InputStream is = stowClient.target(dicomWebUri).request("application/dicom+json").post(stowEntity, InputStream.class);
+        InputStream is = client.target(dicomWebUri).request("application/dicom+json").post(Entity.entity(stream, contentType), InputStream.class);
 
         JsonParser parser = Json.createParser(is);
         JSONReader jsonReader = new JSONReader(parser);
@@ -172,9 +166,8 @@ public class CapabilitiesProxy {
             String combinedUID = studyUID + "/" + seriesUID;
 
             if (!sentSeries.contains(combinedUID)) {
-                UriBuilder claimUriBuilder = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}");
-                URI claimURI = claimUriBuilder.build(sub, studyUID, seriesUID);
-                ClientBuilder.newClient().target(claimURI).request().header("Authorization", "Bearer " + tokenResponse.accessToken).put(Entity.text(""));
+                URI claimURI = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}").build(sub, studyUID, seriesUID);
+                client.target(claimURI).request().header("Authorization", "Bearer " + tokenResponse.accessToken).put(Entity.text(""));
 
                 sentSeries.add(combinedUID);
             }
