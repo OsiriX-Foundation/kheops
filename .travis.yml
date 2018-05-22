@@ -20,3 +20,4 @@ deploy:
   script: docker/docker_push.sh 
   on:
     all_branches: true
+
