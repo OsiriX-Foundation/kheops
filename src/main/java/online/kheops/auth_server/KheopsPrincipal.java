@@ -3,18 +3,18 @@ package online.kheops.auth_server;
 @SuppressWarnings("WeakerAccess")
 public class KheopsPrincipal implements java.security.Principal {
 
-    private final long DBID;
+    private final long dbid;
 
     public KheopsPrincipal(long DBID) {
-        this.DBID = DBID;
+        dbid = DBID;
     }
 
     public long getDBID() {
-        return DBID;
+        return dbid;
     }
 
     @Override
     public String getName() {
-        return Long.toString(DBID);
+        return Long.toString(dbid);
     }
 }
