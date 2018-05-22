@@ -12,8 +12,6 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.entity.Capability;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
@@ -30,8 +28,6 @@ public class AssertionVerifier {
     private String email = null;
     private String errorDescription = "Verification error";
     private boolean capabilityAssertion = false;
-
-    private static final Logger LOG = LoggerFactory.getLogger(AssertionVerifier.class);
 
     private AssertionVerifier() {}
 
@@ -152,7 +148,7 @@ public class AssertionVerifier {
 
                 tx.commit();
             } catch (Throwable t) {
-                LOG.error("Error processing Capability", t);
+                t.printStackTrace();
             } finally {
                 em.close();
                 factory.close();
