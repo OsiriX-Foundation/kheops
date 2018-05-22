@@ -12,16 +12,16 @@ after_success:
   - export BRANCH=$TRAVIS_BRANCH
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
   - git fetch --unshallow
-  #- ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
+  - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
   
-addons:
-  sonarcloud: $SONAR_ORGANIZATION
-    organization: 
-    token:
-      secure: $SONAR_LOGIN
-script:
+#addons:
+#  sonarcloud: $SONAR_ORGANIZATION
+#    organization: 
+#    token:
+#      secure: $SONAR_LOGIN
+#script:
   # other script steps might be done before running the actual analysis
-  - sonar-scanner
+#  - sonar-scanner
 
 deploy:
   skip_cleanup: true
