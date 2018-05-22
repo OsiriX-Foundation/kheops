@@ -14,6 +14,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.AssertionVerifier;
 import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
@@ -23,6 +25,9 @@ import java.util.Date;
 @Path("/")
 public class TokenResource
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TokenResource.class);
+
     @Context
     ServletContext context;
 
@@ -75,13 +80,13 @@ public class TokenResource
 
                 long userPk = User.findPkByUsername(assertionVerifier.getUsername(), em);
                 if (userPk == -1) {
-                    System.out.println("User not found, creating a new User");
+                    LOG.info("User not found, creating a new User");
                     newUser = true;
                     em.persist(new User(assertionVerifier.getUsername(), assertionVerifier.getEmail()));
                 }
                 tx.commit();
             } catch (Throwable t) {
-                t.printStackTrace();
+                LOG.error("Couldn't find the user", t);
             } finally {
                 em.close();
                 factory.close();

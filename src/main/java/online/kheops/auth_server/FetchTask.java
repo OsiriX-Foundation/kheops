@@ -3,6 +3,8 @@ package online.kheops.auth_server;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import org.dcm4che3.data.Attributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.ws.rs.client.Client;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 public class FetchTask implements Runnable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FetchTask.class);
 
     private final URI dicomWebURI;
 
@@ -41,15 +45,16 @@ public class FetchTask implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("fetching series");
+        LOG.info("Starting Fetch Task");
 
         try {
             fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
             fetchUnpopulatedStudies(unpopulatedStudyUIDs());
         } catch (Throwable t) {
-            System.out.println("Caught throwable while running the fetch task");
-            t.printStackTrace();
+            LOG.error("An error occured while fetching", t);
         }
+
+        LOG.info("Finished Fetch Task");
     }
 
     private List<UIDPair> unpopulatedSeriesUIDs() {
@@ -133,7 +138,7 @@ public class FetchTask implements Runnable {
                     factory.close();
                 }
             } catch (Throwable t) {
-                System.out.println(t.getLocalizedMessage());
+                LOG.error("Error while fetching series: " + seriesUID.getSeriesInstanceUID(), t);
             }
         }
     }
@@ -174,7 +179,7 @@ public class FetchTask implements Runnable {
                     factory.close();
                 }
             } catch (Throwable t) {
-                System.out.println(t.getLocalizedMessage());
+                LOG.error("Error while fetching study: " + studyInstanceUID, t);
             }
         }
 

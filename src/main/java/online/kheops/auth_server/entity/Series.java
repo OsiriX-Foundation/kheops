@@ -80,8 +80,6 @@ public class Series {
         Date now = new Date();
         createdTime = now;
         updatedTime = now;
-
-        System.out.println("In prepersist");
     }
 
     @PreUpdate
