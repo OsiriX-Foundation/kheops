@@ -10,10 +10,10 @@ class KheopsPrincipalTest {
     private final static long principalDBID = 123456789L;
     private final static String principalName = "123456789";
 
-    private KheopsPrincipal kheopsPrincipal;
+    static private KheopsPrincipal kheopsPrincipal;
 
     @BeforeAll
-    void beforeAll() {
+    static void beforeAll() {
         kheopsPrincipal = new KheopsPrincipal(principalDBID);
     }
 
