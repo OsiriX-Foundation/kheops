@@ -12,6 +12,8 @@ public abstract class AssertionVerifier {
 
     private static String superuserSecret;
 
+    private AssertionVerifier() {}
+
     public static void setSuperuserSecret(String newSuperuserSecret) {
         superuserSecret = newSuperuserSecret;
     }

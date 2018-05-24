@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
@@ -50,8 +51,8 @@ public class FetchTask implements Runnable {
         try {
             fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
             fetchUnpopulatedStudies(unpopulatedStudyUIDs());
-        } catch (Throwable t) {
-            LOG.error("An error occured while fetching", t);
+        } catch (Exception e) {
+            LOG.error("An error occurred while fetching", e);
         }
 
         LOG.info("Finished Fetch Task");
@@ -111,34 +112,39 @@ public class FetchTask implements Runnable {
         for (UIDPair seriesUID: unpopulatedSeriesUIDs) {
             URI uri = uriBuilder.build(seriesUID.getStudyInstanceUID(), seriesUID.getSeriesInstanceUID());
 
+            final Attributes attributes;
             try {
-                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {});
+                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {
+                });
                 if (seriesList == null || seriesList.size() < 1) {
                     continue;
                 }
-                Attributes attributes = seriesList.get(0);
+                attributes = seriesList.get(0);
+            } catch (WebApplicationException e) {
+                LOG.error("Unable to fetch QIDO data for StudyInstanceUID:" + seriesUID.getStudyInstanceUID() + " SeriesInstanceUID: " + seriesUID.getSeriesInstanceUID(), e);
+                continue;
+            }
 
-                EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-                EntityManager em = factory.createEntityManager();
-                try {
-                    EntityTransaction tx = em.getTransaction();
-                    tx.begin();
+            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
+            EntityManager em = factory.createEntityManager();
+            EntityTransaction tx = em.getTransaction();
+            try {
+                tx.begin();
 
-                    TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :seriesInstanceUID", Series.class);
-                    query.setParameter("seriesInstanceUID", seriesUID.seriesInstanceUID);
-                    query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+                TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :seriesInstanceUID", Series.class);
+                query.setParameter("seriesInstanceUID", seriesUID.seriesInstanceUID);
+                query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
-                    Series series = query.getSingleResult();
-                    series.mergeAttributes(attributes);
-                    series.setPopulated(true);
+                Series series = query.getSingleResult();
+                series.mergeAttributes(attributes);
+                series.setPopulated(true);
 
-                    tx.commit();
-                } finally {
-                    em.close();
-                    factory.close();
-                }
-            } catch (Throwable t) {
-                LOG.error("Error while fetching series: " + seriesUID.getSeriesInstanceUID(), t);
+                tx.commit();
+            } catch (Exception e) {
+                LOG.error("Error while storing series: " + seriesUID.getSeriesInstanceUID(), e);
+            } finally {
+                em.close();
+                factory.close();
             }
         }
     }
@@ -150,36 +156,40 @@ public class FetchTask implements Runnable {
         client.register(AttributesListMarshaller.class);
 
         for (String studyInstanceUID: unpopulatedStudyUIDs) {
-            URI uri = uriBuilder.build(studyInstanceUID);
+            final URI uri = uriBuilder.build(studyInstanceUID);
 
+            final Attributes attributes;
             try {
                 List<Attributes> studyList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {});
                 if (studyList == null || studyList.size() < 1) {
                     continue;
                 }
-                Attributes attributes = studyList.get(0);
+                attributes = studyList.get(0);
+            } catch (WebApplicationException e) {
+                LOG.error("Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
+                continue;
+            }
 
-                EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-                EntityManager em = factory.createEntityManager();
-                try {
-                    EntityTransaction tx = em.getTransaction();
-                    tx.begin();
+            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
+            EntityManager em = factory.createEntityManager();
+            try {
+                EntityTransaction tx = em.getTransaction();
+                tx.begin();
 
-                    TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
-                    query.setParameter("studyInstanceUID", studyInstanceUID);
-                    query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+                TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
+                query.setParameter("studyInstanceUID", studyInstanceUID);
+                query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
-                    Study study = query.getSingleResult();
-                    study.mergeAttributes(attributes);
-                    study.setPopulated(true);
+                Study study = query.getSingleResult();
+                study.mergeAttributes(attributes);
+                study.setPopulated(true);
 
-                    tx.commit();
-                } finally {
-                    em.close();
-                    factory.close();
-                }
-            } catch (Throwable t) {
-                LOG.error("Error while fetching study: " + studyInstanceUID, t);
+                tx.commit();
+            } catch (Exception e) {
+                LOG.error("Error while fetching study: " + studyInstanceUID, e);
+            } finally {
+                em.close();
+                factory.close();
             }
         }
 

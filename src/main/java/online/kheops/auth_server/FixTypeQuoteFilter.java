@@ -3,6 +3,7 @@ package online.kheops.auth_server;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.util.*;
 
@@ -15,8 +16,10 @@ import java.util.*;
 // Jersey notices this and immediately returns a Bad Request. In order to be compatible, we use this filter to fix the content-type.
 
 public class FixTypeQuoteFilter implements Filter {
+
+
     @Override
-    public void init(FilterConfig filterConfig) {}
+    public void init(FilterConfig filterConfig) {/* empty */}
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -24,14 +27,14 @@ public class FixTypeQuoteFilter implements Filter {
         ServletRequest finalRequest = request;
 
         // find if the request has missing quotes
-        String contentType = httpRequest.getHeader("Content-Type");
+        String contentType = httpRequest.getHeader(HttpHeaders.CONTENT_TYPE);
         if (contentType.contains("type=application/dicom")){
             String newContentType = contentType.replace("type=application/dicom", "type=\"application/dicom\"");
 
             finalRequest = new HttpServletRequestWrapper(httpRequest){
                 @Override
                 public String getHeader(String name) {
-                    if (name.equalsIgnoreCase("Content-Type")){
+                    if (name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE)){
                         return newContentType;
                     } else {
                         return super.getHeader(name);
@@ -40,7 +43,7 @@ public class FixTypeQuoteFilter implements Filter {
 
                 @Override
                 public Enumeration<String> getHeaders(String name) {
-                    if (name.equalsIgnoreCase("Content-Type")){
+                    if (name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE)){
                         return new Vector<>(Collections.singletonList(newContentType)).elements();
                     } else {
                         return super.getHeaders(name);
@@ -55,5 +58,5 @@ public class FixTypeQuoteFilter implements Filter {
     }
 
     @Override
-    public void destroy() { }
+    public void destroy() {/* empty */}
 }

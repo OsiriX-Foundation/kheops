@@ -54,12 +54,12 @@ public class TokenResource
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope) {
+    public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope) {
 
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
 
-        if (grant_type == null) {
+        if (grantType == null) {
             errorResponse.errorDescription = "Missing grant_type";
             LOG.warn("Request for a token is missing a grant_type");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
@@ -72,7 +72,7 @@ public class TokenResource
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(assertionToken, grant_type);
+            assertion = AssertionVerifier.createAssertion(assertionToken, grantType);
         } catch (UnknownGrantTypeException | BadAssertionException e) {
             errorResponse.errorDescription = e.getMessage();
             LOG.warn("Error validating a token", e);
