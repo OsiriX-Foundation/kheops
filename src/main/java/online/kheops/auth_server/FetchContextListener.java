@@ -1,6 +1,7 @@
 package online.kheops.auth_server;
 
 
+import online.kheops.auth_server.assertion.AssertionVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

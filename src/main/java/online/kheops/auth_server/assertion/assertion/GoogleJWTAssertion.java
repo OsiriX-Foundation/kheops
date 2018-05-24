@@ -1,4 +1,4 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.assertion.assertion;
 
 import com.auth0.jwk.JwkException;
 import com.auth0.jwk.UrlJwkProvider;
@@ -8,6 +8,9 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import online.kheops.auth_server.assertion.Assertion;
+import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
+import online.kheops.auth_server.assertion.exceptions.DownloadKeyException;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
@@ -28,7 +31,7 @@ public class GoogleJWTAssertion implements Assertion {
     private String username;
     private String email;
 
-    void setAssertionToken(String assertionToken) throws BadAssertionException {
+    public void setAssertionToken(String assertionToken) throws BadAssertionException {
 
         final ConfigurationEntity configurationEntity;
         try {

@@ -1,10 +1,12 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.assertion.assertion;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.assertion.Assertion;
+import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 
 import java.io.UnsupportedEncodingException;
 
@@ -14,11 +16,11 @@ public class SuperuserJWTAssertion implements Assertion {
     private String username;
     private String email;
 
-    void setSuperuserSecret(String superuserSecret) {
+    public void setSuperuserSecret(String superuserSecret) {
         this.superuserSecret = superuserSecret;
     }
 
-    void setAssertionToken(String assertionToken) throws BadAssertionException {
+    public void setAssertionToken(String assertionToken) throws BadAssertionException {
         if (superuserSecret == null) {
             throw new IllegalStateException("superuserSecret was never set");
         }

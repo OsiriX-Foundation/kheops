@@ -12,6 +12,11 @@ import javax.xml.bind.annotation.XmlElement;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.*;
+import online.kheops.auth_server.assertion.Assertion;
+import online.kheops.auth_server.assertion.AssertionVerifier;
+import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
+import online.kheops.auth_server.assertion.exceptions.DownloadKeyException;
+import online.kheops.auth_server.assertion.exceptions.UnknownGrantTypeException;
 import online.kheops.auth_server.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +77,9 @@ public class TokenResource
             errorResponse.errorDescription = e.getMessage();
             LOG.warn("Error validating a token", e);
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        } catch (DownloadKeyException e) {
+            LOG.error("Error downloading public keys", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
         final EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();

@@ -1,4 +1,4 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.assertion.exceptions;
 
 public class BadAssertionException extends Exception {
     public BadAssertionException(String message) {

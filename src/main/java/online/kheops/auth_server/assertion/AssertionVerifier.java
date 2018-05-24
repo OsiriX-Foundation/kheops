@@ -1,7 +1,10 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.assertion;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import online.kheops.auth_server.assertion.builder.AssertionBuilder;
+import online.kheops.auth_server.assertion.builder.CapabilityAssertionBuilder;
+import online.kheops.auth_server.assertion.builder.JWTAssertionBuilder;
+import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
+import online.kheops.auth_server.assertion.exceptions.UnknownGrantTypeException;
 
 public abstract class AssertionVerifier {
     private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:grant-type:jwt-bearer";

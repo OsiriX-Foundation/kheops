@@ -1,5 +1,8 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.assertion.assertion;
 
+import online.kheops.auth_server.PersistenceUtils;
+import online.kheops.auth_server.assertion.Assertion;
+import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.*;
@@ -10,7 +13,7 @@ public class CapabilityAssertion implements Assertion {
     private String username;
     private String email;
 
-    void setCapabilityToken(String capabilityToken) throws BadAssertionException {
+    public void setCapabilityToken(String capabilityToken) throws BadAssertionException {
         final EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         final EntityManager em = factory.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

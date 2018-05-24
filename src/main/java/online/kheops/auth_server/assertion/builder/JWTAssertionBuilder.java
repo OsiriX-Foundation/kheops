@@ -1,7 +1,11 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.assertion.builder;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import online.kheops.auth_server.assertion.Assertion;
+import online.kheops.auth_server.assertion.assertion.GoogleJWTAssertion;
+import online.kheops.auth_server.assertion.assertion.SuperuserJWTAssertion;
+import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 
 public class JWTAssertionBuilder implements AssertionBuilder {
     private static final String KHEOPS_ISSUER = "authorization.kheops.online";
@@ -9,7 +13,7 @@ public class JWTAssertionBuilder implements AssertionBuilder {
 
     private final String superuserSecret;
 
-    JWTAssertionBuilder(String superuserSecret) {
+    public JWTAssertionBuilder(String superuserSecret) {
         this.superuserSecret = superuserSecret;
     }
 
