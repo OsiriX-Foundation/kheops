@@ -10,7 +10,7 @@ rootpwd=$(head -n 1 $filename)
 
 mysql -uroot -p$rootpwd<<MYSQL_SCRIPT
 
-CREATE USER '$user'@'%' IDENTIFIED BY '$pwd';
-GRANT ALL ON *.* TO '$user'@'%';
+CREATE USER '$user'@'tomcataut' IDENTIFIED BY '$pwd';
+GRANT ALL ON kheops.* TO '$user'@'tomcataut';
 
 MYSQL_SCRIPT
