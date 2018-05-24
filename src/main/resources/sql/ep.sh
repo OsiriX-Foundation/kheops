@@ -1,8 +1,8 @@
 #!/bin/bash
-filename="/run/secrets/my_mysql_user"
+filename="/run/secrets/mysql_user"
 user=$(head -n 1 $filename)
 
-filename="/run/secrets/my_mysql_password"
+filename="/run/secrets/mysql_password"
 pwd=$(head -n 1 $filename)
 
 filename="/run/secrets/mysql_root_password"
