@@ -16,7 +16,7 @@
 
     <filter>
         <filter-name>ServletFilter</filter-name>
-        <filter-class>online.kheops.auth_server.FixTypeQuoteFilter</filter-class>
+        <filter-class>online.kheops.auth_server.filter.FixTypeQuoteFilter</filter-class>
     </filter>
 
     <filter-mapping>

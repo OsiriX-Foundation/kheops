@@ -1,10 +1,12 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.User;
 

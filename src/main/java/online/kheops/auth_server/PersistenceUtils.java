@@ -11,15 +11,15 @@ public class PersistenceUtils {
     private static String password;
     private static String url;
 
-    static void setUser(String user) {
+    public static void setUser(String user) {
         PersistenceUtils.user = user;
     }
 
-    static void setPassword(String password) {
+    public static void setPassword(String password) {
         PersistenceUtils.password = password;
     }
 
-    static void setUrl(String url) {
+    public static void setUrl(String url) {
         PersistenceUtils.url = url;
     }
 

@@ -1,6 +1,7 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.fetch;
 
 
+import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

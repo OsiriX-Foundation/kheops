@@ -1,4 +1,4 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.CapabilitySecured;
 

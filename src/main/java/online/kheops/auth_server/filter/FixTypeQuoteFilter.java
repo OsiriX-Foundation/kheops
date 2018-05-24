@@ -1,4 +1,4 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.filter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

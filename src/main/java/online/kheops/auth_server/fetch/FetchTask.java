@@ -1,7 +1,9 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.fetch;
 
+import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
+import online.kheops.auth_server.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +70,7 @@ public class FetchTask implements Runnable {
             tx.begin();
 
             //noinspection JpaQlInspection
-            TypedQuery<UIDPair> query = em.createQuery("select new online.kheops.auth_server.FetchTask$UIDPair(s.study.studyInstanceUID, s.seriesInstanceUID) from Series s where s.populated = false", UIDPair.class);
+            TypedQuery<UIDPair> query = em.createQuery("select new online.kheops.auth_server.fetch.FetchTask$UIDPair(s.study.studyInstanceUID, s.seriesInstanceUID) from Series s where s.populated = false", UIDPair.class);
             query.setMaxResults(30);
             unpopulatedSeriesUIDs = query.getResultList();
 
