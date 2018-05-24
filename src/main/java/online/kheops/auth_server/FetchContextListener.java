@@ -27,6 +27,7 @@ public class FetchContextListener implements ServletContextListener {
         PersistenceUtils.setUser(sce.getServletContext().getInitParameter("online.kheops.jdbc.user"));
         PersistenceUtils.setPassword(sce.getServletContext().getInitParameter("online.kheops.jdbc.password"));
         PersistenceUtils.setUrl(sce.getServletContext().getInitParameter("online.kheops.jdbc.url"));
+        AssertionVerifier.setSuperuserSecret(sce.getServletContext().getInitParameter("online.kheops.superuser.hmacsecret"));
 
         try {
             FetchTask task = new FetchTask(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));

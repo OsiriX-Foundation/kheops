@@ -56,7 +56,7 @@ public class User {
             Query googleIdQuery = em.createNamedQuery("User.findPkByGoogleId");
             googleIdQuery.setParameter("google_id", username);
             return ((BigInteger) googleIdQuery.getSingleResult()).longValue();
-        } catch (NoResultException ignored) {}
+        } catch (NoResultException ignored) {/*empty*/}
         try {
             Query googleEmailQuery = em.createNamedQuery("User.findPkByGoogleEmail");
             googleEmailQuery.setParameter("google_email", username);
@@ -71,12 +71,12 @@ public class User {
             TypedQuery<User> googleIdQuery = em.createNamedQuery("User.findByGoogleId", User.class);
             googleIdQuery.setParameter("google_id", username);
             return googleIdQuery.getSingleResult();
-        } catch (NoResultException ignored) {}
+        } catch (NoResultException ignored) {/*empty*/}
         try {
             TypedQuery<User> googleEmailQuery = em.createNamedQuery("User.findByGoogleEmail", User.class);
             googleEmailQuery.setParameter("google_email", username);
             return googleEmailQuery.getSingleResult();
-        } catch (NoResultException ignored) {}
+        } catch (NoResultException ignored) {/*empty*/}
 
         throw new NoResultException();
     }

@@ -11,8 +11,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import online.kheops.auth_server.AssertionVerifier;
-import online.kheops.auth_server.PersistenceUtils;
+import online.kheops.auth_server.*;
 import online.kheops.auth_server.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,75 +49,74 @@ public class TokenResource
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertion, @FormParam("scope") String scope)
-        throws UnsupportedEncodingException {
+    public Response token(@FormParam("grant_type") String grant_type, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope) {
 
-        ErrorResponse errorResponse = new ErrorResponse();
+        final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
-
 
         if (grant_type == null) {
             errorResponse.errorDescription = "Missing grant_type";
+            LOG.warn("Request for a token is missing a grant_type");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
-        if (assertion == null) {
+        if (assertionToken == null) {
             errorResponse.errorDescription = "Missing assertion";
+            LOG.warn("Request for a token is missing an assertion");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
 
-        final String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
-        AssertionVerifier assertionVerifier = new AssertionVerifier(assertion, grant_type, superuserSecret);
-
-        if (assertionVerifier.isVerfified()) {
-            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-            EntityManager em = factory.createEntityManager();
-
-            boolean newUser = false;
-            try {
-                EntityTransaction tx = em.getTransaction();
-                tx.begin();
-
-                long userPk = User.findPkByUsername(assertionVerifier.getUsername(), em);
-                if (userPk == -1) {
-                    LOG.info("User not found, creating a new User");
-                    newUser = true;
-                    em.persist(new User(assertionVerifier.getUsername(), assertionVerifier.getEmail()));
-                }
-                tx.commit();
-            } catch (Throwable t) {
-                LOG.error("Couldn't find the user", t);
-            } finally {
-                em.close();
-                factory.close();
-            }
-
-            // Generate a new token
-
-            final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-            final Algorithm algorithmHMAC = Algorithm.HMAC256(authSecret);
-
-            String token = JWT.create()
-                    .withIssuer("auth.kheops.online")
-                    .withSubject(assertionVerifier.getUsername())
-                    .withAudience("dicom.kheops.online")
-                    .withClaim("capability", !assertionVerifier.isCapabilityAssertion()) // don't give capability access for capability assertions
-                    .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-                    .withNotBefore(new Date())
-                    .sign(algorithmHMAC);
-
-            TokenResponse tokenResponse = new TokenResponse();
-            tokenResponse.accessToken = token;
-            tokenResponse.tokenType = "Bearer";
-            tokenResponse.expiresIn = 3600L;
-            if (newUser) {
-                return Response.status(Response.Status.CREATED).entity(tokenResponse).build();
-            } else {
-                return Response.ok(tokenResponse).build();
-            }
-        } else {
-            errorResponse.errorDescription = assertionVerifier.getErrorDescription();
+        final Assertion assertion;
+        try {
+            assertion = AssertionVerifier.createAssertion(assertionToken, grant_type);
+        } catch (UnknownGrantTypeException | BadAssertionException e) {
+            errorResponse.errorDescription = e.getMessage();
+            LOG.warn("Error validating a token", e);
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
+
+        final EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
+        final EntityManager em = PersistenceUtils.createEntityManagerFactory().createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        Response.Status responseStatus = Response.Status.OK;
+        try {
+            tx.begin();
+
+            long userPk = User.findPkByUsername(assertion.getUsername(), em);
+            if (userPk == -1) {
+                LOG.info("User not found, creating a new User");
+                responseStatus = Response.Status.CREATED;
+                em.persist(new User(assertion.getUsername(), assertion.getEmail()));
+            }
+            tx.commit();
+        } finally {
+            em.close();
+            factory.close();
+        }
+
+        // Generate a new token
+        final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
+        final Algorithm algorithmHMAC;
+        try {
+            algorithmHMAC = Algorithm.HMAC256(authSecret);
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        String token = JWT.create()
+                .withIssuer("auth.kheops.online")
+                .withSubject(assertion.getUsername())
+                .withAudience("dicom.kheops.online")
+                .withClaim("capability", !assertion.isCapabilityAssertion()) // don't give capability access for capability assertions
+                .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .withNotBefore(new Date())
+                .sign(algorithmHMAC);
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.accessToken = token;
+        tokenResponse.tokenType = "Bearer";
+        tokenResponse.expiresIn = 3600L;
+        return Response.status(responseStatus).entity(tokenResponse).build();
     }
 }
 
