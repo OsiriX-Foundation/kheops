@@ -6,7 +6,7 @@ filename="/run/secrets/mysql_password"
 pwd=$(head -n 1 $filename)
 
 filename="/run/secrets/mysql_root_password"
-root_pwd=$(head -n 1 $filename)
+rootpwd=$(head -n 1 $filename)
 
 mysql -uroot -p$rootpwd<<MYSQL_SCRIPT
 
