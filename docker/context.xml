@@ -1,14 +1,14 @@
 <Context>
-    <Parameter name="online.kheops.superuser.hmacsecret" value="kheops_superuser_hmacsecret"
+    <Parameter name="online.kheops.superuser.hmacsecret" value="$kheops_superuser_hmacsecret"
                override="false"/>
-    <Parameter name="online.kheops.auth.hmacsecret" value="kheops_auth_hmacsecret"
+    <Parameter name="online.kheops.auth.hmacsecret" value="$kheops_auth_hmacsecret"
                override="false"/>
     <Parameter name="online.kheops.pacs.uri" value="http://pacs_arc:8080/dcm4chee-arc/aets/DCM4CHEE/rs"
                override="false"/>
     <Parameter name="online.kheops.jdbc.url" value="jdbc:mysql://kheopsmysql/kheops"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.user" value="mysql_user"
+    <Parameter name="online.kheops.jdbc.user" value="$mysql_user"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.password" value="mysql_password"
+    <Parameter name="online.kheops.jdbc.password" value="$mysql_password"
                override="false"/>
 </Context>
