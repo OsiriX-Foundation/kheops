@@ -5,7 +5,9 @@ import javax.persistence.Persistence;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PersistenceUtils {
+public abstract class PersistenceUtils {
+
+    private PersistenceUtils() {}
 
     private static String user;
     private static String password;

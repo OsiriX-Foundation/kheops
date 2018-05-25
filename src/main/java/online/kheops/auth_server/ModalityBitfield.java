@@ -7,7 +7,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
-public class ModalityBitfield {
+public abstract class ModalityBitfield {
+
+    private ModalityBitfield() {}
+
     private static final List<Code> MODALITY_LIST = new ArrayList<>();
     static {
         Code[] codes = {
