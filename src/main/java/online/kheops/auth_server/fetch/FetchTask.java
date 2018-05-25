@@ -118,8 +118,8 @@ public class FetchTask implements Runnable {
             try {
                 List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {
                 });
-                if (seriesList == null || seriesList.size() < 1) {
-                    continue;
+                if (seriesList == null || seriesList.isEmpty()) {
+                    throw new WebApplicationException("GET to fetch series returned nothing");
                 }
                 attributes = seriesList.get(0);
             } catch (WebApplicationException e) {
@@ -163,8 +163,8 @@ public class FetchTask implements Runnable {
             final Attributes attributes;
             try {
                 List<Attributes> studyList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {});
-                if (studyList == null || studyList.size() < 1) {
-                    continue;
+                if (studyList == null || studyList.isEmpty()) {
+                    throw new WebApplicationException("GET to fetch study returned nothing");
                 }
                 attributes = studyList.get(0);
             } catch (WebApplicationException e) {
