@@ -37,6 +37,14 @@ public class InboxResource
     @Context
     ServletContext context;
 
+    private void checkValidUID(String UID, String name) throws WebApplicationException {
+        try {
+            new Oid(UID);
+        } catch (GSSException exception) {
+            throw new WebApplicationException(Response.status(400, name + " is not a valid UID").build());
+        }
+    }
+
     @PUT
     @Secured
     @Path("/{user}/studies/{studyInstanceUID}")
@@ -44,12 +52,7 @@ public class InboxResource
                              @PathParam("studyInstanceUID") String studyInstanceUID,
                              @Context SecurityContext securityContext) {
 
-        // validate the UIDs
-        try {
-            new Oid(studyInstanceUID);
-        } catch (GSSException exception) {
-            return Response.status(400, "StudyInstanceUID is not a valid UID").build();
-        }
+        checkValidUID(studyInstanceUID, "StudyInstanceUID");
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -110,17 +113,9 @@ public class InboxResource
                              @PathParam("studyInstanceUID") String studyInstanceUID,
                              @PathParam("seriesInstanceUID") String seriesInstanceUID,
                              @Context SecurityContext securityContext) {
-        // validate the UIDs
-        try {
-            new Oid(studyInstanceUID);
-        } catch (GSSException exception) {
-            return Response.status(400, "StudyInstanceUID is not a valid UID").build();
-        }
-        try {
-            new Oid(seriesInstanceUID);
-        } catch (GSSException exception) {
-            return Response.status(400, "SeriesInstanceUID is not a valid UID").build();
-        }
+
+        checkValidUID(studyInstanceUID, "StudyInstanceUID");
+        checkValidUID(seriesInstanceUID, "SeriesInstanceUID");
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -285,6 +280,8 @@ public class InboxResource
                                        @PathParam("studyInstanceUID") String studyInstanceUID,
                                        @Context SecurityContext securityContext) throws URISyntaxException {
 
+        checkValidUID(studyInstanceUID, "StudyInstanceUID");
+
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
@@ -345,6 +342,8 @@ public class InboxResource
     public Response deleteStudy(@PathParam("user") String username,
                                 @PathParam("studyInstanceUID") String studyInstanceUID,
                                 @Context SecurityContext securityContext) {
+
+        checkValidUID(studyInstanceUID, "StudyInstanceUID");
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
