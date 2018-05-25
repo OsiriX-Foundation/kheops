@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Random;
 
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "capabilities")
 public class Capability {
@@ -56,7 +57,7 @@ public class Capability {
         StringBuilder secretBuilder = new StringBuilder();
         Random rnd = new Random();
         while (secretBuilder.length() < 16) {
-            int index = (int) (rnd.nextFloat() * DICT.length());
+            int index = rnd.nextInt(DICT.length());
             secretBuilder.append(DICT.charAt(index));
         }
         this.secret = secretBuilder.toString();
@@ -124,4 +125,4 @@ public class Capability {
     public String getSecret() {
         return secret;
     }
-};
+}

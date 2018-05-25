@@ -253,7 +253,7 @@ public class InboxResource
     }
 
     private Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID) {
-        Set<String> availableSeriesUIDs = new HashSet<>();
+        Set<String> availableSeriesUIDs;
 
         EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
         EntityManager em = factory.createEntityManager();
@@ -263,11 +263,14 @@ public class InboxResource
             tx.begin();
 
             User callingUser = User.findByPk(userPk, em);
+            if (callingUser == null) {
+                throw new IllegalStateException("calling user can't be found");
+            }
 
             TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :StudyInstanceUID and :user member of s.users", String.class);
             query.setParameter(Strings.StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
-            availableSeriesUIDs.addAll(query.getResultList());
+            availableSeriesUIDs = new HashSet<>(query.getResultList());
 
             tx.commit();
         } finally {

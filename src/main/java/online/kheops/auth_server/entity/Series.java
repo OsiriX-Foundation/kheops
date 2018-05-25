@@ -78,7 +78,7 @@ public class Series {
         updatedTime = new Date();
     }
 
-    public Attributes getAttributes() throws IllegalStateException {
+    public Attributes getAttributes() {
         if (!isPopulated()) {
             throw new IllegalStateException();
         }

@@ -22,10 +22,10 @@ import java.util.Set;
                 query = "SELECT u from User u where u.pk = :pk"),
         @NamedQuery(
                 name = "User.findByGoogleEmail",
-                query = "SELECT u from User u where u.google_email = :google_email"),
+                query = "SELECT u from User u where u.googleEmail = :googleEmail"),
         @NamedQuery(
                 name = "User.findByGoogleId",
-                query = "SELECT u from User u where u.google_id = :google_id")
+                query = "SELECT u from User u where u.googleId = :googleId")
 
 })
 public class User {
@@ -35,10 +35,12 @@ public class User {
     private long pk;
 
     @Basic(optional = false)
-    private String google_id;
+    @Column(name = "google_id")
+    private String googleId;
 
     @Basic(optional = false)
-    private String google_email;
+    @Column(name = "google_email")
+    private String googleEmail;
 
     @ManyToMany
     @JoinTable (name = "user_series",
@@ -69,12 +71,12 @@ public class User {
     public static User findByUsername(String username, EntityManager em) {
         try {
             TypedQuery<User> googleIdQuery = em.createNamedQuery("User.findByGoogleId", User.class);
-            googleIdQuery.setParameter("google_id", username);
+            googleIdQuery.setParameter("googleId", username);
             return googleIdQuery.getSingleResult();
         } catch (NoResultException ignored) {/*empty*/}
         try {
             TypedQuery<User> googleEmailQuery = em.createNamedQuery("User.findByGoogleEmail", User.class);
-            googleEmailQuery.setParameter("google_email", username);
+            googleEmailQuery.setParameter("googleEmail", username);
             return googleEmailQuery.getSingleResult();
         } catch (NoResultException ignored) {/*empty*/}
 
@@ -84,14 +86,18 @@ public class User {
     public static User findByPk(long userPk, EntityManager em) throws NoResultException {
         TypedQuery<User> query = em.createNamedQuery("User.findByPk", User.class);
         query.setParameter("pk", userPk);
-        return query.getSingleResult();
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public User() {}
 
-    public User(String google_id, String google_email) {
-        this.google_id = google_id;
-        this.google_email = google_email;
+    public User(String googleId, String googleEmail) {
+        this.googleId = googleId;
+        this.googleEmail = googleEmail;
     }
 
     public long getPk() {
@@ -99,11 +105,11 @@ public class User {
     }
 
     public String getGoogle_id() {
-        return google_id;
+        return googleId;
     }
 
     public String getGoogle_email() {
-        return google_email;
+        return googleEmail;
     }
 
     public Set<Series> getSeries() {
