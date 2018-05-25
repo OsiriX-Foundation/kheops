@@ -3,11 +3,11 @@
                override="false"/>
     <Parameter name="online.kheops.auth.hmacsecret" value="${kheops_auth_hmasecret}"
                override="false"/>
-    <Parameter name="online.kheops.pacs.uri" value="http://pacs_arc:8080/dcm4chee-arc/aets/DCM4CHEE/rs"
+    <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.url" value="jdbc:mysql://kheopsmysql/kheops"
+    <Parameter name="online.kheops.jdbc.url" value="jdbc:${kheops_mysql_url}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.user" value="${mysql_user}"
+    <Parameter name="online.kheops.jdbc.user" value="${kheops_mysql_user}"
                override="false"/>
     <Parameter name="online.kheops.jdbc.password" value="${mysql_password}"
                override="false"/>
