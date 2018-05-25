@@ -1,7 +1,7 @@
 FROM tomcat:8.0.51-jre8
 
 ENV SECRET_FILE_PATH=/run/secrets/*
-ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/*.xml
+ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
 
 CMD ["./replaceSecretsAndRun.sh"]
 
