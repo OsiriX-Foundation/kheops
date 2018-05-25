@@ -82,18 +82,13 @@ public class InboxResource
             }
 
             // find all the series that the use has access to
-            List<Series> availableSeries;
-            try {
-                TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where :callingUser MEMBER OF s.users and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
-                seriesQuery.setParameter("callingUser", callingUser);
-                seriesQuery.setParameter(Strings.StudyInstanceUID, studyInstanceUID);
-                seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-                availableSeries = seriesQuery.getResultList();
-            } catch (Exception exception) {
-                return Response.status(404, "No study with the given StudyInstanceUID").build();
-            }
+            TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where :callingUser MEMBER OF s.users and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+            seriesQuery.setParameter("callingUser", callingUser);
+            seriesQuery.setParameter(Strings.StudyInstanceUID, studyInstanceUID);
+            seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            List<Series> availableSeries = seriesQuery.getResultList();
 
-            if (availableSeries == null || availableSeries.size() == 0) {
+            if (availableSeries.isEmpty()) {
                 return Response.status(404, "No study with the given StudyInstanceUID").build();
             }
 

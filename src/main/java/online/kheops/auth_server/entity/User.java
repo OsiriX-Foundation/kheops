@@ -104,11 +104,11 @@ public class User {
         return pk;
     }
 
-    public String getGoogle_id() {
+    public String getGoogleId() {
         return googleId;
     }
 
-    public String getGoogle_email() {
+    public String getGoogleEmail() {
         return googleEmail;
     }
 

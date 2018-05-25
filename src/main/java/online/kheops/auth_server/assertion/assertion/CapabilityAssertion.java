@@ -33,8 +33,8 @@ public class CapabilityAssertion implements Assertion {
 
             }
 
-            username = capability.getUser().getGoogle_id();
-            email = capability.getUser().getGoogle_email();
+            username = capability.getUser().getGoogleId();
+            email = capability.getUser().getGoogleEmail();
 
             tx.commit();
         } catch (NoResultException e) {
