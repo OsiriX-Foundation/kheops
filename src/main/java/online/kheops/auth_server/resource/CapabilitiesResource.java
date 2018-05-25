@@ -70,6 +70,9 @@ public class CapabilitiesResource {
             tx.begin();
 
             final User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
+                return Response.status(404, "Unknown target user").build();
+            }
 
             if (callingUserPk != targetUser.getPk()) {
                 return Response.status(400, "Can't set capabilities for a different user").build();
@@ -119,6 +122,9 @@ public class CapabilitiesResource {
             tx.begin();
 
             final User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
+                return Response.status(404, "Unknown target user").build();
+            }
 
             if (callingUserPk != targetUser.getPk()) {
                 return Response.status(400, "Can't revoke a different user's capability").build();
@@ -171,6 +177,9 @@ public class CapabilitiesResource {
             tx.begin();
 
             final User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
+                return Response.status(404, "Unknown target user").build();
+            }
 
             if (callingUserPk != targetUser.getPk()) {
                 return Response.status(400, "Can't get capabilities for a different user").build();

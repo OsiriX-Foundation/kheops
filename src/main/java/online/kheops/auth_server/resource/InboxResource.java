@@ -73,6 +73,9 @@ public class InboxResource
             User callingUser = userQuery.setParameter("userPk", callingUserPk).getSingleResult();
 
             final User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
+                return Response.status(404, "Unknown target user").build();
+            }
 
             if (callingUserPk == targetUser.getPk()) {
                 return Response.status(400, "Can't send a study to yourself").build();
@@ -136,10 +139,8 @@ public class InboxResource
             userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             User callingUser = userQuery.setParameter("pk", callingUserPk).getSingleResult();
 
-            User targetUser;
-            try {
-                targetUser = User.findByUsername(username, em);
-            } catch (NoResultException exception) {
+            User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
                 return Response.status(404, "Unknown target user").build();
             }
 
@@ -360,6 +361,10 @@ public class InboxResource
             tx.begin();
 
             User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
+                return Response.status(404, "Unknown target user").build();
+            }
+
             if (callingUserPk != targetUser.getPk()) {
                 return Response.status(403, "Access to study denied").build();
             }

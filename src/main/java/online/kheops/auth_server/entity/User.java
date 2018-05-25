@@ -66,7 +66,7 @@ public class User {
         return -1;
     }
 
-    public static User findByUsername(String username, EntityManager em) throws NoResultException {
+    public static User findByUsername(String username, EntityManager em) {
         try {
             TypedQuery<User> googleIdQuery = em.createNamedQuery("User.findByGoogleId", User.class);
             googleIdQuery.setParameter("google_id", username);
@@ -78,7 +78,7 @@ public class User {
             return googleEmailQuery.getSingleResult();
         } catch (NoResultException ignored) {/*empty*/}
 
-        throw new NoResultException("User not found");
+        return null;
     }
 
     public static User findByPk(long userPk, EntityManager em) throws NoResultException {
