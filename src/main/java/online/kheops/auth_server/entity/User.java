@@ -83,7 +83,7 @@ public class User {
         return null;
     }
 
-    public static User findByPk(long userPk, EntityManager em) throws NoResultException {
+    public static User findByPk(long userPk, EntityManager em) {
         TypedQuery<User> query = em.createNamedQuery("User.findByPk", User.class);
         query.setParameter("pk", userPk);
         try {

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,7 +83,7 @@ public class CapabilitiesProxy {
     @Produces("application/dicom+xml")
     public Response storeInstancesXML(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
-                                      @HeaderParam("Content-Type") String contentType) throws Exception {
+                                      @HeaderParam("Content-Type") String contentType) {
         return store(in, contentType, capabilitySecret, null, Output.DICOM_XML);
     }
 
@@ -92,7 +93,7 @@ public class CapabilitiesProxy {
     public Response storeInstancesXML(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
                                       @HeaderParam("Content-Type") String contentType,
-                                      @PathParam("StudyInstanceUID") String studyInstanceUID) throws Exception {
+                                      @PathParam("StudyInstanceUID") String studyInstanceUID) {
         return store(in, contentType, capabilitySecret, studyInstanceUID, Output.DICOM_XML);
     }
 
@@ -101,7 +102,7 @@ public class CapabilitiesProxy {
     @Produces("application/dicom+json")
     public Response storeInstancesJSON(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
-                                      @HeaderParam("Content-Type") String contentType) throws Exception {
+                                      @HeaderParam("Content-Type") String contentType) {
         return store(in, contentType, capabilitySecret, null, Output.DICOM_JSON);
     }
 
@@ -111,15 +112,27 @@ public class CapabilitiesProxy {
     public Response storeInstancesJSON(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
                                       @HeaderParam("Content-Type") String contentType,
-                                      @PathParam("StudyInstanceUID") String studyInstanceUID) throws Exception {
+                                      @PathParam("StudyInstanceUID") String studyInstanceUID) {
         return store(in, contentType, capabilitySecret, studyInstanceUID, Output.DICOM_JSON);
     }
 
 
-    private Response store(InputStream requestBody, String contentType, String capabilitySecret, String studyInstanceUID, Output output)  throws Exception {
+    private Response store(InputStream requestBody, String contentType, String capabilitySecret, String studyInstanceUID, Output output) {
         Client client = ClientBuilder.newClient();
-        URI authenticationServerURI = new URI(context.getInitParameter("online.kheops.auth_server.uri"));
-        URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
+
+        final URI authenticationServerURI;
+        try {
+            authenticationServerURI = new URI(context.getInitParameter("online.kheops.auth_server.uri"));
+        } catch (URISyntaxException e) {
+            throw new WebApplicationException("online.kheops.auth_server.uri is not a valid URI", e);
+        }
+
+        final URI dicomWebURI;
+        try {
+            dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
+        } catch (URISyntaxException e) {
+            throw new WebApplicationException("online.kheops.pacs.uri is not a valid URI", e);
+        }
 
         Form form = new Form().param("assertion", capabilitySecret).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
         URI uri = UriBuilder.fromUri(authenticationServerURI).path("token").build();

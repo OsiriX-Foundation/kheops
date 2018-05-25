@@ -84,7 +84,7 @@ public abstract class ModalityBitfield {
 
         if (modalities.size() > 1) {
             throw new IllegalArgumentException("Bitfield contains more than one modality");
-        } else if (modalities.size() == 0) {
+        } else if (modalities.isEmpty()) {
             return null;
         }
 
