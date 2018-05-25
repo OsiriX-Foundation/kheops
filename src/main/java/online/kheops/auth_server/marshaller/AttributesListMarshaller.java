@@ -34,26 +34,23 @@ public class AttributesListMarshaller implements MessageBodyReader<List<Attribut
 
     @Override
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
-        if (aClass.isAssignableFrom(List.class)) {
-            if (type instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) type;
-                return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
-            }
+        if (aClass.isAssignableFrom(List.class) && type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
         }
         return false;
     }
 
     @Override
-    public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream)
-            throws WebApplicationException {
+    public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) {
         List<Attributes> list = new ArrayList<>();
 
         try {
             JsonParser parser = Json.createParser(inputStream);
             JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
-        } catch (Throwable t) {
-            LOG.error("Error while parsing JSON dataset", t);
+        } catch (Exception e){
+            throw new WebApplicationException("Error while reading JSON datasets", e);
         }
 
         return list;
@@ -61,18 +58,15 @@ public class AttributesListMarshaller implements MessageBodyReader<List<Attribut
 
     @Override
     public boolean isWriteable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        if (List.class.isAssignableFrom(aClass)) {
-            if (genericType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) genericType;
-                return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
-            }
+        if (List.class.isAssignableFrom(aClass) && genericType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+            return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
         }
         return false;
     }
 
     @Override
-    public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-            throws javax.ws.rs.WebApplicationException {
+    public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
         JsonGenerator generator = Json.createGenerator(entityStream);
         JSONWriter jsonWriter = new JSONWriter(generator);

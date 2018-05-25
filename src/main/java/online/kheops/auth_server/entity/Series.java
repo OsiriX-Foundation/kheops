@@ -66,15 +66,6 @@ public class Series {
         seriesInstanceUID = newSeriesInstanceUID;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Series[pk=" + pk
-//                + ", uid=" + seriesInstanceUID
-//                + ", StudyInstanceUID=" + seriesInstanceUID
-//                + ", mod=" + modality
-//                + "]";
-//    }
-
     @PrePersist
     public void onPrePersist() {
         Date now = new Date();
