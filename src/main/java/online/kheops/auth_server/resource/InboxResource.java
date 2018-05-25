@@ -157,14 +157,14 @@ public class InboxResource
                     } else {
                         return Response.status(403, "Access to series denied").build();
                     }
-                 } catch (NoResultException ignored) {}
+                 } catch (NoResultException ignored) {/*empty*/}
 
                 // find if the study already exists
                 Study study = null;
                 try {
                     TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
                     study = query.setParameter(Strings.StudyInstanceUID, studyInstanceUID).getSingleResult();
-                } catch (NoResultException ignored) {}
+                } catch (NoResultException ignored) {/*empty*/}
 
                 if (study == null) { // the study doesn't exist, we need to create it
                     study = new Study();

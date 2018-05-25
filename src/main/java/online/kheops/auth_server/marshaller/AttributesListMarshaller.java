@@ -30,8 +30,6 @@ import java.util.List;
 @Produces("application/dicom+json")
 public class AttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AttributesListMarshaller.class);
-
     @Override
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
         if (aClass.isAssignableFrom(List.class) && type instanceof ParameterizedType) {

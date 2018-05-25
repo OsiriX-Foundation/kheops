@@ -78,7 +78,7 @@ public class User {
             return googleEmailQuery.getSingleResult();
         } catch (NoResultException ignored) {/*empty*/}
 
-        throw new NoResultException();
+        throw new NoResultException("User not found");
     }
 
     public static User findByPk(long userPk, EntityManager em) throws NoResultException {
