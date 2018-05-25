@@ -34,12 +34,15 @@ import java.util.Set;
 @Path("/users")
 public class InboxResource
 {
+    final static String StudyInstanceUID = "StudyInstanceUID";
+    final static String SeriesInstanceUID = "SeriesInstanceUID";
+
     @Context
     ServletContext context;
 
-    private void checkValidUID(String UID, String name) throws WebApplicationException {
+    private void checkValidUID(String uid, String name) {
         try {
-            new Oid(UID);
+            new Oid(uid);
         } catch (GSSException exception) {
             throw new WebApplicationException(Response.status(400, name + " is not a valid UID").build());
         }
@@ -47,12 +50,12 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("/{user}/studies/{studyInstanceUID}")
+    @Path("/{user}/studies/{StudyInstanceUID}")
     public Response putStudy(@PathParam("user") String username,
-                             @PathParam("studyInstanceUID") String studyInstanceUID,
+                             @PathParam(StudyInstanceUID) String studyInstanceUID,
                              @Context SecurityContext securityContext) {
 
-        checkValidUID(studyInstanceUID, "StudyInstanceUID");
+        checkValidUID(studyInstanceUID, StudyInstanceUID);
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -78,7 +81,7 @@ public class InboxResource
             try {
                 TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where :callingUser MEMBER OF s.users and s.study.studyInstanceUID = :studyInstanceUID", Series.class);
                 seriesQuery.setParameter("callingUser", callingUser);
-                seriesQuery.setParameter("studyInstanceUID", studyInstanceUID);
+                seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
                 seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
                 availableSeries = seriesQuery.getResultList();
             } catch (Exception exception) {
@@ -110,12 +113,12 @@ public class InboxResource
     @Secured
     @Path("/{user}/studies/{studyInstanceUID}/series/{seriesInstanceUID}")
     public Response putSeries(@PathParam("user") String username,
-                             @PathParam("studyInstanceUID") String studyInstanceUID,
-                             @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                             @PathParam(StudyInstanceUID) String studyInstanceUID,
+                             @PathParam(SeriesInstanceUID) String seriesInstanceUID,
                              @Context SecurityContext securityContext) {
 
-        checkValidUID(studyInstanceUID, "StudyInstanceUID");
-        checkValidUID(seriesInstanceUID, "SeriesInstanceUID");
+        checkValidUID(studyInstanceUID, StudyInstanceUID);
+        checkValidUID(seriesInstanceUID, SeriesInstanceUID);
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -144,7 +147,7 @@ public class InboxResource
                 try {
                     TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :seriesInstanceUID", Series.class);
                     query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-                    final Series storedSeries = query.setParameter("seriesInstanceUID", seriesInstanceUID).getSingleResult();
+                    final Series storedSeries = query.setParameter(SeriesInstanceUID, seriesInstanceUID).getSingleResult();
 
                     // we need to check here if the series that was found it owned by the user
                     if (storedSeries.getUsers().contains(callingUser)) {
@@ -158,7 +161,7 @@ public class InboxResource
                 Study study = null;
                 try {
                     TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
-                    study = query.setParameter("studyInstanceUID", studyInstanceUID).getSingleResult();
+                    study = query.setParameter(StudyInstanceUID, studyInstanceUID).getSingleResult();
                 } catch (NoResultException ignored) {}
 
                 if (study == null) { // the study doesn't exist, we need to create it
@@ -179,8 +182,8 @@ public class InboxResource
                 final Series series;
                 try {
                     TypedQuery<Series> seriesQuery = em.createQuery("select s from Series s where s.study.studyInstanceUID = :studyInstanceUID and s.seriesInstanceUID = :seriesInstanceUID and :callingUser member of s.users", Series.class);
-                    seriesQuery.setParameter("studyInstanceUID", studyInstanceUID);
-                    seriesQuery.setParameter("seriesInstanceUID", seriesInstanceUID);
+                    seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
+                    seriesQuery.setParameter(SeriesInstanceUID, seriesInstanceUID);
                     seriesQuery.setParameter("callingUser", callingUser);
                     seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
                     series = seriesQuery.getSingleResult();
@@ -259,7 +262,7 @@ public class InboxResource
             User callingUser = User.findByPk(userPk, em);
 
             TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", String.class);
-            query.setParameter("studyInstanceUID", studyInstanceUID);
+            query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
             availableSeriesUIDs.addAll(query.getResultList());
 
@@ -277,10 +280,10 @@ public class InboxResource
     @Path("/{user}/studies/{studyInstanceUID}/metadata")
     @Produces("application/dicom+json")
     public Response getStudiesMetadata(@PathParam("user") String username,
-                                       @PathParam("studyInstanceUID") String studyInstanceUID,
+                                       @PathParam(StudyInstanceUID) String studyInstanceUID,
                                        @Context SecurityContext securityContext) throws URISyntaxException {
 
-        checkValidUID(studyInstanceUID, "StudyInstanceUID");
+        checkValidUID(studyInstanceUID, StudyInstanceUID);
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -340,10 +343,10 @@ public class InboxResource
     @Path("/{user}/studies/{studyInstanceUID}")
     @Produces("application/dicom+json")
     public Response deleteStudy(@PathParam("user") String username,
-                                @PathParam("studyInstanceUID") String studyInstanceUID,
+                                @PathParam(StudyInstanceUID) String studyInstanceUID,
                                 @Context SecurityContext securityContext) {
 
-        checkValidUID(studyInstanceUID, "StudyInstanceUID");
+        checkValidUID(studyInstanceUID, StudyInstanceUID);
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -360,7 +363,7 @@ public class InboxResource
             }
 
             TypedQuery<Series> query = em.createQuery("select s from Series s where s.study.studyInstanceUID = :studyInstanceUID and :user member of s.users", Series.class);
-            query.setParameter("studyInstanceUID", studyInstanceUID);
+            query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", targetUser);
             List<Series> seriesList = query.getResultList();
 
