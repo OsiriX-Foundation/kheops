@@ -36,7 +36,7 @@ public class CapabilitiesProxy {
     @Context
     ServletContext context;
 
-    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(CapabilitiesProxy.class.getName());
 
     @SuppressWarnings("unused")
     static class TokenResponse {
@@ -125,6 +125,8 @@ public class CapabilitiesProxy {
 
 
     private Response store(InputStream requestBody, String contentType, String capabilitySecret, String studyInstanceUID, Output output) {
+        LOG.info("In store");
+
         Client client = ClientBuilder.newClient();
 
         final URI authenticationServerURI;
