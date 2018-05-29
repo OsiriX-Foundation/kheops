@@ -57,9 +57,8 @@ public class SecuredFilter implements ContainerRequestFilter {
         long userPK;
 
         EntityManager em = EntityManagerListener.createEntityManager();
-
+        EntityTransaction tx = em.getTransaction();
         try {
-            EntityTransaction tx = em.getTransaction();
             tx.begin();
             userPK = User.findPkByUsername(username, em);
             if (userPK == -1) {
@@ -67,6 +66,9 @@ public class SecuredFilter implements ContainerRequestFilter {
             }
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 

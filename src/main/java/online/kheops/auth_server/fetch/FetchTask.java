@@ -64,8 +64,8 @@ public class FetchTask implements Runnable {
         EntityManager em = EntityManagerListener.createEntityManager();
         List<UIDPair> unpopulatedSeriesUIDs;
 
+        EntityTransaction tx = em.getTransaction();
         try {
-            EntityTransaction tx = em.getTransaction();
             tx.begin();
 
             //noinspection JpaQlInspection
@@ -75,6 +75,9 @@ public class FetchTask implements Runnable {
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -85,8 +88,8 @@ public class FetchTask implements Runnable {
         EntityManager em = EntityManagerListener.createEntityManager();
         List<String> unpopulatedStudyUIDs;
 
+        EntityTransaction tx = em.getTransaction();
         try {
-            EntityTransaction tx = em.getTransaction();
             tx.begin();
 
             TypedQuery<String> query = em.createQuery("select s.studyInstanceUID from Study s where s.populated = false", String.class);
@@ -95,6 +98,9 @@ public class FetchTask implements Runnable {
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -140,6 +146,9 @@ public class FetchTask implements Runnable {
             } catch (Exception e) {
                 LOG.error("Error while storing series: " + seriesUID.getSeriesInstanceUID(), e);
             } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
                 em.close();
             }
         }
@@ -167,8 +176,8 @@ public class FetchTask implements Runnable {
             }
 
             EntityManager em = EntityManagerListener.createEntityManager();
+            EntityTransaction tx = em.getTransaction();
             try {
-                EntityTransaction tx = em.getTransaction();
                 tx.begin();
 
                 TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
@@ -183,6 +192,9 @@ public class FetchTask implements Runnable {
             } catch (Exception e) {
                 LOG.error("Error while fetching study: " + studyInstanceUID, e);
             } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
                 em.close();
             }
         }

@@ -39,6 +39,9 @@ public class CapabilityAssertion implements Assertion {
         } catch (NoResultException e) {
             throw new BadAssertionException("Unknown capability token", e);
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
     }

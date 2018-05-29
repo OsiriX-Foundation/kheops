@@ -94,6 +94,9 @@ public class CapabilitiesResource {
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -148,6 +151,9 @@ public class CapabilitiesResource {
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -196,6 +202,9 @@ public class CapabilitiesResource {
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 

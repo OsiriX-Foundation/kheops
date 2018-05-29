@@ -100,6 +100,9 @@ public class InboxResource
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -198,6 +201,9 @@ public class InboxResource
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -234,6 +240,9 @@ public class InboxResource
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -262,6 +271,9 @@ public class InboxResource
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -291,6 +303,9 @@ public class InboxResource
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
@@ -368,6 +383,9 @@ public class InboxResource
 
             tx.commit();
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
