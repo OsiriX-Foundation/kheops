@@ -3,6 +3,9 @@
 chmod a+w /etc/nginx/conf.d/myconf.conf
 sed -i "s|\${root_url}|$KHEOPS_ROOT_URL|" /etc/nginx/conf.d/myconf.conf
 
+sed -i "s|\${kheopsviewer_url}|$KHEOPS_NGINX_URL_KHEOPSVIEWER|" /etc/nginx/conf.d/myconf.conf
+sed -i "s|\${tomcat_url}|$KHEOPS_NGINX_URL_TOMCAT|" /etc/nginx/conf.d/myconf.conf
+
 https="https://"
 server_name=${KHEOPS_ROOT_URL/$https/}
 
