@@ -27,4 +27,5 @@ class KheopsPrincipalTest {
         assertEquals(principalName, kheopsPrincipal.getName());
     }
 
+    
 }
