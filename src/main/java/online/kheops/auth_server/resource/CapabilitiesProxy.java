@@ -126,6 +126,8 @@ public class CapabilitiesProxy {
 
     private Response store(InputStream requestBody, String contentType, String capabilitySecret, String studyInstanceUID, Output output) {
         LOG.info("In store");
+        LOG.info("Starting Fetch Task");
+
 
         Client client = ClientBuilder.newClient();
 
