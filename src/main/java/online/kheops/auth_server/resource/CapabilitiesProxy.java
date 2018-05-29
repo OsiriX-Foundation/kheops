@@ -18,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.transform.stream.StreamResult;
@@ -144,7 +145,7 @@ public class CapabilitiesProxy {
         final TokenResponse tokenResponse;
         try {
             tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
-        } catch (WebApplicationException e) {
+        } catch (ResponseProcessingException e) {
             LOG.warn("Unable to obtain a token for capability token", e);
             return Response.status(Response.Status.FORBIDDEN).entity("Unable to get a request token for the capability URL").build();
         }
