@@ -5,8 +5,6 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.ws.rs.WebApplicationException;
@@ -16,11 +14,13 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
 public class FetchTask implements Runnable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FetchTask.class);
+    private static final Logger LOG = Logger.getLogger(FetchTask.class.getName());
 
     private final URI dicomWebURI;
 
@@ -54,7 +54,7 @@ public class FetchTask implements Runnable {
             fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
             fetchUnpopulatedStudies(unpopulatedStudyUIDs());
         } catch (Exception e) {
-            LOG.error("An error occurred while fetching", e);
+            LOG.log(Level.SEVERE,"An error occurred while fetching", e);
         }
 
         LOG.info("Finished Fetch Task");
@@ -125,7 +125,7 @@ public class FetchTask implements Runnable {
                 }
                 attributes = seriesList.get(0);
             } catch (WebApplicationException e) {
-                LOG.error("Unable to fetch QIDO data for StudyInstanceUID:" + seriesUID.getStudyInstanceUID() + " SeriesInstanceUID: " + seriesUID.getSeriesInstanceUID(), e);
+                LOG.log(Level.SEVERE,"Unable to fetch QIDO data for StudyInstanceUID:" + seriesUID.getStudyInstanceUID() + " SeriesInstanceUID: " + seriesUID.getSeriesInstanceUID(), e);
                 continue;
             }
 
@@ -144,7 +144,7 @@ public class FetchTask implements Runnable {
 
                 tx.commit();
             } catch (Exception e) {
-                LOG.error("Error while storing series: " + seriesUID.getSeriesInstanceUID(), e);
+                LOG.log(Level.SEVERE, "Error while storing series: " + seriesUID.getSeriesInstanceUID(), e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -171,7 +171,7 @@ public class FetchTask implements Runnable {
                 }
                 attributes = studyList.get(0);
             } catch (WebApplicationException e) {
-                LOG.error("Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
+                LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
                 continue;
             }
 
@@ -190,7 +190,7 @@ public class FetchTask implements Runnable {
 
                 tx.commit();
             } catch (Exception e) {
-                LOG.error("Error while fetching study: " + studyInstanceUID, e);
+                LOG.log(Level.SEVERE,"Error while fetching study: " + studyInstanceUID, e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();

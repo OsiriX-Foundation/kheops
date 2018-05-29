@@ -7,8 +7,6 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.SAXTransformer;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
@@ -29,6 +27,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("proxy")
 public class CapabilitiesProxy {
@@ -36,7 +36,7 @@ public class CapabilitiesProxy {
     @Context
     ServletContext context;
 
-    private static final Logger LOG = LoggerFactory.getLogger(TokenResource.class);
+    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @SuppressWarnings("unused")
     static class TokenResponse {
@@ -146,7 +146,7 @@ public class CapabilitiesProxy {
         try {
             tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
         } catch (ResponseProcessingException e) {
-            LOG.warn("Unable to obtain a token for capability token", e);
+            LOG.log(Level.WARNING,"Unable to obtain a token for capability token", e);
             return Response.status(Response.Status.FORBIDDEN).entity("Unable to get a request token for the capability URL").build();
         }
 
