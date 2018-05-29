@@ -87,7 +87,7 @@ public class CapabilitiesProxy {
 
     @POST
     @Path("/capabilities/{capabilitySecret}/studies")
-    @Produces("application/dicom+xml; qs=0.75")
+    @Produces("application/dicom+xml")
     public Response storeInstancesXML(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
                                       @HeaderParam("Content-Type") String contentType) {
@@ -96,7 +96,7 @@ public class CapabilitiesProxy {
 
     @POST
     @Path("/capabilities/{capabilitySecret}/studies/{StudyInstanceUID}")
-    @Produces("application/dicom+xml; qs=0.75")
+    @Produces("application/dicom+xml")
     public Response storeInstancesXML(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
                                       @HeaderParam("Content-Type") String contentType,
@@ -106,7 +106,7 @@ public class CapabilitiesProxy {
 
     @POST
     @Path("/capabilities/{capabilitySecret}/studies")
-    @Produces("application/dicom+json; qs=1.0")
+    @Produces("application/dicom+json")
     public Response storeInstancesJSON(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
                                       @HeaderParam("Content-Type") String contentType) {
@@ -115,7 +115,7 @@ public class CapabilitiesProxy {
 
     @POST
     @Path("/capabilities/{capabilitySecret}/studies/{StudyInstanceUID}")
-    @Produces("application/dicom+json; qs=1.0")
+    @Produces("application/dicom+json")
     public Response storeInstancesJSON(InputStream in,
                                       @PathParam("capabilitySecret") String capabilitySecret,
                                       @HeaderParam("Content-Type") String contentType,
