@@ -5,8 +5,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
-import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.User;
 
@@ -56,8 +56,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         final String username = jwt.getSubject();
         long userPK;
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
             EntityTransaction tx = em.getTransaction();
@@ -69,7 +68,6 @@ public class SecuredFilter implements ContainerRequestFilter {
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();

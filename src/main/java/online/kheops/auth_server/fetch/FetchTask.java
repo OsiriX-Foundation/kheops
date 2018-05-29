@@ -1,6 +1,6 @@
 package online.kheops.auth_server.fetch;
 
-import online.kheops.auth_server.PersistenceUtils;
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.AttributesListMarshaller;
@@ -61,8 +61,7 @@ public class FetchTask implements Runnable {
     }
 
     private List<UIDPair> unpopulatedSeriesUIDs() {
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         List<UIDPair> unpopulatedSeriesUIDs;
 
         try {
@@ -77,15 +76,13 @@ public class FetchTask implements Runnable {
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return unpopulatedSeriesUIDs;
     }
 
     private List<String> unpopulatedStudyUIDs() {
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         List<String> unpopulatedStudyUIDs;
 
         try {
@@ -99,7 +96,6 @@ public class FetchTask implements Runnable {
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return unpopulatedStudyUIDs;
@@ -127,8 +123,7 @@ public class FetchTask implements Runnable {
                 continue;
             }
 
-            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-            EntityManager em = factory.createEntityManager();
+            EntityManager em = EntityManagerListener.createEntityManager();
             EntityTransaction tx = em.getTransaction();
             try {
                 tx.begin();
@@ -146,7 +141,6 @@ public class FetchTask implements Runnable {
                 LOG.error("Error while storing series: " + seriesUID.getSeriesInstanceUID(), e);
             } finally {
                 em.close();
-                factory.close();
             }
         }
     }
@@ -172,8 +166,7 @@ public class FetchTask implements Runnable {
                 continue;
             }
 
-            EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-            EntityManager em = factory.createEntityManager();
+            EntityManager em = EntityManagerListener.createEntityManager();
             try {
                 EntityTransaction tx = em.getTransaction();
                 tx.begin();
@@ -191,7 +184,6 @@ public class FetchTask implements Runnable {
                 LOG.error("Error while fetching study: " + studyInstanceUID, e);
             } finally {
                 em.close();
-                factory.close();
             }
         }
 

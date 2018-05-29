@@ -82,8 +82,7 @@ public class TokenResource
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
-        final EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        final EntityManager em = PersistenceUtils.createEntityManagerFactory().createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         Response.Status responseStatus = Response.Status.OK;
         try {
@@ -98,7 +97,6 @@ public class TokenResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         // Generate a new token

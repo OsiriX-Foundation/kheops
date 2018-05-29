@@ -1,7 +1,6 @@
 package online.kheops.auth_server.fetch;
 
 
-import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +25,6 @@ public class FetchContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         executor = new ScheduledThreadPoolExecutor(MAXIMUM_CONCURRENT);
 
-        PersistenceUtils.setUser(sce.getServletContext().getInitParameter("online.kheops.jdbc.user"));
-        PersistenceUtils.setPassword(sce.getServletContext().getInitParameter("online.kheops.jdbc.password"));
-        PersistenceUtils.setUrl(sce.getServletContext().getInitParameter("online.kheops.jdbc.url"));
         AssertionVerifier.setSuperuserSecret(sce.getServletContext().getInitParameter("online.kheops.superuser.hmacsecret"));
 
         try {

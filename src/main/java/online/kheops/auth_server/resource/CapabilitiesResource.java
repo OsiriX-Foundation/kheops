@@ -1,7 +1,7 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
-import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.annotation.CapabilitySecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Capability;
@@ -62,8 +62,7 @@ public class CapabilitiesResource {
             expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
         }
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
@@ -96,7 +95,6 @@ public class CapabilitiesResource {
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return Response.status(201).entity(capabilityResponse).build();
@@ -114,8 +112,7 @@ public class CapabilitiesResource {
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         CapabilityResponse capabilityResponse;
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
@@ -152,7 +149,6 @@ public class CapabilitiesResource {
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return Response.status(200).entity(capabilityResponse).build();
@@ -169,8 +165,7 @@ public class CapabilitiesResource {
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses = new ArrayList<>();
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
@@ -202,7 +197,6 @@ public class CapabilitiesResource {
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         GenericEntity<List<CapabilityResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilityResponse>>(capabilityResponses) {};

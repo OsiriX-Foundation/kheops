@@ -10,8 +10,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
-import online.kheops.auth_server.PersistenceUtils;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
@@ -61,8 +61,7 @@ public class InboxResource
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
@@ -102,7 +101,6 @@ public class InboxResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return Response.status(201).build();
@@ -122,8 +120,7 @@ public class InboxResource
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
 
@@ -202,7 +199,6 @@ public class InboxResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return Response.status(201).build();
@@ -221,8 +217,7 @@ public class InboxResource
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         // is the user sharing a series, or requesting access to a new series
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         List<Attributes> attributesList;
@@ -240,7 +235,6 @@ public class InboxResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
@@ -250,8 +244,7 @@ public class InboxResource
     private Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID) {
         Set<String> availableSeriesUIDs;
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
@@ -270,7 +263,6 @@ public class InboxResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return availableSeriesUIDs;
@@ -288,8 +280,7 @@ public class InboxResource
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         long targetUserPk;
@@ -301,7 +292,6 @@ public class InboxResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         if (callingUserPk != targetUserPk) {
@@ -351,8 +341,7 @@ public class InboxResource
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
-        EntityManagerFactory factory = PersistenceUtils.createEntityManagerFactory();
-        EntityManager em = factory.createEntityManager();
+        EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
@@ -380,7 +369,6 @@ public class InboxResource
             tx.commit();
         } finally {
             em.close();
-            factory.close();
         }
 
         return Response.status(Response.Status.NO_CONTENT).build();
