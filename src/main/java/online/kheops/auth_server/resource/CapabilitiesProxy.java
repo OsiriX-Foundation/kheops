@@ -7,6 +7,8 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.SAXTransformer;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
@@ -32,6 +34,8 @@ public class CapabilitiesProxy {
 
     @Context
     ServletContext context;
+
+    private static final Logger LOG = LoggerFactory.getLogger(TokenResource.class);
 
     @SuppressWarnings("unused")
     static class TokenResponse {
@@ -137,7 +141,13 @@ public class CapabilitiesProxy {
         Form form = new Form().param("assertion", capabilitySecret).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
         URI uri = UriBuilder.fromUri(authenticationServerURI).path("token").build();
 
-        TokenResponse tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
+        final TokenResponse tokenResponse;
+        try {
+            tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
+        } catch (WebApplicationException e) {
+            LOG.warn("Unable to obtain a token for capability token", e);
+            return Response.status(Response.Status.FORBIDDEN).entity("Unable to get a request token for the capability URL").build();
+        }
 
         // get the user from the token
         String sub = JWT.decode(tokenResponse.accessToken).getSubject();
