@@ -54,7 +54,9 @@ public class CapabilitiesProxy {
             StreamingOutput entity(final Attributes response) {
                 return out -> {
                     try {
+                        LOG.info("Starting to write the response");
                         SAXTransformer.getSAXWriter(new StreamResult(out)).write(response);
+                        LOG.info("Finished to writing the response");
                     } catch (Exception e) {
                         throw new WebApplicationException(errResponseAsTextPlain(e));
                     }
@@ -142,6 +144,8 @@ public class CapabilitiesProxy {
         Form form = new Form().param("assertion", capabilitySecret).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
         URI uri = UriBuilder.fromUri(authenticationServerURI).path("token").build();
 
+        LOG.info("About to get a token");
+
         final TokenResponse tokenResponse;
         try {
             tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
@@ -150,8 +154,12 @@ public class CapabilitiesProxy {
             return Response.status(Response.Status.FORBIDDEN).entity("Unable to get a request token for the capability URL").build();
         }
 
+        LOG.info("Received the token");
+
         // get the user from the token
         String sub = JWT.decode(tokenResponse.accessToken).getSubject();
+
+        LOG.info("Decoded the token");
 
         byte[] buffer = new byte[4096];
         StreamingOutput stream = os -> {
@@ -160,6 +168,7 @@ public class CapabilitiesProxy {
                 os.write(buffer, 0, readBytes);
             }
             os.close();
+            LOG.info("Closed the output stream");
         };
 
         UriBuilder dicomWebUriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies");
@@ -168,12 +177,18 @@ public class CapabilitiesProxy {
         }
         URI dicomWebUri = dicomWebUriBuilder.build();
 
+        LOG.info("Starting to request from dcm4chee");
         InputStream is = client.target(dicomWebUri).request("application/dicom+json").post(Entity.entity(stream, contentType), InputStream.class);
+        LOG.info("Got an inputStream from dcm4chee");
 
+        LOG.info("Starting the parse the attributes from the inputStream");
         JsonParser parser = Json.createParser(is);
         JSONReader jsonReader = new JSONReader(parser);
 
         Attributes attributes = jsonReader.readDataset(null);
+
+        LOG.info("Starting to read the attributes");
+
         Sequence instanceSequence = attributes.getSequence(Tag.ReferencedSOPSequence);
 
         Set<String> sentSeries = new HashSet<>();
@@ -190,12 +205,18 @@ public class CapabilitiesProxy {
             String combinedUID = studyUID + "/" + seriesUID;
 
             if (!sentSeries.contains(combinedUID)) {
+                LOG.info("About to try to claim a series");
+
                 URI claimURI = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}").build(sub, studyUID, seriesUID);
                 client.target(claimURI).request().header("Authorization", "Bearer " + tokenResponse.accessToken).put(Entity.text(""));
+
+                LOG.info("finished claiming the series");
 
                 sentSeries.add(combinedUID);
             }
         }
+
+        LOG.info("Starting to send the output");
 
         return Response.ok(output.entity(attributes)).build();
     }
