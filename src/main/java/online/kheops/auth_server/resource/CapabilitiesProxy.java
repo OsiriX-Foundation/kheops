@@ -170,6 +170,7 @@ public class CapabilitiesProxy {
             int readBytes;
             while ((readBytes = requestBody.read(buffer)) != -1) {
                 os.write(buffer, 0, readBytes);
+                os.flush();
             }
             os.close();
             LOG.info("Closed the output stream");
@@ -182,7 +183,13 @@ public class CapabilitiesProxy {
         URI dicomWebUri = dicomWebUriBuilder.build();
 
         LOG.info("Starting to request from dcm4chee");
-        InputStream is = client.target(dicomWebUri).request("application/dicom+json").post(Entity.entity(stream, contentType), InputStream.class);
+        InputStream is;
+        try {
+            is = client.target(dicomWebUri).request("application/dicom+json").post(Entity.entity(stream, contentType), InputStream.class);
+        } catch (Exception e) {
+            LOG.info("unable to get an input stream");
+            throw new WebApplicationException("unable to get an input stream", e);
+        }
         LOG.info("Got an inputStream from dcm4chee");
 
         LOG.info("Starting the parse the attributes from the inputStream");
