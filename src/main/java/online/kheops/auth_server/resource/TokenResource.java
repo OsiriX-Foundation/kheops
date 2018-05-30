@@ -18,19 +18,19 @@ import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.assertion.exceptions.DownloadKeyException;
 import online.kheops.auth_server.assertion.exceptions.UnknownGrantTypeException;
 import online.kheops.auth_server.entity.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("/")
 public class TokenResource
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TokenResource.class);
+    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @Context
     ServletContext context;
@@ -61,12 +61,12 @@ public class TokenResource
 
         if (grantType == null) {
             errorResponse.errorDescription = "Missing grant_type";
-            LOG.warn("Request for a token is missing a grant_type");
+            LOG.warning("Request for a token is missing a grant_type");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
         if (assertionToken == null) {
             errorResponse.errorDescription = "Missing assertion";
-            LOG.warn("Request for a token is missing an assertion");
+            LOG.warning("Request for a token is missing an assertion");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
 
@@ -75,10 +75,10 @@ public class TokenResource
             assertion = AssertionVerifier.createAssertion(assertionToken, grantType);
         } catch (UnknownGrantTypeException | BadAssertionException e) {
             errorResponse.errorDescription = e.getMessage();
-            LOG.warn("Error validating a token", e);
+            LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         } catch (DownloadKeyException e) {
-            LOG.error("Error downloading public keys", e);
+            LOG.log(Level.SEVERE, "Error downloading public keys", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
@@ -108,7 +108,7 @@ public class TokenResource
         try {
             algorithmHMAC = Algorithm.HMAC256(authSecret);
         } catch (UnsupportedEncodingException e) {
-            LOG.error("online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
+            LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
