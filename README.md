@@ -15,6 +15,10 @@
 
 # Database
 
+### Docker image
+[![](https://images.microbadger.com/badges/image/osirixfoundation/kheopsauthorization-database.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-database "Get your own image badge on microbadger.com")
+
+
 # Environnement variables
 
 ## `KHEOPS_MYSQL_USER`
