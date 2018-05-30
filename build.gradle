@@ -1,0 +1,61 @@
+plugins {
+  id "org.sonarqube" version "2.6"
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: "jacoco"
+apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
+
+// Enable debugging of gretty started webapp in IDEA
+// For debuging a gradle task, IDEA creates a gradle init script (in /tmp/ijinit#.gradle), that sets JVM arguments
+// to enable remote debugging.
+// Unfortunately by default that only works for gradle tasks that implement JavaForkOptions - which gretty doesn't do.
+// So parse the JVM args that IDEA uses from that init script and set them as JVM args to be used by gretty:
+def debugArgs = []
+if (gradle.startParameter.initScripts) {
+    def line = file(gradle.startParameter.initScripts[0]).readLines().findAll({ x -> x ==~ /.*-agentlib:jdwp=.*/ })[0]
+    if (line) {
+        //noinspection GroovyAssignabilityCheck
+        debugArgs = ((line =~ /.*'(.*)'.*/)[0][1] as String).split(' ')
+    }
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        //noinspection GroovyAssignabilityCheck
+        url "https://www.dcm4che.org/maven2/"
+    }
+}
+
+dependencies {
+    compile group: 'org.mitre.dsmiley.httpproxy', name: 'smiley-http-proxy-servlet', version: '1.10'
+
+    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
+        exclude module: 'slf4j-log4j12'
+    }
+    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.13.0') {
+        exclude module: 'slf4j-log4j12'
+    }
+
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    )
+    testRuntimeOnly(
+            'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    )
+}
+
+gretty {
+    jvmArgs = [*debugArgs]
+
+    httpPort = 8042
+    contextPath = ''
+    servletContainer = 'tomcat8'
+}
+
+test {
+    useJUnitPlatform()
+}
