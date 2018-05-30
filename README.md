@@ -2,6 +2,11 @@
 
 [![](https://images.microbadger.com/badges/image/osirixfoundation/kheopsauthorization-tomcat.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat "Get your own image badge on microbadger.com")
 
+[![](https://images.microbadger.com/badges/image/osirixfoundation/kheopsauthorization-tomcat.svg)](http://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/osirixfoundation/kheopsauthorization-tomcat.svg)](http://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/osirixfoundation/kheopsauthorization-tomcat.svg)](http://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat "Get your own commit badge on microbadger.com")
+[![](https://images.microbadger.com/badges/license/osirixfoundation/kheopsauthorization-tomcat.svg)](http://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat "Get your own license badge on microbadger.com")
+
 
 
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsAuthorization&metric=ncloc)](https://sonarcloud.io/dashboard?id=KheopsAuthorization)
