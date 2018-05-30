@@ -42,6 +42,8 @@ public class TokenResource
         String tokenType;
         @XmlElement(name = "expires_in")
         Long expiresIn;
+        @XmlElement(name = "username")
+        String username;
     }
 
     static class ErrorResponse {
@@ -125,6 +127,9 @@ public class TokenResource
         tokenResponse.accessToken = token;
         tokenResponse.tokenType = "Bearer";
         tokenResponse.expiresIn = 3600L;
+        if (assertion.isCapabilityAssertion()) {
+            tokenResponse.username = assertion.getUsername();
+        }
         return Response.status(responseStatus).entity(tokenResponse).build();
     }
 }
