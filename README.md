@@ -8,3 +8,22 @@
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsAuthorization&metric=alert_status)](https://sonarcloud.io/dashboard?id=KheopsAuthorization)
 
 # KheopsAuthorization
+
+
+## Environnement variables
+
+# `$KHEOPS_MYSQL_USER`
+
+# `$KHEOPS_MYSQL_URL`
+
+# `$KHEOPS_PACS_URL`
+
+# `$KHEOPS_AUTHORIZATION_URL`
+
+## Secrets
+
+# `kheops_superuser_hmasecret`
+
+# `kheops_auth_hmasecret`
+
+# `mysql_password`
