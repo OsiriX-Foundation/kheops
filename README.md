@@ -1,6 +1,9 @@
 [![Build Status](https://travis-ci.org/OsiriX-Foundation/KheopsAuthorization.svg?branch=master)](https://travis-ci.org/OsiriX-Foundation/KheopsAuthorization)
 
 
+[![](https://images.microbadger.com/badges/image/OsiriX-Foundation/KheopsAuthorization.svg)](https://microbadger.com/images/OsiriX-Foundation/KheopsAuthorization "Get your own image badge on microbadger.com")
+
+
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsAuthorization&metric=ncloc)](https://sonarcloud.io/dashboard?id=KheopsAuthorization)
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsAuthorization&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=KheopsAuthorization)
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsAuthorization&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=KheopsAuthorization)
