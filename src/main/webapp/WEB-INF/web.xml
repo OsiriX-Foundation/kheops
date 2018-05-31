@@ -9,22 +9,24 @@
         <servlet-name>dicomwebproxy</servlet-name>
         <servlet-class>online.kheops.proxy.DicomWeb</servlet-class>
         <init-param>
-            <param-name>targetUri</param-name>
-            <param-value>http://test.kheops.online:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies</param-value>
-        </init-param>
-        <init-param>
             <param-name>log</param-name>
             <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <description>Base URI for the authentication server</description>
-            <param-name>online.kheops.auth_server.uri</param-name>
-            <param-value>http://localhost:7575</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>dicomwebproxy</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    <context-param>
+        <description>Base URI for the pacs</description>
+        <param-name>online.kheops.pacs.uri</param-name>
+        <param-value>http://test.kheops.online:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
+    </context-param>
+    <context-param>
+        <description>Base URI for the authentication server</description>
+        <param-name>online.kheops.auth_server.uri</param-name>
+        <param-value>http://localhost:7575</param-value>
+    </context-param>
+
 
 </web-app>
