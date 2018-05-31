@@ -1,0 +1,39 @@
+language: java
+sudo: required
+
+services:
+  - docker
+  
+notifications:
+  email: false
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+after_success:
+  - chmod +x docker/docker_push.sh
+  - export BRANCH=$TRAVIS_BRANCH
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
+  - git fetch --unshallow
+  - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
+  
+#addons:
+#  sonarcloud: $SONAR_ORGANIZATION
+#    organization: 
+#    token:
+#      secure: $SONAR_LOGIN
+#script:
+  # other script steps might be done before running the actual analysis
+#  - sonar-scanner
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: docker/docker_push.sh 
+  on:
+    all_branches: true
