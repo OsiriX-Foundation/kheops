@@ -113,80 +113,80 @@ public class DicomWeb extends ProxyServlet
         return getTargetUri(servletRequest)+"/studies";
     }
 
-    @Override
-    protected void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse,
-                                      HttpRequest proxyRequest, HttpServletRequest servletRequest)
-                  throws IOException {
-
-        final URI authenticationServerURI;
-        try {
-            authenticationServerURI = new URI(getContextParam("online.kheops.auth_server.uri"));
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("online.kheops.auth_server.uri is not a valid URI", e);
-        }
-        Client client = ClientBuilder.newClient();
-
-        HttpEntity entity = proxyResponse.getEntity();
-        if (entity != null) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            entity.writeTo(os);
-
-            servletResponse.getOutputStream().write(os.toByteArray());
-            servletResponse.getOutputStream().close();
-
-            ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-
-            Attributes attributes;
-
-            ContentType contentType = ContentType.getOrDefault(entity);
-
-            switch (contentType.getMimeType()) {
-                case "application/dicom+json":
-                    JsonParser parser = Json.createParser(is);
-                    JSONReader jsonReader = new JSONReader(parser);
-                    attributes = jsonReader.readDataset(null);
-                    break;
-                case "application/dicom+xml":
-                    try {
-                        attributes = SAXReader.parse(is);
-                    } catch (Exception e) {
-                        throw new IllegalStateException("Unable to parse XML", e);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown Content-Type");
-            }
-
-            LOG.info("Starting to read the attributes");
-
-            Sequence instanceSequence = attributes.getSequence(Tag.ReferencedSOPSequence);
-
-            Set<String> sentSeries = new HashSet<>();
-            for (Attributes instance: instanceSequence) {
-                String instanceURL = instance.getString(Tag.RetrieveURL);
-
-                // this is a total hack, get the study and series UIDs out of the returned URL
-                int studiesIndex = instanceURL.indexOf("/studies/");
-                int seriesIndex = instanceURL.indexOf("/series/");
-                int instancesIndex = instanceURL.indexOf("/instances/");
-
-                String studyUID = instanceURL.substring(studiesIndex + 9, seriesIndex);
-                String seriesUID = instanceURL.substring(seriesIndex + 8, instancesIndex);
-                String combinedUID = studyUID + "/" + seriesUID;
-
-                if (!sentSeries.contains(combinedUID)) {
-                    LOG.info("About to try to claim a series");
-
-                    URI claimURI = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}").build(getKheopsUser(servletRequest), studyUID, seriesUID);
-                    client.target(claimURI).request().header("Authorization", "Bearer " + getKheopsAccessToken(servletRequest)).put(Entity.text(""));
-
-                    LOG.info("finished claiming the series");
-
-                    sentSeries.add(combinedUID);
-                }
-            }
-        }
-    }
+//    @Override
+//    protected void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse,
+//                                      HttpRequest proxyRequest, HttpServletRequest servletRequest)
+//                  throws IOException {
+//
+//        final URI authenticationServerURI;
+//        try {
+//            authenticationServerURI = new URI(getContextParam("online.kheops.auth_server.uri"));
+//        } catch (URISyntaxException e) {
+//            throw new IllegalStateException("online.kheops.auth_server.uri is not a valid URI", e);
+//        }
+//        Client client = ClientBuilder.newClient();
+//
+//        HttpEntity entity = proxyResponse.getEntity();
+//        if (entity != null) {
+//            ByteArrayOutputStream os = new ByteArrayOutputStream();
+//            entity.writeTo(os);
+//
+//            servletResponse.getOutputStream().write(os.toByteArray());
+//            servletResponse.getOutputStream().close();
+//
+//            ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+//
+//            Attributes attributes;
+//
+//            ContentType contentType = ContentType.getOrDefault(entity);
+//
+//            switch (contentType.getMimeType()) {
+//                case "application/dicom+json":
+//                    JsonParser parser = Json.createParser(is);
+//                    JSONReader jsonReader = new JSONReader(parser);
+//                    attributes = jsonReader.readDataset(null);
+//                    break;
+//                case "application/dicom+xml":
+//                    try {
+//                        attributes = SAXReader.parse(is);
+//                    } catch (Exception e) {
+//                        throw new IllegalStateException("Unable to parse XML", e);
+//                    }
+//                    break;
+//                default:
+//                    throw new IllegalStateException("Unknown Content-Type");
+//            }
+//
+//            LOG.info("Starting to read the attributes");
+//
+//            Sequence instanceSequence = attributes.getSequence(Tag.ReferencedSOPSequence);
+//
+//            Set<String> sentSeries = new HashSet<>();
+//            for (Attributes instance: instanceSequence) {
+//                String instanceURL = instance.getString(Tag.RetrieveURL);
+//
+//                // this is a total hack, get the study and series UIDs out of the returned URL
+//                int studiesIndex = instanceURL.indexOf("/studies/");
+//                int seriesIndex = instanceURL.indexOf("/series/");
+//                int instancesIndex = instanceURL.indexOf("/instances/");
+//
+//                String studyUID = instanceURL.substring(studiesIndex + 9, seriesIndex);
+//                String seriesUID = instanceURL.substring(seriesIndex + 8, instancesIndex);
+//                String combinedUID = studyUID + "/" + seriesUID;
+//
+//                if (!sentSeries.contains(combinedUID)) {
+//                    LOG.info("About to try to claim a series");
+//
+//                    URI claimURI = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}").build(getKheopsUser(servletRequest), studyUID, seriesUID);
+//                    client.target(claimURI).request().header("Authorization", "Bearer " + getKheopsAccessToken(servletRequest)).put(Entity.text(""));
+//
+//                    LOG.info("finished claiming the series");
+//
+//                    sentSeries.add(combinedUID);
+//                }
+//            }
+//        }
+//    }
 
 
     @Override
