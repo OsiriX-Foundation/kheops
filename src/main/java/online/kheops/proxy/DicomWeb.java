@@ -80,7 +80,7 @@ public class DicomWeb extends ProxyServlet
         Matcher m = URI_PATTERN.matcher(uriString);
 
         if (!m.matches()) {
-            throw new IllegalStateException("can't parse the URL");
+            throw new IllegalArgumentException("can't parse the URL:" + uriString);
         }
 
         final String capabilitySecret = m.group(1);
