@@ -8,11 +8,11 @@
 [![](https://images.microbadger.com/badges/commit/osirixfoundation/kheopsproxy-tomcat:master.svg)](http://microbadger.com/images/osirixfoundation/kheopsproxy-tomcat:master "Get your own commit badge on microbadger.com")
 
 ### Sonar
-[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsProxy&metric=ncloc)](https://sonarcloud.io/dashboard?id=KheopsProxy)
-[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsProxy&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=KheopsProxy)
-[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsProxy&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=KheopsProxy)
-[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsProxy&metric=security_rating)](https://sonarcloud.io/dashboard?id=KheopsProxy)
-[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsProxy&metric=alert_status)](https://sonarcloud.io/dashboard?id=KheopsProxy)
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsDICOMwebProxy&metric=ncloc)](https://sonarcloud.io/dashboard?id=KheopsProxy)
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsDICOMwebProxy&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=KheopsDICOMwebProxy)
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsDICOMwebProxy&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=KheopsDICOMwebProxy)
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsDICOMwebProxy&metric=security_rating)](https://sonarcloud.io/dashboard?id=KheopsDICOMwebProxy)
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=KheopsDICOMwebProxy&metric=alert_status)](https://sonarcloud.io/dashboard?id=KheopsDICOMwebProxy)
 
 # Environnement variables
 
