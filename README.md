@@ -16,10 +16,5 @@
 
 # Environnement variables
 
-## `KHEOPS_MYSQL_USER`
+## `XXXX`
 
-# Secrets
-
-## `mysql_root_password`
-
-## `mysql_password`
