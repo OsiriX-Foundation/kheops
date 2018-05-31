@@ -1,4 +1,4 @@
-# KheopsAuthorization
+# KheopsDICOMwebProxy
 
 ### Travis CI
 [![Build Status](https://travis-ci.org/OsiriX-Foundation/KheopsDICOMwebProxy.svg?branch=master)](https://travis-ci.org/OsiriX-Foundation/KheopsDICOMwebProxy)
