@@ -55,7 +55,7 @@ public class DicomWeb extends ProxyServlet
     }
 
     //    private final static Pattern URI_PATTERN = Pattern.compile("/capabilities/([\\w]+)/proxy/studies(?:/)+?|(?:/([0-9.]+)(?:/)+?)+?");
-    private final static Pattern URI_PATTERN = Pattern.compile("/capabilities/([\\w]+)/proxy/studies(?:/)??");
+    private final static Pattern URI_PATTERN = Pattern.compile(".*?/capabilities/([\\w]+)/proxy/studies(?:/)??");
 
     private static final Logger LOG = Logger.getLogger(DicomWeb.class.getName());
 
