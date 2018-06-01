@@ -44,6 +44,8 @@ dependencies {
         exclude module: 'slf4j-log4j12'
     }
 
+    compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
+
     testImplementation(
             'org.junit.jupiter:junit-jupiter-api:5.1.0'
     )
