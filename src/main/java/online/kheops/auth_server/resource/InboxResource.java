@@ -46,7 +46,7 @@ public class InboxResource
         try {
             new Oid(uid);
         } catch (GSSException exception) {
-            throw new WebApplicationException(Response.status(400, name + " is not a valid UID").build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(name + " is not a valid UID").build());
         }
     }
 
@@ -73,11 +73,11 @@ public class InboxResource
 
             final User targetUser = User.findByUsername(username, em);
             if (targetUser == null) {
-                return Response.status(404, "Unknown target user").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
 
             if (callingUserPk == targetUser.getPk()) {
-                return Response.status(400, "Can't send a study to yourself").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Can't send a study to yourself").build();
             }
 
             // find all the series that the use has access to
@@ -88,7 +88,7 @@ public class InboxResource
             List<Series> availableSeries = seriesQuery.getResultList();
 
             if (availableSeries.isEmpty()) {
-                return Response.status(404, "No study with the given StudyInstanceUID").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("No study with the given StudyInstanceUID").build();
             }
 
             for (Series series: availableSeries) {
@@ -136,7 +136,7 @@ public class InboxResource
 
             User targetUser = User.findByUsername(username, em);
             if (targetUser == null) {
-                return Response.status(404, "Unknown target user").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
 
             if (targetUser.getPk() == callingUserPk) { // the user is requesting access to a new series
@@ -149,9 +149,9 @@ public class InboxResource
 
                     // we need to check here if the series that was found it owned by the user
                     if (storedSeries.getUsers().contains(callingUser)) {
-                        return Response.status(200, "User already has access to the series").build();
+                        return Response.status(Response.Status.OK).entity("User already has access to the series").build();
                     } else {
-                        return Response.status(403, "Access to series denied").build();
+                        return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
                     }
                  } catch (NoResultException ignored) {/*empty*/}
 
@@ -186,11 +186,11 @@ public class InboxResource
                     seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
                     series = seriesQuery.getSingleResult();
                 } catch (Exception exception) {
-                    return Response.status(404, "Unknown series").build();
+                    return Response.status(Response.Status.NOT_FOUND).entity("Unknown series").build();
                 }
 
                 if (series.getUsers().contains(targetUser)) {
-                    return Response.status(200, "User already has access to the series").build();
+                    return Response.status(Response.Status.OK).entity("User already has access to the series").build();
                 }
 
                 series.getUsers().add(targetUser);
@@ -233,7 +233,7 @@ public class InboxResource
 
             long targetUserPk = User.findPkByUsername(username, em);
             if (callingUserPk != targetUserPk) {
-                return Response.status(403, "Access to study denied").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
             }
 
             attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
@@ -310,7 +310,7 @@ public class InboxResource
         }
 
         if (callingUserPk != targetUserPk) {
-            return Response.status(403, "Access to study denied").build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
         }
 
         URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
@@ -364,15 +364,70 @@ public class InboxResource
 
             User targetUser = User.findByUsername(username, em);
             if (targetUser == null) {
-                return Response.status(404, "Unknown target user").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
 
             if (callingUserPk != targetUser.getPk()) {
-                return Response.status(403, "Access to study denied").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
             }
 
             TypedQuery<Series> query = em.createQuery("select s from Series s where s.study.studyInstanceUID = :StudyInstanceUID and :user member of s.users", Series.class);
             query.setParameter(Strings.StudyInstanceUID, studyInstanceUID);
+            query.setParameter("user", targetUser);
+            List<Series> seriesList = query.getResultList();
+
+            if (seriesList.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).entity("No access to any series with the given studyInstanceUID").build();
+            }
+
+            for (Series series: seriesList) {
+                series.getUsers().remove(targetUser);
+                targetUser.getSeries().remove(series);
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Secured
+    @Path("/{user}/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
+    @Produces("application/dicom+json")
+    public Response deleteSeries(@PathParam("user") String username,
+                                 @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
+                                 @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
+                                 @Context SecurityContext securityContext) {
+
+        checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
+        checkValidUID(seriesInstanceUID, Strings.SeriesInstanceUID);
+
+        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            User targetUser = User.findByUsername(username, em);
+            if (targetUser == null) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
+            }
+
+            if (callingUserPk != targetUser.getPk()) {
+                return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
+            }
+
+            TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :SeriesInstanceUID and s.study.studyInstanceUID = :StudyInstanceUID and :user member of s.users", Series.class);
+            query.setParameter(Strings.StudyInstanceUID, studyInstanceUID);
+            query.setParameter(Strings.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter("user", targetUser);
             List<Series> seriesList = query.getResultList();
 
