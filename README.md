@@ -20,6 +20,8 @@
 [![](https://images.microbadger.com/badges/image/osirixfoundation/kheopsauthorization-database.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-database "Get your own image badge on microbadger.com")
 
 
+[# API Documentation](https://github.com/OsiriX-Foundation/KheopsAuthorization/wiki)
+
 # Environnement variables
 
 ## `KHEOPS_MYSQL_USER`
