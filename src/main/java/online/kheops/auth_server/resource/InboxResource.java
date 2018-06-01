@@ -376,6 +376,10 @@ public class InboxResource
             query.setParameter("user", targetUser);
             List<Series> seriesList = query.getResultList();
 
+            if (seriesList.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).entity("No access to any series with the given studyInstanceUID").build();
+            }
+
             for (Series series: seriesList) {
                 series.getUsers().remove(targetUser);
                 targetUser.getSeries().remove(series);
