@@ -48,11 +48,13 @@ public class FetchTask implements Runnable {
 
     @Override
     public void run() {
-        LOG.info("Starting Fetch Task");
+        LOG.log(Level.FINE, "Starting Fetch Task");
 
         try {
             fetchUnpopulatedSeries(unpopulatedSeriesUIDs());
             fetchUnpopulatedStudies(unpopulatedStudyUIDs());
+        } catch (IllegalStateException e) {
+            LOG.log(Level.FINE,"IllegalStateException while fetching, probably because the server is not up yet", e);
         } catch (Exception e) {
             LOG.log(Level.SEVERE,"An error occurred while fetching", e);
         }
