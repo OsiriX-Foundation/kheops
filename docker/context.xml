@@ -5,8 +5,6 @@
                override="false"/>
     <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
                override="false"/>
-    <Parameter name="online.kheops.auth_server.uri" value="${kheops_authorization_url}"
-               override="false"/>
     <Parameter name="online.kheops.jdbc.url" value="jdbc:${kheops_mysql_url}"
                override="false"/>
     <Parameter name="online.kheops.jdbc.user" value="${kheops_mysql_user}"

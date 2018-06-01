@@ -10,6 +10,5 @@ done
 sed -i "s|\${kheops_mysql_user}|$KHEOPS_MYSQL_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_mysql_url}|$KHEOPS_MYSQL_URL|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_pacs_url}|$KHEOPS_PACS_URL|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_authorization_url}|$KHEOPS_AUTHORIZATION_URL|" ${REPLACE_FILE_PATH}
 
 catalina.sh run;

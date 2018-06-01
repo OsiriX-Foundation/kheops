@@ -40,11 +40,6 @@
         <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
     </context-param>
     <context-param>
-        <description>Base URI for the authentication server</description>
-        <param-name>online.kheops.auth_server.uri</param-name>
-        <param-value>http://localhost:7575</param-value>
-    </context-param>
-    <context-param>
         <description>URL for the connection to the MySQL database</description>
         <param-name>online.kheops.jdbc.url</param-name>
         <param-value>jdbc:mysql://localhost/kheops</param-value>
