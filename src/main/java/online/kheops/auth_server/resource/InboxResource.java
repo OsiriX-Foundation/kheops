@@ -149,7 +149,7 @@ public class InboxResource
 
                     // we need to check here if the series that was found it owned by the user
                     if (storedSeries.getUsers().contains(callingUser)) {
-                        return Response.status(Response.Status.OK).entity("User already has access to the series").build();
+                        return Response.status(Response.Status.OK).build();
                     } else {
                         return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
                     }
@@ -190,7 +190,7 @@ public class InboxResource
                 }
 
                 if (series.getUsers().contains(targetUser)) {
-                    return Response.status(Response.Status.OK).entity("User already has access to the series").build();
+                    return Response.status(Response.Status.OK).build();
                 }
 
                 series.getUsers().add(targetUser);
