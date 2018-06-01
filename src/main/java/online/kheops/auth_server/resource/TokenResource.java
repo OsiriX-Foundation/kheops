@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlElement;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.*;
+import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
@@ -53,6 +54,7 @@ public class TokenResource
     }
 
     @POST
+    @FormURLEncodedContentType
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)

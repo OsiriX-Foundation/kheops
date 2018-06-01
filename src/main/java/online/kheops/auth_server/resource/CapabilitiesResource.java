@@ -3,6 +3,7 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.CapabilitySecured;
+import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
@@ -36,6 +37,7 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
+    @FormURLEncodedContentType
     @Path("/{user}/capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -109,7 +111,7 @@ public class CapabilitiesResource {
     @Path("/{user}/capabilities/{secret}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCapability(@PathParam("user") String username, @PathParam("secret") String secret,
+    public Response revokeCapability(@PathParam("user") String username, @PathParam("secret") String secret,
                                      @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
