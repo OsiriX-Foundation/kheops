@@ -2,8 +2,6 @@ package online.kheops.auth_server.fetch;
 
 
 import online.kheops.auth_server.assertion.AssertionVerifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -12,12 +10,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebListener
 public class FetchContextListener implements ServletContextListener {
     private static final int MAXIMUM_CONCURRENT = 1;
 
-    private static final Logger LOG = LoggerFactory.getLogger(FetchContextListener.class);
+    private static final Logger LOG = Logger.getLogger(FetchContextListener.class.getName());
 
     private ScheduledThreadPoolExecutor executor = null;
 
@@ -31,7 +31,7 @@ public class FetchContextListener implements ServletContextListener {
             FetchTask task = new FetchTask(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));
             executor.scheduleAtFixedRate(task, 0, 10, TimeUnit.SECONDS);
         } catch (URISyntaxException e) {
-            LOG.error("URI in context param online.kheops.pacs.uri is not valid", e);
+            LOG.log(Level.SEVERE, "URI in context param online.kheops.pacs.uri is not valid", e);
         }
     }
 
