@@ -48,7 +48,7 @@ public class CapabilitiesResource {
         CapabilityResponse capabilityResponse;
 
         if (description == null) {
-            return Response.status(400, "No description set").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No description set").build();
         }
 
         // parse the given expiration date
@@ -58,7 +58,7 @@ public class CapabilitiesResource {
                 OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
                 expirationDateTime = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
             } catch (DateTimeParseException e) {
-                return Response.status(400, "Invalid expiration date").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid expiration date").build();
             }
         } else {
             expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
@@ -72,11 +72,11 @@ public class CapabilitiesResource {
 
             final User targetUser = User.findByUsername(username, em);
             if (targetUser == null) {
-                return Response.status(404, "Unknown target user").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
 
             if (callingUserPk != targetUser.getPk()) {
-                return Response.status(400, "Can't set capabilities for a different user").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Can't set capabilities for a different user").build();
             }
 
             Capability capability = new Capability();
@@ -102,7 +102,7 @@ public class CapabilitiesResource {
             em.close();
         }
 
-        return Response.status(201).entity(capabilityResponse).build();
+        return Response.status(Response.Status.CREATED).entity(capabilityResponse).build();
     }
 
     @POST
@@ -125,11 +125,11 @@ public class CapabilitiesResource {
 
             final User targetUser = User.findByUsername(username, em);
             if (targetUser == null) {
-                return Response.status(404, "Unknown target user").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
 
             if (callingUserPk != targetUser.getPk()) {
-                return Response.status(400, "Can't revoke a different user's capability").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Can't revoke a different user's capability").build();
             }
 
             TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :targetUser = c.user AND :secret = c.secret", Capability.class);
@@ -139,7 +139,7 @@ public class CapabilitiesResource {
             try {
                 capability = query.getSingleResult();
             } catch (NoResultException e) {
-                return Response.status(404, "Unknown capability").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown capability").build();
             }
 
             capability.setRevoked(true);
@@ -159,7 +159,7 @@ public class CapabilitiesResource {
             em.close();
         }
 
-        return Response.status(200).entity(capabilityResponse).build();
+        return Response.status(Response.Status.OK).entity(capabilityResponse).build();
     }
 
     @GET
@@ -181,11 +181,11 @@ public class CapabilitiesResource {
 
             final User targetUser = User.findByUsername(username, em);
             if (targetUser == null) {
-                return Response.status(404, "Unknown target user").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
 
             if (callingUserPk != targetUser.getPk()) {
-                return Response.status(400, "Can't get capabilities for a different user").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Can't get capabilities for a different user").build();
             }
 
             TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :targetUser = c.user", Capability.class);
@@ -211,6 +211,6 @@ public class CapabilitiesResource {
         }
 
         GenericEntity<List<CapabilityResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilityResponse>>(capabilityResponses) {};
-        return Response.status(200).entity(genericCapabilityResponsesList).build();
+        return Response.status(Response.Status.OK).entity(genericCapabilityResponsesList).build();
     }
 }
