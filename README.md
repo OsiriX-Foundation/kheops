@@ -4,7 +4,8 @@
 
 [![Build Status](https://travis-ci.org/OsiriX-Foundation/KheopsAuthorization.svg?branch=master)](https://travis-ci.org/OsiriX-Foundation/KheopsAuthorization)
 
-**Tests**
+**Integration Tests**
+
 [![Build Status](https://travis-ci.org/OsiriX-Foundation/kheopsDocker.svg?branch=ci-test)](https://travis-ci.org/OsiriX-Foundation/kheopsDocker)
 
 **Docker Image**
