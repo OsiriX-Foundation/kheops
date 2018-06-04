@@ -224,10 +224,22 @@ public class DicomWeb extends ProxyServlet
         return (String) servletRequest.getAttribute(KHEOPS_USER);
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected String getContextParam(String key) {
         return getServletContext().getInitParameter(key);
     }
 
+    protected HttpResponse doExecute(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+                                     HttpRequest proxyRequest) throws IOException {
+        HttpResponse httpResponse;
+        try {
+            httpResponse = super.doExecute(servletRequest, servletResponse, proxyRequest);
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "Error!!",e);
+            throw e;
+        }
+        return httpResponse;
+    }
 }
 
 

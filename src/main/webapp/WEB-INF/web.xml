@@ -25,7 +25,7 @@
     <context-param>
         <description>Base URI for the authentication server</description>
         <param-name>online.kheops.auth_server.uri</param-name>
-        <param-value>http://localhost:7575</param-value>
+        <param-value>https://test.kheops.online:8042/KheopsAuthorization</param-value>
     </context-param>
 
 
