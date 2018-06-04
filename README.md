@@ -4,6 +4,9 @@
 
 [![Build Status](https://travis-ci.org/OsiriX-Foundation/KheopsAuthorization.svg?branch=master)](https://travis-ci.org/OsiriX-Foundation/KheopsAuthorization)
 
+**Tests**
+[![Build Status](https://travis-ci.org/OsiriX-Foundation/kheopsDocker.svg?branch=ci-test)](https://travis-ci.org/OsiriX-Foundation/kheopsDocker)
+
 **Docker Image**
 
 [![](https://images.microbadger.com/badges/version/osirixfoundation/kheopsauthorization-tomcat:master.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat:master "Get your own version badge on microbadger.com")
