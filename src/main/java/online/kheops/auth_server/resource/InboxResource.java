@@ -441,7 +441,7 @@ public class InboxResource
             List<Series> seriesList = query.getResultList();
 
             if (seriesList.isEmpty()) {
-                return Response.status(Response.Status.NOT_FOUND).entity("No access to any series with the given studyInstanceUID").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("User does not have access to any series with a study with the given studyInstanceUID").build();
             }
 
             for (Series series: seriesList) {
