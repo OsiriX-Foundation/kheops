@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @Path("/users")
 public class InboxResource
@@ -38,6 +39,8 @@ public class InboxResource
         private static final String StudyInstanceUID = "StudyInstanceUID";
         private static final String SeriesInstanceUID = "SeriesInstanceUID";
     }
+
+    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @Context
     ServletContext context;
@@ -106,6 +109,7 @@ public class InboxResource
             em.close();
         }
 
+        LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
         return Response.status(201).build();
     }
 
@@ -149,8 +153,10 @@ public class InboxResource
 
                     // we need to check here if the series that was found it owned by the user
                     if (storedSeries.getUsers().contains(callingUser)) {
+                        LOG.info("Nothing to claim, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is accessible by "+username);
                         return Response.status(Response.Status.OK).build();
                     } else {
+                        LOG.info("claim denied, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
                         return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
                     }
                  } catch (NoResultException ignored) {/*empty*/}
@@ -176,6 +182,7 @@ public class InboxResource
                 em.persist(study);
                 em.persist(series);
                 em.persist(callingUser);
+                LOG.info("finished claiming, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" to "+username);
             } else { // the user wants to share
                 final Series series;
                 try {
@@ -190,6 +197,7 @@ public class InboxResource
                 }
 
                 if (series.getUsers().contains(targetUser)) {
+                    LOG.info("Nothing to send, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is accessible by "+username);
                     return Response.status(Response.Status.OK).build();
                 }
 
@@ -200,6 +208,7 @@ public class InboxResource
             }
 
             tx.commit();
+            LOG.info("sending, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" to "+username);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

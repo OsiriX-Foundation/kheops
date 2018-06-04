@@ -132,6 +132,7 @@ public class TokenResource
         if (assertion.isCapabilityAssertion()) {
             tokenResponse.user = assertion.getUsername();
         }
+        LOG.info("Returning token for user: " + assertion.getUsername());
         return Response.status(responseStatus).entity(tokenResponse).build();
     }
 }
