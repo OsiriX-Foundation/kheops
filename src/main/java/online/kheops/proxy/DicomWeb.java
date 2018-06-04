@@ -115,7 +115,11 @@ public class DicomWeb extends ProxyServlet
         servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, tokenResponse.accessToken);
         servletRequest.setAttribute(KHEOPS_USER, tokenResponse.user);
 
-        return getTargetUri(servletRequest)+"/studies";
+        String targetURL = getTargetUri(servletRequest)+"/studies";
+        LOG.info("Returning target URI: " + targetURL);
+
+
+        return targetURL;
     }
 
     @Override
