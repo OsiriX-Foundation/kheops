@@ -105,6 +105,9 @@ public class DicomWeb extends ProxyServlet
         } catch (ResponseProcessingException e) {
             LOG.log(Level.WARNING,"Unable to obtain a token for capability token", e);
             throw new IllegalStateException("Unable to get a request token for the capability URL", e);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING,"Other exception Unable to obtain a token for capability token", e);
+            throw new IllegalStateException("Unable to get a request token for the capability URL", e);
         }
 
         LOG.info("Successfully obtained a token for user: " + tokenResponse.user);
