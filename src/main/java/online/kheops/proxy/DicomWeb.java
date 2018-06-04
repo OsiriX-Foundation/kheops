@@ -107,6 +107,8 @@ public class DicomWeb extends ProxyServlet
             throw new IllegalStateException("Unable to get a request token for the capability URL", e);
         }
 
+        LOG.info("Successfully obtained a token for user: " + tokenResponse.user);
+
         servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, tokenResponse.accessToken);
         servletRequest.setAttribute(KHEOPS_USER, tokenResponse.user);
 
@@ -117,6 +119,8 @@ public class DicomWeb extends ProxyServlet
     protected void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse,
                                       HttpRequest proxyRequest, HttpServletRequest servletRequest)
                   throws IOException {
+
+        LOG.info("Starting to copy the response");
 
         final URI authenticationServerURI;
         try {
@@ -135,6 +139,7 @@ public class DicomWeb extends ProxyServlet
             servletResponse.getOutputStream().close();
 
             ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+            LOG.info("Built the shared input stream");
 
             Attributes attributes;
 
@@ -142,11 +147,13 @@ public class DicomWeb extends ProxyServlet
 
             switch (contentType.getMimeType()) {
                 case "application/dicom+json":
+                    LOG.info("Processing application/dicom+json");
                     JsonParser parser = Json.createParser(is);
                     JSONReader jsonReader = new JSONReader(parser);
                     attributes = jsonReader.readDataset(null);
                     break;
                 case "application/dicom+xml":
+                    LOG.info("Processing application/dicom+xml");
                     try {
                         attributes = SAXReader.parse(is);
                     } catch (Exception e) {
@@ -185,7 +192,10 @@ public class DicomWeb extends ProxyServlet
                     sentSeries.add(combinedUID);
                 }
             }
+        } else {
+            LOG.warning("The entity was null");
         }
+        LOG.warning("finished copying the response");
     }
 
 
@@ -194,6 +204,7 @@ public class DicomWeb extends ProxyServlet
             throws ServletException, IOException {
         if (!servletRequest.getMethod().equals("POST")) {
             servletResponse.setStatus(405);
+            LOG.warning("received request with method "+servletRequest.getMethod() + ", not processing it");
         } else {
             super.service(servletRequest, servletResponse);
         }
