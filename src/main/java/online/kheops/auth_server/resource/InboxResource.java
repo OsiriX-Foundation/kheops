@@ -16,7 +16,6 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
-import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
@@ -26,7 +25,6 @@ import org.ietf.jgss.Oid;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -217,46 +215,6 @@ public class InboxResource
         }
 
         return Response.status(201).build();
-    }
-
-    @GET
-    @Secured
-    @Path("/{user}/studies")
-    @Produces("application/dicom+json")
-    public Response getStudies(@PathParam("user") String username,
-                                @Context SecurityContext securityContext) {
-
-        // for now don't use any parameters
-
-        // get a list of all the studies
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        // is the user sharing a series, or requesting access to a new series
-
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        List<Attributes> attributesList;
-
-        try {
-            tx.begin();
-
-            long targetUserPk = User.findPkByUsername(username, em);
-            if (callingUserPk != targetUserPk) {
-                return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
-            }
-
-            attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-
-        GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
-        return Response.ok(genericAttributesList).build();
     }
 
     private Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID) {
