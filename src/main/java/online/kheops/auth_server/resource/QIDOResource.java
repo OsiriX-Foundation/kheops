@@ -13,15 +13,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Path("/users")
 public class QIDOResource {
+
+    @Context
+    private UriInfo uriInfo;
 
     @GET
     @Secured

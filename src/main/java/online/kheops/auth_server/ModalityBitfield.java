@@ -84,7 +84,7 @@ public abstract class ModalityBitfield {
         Set<Code> modalities = new HashSet<>();
 
         for (int i = 0; i < MODALITY_LIST.size(); i++) {
-            if ((bitfield & (1 << i)) != 0) {
+            if ((bitfield & (1L << i)) != 0) {
                 modalities.add(MODALITY_LIST.get(i));
             }
         }
