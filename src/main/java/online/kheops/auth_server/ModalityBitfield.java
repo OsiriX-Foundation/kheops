@@ -11,6 +11,9 @@ public abstract class ModalityBitfield {
 
     private ModalityBitfield() {}
 
+    // Add bogus SC Modality because some dicom files use it even though it is not a modality
+    private static final Code SecondaryCapture = new Code("SC", "KHEOPS", (String)null, "Secondary Capture");
+
     private static final List<Code> MODALITY_LIST = new ArrayList<>();
     static {
         Code[] codes = {
@@ -50,16 +53,30 @@ public abstract class ModalityBitfield {
                 AcquisitionModality.SubjectiveRefraction,
                 AcquisitionModality.Ultrasound,
                 AcquisitionModality.VisualAcuity,
-                AcquisitionModality.XRayAngiography
+                AcquisitionModality.XRayAngiography,
+                SecondaryCapture,
         };
         MODALITY_LIST.addAll(Arrays.asList(codes));
     }
 
     public static long getBitfield(Code modality) {
-        return 1 << MODALITY_LIST.indexOf(modality);
+        if (modality == null) {
+            throw new IllegalArgumentException("missing modality");
+        }
+        int index = MODALITY_LIST.indexOf(modality);
+        if (index == -1) {
+            throw new IllegalArgumentException("unknown modality");
+        }
+        return 1 << index;
     }
 
     public static long getBitfield(String modality) {
+        if (modality == null) {
+            throw new IllegalArgumentException("missing modality");
+        }
+        if (modality.equals("SC")) {
+            return getBitfield(SecondaryCapture);
+        }
         return getBitfield(AcquisitionModality.codeOf(modality));
     }
 
