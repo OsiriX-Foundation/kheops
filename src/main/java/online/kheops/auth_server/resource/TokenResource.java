@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.*;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
@@ -19,17 +20,37 @@ import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.assertion.exceptions.DownloadKeyException;
 import online.kheops.auth_server.assertion.exceptions.UnknownGrantTypeException;
 import online.kheops.auth_server.entity.User;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.Oid;
 
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Path("/")
 public class TokenResource
 {
+    private static class UIDPair {
+        private String studyInstanceUID;
+        private String seriesInstanceUID;
+
+        @SuppressWarnings("WeakerAccess")
+        public UIDPair(String studyInstanceUID, String seriesInstanceUID) {
+            this.studyInstanceUID = studyInstanceUID;
+            this.seriesInstanceUID = seriesInstanceUID;
+        }
+
+        String getStudyInstanceUID() {
+            return studyInstanceUID;
+        }
+
+        String getSeriesInstanceUID() {
+            return seriesInstanceUID;
+        }
+    }
 
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
@@ -60,6 +81,7 @@ public class TokenResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope) {
 
+        UIDPair uidPair = getUIDPairFromScope(scope);
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
 
@@ -92,12 +114,24 @@ public class TokenResource
         try {
             tx.begin();
 
+            // build the user if the user doesn't exist
             long userPk = User.findPkByUsername(assertion.getUsername(), em);
+            User user;
             if (userPk == -1) {
                 LOG.info("User not found, creating a new User");
                 responseStatus = Response.Status.CREATED;
-                em.persist(new User(assertion.getUsername(), assertion.getEmail()));
+                user = new User(assertion.getUsername(), assertion.getEmail());
+                em.persist(user);
+            } else {
+                user = User.findByPk(userPk, em);
             }
+
+            if (uidPair != null && user != null) {
+                if (!user.hasAccess(uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em)) {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair").build();
+                }
+            }
+
             tx.commit();
         } finally {
             if (tx.isActive()) {
@@ -116,14 +150,20 @@ public class TokenResource
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
-        String token = JWT.create()
+        JWTCreator.Builder jwtBuilder = JWT.create()
                 .withIssuer("auth.kheops.online")
                 .withSubject(assertion.getUsername())
                 .withAudience("dicom.kheops.online")
                 .withClaim("capability", !assertion.isCapabilityAssertion()) // don't give capability access for capability assertions
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-                .withNotBefore(new Date())
-                .sign(algorithmHMAC);
+                .withNotBefore(new Date());
+
+        if (uidPair != null) {
+            jwtBuilder = jwtBuilder.withClaim("study_uid", uidPair.getStudyInstanceUID())
+                .withClaim("series_uid", uidPair.getSeriesInstanceUID());
+        }
+
+        String token = jwtBuilder.sign(algorithmHMAC);
 
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.accessToken = token;
@@ -134,6 +174,46 @@ public class TokenResource
         }
         LOG.info("Returning token for user: " + assertion.getUsername());
         return Response.status(responseStatus).entity(tokenResponse).build();
+    }
+
+    private UIDPair getUIDPairFromScope(String scope) {
+        String seriesUID = null;
+        String studyUID = null;
+
+        if (scope == null) {
+            return null;
+        }
+
+       String[] scopes = scope.split(" ");
+       for (String item: scopes) {
+           if (item.startsWith("StudyInstanceUID=")) {
+               studyUID = item.substring(17);
+               try {
+                   new Oid(studyUID);
+               } catch (GSSException exception) {
+                   throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("scope StudyInstanceUID is not a valid UID").build());
+               }
+           } else if (item.startsWith("SeriesInstanceUID=")) {
+               seriesUID = item.substring(18);
+               try {
+                   new Oid(seriesUID);
+               } catch (GSSException exception) {
+                   throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("scope SeriesInstanceUID is not a valid UID").build());
+               }
+           } else {
+               throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("unknown scope: " + item).build());
+           }
+       }
+
+       if (studyUID == null && seriesUID == null) {
+           return null;
+       } else if (studyUID == null) {
+           throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("no StudyInstanceUID provided in the scope").build());
+       } else if (seriesUID == null) {
+           throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("no SeriesInstanceUID provided in the scope").build());
+       } else {
+           return new UIDPair(studyUID, seriesUID);
+       }
     }
 }
 

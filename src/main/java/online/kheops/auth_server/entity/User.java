@@ -3,6 +3,7 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -98,6 +99,14 @@ public class User {
     public User(String googleId, String googleEmail) {
         this.googleId = googleId;
         this.googleEmail = googleEmail;
+    }
+
+    public boolean hasAccess(String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
+        TypedQuery<Series> query = em.createQuery("select s from Series s where :user member of s.users and s.seriesInstanceUID = :seriesInstanceUID and s.study.studyInstanceUID = :studyInstanceUID", Series.class);
+        query.setParameter("user", this);
+        query.setParameter("seriesInstanceUID", seriesInstanceUID);
+        query.setParameter("studyInstanceUID", studyInstanceUID);
+        return !query.getResultList().isEmpty();
     }
 
     public long getPk() {
