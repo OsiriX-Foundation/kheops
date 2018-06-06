@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.ModalityBitfield;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Code;
 import org.dcm4che3.data.Tag;
@@ -34,8 +33,8 @@ public class Series {
     @Column(name = "series_uid", updatable = false)
     private String seriesInstanceUID;
 
-    @Column(name = "modality_bitfield")
-    private long modalityBitfield;
+    @Column(name = "modality")
+    private String modality;
 
     @Column(name = "timezone_offset_from_utc")
     private String timezoneOffsetFromUTC;
@@ -126,25 +125,12 @@ public class Series {
         return seriesInstanceUID;
     }
 
-    private long getModalityBitfield() {
-        return modalityBitfield;
-    }
-
-    private void setModalityBitfield(long modalityBitfield) {
-        this.modalityBitfield = modalityBitfield;
-    }
-
     public String getModality() {
-        Code modality = ModalityBitfield.getOnlyModality(getModalityBitfield());
-        if (modality != null) {
-            return modality.getCodeValue();
-        } else {
-            return null;
-        }
+        return modality;
     }
 
     public void setModality(String modality) {
-        setModalityBitfield(ModalityBitfield.getBitfield(modality));
+        this.modality = modality;
     }
 
     public Study getStudy() {
