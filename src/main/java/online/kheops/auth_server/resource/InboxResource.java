@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Path("/users")
@@ -298,11 +299,16 @@ public class InboxResource
 
             generator.writeStartArray();
 
-            jsonReader.readDatasets((fmi, dataset) -> {
-                if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
-                    jsonWriter.write(dataset);
-                }
-            });
+            try {
+                jsonReader.readDatasets((fmi, dataset) -> {
+                    if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
+                        jsonWriter.write(dataset);
+                    }
+                });
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, "Error while processing metadata", e);
+                throw new WebApplicationException(e);
+            }
 
             generator.writeEnd();
             generator.flush();
