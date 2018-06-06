@@ -128,6 +128,7 @@ public class TokenResource
 
             if (uidPair != null && user != null) {
                 if (!user.hasAccess(uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em)) {
+                    LOG.info("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair");
                     return Response.status(Response.Status.BAD_REQUEST).entity("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair").build();
                 }
             }
@@ -191,6 +192,7 @@ public class TokenResource
                try {
                    new Oid(studyUID);
                } catch (GSSException exception) {
+                   LOG.info("scope StudyInstanceUID is not a valid UID");
                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("scope StudyInstanceUID is not a valid UID").build());
                }
            } else if (item.startsWith("SeriesInstanceUID=")) {
@@ -198,18 +200,21 @@ public class TokenResource
                try {
                    new Oid(seriesUID);
                } catch (GSSException exception) {
+                   LOG.info("scope SeriesInstanceUID is not a valid UID");
                    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("scope SeriesInstanceUID is not a valid UID").build());
                }
            } else {
-               throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("unknown scope: " + item).build());
+               LOG.info("Unknown scope requested: " +item);
            }
        }
 
        if (studyUID == null && seriesUID == null) {
            return null;
        } else if (studyUID == null) {
+           LOG.info("no StudyInstanceUID provided in the scope");
            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("no StudyInstanceUID provided in the scope").build());
        } else if (seriesUID == null) {
+           LOG.info("no SeriesInstanceUID provided in the scope");
            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("no SeriesInstanceUID provided in the scope").build());
        } else {
            return new UIDPair(studyUID, seriesUID);
