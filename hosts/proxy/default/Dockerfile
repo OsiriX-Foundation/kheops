@@ -1,4 +1,4 @@
-FROM osirixfoundation/pacsproxyauthorization
+FROM base
 
 ENV JWT_SECRET="JWTs are the best!"
 
