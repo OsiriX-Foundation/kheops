@@ -14,11 +14,10 @@ else
 fi
 
 # ensure a supported command
-commands=(run tests deps clean package)
+commands=(run deps clean package)
 if [[ ! ${commands[*]} =~ "$command" ]]; then
     echo -e "${cyan}Unsupported command. Try:${no_color}"
     echo -e "run [NAME]: build and run backend and the specified proxy container and report back the proxy's URL"
-    echo -e "tests: run the integration tests, building and running all necessary containers"
     echo -e "deps: build only Lua script dependencies"
     echo -e "clean: stop/delete all running containers and remove all images"
     echo -e "package: build a release package archive"
@@ -32,7 +31,7 @@ if [[ "$command" == "run" ]]; then
     fi
 fi
 
-commands=(run tests deps)
+commands=(run deps)
 if [[ ${commands[*]} =~ "$command" ]]; then
     # build Lua script dependencies
     ./scripts/build_deps.sh
@@ -65,18 +64,6 @@ if [[ "$command" == "run" ]]; then
     # report URL to proxy container
     echo -e "${cyan}Proxy:${no_color}"
     echo -e curl http://$proxy_host
-fi
-
-if [[ "$command" == "tests" ]]; then
-    echo -e "${cyan}Running integration tests against proxy host:${no_color} $proxy_host"
-    cd test
-
-    # make sure npm packages are installed
-    npm install
-    # run tests
-    PROXY_HOST=$proxy_host npm test
-
-    cd ..
 fi
 
 if [[ "$command" == "clean" ]]; then
