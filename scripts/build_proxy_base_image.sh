@@ -13,9 +13,9 @@ echo -e "${cyan}Required Dockerfile SHA1:${no_color} $dockerfile_sha1"
 echo -e "${cyan}Building base proxy image, if necessary...${no_color}"
 image_exists=$(docker images | grep "base") || true
 
-if [ -z "$image_exists" ]; then
-    echo -e "${blue}Building image${no_color}"
+#if [ -z "$image_exists" ]; then
+#    echo -e "${blue}Building image${no_color}"
     docker build -t="base" --force-rm $proxy_base_dir
-else
-    echo -e "${blue}Base image already exists${no_color}"
-fi
+#else
+#    echo -e "${blue}Base image already exists${no_color}"
+#fi
