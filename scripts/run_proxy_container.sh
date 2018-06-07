@@ -23,4 +23,5 @@ cp -r lib/* $proxy_dir/nginx/lua
 docker image ls
 echo -e "${blue}Building the new image${no_color}"
 docker build -t="osirixfoundation/pacsproxyauthorization" --force-rm $proxy_dir
+docker image ls
 docker run --name "proxy-$proxy_name" -d -p 80:80 --link backend:backend "osirixfoundation/pacsproxyauthorization"
