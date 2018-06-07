@@ -58,6 +58,14 @@ if [[ "$command" == "run" ]]; then
     echo -e curl http://$proxy_host
 fi
 
+if [[ "$command" == "build" ]]; then
+    # build proxy base image
+    ./scripts/build_proxy_base_image.sh
+
+    # build specified proxy container
+    ./scripts/build_proxy_container.sh
+fi
+
 if [[ "$command" == "clean" ]]; then
     # shut down all proxy containers
     for proxy_dir in hosts/proxy/*; do
