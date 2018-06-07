@@ -23,14 +23,6 @@ if [[ ! ${commands[*]} =~ "$command" ]]; then
     echo -e "package: build a release package archive"
 fi
 
-if [[ "$command" == "run" ]]; then
-    run_proxy_name=${2:-default}
-    if [[ ! -d "hosts/proxy/${run_proxy_name}" ]]; then
-        echo -e "Not a valid proxy container to run: $run_proxy_name"
-        exit 1
-    fi
-fi
-
 commands=(run deps)
 if [[ ${commands[*]} =~ "$command" ]]; then
     # build Lua script dependencies
@@ -59,7 +51,7 @@ if [[ "$command" == "run" ]]; then
     ./scripts/build_proxy_base_image.sh
 
     # run specified proxy container
-    ./scripts/run_proxy_container.sh $run_proxy_name
+    ./scripts/run_proxy_container.sh
 
     # report URL to proxy container
     echo -e "${cyan}Proxy:${no_color}"
