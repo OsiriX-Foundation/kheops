@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -o pipefail
+set -e
+
+. scripts/common.sh
+
+command=$1
+
+if type "docker-machine" 2>/dev/null; then
+  proxy_host=$(docker-machine ip default)
+else
+  proxy_host='localhost'
+fi
+
+# ensure a supported command
+commands=(run tests deps clean package)
+if [[ ! ${commands[*]} =~ "$command" ]]; then
+    echo -e "${cyan}Unsupported command. Try:${no_color}"
+    echo -e "run [NAME]: build and run backend and the specified proxy container and report back the proxy's URL"
+    echo -e "tests: run the integration tests, building and running all necessary containers"
+    echo -e "deps: build only Lua script dependencies"
+    echo -e "clean: stop/delete all running containers and remove all images"
+    echo -e "package: build a release package archive"
+fi
+
+if [[ "$command" == "run" ]]; then
+    run_proxy_name=${2:-default}
+    if [[ ! -d "hosts/proxy/${run_proxy_name}" ]]; then
+        echo -e "Not a valid proxy container to run: $run_proxy_name"
+        exit 1
+    fi
+fi
+
+commands=(run tests deps)
+if [[ ${commands[*]} =~ "$command" ]]; then
+    # build Lua script dependencies
+    ./scripts/build_deps.sh
+fi
+
+if [[ "$command" == "package" ]]; then
+    echo -e "${cyan}Building package archive for version:${no_color} $(cat version.txt)"
+    archive=nginx-jwt.tar.gz
+    if [ -f $archive ] ; then 
+    rm $archive
+    fi
+
+    tar cvf $archive ./nginx-jwt.lua
+    tar rvf $archive ./version.txt
+    cd lib/
+    tar rvf ../$archive ./
+    cd ..
+fi
+
+if [[ "$command" == "run" ]]; then
+    # run backend container
+    ./scripts/run_backend.sh
+
+    # build proxy base image
+    ./scripts/build_proxy_base_image.sh
+
+    # run specified proxy container
+    ./scripts/run_proxy_container.sh $run_proxy_name
+
+    # report URL to proxy container
+    echo -e "${cyan}Proxy:${no_color}"
+    echo -e curl http://$proxy_host
+fi
+
+if [[ "$command" == "tests" ]]; then
+    echo -e "${cyan}Running integration tests against proxy host:${no_color} $proxy_host"
+    cd test
+
+    # make sure npm packages are installed
+    npm install
+    # run tests
+    PROXY_HOST=$proxy_host npm test
+
+    cd ..
+fi
+
+if [[ "$command" == "clean" ]]; then
+    # shut down all proxy containers
+    for proxy_dir in hosts/proxy/*; do
+        [[ -d "${proxy_dir}" ]] || continue # if not a directory, skip
+
+        proxy_name="$(basename $proxy_dir)"
+
+        ./scripts/stop_proxy_container.sh $proxy_name
+    done
+
+    # shut down backend container
+    ./scripts/stop_backend.sh
+fi
