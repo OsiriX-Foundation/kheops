@@ -21,5 +21,5 @@ cp $root_dir/nginx-jwt.lua $proxy_dir/nginx/lua
 cp -r lib/* $proxy_dir/nginx/lua
 
 echo -e "${blue}Building the new image${no_color}"
-docker build -t="proxy-$proxy_name-image" --force-rm $proxy_dir
-docker run --name "proxy-$proxy_name" -d -p 80:80 --link backend:backend "proxy-$proxy_name-image"
+docker build -t="osirixfoundation/pacsproxyauthorization" --force-rm $proxy_dir
+docker run --name "proxy-$proxy_name" -d -p 80:80 --link backend:backend "osirixfoundation/pacsproxyauthorization"
