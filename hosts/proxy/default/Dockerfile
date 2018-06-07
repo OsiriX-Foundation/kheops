@@ -1,4 +1,4 @@
-FROM proxy-base-image
+FROM osirixfoundation/pacsproxyauthorization
 
 ENV JWT_SECRET="JWTs are the best!"
 
