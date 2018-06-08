@@ -9,7 +9,7 @@ app.get('/', function (req, res) {
 });
 
 
-app.get('/studyUID/:study/seriesUID/:series', function (req, res) {
+app.get('/dcm4chee-arc/aets/DCM4CHEE/rs/studies/:study/series/:series', function (req, res) {
     console.log('Authorization header:', req.get('Authorization'));
 
     res.json({
