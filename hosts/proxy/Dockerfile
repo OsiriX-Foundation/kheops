@@ -10,6 +10,9 @@ ENV OPENRESTY_VERSION 1.9.3.1
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV VAR_PREFIX /var/nginx
+ENV JWT_SECRET="P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA=="
+
+EXPOSE 80
 
 # NginX prefix is automatically set by OpenResty to $OPENRESTY_PREFIX/nginx
 # look for $ngx_prefix in https://github.com/openresty/ngx_openresty/blob/master/util/configure
@@ -54,7 +57,7 @@ RUN cd /root \
 
 WORKDIR $NGINX_PREFIX/
 
-ONBUILD RUN rm -rf conf/* html/*
-ONBUILD COPY nginx $NGINX_PREFIX/
+RUN rm -rf conf/* html/*
+COPY default/nginx $NGINX_PREFIX/
 
 CMD ["nginx", "-g", "daemon off; error_log /dev/stderr info;"]
