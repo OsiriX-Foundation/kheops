@@ -3,6 +3,10 @@ local cjson = require "cjson"
 local basexx = require "basexx"
 local secret = os.getenv("JWT_SECRET")
 
+function string.starts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
 assert(secret ~= nil, "Environment variable JWT_SECRET not set")
 
 if os.getenv("JWT_SECRET_IS_BASE64_ENCODED") == 'true' then
@@ -45,6 +49,27 @@ function M.auth(claim_specs)
     if jwt_obj.verified == false then
         ngx.log(ngx.WARN, "Invalid token: ".. jwt_obj.reason)
         ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    end
+
+    -- if wado uri request
+    if string.starts(ngx.var.request_uri, "/wado") then
+        if ngx.var.arg_requestType == "WADO" then    
+            if ngx.var.arg_studyUID ~= nil then
+                if ngx.var.arg_studyUID ~= jwt_obj.payload["study_uid"] then
+                    ngx.log(ngx.WARN,"studyUID: error")
+                    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+                end
+            end
+            if ngx.var.arg_seriesUID ~= nil then
+                if ngx.var.arg_seriesUID ~= jwt_obj.payload["series  _uid"] then
+                    ngx.log(ngx.WARN,"seriesUID: error")
+                    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+                end
+            end
+        else
+            ngx.log(ngx.WARN,"requestType: missing")
+            ngx.exit(ngx.HTTP_UNAUTHORIZED)
+        end 
     end
 
     ngx.log(ngx.INFO, "JWT: " .. cjson.encode(jwt_obj))
