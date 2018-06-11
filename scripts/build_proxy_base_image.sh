@@ -15,7 +15,7 @@ image_exists=$(docker images | grep "base") || true
 
 #if [ -z "$image_exists" ]; then
 #    echo -e "${blue}Building image${no_color}"
-    docker build -t="base" --force-rm $proxy_base_dir
+    docker build -t="osirixfoundation/pacsproxyauthorization" --force-rm $proxy_base_dir
 #else
 #    echo -e "${blue}Base image already exists${no_color}"
 #fi
