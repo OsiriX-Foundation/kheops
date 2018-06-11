@@ -23,12 +23,6 @@ if [[ ! ${commands[*]} =~ "$command" ]]; then
     echo -e "package: build a release package archive"
 fi
 
-commands=(run deps)
-if [[ ${commands[*]} =~ "$command" ]]; then
-    # build Lua script dependencies
-    ./scripts/build_deps.sh
-fi
-
 if [[ "$command" == "package" ]]; then
     echo -e "${cyan}Building package archive for version:${no_color} $(cat version.txt)"
     archive=nginx-jwt.tar.gz
@@ -61,9 +55,6 @@ fi
 if [[ "$command" == "build" ]]; then
     # build proxy base image
     ./scripts/build_proxy_base_image.sh
-
-    # build specified proxy container
-    ./scripts/build_proxy_container.sh
 fi
 
 if [[ "$command" == "clean" ]]; then
