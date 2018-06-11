@@ -3,11 +3,12 @@ package online.kheops.auth_server.entity;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
-import org.dcm4che3.util.StringUtils;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,14 @@ public class Study {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "pk")
     private long pk;
+
+    @Basic(optional = false)
+    @Column(name = "created_time", updatable = false)
+    private LocalDateTime createdTime;
+
+    @Basic(optional = false)
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
 
     @Basic(optional = false)
     @Column(name = "study_uid", updatable = false)
@@ -67,6 +76,18 @@ public class Study {
     @OneToMany
     @JoinColumn (name = "study_fk", nullable=false)
     private Set<Series> series = new HashSet<>();
+
+    @PrePersist
+    public void onPrePersist() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        createdTime = now;
+        updatedTime = now;
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        updatedTime = LocalDateTime.now(ZoneOffset.UTC);
+    }
 
     public static List<Attributes> findAttributesByUserPK(long userPK, EntityManager em) {
         List<Attributes> attributesList = new ArrayList<>();
@@ -249,5 +270,13 @@ public class Study {
 
     public Set<Series> getSeries() {
         return series;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
     }
 }

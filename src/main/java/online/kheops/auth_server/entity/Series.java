@@ -1,12 +1,12 @@
 package online.kheops.auth_server.entity;
 
 import org.dcm4che3.data.Attributes;
-import org.dcm4che3.data.Code;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,14 +20,12 @@ public class Series {
     private long pk;
 
     @Basic(optional = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_time", updatable = false)
-    private Date createdTime;
+    private LocalDateTime createdTime;
 
     @Basic(optional = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_time")
-    private Date updatedTime;
+    private LocalDateTime updatedTime;
 
     @Basic(optional = false)
     @Column(name = "series_uid", updatable = false)
@@ -67,14 +65,14 @@ public class Series {
 
     @PrePersist
     public void onPrePersist() {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         updatedTime = now;
     }
 
     @PreUpdate
     public void onPreUpdate() {
-        updatedTime = new Date();
+        updatedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     public Attributes getAttributes() {
@@ -113,11 +111,11 @@ public class Series {
         return pk;
     }
 
-    public Date getCreatedTime() {
+    public LocalDateTime getCreatedTime() {
         return createdTime;
     }
 
-    public Date getUpdatedTime() {
+    public LocalDateTime getUpdatedTime() {
         return updatedTime;
     }
 

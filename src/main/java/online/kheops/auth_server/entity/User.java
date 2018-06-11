@@ -2,8 +2,9 @@ package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -34,6 +35,14 @@ public class User {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "pk")
     private long pk;
+
+    @Basic(optional = false)
+    @Column(name = "created_time", updatable = false)
+    private LocalDateTime createdTime;
+
+    @Basic(optional = false)
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
 
     @Basic(optional = false)
     @Column(name = "google_id")
@@ -94,6 +103,18 @@ public class User {
         }
     }
 
+    @PrePersist
+    public void onPrePersist() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        createdTime = now;
+        updatedTime = now;
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        updatedTime = LocalDateTime.now(ZoneOffset.UTC);
+    }
+
     public User() {}
 
     public User(String googleId, String googleEmail) {
@@ -107,6 +128,14 @@ public class User {
         query.setParameter("seriesInstanceUID", seriesInstanceUID);
         query.setParameter("studyInstanceUID", studyInstanceUID);
         return !query.getResultList().isEmpty();
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
     }
 
     public long getPk() {

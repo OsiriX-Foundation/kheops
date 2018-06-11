@@ -6,6 +6,8 @@ USE kheops;
 
 CREATE TABLE users (
   pk BIGINT NOT NULL AUTO_INCREMENT,
+  created_time DATETIME NOT NULL,
+  updated_time DATETIME NOT NULL,
   google_id VARCHAR(255) NOT NULL,
   google_email VARCHAR(255) NOT NULL,
 
@@ -19,6 +21,8 @@ CREATE TABLE users (
 
 CREATE TABLE studies (
   pk BIGINT NOT NULL AUTO_INCREMENT,
+  created_time DATETIME NOT NULL,
+  updated_time DATETIME NOT NULL,
   study_uid VARCHAR(255) NOT NULL,
   study_date VARCHAR(255),
   study_time VARCHAR(255),
