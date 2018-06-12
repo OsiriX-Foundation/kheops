@@ -13,6 +13,6 @@ else
     kheops_superuser_hmasecret=XXX
 fi
 
-export JWT_SECRET=kheops_superuser_hmasecret
+export JWT_SECRET=$kheops_superuser_hmasecret
 
 nginx -g 'daemon off; error_log /dev/stderr info;'
