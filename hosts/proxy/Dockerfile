@@ -62,4 +62,4 @@ COPY default/nginx $NGINX_PREFIX/
 
 RUN chmod +x $NGINX_PREFIX/script.sh
 
-CMD .$NGINX_PREFIX/script.sh
+CMD ./$NGINX_PREFIX/script.sh
