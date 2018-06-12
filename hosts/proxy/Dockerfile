@@ -11,6 +11,9 @@ ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV VAR_PREFIX /var/nginx
 
+LABEL org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/OsiriX-Foundation/PACSProxyAuthorization"
+
 EXPOSE 80
 
 # NginX prefix is automatically set by OpenResty to $OPENRESTY_PREFIX/nginx
