@@ -60,4 +60,6 @@ WORKDIR $NGINX_PREFIX/
 RUN rm -rf conf/* html/*
 COPY default/nginx $NGINX_PREFIX/
 
-CMD ["nginx", "-g", "daemon off; error_log /dev/stderr info;"]
+RUN chmod +x $NGINX_PREFIX/script.sh
+
+CMD [".$NGINX_PREFIX/script.sh"]
