@@ -2,8 +2,8 @@
 
 chmod a+w /opt/openresty/nginx/conf/nginx.conf
 
-sed -i "s|\${pacs_wado_uri}|$KHEOPS_WADO_URI_ROOT|" /opt/openresty/nginx/conf/nginx.conf
-sed -i "s|\${pacs_wado_rs}|$KHEOPS_PACS_URL|" /opt/openresty/nginx/conf/nginx.conf
+sed -i "s|\${pacs_wado_uri}|$KHEOPS_PROXY_PACS_WADO_URI|" /opt/openresty/nginx/conf/nginx.conf
+sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /opt/openresty/nginx/conf/nginx.conf
 
 if [ -f /run/secrets/kheops_superuser_hmasecret ]; then
     filename="/run/secrets/kheops_superuser_hmasecret"
