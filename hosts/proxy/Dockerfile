@@ -62,4 +62,5 @@ COPY default/nginx $NGINX_PREFIX/
 
 RUN chmod +x $NGINX_PREFIX/script.sh
 
+CMD ["nginx", "-g", "daemon off; error_log /dev/stderr info;"]
 #CMD .$NGINX_PREFIX/script.sh
