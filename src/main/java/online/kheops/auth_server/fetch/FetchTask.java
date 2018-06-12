@@ -1,6 +1,7 @@
 package online.kheops.auth_server.fetch;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.AttributesListMarshaller;
@@ -120,7 +121,8 @@ public class FetchTask implements Runnable {
 
             final Attributes attributes;
             try {
-                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {
+                String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(seriesUID.getStudyInstanceUID()).withSeriesUID(seriesUID.getSeriesInstanceUID()).build();
+                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").header("Authorization", authToken).get(new GenericType<List<Attributes>>() {
                 });
                 if (seriesList == null || seriesList.isEmpty()) {
                     throw new WebApplicationException("GET to fetch series returned nothing");
@@ -167,7 +169,8 @@ public class FetchTask implements Runnable {
 
             final Attributes attributes;
             try {
-                List<Attributes> studyList = client.target(uri).request().accept("application/dicom+json").get(new GenericType<List<Attributes>>() {});
+                String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
+                List<Attributes> studyList = client.target(uri).request().accept("application/dicom+json").header("Authorization", authToken).get(new GenericType<List<Attributes>>() {});
                 if (studyList == null || studyList.isEmpty()) {
                     throw new WebApplicationException("GET to fetch study returned nothing");
                 }

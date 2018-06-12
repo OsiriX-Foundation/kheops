@@ -12,6 +12,7 @@ import javax.ws.rs.core.*;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
@@ -284,8 +285,9 @@ public class InboxResource
         URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
         UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/metadata");
         URI uri = uriBuilder.build(studyInstanceUID);
+        String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
         Client client = ClientBuilder.newClient();
-        InputStream is = client.target(uri).request("application/dicom+json").get(InputStream.class);
+        InputStream is = client.target(uri).request("application/dicom+json").header("Authorization", authToken).get(InputStream.class);
 
         JsonParser parser = Json.createParser(is);
         JSONReader jsonReader = new JSONReader(parser);
