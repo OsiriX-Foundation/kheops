@@ -287,7 +287,7 @@ public class InboxResource
         URI uri = uriBuilder.build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
         Client client = ClientBuilder.newClient();
-        InputStream is = client.target(uri).request("application/dicom+json").header("Authorization", authToken).get(InputStream.class);
+        InputStream is = client.target(uri).request("application/dicom+json").header("Authorization", "Bearer "+authToken).get(InputStream.class);
 
         JsonParser parser = Json.createParser(is);
         JSONReader jsonReader = new JSONReader(parser);
