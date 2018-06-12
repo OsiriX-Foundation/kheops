@@ -1,16 +1,8 @@
 #!/bin/bash
 
-chmod a+w /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${root_url}|$KHEOPS_ROOT_URL|" /etc/nginx/conf.d/kheops.conf
+chmod a+w /opt/openresty/nginx/conf/nginx.conf
 
-sed -i "s|\${kheopsviewer_url}|$KHEOPS_NGINX_URL_KHEOPSVIEWER|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${tomcat_url}|$KHEOPS_NGINX_URL_TOMCAT|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${proxy_url}|$KHEOPS_NGINX_URL_PROXY|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${wado_url}|$KHEOPS_WADO_ROOT|" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${pacs_wado_uri}|$KHEOPS_WADO_URI_ROOT|" /opt/openresty/nginx/conf/nginx.conf
+sed -i "s|\${pacs_wado_rs}|$KHEOPS_PACS_URL|" /opt/openresty/nginx/conf/nginx.conf
 
-https="https://"
-server_name=${KHEOPS_ROOT_URL/$https/}
-
-sed -i "s|\${server_name}|$server_name|" /etc/nginx/conf.d/kheops.conf
-
-nginx -g 'daemon off;'
+nginx -g daemon off; error_log /dev/stderr info;
