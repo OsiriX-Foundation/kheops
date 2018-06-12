@@ -61,7 +61,7 @@ function M.auth(claim_specs)
                 end
             end
             if ngx.var.arg_seriesUID ~= nil then
-                if ngx.var.arg_seriesUID ~= jwt_obj.payload["series  _uid"] then
+                if ngx.var.arg_seriesUID ~= jwt_obj.payload["series_uid"] then
                     ngx.log(ngx.WARN,"seriesUID: error")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
