@@ -6,7 +6,3 @@ services:
         image: osirixfoundation/pacsproxyauthorization:latest
         ports:
             - "80:80"
-    backend:
-        container_name: backend
-        image: backend-image
-        
