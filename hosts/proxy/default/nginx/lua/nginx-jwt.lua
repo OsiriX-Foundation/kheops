@@ -89,7 +89,6 @@ function M.auth(claim_specs)
 
             -- make sure token actually contains the claim
             local claim_value = jwt_obj.payload[claim]
-            ngx.log(ngx.WARN,"claim_value="..claim_value)
             if claim_value == nil then
                 blocking_claim = claim .. " (missing)"
                 break
