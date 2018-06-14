@@ -27,17 +27,16 @@ end
 local M = {}
 
 function M.auth(claim_specs)
-    ngx.log(ngx.INFO,"++++++++++++++++++++++++++++++ NEW REQUEST ++++++++++++++++++++++++++++++")
     -- require Authorization request header
     local auth_header = ngx.var.http_Authorization
     local token = nil
     if auth_header ~= nil then
         _, _, token = string.find(auth_header, "Bearer%s+(.+)")
-        ngx.log(ngx.INFO, "token from Header: "..token)
+        ngx.log(ngx.INFO, "access_token from Header: "..token)
     else
         if ngx.var.arg_access_token ~= nil then    
             token=ngx.var.arg_access_token
-	    ngx.log(ngx.INFO, "token from URI query parameter: "..token)
+	    ngx.log(ngx.INFO, "access token from URI query parameter: "..token)
         else
             ngx.log(ngx.WARN,"access_token: missing")
             ngx.exit(ngx.HTTP_UNAUTHORIZED)
@@ -56,24 +55,23 @@ function M.auth(claim_specs)
         if ngx.var.arg_requestType == "WADO" then    
             if ngx.var.arg_studyUID ~= nil then
                 if ngx.var.arg_studyUID ~= jwt_obj.payload["study_uid"] then
-                    ngx.log(ngx.WARN,"studyUID: error")
+                    ngx.log(ngx.WARN,"studyUID: error (not same as JWT)")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
             end
             if ngx.var.arg_seriesUID ~= nil then
-                if ngx.var.arg_seriesUID ~= jwt_obj.payload["series  _uid"] then
-                    ngx.log(ngx.WARN,"seriesUID: error")
+                if ngx.var.arg_seriesUID ~= jwt_obj.payload["series_uid"] then
+                    ngx.log(ngx.WARN,"seriesUID: error (not same as JWT)")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
             end
         else
             ngx.log(ngx.WARN,"requestType: missing")
-            ngx.exit(ngx.HTTP_UNAUTHORIZED)
+            ngx.exit(ngx.HTTP_BAD_REQUEST)
         end 
     end
 
     ngx.log(ngx.INFO, "JWT: " .. cjson.encode(jwt_obj))
-
 
 
 
