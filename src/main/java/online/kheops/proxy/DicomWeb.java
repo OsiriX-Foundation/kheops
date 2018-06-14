@@ -205,6 +205,11 @@ public class DicomWeb extends ProxyServlet
         LOG.warning("finished copying the response");
     }
 
+    @Override
+    protected void copyRequestHeaders(HttpServletRequest servletRequest, HttpRequest proxyRequest) {
+        super.copyRequestHeaders(servletRequest, proxyRequest);
+        proxyRequest.addHeader("Authorization", "Bearer " + getKheopsAccessToken(servletRequest));
+    }
 
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
