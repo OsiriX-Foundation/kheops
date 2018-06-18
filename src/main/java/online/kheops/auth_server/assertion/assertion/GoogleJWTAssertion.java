@@ -64,6 +64,7 @@ public class GoogleJWTAssertion implements Assertion {
         final DecodedJWT jwt;
         try {
             jwt = JWT.require(Algorithm.RSA256(keyProvider))
+                    .acceptLeeway(120)
                     .acceptExpiresAt(86400)
                     .withIssuer("accounts.google.com")
                     .build().verify(assertionToken);
