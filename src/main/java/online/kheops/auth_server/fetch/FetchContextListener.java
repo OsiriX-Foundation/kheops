@@ -31,7 +31,7 @@ public class FetchContextListener implements ServletContextListener {
 
         try {
             FetchTask task = new FetchTask(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));
-            executor.scheduleAtFixedRate(task, 0, 10, TimeUnit.SECONDS);
+            executor.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS);
         } catch (URISyntaxException e) {
             LOG.log(Level.SEVERE, "URI in context param online.kheops.pacs.uri is not valid", e);
         }

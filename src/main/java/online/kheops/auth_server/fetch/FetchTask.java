@@ -60,7 +60,7 @@ public class FetchTask implements Runnable {
             LOG.log(Level.SEVERE,"An error occurred while fetching", e);
         }
 
-        LOG.info("Finished Fetch Task");
+        LOG.log(Level.FINE, "Finished Fetch Task");
     }
 
     private List<UIDPair> unpopulatedSeriesUIDs() {
