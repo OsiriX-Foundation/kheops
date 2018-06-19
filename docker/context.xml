@@ -1,4 +1,4 @@
-<Context>
+<Context path="capabilities" docBase="KheopsDICOMwebProxy" debug="0" reloadable="true">
     <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
                override="false"/>
     <Parameter name="online.kheops.auth_server.uri" value="${kheops_authorization_url}"
