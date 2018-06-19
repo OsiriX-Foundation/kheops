@@ -32,11 +32,11 @@ function M.auth(claim_specs)
     local token = nil
     if auth_header ~= nil then
         _, _, token = string.find(auth_header, "Bearer%s+(.+)")
-        ngx.log(ngx.INFO, "access_token from Header: "..token)
+        --ngx.log(ngx.INFO, "access_token from Header: "..token)
     else
         if ngx.var.arg_access_token ~= nil then    
             token=ngx.var.arg_access_token
-	    ngx.log(ngx.INFO, "access token from URI query parameter: "..token)
+	    --ngx.log(ngx.INFO, "access token from URI query parameter: "..token)
         else
             ngx.log(ngx.WARN,"access_token: missing")
             ngx.exit(ngx.HTTP_UNAUTHORIZED)
@@ -71,7 +71,7 @@ function M.auth(claim_specs)
         end 
     end
 
-    ngx.log(ngx.INFO, "JWT: " .. cjson.encode(jwt_obj))
+    --ngx.log(ngx.INFO, "JWT: " .. cjson.encode(jwt_obj))
 
 
 
