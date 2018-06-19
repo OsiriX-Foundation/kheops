@@ -1,6 +1,7 @@
 package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Random;
@@ -55,8 +56,8 @@ public class Capability {
     public Capability() {
         final String DICT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         StringBuilder secretBuilder = new StringBuilder();
-        Random rnd = new Random();
-        while (secretBuilder.length() < 16) {
+        Random rnd = new SecureRandom();
+        while (secretBuilder.length() < 20) {
             int index = rnd.nextInt(DICT.length());
             secretBuilder.append(DICT.charAt(index));
         }
