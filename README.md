@@ -1,15 +1,15 @@
 # KheopsNginx
 
-# Environnement variables
+## Environnement variables
 
-## `KHEOPS_ROOT_URL`
+`KHEOPS_ROOT_URL`
 
-## `KHOEPS_NGINX_URL_TOMCAT`
+`KHOEPS_NGINX_URL_TOMCAT`
 
-## `KHEOPS_NGINX_KHEOPSVIEWER`
+`KHEOPS_NGINX_KHEOPSVIEWER`
 
-# Secrets
+*# Secrets
 
-## `privkey1.pem`
+`privkey1.pem`
 
-## `fullchain1.pem`
+`fullchain1.pem`
