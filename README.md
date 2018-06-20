@@ -25,7 +25,8 @@
 
 **Database Docker Image**
 
-[![](https://images.microbadger.com/badges/image/osirixfoundation/kheopsauthorization-database.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-database "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/osirixfoundation/kheops-authorization-database.svg)](https://microbadger.com/images/osirixfoundation/kheops-authorization-database "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/osirixfoundation/kheops-authorization-database.svg)](https://microbadger.com/images/osirixfoundation/kheops-authorization-database "Get your own image badge on microbadger.com")
 
 # [API Documentation](https://github.com/OsiriX-Foundation/KheopsAuthorization/wiki)
 
