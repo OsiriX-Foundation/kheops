@@ -8,7 +8,7 @@
 
 `KHEOPS_NGINX_KHEOPSVIEWER`
 
-*# Secrets
+# Secrets
 
 `privkey1.pem`
 
