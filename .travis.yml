@@ -21,4 +21,4 @@ before_script:
 script:
    - ./build
    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-   - docker push osirixfoundation/pacsproxyauthorization
+   - docker push osirixfoundation/pacs-authorization-proxy
