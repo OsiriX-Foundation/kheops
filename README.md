@@ -10,9 +10,9 @@
 
 **Docker Image**
 
-[![](https://images.microbadger.com/badges/version/osirixfoundation/kheopsauthorization-tomcat:master.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat:master "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/osirixfoundation/kheopsauthorization-tomcat:master.svg)](https://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat:master "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/commit/osirixfoundation/kheopsauthorization-tomcat:master.svg)](http://microbadger.com/images/osirixfoundation/kheopsauthorization-tomcat:master "Get your own commit badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/osirixfoundation/kheops-authorization:master.svg)](https://microbadger.com/images/osirixfoundation/kheops-authorization:master "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/osirixfoundation/kheops-authorization:master.svg)](https://microbadger.com/images/osirixfoundation/kheops-authorization:master "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/osirixfoundation/kheops-authorization:master.svg)](https://microbadger.com/images/osirixfoundation/kheops-authorization:master "Get your own commit badge on microbadger.com")
 
 **Sonar**
 
