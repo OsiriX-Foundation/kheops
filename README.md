@@ -1,5 +1,9 @@
 # KheopsNginx
 
+**Docker image**
+
+Name : [osirixfoundation/kheops-reverse-proxy](https://hub.docker.com/r/osirixfoundation/kheops-reverse-proxy/)
+
 ## Environnement variables
 
 `KHEOPS_ROOT_URL`
