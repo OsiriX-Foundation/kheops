@@ -1,11 +1,13 @@
 plugins {
-  id "org.sonarqube" version "2.6"
+    id "org.sonarqube" version "2.6"
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.9"
 }
 
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: "jacoco"
 apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
+
 
 // Enable debugging of gretty started webapp in IDEA
 // For debuging a gradle task, IDEA creates a gradle init script (in /tmp/ijinit#.gradle), that sets JVM arguments
@@ -30,6 +32,7 @@ repositories {
     }
 }
 
+
 dependencies {
     compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.26'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
@@ -44,6 +47,9 @@ dependencies {
 
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
     compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
+
+    compile group: 'com.querydsl', name: 'querydsl-jpa', version: '4.2.1'
+    compile "org.springframework.data:spring-data-jpa:2.0.8.RELEASE"
 
     compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
         exclude module: 'slf4j-log4j12'
@@ -62,12 +68,18 @@ dependencies {
     )
 }
 
+querydsl {
+    jpa = true
+}
+
 gretty {
     jvmArgs = [*debugArgs]
 
     httpPort = 7575
     contextPath = ''
     servletContainer = 'tomcat8'
+
+    contextConfigFile = 'tomcat-config.xml'
 }
 
 test {

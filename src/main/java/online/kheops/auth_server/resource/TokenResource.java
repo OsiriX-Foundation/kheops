@@ -9,6 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 
+import online.kheops.auth_server.entity.QUser;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -80,6 +82,11 @@ public class TokenResource
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope) {
+
+
+        QUser q;
+
+
 
         UIDPair uidPair = getUIDPairFromScope(scope);
         final ErrorResponse errorResponse = new ErrorResponse();
