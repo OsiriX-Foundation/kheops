@@ -20,15 +20,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.UriBuilder;
-import javax.xml.bind.annotation.XmlElement;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -38,24 +37,12 @@ import java.util.regex.Pattern;
 
 public class DicomWeb extends ProxyServlet
 {
-
     private static final String KHEOPS_ACCESS_TOKEN = "kheops.accessToken";
     private static final String KHEOPS_USER = "kheops.user";
 
-    @SuppressWarnings("unused")
-    static class TokenResponse {
-        @XmlElement(name = "access_token")
-        String accessToken;
-        @XmlElement(name = "token_type")
-        String tokenType;
-        @XmlElement(name = "expires_in")
-        String expiresIn;
-        @XmlElement(name = "user")
-        String user;
-    }
-
     //    private final static Pattern URI_PATTERN = Pattern.compile("/capabilities/([\\w]+)/proxy/studies(?:/)+?|(?:/([0-9.]+)(?:/)+?)+?");
     private final static Pattern URI_PATTERN = Pattern.compile(".*?/capabilities/([\\w]+)/dicomweb/studies(?:/)??");
+    private final static Pattern PASSWORD_PATTERN = Pattern.compile(".*?/capabilities/password/dicomweb/studies(?:/)??");
 
     private static final Logger LOG = Logger.getLogger(DicomWeb.class.getName());
 
@@ -77,49 +64,75 @@ public class DicomWeb extends ProxyServlet
     @Override
     protected String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
         String uriString = servletRequest.getRequestURI();
-        Matcher m = URI_PATTERN.matcher(uriString);
+        Matcher uriMatcher = URI_PATTERN.matcher(uriString);
+        Matcher passwordMatcher = PASSWORD_PATTERN.matcher(uriString);
 
-        if (!m.matches()) {
+        if (!uriMatcher.matches() && !passwordMatcher.matches()) {
             throw new IllegalArgumentException("can't parse the URL:" + uriString);
         }
 
-        final String capabilitySecret = m.group(1);
+        if (uriMatcher.matches() && !passwordMatcher.matches()) {
+            final String capabilitySecret = uriMatcher.group(1);
 
-        Client client = ClientBuilder.newClient();
+            final URI authorizationServerRoot;
+            try {
+                authorizationServerRoot = new URI(getContextParam("online.kheops.auth_server.uri"));
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException("online.kheops.auth_server.uri is not a valid URI", e);
+            }
 
-        final URI authenticationServerURI;
-        try {
-            authenticationServerURI = new URI(getContextParam("online.kheops.auth_server.uri"));
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("online.kheops.auth_server.uri is not a valid URI", e);
+            AccessToken accessToken = AccessToken.createBuilder(authorizationServerRoot).withCapability(capabilitySecret).build();
+
+            servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, accessToken.getToken());
+            servletRequest.setAttribute(KHEOPS_USER, accessToken.getUser());
         }
-
-        Form form = new Form().param("assertion", capabilitySecret).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
-        URI uri = UriBuilder.fromUri(authenticationServerURI).path("token").build();
-
-        LOG.info("About to get a token");
-
-        final TokenResponse tokenResponse;
-        try {
-            tokenResponse = client.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
-        } catch (ResponseProcessingException e) {
-            LOG.log(Level.WARNING,"Unable to obtain a token for capability token", e);
-            throw new IllegalStateException("Unable to get a request token for the capability URL", e);
-        } catch (Exception e) {
-            LOG.log(Level.WARNING,"Other exception Unable to obtain a token for capability token", e);
-            throw new IllegalStateException("Unable to get a request token for the capability URL", e);
-        }
-
-        LOG.info("Successfully obtained a token for user: " + tokenResponse.user);
-
-        servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, tokenResponse.accessToken);
-        servletRequest.setAttribute(KHEOPS_USER, tokenResponse.user);
 
         String targetURL = getTargetUri(servletRequest)+"/studies";
         LOG.info("Returning target URI: " + targetURL);
 
 
         return targetURL;
+    }
+
+    @Override
+    protected void copyRequestHeaders(HttpServletRequest servletRequest, HttpRequest proxyRequest) {
+        final String AuthorizationHeader =  servletRequest.getHeader("Authorization");
+
+        if (AuthorizationHeader != null) {
+            if (!AuthorizationHeader.toUpperCase().startsWith("BASIC ")) {
+                throw new IllegalStateException("Authorization header is not basic authorization");
+            }
+
+            final String encodedAuthorization = AuthorizationHeader.substring(6);
+
+            final String decoded = new String(Base64.getDecoder().decode(encodedAuthorization), StandardCharsets.UTF_8);
+            String[] split = decoded.split(":");
+            if (split.length != 2) {
+                throw new IllegalStateException("Authorization header has more than two elements");
+            }
+
+            final String username = split[0];
+            final String capability = split[1];
+
+            if (!username.equals("Capability")) {
+                throw new IllegalStateException("Authorization header username is not Capability");
+            }
+
+            final URI authorizationServerRoot;
+            try {
+                authorizationServerRoot = new URI(getContextParam("online.kheops.auth_server.uri"));
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException("online.kheops.auth_server.uri is not a valid URI", e);
+            }
+
+            AccessToken accessToken = AccessToken.createBuilder(authorizationServerRoot).withCapability(capability).build();
+
+            servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, accessToken.getToken());
+            servletRequest.setAttribute(KHEOPS_USER, accessToken.getUser());
+        }
+
+        super.copyRequestHeaders(servletRequest, proxyRequest);
+        proxyRequest.addHeader("Authorization", "Bearer " + getKheopsAccessToken(servletRequest));
     }
 
     @Override
@@ -203,12 +216,6 @@ public class DicomWeb extends ProxyServlet
             LOG.warning("The entity was null");
         }
         LOG.warning("finished copying the response");
-    }
-
-    @Override
-    protected void copyRequestHeaders(HttpServletRequest servletRequest, HttpRequest proxyRequest) {
-        super.copyRequestHeaders(servletRequest, proxyRequest);
-        proxyRequest.addHeader("Authorization", "Bearer " + getKheopsAccessToken(servletRequest));
     }
 
     @Override
