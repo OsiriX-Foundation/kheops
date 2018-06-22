@@ -1,8 +1,12 @@
 package online.kheops.auth_server.resource;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.entity.QSeries;
+import online.kheops.auth_server.entity.QUser;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import org.dcm4che3.data.Attributes;
@@ -16,9 +20,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Path("/users")
 public class QIDOResource {
+
+    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @Context
     private UriInfo uriInfo;
@@ -48,6 +55,25 @@ public class QIDOResource {
             if (callingUserPk != targetUserPk) {
                 return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
             }
+
+
+
+            QUser u = QUser.user;
+            QSeries s = QSeries.series;
+
+            JPAQuery<?> query = new JPAQuery<Void>(em);
+            JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+            List<User> us = queryFactory.selectFrom(u)
+                    .innerJoin(u.series)
+                    .where(u.pk.eq(callingUserPk))
+                    .fetch();
+            Object l = query.from(u,s);
+            LOG.info(uriInfo.getQueryParameters().toString());
+
+
+
+
+
 
             attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
 
