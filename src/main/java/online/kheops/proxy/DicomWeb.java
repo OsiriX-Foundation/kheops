@@ -155,6 +155,12 @@ public class DicomWeb extends ProxyServlet
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             entity.writeTo(os);
 
+            if (proxyResponse.getStatusLine().getStatusCode() >= 300) {
+                LOG.log(Level.SEVERE,"Status code from dcm4chee is: " + proxyResponse.getStatusLine().getStatusCode());
+                LOG.log(Level.SEVERE, new String(os.toByteArray()), StandardCharsets.UTF_8);
+                throw new IllegalStateException("Status code from dcm4chee is: " + proxyResponse.getStatusLine().getStatusCode());
+            };
+
             servletResponse.getOutputStream().write(os.toByteArray());
             servletResponse.getOutputStream().close();
 

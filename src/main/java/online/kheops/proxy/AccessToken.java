@@ -65,6 +65,7 @@ public class AccessToken {
                 throw new IllegalStateException("Unable to get a request token for the capability URL", e);
             }
 
+            LOG.info("finished getting the access token");
             return new AccessToken(tokenResponse.accessToken, tokenResponse.user);
         }
     }
