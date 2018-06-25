@@ -132,6 +132,7 @@ public class DicomWeb extends ProxyServlet
         }
 
         super.copyRequestHeaders(servletRequest, proxyRequest);
+        proxyRequest.removeHeaders("Authorization");
         proxyRequest.addHeader("Authorization", "Bearer " + getKheopsAccessToken(servletRequest));
     }
 
