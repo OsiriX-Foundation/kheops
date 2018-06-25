@@ -42,7 +42,7 @@ function M.auth(claim_specs)
             ngx.exit(ngx.HTTP_UNAUTHORIZED)
         end 
     end
-    ngx.log(ngx.WARN, secret)
+
     -- require valid JWT
     local jwt_obj = jwt:verify(secret, token, 0)
     if jwt_obj.verified == false then
