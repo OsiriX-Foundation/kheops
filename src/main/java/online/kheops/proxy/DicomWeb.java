@@ -181,7 +181,7 @@ public class DicomWeb extends ProxyServlet
                     }
                     break;
                 default:
-                    throw new IllegalStateException("Unknown Content-Type");
+                    throw new IllegalStateException("Unknown Content-Type: " + contentType.getMimeType());
             }
 
             LOG.info("Starting to read the attributes");
