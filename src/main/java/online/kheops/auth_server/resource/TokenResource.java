@@ -110,26 +110,48 @@ public class TokenResource
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
         }
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
         Response.Status responseStatus = Response.Status.OK;
+
+        EntityManager em;
+        EntityTransaction tx;
+
+        // try to find the user in the database;
+        User callingUser = User.findByUsername(assertion.getUsername());
+
+        // if the user can't be found, try to build a new one;
+        if (callingUser == null) {
+            // try to build a new user, building a new user might fail if there is a unique constraint violation
+            // due to a race condition. Catch the violation and do nothing in that case.
+            em = EntityManagerListener.createEntityManager();
+            tx = em.getTransaction();
+
+            try {
+                tx.begin();
+                LOG.info("User not found, creating a new User");
+                User user = new User(assertion.getUsername(), assertion.getEmail());
+                em.persist(user);
+                tx.commit();
+                responseStatus = Response.Status.CREATED;
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+
+            // At this point there should definitely be a user in the database for the calling user.
+            callingUser = User.findByUsername(assertion.getUsername());
+        }
+
+        em = EntityManagerListener.createEntityManager();
+        tx = em.getTransaction();
         try {
             tx.begin();
 
-            // build the user if the user doesn't exist
-            long userPk = User.findPkByUsername(assertion.getUsername(), em);
-            User user;
-            if (userPk == -1) {
-                LOG.info("User not found, creating a new User");
-                responseStatus = Response.Status.CREATED;
-                user = new User(assertion.getUsername(), assertion.getEmail());
-                em.persist(user);
-            } else {
-                user = User.findByPk(userPk, em);
-            }
-
-            if (uidPair != null && user != null) {
-                if (!user.hasAccess(uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em)) {
+            if (uidPair != null && callingUser != null) {
+                if (!callingUser.hasAccess(uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em)) {
                     LOG.info("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair");
                     errorResponse.errorDescription = "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair";
                     return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();

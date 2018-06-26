@@ -1,5 +1,7 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.EntityManagerListener;
+
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -76,6 +78,25 @@ public class User {
         } catch (NoResultException ignored) {/*empty*/}
 
         return -1;
+    }
+
+    public static User findByUsername(String username) {
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        User user;
+
+        try {
+            tx.begin();
+            user = User.findByUsername(username, em);
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+
+        return user;
     }
 
     public static User findByUsername(String username, EntityManager em) {
