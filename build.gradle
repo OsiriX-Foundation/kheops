@@ -51,6 +51,9 @@ dependencies {
     compile group: 'com.querydsl', name: 'querydsl-jpa', version: '4.2.1'
     compile "org.springframework.data:spring-data-jpa:2.0.8.RELEASE"
 
+    compile group: 'com.querydsl', name: 'querydsl-sql', version: '4.2.1'
+    compile group: 'com.querydsl', name: 'querydsl-sql-codegen', version: '4.2.1'
+
     compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
         exclude module: 'slf4j-log4j12'
     }

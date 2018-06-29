@@ -1,8 +1,14 @@
 package online.kheops.auth_server.resource;
 
+import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.group.GroupBy.*;
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.Tuple;
+import com.querydsl.sql.*;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
@@ -13,17 +19,24 @@ import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
+import java.io.PrintWriter;
+import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.*;
 import java.util.logging.Logger;
+
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.types.dsl.Expressions.list;
 
 @Path("/users")
 public class QIDOResource {
@@ -61,9 +74,9 @@ public class QIDOResource {
 
 
 
-            QUser u = QUser.user;
-            QSeries s = QSeries.series;
-            QStudy st = QStudy.study;
+            QUser user = QUser.user;
+            QSeries series = QSeries.series;
+            QStudy study = QStudy.study;
 
             String modality = "";
             if (uriInfo.getQueryParameters().containsKey("ModalitiesInStudy"))
@@ -86,29 +99,51 @@ public class QIDOResource {
 
 
             //JPAQuery<?> query = new JPAQuery<Void>(em);
-            //List<?> uuss = query.from(s,u).select(u.pk, s.pk, s.seriesDescription, u.googleEmail)
-            //        .join(u.series, s)
+            //List<?> uuss = query.from(series,user).select(user.pk, series.pk, series.seriesDescription, user.googleEmail)
+            //        .join(user.series, series)
             //        .where()
-            //        .where(s.modality.eq("CT"), u.pk.eq(callingUserPk))
+            //        .where(series.modality.eq("CT"), user.pk.eq(callingUserPk))
             //        .fetch();
-            //List<?> uuss = query.where(s.modality.eq("CT"))
+            //List<?> uuss = query.where(series.modality.eq("CT"))
             //        .fetch();
+
 
             JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-            List<Tuple> lst = queryFactory.selectFrom(u)
-                    .select(st.studyInstanceUID, st.studyDate, st.studyTime, st.timezoneOffsetFromUTC, st.accessionNumber, st.referringPhysicianName, st.patientName, st.patientID, st.patientBirthDate, st.patientSex, st.studyID, s.numberOfSeriesRelatedInstances, s.numberOfSeriesRelatedInstances, s.modality)
-                    .innerJoin(u.series, s)
-                    .where(u.pk.eq(callingUserPk))
-                    .where(s.modality.startsWithIgnoreCase(modality))
-                    .innerJoin(s.study, st)
-                    .where(st.patientID.startsWithIgnoreCase(patientID))
-                    .where(st.patientName.startsWithIgnoreCase(patientName))
-                    .where(st.studyDate.between(studyDateBegin,studyDateEnd))
-                    .where(st.populated.eq(true))
-                    .where(s.populated.eq(true))
-                    .groupBy(st)
+            List<Tuple> lst = queryFactory.selectFrom(user)
+                    .select(study.studyInstanceUID, study.studyDate, study.studyTime, study.timezoneOffsetFromUTC, study.accessionNumber,
+                            study.referringPhysicianName, study.patientName, study.patientID, study.patientBirthDate, study.patientSex,
+                            study.studyID, series.pk, series.numberOfSeriesRelatedInstances,
+                            //SQLExpressions.groupConcat(series.modality, "/"))
+                            series.modality)
+                    .innerJoin(user.series, series)
+                    .where(user.pk.eq(callingUserPk))
+                    .where(series.modality.startsWithIgnoreCase(modality))
+                    .innerJoin(series.study, study)
+                    .where(study.patientID.startsWithIgnoreCase(patientID))
+                    .where(study.patientName.startsWithIgnoreCase(patientName))
+                    .where(study.studyDate.between(studyDateBegin,studyDateEnd))
+                    .where(study.populated.eq(true))
+                    .where(series.populated.eq(true))
+                    //.groupBy(study.studyInstanceUID)
+                    //.orderBy(series.pk.asc())//.offset(10).limit(20)
+                    //.transform(groupBy(study.studyInstanceUID).as(list(series.modality)))
                     .fetch();
 
+
+            JPAQuery<?> query = new JPAQuery<Void>(em);
+            Map<String, Tuple> result = query.from(user, series, study)
+                    .where(user.pk.eq(callingUserPk))
+                    .innerJoin(user.series, series)
+                    .innerJoin(series.study, study)
+                    .transform(groupBy(study.studyInstanceUID).as(list(series)));
+
+
+
+
+          //  MySQLTemplates templates = new MySQLTemplates();
+
+           // SQLQueryFactory sqlQueryFactory = new SQLQueryFactory(templ);
+          //  sqlQueryFactory.select(SQLExpressions.groupConcat())
 
             LOG.info(lst.toString());
             LOG.info(uriInfo.getQueryParameters().toString());
@@ -136,7 +171,7 @@ public class QIDOResource {
                 safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, res[8].toString());
                 safeAttributeSetString(attributes, Tag.PatientSex, VR.CS, res[9].toString());
                 safeAttributeSetString(attributes, Tag.StudyID, VR.SH, res[10].toString());
-                attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer)res[11]));
+                attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Long)res[11]).intValue());
                 attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((Integer)res[12]));
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, res[13].toString());
 
@@ -144,7 +179,6 @@ public class QIDOResource {
 
                 attributesList.add(attributes);
             }
-
 
 
             //attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
