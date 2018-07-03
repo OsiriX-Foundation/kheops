@@ -1,21 +1,15 @@
 package online.kheops.auth_server.resource;
 
-import com.querydsl.core.group.GroupBy;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.group.GroupBy.*;
-import com.querydsl.core.types.dsl.StringPath;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.querydsl.core.Tuple;
-import com.querydsl.sql.*;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.generated.tables.Studies;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -25,18 +19,26 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
-import java.io.PrintWriter;
-import java.lang.annotation.Target;
+import javax.ws.rs.core.Context;
+import javax.xml.ws.Provider;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
+import java.sql.*;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.types.dsl.Expressions.list;
+import static online.kheops.auth_server.generated.tables.Users.*;
+
+import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+import static online.kheops.auth_server.generated.tables.Series.SERIES;
+import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
+import static online.kheops.auth_server.generated.tables.UserSeries.USER_SERIES;
+import static org.jooq.impl.DSL.*;
+
+import org.jooq.*;
+import org.jooq.impl.*;
+
 
 @Path("/users")
 public class QIDOResource {
@@ -74,9 +76,9 @@ public class QIDOResource {
 
 
 
-            QUser user = QUser.user;
+           /* QUser user = QUser.user;
             QSeries series = QSeries.series;
-            QStudy study = QStudy.study;
+            QStudy study = QStudy.study;*/
 
             String modality = "";
             if (uriInfo.getQueryParameters().containsKey("ModalitiesInStudy"))
@@ -91,7 +93,7 @@ public class QIDOResource {
                 patientName = uriInfo.getQueryParameters().get("PatientName").get(0).replace("*", "");
 
             String studyDateBegin = "00000000";
-            String studyDateEnd = "999999999";
+            String studyDateEnd = "99999999";
             if (uriInfo.getQueryParameters().containsKey("StudyDate")) {
                 studyDateBegin = uriInfo.getQueryParameters().get("StudyDate").get(0).split("-")[0];
                 studyDateEnd = uriInfo.getQueryParameters().get("StudyDate").get(0).split("-")[1];
@@ -108,7 +110,7 @@ public class QIDOResource {
             //        .fetch();
 
 
-            JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+           /* JPAQueryFactory queryFactory = new JPAQueryFactory(em);
             List<Tuple> lst = queryFactory.selectFrom(user)
                     .select(study.studyInstanceUID, study.studyDate, study.studyTime, study.timezoneOffsetFromUTC, study.accessionNumber,
                             study.referringPhysicianName, study.patientName, study.patientID, study.patientBirthDate, study.patientSex,
@@ -131,25 +133,99 @@ public class QIDOResource {
 
 
             JPAQuery<?> query = new JPAQuery<Void>(em);
-            Map<String, Tuple> result = query.from(user, series, study)
+            Map<String, ?> result = query.from(series, user, study)
+
                     .where(user.pk.eq(callingUserPk))
-                    .innerJoin(user.series, series)
-                    .innerJoin(series.study, study)
-                    .transform(groupBy(study.studyInstanceUID).as(list(series)));
+                    .where(series.modality.startsWithIgnoreCase(modality))
+                    .join(series.users, user)
+                    .join(study.series, series)
+                    .where(study.patientID.startsWithIgnoreCase(patientID))
+                    .where(study.patientName.startsWithIgnoreCase(patientName))
+                    .where(study.studyDate.between(studyDateBegin,studyDateEnd))
+                    .where(study.populated.eq(true))
+                    .where(series.populated.eq(true)).limit(4).offset(2)
+                    .transform(GroupBy.groupBy(study.studyInstanceUID).as(study.patientID, GroupBy.set(series.modality),
+                            GroupBy.sum(series.numberOfSeriesRelatedInstances), GroupBy.list(series)));*/
 
 
 
 
-          //  MySQLTemplates templates = new MySQLTemplates();
 
-           // SQLQueryFactory sqlQueryFactory = new SQLQueryFactory(templ);
-          //  sqlQueryFactory.select(SQLExpressions.groupConcat())
+           // SQLQueryFactory(Configuration configuration, DataSource dataSource)
+           // SQLQueryFactory(Configuration configuration, DataSource dataSource, boolean release)
+           // SQLQueryFactory(Configuration configuration, javax.inject.Provider<Connection> connection)
+           // SQLQueryFactory(SQLTemplates templates, javax.inject.Provider<Connection> connection)
 
-            LOG.info(lst.toString());
+
+
+            //Configuration conf = new Configuration(t);
+            //SQLQuery<Tuple> q = new SQLQuery<Tuple>();
+            //List<?> tt = q.from(user).select(user).fetch();
+
+           /* SQLTemplates templates = new H2Templates();
+            Configuration configuration = new Configuration(templates);
+            String url = "jdbc:mysql://172.30.255.250/kheops";
+            Connection conn = null;
+            try {
+                conn = DriverManager.getConnection(url, "kheopsuser", "mypwd");
+            } catch (Exception e) {
+
+            }
+            try {
+                Provider<Connection> provider = (Provider<Connection>) DriverManager.getConnection(url, "kheopsuser", "mypwd");
+                SQLQueryFactory sqlQueryFactory = new SQLQueryFactory(SQLTemplates.DEFAULT, (javax.inject.Provider<Connection>) provider);
+                //SQLQuery<Tuple> u2 = new SQLQuery<Tuple>();
+                //Configuration conf = new Configuration(SQLTemplates.DEFAULT);
+
+                List<User> test = sqlQueryFactory.from(user).select(user).fetch();
+                LOG.info(test.toString());
+            } catch (Exception e) {
+
+            }*/
+
+            /*JOOK*/
+
+            String userName = "kheopsuser";
+            String password = "mypwd";
+            String url = "jdbc:mysql://172.30.255.250/kheops";
+
+            // Connection is the only JDBC resource that we need
+            // PreparedStatement and ResultSet are handled by jOOQ, internally
+            try (Connection conn = DriverManager.getConnection(url, userName, password)) {
+
+                DSLContext create = DSL.using(conn, SQLDialect.MYSQL);
+
+                Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = create.select(STUDIES.STUDY_UID, STUDIES.STUDY_DATE, STUDIES.STUDY_TIME, STUDIES.TIMEZONE_OFFSET_FROM_UTC,
+                STUDIES.ACCESSION_NUMBER, STUDIES.REFERRING_PHYSICIAN_NAME, STUDIES.PATIENT_NAME, STUDIES.PATIENT_ID, STUDIES.PATIENT_BIRTH_DATE, STUDIES.PATIENT_SEX,
+                STUDIES.STUDY_ID, count(SERIES.PK), sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES), groupConcatDistinct(SERIES.MODALITY))
+                        .from(USERS)
+                        .join(USER_SERIES)
+                        .on(USER_SERIES.USER_FK.eq(USERS.PK))
+                        .join(SERIES)
+                        .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                        .join(STUDIES)
+                        .on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                        .where(USERS.PK.eq(callingUserPk))
+                        .groupBy(STUDIES.STUDY_UID)
+                        .fetch();
+
+                for (Record r : result) {
+
+                    LOG.info(r.getValue(USERS.PK).toString());
+                }
+            }
+
+            // For the sake of this tutorial, let's keep exception handling simple
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            /*JOOK*/
+
+           // LOG.info(lst.toString());
             LOG.info(uriInfo.getQueryParameters().toString());
 
 
-            attributesList = new ArrayList<>();
+           /* attributesList = new ArrayList<>();
 
             for (Tuple results: lst) {
                 Attributes attributes = new Attributes();
@@ -178,10 +254,10 @@ public class QIDOResource {
                 safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
                 attributesList.add(attributes);
-            }
+            }*/
 
 
-            //attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
+            attributesList = new ArrayList<>(Study.findAttributesByUserPK(callingUserPk, em));
 
             tx.commit();
         } finally {
