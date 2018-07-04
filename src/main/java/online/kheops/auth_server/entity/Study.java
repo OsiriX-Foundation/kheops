@@ -3,16 +3,28 @@ package online.kheops.auth_server.entity;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 
 import javax.persistence.*;
+import javax.persistence.Query;
+import javax.persistence.Table;
+import javax.ws.rs.core.MultivaluedMap;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static online.kheops.auth_server.generated.tables.Series.SERIES;
+import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
+import static online.kheops.auth_server.generated.tables.UserSeries.USER_SERIES;
+import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static org.jooq.impl.DSL.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
@@ -123,6 +135,126 @@ public class Study {
         }
 
         return attributesList;
+    }
+
+    public static List<Attributes> findAttributesByUserPKJOOQ(long userPK, MultivaluedMap<String, String> queryParameters, Connection connection) {
+        Integer offset = 0;
+        Integer limit = 100;
+
+        TableField ord = STUDIES.PATIENT_NAME;
+        SortField orderBy = ord.asc();
+
+        String modality = "";
+        if (queryParameters.containsKey("ModalitiesInStudy")) {
+            modality = queryParameters.get("ModalitiesInStudy").get(0);
+        }
+
+        String patientID = "";
+        if (queryParameters.containsKey("PatientID")) {
+            patientID = queryParameters.get("PatientID").get(0).replace("*", "");
+        }
+
+        String patientName = "";
+        if (queryParameters.containsKey("PatientName")) {
+            patientName = queryParameters.get("PatientName").get(0).replace("*", "");
+        }
+
+        String studyDateBegin = "00000000";
+        String studyDateEnd = "99999999";
+        if (queryParameters.containsKey("StudyDate")) {
+            studyDateBegin = queryParameters.get("StudyDate").get(0).split("-")[0];
+            studyDateEnd = queryParameters.get("StudyDate").get(0).split("-")[1];
+        }
+
+        String accessionNumber = "";
+        if (queryParameters.containsKey("AccessionNumber")) {
+            accessionNumber = queryParameters.get("AccessionNumber").get(0).replace("*", "");
+        }
+
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+
+        Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = create
+                .select(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
+                        isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
+                        isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
+                        isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
+                        isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
+                        isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
+                        isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
+                        isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
+                        isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
+                        isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
+                        isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
+                        isnull(count(SERIES.PK), 0).as("count:"+SERIES.PK.getName()),
+                        sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                        isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"))
+                .from(USERS)
+                .join(USER_SERIES)
+                .on(USER_SERIES.USER_FK.eq(USERS.PK))
+                .join(SERIES)
+                .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                .join(STUDIES)
+                .on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                .where(USERS.PK.eq(userPK))
+                .and(SERIES.POPULATED.eq((byte)0x01))
+                .and(STUDIES.POPULATED.eq((byte)0x01))
+                .and(SERIES.MODALITY.lower().startsWith(modality.toLowerCase()))
+                .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()))
+                .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()))
+                .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd))
+                .and(STUDIES.ACCESSION_NUMBER.lower().startsWith(accessionNumber.toLowerCase()))
+                .groupBy(STUDIES.STUDY_UID)
+                .orderBy(orderBy)
+                .offset(offset).limit(limit)
+                .fetch();
+
+        List<Attributes> attributesList;
+        attributesList = new ArrayList<>();
+
+        for (Record r : result) {
+
+            //get all the modalities for the STUDY_UID
+            Result<Record1<String>> mod = create.select(groupConcatDistinct(SERIES.MODALITY))
+                    .from(USERS)
+                    .join(USER_SERIES)
+                    .on(USER_SERIES.USER_FK.eq(USERS.PK))
+                    .join(SERIES)
+                    .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                    .join(STUDIES)
+                    .on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                    .where(USERS.PK.eq(userPK))
+                    .and(SERIES.POPULATED.eq((byte)0x01))
+                    .and(STUDIES.POPULATED.eq((byte)0x01))
+                    .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
+                    .groupBy(STUDIES.STUDY_UID)
+                    .fetch();
+
+            Attributes attributes = new Attributes();
+
+            safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
+            safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
+            safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
+            safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
+            safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, r.getValue(STUDIES.ACCESSION_NUMBER.getName()).toString());
+            safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientName, VR.PN, r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientID, VR.LO, r.getValue(STUDIES.PATIENT_ID.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, r.getValue(STUDIES.PATIENT_BIRTH_DATE.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientSex, VR.CS, r.getValue(STUDIES.PATIENT_SEX.getName()).toString());
+            safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
+            attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer)r.getValue("count:"+SERIES.PK.getName())));
+            attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, (((BigDecimal)r.getValue("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()))).intValue());
+            //attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
+            attributes.setString(Tag.ModalitiesInStudy, VR.CS, mod.get(0).getValue(0).toString());
+
+            safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
+
+            attributesList.add(attributes);
+        }
+
+
+        return attributesList;
+
     }
 
     // This method does not set Tag.NumberOfStudyRelatedSeries, Tag.NumberOfStudyRelatedInstances, Tag.ModalitiesInStudy
