@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import org.dcm4che3.data.Attributes;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -26,6 +27,9 @@ public class QIDOResource {
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    ServletContext context;
+
     @GET
     @Secured
     @Path("/{user}/studies")
@@ -39,13 +43,15 @@ public class QIDOResource {
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         // is the user sharing a series, or requesting access to a new series
 
+
         List<Attributes> attributesList = new ArrayList<>();
 
-        final String userName = "kheopsuser";
-        final String password = "mypwd";
-        final String url = "jdbc:mysql://172.30.255.250/kheops";
 
-        try (Connection conn = DriverManager.getConnection(url, userName, password)) {
+        final String user = context.getInitParameter("online.kheops.jdbc.user");
+        final String password = context.getInitParameter("online.kheops.jdbc.password");
+        final String url = context.getInitParameter("online.kheops.jdbc.url");
+
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
                 // Connection is the only JDBC resource that we need
                 // PreparedStatement and ResultSet are handled by jOOQ, internally
 

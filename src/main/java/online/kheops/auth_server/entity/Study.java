@@ -138,11 +138,26 @@ public class Study {
     }
 
     public static List<Attributes> findAttributesByUserPKJOOQ(long userPK, MultivaluedMap<String, String> queryParameters, Connection connection) {
-        Integer offset = 0;
-        Integer limit = 100;
 
         TableField ord = STUDIES.PATIENT_NAME;
         SortField orderBy = ord.asc();
+
+        Integer studiesPerPage = 50;
+        if (queryParameters.containsKey("StudiesPerPage")) {
+            studiesPerPage = Integer.parseInt(queryParameters.get("StudiesPerPage").get(0));
+            if (studiesPerPage < 1) {
+                studiesPerPage = 1;
+            }
+        }
+
+        Integer page = 1;
+        if (queryParameters.containsKey("Page")) {
+             String i = queryParameters.get("Page").get(0);
+            page = studiesPerPage * Integer.parseInt(queryParameters.get("Page").get(0));
+            if (page < 1) {
+                page = 1;
+            }
+        }
 
         String modality = "";
         if (queryParameters.containsKey("ModalitiesInStudy")) {
@@ -173,21 +188,7 @@ public class Study {
 
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
-        Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = create
-                .select(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
-                        isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
-                        isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
-                        isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
-                        isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
-                        isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
-                        isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
-                        isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
-                        isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
-                        isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
-                        isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
-                        isnull(count(SERIES.PK), 0).as("count:"+SERIES.PK.getName()),
-                        sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
-                        isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"))
+        Integer nbStudiesMax = (Integer)create.select(countDistinct(STUDIES.PK))
                 .from(USERS)
                 .join(USER_SERIES)
                 .on(USER_SERIES.USER_FK.eq(USERS.PK))
@@ -203,10 +204,53 @@ public class Study {
                 .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()))
                 .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd))
                 .and(STUDIES.ACCESSION_NUMBER.lower().startsWith(accessionNumber.toLowerCase()))
+                .fetch().get(0).get(0);
+
+        //Double test =  Math.ceil(nbStudiesMax / studiesPerPage);
+        Integer lastPage =  (int) Math.ceil( (double)nbStudiesMax / studiesPerPage);
+
+        if (page > lastPage) {
+            page = lastPage;
+        }
+        
+
+        Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = create
+                .select(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
+                        isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
+                        isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
+                        isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
+                        isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
+                        isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
+                        isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
+                        isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
+                        isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
+                        isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
+                        isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
+                        isnull(count(SERIES.PK), 0).as("count:"+SERIES.PK.getName()),
+                        sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                        isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"))
+                //.hint("SQL_CALC_FOUND_ROWS")
+                .from(USERS)
+                .join(USER_SERIES)
+                    .on(USER_SERIES.USER_FK.eq(USERS.PK))
+                .join(SERIES)
+                    .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                .join(STUDIES)
+                    .on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                .where(USERS.PK.eq(userPK))
+                    .and(SERIES.POPULATED.eq((byte)0x01))
+                    .and(STUDIES.POPULATED.eq((byte)0x01))
+                    .and(SERIES.MODALITY.lower().startsWith(modality.toLowerCase()))
+                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()))
+                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()))
+                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd))
+                    .and(STUDIES.ACCESSION_NUMBER.lower().startsWith(accessionNumber.toLowerCase()))
                 .groupBy(STUDIES.STUDY_UID)
                 .orderBy(orderBy)
-                .offset(offset).limit(limit)
+                .offset(page - 1).limit(studiesPerPage)
                 .fetch();
+
+      //  Result<Record> tot = create.select().hint("FOUND_ROWS").fetch();
 
         List<Attributes> attributesList;
         attributesList = new ArrayList<>();
@@ -214,7 +258,7 @@ public class Study {
         for (Record r : result) {
 
             //get all the modalities for the STUDY_UID
-            Result<Record1<String>> mod = create.select(groupConcatDistinct(SERIES.MODALITY))
+            String modalities = create.select(groupConcatDistinct(SERIES.MODALITY))
                     .from(USERS)
                     .join(USER_SERIES)
                     .on(USER_SERIES.USER_FK.eq(USERS.PK))
@@ -227,7 +271,7 @@ public class Study {
                     .and(STUDIES.POPULATED.eq((byte)0x01))
                     .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
                     .groupBy(STUDIES.STUDY_UID)
-                    .fetch();
+                    .fetch().get(0).getValue(0).toString();
 
             Attributes attributes = new Attributes();
 
@@ -245,16 +289,13 @@ public class Study {
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer)r.getValue("count:"+SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, (((BigDecimal)r.getValue("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()))).intValue());
             //attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
-            attributes.setString(Tag.ModalitiesInStudy, VR.CS, mod.get(0).getValue(0).toString());
+            attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
             attributesList.add(attributes);
         }
-
-
         return attributesList;
-
     }
 
     // This method does not set Tag.NumberOfStudyRelatedSeries, Tag.NumberOfStudyRelatedInstances, Tag.ModalitiesInStudy
