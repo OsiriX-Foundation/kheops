@@ -48,13 +48,6 @@ dependencies {
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
     compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
 
-    //compile group: 'com.querydsl', name: 'querydsl-jpa', version: '4.2.1'
-    //compile "org.springframework.data:spring-data-jpa:2.0.8.RELEASE"
-
-    //compile group: 'com.querydsl', name: 'querydsl-sql', version: '4.2.1'
-    //compile group: 'com.querydsl', name: 'querydsl-sql-codegen', version: '4.2.1'
-    //compile group: 'com.querydsl', name: 'querydsl-sql-spring', version: '4.2.1'
-
     // https://mvnrepository.com/artifact/org.jooq/jooq
     compile group: 'org.jooq', name: 'jooq', version: '3.11.2'
     // https://mvnrepository.com/artifact/org.jooq/jooq-meta
