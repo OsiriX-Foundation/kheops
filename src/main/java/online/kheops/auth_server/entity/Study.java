@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import javafx.util.Pair;
 import online.kheops.auth_server.resource.TokenResource;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Keyword;
@@ -104,7 +103,7 @@ public class Study {
     }
 
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
-    public static Pair<Integer, List<Attributes>> findAttributesByUserPKJOOQ(long userPK, MultivaluedMap<String, String> queryParameters, Connection connection) {
+    public static Pair findAttributesByUserPKJOOQ(long userPK, MultivaluedMap<String, String> queryParameters, Connection connection) {
 
         TableField ord = STUDIES.STUDY_DATE;
         if (queryParameters.containsKey("sort")) {
@@ -332,7 +331,7 @@ public class Study {
 
             attributesList.add(attributes);
         }
-        return new Pair<>(studiesTotalCount, attributesList);
+        return new Pair(studiesTotalCount, attributesList);
     }
 
     // This method does not set Tag.NumberOfStudyRelatedSeries, Tag.NumberOfStudyRelatedInstances, Tag.ModalitiesInStudy

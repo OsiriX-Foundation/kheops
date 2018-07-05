@@ -1,7 +1,7 @@
 package online.kheops.auth_server.resource;
 
-import javafx.util.Pair;
 import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.entity.Pair;
 import online.kheops.auth_server.annotation.Secured;;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
@@ -62,9 +62,9 @@ public class QIDOResource {
                     return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
                 }
 
-                Pair<Integer, List<Attributes>> pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), conn);
-                studiesTotalCount = pair.getKey();
-                attributesList = pair.getValue();
+                Pair pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), conn);
+                studiesTotalCount = pair.getStudiesTotalCount();
+                attributesList = pair.getAttributesList();
                 LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (Exception e) {/*empty*/}
 
