@@ -1,5 +1,6 @@
 package online.kheops.auth_server.resource;
 
+import javafx.util.Pair;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;;
 import online.kheops.auth_server.entity.Study;
@@ -45,6 +46,7 @@ public class QIDOResource {
 
 
         List<Attributes> attributesList = new ArrayList<>();
+        Integer studiesTotalCount = -1;
 
 
         final String user = context.getInitParameter("online.kheops.jdbc.user");
@@ -60,11 +62,13 @@ public class QIDOResource {
                     return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
                 }
 
-                attributesList = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), conn);
+                Pair<Integer, List<Attributes>> pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), conn);
+                studiesTotalCount = pair.getKey();
+                attributesList = pair.getValue();
                 LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (Exception e) {/*empty*/}
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
-        return Response.ok(genericAttributesList).build();
+        return Response.ok(genericAttributesList).header("X-total-count", studiesTotalCount).build();
     }
 }
