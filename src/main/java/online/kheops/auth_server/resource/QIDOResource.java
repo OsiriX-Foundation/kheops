@@ -73,7 +73,7 @@ public class QIDOResource {
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
-         }
+        }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
         return Response.ok(genericAttributesList).header("X-Total-Count", studiesTotalCount).build();

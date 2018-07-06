@@ -103,48 +103,12 @@ public class Study {
     }
 
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
+
     public static Pair findAttributesByUserPKJOOQ(long userPK, MultivaluedMap<String, String> queryParameters, Connection connection) {
 
-        TableField ord = STUDIES.STUDY_DATE;
-        if (queryParameters.containsKey("sort")) {
-            String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
-            if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyDate)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyDate)) == 0) ord = STUDIES.STUDY_DATE;
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyTime)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyTime)) == 0) ord = STUDIES.STUDY_TIME;
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.AccessionNumber)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.AccessionNumber)) == 0) ord = STUDIES.ACCESSION_NUMBER;
-            //ModalitiesInStudy
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.ReferringPhysicianName)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.ReferringPhysicianName)) == 0) ord = STUDIES.REFERRING_PHYSICIAN_NAME;
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.PatientName)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.PatientName)) == 0) ord = STUDIES.PATIENT_NAME;
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.PatientID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.PatientID)) == 0) ord = STUDIES.PATIENT_ID;
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyInstanceUID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyInstanceUID)) == 0) ord = STUDIES.STUDY_UID;
-            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyID)) == 0) ord = STUDIES.STUDY_ID;
-        }
-
-        SortField orderBy = ord.desc();
-        if (queryParameters.containsKey("sort")) {
-            if (queryParameters.get("sort").get(0).startsWith("-")) {
-                orderBy = ord.desc();
-            } else {
-                orderBy = ord.asc();
-            }
-        }
-
-        Integer limit = Integer.MAX_VALUE;
-        if (queryParameters.containsKey("limit")) {
-            limit = Integer.parseInt(queryParameters.get("limit").get(0));
-            if (limit < 1) {
-                limit = 1;
-            }
-        }
-
-        Integer offset = 0;
-        if (queryParameters.containsKey("offset")) {
-             String i = queryParameters.get("offset").get(0);
-            offset = limit * Integer.parseInt(queryParameters.get("offset").get(0));
-            if (offset < 0) {
-                offset = 0;
-            }
-        }
+        ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
         String studyDateBegin = "00000000";
         String studyDateEnd = "99999999";
@@ -182,125 +146,82 @@ public class Study {
             }
         }
 
-        String accessionNumber = "";
-        if (queryParameters.containsKey("AccessionNumber")) {
-            accessionNumber = queryParameters.get("AccessionNumber").get(0).replace("*", "");
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.AccessionNumber))) {
-            accessionNumber = queryParameters.get(String.format("%08X",Tag.AccessionNumber)).get(0).replace("*", "");
+        conditionArrayList.add(createConditon(Tag.AccessionNumber, queryParameters, "AccessionNumber", STUDIES.ACCESSION_NUMBER));
+        conditionArrayList.add(createConditonModality(queryParameters));
+        conditionArrayList.add(createConditon(Tag.ReferringPhysicianName, queryParameters, "ReferringPhysicianName", STUDIES.REFERRING_PHYSICIAN_NAME));
+        conditionArrayList.add(createConditon(Tag.PatientName, queryParameters, "PatientName", STUDIES.PATIENT_NAME));
+        conditionArrayList.add(createConditon(Tag.PatientID, queryParameters, "PatientID", STUDIES.PATIENT_ID));
+        conditionArrayList.add(createConditon(Tag.StudyInstanceUID, queryParameters, "StudyInstanceUID", STUDIES.STUDY_UID));
+        conditionArrayList.add(createConditon(Tag.StudyID, queryParameters, "StudyID", STUDIES.STUDY_ID));
+
+        SelectQuery query = create.selectQuery();
+        query.addSelect(countDistinct(STUDIES.PK));
+        query.addFrom(USERS);
+        query.addJoin(USER_SERIES, USER_SERIES.USER_FK.eq(USERS.PK));
+        query.addJoin(SERIES, SERIES.PK.eq(USER_SERIES.SERIES_FK));
+        query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+        query.addConditions(USERS.PK.eq(userPK));
+        query.addConditions(SERIES.POPULATED.isTrue());
+        query.addConditions(STUDIES.POPULATED.isTrue());
+
+        for (Condition c :  conditionArrayList) {
+            if (c != null) {
+                query.addConditions(c);
+            }
         }
 
-        String modalitiesInStudy = "";
-        if (queryParameters.containsKey("ModalitiesInStudy")) {
-            modalitiesInStudy = queryParameters.get("ModalitiesInStudy").get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.ModalitiesInStudy))) {
-            modalitiesInStudy = queryParameters.get(String.format("%08X",Tag.ModalitiesInStudy)).get(0);
+        Integer studiesTotalCount = (Integer)query.fetch().getValues("count").get(0);
+
+        query = create.selectQuery();
+        query.addSelect(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
+                isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
+                isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
+                isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
+                isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
+                isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
+                isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
+                isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
+                isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
+                isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
+                isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
+                isnull(count(SERIES.PK), 0).as("count:"+SERIES.PK.getName()),
+                sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"));
+        query.addFrom(USERS);
+        query.addJoin(USER_SERIES, USER_SERIES.USER_FK.eq(USERS.PK));
+        query.addJoin(SERIES, SERIES.PK.eq(USER_SERIES.SERIES_FK));
+        query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+        query.addConditions(USERS.PK.eq(userPK));
+        query.addConditions(SERIES.POPULATED.isTrue());
+        query.addConditions(STUDIES.POPULATED.isTrue());
+
+        for (Condition c :  conditionArrayList) {
+            if (c != null) {
+                query.addConditions(c);
+            }
         }
 
-        String referringPhysicianName = "";
-        if (queryParameters.containsKey("ReferringPhysicianName")) {
-            referringPhysicianName = queryParameters.get("ReferringPhysicianName").get(0).replace("*", "");
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.ReferringPhysicianName))) {
-            referringPhysicianName = queryParameters.get(String.format("%08X",Tag.ReferringPhysicianName)).get(0).replace("*", "");
+        query.addGroupBy(STUDIES.STUDY_UID);
+        query.addOrderBy(orderBy(queryParameters));
+
+        if (queryParameters.containsKey("limit")) {
+                Integer limit = Integer.parseInt(queryParameters.get("limit").get(0));
+                if (limit < 1) {
+                    limit = 1;
+                }
+                query.addLimit(limit);
         }
 
-        String patientName = "";
-        if (queryParameters.containsKey("PatientName")) {
-            patientName = queryParameters.get("PatientName").get(0).replace("*", "");
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.PatientName))) {
-            patientName = queryParameters.get(String.format("%08X",Tag.PatientName)).get(0).replace("*", "");
+        if (queryParameters.containsKey("offset")) {
+            Integer offset = Integer.parseInt(queryParameters.get("offset").get(0));
+
+            if (offset < 0) {
+                offset = 0;
+            }
+            query.addOffset(offset);
         }
 
-        String patientID = "";
-        if (queryParameters.containsKey("PatientID")) {
-            patientID = queryParameters.get("PatientID").get(0).replace("*", "");
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.PatientID))) {
-            patientID = queryParameters.get(String.format("%08X",Tag.PatientID)).get(0).replace("*", "");
-        }
-
-        String studyInstanceUID = "";
-        if (queryParameters.containsKey("StudyInstanceUID")) {
-            studyInstanceUID = queryParameters.get("StudyInstanceUID").get(0).replace("*", "");
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyInstanceUID))) {
-            studyInstanceUID = queryParameters.get(String.format("%08X",Tag.StudyInstanceUID)).get(0).replace("*", "");
-        }
-
-        String studyID = "";
-        if (queryParameters.containsKey("StudyID")) {
-            studyID = queryParameters.get("StudyID").get(0).replace("*", "");
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyID))) {
-            studyID = queryParameters.get(String.format("%08X",Tag.PatientName)).get(0).replace("*", "");
-        }
-
-        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
-
-        Integer studiesTotalCount = (Integer)create
-                .select(countDistinct(STUDIES.PK))
-                .from(USERS)
-                .join(USER_SERIES)
-                    .on(USER_SERIES.USER_FK.eq(USERS.PK))
-                .join(SERIES)
-                    .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
-                .join(STUDIES)
-                    .on(STUDIES.PK.eq(SERIES.STUDY_FK))
-                .where(USERS.PK.eq(userPK))
-                    .and(SERIES.POPULATED.isTrue())
-                    .and(STUDIES.POPULATED.isTrue())
-                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd).or(STUDIES.STUDY_DATE.isNull().and(studyDateBegin.equalsIgnoreCase("00000000")).and(studyDateEnd.equalsIgnoreCase("99999999"))).or(STUDIES.STUDY_DATE.isNull().and("NULL".startsWith(studyDateBegin.toUpperCase())).and("NULL".startsWith(studyDateEnd.toUpperCase()))))
-                    .and(STUDIES.STUDY_TIME.between(studyTimeBegin, studyTimeEnd).or(STUDIES.STUDY_TIME.isNull().and(studyTimeBegin.equalsIgnoreCase("000000.000000")).and(studyTimeEnd.equalsIgnoreCase("235959.999999"))).or(STUDIES.STUDY_TIME.isNull().and("NULL".startsWith(studyTimeBegin.toUpperCase())).and("NULL".startsWith(studyTimeEnd.toUpperCase()))))
-                    .and(STUDIES.ACCESSION_NUMBER.startsWith(accessionNumber).or(STUDIES.ACCESSION_NUMBER.isNull().and(accessionNumber.equalsIgnoreCase(""))).or(STUDIES.ACCESSION_NUMBER.isNull().and("NULL".startsWith(accessionNumber.toUpperCase()))))
-                    .and(SERIES.MODALITY.lower().startsWith(modalitiesInStudy.toLowerCase()).or(SERIES.MODALITY.isNull().and(modalitiesInStudy.equalsIgnoreCase(""))).or(SERIES.MODALITY.isNull().and("NULL".startsWith(modalitiesInStudy.toUpperCase()))))
-                    .and(STUDIES.REFERRING_PHYSICIAN_NAME.lower().startsWith(referringPhysicianName.toLowerCase()).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and(referringPhysicianName.equalsIgnoreCase(""))).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and("NULL".startsWith(referringPhysicianName.toUpperCase()))))
-                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()).or(STUDIES.PATIENT_NAME.isNull().and(patientName.equalsIgnoreCase(""))).or(STUDIES.PATIENT_NAME.isNull().and("NULL".startsWith(patientName.toUpperCase()))))
-                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()).or(STUDIES.PATIENT_ID.isNull().and(patientID.equalsIgnoreCase(""))).or(STUDIES.PATIENT_ID.isNull().and("NULL".startsWith(patientID.toUpperCase()))))
-                    .and(STUDIES.STUDY_UID.startsWith(studyInstanceUID))
-                    .and(STUDIES.STUDY_ID.startsWith(studyID).or(STUDIES.STUDY_ID.isNull().and(studyID.equalsIgnoreCase(""))).or(STUDIES.STUDY_ID.isNull().and("NULL".startsWith(studyID.toUpperCase()))))
-                .fetch().get(0).get(0);
-
-        Boolean b = modalitiesInStudy.equalsIgnoreCase("");
-        Integer lastPage =  (int) Math.ceil( (double)studiesTotalCount / limit);
-
-        if (offset > lastPage) {
-            offset = lastPage;
-        }
-
-        @SuppressWarnings("unchecked") Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = create
-                .select(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
-                        isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
-                        isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
-                        isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
-                        isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
-                        isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
-                        isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
-                        isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
-                        isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
-                        isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
-                        isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
-                        isnull(count(SERIES.PK), 0).as("count:"+SERIES.PK.getName()),
-                        sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
-                        isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"))
-                .from(USERS)
-                .join(USER_SERIES)
-                    .on(USER_SERIES.USER_FK.eq(USERS.PK))
-                .join(SERIES)
-                    .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
-                .join(STUDIES)
-                    .on(STUDIES.PK.eq(SERIES.STUDY_FK))
-                .where(USERS.PK.eq(userPK))
-                    .and(SERIES.POPULATED.isTrue())
-                    .and(STUDIES.POPULATED.isTrue())
-                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd).or(STUDIES.STUDY_DATE.isNull().and(studyDateBegin.equalsIgnoreCase("00000000")).and(studyDateEnd.equalsIgnoreCase("99999999"))).or(STUDIES.STUDY_DATE.isNull().and("NULL".startsWith(studyDateBegin.toUpperCase())).and("NULL".startsWith(studyDateEnd.toUpperCase()))))
-                    .and(STUDIES.STUDY_TIME.between(studyTimeBegin, studyTimeEnd).or(STUDIES.STUDY_TIME.isNull().and(studyTimeBegin.equalsIgnoreCase("000000.000000")).and(studyTimeEnd.equalsIgnoreCase("235959.999999"))).or(STUDIES.STUDY_TIME.isNull().and("NULL".startsWith(studyTimeBegin.toUpperCase())).and("NULL".startsWith(studyTimeEnd.toUpperCase()))))
-                    .and(STUDIES.ACCESSION_NUMBER.startsWith(accessionNumber).or(STUDIES.ACCESSION_NUMBER.isNull().and(accessionNumber.equalsIgnoreCase(""))).or(STUDIES.ACCESSION_NUMBER.isNull().and("NULL".startsWith(accessionNumber.toUpperCase()))))
-                    .and(SERIES.MODALITY.lower().startsWith(modalitiesInStudy.toLowerCase()).or(SERIES.MODALITY.isNull().and(modalitiesInStudy.equalsIgnoreCase(""))).or(SERIES.MODALITY.isNull().and("NULL".startsWith(modalitiesInStudy.toUpperCase()))))
-                    .and(STUDIES.REFERRING_PHYSICIAN_NAME.lower().startsWith(referringPhysicianName.toLowerCase()).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and(referringPhysicianName.equalsIgnoreCase(""))).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and("NULL".startsWith(referringPhysicianName.toUpperCase()))))
-                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()).or(STUDIES.PATIENT_NAME.isNull().and(patientName.equalsIgnoreCase(""))).or(STUDIES.PATIENT_NAME.isNull().and("NULL".startsWith(patientName.toUpperCase()))))
-                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()).or(STUDIES.PATIENT_ID.isNull().and(patientID.equalsIgnoreCase(""))).or(STUDIES.PATIENT_ID.isNull().and("NULL".startsWith(patientID.toUpperCase()))))
-                    .and(STUDIES.STUDY_UID.startsWith(studyInstanceUID))
-                    .and(STUDIES.STUDY_ID.startsWith(studyID).or(STUDIES.STUDY_ID.isNull().and(studyID.equalsIgnoreCase(""))).or(STUDIES.STUDY_ID.isNull().and("NULL".startsWith(studyID.toUpperCase()))))
-                .groupBy(STUDIES.STUDY_UID)
-                .orderBy(orderBy)
-                .offset(offset).limit(limit)
-                .fetch();
+        Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = query.fetch();
 
         List<Attributes> attributesList;
         attributesList = new ArrayList<>();
@@ -314,15 +235,15 @@ public class Study {
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
                         .join(USER_SERIES)
-                            .on(USER_SERIES.USER_FK.eq(USERS.PK))
+                        .on(USER_SERIES.USER_FK.eq(USERS.PK))
                         .join(SERIES)
-                            .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                        .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
                         .join(STUDIES)
-                            .on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                        .on(STUDIES.PK.eq(SERIES.STUDY_FK))
                         .where(USERS.PK.eq(userPK))
-                            .and(SERIES.POPULATED.isTrue())
-                            .and(STUDIES.POPULATED.isTrue())
-                            .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
+                        .and(SERIES.POPULATED.isTrue())
+                        .and(STUDIES.POPULATED.isTrue())
+                        .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
                         .groupBy(STUDIES.STUDY_UID)
                         .fetch().get(0).getValue(0).toString();
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
@@ -351,6 +272,80 @@ public class Study {
             attributesList.add(attributes);
         }
         return new Pair(studiesTotalCount, attributesList);
+    }
+
+    private static SortField orderBy(MultivaluedMap<String, String> queryParameters) {
+
+        if (queryParameters.containsKey("sort")) {
+            TableField ord = STUDIES.STUDY_DATE;
+
+            Boolean asc_desc = queryParameters.get("sort").get(0).startsWith("-");
+            String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
+
+            if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyDate)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyDate)) == 0) ord = STUDIES.STUDY_DATE;
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyTime)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyTime)) == 0) ord = STUDIES.STUDY_TIME;
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.AccessionNumber)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.AccessionNumber)) == 0) ord = STUDIES.ACCESSION_NUMBER;
+            //ModalitiesInStudy
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.ReferringPhysicianName)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.ReferringPhysicianName)) == 0) ord = STUDIES.REFERRING_PHYSICIAN_NAME;
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.PatientName)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.PatientName)) == 0) ord = STUDIES.PATIENT_NAME;
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.PatientID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.PatientID)) == 0) ord = STUDIES.PATIENT_ID;
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyInstanceUID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyInstanceUID)) == 0) ord = STUDIES.STUDY_UID;
+            else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyID)) == 0) ord = STUDIES.STUDY_ID;
+
+            return asc_desc ? ord.desc() : ord.asc();
+        }
+        //Default sort
+        return STUDIES.STUDY_DATE.desc();
+    }
+
+    private static Condition createConditonModality(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("ModalitiesInStudy")) {
+            String parameter = queryParameters.get("ModalitiesInStudy").get(0);
+            if (parameter.equalsIgnoreCase("null")) {
+                return SERIES.MODALITY.isNull();
+            } else {
+                return SERIES.MODALITY.lower().equal(parameter.toLowerCase());
+            }
+        } else if (queryParameters.containsKey(String.format("%08X",Tag.ModalitiesInStudy))) {
+            String parameter = queryParameters.get(String.format("%08X",Tag.ModalitiesInStudy)).get(0);
+            if (parameter.equalsIgnoreCase("null")) {
+                return SERIES.MODALITY.isNull();
+            } else {
+                return SERIES.MODALITY.lower().equal(parameter.toLowerCase());
+            }
+        }
+        return null;
+    }
+
+    private static Condition createConditon(Integer tag,  MultivaluedMap<String, String> queryParameters, String key, TableField column) {
+        if (queryParameters.containsKey(key)) {
+            return createConditon(queryParameters, key, column);
+        } else if (queryParameters.containsKey(String.format("%08X",tag))) {
+            return createConditon(queryParameters, String.format("%08X",tag), column);
+        }
+        return null;
+    }
+
+    private static Condition createConditon(MultivaluedMap<String, String> queryParameters, String key, TableField column) {
+        String parameterNoStar = queryParameters.get(key).get(0).replace("*", "");
+        String parameter = queryParameters.get(key).get(0);
+        if (parameterNoStar.length() == 0) {
+            return null;
+        }
+
+        if ("null".equalsIgnoreCase(parameterNoStar)) {
+            return column.isNull();
+        } else {
+            if (parameter.startsWith("*") && parameter.endsWith("*")) {
+                return column.lower().contains(parameterNoStar.toLowerCase());
+            } else if (parameter.startsWith("*")) {
+                return column.lower().endsWith(parameterNoStar.toLowerCase());
+            } else if (parameter.endsWith("*")) {
+                return column.lower().startsWith(parameterNoStar.toLowerCase());
+            } else {
+                return column.lower().equal(parameterNoStar.toLowerCase());
+            }
+        }
     }
 
     // This method does not set Tag.NumberOfStudyRelatedSeries, Tag.NumberOfStudyRelatedInstances, Tag.ModalitiesInStudy
@@ -509,3 +504,6 @@ public class Study {
         return updatedTime;
     }
 }
+
+
+
