@@ -1,22 +1,22 @@
 package online.kheops.auth_server.resource;
 
+import com.mchange.v2.c3p0.C3P0Registry;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.entity.Pair;
-import online.kheops.auth_server.annotation.Secured;;
+import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import org.dcm4che3.data.Attributes;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Context;
 
 import java.sql.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -31,6 +31,20 @@ public class QIDOResource {
     @Context
     ServletContext context;
 
+    private static DataSource getDataSource() {
+        Iterator iterator = C3P0Registry.getPooledDataSources().iterator();
+
+        if (!iterator.hasNext()) {
+            throw new RuntimeException("No C3P0 DataSource available");
+        }
+        DataSource dataSource = (DataSource) iterator.next();
+        if (iterator.hasNext()) {
+            LOG.log(Level.SEVERE, "More than one C3P0 Datasource present, picked the first one");
+        }
+
+        return dataSource;
+    }
+
     @GET
     @Secured
     @Path("/{user}/studies")
@@ -38,26 +52,15 @@ public class QIDOResource {
     public Response getStudies(@PathParam("user") String username,
                                @Context SecurityContext securityContext) {
 
-        // for now don't use any parameters
-
-        // get a list of all the studies
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        // is the user sharing a series, or requesting access to a new series
 
-
-        List<Attributes> attributesList = new ArrayList<>();
-        Integer studiesTotalCount = -1;
-
+        List<Attributes> attributesList;
+        Integer studiesTotalCount;
 
         final String user = context.getInitParameter("online.kheops.jdbc.user");
         final String password = context.getInitParameter("online.kheops.jdbc.password");
-        final String url = context.getInitParameter("online.kheops.jdbc.url");
 
-        try (Connection connection = DriverManager.getConnection(url, user, password)) {
-
-                // Connection is the only JDBC resource that we need
-                // PreparedStatement and ResultSet are handled by jOOQ, internally
-
+        try (Connection connection = getDataSource().getConnection(user, password)) {
                 long targetUserPk = User.findPkByUsernameJOOQ(username, connection);
                 if (callingUserPk != targetUserPk) {
                     return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
@@ -67,9 +70,12 @@ public class QIDOResource {
                 studiesTotalCount = pair.getStudiesTotalCount();
                 attributesList = pair.getAttributesList();
                 LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
-        } catch (Exception e) {/*empty*/}
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error while connecting to the database", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
+         }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
-        return Response.ok(genericAttributesList).header("X-total-count", studiesTotalCount).build();
+        return Response.ok(genericAttributesList).header("X-Total-Count", studiesTotalCount).build();
     }
 }
