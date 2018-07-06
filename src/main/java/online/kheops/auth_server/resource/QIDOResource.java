@@ -57,10 +57,7 @@ public class QIDOResource {
         List<Attributes> attributesList;
         Integer studiesTotalCount;
 
-        final String user = context.getInitParameter("online.kheops.jdbc.user");
-        final String password = context.getInitParameter("online.kheops.jdbc.password");
-
-        try (Connection connection = getDataSource().getConnection(user, password)) {
+        try (Connection connection = getDataSource().getConnection()) {
                 long targetUserPk = User.findPkByUsernameJOOQ(username, connection);
                 if (callingUserPk != targetUserPk) {
                     return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
