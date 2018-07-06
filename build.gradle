@@ -1,6 +1,5 @@
 plugins {
     id "org.sonarqube" version "2.6"
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.9"
 }
 
 apply plugin: 'java'
@@ -74,9 +73,6 @@ dependencies {
     )
 }
 
-querydsl {
-    jpa = true
-}
 
 gretty {
     jvmArgs = [*debugArgs]
