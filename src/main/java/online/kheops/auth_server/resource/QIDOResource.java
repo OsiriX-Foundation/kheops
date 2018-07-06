@@ -53,16 +53,17 @@ public class QIDOResource {
         final String password = context.getInitParameter("online.kheops.jdbc.password");
         final String url = context.getInitParameter("online.kheops.jdbc.url");
 
-        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password)) {
+
                 // Connection is the only JDBC resource that we need
                 // PreparedStatement and ResultSet are handled by jOOQ, internally
 
-                long targetUserPk = User.findPkByUsernameJOOQ(username, conn);
+                long targetUserPk = User.findPkByUsernameJOOQ(username, connection);
                 if (callingUserPk != targetUserPk) {
                     return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
                 }
 
-                Pair pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), conn);
+                Pair pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
                 studiesTotalCount = pair.getStudiesTotalCount();
                 attributesList = pair.getAttributesList();
                 LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());

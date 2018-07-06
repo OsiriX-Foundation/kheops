@@ -149,21 +149,37 @@ public class Study {
         String studyDateBegin = "00000000";
         String studyDateEnd = "99999999";
         if (queryParameters.containsKey("StudyDate")) {
-            studyDateBegin = queryParameters.get("StudyDate").get(0).split("-")[0];
-            studyDateEnd = queryParameters.get("StudyDate").get(0).split("-")[1];
+            if(queryParameters.get("StudyDate").get(0).equalsIgnoreCase("NULL")) {
+                studyDateBegin = studyDateEnd = "NULL";
+            } else {
+                studyDateBegin = queryParameters.get("StudyDate").get(0).split("-")[0];
+                studyDateEnd = queryParameters.get("StudyDate").get(0).split("-")[1];
+            }
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            studyDateBegin = queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0).split("-")[0];
-            studyDateEnd = queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0).split("-")[1];
+            if(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0).equalsIgnoreCase("NULL")) {
+                studyDateBegin = studyDateEnd = "NULL";
+            } else {
+                studyDateBegin = queryParameters.get(String.format("%08X", Tag.StudyDate)).get(0).split("-")[0];
+                studyDateEnd = queryParameters.get(String.format("%08X", Tag.StudyDate)).get(0).split("-")[1];
+            }
         }
 
         String studyTimeBegin = "000000.000000";
         String studyTimeEnd = "235959.999999";
         if (queryParameters.containsKey("StudyTime")) {
-            studyTimeBegin = queryParameters.get("StudyTime").get(0).split("-")[0];
-            studyTimeEnd = queryParameters.get("StudyTime").get(0).split("-")[1];
+            if(queryParameters.get("StudyTime").get(0).equalsIgnoreCase("NULL")) {
+                studyTimeBegin = studyTimeEnd = "NULL";
+            } else {
+                studyTimeBegin = queryParameters.get("StudyTime").get(0).split("-")[0];
+                studyTimeEnd = queryParameters.get("StudyTime").get(0).split("-")[1];
+            }
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            studyTimeBegin = queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0).split("-")[0];
-            studyTimeEnd = queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0).split("-")[1];
+            if(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0).equalsIgnoreCase("NULL")) {
+                studyTimeBegin = studyTimeEnd = "NULL";
+            } else {
+                studyTimeBegin = queryParameters.get(String.format("%08X", Tag.StudyTime)).get(0).split("-")[0];
+                studyTimeEnd = queryParameters.get(String.format("%08X", Tag.StudyTime)).get(0).split("-")[1];
+            }
         }
 
         String accessionNumber = "";
@@ -227,19 +243,20 @@ public class Study {
                 .join(STUDIES)
                     .on(STUDIES.PK.eq(SERIES.STUDY_FK))
                 .where(USERS.PK.eq(userPK))
-                    .and(SERIES.POPULATED.eq((byte)0x01))
-                    .and(STUDIES.POPULATED.eq((byte)0x01))
-                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd))
-                    .and(STUDIES.STUDY_TIME.between(studyTimeBegin, studyTimeEnd))
-                    .and(STUDIES.ACCESSION_NUMBER.startsWith(accessionNumber))
-                    .and(SERIES.MODALITY.lower().startsWith(modalitiesInStudy.toLowerCase()))
-                    .and(STUDIES.REFERRING_PHYSICIAN_NAME.lower().startsWith(referringPhysicianName.toLowerCase()))
-                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()))
-                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()))
+                    .and(SERIES.POPULATED.isTrue())
+                    .and(STUDIES.POPULATED.isTrue())
+                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd).or(STUDIES.STUDY_DATE.isNull().and(studyDateBegin.equalsIgnoreCase("00000000")).and(studyDateEnd.equalsIgnoreCase("99999999"))).or(STUDIES.STUDY_DATE.isNull().and("NULL".startsWith(studyDateBegin.toUpperCase())).and("NULL".startsWith(studyDateEnd.toUpperCase()))))
+                    .and(STUDIES.STUDY_TIME.between(studyTimeBegin, studyTimeEnd).or(STUDIES.STUDY_TIME.isNull().and(studyTimeBegin.equalsIgnoreCase("000000.000000")).and(studyTimeEnd.equalsIgnoreCase("235959.999999"))).or(STUDIES.STUDY_TIME.isNull().and("NULL".startsWith(studyTimeBegin.toUpperCase())).and("NULL".startsWith(studyTimeEnd.toUpperCase()))))
+                    .and(STUDIES.ACCESSION_NUMBER.startsWith(accessionNumber).or(STUDIES.ACCESSION_NUMBER.isNull().and(accessionNumber.equalsIgnoreCase(""))).or(STUDIES.ACCESSION_NUMBER.isNull().and("NULL".startsWith(accessionNumber.toUpperCase()))))
+                    .and(SERIES.MODALITY.lower().startsWith(modalitiesInStudy.toLowerCase()).or(SERIES.MODALITY.isNull().and(modalitiesInStudy.equalsIgnoreCase(""))).or(SERIES.MODALITY.isNull().and("NULL".startsWith(modalitiesInStudy.toUpperCase()))))
+                    .and(STUDIES.REFERRING_PHYSICIAN_NAME.lower().startsWith(referringPhysicianName.toLowerCase()).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and(referringPhysicianName.equalsIgnoreCase(""))).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and("NULL".startsWith(referringPhysicianName.toUpperCase()))))
+                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()).or(STUDIES.PATIENT_NAME.isNull().and(patientName.equalsIgnoreCase(""))).or(STUDIES.PATIENT_NAME.isNull().and("NULL".startsWith(patientName.toUpperCase()))))
+                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()).or(STUDIES.PATIENT_ID.isNull().and(patientID.equalsIgnoreCase(""))).or(STUDIES.PATIENT_ID.isNull().and("NULL".startsWith(patientID.toUpperCase()))))
                     .and(STUDIES.STUDY_UID.startsWith(studyInstanceUID))
-                    .and(STUDIES.STUDY_ID.startsWith(studyID))
+                    .and(STUDIES.STUDY_ID.startsWith(studyID).or(STUDIES.STUDY_ID.isNull().and(studyID.equalsIgnoreCase(""))).or(STUDIES.STUDY_ID.isNull().and("NULL".startsWith(studyID.toUpperCase()))))
                 .fetch().get(0).get(0);
 
+        Boolean b = modalitiesInStudy.equalsIgnoreCase("");
         Integer lastPage =  (int) Math.ceil( (double)studiesTotalCount / limit);
 
         if (offset > lastPage) {
@@ -269,46 +286,49 @@ public class Study {
                 .join(STUDIES)
                     .on(STUDIES.PK.eq(SERIES.STUDY_FK))
                 .where(USERS.PK.eq(userPK))
-                    .and(SERIES.POPULATED.eq((byte)0x01))
-                    .and(STUDIES.POPULATED.eq((byte)0x01))
-                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd))
-                    .and(STUDIES.STUDY_TIME.between(studyTimeBegin, studyTimeEnd))
-                    .and(STUDIES.ACCESSION_NUMBER.startsWith(accessionNumber))
-                    .and(SERIES.MODALITY.lower().startsWith(modalitiesInStudy.toLowerCase()))
-                    .and(STUDIES.REFERRING_PHYSICIAN_NAME.lower().startsWith(referringPhysicianName.toLowerCase()))
-                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()))
-                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()))
+                    .and(SERIES.POPULATED.isTrue())
+                    .and(STUDIES.POPULATED.isTrue())
+                    .and(STUDIES.STUDY_DATE.between(studyDateBegin, studyDateEnd).or(STUDIES.STUDY_DATE.isNull().and(studyDateBegin.equalsIgnoreCase("00000000")).and(studyDateEnd.equalsIgnoreCase("99999999"))).or(STUDIES.STUDY_DATE.isNull().and("NULL".startsWith(studyDateBegin.toUpperCase())).and("NULL".startsWith(studyDateEnd.toUpperCase()))))
+                    .and(STUDIES.STUDY_TIME.between(studyTimeBegin, studyTimeEnd).or(STUDIES.STUDY_TIME.isNull().and(studyTimeBegin.equalsIgnoreCase("000000.000000")).and(studyTimeEnd.equalsIgnoreCase("235959.999999"))).or(STUDIES.STUDY_TIME.isNull().and("NULL".startsWith(studyTimeBegin.toUpperCase())).and("NULL".startsWith(studyTimeEnd.toUpperCase()))))
+                    .and(STUDIES.ACCESSION_NUMBER.startsWith(accessionNumber).or(STUDIES.ACCESSION_NUMBER.isNull().and(accessionNumber.equalsIgnoreCase(""))).or(STUDIES.ACCESSION_NUMBER.isNull().and("NULL".startsWith(accessionNumber.toUpperCase()))))
+                    .and(SERIES.MODALITY.lower().startsWith(modalitiesInStudy.toLowerCase()).or(SERIES.MODALITY.isNull().and(modalitiesInStudy.equalsIgnoreCase(""))).or(SERIES.MODALITY.isNull().and("NULL".startsWith(modalitiesInStudy.toUpperCase()))))
+                    .and(STUDIES.REFERRING_PHYSICIAN_NAME.lower().startsWith(referringPhysicianName.toLowerCase()).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and(referringPhysicianName.equalsIgnoreCase(""))).or(STUDIES.REFERRING_PHYSICIAN_NAME.isNull().and("NULL".startsWith(referringPhysicianName.toUpperCase()))))
+                    .and(STUDIES.PATIENT_NAME.lower().startsWith(patientName.toLowerCase()).or(STUDIES.PATIENT_NAME.isNull().and(patientName.equalsIgnoreCase(""))).or(STUDIES.PATIENT_NAME.isNull().and("NULL".startsWith(patientName.toUpperCase()))))
+                    .and(STUDIES.PATIENT_ID.lower().startsWith(patientID.toLowerCase()).or(STUDIES.PATIENT_ID.isNull().and(patientID.equalsIgnoreCase(""))).or(STUDIES.PATIENT_ID.isNull().and("NULL".startsWith(patientID.toUpperCase()))))
                     .and(STUDIES.STUDY_UID.startsWith(studyInstanceUID))
-                    .and(STUDIES.STUDY_ID.startsWith(studyID))
+                    .and(STUDIES.STUDY_ID.startsWith(studyID).or(STUDIES.STUDY_ID.isNull().and(studyID.equalsIgnoreCase(""))).or(STUDIES.STUDY_ID.isNull().and("NULL".startsWith(studyID.toUpperCase()))))
                 .groupBy(STUDIES.STUDY_UID)
                 .orderBy(orderBy)
                 .offset(offset).limit(limit)
                 .fetch();
-
-      //  Result<Record> tot = create.select().hint("FOUND_ROWS").fetch();
 
         List<Attributes> attributesList;
         attributesList = new ArrayList<>();
 
         for (Record r : result) {
 
-            //get all the modalities for the STUDY_UID
-            String modalities = create.select(groupConcatDistinct(SERIES.MODALITY))
-                    .from(USERS)
-                    .join(USER_SERIES)
-                    .on(USER_SERIES.USER_FK.eq(USERS.PK))
-                    .join(SERIES)
-                    .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
-                    .join(STUDIES)
-                    .on(STUDIES.PK.eq(SERIES.STUDY_FK))
-                    .where(USERS.PK.eq(userPK))
-                    .and(SERIES.POPULATED.eq((byte)0x01))
-                    .and(STUDIES.POPULATED.eq((byte)0x01))
-                    .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
-                    .groupBy(STUDIES.STUDY_UID)
-                    .fetch().get(0).getValue(0).toString();
-
             Attributes attributes = new Attributes();
+
+            if(queryParameters.containsKey("ModalitiesInStudy")) {
+                //get all the modalities for the STUDY_UID
+                String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
+                        .from(USERS)
+                        .join(USER_SERIES)
+                            .on(USER_SERIES.USER_FK.eq(USERS.PK))
+                        .join(SERIES)
+                            .on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                        .join(STUDIES)
+                            .on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                        .where(USERS.PK.eq(userPK))
+                            .and(SERIES.POPULATED.isTrue())
+                            .and(STUDIES.POPULATED.isTrue())
+                            .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
+                        .groupBy(STUDIES.STUDY_UID)
+                        .fetch().get(0).getValue(0).toString();
+                attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
+            } else {
+                attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
+            }
 
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
@@ -323,8 +343,7 @@ public class Study {
             safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer)r.getValue("count:"+SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, (((BigDecimal)r.getValue("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()))).intValue());
-            //attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
-            attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
+
 
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
