@@ -14,16 +14,6 @@
         </init-param>
     </servlet>
 
-    <filter>
-        <filter-name>ServletFilter</filter-name>
-        <filter-class>online.kheops.auth_server.filter.FixTypeQuoteFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>ServletFilter</filter-name>
-        <url-pattern>/proxy/*</url-pattern>
-    </filter-mapping>
-
     <context-param>
         <description>All JWT Assertions signed by issuer superuser.kheops.online are considered valid</description>
         <param-name>online.kheops.superuser.hmacsecret</param-name>
