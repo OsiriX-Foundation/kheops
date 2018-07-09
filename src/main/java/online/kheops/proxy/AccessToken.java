@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("WeakerAccess")
 public class AccessToken {
     private static final Logger LOG = Logger.getLogger(AccessToken.class.getName());
     private static Client client = ClientBuilder.newClient();
