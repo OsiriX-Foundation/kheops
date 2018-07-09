@@ -49,7 +49,7 @@ public class AccessToken {
                 throw new IllegalStateException("Capability is not set");
             }
 
-            Form form = new Form().param("assertion", capability).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability");
+            Form form = new Form().param("assertion", capability).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability").param("return_user", "true");
             URI uri = UriBuilder.fromUri(authorizationServerRoot).path("token").build();
 
             LOG.info("About to get a token");
