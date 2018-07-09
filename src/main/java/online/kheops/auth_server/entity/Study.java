@@ -10,21 +10,26 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.*;
 import javax.persistence.Table;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
+import static java.util.Calendar.*;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.UserSeries.USER_SERIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static org.dcm4che3.data.Tag.DateTime;
 import static org.jooq.impl.DSL.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -110,41 +115,8 @@ public class Study {
 
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
-        String studyDateBegin = "00000000";
-        String studyDateEnd = "99999999";
-        if (queryParameters.containsKey("StudyDate")) {
-            if(queryParameters.get("StudyDate").get(0).equalsIgnoreCase("NULL")) {
-                studyDateBegin = studyDateEnd = "NULL";
-            } else {
-                studyDateBegin = queryParameters.get("StudyDate").get(0).split("-")[0];
-                studyDateEnd = queryParameters.get("StudyDate").get(0).split("-")[1];
-            }
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            if(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0).equalsIgnoreCase("NULL")) {
-                studyDateBegin = studyDateEnd = "NULL";
-            } else {
-                studyDateBegin = queryParameters.get(String.format("%08X", Tag.StudyDate)).get(0).split("-")[0];
-                studyDateEnd = queryParameters.get(String.format("%08X", Tag.StudyDate)).get(0).split("-")[1];
-            }
-        }
-
-        String studyTimeBegin = "000000.000000";
-        String studyTimeEnd = "235959.999999";
-        if (queryParameters.containsKey("StudyTime")) {
-            if(queryParameters.get("StudyTime").get(0).equalsIgnoreCase("NULL")) {
-                studyTimeBegin = studyTimeEnd = "NULL";
-            } else {
-                studyTimeBegin = queryParameters.get("StudyTime").get(0).split("-")[0];
-                studyTimeEnd = queryParameters.get("StudyTime").get(0).split("-")[1];
-            }
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            if(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0).equalsIgnoreCase("NULL")) {
-                studyTimeBegin = studyTimeEnd = "NULL";
-            } else {
-                studyTimeBegin = queryParameters.get(String.format("%08X", Tag.StudyTime)).get(0).split("-")[0];
-                studyTimeEnd = queryParameters.get(String.format("%08X", Tag.StudyTime)).get(0).split("-")[1];
-            }
-        }
+        conditionArrayList.add(createConditonStudyDate(queryParameters));
+        conditionArrayList.add(createConditonStudyTime(queryParameters));
 
         conditionArrayList.add(createConditon(Tag.AccessionNumber, queryParameters, "AccessionNumber", STUDIES.ACCESSION_NUMBER));
         conditionArrayList.add(createConditonModality(queryParameters));
@@ -205,7 +177,12 @@ public class Study {
         query.addOrderBy(orderBy(queryParameters));
 
         if (queryParameters.containsKey("limit")) {
-                Integer limit = Integer.parseInt(queryParameters.get("limit").get(0));
+                Integer limit;
+                try {
+                    limit = Integer.parseInt(queryParameters.get("limit").get(0));
+                } catch (Exception e) {
+                    throw new BadRequestException();
+                }
                 if (limit < 1) {
                     limit = 1;
                 }
@@ -213,7 +190,12 @@ public class Study {
         }
 
         if (queryParameters.containsKey("offset")) {
-            Integer offset = Integer.parseInt(queryParameters.get("offset").get(0));
+            Integer offset;
+            try {
+                offset = Integer.parseInt(queryParameters.get("offset").get(0));
+            } catch (Exception e) {
+                throw new BadRequestException();
+            }
 
             if (offset < 0) {
                 offset = 0;
@@ -265,8 +247,6 @@ public class Study {
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer)r.getValue("count:"+SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, (((BigDecimal)r.getValue("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()))).intValue());
 
-
-
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
             attributesList.add(attributes);
@@ -315,6 +295,108 @@ public class Study {
             }
         }
         return null;
+    }
+
+    private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("StudyDate")) {
+            return createIntervalConditon(queryParameters.get("StudyDate").get(0), "00010101", "99993112", STUDIES.STUDY_DATE, new checkDate());
+        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), "00010101", "99993112", STUDIES.STUDY_DATE, new checkDate());
+        } else {
+            return null;
+        }
+    }
+
+    private static Condition createConditonStudyTime(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("StudyTime")) {
+            return createIntervalConditon(queryParameters.get("StudyTime").get(0), "000000.000000", "235959.999999", STUDIES.STUDY_TIME, new checkTime());
+        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0), "000000.000000", "235959.999999", STUDIES.STUDY_TIME, new checkTime());
+        } else {
+            return null;
+        }
+    }
+
+    private static Condition createIntervalConditon(String parameter, String intervalBegin, String intervalEnd, TableField column, CheckMethode checkMethode) {
+        if (parameter.contains("-")) {
+            String begin;
+            String end;
+            String[] parameters = parameter.split("-");
+            if (parameters.length == 2) {
+                begin = parameters[0];
+                end = parameters[1];
+                if (begin.length() == 0) {
+                    begin = intervalBegin;
+                }
+                if (checkMethode.check(begin) && checkMethode.check(end)) {
+                    return column.between(begin, end);
+                } else {
+                    throw new BadRequestException();
+                }
+            }else if(parameters.length == 1) {
+                begin = parameters[0];
+                end = intervalEnd;
+                if (checkMethode.check(begin) && checkMethode.check(end)) {
+                    return column.between(begin, end);
+                } else {
+                    throw new BadRequestException();
+                }
+            } else {
+                throw new BadRequestException();
+            }
+        } else {
+            if (checkMethode.check(parameter)) {
+                return column.eq(parameter);
+            } else {
+                throw new BadRequestException();
+            }
+        }
+    }
+
+    private interface CheckMethode {
+        public Boolean check(String s);
+    }
+
+    private static class checkTime implements CheckMethode {
+        public Boolean check(String time) {
+            return time.matches("^[0-2][0-9]([0-5][0-9]){2}.[0-9]{6}$");
+        }
+    }
+
+    private static class checkDate implements CheckMethode {
+        public Boolean check(String date) {
+            if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                dateFormat.setLenient(false);
+                try {
+                    dateFormat.parse(date);
+                } catch (Exception e) {
+                    throw new BadRequestException();
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+
+    private static Boolean checkTimeFormat (String time) {
+        return time.matches("^[0-2][0-9]([0-5][0-9]){2}.[0-9]{6}$");
+    }
+    private static Boolean checkDateFormat(String date) {
+        if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            dateFormat.setLenient(false);
+            try {
+                dateFormat.parse(date);
+            } catch (Exception e) {
+                throw new BadRequestException();
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private static Condition createConditon(Integer tag,  MultivaluedMap<String, String> queryParameters, String key, TableField column) {

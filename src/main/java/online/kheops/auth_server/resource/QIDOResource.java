@@ -67,7 +67,12 @@ public class QIDOResource {
                 studiesTotalCount = pair.getStudiesTotalCount();
                 attributesList = pair.getAttributesList();
                 LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
-        } catch (Exception e) {
+        }
+        catch (BadRequestException e) {
+            LOG.log(Level.SEVERE, "Error 400 :", e);
+            return Response.status(Response.Status.BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component.").build();
+        }
+        catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
