@@ -380,25 +380,6 @@ public class Study {
         }
     }
 
-
-    private static Boolean checkTimeFormat (String time) {
-        return time.matches("^[0-2][0-9]([0-5][0-9]){2}.[0-9]{6}$");
-    }
-    private static Boolean checkDateFormat(String date) {
-        if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-            dateFormat.setLenient(false);
-            try {
-                dateFormat.parse(date);
-            } catch (Exception e) {
-                throw new BadRequestException();
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private static Condition createConditon(Integer tag,  MultivaluedMap<String, String> queryParameters, String key, TableField column) {
         if (queryParameters.containsKey(key)) {
             return createConditon(queryParameters, key, column);
