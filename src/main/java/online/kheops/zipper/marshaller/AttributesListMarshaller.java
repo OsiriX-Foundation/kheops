@@ -1,4 +1,4 @@
-package online.kheops.auth_server.marshaller;
+package online.kheops.zipper.marshaller;
 
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.json.JSONReader;

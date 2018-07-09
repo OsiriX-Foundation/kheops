@@ -4,7 +4,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.Set;
 
-@ApplicationPath("/zipper")
+@ApplicationPath("/*")
 public class ZipperApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {

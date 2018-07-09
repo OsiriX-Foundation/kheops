@@ -84,7 +84,7 @@ public class ZipStudyResource {
         }
 
         // metadata URI
-        URI metadataURI = UriBuilder.fromUri(dicomWebURI).path("/users/{user}/studies/{studyInstanceUID}/metadata").build(tokenResponse.user, studyInstanceUID);
+        URI metadataURI = UriBuilder.fromUri(authorizationURI).path("/users/{user}/studies/{studyInstanceUID}/metadata").build(tokenResponse.user, studyInstanceUID);
 
         List<Attributes> studyList = client.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer "+tokenResponse.accessToken).get(new GenericType<List<Attributes>>() {});
 
