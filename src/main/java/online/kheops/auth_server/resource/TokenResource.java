@@ -79,7 +79,7 @@ public class TokenResource
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope) {
+    public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope, @FormParam("return_user") String returnUser) {
 
         UIDPair uidPair = getUIDPairFromScope(scope);
         final ErrorResponse errorResponse = new ErrorResponse();
@@ -200,7 +200,7 @@ public class TokenResource
         tokenResponse.accessToken = token;
         tokenResponse.tokenType = "Bearer";
         tokenResponse.expiresIn = 3600L;
-        if (assertion.isCapabilityAssertion()) {
+        if (returnUser != null && returnUser.equalsIgnoreCase("true")) {
             tokenResponse.user = assertion.getUsername();
         }
         LOG.info("Returning token for user: " + assertion.getUsername());
