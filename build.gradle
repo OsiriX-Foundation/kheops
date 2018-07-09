@@ -35,6 +35,13 @@ dependencies {
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
 
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
+
+    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
+        exclude module: 'slf4j-log4j12'
+    }
+    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.13.0') {
+        exclude module: 'slf4j-log4j12'
+    }
 }
 
 gretty {
