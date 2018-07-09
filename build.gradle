@@ -33,7 +33,7 @@ repositories {
 dependencies {
     compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.27'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.27'
 
     compile group: 'org.mitre.dsmiley.httpproxy', name: 'smiley-http-proxy-servlet', version: '1.10'
 
