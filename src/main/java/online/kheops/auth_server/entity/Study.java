@@ -184,7 +184,7 @@ public class Study {
                     throw new BadRequestException();
                 }
                 if (limit < 1) {
-                    limit = 1;
+                    throw new BadRequestException();
                 }
                 query.addLimit(limit);
         }
@@ -198,7 +198,7 @@ public class Study {
             }
 
             if (offset < 0) {
-                offset = 0;
+                throw new BadRequestException();
             }
             query.addOffset(offset);
         }
