@@ -300,9 +300,9 @@ public class Study {
 
     private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyDate")) {
-            return createIntervalConditon(queryParameters.get("StudyDate").get(0), "00010101", "99993112", STUDIES.STUDY_DATE, new checkDate());
+            return createIntervalConditon(queryParameters.get("StudyDate").get(0), "00010101", "99991231", STUDIES.STUDY_DATE, new checkDate());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), "00010101", "99993112", STUDIES.STUDY_DATE, new checkDate());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), "00010101", "99991231", STUDIES.STUDY_DATE, new checkDate());
         } else {
             return null;
         }
