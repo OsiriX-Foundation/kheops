@@ -70,7 +70,7 @@ public class QIDOResource {
         }
         catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
-            return Response.status(Response.Status.BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component.").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
         }
         catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);

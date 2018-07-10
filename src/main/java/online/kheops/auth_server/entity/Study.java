@@ -181,10 +181,10 @@ public class Study {
                 try {
                     limit = Integer.parseInt(queryParameters.get("limit").get(0));
                 } catch (Exception e) {
-                    throw new BadRequestException();
+                    throw new BadRequestException("limit: " + queryParameters.get("limit").get(0));
                 }
                 if (limit < 1) {
-                    throw new BadRequestException();
+                    throw new BadRequestException("limit: " + queryParameters.get("limit").get(0));
                 }
                 query.addLimit(limit);
         }
@@ -194,11 +194,11 @@ public class Study {
             try {
                 offset = Integer.parseInt(queryParameters.get("offset").get(0));
             } catch (Exception e) {
-                throw new BadRequestException();
+                throw new BadRequestException("offset: " + queryParameters.get("offset").get(0));
             }
 
             if (offset < 0) {
-                throw new BadRequestException();
+                throw new BadRequestException("offset: " + queryParameters.get("offset").get(0));
             }
             query.addOffset(offset);
         }
@@ -271,7 +271,7 @@ public class Study {
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.PatientID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.PatientID)) == 0) ord = STUDIES.PATIENT_ID;
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyInstanceUID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyInstanceUID)) == 0) ord = STUDIES.STUDY_UID;
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyID)) == 0) ord = STUDIES.STUDY_ID;
-            else throw new BadRequestException();
+            else throw new BadRequestException("sort: " + queryParameters.get("sort").get(0));
 
             return asc_desc ? ord.desc() : ord.asc();
         }
@@ -332,7 +332,7 @@ public class Study {
                 if (checkMethode.check(begin) && checkMethode.check(end)) {
                     return column.between(begin, end);
                 } else {
-                    throw new BadRequestException();
+                    throw new BadRequestException(column.getName() + ": " + parameter);
                 }
             }else if(parameters.length == 1) {
                 begin = parameters[0];
@@ -340,16 +340,16 @@ public class Study {
                 if (checkMethode.check(begin) && checkMethode.check(end)) {
                     return column.between(begin, end);
                 } else {
-                    throw new BadRequestException();
+                    throw new BadRequestException(column.getName() + ": " + parameter);
                 }
             } else {
-                throw new BadRequestException();
+                throw new BadRequestException(column.getName() + ": " + parameter);
             }
         } else {
             if (checkMethode.check(parameter)) {
                 return column.eq(parameter);
             } else {
-                throw new BadRequestException();
+                throw new BadRequestException(column.getName() + ": " + parameter);
             }
         }
     }
@@ -372,7 +372,7 @@ public class Study {
                 try {
                     dateFormat.parse(date);
                 } catch (Exception e) {
-                    throw new BadRequestException();
+                    throw new BadRequestException("StudyDate :" + date);
                 }
                 return true;
             } else {
