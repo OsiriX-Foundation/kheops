@@ -360,7 +360,7 @@ public class Study {
 
     private static class checkTime implements CheckMethode {
         public Boolean check(String time) {
-            return time.matches("^[0-2][0-9]([0-5][0-9]){2}.[0-9]{6}$");
+            return time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$");
         }
     }
 
