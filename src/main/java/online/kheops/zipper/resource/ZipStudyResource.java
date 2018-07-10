@@ -1,6 +1,5 @@
 package online.kheops.zipper.resource;
 
-import javassist.bytecode.ByteArray;
 import online.kheops.zipper.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -14,11 +13,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,10 +27,6 @@ public class ZipStudyResource {
     static class TokenResponse {
         @XmlElement(name = "access_token")
         String accessToken;
-        @XmlElement(name = "token_type")
-        String tokenType;
-        @XmlElement(name = "expires_in")
-        String expiresIn;
         @XmlElement(name = "user")
         String user;
     }
@@ -49,17 +41,10 @@ public class ZipStudyResource {
     ServletContext context;
 
     @GET
-    @Path("/simple")
-    public Response simple() {
-        return Response.status(Response.Status.OK).build();
-    }
-
-    @GET
     @Path("/{StudyInstanceUID}/stream")
     @Produces("application/zip")
     public Response streamStudy(@PathParam("StudyInstanceUID") String studyInstanceUID, @HeaderParam("authorization") String authorizationHeader) {
 
-        // get the token from the user, and figure out what kind of token it is.
         if (authorizationHeader == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -75,7 +60,6 @@ public class ZipStudyResource {
         Form capabilityForm = new Form().param("assertion", userToken).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability").param("return_user", "true");
         Form jwtForm = new Form().param("assertion", userToken).param("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer").param("return_user", "true");
 
-        // try to get the token as
         URI dicomWebURI = dicomWebURI();
         URI authorizationURI = authorizationURI();
 
@@ -103,7 +87,6 @@ public class ZipStudyResource {
             }
         }
 
-        // metadata URI
         URI metadataURI = UriBuilder.fromUri(authorizationURI).path("/users/{user}/studies/{studyInstanceUID}/metadata").build(tokenResponse.user, studyInstanceUID);
 
         List<Attributes> attributesList = client.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer "+tokenResponse.accessToken).get(new GenericType<List<Attributes>>() {});
@@ -152,16 +135,11 @@ public class ZipStudyResource {
 
                 ZipEntry e = new ZipEntry(instance.SOPInstanceUID + ".dcm");
                 zipStream.putNextEntry(e);
-//                zipStream.write(instance.SOPInstanceUID.getBytes());
                 zipStream.write(instanceArray);
                 zipStream.closeEntry();
             }
             zipStream.close();
         };
-
-        // iterate over the list to find the instances that need to be downloaded
-
-
 
         return Response.ok(stream).build();
 
@@ -187,7 +165,7 @@ public class ZipStudyResource {
         return authorizationURI;
     }
 
-    private void checkValidUID(String uid, String name) {
+    private void checkValidUID(String uid, @SuppressWarnings("SameParameterValue") String name) {
         try {
             new Oid(uid);
         } catch (GSSException exception) {
