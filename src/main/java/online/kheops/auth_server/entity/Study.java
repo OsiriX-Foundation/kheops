@@ -271,6 +271,7 @@ public class Study {
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.PatientID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.PatientID)) == 0) ord = STUDIES.PATIENT_ID;
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyInstanceUID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyInstanceUID)) == 0) ord = STUDIES.STUDY_UID;
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyID)) == 0) ord = STUDIES.STUDY_ID;
+            else throw new BadRequestException();
 
             return asc_desc ? ord.desc() : ord.asc();
         }
