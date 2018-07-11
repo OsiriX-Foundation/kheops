@@ -1,62 +1,55 @@
 package online.kheops.zipper;
 
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+@SuppressWarnings("WeakerAccess")
 public final class InstanceRetriever {
     private static final int CONCURRENT_REQUESTS = 6;
+    private static final long SLEEP_TIME = 500;
 
-    private final Set<Instance> instances;
-    private final String token;
-    private final TokenType tokenType;
+    private static final Logger LOG = Logger.getLogger(InstanceRetriever.class.getName());
+
     private final URI wadoURI;
     private final Client client;
 
     private boolean started = false;
 
     private final StateManager stateManager;
-
-    public enum TokenType {
-        JWT_BEARER_TOKEN("urn:ietf:params:oauth:grant-type:jwt-bearer"),
-        CAPABILITY_TOKEN("urn:x-kheops:params:oauth:grant-type:capability");
-
-        final private String tokenType;
-
-        TokenType(String tokenType) {
-            this.tokenType = tokenType;
-        }
-
-        @Override
-        public String toString() {
-            return tokenType;
-        }
-    }
+    private final BearerTokenRetriever bearerTokenRetriever;
 
     public static final class Builder {
         private Set<Instance> instances;
-        private String token;
-        private TokenType tokenType;
+        private AccessToken accessToken;
         private URI wadoURI;
+        private URI authorizationURI;
         private Client client;
+
+        public Builder(){}
 
         public Builder instances(Set<Instance> instances) {
             this.instances = instances;
             return this;
         }
 
-        public Builder token(String token) {
-            this.token = token;
-            return this;
-        }
-
-        public Builder tokenType(TokenType tokenType) {
-            this.tokenType = tokenType;
+        public Builder accessToken(AccessToken accessToken) {
+            this.accessToken = accessToken;
             return this;
         }
 
         public Builder wadoURI(URI wadoURI) {
             this.wadoURI = wadoURI;
+            return this;
+        }
+
+        public Builder authorizationURI(URI authorizationURI) {
+            this.authorizationURI = authorizationURI;
             return this;
         }
 
@@ -66,37 +59,23 @@ public final class InstanceRetriever {
         }
 
         public InstanceRetriever build() {
-            if (instances == null) {
-                throw new IllegalStateException("instances not set");
-            }
-            if (token == null) {
-                throw new IllegalStateException("token not set");
-            }
-            if (tokenType == null) {
-                throw new IllegalStateException("tokenType not set");
-            }
-            if (wadoURI == null) {
-                throw new IllegalStateException("wadoURI not set");
-            }
-            if (client == null) {
-                throw new IllegalStateException("client not set");
-            }
-
             return new InstanceRetriever(this);
         }
     }
 
     private InstanceRetriever(Builder builder) {
-        instances = builder.instances;
-        token = builder.token;
-        tokenType = builder.tokenType;
-        wadoURI = builder.wadoURI;
-        client = builder.client;
+        wadoURI = Objects.requireNonNull(builder.wadoURI, "wadoURI must not be null");
+        client = Objects.requireNonNull(builder.client, "client must not be null");
 
-        stateManager = StateManager.newInstance(instances);
+        stateManager = StateManager.newInstance(builder.instances);
+        bearerTokenRetriever = new BearerTokenRetriever.Builder().accessToken(builder.accessToken).authorizationURI(builder.authorizationURI).client(client).build();
     }
 
     public void start() {
+        if (started) {
+            throw new IllegalStateException("Already Started");
+        }
+
         started = true;
 
         for (int i = 0; i < CONCURRENT_REQUESTS; i++) {
@@ -104,31 +83,71 @@ public final class InstanceRetriever {
         }
     }
 
-    public InstanceData nextInstance() {
+    public InstanceData poll() {
         if (!started) {
             throw new IllegalStateException("InstanceRetriever not started");
         }
 
         InstanceData instanceData = null;
         while (stateManager.countUnReturned() > 0 && (instanceData = stateManager.getForReturning()) == null) {
-            synchronized(stateManager) {
-                try {
-                    stateManager.wait(1000);
-                } catch (InterruptedException e) { /* empty */ }
-            }
+            try {
+                Thread.sleep(SLEEP_TIME);
+            } catch (InterruptedException e) { /* empty */ }
         }
 
         return instanceData;
     }
 
     private void startNewRequest() {
+        final Instance instance = stateManager.getForProcessing();
 
+        bearerTokenRetriever.get(instance, new InvocationCallback<BearerToken>() {
+            @Override
+            public void completed(BearerToken bearerToken) {
+                processInstance(instance, bearerToken);
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                stateManager.failedProcessing(instance);
+                LOG.log(Level.WARNING, "Failed to get a Bearer token for Study:" + instance.getStudyInstanceUID() +
+                        "%nSeries:" + instance.getSeriesInstanceUID() + "%nInstance:" + instance.getSOPInstanceUID(), throwable);
+                startNewRequest();
+            }
+        });
     }
 
+    private void processInstance(Instance instance, BearerToken bearerToken) {
+        URI instanceURI = getWadoUriBuilder().queryParam("studyUID", instance.getStudyInstanceUID())
+                .queryParam("seriesUID", instance.getSeriesInstanceUID())
+                .queryParam("objectUID", instance.getSOPInstanceUID())
+                .build();
+
+        client.target(instanceURI)
+                .request("application/dicom")
+                .header("Authorization", "Bearer " + bearerToken.getToken())
+                .async()
+                .get(new InvocationCallback<byte[]>() {
+                    @Override
+                    public void completed(byte[] bytes) {
+                        stateManager.finishedProcessing(InstanceData.newInstance(instance, bytes));
+                        startNewRequest();
+                    }
+
+                    @Override
+                    public void failed(Throwable throwable) {
+                        stateManager.failedProcessing(instance);
+                        LOG.log(Level.WARNING, "Failed to process Study:" + instance.getStudyInstanceUID() +
+                                "%nSeries:" + instance.getSeriesInstanceUID() + "%nInstance:" + instance.getSOPInstanceUID(), throwable);
+                        startNewRequest();
+                    }
+                });
+    }
+
+    private UriBuilder getWadoUriBuilder() {
+        return UriBuilder.fromUri(wadoURI).path("/wado")
+                .queryParam("requestType", "WADO")
+                .queryParam("contentType", "application%2Fdicom")
+                .queryParam("transferSyntax", "*");
+    }
 }
-
-
-
-
-
-

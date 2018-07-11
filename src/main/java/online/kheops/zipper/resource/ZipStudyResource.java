@@ -1,5 +1,9 @@
 package online.kheops.zipper.resource;
 
+import online.kheops.zipper.AccessToken;
+import online.kheops.zipper.AccessTokenType;
+import online.kheops.zipper.Instance;
+import online.kheops.zipper.InstanceZipper;
 import online.kheops.zipper.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -18,8 +22,6 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Path("/studies")
 public class ZipStudyResource {
@@ -29,12 +31,6 @@ public class ZipStudyResource {
         String accessToken;
         @XmlElement(name = "user")
         String user;
-    }
-
-    static class Instance {
-        String StudyInstanceUID;
-        String SeriesInstanceUID;
-        String SOPInstanceUID;
     }
 
     @Context
@@ -69,11 +65,11 @@ public class ZipStudyResource {
         client.register(AttributesListMarshaller.class);
 
         TokenResponse tokenResponse = null;
-        Form authorizationForm = null;
+        AccessToken accessToken = null;
 
         try {
             tokenResponse = client.target(tokenURI).request("application/json").post(Entity.form(capabilityForm), TokenResponse.class);
-            authorizationForm = capabilityForm;
+            accessToken = AccessToken.getInstance(tokenResponse.accessToken, AccessTokenType.CAPABILITY_TOKEN);
         } catch (Exception e) {
             /* empty */
         }
@@ -81,7 +77,7 @@ public class ZipStudyResource {
         if (tokenResponse == null) {
             try {
                 tokenResponse = client.target(tokenURI).request("application/json").post(Entity.form(jwtForm), TokenResponse.class);
-                authorizationForm = jwtForm;
+                accessToken = AccessToken.getInstance(tokenResponse.accessToken, AccessTokenType.JWT_BEARER_TOKEN);
             } catch (Exception e) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
@@ -93,52 +89,21 @@ public class ZipStudyResource {
 
         Set<Instance> instanceList = new HashSet<>();
         for (Attributes attr: attributesList) {
-            Instance instance = new Instance();
-            instance.StudyInstanceUID = attr.getString(Tag.StudyInstanceUID);
-            instance.SeriesInstanceUID = attr.getString(Tag.SeriesInstanceUID);
-            instance.SOPInstanceUID = attr.getString(Tag.SOPInstanceUID);
+            Instance instance = Instance.newInstance(attr.getString(Tag.StudyInstanceUID), attr.getString(Tag.SeriesInstanceUID), attr.getString(Tag.SOPInstanceUID));
             instanceList.add(instance);
         }
 
-        UriBuilder instanceURIBuilder = UriBuilder.fromUri(dicomWebURI).path("/wado")
-                .queryParam("requestType", "WADO")
-                .queryParam("contentType", "application%2Fdicom")
-                .queryParam("transferSyntax", "*");
+        InstanceZipper instanceZipper = new InstanceZipper.Builder()
+                .accessToken(accessToken)
+                .authorizationURI(authorizationURI())
+                .wadoURI(dicomWebURI)
+                .client(client)
+                .instances(instanceList)
+                .build();
 
-        authorizationForm.asMap().remove("return_user");
-
-        final Form theForm = authorizationForm;
         StreamingOutput stream = os -> {
-            ZipOutputStream zipStream = new ZipOutputStream(os);
-
-            for (Instance instance : instanceList) {
-                theForm.asMap().remove("scope");
-                Form scopedForm = theForm.param("scope", "StudyInstanceUID=" + instance.StudyInstanceUID + " SeriesInstanceUID=" + instance.SeriesInstanceUID);
-
-                TokenResponse scopedResponse;
-                try {
-                    scopedResponse = client.target(tokenURI).request("application/json").post(Entity.form(scopedForm), TokenResponse.class);
-                } catch (Exception e) {
-                    throw new WebApplicationException(e);
-                }
-                URI instanceURI = instanceURIBuilder.replaceQueryParam("studyUID", instance.StudyInstanceUID)
-                        .replaceQueryParam("seriesUID", instance.SeriesInstanceUID)
-                        .replaceQueryParam("objectUID", instance.SOPInstanceUID)
-                        .build();
-
-                byte[] instanceArray;
-                try {
-                    instanceArray = client.target(instanceURI).request("application/dicom").header("Authorization", "Bearer " + scopedResponse.accessToken).get(byte[].class);
-                } catch (Exception e) {
-                    throw new WebApplicationException(e);
-                }
-
-                ZipEntry e = new ZipEntry(instance.SOPInstanceUID + ".dcm");
-                zipStream.putNextEntry(e);
-                zipStream.write(instanceArray);
-                zipStream.closeEntry();
-            }
-            zipStream.close();
+            instanceZipper.write(os);
+            os.close();
         };
 
         return Response.ok(stream).build();
