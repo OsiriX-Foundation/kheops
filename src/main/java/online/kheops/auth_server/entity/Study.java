@@ -111,6 +111,8 @@ public class Study {
 
     public static Pair findAttributesByUserPKJOOQ(long userPK, MultivaluedMap<String, String> queryParameters, Connection connection) {
 
+        //queryParameters = ConvertDICOMKeyWordToDICOMTag(queryParameters);
+
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
@@ -254,6 +256,38 @@ public class Study {
         return new Pair(studiesTotalCount, attributesList);
     }
 
+    private static MultivaluedMap<String, String> ConvertDICOMKeyWordToDICOMTag(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyDate))) {
+            queryParameters.add(String.format("%08X",Tag.StudyDate),queryParameters.get(Keyword.valueOf(Tag.StudyDate)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyTime))) {
+            queryParameters.add(String.format("%08X",Tag.StudyTime),queryParameters.get(Keyword.valueOf(Tag.StudyTime)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.AccessionNumber))) {
+            queryParameters.add(String.format("%08X",Tag.AccessionNumber),queryParameters.get(Keyword.valueOf(Tag.AccessionNumber)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.ModalitiesInStudy))) {
+            queryParameters.add(String.format("%08X",Tag.ModalitiesInStudy),queryParameters.get(Keyword.valueOf(Tag.ModalitiesInStudy)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.ReferringPhysicianName))) {
+            queryParameters.add(String.format("%08X",Tag.ReferringPhysicianName),queryParameters.get(Keyword.valueOf(Tag.ReferringPhysicianName)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.PatientName))) {
+            queryParameters.add(String.format("%08X",Tag.PatientName),queryParameters.get(Keyword.valueOf(Tag.PatientName)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.PatientID))) {
+            queryParameters.add(String.format("%08X",Tag.PatientID),queryParameters.get(Keyword.valueOf(Tag.PatientID)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyInstanceUID))) {
+            queryParameters.add(String.format("%08X",Tag.StudyInstanceUID),queryParameters.get(Keyword.valueOf(Tag.StudyInstanceUID)).get(0));
+        }
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyID))) {
+            queryParameters.add(String.format("%08X",Tag.StudyID),queryParameters.get(Keyword.valueOf(Tag.StudyID)).get(0));
+        }
+
+        return queryParameters;
+    }
+
     private static SortField orderBy(MultivaluedMap<String, String> queryParameters) {
 
         if (queryParameters.containsKey("sort")) {
@@ -300,9 +334,9 @@ public class Study {
 
     private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyDate")) {
-            return createIntervalConditon(queryParameters.get("StudyDate").get(0), "00010101", "99991231", STUDIES.STUDY_DATE, new checkDate());
+            return createIntervalConditon(queryParameters.get("StudyDate").get(0), STUDIES.STUDY_DATE, new checkDate());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), "00010101", "99991231", STUDIES.STUDY_DATE, new checkDate());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), STUDIES.STUDY_DATE, new checkDate());
         } else {
             return null;
         }
@@ -310,15 +344,15 @@ public class Study {
 
     private static Condition createConditonStudyTime(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyTime")) {
-            return createIntervalConditon(queryParameters.get("StudyTime").get(0), "000000.000000", "235959.999999", STUDIES.STUDY_TIME, new checkTime());
+            return createIntervalConditon(queryParameters.get("StudyTime").get(0), STUDIES.STUDY_TIME, new checkTime());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0), "000000.000000", "235959.999999", STUDIES.STUDY_TIME, new checkTime());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0),STUDIES.STUDY_TIME, new checkTime());
         } else {
             return null;
         }
     }
 
-    private static Condition createIntervalConditon(String parameter, String intervalBegin, String intervalEnd, TableField column, CheckMethode checkMethode) {
+    private static Condition createIntervalConditon(String parameter, TableField column, CheckMethode checkMethode) {
         if (parameter.contains("-")) {
             String begin;
             String end;
@@ -327,7 +361,7 @@ public class Study {
                 begin = parameters[0];
                 end = parameters[1];
                 if (begin.length() == 0) {
-                    begin = intervalBegin;
+                    begin = checkMethode.intervalBegin();
                 }
                 if (checkMethode.check(begin) && checkMethode.check(end)) {
                     return column.between(begin, end);
@@ -336,7 +370,7 @@ public class Study {
                 }
             }else if(parameters.length == 1) {
                 begin = parameters[0];
-                end = intervalEnd;
+                end = checkMethode.intervalEnd();
                 if (checkMethode.check(begin) && checkMethode.check(end)) {
                     return column.between(begin, end);
                 } else {
@@ -355,16 +389,24 @@ public class Study {
     }
 
     private interface CheckMethode {
+        public String intervalBegin();
+        public String intervalEnd();
         public Boolean check(String s);
     }
 
     private static class checkTime implements CheckMethode {
+        public String intervalBegin() {return "000000.000000";}
+        public String intervalEnd() {return "235959.999999";};
+
         public Boolean check(String time) {
             return time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$");
         }
     }
 
     private static class checkDate implements CheckMethode {
+        public String intervalBegin() {return "00010101";}
+        public String intervalEnd() {return "99991231";}
+
         public Boolean check(String date) {
             if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
