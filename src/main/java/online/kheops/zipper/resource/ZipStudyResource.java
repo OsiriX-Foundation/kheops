@@ -69,7 +69,7 @@ public class ZipStudyResource {
 
         try {
             tokenResponse = client.target(tokenURI).request("application/json").post(Entity.form(capabilityForm), TokenResponse.class);
-            accessToken = AccessToken.getInstance(tokenResponse.accessToken, AccessTokenType.CAPABILITY_TOKEN);
+            accessToken = AccessToken.getInstance(userToken, AccessTokenType.CAPABILITY_TOKEN);
         } catch (Exception e) {
             /* empty */
         }
@@ -77,7 +77,7 @@ public class ZipStudyResource {
         if (tokenResponse == null) {
             try {
                 tokenResponse = client.target(tokenURI).request("application/json").post(Entity.form(jwtForm), TokenResponse.class);
-                accessToken = AccessToken.getInstance(tokenResponse.accessToken, AccessTokenType.JWT_BEARER_TOKEN);
+                accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
             } catch (Exception e) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
@@ -101,12 +101,7 @@ public class ZipStudyResource {
                 .instances(instanceList)
                 .build();
 
-        StreamingOutput stream = os -> {
-            instanceZipper.write(os);
-            os.close();
-        };
-
-        return Response.ok(stream).build();
+        return Response.ok((StreamingOutput)instanceZipper::write).build();
 
     }
 

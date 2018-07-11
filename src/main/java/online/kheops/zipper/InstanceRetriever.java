@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
 public final class InstanceRetriever {
-    private static final int CONCURRENT_REQUESTS = 6;
+    private static final int CONCURRENT_REQUESTS = 10;
     private static final long SLEEP_TIME = 500;
 
     private static final Logger LOG = Logger.getLogger(InstanceRetriever.class.getName());
@@ -91,15 +91,24 @@ public final class InstanceRetriever {
         InstanceData instanceData = null;
         while (stateManager.countUnReturned() > 0 && (instanceData = stateManager.getForReturning()) == null) {
             try {
+                LOG.log(Level.WARNING, "no instances ready, sleeping");
                 Thread.sleep(SLEEP_TIME);
-            } catch (InterruptedException e) { /* empty */ }
+            } catch (InterruptedException e) {
+                LOG.log(Level.SEVERE, "Interrupted during sleep", e);
+            }
         }
+
+        startNewRequest();
 
         return instanceData;
     }
 
     private void startNewRequest() {
         final Instance instance = stateManager.getForProcessing();
+
+        if (instance == null) {
+            return;
+        }
 
         bearerTokenRetriever.get(instance, new InvocationCallback<BearerToken>() {
             @Override
@@ -131,7 +140,6 @@ public final class InstanceRetriever {
                     @Override
                     public void completed(byte[] bytes) {
                         stateManager.finishedProcessing(InstanceData.newInstance(instance, bytes));
-                        startNewRequest();
                     }
 
                     @Override

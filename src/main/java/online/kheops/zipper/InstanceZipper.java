@@ -81,6 +81,6 @@ public final class InstanceZipper {
             zipStream.write(instanceBytes);
             zipStream.closeEntry();
         }
-        zipStream.flush();
+        zipStream.close();
     }
 }

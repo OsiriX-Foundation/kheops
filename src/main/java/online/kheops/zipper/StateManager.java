@@ -27,7 +27,7 @@ public final class StateManager {
     public Instance getForProcessing() {
         synchronized (lock) {
             if (waitingInstances.size() == 0) {
-                throw new IllegalStateException("No instances are available for processing");
+                return null;
             }
 
             final Instance next = waitingInstances.pollFirst();
@@ -67,7 +67,7 @@ public final class StateManager {
             InstanceData next = null;
             if (retrievedInstances.size() > 0) {
                 next = retrievedInstances.pollFirst();
-                returnedInstances.add(Objects.requireNonNull(next).getInstance());
+                returnedInstances.add(next.getInstance());
             }
             return next;
         }
