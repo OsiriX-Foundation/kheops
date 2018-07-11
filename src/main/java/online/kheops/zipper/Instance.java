@@ -3,6 +3,7 @@ package online.kheops.zipper;
 
 import java.util.Objects;
 
+@SuppressWarnings("WeakerAccess")
 public final class Instance {
     final private String studyInstanceUID;
     final private String seriesInstanceUID;

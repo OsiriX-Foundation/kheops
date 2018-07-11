@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+@SuppressWarnings("WeakerAccess")
 public final class BearerTokenRetriever {
     private final Client client;
     private final URI tokenURI;

@@ -2,6 +2,7 @@ package online.kheops.zipper;
 
 import java.util.Objects;
 
+@SuppressWarnings("WeakerAccess")
 public final class BearerToken  {
     private final String token;
 

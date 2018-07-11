@@ -2,6 +2,7 @@ package online.kheops.zipper;
 
 import java.util.Objects;
 
+@SuppressWarnings("WeakerAccess")
 public final class AccessToken {
     private final String token;
     private final AccessTokenType type;

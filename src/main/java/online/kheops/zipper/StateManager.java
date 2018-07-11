@@ -3,6 +3,7 @@ package online.kheops.zipper;
 import java.util.*;
 
 // states: waiting, processing, retrieved, returned
+@SuppressWarnings("WeakerAccess")
 public final class StateManager {
 
     private final static int RETRY_COUNT = 6;
@@ -67,6 +68,7 @@ public final class StateManager {
             InstanceData next = null;
             if (retrievedInstances.size() > 0) {
                 next = retrievedInstances.pollFirst();
+                assert next != null;
                 returnedInstances.add(next.getInstance());
             }
             return next;
