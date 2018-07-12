@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 @SuppressWarnings("WeakerAccess")
 public final class InstanceRetriever {
     private static final int CONCURRENT_REQUESTS = 6;
-    private static final long SLEEP_TIME = 500;
+    private static final long WAIT_TIMEOUT = 500;
 
     private static final Logger LOG = Logger.getLogger(InstanceRetriever.class.getName());
 
@@ -23,6 +23,8 @@ public final class InstanceRetriever {
 
     private final StateManager stateManager;
     private final BearerTokenRetriever bearerTokenRetriever;
+
+    private final Object waitSemaphore = new Object();
 
     public static final class Builder {
         private Set<Instance> instances;
@@ -68,7 +70,11 @@ public final class InstanceRetriever {
         client = Objects.requireNonNull(builder.client, "client must not be null");
 
         stateManager = StateManager.newInstance(builder.instances);
-        bearerTokenRetriever = new BearerTokenRetriever.Builder().accessToken(builder.accessToken).authorizationURI(builder.authorizationURI).client(client).build();
+        bearerTokenRetriever = new BearerTokenRetriever.Builder()
+                .accessToken(builder.accessToken)
+                .authorizationURI(builder.authorizationURI)
+                .client(client)
+                .build();
     }
 
     public void start() {
@@ -90,12 +96,7 @@ public final class InstanceRetriever {
 
         InstanceData instanceData = null;
         while (stateManager.countUnReturned() > 0 && (instanceData = stateManager.getForReturning()) == null) {
-            try {
-                LOG.log(Level.WARNING, "no instances ready, sleeping");
-                Thread.sleep(SLEEP_TIME);
-            } catch (InterruptedException e) {
-                LOG.log(Level.SEVERE, "Interrupted during sleep", e);
-            }
+            waitForReturnedInstance();
         }
 
         startNewRequest();
@@ -118,7 +119,7 @@ public final class InstanceRetriever {
 
             @Override
             public void failed(Throwable throwable) {
-                stateManager.failedProcessing(instance);
+                failedProcessing(instance);
                 LOG.log(Level.WARNING, "Failed to get a Bearer token for Study:" + instance.getStudyInstanceUID() +
                         "%nSeries:" + instance.getSeriesInstanceUID() + "%nInstance:" + instance.getSOPInstanceUID(), throwable);
                 startNewRequest();
@@ -139,12 +140,12 @@ public final class InstanceRetriever {
                 .get(new InvocationCallback<byte[]>() {
                     @Override
                     public void completed(byte[] bytes) {
-                        stateManager.finishedProcessing(InstanceData.newInstance(instance, bytes));
+                        finishedProcessing(InstanceData.newInstance(instance, bytes));
                     }
 
                     @Override
                     public void failed(Throwable throwable) {
-                        stateManager.failedProcessing(instance);
+                        failedProcessing(instance);
                         LOG.log(Level.WARNING, "Failed to process Study:" + instance.getStudyInstanceUID() +
                                 "%nSeries:" + instance.getSeriesInstanceUID() + "%nInstance:" + instance.getSOPInstanceUID(), throwable);
                         startNewRequest();
@@ -157,5 +158,31 @@ public final class InstanceRetriever {
                 .queryParam("requestType", "WADO")
                 .queryParam("contentType", "application%2Fdicom")
                 .queryParam("transferSyntax", "*");
+    }
+
+    private void finishedProcessing(InstanceData instanceData) {
+        stateManager.finishedProcessing(instanceData);
+        notifyForReturnedInstance();
+    }
+
+    private void failedProcessing(Instance instance) {
+        stateManager.failedProcessing(instance);
+        notifyForReturnedInstance();
+    }
+
+    private void waitForReturnedInstance() {
+        synchronized (waitSemaphore) {
+            try {
+                LOG.log(Level.WARNING, "no instances ready, waiting");
+                waitSemaphore.wait(WAIT_TIMEOUT);
+            } catch (InterruptedException e) {
+                LOG.log(Level.SEVERE, "Interrupted during wait", e);
+            }
+        }
+    }
+    private void notifyForReturnedInstance() {
+        synchronized (waitSemaphore) {
+            waitSemaphore.notifyAll();
+        }
     }
 }
