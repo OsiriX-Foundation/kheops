@@ -77,7 +77,7 @@ public final class StateManager {
 
     public int countUnReturned() {
         synchronized (lock) {
-            return (waitingInstances.size() + processingInstances.size() + retrievedInstances.size()) - returnedInstances.size();
+            return waitingInstances.size() + processingInstances.size() + retrievedInstances.size();
         }
     }
 
