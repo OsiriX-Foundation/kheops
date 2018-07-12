@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
 public final class InstanceRetriever {
-    private static final int CONCURRENT_REQUESTS = 10;
+    private static final int CONCURRENT_REQUESTS = 6;
     private static final long SLEEP_TIME = 500;
 
     private static final Logger LOG = Logger.getLogger(InstanceRetriever.class.getName());
