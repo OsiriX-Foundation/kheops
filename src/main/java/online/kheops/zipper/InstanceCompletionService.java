@@ -6,15 +6,11 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
-public final class InstanceRetriever {
+public final class InstanceCompletionService {
     private static final int CONCURRENT_REQUESTS = 6;
-    private static final long WAIT_TIMEOUT = 500;
 
-    private static final Logger LOG = Logger.getLogger(InstanceRetriever.class.getName());
 
     private final URI wadoURI;
     private final Client client;
@@ -23,8 +19,6 @@ public final class InstanceRetriever {
 
     private final StateManager stateManager;
     private final BearerTokenRetriever bearerTokenRetriever;
-
-    private final Object waitSemaphore = new Object();
 
     public static final class Builder {
         private Set<Instance> instances;
@@ -60,12 +54,12 @@ public final class InstanceRetriever {
             return this;
         }
 
-        public InstanceRetriever build() {
-            return new InstanceRetriever(this);
+        public InstanceCompletionService build() {
+            return new InstanceCompletionService(this);
         }
     }
 
-    private InstanceRetriever(Builder builder) {
+    private InstanceCompletionService(Builder builder) {
         wadoURI = Objects.requireNonNull(builder.wadoURI, "wadoURI must not be null");
         client = Objects.requireNonNull(builder.client, "client must not be null");
 
@@ -89,19 +83,16 @@ public final class InstanceRetriever {
         }
     }
 
-    public InstanceData poll() {
+    public InstanceFuture take() throws InterruptedException {
         if (!started) {
-            throw new IllegalStateException("InstanceRetriever not started");
+            throw new IllegalStateException("Not Started");
         }
 
-        InstanceData instanceData = null;
-        while (stateManager.countUnReturned() > 0 && (instanceData = stateManager.getForReturning()) == null) {
-            waitForReturnedInstance();
-        }
+        InstanceFuture instanceFuture = stateManager.take();
 
         startNewRequest();
 
-        return instanceData;
+        return instanceFuture;
     }
 
     private void startNewRequest() {
@@ -119,19 +110,13 @@ public final class InstanceRetriever {
 
             @Override
             public void failed(Throwable throwable) {
-                failedProcessing(instance);
-                LOG.log(Level.WARNING, "Failed to get a Bearer token for Study:" + instance.getStudyInstanceUID() +
-                        "%nSeries:" + instance.getSeriesInstanceUID() + "%nInstance:" + instance.getSOPInstanceUID(), throwable);
-                startNewRequest();
+                failedProcessing(instance, throwable);
             }
         });
     }
 
     private void processInstance(Instance instance, BearerToken bearerToken) {
-        URI instanceURI = getWadoUriBuilder().queryParam("studyUID", instance.getStudyInstanceUID())
-                .queryParam("seriesUID", instance.getSeriesInstanceUID())
-                .queryParam("objectUID", instance.getSOPInstanceUID())
-                .build();
+        URI instanceURI = getInstanceURI(instance);
 
         client.target(instanceURI)
                 .request("application/dicom")
@@ -140,17 +125,21 @@ public final class InstanceRetriever {
                 .get(new InvocationCallback<byte[]>() {
                     @Override
                     public void completed(byte[] bytes) {
-                        finishedProcessing(InstanceData.newInstance(instance, bytes));
+                        finishedProcessing(instance, bytes);
                     }
 
                     @Override
-                    public void failed(Throwable throwable) {
-                        failedProcessing(instance);
-                        LOG.log(Level.WARNING, "Failed to process Study:" + instance.getStudyInstanceUID() +
-                                "%nSeries:" + instance.getSeriesInstanceUID() + "%nInstance:" + instance.getSOPInstanceUID(), throwable);
-                        startNewRequest();
+                    public void failed(Throwable reason) {
+                        failedProcessing(instance, reason);
                     }
                 });
+    }
+
+    private URI getInstanceURI(Instance instance) {
+        return getWadoUriBuilder().queryParam("studyUID", instance.getStudyInstanceUID())
+                .queryParam("seriesUID", instance.getSeriesInstanceUID())
+                .queryParam("objectUID", instance.getSOPInstanceUID())
+                .build();
     }
 
     private UriBuilder getWadoUriBuilder() {
@@ -160,29 +149,12 @@ public final class InstanceRetriever {
                 .queryParam("transferSyntax", "*");
     }
 
-    private void finishedProcessing(InstanceData instanceData) {
-        stateManager.finishedProcessing(instanceData);
-        notifyForReturnedInstance();
+    private void finishedProcessing(Instance instanceData, byte[] bytes) {
+        stateManager.finishedProcessing(instanceData, bytes);
     }
 
-    private void failedProcessing(Instance instance) {
-        stateManager.failedProcessing(instance);
-        notifyForReturnedInstance();
-    }
-
-    private void waitForReturnedInstance() {
-        synchronized (waitSemaphore) {
-            try {
-                LOG.log(Level.WARNING, "no instances ready, waiting");
-                waitSemaphore.wait(WAIT_TIMEOUT);
-            } catch (InterruptedException e) {
-                LOG.log(Level.SEVERE, "Interrupted during wait", e);
-            }
-        }
-    }
-    private void notifyForReturnedInstance() {
-        synchronized (waitSemaphore) {
-            waitSemaphore.notifyAll();
-        }
+    private void failedProcessing(Instance instance, Throwable reason) {
+        stateManager.failedProcessing(instance, reason);
+        startNewRequest();
     }
 }

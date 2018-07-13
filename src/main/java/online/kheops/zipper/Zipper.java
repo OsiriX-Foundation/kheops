@@ -1,8 +1,7 @@
 package online.kheops.zipper;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -11,8 +10,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @SuppressWarnings("WeakerAccess")
-public final class InstanceZipper {
-    private final InstanceRetriever instanceRetriever;
+public final class Zipper implements StreamingOutput {
+    private final InstanceCompletionService instanceCompletionService;
+    private final int instanceCount;
 
     public static final class Builder {
         private Set<Instance> instances;
@@ -48,35 +48,38 @@ public final class InstanceZipper {
             return this;
         }
 
-        public InstanceZipper build() {
-            return new InstanceZipper(this);
+        public Zipper build() {
+            return new Zipper(this);
         }
     }
 
-    private InstanceZipper(Builder builder) {
-        instanceRetriever = new InstanceRetriever.Builder()
+    private Zipper(Builder builder) {
+        instanceCompletionService = new InstanceCompletionService.Builder()
                 .instances(builder.instances)
                 .accessToken(builder.accessToken)
                 .wadoURI(builder.wadoURI)
                 .authorizationURI(builder.authorizationURI)
                 .client(builder.client)
                 .build();
+        instanceCount = builder.instances.size();
     }
 
-    public void write(OutputStream output) throws IOException, WebApplicationException {
-        instanceRetriever.start();
+    public void write(OutputStream output) throws IOException {
+        instanceCompletionService.start();
 
         ZipOutputStream zipStream = new ZipOutputStream(output);
 
-        InstanceData instanceData;
-        while ((instanceData = instanceRetriever.poll()) != null) {
-            byte[] instanceBytes = instanceData.getBytes();
-
-            if (instanceBytes == null) {
-                throw new WebApplicationException("Missing data to add to the zip stream", Response.Status.SERVICE_UNAVAILABLE);
+        for (int i = 0; i < instanceCount; i++) {
+            final InstanceFuture instanceFuture;
+            final byte[] instanceBytes;
+            try {
+                instanceFuture = instanceCompletionService.take();
+                instanceBytes = instanceFuture.get();
+            } catch (Exception e) {
+                throw new IOException("Missing data to add to the zip stream", e);
             }
 
-            ZipEntry e = new ZipEntry(instanceData.getInstance().getSOPInstanceUID() + ".dcm");
+            ZipEntry e = new ZipEntry(instanceFuture.getInstance().getSOPInstanceUID() + ".dcm");
             zipStream.putNextEntry(e);
             zipStream.write(instanceBytes);
             zipStream.closeEntry();

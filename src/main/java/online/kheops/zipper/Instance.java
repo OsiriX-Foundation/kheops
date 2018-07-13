@@ -30,4 +30,9 @@ public final class Instance {
     public String getSOPInstanceUID() {
         return SOPInstanceUID;
     }
+
+    @Override
+    public String toString() {
+        return "studyInstanceUID:" + studyInstanceUID + " seriesInstanceUID:" + seriesInstanceUID + " SOPInstanceUID:" + SOPInstanceUID;
+    }
 }

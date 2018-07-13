@@ -3,7 +3,7 @@ package online.kheops.zipper.resource;
 import online.kheops.zipper.AccessToken;
 import online.kheops.zipper.AccessTokenType;
 import online.kheops.zipper.Instance;
-import online.kheops.zipper.InstanceZipper;
+import online.kheops.zipper.Zipper;
 import online.kheops.zipper.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -24,13 +24,33 @@ import java.util.List;
 import java.util.Set;
 
 @Path("/studies")
-public class ZipStudyResource {
+public final class ZipStudyResource {
 
-    static class TokenResponse {
+    private static final Client CLIENT = newClient();
+
+    private static class TokenResponse {
         @XmlElement(name = "access_token")
         String accessToken;
         @XmlElement(name = "user")
         String user;
+    }
+
+    private static class Tokens {
+        private final AccessToken accessToken;
+        private final String bearerToken;
+
+        private Tokens(AccessToken accessToken, String bearerToken) {
+            this.accessToken = accessToken;
+            this.bearerToken = bearerToken;
+        }
+
+        AccessToken getAccessToken() {
+            return accessToken;
+        }
+
+        String getBearerToken() {
+            return bearerToken;
+        }
     }
 
     @Context
@@ -40,69 +60,96 @@ public class ZipStudyResource {
     @Path("/{StudyInstanceUID}/stream")
     @Produces("application/zip")
     public Response streamStudy(@PathParam("StudyInstanceUID") String studyInstanceUID, @HeaderParam("authorization") String authorizationHeader) {
+        checkValidUID(studyInstanceUID, "studyInstanceUID");
 
+        final String userToken = getUserTokenFromHeader(authorizationHeader);
+        final Tokens tokens = getTokens(userToken);
+        final Set<Instance> instances = getInstances(tokens, studyInstanceUID);
+
+        Zipper zipper = new Zipper.Builder()
+                .accessToken(tokens.getAccessToken())
+                .authorizationURI(authorizationURI())
+                .wadoURI(dicomWebURI())
+                .client(CLIENT)
+                .instances(instances)
+                .build();
+
+        return Response.ok(zipper).build();
+    }
+
+    private static Client newClient() {
+        final Client client = ClientBuilder.newClient();
+        client.register(AttributesListMarshaller.class);
+        return client;
+    }
+
+    private String getUserTokenFromHeader(String authorizationHeader) {
         if (authorizationHeader == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
 
         if (!authorizationHeader.toUpperCase().startsWith("BEARER ")) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
 
-        checkValidUID(studyInstanceUID, "studyInstanceUID");
+        return authorizationHeader.substring(7);
+    }
 
-        final String userToken = authorizationHeader.substring(7);
+    private Tokens getTokens(String userToken) {
+        Form capabilityForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.CAPABILITY_TOKEN.getUrn()).param("return_user", "true");
+        Form jwtForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.JWT_BEARER_TOKEN.getUrn()).param("return_user", "true");
 
-        Form capabilityForm = new Form().param("assertion", userToken).param("grant_type", "urn:x-kheops:params:oauth:grant-type:capability").param("return_user", "true");
-        Form jwtForm = new Form().param("assertion", userToken).param("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer").param("return_user", "true");
-
-        URI dicomWebURI = dicomWebURI();
-        URI authorizationURI = authorizationURI();
-
-        URI tokenURI = UriBuilder.fromUri(authorizationURI).path("/token").build();
-
-        final Client client = ClientBuilder.newClient();
-        client.register(AttributesListMarshaller.class);
+        URI tokenURI = UriBuilder.fromUri(authorizationURI()).path("/token").build();
 
         TokenResponse tokenResponse = null;
         AccessToken accessToken = null;
 
         try {
-            tokenResponse = client.target(tokenURI).request("application/json").post(Entity.form(capabilityForm), TokenResponse.class);
-            accessToken = AccessToken.getInstance(userToken, AccessTokenType.CAPABILITY_TOKEN);
-        } catch (Exception e) {
-            /* empty */
+            tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(capabilityForm), TokenResponse.class);
+            accessToken = AccessToken.getInstance(userToken, tokenResponse.user, AccessTokenType.CAPABILITY_TOKEN);
+        } catch (Exception ignored) {
+            /* go on and try a different token type */
         }
 
         if (tokenResponse == null) {
             try {
-                tokenResponse = client.target(tokenURI).request("application/json").post(Entity.form(jwtForm), TokenResponse.class);
-                accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
+                tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(jwtForm), TokenResponse.class);
+                accessToken = AccessToken.getInstance(userToken, tokenResponse.user, AccessTokenType.JWT_BEARER_TOKEN);
+            } catch (WebApplicationException webException) {
+                if (webException.getResponse().getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
+                    throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
+                } else {
+                    throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+                }
             } catch (Exception e) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
             }
         }
 
-        URI metadataURI = UriBuilder.fromUri(authorizationURI).path("/users/{user}/studies/{studyInstanceUID}/metadata").build(tokenResponse.user, studyInstanceUID);
+        return new Tokens(accessToken, tokenResponse.accessToken);
+    }
 
-        List<Attributes> attributesList = client.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer "+tokenResponse.accessToken).get(new GenericType<List<Attributes>>() {});
+    private Set<Instance> getInstances(Tokens tokens, String studyInstanceUID) {
+        final URI metadataURI = UriBuilder.fromUri(authorizationURI()).path("/users/{user}/studies/{studyInstanceUID}/metadata").build(tokens.getAccessToken().getUser(), studyInstanceUID);
 
-        Set<Instance> instanceList = new HashSet<>();
-        for (Attributes attr: attributesList) {
-            Instance instance = Instance.newInstance(attr.getString(Tag.StudyInstanceUID), attr.getString(Tag.SeriesInstanceUID), attr.getString(Tag.SOPInstanceUID));
-            instanceList.add(instance);
+        List<Attributes> attributesList;
+        try {
+            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {});
+        } catch (Exception e) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
         }
 
-        InstanceZipper instanceZipper = new InstanceZipper.Builder()
-                .accessToken(accessToken)
-                .authorizationURI(authorizationURI())
-                .wadoURI(dicomWebURI)
-                .client(client)
-                .instances(instanceList)
-                .build();
+        Set<Instance> instances = new HashSet<>();
+        try {
+            for (Attributes attr : attributesList) {
+                Instance instance = Instance.newInstance(attr.getString(Tag.StudyInstanceUID), attr.getString(Tag.SeriesInstanceUID), attr.getString(Tag.SOPInstanceUID));
+                instances.add(instance);
+            }
+        } catch (Exception e) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+        }
 
-        return Response.ok((StreamingOutput)instanceZipper::write).build();
-
+        return instances;
     }
 
     private URI dicomWebURI() {

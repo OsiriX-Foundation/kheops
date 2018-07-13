@@ -4,14 +4,11 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings("WeakerAccess")
 public final class BearerTokenRetriever {
@@ -57,10 +54,10 @@ public final class BearerTokenRetriever {
         tokenURI = UriBuilder.fromUri(authorizationURI).path("/token").build();
     }
 
-    public Future<BearerToken> get(Instance instance, InvocationCallback<BearerToken> callback) {
-        final Form form = getForm().param("scope", "StudyInstanceUID=" + instance.getStudyInstanceUID() + " SeriesInstanceUID=" + instance.getSeriesInstanceUID());
+    public void get(Instance instance, InvocationCallback<BearerToken> callback) {
+        final Form form = getInstanceForm(instance);
 
-        Future<TokenResponse> tokenFuture = client.target(tokenURI).request("application/json").async().post(Entity.form(form), new InvocationCallback<TokenResponse>() {
+        client.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).async().post(Entity.form(form), new InvocationCallback<TokenResponse>() {
 
             @Override
             public void completed(TokenResponse tokenResponse) {
@@ -69,40 +66,16 @@ public final class BearerTokenRetriever {
 
             @Override
             public void failed(Throwable throwable) {
-                callback.failed(throwable);
+                callback.failed(new BearerTokenRetrievalException("Unable to retrieve bearer token", throwable));
             }
         });
-
-        return new Future<BearerToken>() {
-
-            @Override
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return tokenFuture.cancel(mayInterruptIfRunning);
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return tokenFuture.isCancelled();
-            }
-
-            @Override
-            public boolean isDone() {
-                return tokenFuture.isDone();
-            }
-
-            @Override
-            public BearerToken get() throws InterruptedException, ExecutionException {
-                return BearerToken.newInstance(tokenFuture.get().accessToken);
-            }
-
-            @Override
-            public BearerToken get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                return BearerToken.newInstance(tokenFuture.get(timeout, unit).accessToken);
-            }
-        };
     }
 
     private Form getForm() {
         return new Form().param("assertion", accessToken.getToken()).param("grant_type", accessToken.getTypeUrn());
+    }
+
+    private Form getInstanceForm(Instance instance) {
+        return getForm().param("scope", "StudyInstanceUID=" + instance.getStudyInstanceUID() + " SeriesInstanceUID=" + instance.getSeriesInstanceUID());
     }
 }
