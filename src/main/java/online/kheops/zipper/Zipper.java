@@ -79,11 +79,15 @@ public final class Zipper implements StreamingOutput {
                 throw new IOException("Missing data to add to the zip stream", e);
             }
 
-            ZipEntry e = new ZipEntry(instanceFuture.getInstance().getSOPInstanceUID() + ".dcm");
+            ZipEntry e = new ZipEntry(getZipEntryName(instanceFuture.getInstance()));
             zipStream.putNextEntry(e);
             zipStream.write(instanceBytes);
             zipStream.closeEntry();
         }
         zipStream.close();
+    }
+
+    private String getZipEntryName(Instance instance) {
+        return instance.getStudyInstanceUID() + "/" + instance.getSeriesInstanceUID() + "/" + instance.getSOPInstanceUID() + ".dcm";
     }
 }
