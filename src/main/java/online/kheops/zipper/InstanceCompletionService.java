@@ -11,7 +11,6 @@ import java.util.Set;
 public final class InstanceCompletionService {
     private static final int CONCURRENT_REQUESTS = 6;
 
-
     private final URI wadoURI;
     private final Client client;
 

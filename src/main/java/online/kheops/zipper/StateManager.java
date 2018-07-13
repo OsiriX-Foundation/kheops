@@ -67,27 +67,19 @@ public final class StateManager {
     }
 
     public InstanceFuture take() throws InterruptedException {
-        if (countNotTaken() == 0) {
+        if (notTakenSize() == 0) {
             throw new IllegalStateException("There are no more futures to take");
         }
         return retrievedInstances.take();
     }
 
-    public int countNotTaken() {
-        synchronized (lock) {
-            return waitingInstances.size() + processingInstances.size() + retrievedInstances.size();
-        }
-    }
-
     private int addProcessingFailures(Instance instance, Throwable reason) {
-        synchronized (lock) {
-            if (!processingFailureReasons.containsKey(instance)) {
-                processingFailureReasons.put(instance, new ArrayList<>(Collections.singletonList(reason)));
-            } else {
-                processingFailureReasons.get(instance).add(reason);
-            }
-            return processingFailureReasons.get(instance).size();
+        if (!processingFailureReasons.containsKey(instance)) {
+            processingFailureReasons.put(instance, new ArrayList<>(Collections.singletonList(reason)));
+        } else {
+            processingFailureReasons.get(instance).add(reason);
         }
+        return processingFailureReasons.get(instance).size();
     }
 
     private InstanceFuture newFailureInstanceFuture(Instance instance) {
@@ -100,16 +92,18 @@ public final class StateManager {
         return InstanceFuture.newInstance(instance, instanceRetrievalException);
     }
 
+    private int notTakenSize() {
+        return waitingInstances.size() + processingInstances.size() + retrievedInstances.size();
+    }
+
     private InstanceFuture newInstanceFuture(Instance instance, byte[] bytes) {
         return InstanceFuture.newInstance(instance, bytes);
     }
 
     private void failAllWaitingInstances() {
-        synchronized (lock) {
-            Instance instance;
-            while ((instance = waitingInstances.pollFirst()) != null) {
-                retrievedInstances.add(newFailureInstanceFuture(instance));
-            }
+        Instance instance;
+        while ((instance = waitingInstances.pollFirst()) != null) {
+            retrievedInstances.add(newFailureInstanceFuture(instance));
         }
     }
 }
