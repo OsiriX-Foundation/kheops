@@ -48,9 +48,9 @@ public final class BearerTokenRetriever {
     }
 
     private BearerTokenRetriever(Builder builder) {
-        client = Objects.requireNonNull(builder.client, "client must not be null");
-        accessToken = Objects.requireNonNull(builder.accessToken, "client must not be null");
-        URI authorizationURI = Objects.requireNonNull(builder.authorizationURI, "authorizationURI must not be null");
+        client = Objects.requireNonNull(builder.client, "client");
+        accessToken = Objects.requireNonNull(builder.accessToken, "accessToken");
+        URI authorizationURI = Objects.requireNonNull(builder.authorizationURI, "authorizationURI");
         tokenURI = UriBuilder.fromUri(authorizationURI).path("/token").build();
     }
 

@@ -9,9 +9,9 @@ public final class AccessToken {
     private final AccessTokenType type;
 
     private AccessToken(String token, String user, AccessTokenType type) {
-        this.token = Objects.requireNonNull(token, "token must not be null");
-        this.user = Objects.requireNonNull(user, "user must not be null");
-        this.type = Objects.requireNonNull(type, "type must not be null");
+        this.token = Objects.requireNonNull(token, "token");
+        this.user = Objects.requireNonNull(user, "user");
+        this.type = Objects.requireNonNull(type, "type");
     }
 
     public static AccessToken getInstance(String token, String user, AccessTokenType type) {

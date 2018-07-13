@@ -60,8 +60,8 @@ public final class InstanceCompletionService {
     }
 
     private InstanceCompletionService(Builder builder) {
-        wadoURI = Objects.requireNonNull(builder.wadoURI, "wadoURI must not be null");
-        client = Objects.requireNonNull(builder.client, "client must not be null");
+        wadoURI = Objects.requireNonNull(builder.wadoURI, "wadoURI");
+        client = Objects.requireNonNull(builder.client, "client");
 
         stateManager = StateManager.newInstance(builder.instances);
         bearerTokenRetriever = new BearerTokenRetriever.Builder()

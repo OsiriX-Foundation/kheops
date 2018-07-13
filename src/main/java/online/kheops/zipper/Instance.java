@@ -10,9 +10,9 @@ public final class Instance {
     final private String SOPInstanceUID;
 
     private Instance(String studyInstanceUID, String seriesInstanceUID, String SOPInstanceUID) {
-        this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID, "studyInstanceUID must not be null");
-        this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID, "seriesInstanceUID must not be null");
-        this.SOPInstanceUID = Objects.requireNonNull(SOPInstanceUID, "SOPInstanceUID must not be null");
+        this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID, "studyInstanceUID");
+        this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID, "seriesInstanceUID");
+        this.SOPInstanceUID = Objects.requireNonNull(SOPInstanceUID, "SOPInstanceUID");
     }
 
     public static Instance newInstance(String studyInstanceUID, String seriesInstanceUID, String SOPInstanceUID) {

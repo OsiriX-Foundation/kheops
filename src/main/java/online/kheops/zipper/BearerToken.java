@@ -7,7 +7,7 @@ public final class BearerToken  {
     private final String token;
 
     private BearerToken(String token) {
-        this.token = Objects.requireNonNull(token, "token must not be null");
+        this.token = Objects.requireNonNull(token, "token");
     }
 
     public static BearerToken newInstance(String token) {
