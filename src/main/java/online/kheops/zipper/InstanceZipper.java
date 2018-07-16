@@ -54,6 +54,7 @@ public final class InstanceZipper {
     }
 
     private class ZipperStreamingOutput implements StreamingOutput {
+        @Override
         public void write(OutputStream output) throws IOException {
             instanceCompletionService.start();
 
