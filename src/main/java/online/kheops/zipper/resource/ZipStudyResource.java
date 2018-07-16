@@ -74,7 +74,9 @@ public final class ZipStudyResource {
                 .instances(instances)
                 .build();
 
-        return Response.ok(instanceZipper.getStreamingOutput()).build();
+        return Response.ok(instanceZipper.getStreamingOutput())
+                .header("Content-Disposition", "attachment; filename=\"" + studyInstanceUID + ".zip\"")
+                .build();
     }
 
     private static Client newClient() {
