@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
-public final class InstanceCompletionService {
+public final class InstanceRetrievalService {
     private static final int CONCURRENT_REQUESTS = 6;
 
     private final URI wadoURI;
@@ -53,12 +53,12 @@ public final class InstanceCompletionService {
             return this;
         }
 
-        public InstanceCompletionService build() {
-            return new InstanceCompletionService(this);
+        public InstanceRetrievalService build() {
+            return new InstanceRetrievalService(this);
         }
     }
 
-    private InstanceCompletionService(Builder builder) {
+    private InstanceRetrievalService(Builder builder) {
         wadoURI = Objects.requireNonNull(builder.wadoURI, "wadoURI");
         client = Objects.requireNonNull(builder.client, "client");
 

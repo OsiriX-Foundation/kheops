@@ -3,7 +3,7 @@ package online.kheops.zipper.resource;
 import online.kheops.zipper.AccessToken;
 import online.kheops.zipper.AccessTokenType;
 import online.kheops.zipper.Instance;
-import online.kheops.zipper.Zipper;
+import online.kheops.zipper.InstanceZipper;
 import online.kheops.zipper.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -66,7 +66,7 @@ public final class ZipStudyResource {
         final Tokens tokens = getTokens(userToken);
         final Set<Instance> instances = getInstances(tokens, studyInstanceUID);
 
-        Zipper zipper = new Zipper.Builder()
+        InstanceZipper instanceZipper = new InstanceZipper.Builder()
                 .accessToken(tokens.getAccessToken())
                 .authorizationURI(authorizationURI())
                 .wadoURI(dicomWebURI())
@@ -74,7 +74,7 @@ public final class ZipStudyResource {
                 .instances(instances)
                 .build();
 
-        return Response.ok(zipper).build();
+        return Response.ok(instanceZipper.getStreamingOutput()).build();
     }
 
     private static Client newClient() {
