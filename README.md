@@ -14,6 +14,8 @@ Name : [osirixfoundation/kheops-reverse-proxy](https://hub.docker.com/r/osirixfo
 
 `KHEOPS_NGINX_URL_AUTHORIZATION_PROXY`
 
+`KHEOPS_NGINX_URL_ZIPPER`
+
 `KHEOPS_NGINX_URL_VIEWER`
 
 ## Secrets
