@@ -54,10 +54,10 @@ public class Capability {
     }
 
     public Capability() {
-        final String DICT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         StringBuilder secretBuilder = new StringBuilder();
         Random rnd = new SecureRandom();
-        while (secretBuilder.length() < 20) {
+        while (secretBuilder.length() < 22) {
             int index = rnd.nextInt(DICT.length());
             secretBuilder.append(DICT.charAt(index));
         }
