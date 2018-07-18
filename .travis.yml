@@ -10,6 +10,7 @@ notifications:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - chmod +x gradlew
 cache:
   directories:
     - $HOME/.gradle/caches/
@@ -20,7 +21,6 @@ after_success:
   - export BRANCH=$TRAVIS_BRANCH
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
   - git fetch --unshallow
-  - chmod +x gradlew
   - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
   
 deploy:
