@@ -1,9 +1,6 @@
 package online.kheops.zipper.resource;
 
-import online.kheops.zipper.AccessToken;
-import online.kheops.zipper.AccessTokenType;
-import online.kheops.zipper.Instance;
-import online.kheops.zipper.InstanceZipper;
+import online.kheops.zipper.*;
 import online.kheops.zipper.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -65,14 +62,15 @@ public final class ZipStudyResource {
         final String userToken = getUserTokenFromHeader(authorizationHeader);
         final Tokens tokens = getTokens(userToken);
         final Set<Instance> instances = getInstances(tokens, studyInstanceUID);
-
-        InstanceZipper instanceZipper = new InstanceZipper.Builder()
+        final InstanceRetrievalService instanceRetrievalService = new InstanceRetrievalService.Builder()
                 .accessToken(tokens.getAccessToken())
                 .authorizationURI(authorizationURI())
                 .wadoURI(dicomWebURI())
                 .client(CLIENT)
                 .instances(instances)
                 .build();
+
+        InstanceZipper instanceZipper = new InstanceZipper.Builder().instanceRetrievalService(instanceRetrievalService).build();
 
         return Response.ok(instanceZipper.getStreamingOutput())
                 .header("Content-Disposition", "attachment; filename=\"" + studyInstanceUID + ".zip\"")

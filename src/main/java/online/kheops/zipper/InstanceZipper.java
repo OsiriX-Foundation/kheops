@@ -1,48 +1,22 @@
 package online.kheops.zipper;
 
-import javax.ws.rs.client.Client;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.util.Set;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public final class InstanceZipper {
-    private final InstanceRetrievalService instanceCompletionService;
+    private final InstanceRetrievalService instanceRetrievalService;
     private final int instanceCount;
     private final StreamingOutput streamingOutput = new ZipperStreamingOutput();
 
     public static final class Builder {
-        private Set<Instance> instances;
-        private AccessToken accessToken;
-        private URI wadoURI;
-        private URI authorizationURI;
-        private Client client;
+        private  InstanceRetrievalService instanceRetrievalService;
 
-        public Builder instances(Set<Instance> instances) {
-            this.instances = instances;
-            return this;
-        }
-
-        public Builder accessToken(AccessToken accessToken) {
-            this.accessToken = accessToken;
-            return this;
-        }
-
-        public Builder wadoURI(URI wadoURI) {
-            this.wadoURI = wadoURI;
-            return this;
-        }
-
-        public Builder authorizationURI(URI authorizationURI) {
-            this.authorizationURI = authorizationURI;
-            return this;
-        }
-
-        public Builder client(Client client) {
-            this.client = client;
+        public Builder instanceRetrievalService(InstanceRetrievalService instanceRetrievalService) {
+            this.instanceRetrievalService = instanceRetrievalService;
             return this;
         }
 
@@ -54,7 +28,7 @@ public final class InstanceZipper {
     private class ZipperStreamingOutput implements StreamingOutput {
         @Override
         public void write(OutputStream output) throws IOException {
-            instanceCompletionService.start();
+            instanceRetrievalService.start();
 
             ZipOutputStream zipStream = new ZipOutputStream(output);
 
@@ -62,7 +36,7 @@ public final class InstanceZipper {
                 final InstanceFuture instanceFuture;
                 final byte[] instanceBytes;
                 try {
-                    instanceFuture = instanceCompletionService.take();
+                    instanceFuture = instanceRetrievalService.take();
                     instanceBytes = instanceFuture.get();
                 } catch (Exception e) {
                     throw new IOException("Missing data to add to the zip stream", e);
@@ -82,14 +56,8 @@ public final class InstanceZipper {
     }
 
     private InstanceZipper(Builder builder) {
-        instanceCompletionService = new InstanceRetrievalService.Builder()
-                .instances(builder.instances)
-                .accessToken(builder.accessToken)
-                .wadoURI(builder.wadoURI)
-                .authorizationURI(builder.authorizationURI)
-                .client(builder.client)
-                .build();
-        instanceCount = builder.instances.size();
+        instanceRetrievalService = Objects.requireNonNull(builder.instanceRetrievalService, "instanceRetrievalService");
+        instanceCount = instanceRetrievalService.getInstanceCount();
     }
 
     public StreamingOutput getStreamingOutput() {

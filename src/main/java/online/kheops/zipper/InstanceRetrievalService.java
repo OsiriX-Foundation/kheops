@@ -13,6 +13,7 @@ public final class InstanceRetrievalService {
 
     private final URI wadoURI;
     private final Client client;
+    private final int instanceCount;
 
     private boolean started = false;
 
@@ -66,6 +67,7 @@ public final class InstanceRetrievalService {
                 .authorizationURI(builder.authorizationURI)
                 .client(client)
                 .build();
+        instanceCount = builder.instances.size();
     }
 
     public void start() {
@@ -91,6 +93,11 @@ public final class InstanceRetrievalService {
 
         return instanceFuture;
     }
+
+    public int getInstanceCount() {
+        return instanceCount;
+    }
+
 
     private void startNewRequest() {
         final Instance instance = stateManager.getForProcessing();
