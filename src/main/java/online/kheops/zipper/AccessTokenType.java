@@ -4,7 +4,7 @@ public enum AccessTokenType {
     JWT_BEARER_TOKEN("urn:ietf:params:oauth:grant-type:jwt-bearer"),
     CAPABILITY_TOKEN("urn:x-kheops:params:oauth:grant-type:capability");
 
-    final private String urn;
+    private final String urn;
 
     AccessTokenType(String urn) {
         this.urn = urn;

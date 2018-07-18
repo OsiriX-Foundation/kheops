@@ -26,8 +26,6 @@ public final class InstanceRetrievalService {
         private URI authorizationURI;
         private Client client;
 
-        public Builder(){}
-
         public Builder instances(Set<Instance> instances) {
             this.instances = instances;
             return this;
@@ -137,7 +135,7 @@ public final class InstanceRetrievalService {
     private URI getInstanceURI(Instance instance) {
         return getWadoUriBuilder().queryParam("studyUID", instance.getStudyInstanceUID())
                 .queryParam("seriesUID", instance.getSeriesInstanceUID())
-                .queryParam("objectUID", instance.getSOPInstanceUID())
+                .queryParam("objectUID", instance.getSopInstanceUID())
                 .build();
     }
 

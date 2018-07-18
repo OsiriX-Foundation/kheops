@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @SuppressWarnings("WeakerAccess")
 public final class StateManager {
 
-    private final static int RETRY_COUNT = 6;
+    private static final int RETRY_COUNT = 6;
 
     private final Object lock = new Object();
 
@@ -22,7 +22,7 @@ public final class StateManager {
         waitingInstances.addAll(instances);
     }
 
-    static public StateManager newInstance(Set<Instance> instances) {
+    public static StateManager newInstance(Set<Instance> instances) {
         return new StateManager(instances);
     }
 
@@ -74,11 +74,7 @@ public final class StateManager {
     }
 
     private int addProcessingFailures(Instance instance, Throwable reason) {
-        if (!processingFailureReasons.containsKey(instance)) {
-            processingFailureReasons.put(instance, new ArrayList<>(Collections.singletonList(reason)));
-        } else {
-            processingFailureReasons.get(instance).add(reason);
-        }
+        processingFailureReasons.computeIfAbsent(instance, (unused) -> new ArrayList<>()).add(reason);
         return processingFailureReasons.get(instance).size();
     }
 

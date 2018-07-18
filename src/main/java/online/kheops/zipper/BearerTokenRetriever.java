@@ -26,23 +26,21 @@ public final class BearerTokenRetriever {
         private URI authorizationURI;
         private AccessToken accessToken;
 
-        public Builder(){}
-
-        Builder client(Client client) {
+        public Builder client(Client client) {
             this.client = client;
             return this;
         }
-        Builder authorizationURI(URI authorizationURI) {
+        public Builder authorizationURI(URI authorizationURI) {
             this.authorizationURI = authorizationURI;
             return this;
         }
 
-        Builder accessToken(AccessToken accessToken) {
+        public Builder accessToken(AccessToken accessToken) {
             this.accessToken = accessToken;
             return this;
         }
 
-        BearerTokenRetriever build() {
+        public BearerTokenRetriever build() {
             return new BearerTokenRetriever(this);
         }
     }

@@ -5,14 +5,14 @@ import java.util.Objects;
 
 @SuppressWarnings("WeakerAccess")
 public final class Instance {
-    final private String studyInstanceUID;
-    final private String seriesInstanceUID;
-    final private String SOPInstanceUID;
+    private final String studyInstanceUID;
+    private final String seriesInstanceUID;
+    private final String sopInstanceUID;
 
-    private Instance(String studyInstanceUID, String seriesInstanceUID, String SOPInstanceUID) {
+    private Instance(String studyInstanceUID, String seriesInstanceUID, String sopInstanceUID) {
         this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID, "studyInstanceUID");
         this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID, "seriesInstanceUID");
-        this.SOPInstanceUID = Objects.requireNonNull(SOPInstanceUID, "SOPInstanceUID");
+        this.sopInstanceUID = Objects.requireNonNull(sopInstanceUID, "sopInstanceUID");
     }
 
     public static Instance newInstance(String studyInstanceUID, String seriesInstanceUID, String SOPInstanceUID) {
@@ -27,12 +27,12 @@ public final class Instance {
         return seriesInstanceUID;
     }
 
-    public String getSOPInstanceUID() {
-        return SOPInstanceUID;
+    public String getSopInstanceUID() {
+        return sopInstanceUID;
     }
 
     @Override
     public String toString() {
-        return "studyInstanceUID:" + studyInstanceUID + " seriesInstanceUID:" + seriesInstanceUID + " SOPInstanceUID:" + SOPInstanceUID;
+        return "studyInstanceUID:" + studyInstanceUID + " seriesInstanceUID:" + seriesInstanceUID + " sopInstanceUID:" + sopInstanceUID;
     }
 }

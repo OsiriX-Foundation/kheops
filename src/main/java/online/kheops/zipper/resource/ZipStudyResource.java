@@ -136,8 +136,7 @@ public final class ZipStudyResource {
 
         List<Attributes> attributesList;
         try {
-            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {
-            });
+            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {});
         } catch (WebApplicationException e) {
             if (e.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());

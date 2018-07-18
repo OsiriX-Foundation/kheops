@@ -21,8 +21,6 @@ public final class InstanceZipper {
         private URI authorizationURI;
         private Client client;
 
-        public Builder(){}
-
         public Builder instances(Set<Instance> instances) {
             this.instances = instances;
             return this;
@@ -77,6 +75,10 @@ public final class InstanceZipper {
             }
             zipStream.close();
         }
+
+        private String getZipEntryName(Instance instance) {
+            return instance.getStudyInstanceUID() + "/" + instance.getSeriesInstanceUID() + "/" + instance.getSopInstanceUID() + ".dcm";
+        }
     }
 
     private InstanceZipper(Builder builder) {
@@ -88,10 +90,6 @@ public final class InstanceZipper {
                 .client(builder.client)
                 .build();
         instanceCount = builder.instances.size();
-    }
-
-    private static String getZipEntryName(Instance instance) {
-        return instance.getStudyInstanceUID() + "/" + instance.getSeriesInstanceUID() + "/" + instance.getSOPInstanceUID() + ".dcm";
     }
 
     public StreamingOutput getStreamingOutput() {
