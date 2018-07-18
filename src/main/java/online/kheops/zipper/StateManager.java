@@ -28,7 +28,7 @@ public final class StateManager {
 
     public Instance getForProcessing() {
         synchronized (lock) {
-            if (waitingInstances.size() == 0) {
+            if (waitingInstances.isEmpty()) {
                 return null;
             }
 
@@ -74,7 +74,7 @@ public final class StateManager {
     }
 
     private int addProcessingFailures(Instance instance, Throwable reason) {
-        processingFailureReasons.computeIfAbsent(instance, (unused) -> new ArrayList<>()).add(reason);
+        processingFailureReasons.computeIfAbsent(instance, unused -> new ArrayList<>()).add(reason);
         return processingFailureReasons.get(instance).size();
     }
 

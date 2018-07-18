@@ -15,8 +15,8 @@ public final class Instance {
         this.sopInstanceUID = Objects.requireNonNull(sopInstanceUID, "sopInstanceUID");
     }
 
-    public static Instance newInstance(String studyInstanceUID, String seriesInstanceUID, String SOPInstanceUID) {
-        return new Instance(studyInstanceUID, seriesInstanceUID, SOPInstanceUID);
+    public static Instance newInstance(String studyInstanceUID, String seriesInstanceUID, String sopInstanceUID) {
+        return new Instance(studyInstanceUID, seriesInstanceUID, sopInstanceUID);
     }
 
     public String getStudyInstanceUID() {
