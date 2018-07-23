@@ -2,6 +2,7 @@ package online.kheops.zipper;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 // states: waiting, processing, retrieved, and removed
@@ -85,7 +86,7 @@ public final class StateManager {
                 instanceRetrievalException.addSuppressed(throwable);
             }
         }
-        return InstanceFuture.newInstance(instance, instanceRetrievalException);
+        return InstanceFuture.newInstance(instance, new ExecutionException(instanceRetrievalException));
     }
 
     private int notTakenSize() {
