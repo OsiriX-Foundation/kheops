@@ -12,24 +12,21 @@ import javax.persistence.*;
 import javax.persistence.Table;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import static java.util.Calendar.*;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.UserSeries.USER_SERIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
-import static org.dcm4che3.data.Tag.DateTime;
 import static org.jooq.impl.DSL.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -249,7 +246,7 @@ public class Study {
             safeAttributeSetString(attributes, Tag.PatientSex, VR.CS, r.getValue(STUDIES.PATIENT_SEX.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer)r.getValue("count:"+SERIES.PK.getName())));
-            attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, (((BigDecimal)r.getValue("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()))).intValue());
+            attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal)r.getValue("sum:"+SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
@@ -258,7 +255,7 @@ public class Study {
         return new Pair(studiesTotalCount, attributesList);
     }
 
-    private static MultivaluedMap<String, String> ConvertDICOMKeyWordToDICOMTag(MultivaluedMap<String, String> queryParameters) {
+    private static MultivaluedMap<String, String> convertDICOMKeyWordToDICOMTag(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyDate))) {
             queryParameters.add(String.format("%08X",Tag.StudyDate),queryParameters.get(Keyword.valueOf(Tag.StudyDate)).get(0));
         }
@@ -293,9 +290,9 @@ public class Study {
     private static SortField orderBy(MultivaluedMap<String, String> queryParameters) {
 
         if (queryParameters.containsKey("sort")) {
-            TableField ord = STUDIES.STUDY_DATE;
+            TableField ord;
 
-            Boolean asc_desc = queryParameters.get("sort").get(0).startsWith("-");
+            Boolean ascDesc = queryParameters.get("sort").get(0).startsWith("-");
             String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
 
             if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyDate)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyDate)) == 0) ord = STUDIES.STUDY_DATE;
@@ -309,7 +306,7 @@ public class Study {
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyID)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyID)) == 0) ord = STUDIES.STUDY_ID;
             else throw new BadRequestException("sort: " + queryParameters.get("sort").get(0));
 
-            return asc_desc ? ord.desc() : ord.asc();
+            return ascDesc ? ord.desc() : ord.asc();
         }
         //Default sort
         return STUDIES.STUDY_DATE.desc();
@@ -335,18 +332,14 @@ public class Study {
     }
 
     private static Boolean isFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey("fuzzymatching") && queryParameters.get("fuzzymatching").get(0).compareTo("true") == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return queryParameters.containsKey("fuzzymatching") && queryParameters.get("fuzzymatching").get(0).compareTo("true") == 0;
     }
 
     private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyDate")) {
-            return createIntervalConditon(queryParameters.get("StudyDate").get(0), STUDIES.STUDY_DATE, new checkDate());
+            return createIntervalConditon(queryParameters.get("StudyDate").get(0), STUDIES.STUDY_DATE, new CheckDate());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), STUDIES.STUDY_DATE, new checkDate());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), STUDIES.STUDY_DATE, new CheckDate());
         } else {
             return null;
         }
@@ -354,9 +347,9 @@ public class Study {
 
     private static Condition createConditonStudyTime(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyTime")) {
-            return createIntervalConditon(queryParameters.get("StudyTime").get(0), STUDIES.STUDY_TIME, new checkTime());
+            return createIntervalConditon(queryParameters.get("StudyTime").get(0), STUDIES.STUDY_TIME, new CheckTime());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0),STUDIES.STUDY_TIME, new checkTime());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0),STUDIES.STUDY_TIME, new CheckTime());
         } else {
             return null;
         }
@@ -404,7 +397,7 @@ public class Study {
         public Boolean check(String s);
     }
 
-    private static class checkTime implements CheckMethode {
+    private static class CheckTime implements CheckMethode {
         public String intervalBegin() {return "000000.000000";}
         public String intervalEnd() {return "235959.999999";};
 
@@ -413,7 +406,7 @@ public class Study {
         }
     }
 
-    private static class checkDate implements CheckMethode {
+    private static class CheckDate implements CheckMethode {
         public String intervalBegin() {return "00010101";}
         public String intervalEnd() {return "99991231";}
 
