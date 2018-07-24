@@ -235,6 +235,8 @@ public class Study {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
             }
 
+
+            LOG.info(r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
@@ -330,6 +332,14 @@ public class Study {
             }
         }
         return null;
+    }
+
+    private static Boolean isFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("fuzzymatching") && queryParameters.get("fuzzymatching").get(0).compareTo("true") == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
@@ -433,24 +443,34 @@ public class Study {
     }
 
     private static Condition createConditon(MultivaluedMap<String, String> queryParameters, String key, TableField column) {
-        String parameterNoStar = queryParameters.get(key).get(0).replace("*", "");
+        String parameterNoStar = queryParameters.get(key).get(0).replace("*", "")
+                                                                .replace(", ", "^")
+                                                                .replace(" ","^")
+                                                                .replace(",", "^");
+
         String parameter = queryParameters.get(key).get(0);
         if (parameterNoStar.length() == 0) {
             return null;
         }
-
         if ("null".equalsIgnoreCase(parameterNoStar)) {
             return column.isNull();
         } else {
+            Condition condition;
             if (parameter.startsWith("*") && parameter.endsWith("*")) {
-                return column.lower().contains(parameterNoStar.toLowerCase());
+                condition = column.lower().contains(parameterNoStar.toLowerCase());
             } else if (parameter.startsWith("*")) {
-                return column.lower().endsWith(parameterNoStar.toLowerCase());
+                condition = column.lower().endsWith(parameterNoStar.toLowerCase());
             } else if (parameter.endsWith("*")) {
-                return column.lower().startsWith(parameterNoStar.toLowerCase());
+                condition = column.lower().startsWith(parameterNoStar.toLowerCase());
             } else {
-                return column.lower().equal(parameterNoStar.toLowerCase());
+                condition = column.lower().equal(parameterNoStar.toLowerCase());
             }
+
+            if (isFuzzyMatching(queryParameters)) {
+                Condition fuzzyCondition = condition("SOUNDEX(\""+parameterNoStar+"\") = SOUNDEX("+column.getName()+")");
+                return condition.or(fuzzyCondition);
+            }
+            return condition;
         }
     }
 
