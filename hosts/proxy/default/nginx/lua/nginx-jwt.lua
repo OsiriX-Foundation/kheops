@@ -2,31 +2,18 @@ local jwt = require "resty.jwt"
 local cjson = require "cjson"
 local basexx = require "basexx"
 local secret = os.getenv("JWT_SECRET")
+local secret_post = os.getenv("JWT_POST_SECRET")
 
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
 
 assert(secret ~= nil, "Environment variable JWT_SECRET not set")
-
-if os.getenv("JWT_SECRET_IS_BASE64_ENCODED") == 'true' then
-    -- convert from URL-safe Base64 to Base64
-    local r = #secret % 4
-    if r == 2 then
-        secret = secret .. "=="
-    elseif r == 3 then
-        secret = secret .. "="
-    end
-    secret = string.gsub(secret, "-", "+")
-    secret = string.gsub(secret, "_", "/")
-
-    -- convert from Base64 to UTF-8 string
-    secret = basexx.from_base64(secret)
-end
+assert(secret_post ~= nil, "Environment variable JWT_POST_SECRET not set")
 
 local M = {}
 
-function M.auth(claim_specs)
+function M.auth(claim_specs, post_secret)
     -- require Authorization request header
     local auth_header = ngx.var.http_Authorization
     local token = nil
@@ -43,6 +30,10 @@ function M.auth(claim_specs)
         end 
     end
 
+   if post_secret == true
+	secret = secret_post
+   end
+	
     -- require valid JWT
     local jwt_obj = jwt:verify(secret, token, 0)
     if jwt_obj.verified == false then
