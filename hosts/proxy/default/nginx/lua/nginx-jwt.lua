@@ -2,7 +2,7 @@ local jwt = require "resty.jwt"
 local cjson = require "cjson"
 local basexx = require "basexx"
 local secret = os.getenv("JWT_SECRET")
-local secret_post = os.getenv("JWT_POST_SECRET")
+local post_secret = os.getenv("JWT_POST_SECRET")
 
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
@@ -13,7 +13,7 @@ assert(secret_post ~= nil, "Environment variable JWT_POST_SECRET not set")
 
 local M = {}
 
-function M.auth(claim_specs, post_secret)
+function M.auth(claim_specs, use_post_secret)
     -- require Authorization request header
     local auth_header = ngx.var.http_Authorization
     local token = nil
@@ -30,8 +30,8 @@ function M.auth(claim_specs, post_secret)
         end 
     end
 
-   if post_secret == true then
-	secret = secret_post
+   if use_post_secret == true then
+	secret = post_secret
    end
 	
     -- require valid JWT
