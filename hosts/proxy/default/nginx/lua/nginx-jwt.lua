@@ -30,7 +30,7 @@ function M.auth(claim_specs, post_secret)
         end 
     end
 
-   if post_secret == true
+   if post_secret == true then
 	secret = secret_post
    end
 	
