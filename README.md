@@ -17,3 +17,5 @@ Name : [osirixfoundation/pacs-authorization-proxy](https://hub.docker.com/r/osir
 ## Secrets
 
 `kheops_superuser_hmasecret`
+
+`kheops_superuser_hmasecret_post`
