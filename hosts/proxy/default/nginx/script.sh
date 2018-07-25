@@ -12,7 +12,16 @@ else
     echo "Missing kheops auth_hmasecret secret"
     kheops_auth_hmasecret=XXX
 fi
-
 export JWT_SECRET=$kheops_auth_hmasecret
+
+if [ -f /run/secrets/kheops_auth_hmasecret_post ]; then
+    filename="/run/secrets/kheops_auth_hmasecret_post"
+    kheops_auth_hmasecret_post=$(head -n 1 $filename)
+else
+    echo "Missing kheops auth_hmasecret_post secret"
+    kheops_auth_hmasecret_post=XXX
+fi
+export JWT_POST_SECRET=$kheops_auth_hmasecret_post
+
 
 nginx -g 'daemon off; error_log /dev/stderr info;'
