@@ -2,7 +2,7 @@ local jwt = require "resty.jwt"
 local cjson = require "cjson"
 local basexx = require "basexx"
 local secret = os.getenv("JWT_SECRET")
-local post_secret = os.getenv("JWT_POST_SECRET")
+local secret_post = os.getenv("JWT_POST_SECRET")
 
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
