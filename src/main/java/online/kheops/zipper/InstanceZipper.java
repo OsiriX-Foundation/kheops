@@ -38,6 +38,9 @@ public final class InstanceZipper {
                 try {
                     instanceFuture = instanceRetrievalService.take();
                     instanceBytes = instanceFuture.get();
+                }catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Current thread was interrupted", e);
                 } catch (Exception e) {
                     throw new IOException("Missing data to add to the zip stream", e);
                 }
