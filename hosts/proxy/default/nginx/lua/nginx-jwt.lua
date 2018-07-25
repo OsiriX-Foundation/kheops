@@ -2,14 +2,14 @@ local jwt = require "resty.jwt"
 local cjson = require "cjson"
 local basexx = require "basexx"
 local secret = os.getenv("JWT_SECRET")
-local secret_post = os.getenv("JWT_POST_SECRET")
+local post_secret = os.getenv("JWT_POST_SECRET")
 
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
 
 assert(secret ~= nil, "Environment variable JWT_SECRET not set")
-assert(secret_post ~= nil, "Environment variable JWT_POST_SECRET not set")
+assert(post_secret ~= nil, "Environment variable JWT_POST_SECRET not set")
 
 local M = {}
 
