@@ -100,7 +100,7 @@ public final class DicomDirGenerator implements Closeable {
                     dicomDirWriter.addLowerDirectoryRecord(studyRecord, seriesRecord);
                 }
 
-                Attributes instanceRecord = recordFactory.createRecord(dataset, fmi, fileIDs);
+                final Attributes instanceRecord = recordFactory.createRecord(dataset, fmi, fileIDs);
                 dicomDirWriter.addLowerDirectoryRecord(seriesRecord, instanceRecord);
             }
         }
@@ -114,10 +114,9 @@ public final class DicomDirGenerator implements Closeable {
                 null,
                 null);
         dicomDirWriter = DicomDirWriter.open(file);
-        dicomDirWriter.setEncodingOptions(DicomEncodingOptions.DEFAULT);
     }
 
-    public static DicomDirGenerator getInstance() throws IOException {
+    public static DicomDirGenerator newInstance() throws IOException {
         return new DicomDirGenerator(DEFAULT_FILESET_ID);
     }
 

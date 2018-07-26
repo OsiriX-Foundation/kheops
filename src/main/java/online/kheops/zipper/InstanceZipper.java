@@ -29,7 +29,7 @@ public final class InstanceZipper {
 
         @Override
         public void write(OutputStream outputStream) throws IOException {
-            try (final DicomDirGenerator dicomDirGenerator = DicomDirGenerator.getInstance()){
+            try (final DicomDirGenerator dicomDirGenerator = DicomDirGenerator.newInstance()){
                 privateWrite(outputStream, dicomDirGenerator);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
