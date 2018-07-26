@@ -3,14 +3,16 @@ package online.kheops.zipper;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.concurrent.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public final class InstanceZipper {
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     private final InstanceRetrievalService instanceRetrievalService;
     private final int instanceCount;
-    private final StreamingOutput streamingOutput = new ZipperStreamingOutput();
 
     public static final class Builder {
         private  InstanceRetrievalService instanceRetrievalService;
@@ -26,6 +28,8 @@ public final class InstanceZipper {
     }
 
     private class ZipperStreamingOutput implements StreamingOutput {
+        final DicomDir dicomDir = DicomDir.getInstance();
+
         @Override
         public void write(OutputStream output) throws IOException {
             instanceRetrievalService.start();
@@ -45,11 +49,24 @@ public final class InstanceZipper {
                     throw new IOException("Missing data to add to the zip stream", e);
                 }
 
-                ZipEntry e = new ZipEntry(getZipEntryName(instanceFuture.getInstance()));
-                zipStream.putNextEntry(e);
+                final Future dicomFuture = EXECUTOR_SERVICE.submit(dicomDir.getAddInstanceRunnable(instanceFuture.getInstance(), instanceBytes, Paths.get("DICOM", String.valueOf(i))));
+
+                final ZipEntry entry = new ZipEntry("DICOM/" + String.format("%08d", i));
+                zipStream.putNextEntry(entry);
                 zipStream.write(instanceBytes);
                 zipStream.closeEntry();
+                try {
+                    dicomFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new IOException("get interupted", e);
+                }
             }
+
+            ZipEntry dicomDirEntry = new ZipEntry("DICOMDIR");
+            zipStream.putNextEntry(dicomDirEntry);
+            zipStream.write(dicomDir.getBytes());
+            zipStream.closeEntry();
+
             zipStream.close();
         }
 
@@ -64,6 +81,6 @@ public final class InstanceZipper {
     }
 
     public StreamingOutput getStreamingOutput() {
-        return streamingOutput;
+        return new ZipperStreamingOutput();
     }
 }
