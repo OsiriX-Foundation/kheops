@@ -33,37 +33,37 @@ public final class InstanceZipper {
                 throw new IOException("Unable to get ZIP data", e.getCause());
             }
         }
-    }
 
-    private void privateWrite(OutputStream output, DicomDirGenerator dicomDirGenerator) throws IOException, InterruptedException, ExecutionException {
-        if (finishedWriting) {
-            throw new IllegalStateException("Already written out");
-        }
-        finishedWriting = true;
+        private void privateWrite(OutputStream output, DicomDirGenerator dicomDirGenerator) throws IOException, InterruptedException, ExecutionException {
+            if (finishedWriting) {
+                throw new IllegalStateException("Already written out");
+            }
+            finishedWriting = true;
 
-        instanceRetrievalService.start();
+            instanceRetrievalService.start();
 
-        ZipOutputStream zipStream = new ZipOutputStream(output);
+            ZipOutputStream zipStream = new ZipOutputStream(output);
 
-        for (int i = 0; i < instanceCount; i++) {
-            final InstanceFuture instanceFuture = instanceRetrievalService.take();
-            final byte[] instanceBytes = instanceFuture.get();
+            for (int i = 0; i < instanceCount; i++) {
+                final InstanceFuture instanceFuture = instanceRetrievalService.take();
+                final byte[] instanceBytes = instanceFuture.get();
 
-            final String instanceFileName = String.format("%08d", i+1);
-            final Future dicomFuture = EXECUTOR_SERVICE.submit(dicomDirGenerator.getAddInstanceCallable(instanceBytes, Paths.get("DICOM", instanceFileName)));
+                final String instanceFileName = String.format("%08d", i+1);
+                final Future dicomFuture = EXECUTOR_SERVICE.submit(dicomDirGenerator.getAddInstanceCallable(instanceBytes, Paths.get("DICOM", instanceFileName)));
 
-            zipStream.putNextEntry(new ZipEntry("DICOM/" + instanceFileName));
-            zipStream.write(instanceBytes);
+                zipStream.putNextEntry(new ZipEntry("DICOM/" + instanceFileName));
+                zipStream.write(instanceBytes);
+                zipStream.closeEntry();
+
+                dicomFuture.get();
+            }
+
+            zipStream.putNextEntry(new ZipEntry("DICOMDIR"));
+            zipStream.write(dicomDirGenerator.getBytes());
             zipStream.closeEntry();
 
-            dicomFuture.get();
+            zipStream.close();
         }
-
-        zipStream.putNextEntry(new ZipEntry("DICOMDIR"));
-        zipStream.write(dicomDirGenerator.getBytes());
-        zipStream.closeEntry();
-
-        zipStream.close();
     }
 
     public StreamingOutput getStreamingOutput() {

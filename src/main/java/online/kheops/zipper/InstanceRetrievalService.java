@@ -22,18 +22,12 @@ public final class InstanceRetrievalService {
 
     public static final class Builder {
         private Set<Instance> instances;
-        private AccessToken accessToken;
         private URI wadoURI;
-        private URI authorizationURI;
         private Client client;
+        private BearerTokenRetriever bearerTokenRetriever;
 
         public Builder instances(Set<Instance> instances) {
             this.instances = instances;
-            return this;
-        }
-
-        public Builder accessToken(AccessToken accessToken) {
-            this.accessToken = accessToken;
             return this;
         }
 
@@ -42,13 +36,13 @@ public final class InstanceRetrievalService {
             return this;
         }
 
-        public Builder authorizationURI(URI authorizationURI) {
-            this.authorizationURI = authorizationURI;
+        public Builder client(Client client) {
+            this.client = client;
             return this;
         }
 
-        public Builder client(Client client) {
-            this.client = client;
+        public Builder bearerTokenRetriever(BearerTokenRetriever bearerTokenRetriever) {
+            this.bearerTokenRetriever = bearerTokenRetriever;
             return this;
         }
 
@@ -60,13 +54,9 @@ public final class InstanceRetrievalService {
     private InstanceRetrievalService(Builder builder) {
         wadoURI = Objects.requireNonNull(builder.wadoURI, "wadoURI");
         client = Objects.requireNonNull(builder.client, "client");
+        bearerTokenRetriever = Objects.requireNonNull(builder.bearerTokenRetriever, "bearerTokenRetriever");
 
         stateManager = StateManager.newInstance(builder.instances);
-        bearerTokenRetriever = new BearerTokenRetriever.Builder()
-                .accessToken(builder.accessToken)
-                .authorizationURI(builder.authorizationURI)
-                .client(client)
-                .build();
         instanceCount = builder.instances.size();
     }
 

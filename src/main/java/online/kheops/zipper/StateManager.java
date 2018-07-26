@@ -13,7 +13,7 @@ public final class StateManager {
 
     private final Object lock = new Object();
 
-    private final Deque<Instance> waitingInstances = new LinkedList<>();
+    private final Queue<Instance> waitingInstances = new LinkedList<>();
     private final Set<Instance> processingInstances = new HashSet<>();
     private final BlockingQueue<InstanceFuture> retrievedInstances = new LinkedBlockingQueue<>();
 
@@ -29,12 +29,10 @@ public final class StateManager {
 
     public Instance getForProcessing() {
         synchronized (lock) {
-            if (waitingInstances.isEmpty()) {
-                return null;
+            final Instance next = waitingInstances.poll();
+            if (next != null) {
+                processingInstances.add(next);
             }
-
-            final Instance next = waitingInstances.pollFirst();
-            processingInstances.add(next);
             return next;
         }
     }
@@ -58,7 +56,7 @@ public final class StateManager {
 
             int failureCount = addProcessingFailures(instance, reason);
             if (failureCount < RETRY_COUNT) {
-                waitingInstances.addLast(instance);
+                waitingInstances.add(instance);
             } else {
                 retrievedInstances.add(newFailureInstanceFuture(instance));
 
@@ -99,7 +97,7 @@ public final class StateManager {
 
     private void failAllWaitingInstances() {
         Instance instance;
-        while ((instance = waitingInstances.pollFirst()) != null) {
+        while ((instance = waitingInstances.poll()) != null) {
             retrievedInstances.add(newFailureInstanceFuture(instance));
         }
     }

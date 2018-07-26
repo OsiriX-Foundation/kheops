@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings("WeakerAccess")
@@ -31,7 +30,6 @@ public class DicomDirGenerator implements Closeable {
     private final RecordFactory recordFactory = new RecordFactory();
 
     private final Object lock = new Object();
-    private static final Logger LOG = Logger.getLogger(DicomDirGenerator.class.getName());
 
     private class AddInstanceCallable implements Callable<Void> {
         private final byte[] instanceBytes;
@@ -46,6 +44,66 @@ public class DicomDirGenerator implements Closeable {
         public Void call() throws Exception {
             addInstance(instanceBytes, path);
             return null;
+        }
+
+        private void addInstance(byte[] instanceBytes, Path path) throws IOException {
+            synchronized (lock) {
+                Attributes fmi;
+                Attributes dataset;
+                try (DicomInputStream din = new DicomInputStream(new ByteArrayInputStream(instanceBytes))) {
+                    din.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
+                    fmi = din.readFileMetaInformation();
+                    dataset = din.readDataset(-1, Tag.PixelData);
+                }
+                if (fmi == null) {
+                    fmi = dataset.createFileMetaInformation(UID.ImplicitVRLittleEndian);
+                }
+                final String iuid = fmi.getString(Tag.MediaStorageSOPInstanceUID, null);
+                if (iuid == null) {
+                    throw new IllegalArgumentException("No MediaStorageSOPInstanceUID in the instance");
+                }
+
+                String patientID = dataset.getString(Tag.PatientID, null);
+                final String studyUID = dataset.getString(Tag.StudyInstanceUID, null);
+                final String seriesUID = dataset.getString(Tag.SeriesInstanceUID, null);
+                final String[] fileIDs = StreamSupport.stream(path.spliterator(), false)
+                        .map(Path::toString)
+                        .toArray(String[]::new);
+
+                if (studyUID == null) {
+                    throw new IllegalArgumentException("No StudyInstanceUID in the instance");
+                }
+                if (seriesUID == null) {
+                    throw new IllegalArgumentException("No SeriesInstanceUID in the instance");
+                }
+
+                if (patientID == null) {
+                    patientID = studyUID;
+                    dataset.setString(Tag.PatientID, VR.LO, patientID);
+                }
+                Attributes patientRecord = dicomDirWriter.findPatientRecord(patientID);
+                if (patientRecord == null) {
+                    patientRecord = recordFactory.createRecord(RecordType.PATIENT, null,
+                            dataset, null, null);
+                    dicomDirWriter.addRootDirectoryRecord(patientRecord);
+                }
+                Attributes studyRecord = dicomDirWriter.findStudyRecord(patientRecord, studyUID);
+                if (studyRecord == null) {
+                    studyRecord = recordFactory.createRecord(RecordType.STUDY, null,
+                            dataset, null, null);
+                    dicomDirWriter.addLowerDirectoryRecord(patientRecord, studyRecord);
+                }
+
+                Attributes seriesRecord = dicomDirWriter.findSeriesRecord(studyRecord, seriesUID);
+                if (seriesRecord == null) {
+                    seriesRecord = recordFactory.createRecord(RecordType.SERIES, null,
+                            dataset, null, null);
+                    dicomDirWriter.addLowerDirectoryRecord(studyRecord, seriesRecord);
+                }
+
+                Attributes instanceRecord = recordFactory.createRecord(dataset, fmi, fileIDs);
+                dicomDirWriter.addLowerDirectoryRecord(seriesRecord, instanceRecord);
+            }
         }
     }
 
@@ -75,67 +133,6 @@ public class DicomDirGenerator implements Closeable {
     @Override
     public void close() throws IOException {
         dicomDirWriter.close();
-        if (!file.delete()) {
-            LOG.warning("Unable to delete the temporary DICOMDIR file");
-        }
-    }
-
-    private void addInstance(byte[] instanceBytes, Path path) throws Exception {
-        synchronized (lock) {
-            Attributes fmi;
-            Attributes dataset;
-            try (DicomInputStream din = new DicomInputStream(new ByteArrayInputStream(instanceBytes))) {
-                din.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
-                fmi = din.readFileMetaInformation();
-                dataset = din.readDataset(-1, Tag.PixelData);
-            }
-            if (fmi == null) {
-                fmi = dataset.createFileMetaInformation(UID.ImplicitVRLittleEndian);
-            }
-            final String iuid = fmi.getString(Tag.MediaStorageSOPInstanceUID, null);
-            if (iuid == null) {
-                throw new IllegalArgumentException("No MediaStorageSOPInstanceUIDin the instance");
-            }
-
-            String patientID = dataset.getString(Tag.PatientID, null);
-            final String studyUID = dataset.getString(Tag.StudyInstanceUID, null);
-            final String seriesUID = dataset.getString(Tag.SeriesInstanceUID, null);
-            final String[] fileIDs = StreamSupport.stream(path.spliterator(), false)
-                    .map(Path::toString)
-                    .toArray(String[]::new);
-
-            if (studyUID == null) {
-                throw new IllegalArgumentException("No StudyInstanceUID the instance");
-            }
-            if (seriesUID == null) {
-                throw new IllegalArgumentException("No SeriesInstanceUID the instance");
-            }
-
-            if (patientID == null) {
-                dataset.setString(Tag.PatientID, VR.LO, patientID = studyUID);
-            }
-            Attributes patientRecord = dicomDirWriter.findPatientRecord(patientID);
-            if (patientRecord == null) {
-                patientRecord = recordFactory.createRecord(RecordType.PATIENT, null,
-                        dataset, null, null);
-                dicomDirWriter.addRootDirectoryRecord(patientRecord);
-            }
-            Attributes studyRecord = dicomDirWriter.findStudyRecord(patientRecord, studyUID);
-            if (studyRecord == null) {
-                studyRecord = recordFactory.createRecord(RecordType.STUDY, null,
-                        dataset, null, null);
-                dicomDirWriter.addLowerDirectoryRecord(patientRecord, studyRecord);
-            }
-
-            Attributes seriesRecord = dicomDirWriter.findSeriesRecord(studyRecord, seriesUID);
-            if (seriesRecord == null) {
-                seriesRecord = recordFactory.createRecord(RecordType.SERIES, null,
-                        dataset, null, null);
-                dicomDirWriter.addLowerDirectoryRecord(studyRecord, seriesRecord);
-            }
-
-            Attributes instanceRecord = recordFactory.createRecord(dataset, fmi, fileIDs);
-            dicomDirWriter.addLowerDirectoryRecord(seriesRecord, instanceRecord);
-        }
+        Files.delete(file.toPath());
     }
 }

@@ -63,11 +63,15 @@ public final class ZipStudyResource {
         final String userToken = getUserTokenFromHeader(authorizationHeader);
         final Tokens tokens = getTokens(userToken);
         final Set<Instance> instances = getInstances(tokens, studyInstanceUID);
-        final InstanceRetrievalService instanceRetrievalService = new InstanceRetrievalService.Builder()
-                .accessToken(tokens.getAccessToken())
-                .authorizationURI(authorizationURI())
-                .wadoURI(dicomWebURI())
+        final BearerTokenRetriever bearerTokenRetriever = new BearerTokenRetriever.Builder()
                 .client(CLIENT)
+                .authorizationURI(authorizationURI())
+                .accessToken(tokens.getAccessToken())
+                .build();
+        final InstanceRetrievalService instanceRetrievalService = new InstanceRetrievalService.Builder()
+                .client(CLIENT)
+                .wadoURI(dicomWebURI())
+                .bearerTokenRetriever(bearerTokenRetriever)
                 .instances(instances)
                 .build();
 
