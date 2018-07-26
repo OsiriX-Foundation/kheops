@@ -24,6 +24,7 @@ import java.util.Set;
 public final class ZipStudyResource {
 
     private static final Client CLIENT = newClient();
+    private static final String CONTENT_DISPOSITION = "DICOM.ZIP";
 
     private static class TokenResponse {
         @XmlElement(name = "access_token")
@@ -70,10 +71,10 @@ public final class ZipStudyResource {
                 .instances(instances)
                 .build();
 
-        InstanceZipper instanceZipper = new InstanceZipper.Builder().instanceRetrievalService(instanceRetrievalService).build();
+        InstanceZipper instanceZipper = new InstanceZipper(instanceRetrievalService);
 
         return Response.ok(instanceZipper.getStreamingOutput())
-                .header("Content-Disposition", "attachment; filename=\"" + studyInstanceUID + ".zip\"")
+                .header("Content-Disposition", "attachment; filename=\"" + CONTENT_DISPOSITION + "\"")
                 .build();
     }
 

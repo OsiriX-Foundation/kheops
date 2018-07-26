@@ -13,71 +13,57 @@ public final class InstanceZipper {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     private final InstanceRetrievalService instanceRetrievalService;
     private final int instanceCount;
+    private boolean finishedWriting = false;
 
-    public static final class Builder {
-        private  InstanceRetrievalService instanceRetrievalService;
-
-        public Builder instanceRetrievalService(InstanceRetrievalService instanceRetrievalService) {
-            this.instanceRetrievalService = instanceRetrievalService;
-            return this;
-        }
-
-        public InstanceZipper build() {
-            return new InstanceZipper(this);
-        }
+    public InstanceZipper(InstanceRetrievalService instanceRetrievalService) {
+        this.instanceRetrievalService = Objects.requireNonNull(instanceRetrievalService, "instanceRetrievalService");
+        instanceCount = instanceRetrievalService.getInstanceCount();
     }
 
     private class ZipperStreamingOutput implements StreamingOutput {
-        final DicomDir dicomDir = DicomDir.getInstance();
 
         @Override
-        public void write(OutputStream output) throws IOException {
-            instanceRetrievalService.start();
-
-            ZipOutputStream zipStream = new ZipOutputStream(output);
-
-            for (int i = 0; i < instanceCount; i++) {
-                final InstanceFuture instanceFuture;
-                final byte[] instanceBytes;
-                try {
-                    instanceFuture = instanceRetrievalService.take();
-                    instanceBytes = instanceFuture.get();
-                }catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new IOException("Current thread was interrupted", e);
-                } catch (Exception e) {
-                    throw new IOException("Missing data to add to the zip stream", e);
-                }
-
-                final Future dicomFuture = EXECUTOR_SERVICE.submit(dicomDir.getAddInstanceRunnable(instanceFuture.getInstance(), instanceBytes, Paths.get("DICOM", String.valueOf(i))));
-
-                final ZipEntry entry = new ZipEntry("DICOM/" + String.format("%08d", i));
-                zipStream.putNextEntry(entry);
-                zipStream.write(instanceBytes);
-                zipStream.closeEntry();
-                try {
-                    dicomFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IOException("get interupted", e);
-                }
+        public void write(OutputStream outputStream) throws IOException {
+            try (final DicomDirGenerator dicomDirGenerator = DicomDirGenerator.getInstance()){
+                privateWrite(outputStream, dicomDirGenerator);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted");
+            } catch (ExecutionException e) {
+                throw new IOException("Unable to get ZIP data", e.getCause());
             }
-
-            ZipEntry dicomDirEntry = new ZipEntry("DICOMDIR");
-            zipStream.putNextEntry(dicomDirEntry);
-            zipStream.write(dicomDir.getBytes());
-            zipStream.closeEntry();
-
-            zipStream.close();
-        }
-
-        private String getZipEntryName(Instance instance) {
-            return instance.getStudyInstanceUID() + "/" + instance.getSeriesInstanceUID() + "/" + instance.getSopInstanceUID() + ".dcm";
         }
     }
 
-    private InstanceZipper(Builder builder) {
-        instanceRetrievalService = Objects.requireNonNull(builder.instanceRetrievalService, "instanceRetrievalService");
-        instanceCount = instanceRetrievalService.getInstanceCount();
+    private void privateWrite(OutputStream output, DicomDirGenerator dicomDirGenerator) throws IOException, InterruptedException, ExecutionException {
+        if (finishedWriting) {
+            throw new IllegalStateException("Already written out");
+        }
+        finishedWriting = true;
+
+        instanceRetrievalService.start();
+
+        ZipOutputStream zipStream = new ZipOutputStream(output);
+
+        for (int i = 0; i < instanceCount; i++) {
+            final InstanceFuture instanceFuture = instanceRetrievalService.take();
+            final byte[] instanceBytes = instanceFuture.get();
+
+            final String instanceFileName = String.format("%08d", i+1);
+            final Future dicomFuture = EXECUTOR_SERVICE.submit(dicomDirGenerator.getAddInstanceCallable(instanceBytes, Paths.get("DICOM", instanceFileName)));
+
+            zipStream.putNextEntry(new ZipEntry("DICOM/" + instanceFileName));
+            zipStream.write(instanceBytes);
+            zipStream.closeEntry();
+
+            dicomFuture.get();
+        }
+
+        zipStream.putNextEntry(new ZipEntry("DICOMDIR"));
+        zipStream.write(dicomDirGenerator.getBytes());
+        zipStream.closeEntry();
+
+        zipStream.close();
     }
 
     public StreamingOutput getStreamingOutput() {
