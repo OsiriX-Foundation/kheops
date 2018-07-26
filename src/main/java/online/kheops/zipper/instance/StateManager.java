@@ -1,4 +1,4 @@
-package online.kheops.zipper;
+package online.kheops.zipper.instance;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -6,8 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 // states: waiting, processing, retrieved, and removed
-@SuppressWarnings("WeakerAccess")
-public final class StateManager {
+final class StateManager {
 
     private static final int RETRY_COUNT = 6;
 
@@ -23,11 +22,11 @@ public final class StateManager {
         waitingInstances.addAll(instances);
     }
 
-    public static StateManager newInstance(Set<Instance> instances) {
+    static StateManager newInstance(Set<Instance> instances) {
         return new StateManager(instances);
     }
 
-    public Instance getForProcessing() {
+    Instance getForProcessing() {
         synchronized (lock) {
             final Instance next = waitingInstances.poll();
             if (next != null) {
@@ -37,7 +36,7 @@ public final class StateManager {
         }
     }
 
-    public void finishedProcessing(Instance instance, byte[] bytes) {
+    void finishedProcessing(Instance instance, byte[] bytes) {
         synchronized (lock) {
             if (!processingInstances.contains(instance)) {
                 throw new IllegalArgumentException("The instance is not currently processing");
@@ -47,7 +46,7 @@ public final class StateManager {
         }
     }
 
-    public void failedProcessing(Instance instance, Throwable reason) {
+    void failedProcessing(Instance instance, Throwable reason) {
         synchronized (lock) {
             if (!processingInstances.contains(instance)) {
                 throw new IllegalArgumentException("The instance is not currently processing");
@@ -65,7 +64,7 @@ public final class StateManager {
         }
     }
 
-    public InstanceFuture take() throws InterruptedException {
+    InstanceFuture take() throws InterruptedException {
         if (notTakenSize() == 0) {
             throw new IllegalStateException("There are no more futures to take");
         }

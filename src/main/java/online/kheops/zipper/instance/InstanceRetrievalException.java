@@ -1,6 +1,5 @@
-package online.kheops.zipper;
+package online.kheops.zipper.instance;
 
-@SuppressWarnings("WeakerAccess")
 public final class InstanceRetrievalException extends Exception {
     public InstanceRetrievalException(String message) {
         super(message);

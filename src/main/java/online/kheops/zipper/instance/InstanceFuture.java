@@ -1,10 +1,9 @@
-package online.kheops.zipper;
+package online.kheops.zipper.instance;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("WeakerAccess")
 public final class InstanceFuture implements Future<byte[]> {
 
     private final Instance instance;

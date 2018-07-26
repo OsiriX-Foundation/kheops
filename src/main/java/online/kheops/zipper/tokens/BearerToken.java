@@ -1,8 +1,7 @@
-package online.kheops.zipper;
+package online.kheops.zipper.tokens;
 
 import java.util.Objects;
 
-@SuppressWarnings("WeakerAccess")
 public final class BearerToken  {
     private final String token;
 
@@ -10,7 +9,7 @@ public final class BearerToken  {
         this.token = Objects.requireNonNull(token, "token");
     }
 
-    public static BearerToken newInstance(String token) {
+    static BearerToken newInstance(String token) {
         return new BearerToken(token);
     }
 

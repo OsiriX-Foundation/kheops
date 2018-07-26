@@ -1,4 +1,6 @@
-package online.kheops.zipper;
+package online.kheops.zipper.tokens;
+
+import online.kheops.zipper.instance.Instance;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -10,7 +12,6 @@ import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.util.Objects;
 
-@SuppressWarnings("WeakerAccess")
 public final class BearerTokenRetriever {
     private final Client client;
     private final URI tokenURI;

@@ -1,4 +1,7 @@
-package online.kheops.zipper;
+package online.kheops.zipper.instance;
+
+import online.kheops.zipper.tokens.BearerToken;
+import online.kheops.zipper.tokens.BearerTokenRetriever;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.InvocationCallback;
@@ -7,7 +10,6 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
 
-@SuppressWarnings("WeakerAccess")
 public final class InstanceRetrievalService {
     private static final int CONCURRENT_REQUESTS = 6;
 
