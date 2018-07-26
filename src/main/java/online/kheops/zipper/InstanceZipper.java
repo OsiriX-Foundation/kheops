@@ -25,7 +25,7 @@ public final class InstanceZipper {
         return new InstanceZipper(instanceRetrievalService);
     }
 
-    private class ZipperStreamingOutput implements StreamingOutput {
+    private final class ZipperStreamingOutput implements StreamingOutput {
 
         @Override
         public void write(OutputStream outputStream) throws IOException {

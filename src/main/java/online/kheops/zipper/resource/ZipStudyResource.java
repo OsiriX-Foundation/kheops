@@ -1,8 +1,8 @@
 package online.kheops.zipper.resource;
 
-import online.kheops.zipper.tokens.AccessToken;
-import online.kheops.zipper.tokens.AccessTokenType;
-import online.kheops.zipper.tokens.BearerTokenRetriever;
+import online.kheops.zipper.token.AccessToken;
+import online.kheops.zipper.token.AccessTokenType;
+import online.kheops.zipper.token.BearerTokenRetriever;
 import online.kheops.zipper.instance.Instance;
 import online.kheops.zipper.instance.InstanceRetrievalService;
 import online.kheops.zipper.InstanceZipper;

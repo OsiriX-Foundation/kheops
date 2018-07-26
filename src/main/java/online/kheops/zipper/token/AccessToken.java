@@ -1,4 +1,4 @@
-package online.kheops.zipper.tokens;
+package online.kheops.zipper.token;
 
 import java.util.Objects;
 

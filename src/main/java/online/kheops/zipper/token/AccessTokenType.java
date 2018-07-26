@@ -1,4 +1,4 @@
-package online.kheops.zipper.tokens;
+package online.kheops.zipper.token;
 
 public enum AccessTokenType {
     JWT_BEARER_TOKEN("urn:ietf:params:oauth:grant-type:jwt-bearer"),

@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.stream.StreamSupport;
 
-public class DicomDirGenerator implements Closeable {
+public final class DicomDirGenerator implements Closeable {
     private static final String DICOMDIR_FILENAME = "DICOMDIR";
     private static final String DEFAULT_FILESET_ID = "Dicom Files";
 
@@ -30,7 +30,7 @@ public class DicomDirGenerator implements Closeable {
 
     private final Object lock = new Object();
 
-    private class AddInstanceCallable implements Callable<Void> {
+    private final class AddInstanceCallable implements Callable<Void> {
         private final byte[] instanceBytes;
         private final Path path;
 
