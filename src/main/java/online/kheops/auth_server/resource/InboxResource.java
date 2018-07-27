@@ -162,6 +162,7 @@ public class InboxResource
                         em.persist(callingUser);
                         tx.commit();
                         LOG.info("Claim accepted because no one else owns the series, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
+                        return Response.status(Response.Status.OK).build();
                     } else {
                         LOG.info("Claim denied, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
                         return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
