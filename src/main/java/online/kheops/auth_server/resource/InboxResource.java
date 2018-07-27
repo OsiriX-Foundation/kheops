@@ -151,12 +151,12 @@ public class InboxResource
                     query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
                     final Series storedSeries = query.setParameter(Strings.SeriesInstanceUID, seriesInstanceUID).getSingleResult();
 
-                    // we need to check here if the series that was found it owned by the user
+                    // we need to check here if the series that was found is owned by the user
                     if (storedSeries.getUsers().contains(callingUser)) {
-                        LOG.info("Nothing to claim, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is accessible by "+username);
+                        LOG.info("Nothing to claim, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is accessible by " + username);
                         return Response.status(Response.Status.OK).build();
-                    } else {
-                        LOG.info("claim denied, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
+                    } else if (!storedSeries.getUsers().isEmpty()){
+                        LOG.info("Claim denied, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
                         return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
                     }
                  } catch (NoResultException ignored) {/*empty*/}
