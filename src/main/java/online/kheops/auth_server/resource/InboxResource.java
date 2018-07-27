@@ -155,7 +155,14 @@ public class InboxResource
                     if (storedSeries.getUsers().contains(callingUser)) {
                         LOG.info("Nothing to claim, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is accessible by " + username);
                         return Response.status(Response.Status.OK).build();
-                    } else if (!storedSeries.getUsers().isEmpty()){
+                    } else if (storedSeries.getUsers().isEmpty()) {
+                        storedSeries.getUsers().add(callingUser);
+                        callingUser.getSeries().add(storedSeries);
+                        em.persist(storedSeries);
+                        em.persist(callingUser);
+                        tx.commit();
+                        LOG.info("Claim accepted because no one else owns the series, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
+                    } else {
                         LOG.info("Claim denied, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
                         return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
                     }
