@@ -23,11 +23,15 @@ public final class DicomDirGenerator implements Closeable {
     private static final String DICOMDIR_FILENAME = "DICOMDIR";
     private static final String DEFAULT_FILESET_ID = "Dicom Files";
 
+    private final Object lock = new Object();
+
     private final File file;
     private final DicomDirWriter dicomDirWriter;
     private final RecordFactory recordFactory = new RecordFactory();
 
-    private final Object lock = new Object();
+    private boolean dicomDirWriterClosed = false;
+    private boolean closed = false;
+
 
     private final class AddInstanceCallable implements Callable<Void> {
         private final byte[] instanceBytes;
@@ -119,17 +123,31 @@ public final class DicomDirGenerator implements Closeable {
         return new DicomDirGenerator(DEFAULT_FILESET_ID);
     }
 
+    private void closeDicomDirWriter() throws IOException
+    {
+        if (!dicomDirWriterClosed) {
+            dicomDirWriter.close();
+            dicomDirWriterClosed = true;
+        }
+    }
+
     public Callable<Void> getAddInstanceCallable(byte[] instanceBytes, Path path) {
         return new AddInstanceCallable(instanceBytes, path);
     }
 
     public byte[] getBytes() throws IOException {
+        if (closed) {
+            throw new IllegalStateException("Can't get bytes when closed");
+        }
+
+        closeDicomDirWriter();
         return Files.readAllBytes(file.toPath());
     }
 
     @Override
     public void close() throws IOException {
-        dicomDirWriter.close();
+        closeDicomDirWriter();
         Files.delete(file.toPath());
+        closed = true;
     }
 }
