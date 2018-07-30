@@ -21,7 +21,7 @@ import java.util.stream.StreamSupport;
 
 public final class DicomDirGenerator implements Closeable {
     private static final String DICOMDIR_FILENAME = "DICOMDIR";
-    private static final String DEFAULT_FILESET_ID = "Dicom Files";
+    private static final String DEFAULT_FILESET_ID = "KHEOPS_ZIP";
 
     private final Object lock = new Object();
 
