@@ -414,6 +414,8 @@ public class Study {
                 } catch (Exception e) {
                     throw new BadRequestException("StudyDate :" + date);
                 }
+            } else {
+                throw new BadRequestException("StudyDate :" + date);
             }
         }
     }
