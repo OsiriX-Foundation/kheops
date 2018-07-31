@@ -231,9 +231,6 @@ public class Study {
             } else {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
             }
-
-
-            LOG.info(r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
