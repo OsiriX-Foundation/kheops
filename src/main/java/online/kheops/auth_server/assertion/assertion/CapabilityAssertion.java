@@ -2,7 +2,6 @@ package online.kheops.auth_server.assertion.assertion;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.*;
