@@ -6,6 +6,8 @@ import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.*;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotAuthorizedException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
@@ -13,7 +15,7 @@ public class CapabilityAssertion implements Assertion {
     private String username;
     private String email;
 
-    public void setCapabilityToken(String capabilityToken) throws BadAssertionException {
+    public void setCapabilityToken(String capabilityToken) {//throws BadAssertionException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         try {
@@ -24,12 +26,13 @@ public class CapabilityAssertion implements Assertion {
             final Capability capability = query.getSingleResult();
 
             if (capability.isRevoked()) {
-                throw new BadAssertionException("Capability token is revoked");
+                //throw new BadAssertionException("Capability token is revoked");
+                throw new ForbiddenException("");
             }
 
             if (ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
-                throw new BadAssertionException("Capability token is expired");
-
+                //throw new BadAssertionException("Capability token is expired");
+                throw new ForbiddenException("");
             }
 
             username = capability.getUser().getGoogleId();
@@ -37,7 +40,8 @@ public class CapabilityAssertion implements Assertion {
 
             tx.commit();
         } catch (NoResultException e) {
-            throw new BadAssertionException("Unknown capability token", e);
+            //throw new BadAssertionException("Unknown capability token", e);
+            throw new NotAuthorizedException("");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
