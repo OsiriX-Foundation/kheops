@@ -9,16 +9,10 @@ import online.kheops.auth_server.Capabilities;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.assertion.CapabilityAssertion;
 import online.kheops.auth_server.assertion.assertion.GoogleJWTAssertion;
 import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
-import online.kheops.auth_server.assertion.exceptions.DownloadKeyException;
-import online.kheops.auth_server.assertion.exceptions.UnknownGrantTypeException;
-import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.resource.TokenResource;
 
 import javax.annotation.Priority;
 import javax.persistence.*;
@@ -33,8 +27,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import java.time.LocalDateTime;
-import java.util.logging.Level;
 
 @Secured
 @Provider
@@ -84,7 +76,7 @@ public class SecuredFilter implements ContainerRequestFilter {
                 capabilityAccess = true;
                 validToken = true;
 
-            } catch (BadAssertionException e) { }
+            } catch (BadAssertionException e) { /*empty*/ }
 
             if ( ! validToken) {
                 final DecodedJWT jwt;
