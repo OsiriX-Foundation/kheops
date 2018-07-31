@@ -334,9 +334,9 @@ public class Study {
 
     private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyDate")) {
-            return createIntervalConditon(queryParameters.get("StudyDate").get(0), STUDIES.STUDY_DATE, new CheckDate());
+            return createIntervalConditon(queryParameters.get("StudyDate").get(0), new CheckDate());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), STUDIES.STUDY_DATE, new CheckDate());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), new CheckDate());
         } else {
             return null;
         }
@@ -344,15 +344,15 @@ public class Study {
 
     private static Condition createConditonStudyTime(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("StudyTime")) {
-            return createIntervalConditon(queryParameters.get("StudyTime").get(0), STUDIES.STUDY_TIME, new CheckTime());
+            return createIntervalConditon(queryParameters.get("StudyTime").get(0), new CheckTime());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0),STUDIES.STUDY_TIME, new CheckTime());
+            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0), new CheckTime());
         } else {
             return null;
         }
     }
 
-    private static Condition createIntervalConditon(String parameter, TableField column, CheckMethode checkMethode) {
+    private static Condition createIntervalConditon(String parameter, CheckMethode checkMethode) {
         if (parameter.contains("-")) {
             String begin;
             String end;
@@ -363,51 +363,49 @@ public class Study {
                 if (begin.length() == 0) {
                     begin = checkMethode.intervalBegin();
                 }
-                if (checkMethode.check(begin) && checkMethode.check(end)) {
-                    return column.between(begin, end);
-                } else {
-                    throw new BadRequestException(column.getName() + ": " + parameter);
-                }
+                checkMethode.check(begin);
+                checkMethode.check(end);
+                return checkMethode.getColumn().between(begin, end);
+
             }else if(parameters.length == 1) {
                 begin = parameters[0];
                 end = checkMethode.intervalEnd();
-                if (checkMethode.check(begin) && checkMethode.check(end)) {
-                    return column.between(begin, end);
-                } else {
-                    throw new BadRequestException(column.getName() + ": " + parameter);
-                }
+                checkMethode.check(begin);
+                return checkMethode.getColumn().between(begin, end);
             } else {
-                throw new BadRequestException(column.getName() + ": " + parameter);
+                throw new BadRequestException(checkMethode.getColumn().getName() + ": " + parameter);
             }
         } else {
-            if (checkMethode.check(parameter)) {
-                return column.eq(parameter);
-            } else {
-                throw new BadRequestException(column.getName() + ": " + parameter);
-            }
+            checkMethode.check(parameter);
+            return checkMethode.getColumn().eq(parameter);
         }
     }
 
     private interface CheckMethode {
         public String intervalBegin();
         public String intervalEnd();
-        public Boolean check(String s);
+        public void check(String s);
+        public TableField getColumn();
     }
 
     private static class CheckTime implements CheckMethode {
         public String intervalBegin() {return "000000.000000";}
-        public String intervalEnd() {return "235959.999999";};
+        public String intervalEnd() {return "235959.999999";}
+        public TableField getColumn() {return STUDIES.STUDY_TIME;}
 
-        public Boolean check(String time) {
-            return time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$");
+        public void check(String time) {
+            if (! time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$") ) {
+                throw new BadRequestException("StudyTime :" + time);
+            }
         }
     }
 
     private static class CheckDate implements CheckMethode {
         public String intervalBegin() {return "00010101";}
         public String intervalEnd() {return "99991231";}
+        public TableField getColumn() {return STUDIES.STUDY_DATE;}
 
-        public Boolean check(String date) {
+        public void check(String date) {
             if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
                 dateFormat.setLenient(false);
@@ -416,9 +414,6 @@ public class Study {
                 } catch (Exception e) {
                     throw new BadRequestException("StudyDate :" + date);
                 }
-                return true;
-            } else {
-                return false;
             }
         }
     }
