@@ -3,11 +3,8 @@ package online.kheops.auth_server.entity;
 import online.kheops.auth_server.Capabilities;
 
 import javax.persistence.*;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Random;
 
 @SuppressWarnings("unused")
 @Entity
