@@ -120,13 +120,13 @@ public class Study {
         conditionArrayList.add(createConditonStudyDate(queryParameters));
         conditionArrayList.add(createConditonStudyTime(queryParameters));
 
-        conditionArrayList.add(createConditon(Tag.AccessionNumber, queryParameters, "AccessionNumber", STUDIES.ACCESSION_NUMBER));
+        conditionArrayList.add(createConditon(Tag.AccessionNumber, queryParameters, STUDIES.ACCESSION_NUMBER));
         conditionArrayList.add(createConditonModality(queryParameters));
-        conditionArrayList.add(createConditon(Tag.ReferringPhysicianName, queryParameters, "ReferringPhysicianName", STUDIES.REFERRING_PHYSICIAN_NAME));
-        conditionArrayList.add(createConditon(Tag.PatientName, queryParameters, "PatientName", STUDIES.PATIENT_NAME));
-        conditionArrayList.add(createConditon(Tag.PatientID, queryParameters, "PatientID", STUDIES.PATIENT_ID));
-        conditionArrayList.add(createConditon(Tag.StudyInstanceUID, queryParameters, "StudyInstanceUID", STUDIES.STUDY_UID));
-        conditionArrayList.add(createConditon(Tag.StudyID, queryParameters, "StudyID", STUDIES.STUDY_ID));
+        conditionArrayList.add(createConditon(Tag.ReferringPhysicianName, queryParameters, STUDIES.REFERRING_PHYSICIAN_NAME));
+        conditionArrayList.add(createConditon(Tag.PatientName, queryParameters, STUDIES.PATIENT_NAME));
+        conditionArrayList.add(createConditon(Tag.PatientID, queryParameters, STUDIES.PATIENT_ID));
+        conditionArrayList.add(createConditon(Tag.StudyInstanceUID, queryParameters, STUDIES.STUDY_UID));
+        conditionArrayList.add(createConditon(Tag.StudyID, queryParameters, STUDIES.STUDY_ID));
 
         SelectQuery query = create.selectQuery();
         query.addSelect(countDistinct(STUDIES.PK));
@@ -183,10 +183,10 @@ public class Study {
                 try {
                     limit = Integer.parseInt(queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
                 } catch (Exception e) {
-                    throw new BadRequestException("limit: " + queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
+                    throw new BadRequestException(QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
                 }
                 if (limit < 1) {
-                    throw new BadRequestException("limit: " + queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
+                    throw new BadRequestException(QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
                 }
                 query.addLimit(limit);
         }
@@ -196,11 +196,11 @@ public class Study {
             try {
                 offset = Integer.parseInt(queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
             } catch (Exception e) {
-                throw new BadRequestException("offset: " + queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
+                throw new BadRequestException(QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
             }
 
             if (offset < 0) {
-                throw new BadRequestException("offset: " + queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
+                throw new BadRequestException(QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
             }
             query.addOffset(offset);
         }
@@ -213,7 +213,7 @@ public class Study {
         for (Record r : result) {
 
             Attributes attributes = new Attributes();
-            
+
             if(queryParameters.containsKey(Keyword.valueOf(Tag.ModalitiesInStudy))) {
                 //get all the modalities for the STUDY_UID
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
@@ -336,8 +336,8 @@ public class Study {
     }
 
     private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey("StudyDate")) {
-            return createIntervalConditon(queryParameters.get("StudyDate").get(0), new CheckDate());
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyDate))) {
+            return createIntervalConditon(queryParameters.get(Keyword.valueOf(Tag.StudyDate)).get(0), new CheckDate());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
             return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), new CheckDate());
         } else {
@@ -346,8 +346,8 @@ public class Study {
     }
 
     private static Condition createConditonStudyTime(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey("StudyTime")) {
-            return createIntervalConditon(queryParameters.get("StudyTime").get(0), new CheckTime());
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.StudyTime))) {
+            return createIntervalConditon(queryParameters.get(Keyword.valueOf(Tag.StudyTime)).get(0), new CheckTime());
         } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
             return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0), new CheckTime());
         } else {
@@ -398,7 +398,7 @@ public class Study {
 
         public void check(String time) {
             if (! time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$") ) {
-                throw new BadRequestException("StudyTime :" + time);
+                throw new BadRequestException(Keyword.valueOf(Tag.StudyTime) + " :" + time);
             }
         }
     }
@@ -415,17 +415,17 @@ public class Study {
                 try {
                     dateFormat.parse(date);
                 } catch (Exception e) {
-                    throw new BadRequestException("StudyDate :" + date);
+                    throw new BadRequestException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
                 }
             } else {
-                throw new BadRequestException("StudyDate :" + date);
+                throw new BadRequestException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
             }
         }
     }
 
-    private static Condition createConditon(Integer tag,  MultivaluedMap<String, String> queryParameters, String key, TableField column) {
-        if (queryParameters.containsKey(key)) {
-            return createConditon(queryParameters, key, column);
+    private static Condition createConditon(Integer tag,  MultivaluedMap<String, String> queryParameters, TableField column) {
+        if (queryParameters.containsKey(Keyword.valueOf(tag))) {
+            return createConditon(queryParameters, Keyword.valueOf(tag), column);
         } else if (queryParameters.containsKey(String.format("%08X",tag))) {
             return createConditon(queryParameters, String.format("%08X",tag), column);
         }
