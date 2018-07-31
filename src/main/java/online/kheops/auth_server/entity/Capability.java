@@ -1,6 +1,9 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.Capabilities;
+
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -9,6 +12,11 @@ import java.util.Random;
 @SuppressWarnings("unused")
 @Entity
 @Table(name = "capabilities")
+@NamedNativeQueries({
+        @NamedNativeQuery(
+                name = "Capability.findCapabilityBySecret",
+                query = "SELECT c from capabilities c where secret = :token")
+})
 public class Capability {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -54,15 +62,19 @@ public class Capability {
     }
 
     public Capability() {
-        final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder secretBuilder = new StringBuilder();
-        Random rnd = new SecureRandom();
-        while (secretBuilder.length() < 22) {
-            int index = rnd.nextInt(DICT.length());
-            secretBuilder.append(DICT.charAt(index));
-        }
-        this.secret = secretBuilder.toString();
+        this.secret = Capabilities.newCapabilityToken();
     }
+
+    // returns null if the token does not exist
+    public static Capability findCapabilityByCapabilityToken(String token, EntityManager em) {
+        try {
+            Query capabilityTokenQuery = em.createNamedQuery("Capability.findCapabilityBySecret");
+            capabilityTokenQuery.setParameter("token", token);
+            return ((Capability) capabilityTokenQuery.getSingleResult());
+        } catch (NoResultException ignored) {/*empty*/}
+        return null;
+    }
+
 
     public LocalDateTime getExpiration() {
         return expiration;

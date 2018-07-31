@@ -89,7 +89,6 @@ public class User {
         return -1;
     }
 
-
     public static User findByUsername(String username) {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
