@@ -213,8 +213,8 @@ public class Study {
         for (Record r : result) {
 
             Attributes attributes = new Attributes();
-
-            if(queryParameters.containsKey("ModalitiesInStudy")) {
+            
+            if(queryParameters.containsKey(Keyword.valueOf(Tag.ModalitiesInStudy))) {
                 //get all the modalities for the STUDY_UID
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
@@ -292,8 +292,8 @@ public class Study {
         if (queryParameters.containsKey("sort")) {
             TableField ord;
 
-            Boolean ascDesc = queryParameters.get("sort").get(0).startsWith("-");
-            String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
+            final Boolean ascDesc = queryParameters.get("sort").get(0).startsWith("-");
+            final String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
 
             if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyDate)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyDate)) == 0) ord = STUDIES.STUDY_DATE;
             else if (orderByParameter.compareTo(Keyword.valueOf(Tag.StudyTime)) == 0 || orderByParameter.compareTo(String.format("%08X",Tag.StudyTime)) == 0) ord = STUDIES.STUDY_TIME;
@@ -313,8 +313,8 @@ public class Study {
     }
 
     private static Condition createConditonModality(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey("ModalitiesInStudy")) {
-            String parameter = queryParameters.get("ModalitiesInStudy").get(0);
+        if (queryParameters.containsKey(Keyword.valueOf(Tag.ModalitiesInStudy))) {
+            String parameter = queryParameters.get(Keyword.valueOf(Tag.ModalitiesInStudy)).get(0);
             if (parameter.equalsIgnoreCase("null")) {
                 return SERIES.MODALITY.isNull();
             } else {
