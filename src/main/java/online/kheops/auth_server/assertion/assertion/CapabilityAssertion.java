@@ -15,7 +15,7 @@ public class CapabilityAssertion implements Assertion {
     private String username;
     private String email;
 
-    public void setCapabilityToken(String capabilityToken) {//throws BadAssertionException {
+    public void setCapabilityToken(String capabilityToken) {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         try {
@@ -26,13 +26,11 @@ public class CapabilityAssertion implements Assertion {
             final Capability capability = query.getSingleResult();
 
             if (capability.isRevoked()) {
-                //throw new BadAssertionException("Capability token is revoked");
-                throw new ForbiddenException("");
+                throw new ForbiddenException("Capability token is revoked");
             }
 
             if (ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
-                //throw new BadAssertionException("Capability token is expired");
-                throw new ForbiddenException("");
+                throw new ForbiddenException("Capability token is expired");
             }
 
             username = capability.getUser().getGoogleId();
@@ -40,8 +38,7 @@ public class CapabilityAssertion implements Assertion {
 
             tx.commit();
         } catch (NoResultException e) {
-            //throw new BadAssertionException("Unknown capability token", e);
-            throw new NotAuthorizedException("");
+            throw new NotAuthorizedException("Unknown capability token");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
