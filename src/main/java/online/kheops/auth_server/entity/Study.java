@@ -99,8 +99,8 @@ public class Study {
         updatedTime = now;
     }
 
-    private final static String QUERY_PARAMETER_LIMIT = "limit";
-    private final static String QUERY_PARAMETER_OFFSET = "offset";
+    private static final String QUERY_PARAMETER_LIMIT = "limit";
+    private static final String QUERY_PARAMETER_OFFSET = "offset";
 
     @PreUpdate
     public void onPreUpdate() {
