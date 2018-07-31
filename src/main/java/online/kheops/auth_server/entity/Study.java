@@ -99,6 +99,9 @@ public class Study {
         updatedTime = now;
     }
 
+    private final static String QUERY_PARAMETER_LIMIT = "limit";
+    private final static String QUERY_PARAMETER_OFFSET = "offset";
+
     @PreUpdate
     public void onPreUpdate() {
         updatedTime = LocalDateTime.now(ZoneOffset.UTC);
@@ -175,29 +178,29 @@ public class Study {
         query.addGroupBy(STUDIES.STUDY_UID);
         query.addOrderBy(orderBy(queryParameters));
 
-        if (queryParameters.containsKey("limit")) {
+        if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
                 Integer limit;
                 try {
-                    limit = Integer.parseInt(queryParameters.get("limit").get(0));
+                    limit = Integer.parseInt(queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
                 } catch (Exception e) {
-                    throw new BadRequestException("limit: " + queryParameters.get("limit").get(0));
+                    throw new BadRequestException("limit: " + queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
                 }
                 if (limit < 1) {
-                    throw new BadRequestException("limit: " + queryParameters.get("limit").get(0));
+                    throw new BadRequestException("limit: " + queryParameters.get(QUERY_PARAMETER_LIMIT).get(0));
                 }
                 query.addLimit(limit);
         }
 
-        if (queryParameters.containsKey("offset")) {
+        if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
             Integer offset;
             try {
-                offset = Integer.parseInt(queryParameters.get("offset").get(0));
+                offset = Integer.parseInt(queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
             } catch (Exception e) {
-                throw new BadRequestException("offset: " + queryParameters.get("offset").get(0));
+                throw new BadRequestException("offset: " + queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
             }
 
             if (offset < 0) {
-                throw new BadRequestException("offset: " + queryParameters.get("offset").get(0));
+                throw new BadRequestException("offset: " + queryParameters.get(QUERY_PARAMETER_OFFSET).get(0));
             }
             query.addOffset(offset);
         }
