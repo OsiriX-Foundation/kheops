@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Path("/users")
+@Path("/")
 public class InboxResource
 {
     private static class Strings {
@@ -55,7 +55,7 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("/{user}/studies/{StudyInstanceUID}")
+    @Path("studies/{StudyInstanceUID}/user/{user}")
     public Response putStudy(@PathParam("user") String username,
                              @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                              @Context SecurityContext securityContext) {
@@ -116,11 +116,11 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("/{user}/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
+    @Path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/user/{user}")
     public Response putSeries(@PathParam("user") String username,
-                             @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
-                             @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
-                             @Context SecurityContext securityContext) {
+                              @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
+                              @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
+                              @Context SecurityContext securityContext) {
 
         checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Strings.SeriesInstanceUID);
@@ -144,53 +144,7 @@ public class InboxResource
             }
 
             if (targetUser.getPk() == callingUserPk) { // the user is requesting access to a new series
-
-                // find if the series already exists
-                try {
-                    TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
-                    query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-                    final Series storedSeries = query.setParameter(Strings.SeriesInstanceUID, seriesInstanceUID).getSingleResult();
-
-                    // we need to check here if the series that was found is owned by the user
-                    if (storedSeries.getUsers().contains(callingUser)) {
-                        LOG.info("Nothing to claim, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is accessible by " + username);
-                        return Response.status(Response.Status.OK).build();
-                    } else if (storedSeries.getUsers().isEmpty()) {
-                        storedSeries.getUsers().add(callingUser);
-                        callingUser.getSeries().add(storedSeries);
-                        em.persist(storedSeries);
-                        em.persist(callingUser);
-                        tx.commit();
-                        LOG.info("Claim accepted because no one else owns the series, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
-                        return Response.status(Response.Status.OK).build();
-                    } else {
-                        LOG.info("Claim denied, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" is not accessible by "+callingUser.getGoogleId());
-                        return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
-                    }
-                 } catch (NoResultException ignored) {/*empty*/}
-
-                // find if the study already exists
-                Study study = null;
-                try {
-                    TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
-                    study = query.setParameter(Strings.StudyInstanceUID, studyInstanceUID).getSingleResult();
-                } catch (NoResultException ignored) {/*empty*/}
-
-                if (study == null) { // the study doesn't exist, we need to create it
-                    study = new Study();
-                    study.setStudyInstanceUID(studyInstanceUID);
-                    em.persist(study);
-                }
-
-                Series series = new Series(seriesInstanceUID);
-                series.getUsers().add(callingUser);
-                callingUser.getSeries().add(series);
-                study.getSeries().add(series);
-
-                em.persist(study);
-                em.persist(series);
-                em.persist(callingUser);
-                LOG.info("finished claiming, StudyInstanceUID:"+studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" to "+username);
+                return Response.status(Response.Status.FORBIDDEN).entity("Use studies/{StudyInstanceUID}/series/{SeriesInstanceUID} for request access to a new series").build();
             } else { // the user wants to share
                 final Series series;
                 try {
@@ -227,6 +181,92 @@ public class InboxResource
         return Response.status(201).build();
     }
 
+@PUT
+@Secured
+@Path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
+public Response putSeries(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
+                          @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
+                          @Context SecurityContext securityContext) {
+
+    checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
+    checkValidUID(seriesInstanceUID, Strings.SeriesInstanceUID);
+
+    final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
+    EntityManager em = EntityManagerListener.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
+
+
+    try {
+        tx.begin();
+
+        TypedQuery<User> userQuery = em.createQuery("select u from User u where u.pk = :pk", User.class);
+        userQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        User callingUser = userQuery.setParameter("pk", callingUserPk).getSingleResult();
+
+        if (callingUser == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
+        }
+
+        // find if the series already exists
+        try {
+            TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            final Series storedSeries = query.setParameter(Strings.SeriesInstanceUID, seriesInstanceUID).getSingleResult();
+
+            // we need to check here if the series that was found is owned by the user
+            if (storedSeries.getUsers().contains(callingUser)) {
+                LOG.info("Nothing to claim, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is accessible by " + callingUser.getGoogleId());
+                return Response.status(Response.Status.OK).build();
+            } else if (storedSeries.getUsers().isEmpty()) {
+                storedSeries.getUsers().add(callingUser);
+                callingUser.getSeries().add(storedSeries);
+                em.persist(storedSeries);
+                em.persist(callingUser);
+                tx.commit();
+                LOG.info("Claim accepted because no one else owns the series, StudyInstanceUID:" + studyInstanceUID+", SeriesInstanceUID:" + seriesInstanceUID + " is not accessible by "+callingUser.getGoogleId());
+                return Response.status(Response.Status.OK).build();
+            } else {
+                LOG.info("Claim denied, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is not accessible by "+callingUser.getGoogleId());
+                return Response.status(Response.Status.FORBIDDEN).entity("Access to series denied").build();
+            }
+        } catch (NoResultException ignored) {/*empty*/}
+
+        // find if the study already exists
+        Study study = null;
+        try {
+            TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
+            study = query.setParameter(Strings.StudyInstanceUID, studyInstanceUID).getSingleResult();
+        } catch (NoResultException ignored) {/*empty*/}
+
+        if (study == null) { // the study doesn't exist, we need to create it
+            study = new Study();
+            study.setStudyInstanceUID(studyInstanceUID);
+            em.persist(study);
+        }
+
+        Series series = new Series(seriesInstanceUID);
+        series.getUsers().add(callingUser);
+        callingUser.getSeries().add(series);
+        study.getSeries().add(series);
+
+        em.persist(study);
+        em.persist(series);
+        em.persist(callingUser);
+        LOG.info("finished claiming, StudyInstanceUID:" + studyInstanceUID+", SeriesInstanceUID:"+seriesInstanceUID+" to " + callingUser.getGoogleId());
+
+        tx.commit();
+        LOG.info("sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:"+seriesInstanceUID+" to " + callingUser.getGoogleId());
+    } finally {
+        if (tx.isActive()) {
+            tx.rollback();
+        }
+        em.close();
+    }
+
+    return Response.status(201).build();
+}
+
     private Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID) {
         Set<String> availableSeriesUIDs;
 
@@ -259,10 +299,9 @@ public class InboxResource
 
     @GET
     @Secured
-    @Path("/{user}/studies/{StudyInstanceUID}/metadata")
+    @Path("studies/{StudyInstanceUID}/metadata")
     @Produces("application/dicom+json")
-    public Response getStudiesMetadata(@PathParam("user") String username,
-                                       @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
+    public Response getStudiesMetadata(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                                        @Context SecurityContext securityContext) throws URISyntaxException {
 
         checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
@@ -271,24 +310,6 @@ public class InboxResource
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-
-        long targetUserPk;
-        try {
-            tx.begin();
-
-            targetUserPk = User.findPkByUsername(username, em);
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-
-        if (callingUserPk != targetUserPk) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
-        }
 
         URI dicomWebURI = new URI(context.getInitParameter("online.kheops.pacs.uri"));
         UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/metadata");
@@ -301,7 +322,7 @@ public class InboxResource
         JSONReader jsonReader = new JSONReader(parser);
 
 
-        Set<String> availableSeriesUIDs = this.availableSeriesUIDs(((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID(), studyInstanceUID);
+        Set<String> availableSeriesUIDs = this.availableSeriesUIDs(callingUserPk, studyInstanceUID);
 
         StreamingOutput stream = os -> {
             JsonGenerator generator = Json.createGenerator(os);
@@ -329,10 +350,9 @@ public class InboxResource
 
     @DELETE
     @Secured
-    @Path("/{user}/studies/{StudyInstanceUID}")
+    @Path("studies/{StudyInstanceUID}")
     @Produces("application/dicom+json")
-    public Response deleteStudy(@PathParam("user") String username,
-                                @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
+    public Response deleteStudy(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                                 @Context SecurityContext securityContext) {
 
         checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
@@ -345,13 +365,9 @@ public class InboxResource
         try {
             tx.begin();
 
-            User targetUser = User.findByUsername(username, em);
+            User targetUser = User.findByPk(callingUserPk, em);
             if (targetUser == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
-            }
-
-            if (callingUserPk != targetUser.getPk()) {
-                return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
             }
 
             TypedQuery<Series> query = em.createQuery("select s from Series s where s.study.studyInstanceUID = :StudyInstanceUID and :user member of s.users", Series.class);
@@ -381,10 +397,9 @@ public class InboxResource
 
     @DELETE
     @Secured
-    @Path("/{user}/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
+    @Path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
     @Produces("application/dicom+json")
-    public Response deleteSeries(@PathParam("user") String username,
-                                 @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
+    public Response deleteSeries(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                                  @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
                                  @Context SecurityContext securityContext) {
 
@@ -399,13 +414,9 @@ public class InboxResource
         try {
             tx.begin();
 
-            User targetUser = User.findByUsername(username, em);
+            User targetUser = User.findByPk(callingUserPk, em);
             if (targetUser == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
-            }
-
-            if (callingUserPk != targetUser.getPk()) {
-                return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
             }
 
             TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :SeriesInstanceUID and s.study.studyInstanceUID = :StudyInstanceUID and :user member of s.users", Series.class);

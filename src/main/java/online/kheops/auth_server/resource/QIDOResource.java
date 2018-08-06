@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-@Path("/users")
+@Path("/")
 public class QIDOResource {
 
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
@@ -47,10 +47,9 @@ public class QIDOResource {
 
     @GET
     @Secured
-    @Path("/{user}/studies")
+    @Path("studies")
     @Produces("application/dicom+json")
-    public Response getStudies(@PathParam("user") String username,
-                               @Context SecurityContext securityContext) {
+    public Response getStudies(@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -58,11 +57,6 @@ public class QIDOResource {
         Integer studiesTotalCount;
 
         try (Connection connection = getDataSource().getConnection()) {
-                long targetUserPk = User.findPkByUsernameJOOQ(username, connection);
-                if (callingUserPk != targetUserPk) {
-                    return Response.status(Response.Status.FORBIDDEN).entity("Access to study denied").build();
-                }
-
                 Pair pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
                 studiesTotalCount = pair.getStudiesTotalCount();
                 attributesList = pair.getAttributesList();

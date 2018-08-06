@@ -20,7 +20,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Path("/users")
+@Path("/")
 public class CapabilitiesResource {
 
     static class CapabilityResponse {
@@ -38,10 +38,10 @@ public class CapabilitiesResource {
     @Secured
     @CapabilitySecured
     @FormURLEncodedContentType
-    @Path("/{user}/capabilities")
+    @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCapability(@PathParam("user") String username, @FormParam("description") String description, @FormParam("expiration") String expirationDate,
+    public Response createCapability(@FormParam("description") String description, @FormParam("expiration") String expirationDate,
                                      @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
@@ -70,13 +70,9 @@ public class CapabilitiesResource {
         try {
             tx.begin();
 
-            final User targetUser = User.findByUsername(username, em);
+            final User targetUser = User.findByPk(callingUserPk, em);
             if (targetUser == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
-            }
-
-            if (callingUserPk != targetUser.getPk()) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Can't set capabilities for a different user").build();
             }
 
             Capability capability = new Capability();
@@ -108,10 +104,10 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
-    @Path("/{user}/capabilities/{secret}/revoke")
+    @Path("capabilities/{secret}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response revokeCapability(@PathParam("user") String username, @PathParam("secret") String secret,
+    public Response revokeCapability(@PathParam("secret") String secret,
                                      @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
@@ -123,7 +119,7 @@ public class CapabilitiesResource {
         try {
             tx.begin();
 
-            final User targetUser = User.findByUsername(username, em);
+            final User targetUser = User.findByPk(callingUserPk, em);
             if (targetUser == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
@@ -165,10 +161,9 @@ public class CapabilitiesResource {
     @GET
     @Secured
     @CapabilitySecured
-    @Path("/{user}/capabilities")
+    @Path("capabilities")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCapability(@PathParam("user") String username,
-                                     @Context SecurityContext securityContext) {
+    public Response createCapability(@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses = new ArrayList<>();
@@ -179,7 +174,7 @@ public class CapabilitiesResource {
         try {
             tx.begin();
 
-            final User targetUser = User.findByUsername(username, em);
+            final User targetUser = User.findByPk(callingUserPk, em);
             if (targetUser == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
             }
