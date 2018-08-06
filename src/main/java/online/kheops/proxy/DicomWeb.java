@@ -84,7 +84,6 @@ public class DicomWeb extends ProxyServlet
             AccessToken accessToken = AccessToken.createBuilder(authorizationServerRoot).withCapability(capabilitySecret).build();
 
             servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, accessToken.getToken());
-            servletRequest.setAttribute(KHEOPS_USER, accessToken.getUser());
         }
 
         String targetURL = getTargetUri(servletRequest)+"/studies";
@@ -128,7 +127,6 @@ public class DicomWeb extends ProxyServlet
             AccessToken accessToken = AccessToken.createBuilder(authorizationServerRoot).withCapability(capability).build();
 
             servletRequest.setAttribute(KHEOPS_ACCESS_TOKEN, accessToken.getToken());
-            servletRequest.setAttribute(KHEOPS_USER, accessToken.getUser());
         }
 
         super.copyRequestHeaders(servletRequest, proxyRequest);
@@ -211,7 +209,7 @@ public class DicomWeb extends ProxyServlet
                 if (!sentSeries.contains(combinedUID)) {
                     LOG.info("About to try to claim a series");
 
-                    URI claimURI = UriBuilder.fromUri(authenticationServerURI).path("users/{user}/studies/{studyUID}/series/{seriesUID}").build(getKheopsUser(servletRequest), studyUID, seriesUID);
+                    URI claimURI = UriBuilder.fromUri(authenticationServerURI).path("/studies/{studyUID}/series/{seriesUID}").build(studyUID, seriesUID);
                     client.target(claimURI).request().header("Authorization", "Bearer " + getKheopsAccessToken(servletRequest)).put(Entity.text(""));
 
                     LOG.info("finished claiming the series");
@@ -238,9 +236,6 @@ public class DicomWeb extends ProxyServlet
 
     private String getKheopsAccessToken(HttpServletRequest servletRequest) {
         return (String) servletRequest.getAttribute(KHEOPS_ACCESS_TOKEN);
-    }
-    private String getKheopsUser(HttpServletRequest servletRequest) {
-        return (String) servletRequest.getAttribute(KHEOPS_USER);
     }
 
     @SuppressWarnings("WeakerAccess")

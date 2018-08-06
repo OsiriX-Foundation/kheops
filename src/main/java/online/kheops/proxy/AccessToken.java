@@ -18,7 +18,6 @@ public class AccessToken {
 
 
     private String token;
-    private String user;
 
     @SuppressWarnings("unused")
     static class TokenResponse {
@@ -28,8 +27,6 @@ public class AccessToken {
         String tokenType;
         @XmlElement(name = "expires_in")
         String expiresIn;
-        @XmlElement(name = "user")
-        String user;
     }
 
     public static class AccessTokenBuilder {
@@ -67,13 +64,12 @@ public class AccessToken {
             }
 
             LOG.info("finished getting the access token");
-            return new AccessToken(tokenResponse.accessToken, tokenResponse.user);
+            return new AccessToken(tokenResponse.accessToken);
         }
     }
 
-    private AccessToken(String token, String user) {
+    private AccessToken(String token) {
         this.token = token;
-        this.user = user;
     }
 
     public static AccessTokenBuilder createBuilder(URI authorizationServerRoot) {
@@ -82,9 +78,5 @@ public class AccessToken {
 
     public String getToken() {
         return token;
-    }
-
-    public String getUser() {
-        return user;
     }
 }
