@@ -58,4 +58,10 @@ public class SuperuserJWTAssertion implements Assertion {
     public String getEmail() {
         return email;
     }
+
+
+    @Override
+    public Boolean getCapabilityAccess() {
+        return true;
+    }
 }

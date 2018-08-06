@@ -60,4 +60,9 @@ public class CapabilityAssertion implements Assertion {
     public boolean isCapabilityAssertion() {
         return true;
     }
+
+    @Override
+    public Boolean getCapabilityAccess() {
+        return false;
+    }
 }

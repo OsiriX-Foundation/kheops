@@ -1,21 +1,15 @@
 package online.kheops.auth_server.filter;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.Capabilities;
-import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.assertion.assertion.AccessJWTAssertion;
 import online.kheops.auth_server.assertion.assertion.CapabilityAssertion;
 import online.kheops.auth_server.assertion.assertion.GoogleJWTAssertion;
 import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.entity.User;
 
 import javax.annotation.Priority;
-import javax.persistence.*;
 import javax.servlet.ServletContext;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
@@ -64,7 +58,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             }
 
             userPK = User.findByUsername(capabilityAssertion.getUsername()).getPk();
-            capabilityAccess = false;
+            capabilityAccess = capabilityAssertion.getCapabilityAccess();
             validToken = true;
 
         } else {
@@ -79,41 +73,13 @@ public class SecuredFilter implements ContainerRequestFilter {
             } catch (BadAssertionException e) { /*empty*/ }
 
             if ( ! validToken) {
-                final DecodedJWT jwt;
-                EntityManager em = EntityManagerListener.createEntityManager();
-                EntityTransaction tx = em.getTransaction();
+                final AccessJWTAssertion accessJWTAssertion = new AccessJWTAssertion();
                 try {
-                    final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-                    final Algorithm kheopsAlgorithmHMAC = Algorithm.HMAC256(authSecret);
-                    JWTVerifier verifier = JWT.require(kheopsAlgorithmHMAC)
-                            .withIssuer("auth.kheops.online")
-                            .build();
-                    jwt = verifier.verify(token);
-                    final String username = jwt.getSubject();
-
-
-
-                    tx.begin();
-                    userPK = User.findPkByUsername(username, em);
-                    if (userPK == -1) {
-                        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
-                    }
-                    tx.commit();
-                    Claim capabilityClaim = jwt.getClaim("capability");
-                    if (capabilityClaim.asBoolean() != null) {
-                        capabilityAccess = capabilityClaim.asBoolean();
-                    } else {
-                        capabilityAccess = false;
-                    }
+                    accessJWTAssertion.setAssertionToken(token, context);
+                    userPK = User.findByUsername(accessJWTAssertion.getUsername()).getPk();
+                    capabilityAccess = accessJWTAssertion.getCapabilityAccess();
                     validToken = true;
-                } catch (Exception e) {
-                    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                } finally {
-                    if (tx.isActive()) {
-                        tx.rollback();
-                    }
-                    em.close();
-                }
+                } catch (BadAssertionException e) {/*empty*/}
             }
         }
 
@@ -147,6 +113,8 @@ public class SecuredFilter implements ContainerRequestFilter {
                     return "BEARER";
                 }
             });
+        } else {
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }
 }

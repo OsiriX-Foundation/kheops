@@ -93,4 +93,9 @@ public class GoogleJWTAssertion implements Assertion {
     public String getEmail() {
         return email;
     }
+
+    @Override
+    public Boolean getCapabilityAccess() {
+        return true;
+    }
 }
