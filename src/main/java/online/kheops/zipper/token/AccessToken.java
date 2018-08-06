@@ -7,13 +7,13 @@ public final class AccessToken {
     private final String token;
     private final AccessTokenType type;
 
-    private AccessToken(String token, String user, AccessTokenType type) {
+    private AccessToken(String token, AccessTokenType type) {
         this.token = Objects.requireNonNull(token, "token");
         this.type = Objects.requireNonNull(type, "type");
     }
 
-    public static AccessToken getInstance(String token, String user, AccessTokenType type) {
-        return new AccessToken(token, user, type);
+    public static AccessToken getInstance(String token, AccessTokenType type) {
+        return new AccessToken(token, type);
     }
 
     public String getToken() {

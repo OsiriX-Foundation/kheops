@@ -34,8 +34,6 @@ public final class ZipStudyResource {
     private static class TokenResponse {
         @XmlElement(name = "access_token")
         String accessToken;
-        @XmlElement(name = "user")
-        String user;
     }
 
     private static class Tokens {
@@ -103,8 +101,8 @@ public final class ZipStudyResource {
     }
 
     private Tokens getTokens(String userToken) {
-        Form capabilityForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.CAPABILITY_TOKEN.getUrn()).param("return_user", "true");
-        Form jwtForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.JWT_BEARER_TOKEN.getUrn()).param("return_user", "true");
+        Form capabilityForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.CAPABILITY_TOKEN.getUrn());
+        Form jwtForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.JWT_BEARER_TOKEN.getUrn());
 
         URI tokenURI = UriBuilder.fromUri(authorizationURI()).path("/token").build();
 
@@ -113,7 +111,7 @@ public final class ZipStudyResource {
 
         try {
             tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(capabilityForm), TokenResponse.class);
-            accessToken = AccessToken.getInstance(userToken, tokenResponse.user, AccessTokenType.CAPABILITY_TOKEN);
+            accessToken = AccessToken.getInstance(userToken, AccessTokenType.CAPABILITY_TOKEN);
         } catch (Exception ignored) {
             /* go on and try a different token type */
         }
@@ -121,7 +119,7 @@ public final class ZipStudyResource {
         if (tokenResponse == null) {
             try {
                 tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(jwtForm), TokenResponse.class);
-                accessToken = AccessToken.getInstance(userToken, tokenResponse.user, AccessTokenType.JWT_BEARER_TOKEN);
+                accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
             } catch (WebApplicationException webException) {
                 if (webException.getResponse().getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
                     throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
