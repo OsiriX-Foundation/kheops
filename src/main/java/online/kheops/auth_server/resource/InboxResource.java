@@ -55,7 +55,7 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID}/user/{user}")
+    @Path("studies/{StudyInstanceUID}/users/{user}")
     public Response putStudy(@PathParam("user") String username,
                              @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                              @Context SecurityContext securityContext) {
@@ -116,7 +116,7 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/user/{user}")
+    @Path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/users/{user}")
     public Response putSeries(@PathParam("user") String username,
                               @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                               @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
