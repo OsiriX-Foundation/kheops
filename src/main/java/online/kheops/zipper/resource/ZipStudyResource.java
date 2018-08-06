@@ -137,7 +137,7 @@ public final class ZipStudyResource {
     }
 
     private Set<Instance> getInstances(Tokens tokens, String studyInstanceUID) {
-        final URI metadataURI = UriBuilder.fromUri(authorizationURI()).path("/users/{user}/studies/{studyInstanceUID}/metadata").build(tokens.getAccessToken().getUser(), studyInstanceUID);
+        final URI metadataURI = UriBuilder.fromUri(authorizationURI()).path("/studies/{studyInstanceUID}/metadata").build(studyInstanceUID);
 
         List<Attributes> attributesList;
         try {

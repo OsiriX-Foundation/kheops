@@ -5,12 +5,10 @@ import java.util.Objects;
 @SuppressWarnings("WeakerAccess")
 public final class AccessToken {
     private final String token;
-    private final String user;
     private final AccessTokenType type;
 
     private AccessToken(String token, String user, AccessTokenType type) {
         this.token = Objects.requireNonNull(token, "token");
-        this.user = Objects.requireNonNull(user, "user");
         this.type = Objects.requireNonNull(type, "type");
     }
 
@@ -20,10 +18,6 @@ public final class AccessToken {
 
     public String getToken() {
         return token;
-    }
-
-    public String getUser() {
-        return user;
     }
 
     @SuppressWarnings("unused")
