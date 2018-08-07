@@ -60,6 +60,7 @@ public class InboxResource
                              @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                              @Context SecurityContext securityContext) {
 
+        LOG.info("studies/{StudyInstanceUID}/users/{user}");
         checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
@@ -122,6 +123,7 @@ public class InboxResource
                               @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
                               @Context SecurityContext securityContext) {
 
+        LOG.info("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/users/{user}");
         checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Strings.SeriesInstanceUID);
 
