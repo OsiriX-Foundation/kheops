@@ -188,6 +188,8 @@ public Response putSeries(@PathParam(Strings.StudyInstanceUID) String studyInsta
                           @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
                           @Context SecurityContext securityContext) {
 
+    LOG.info("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
+
     checkValidUID(studyInstanceUID, Strings.StudyInstanceUID);
     checkValidUID(seriesInstanceUID, Strings.SeriesInstanceUID);
 
