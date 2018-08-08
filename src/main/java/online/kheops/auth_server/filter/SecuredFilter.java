@@ -6,6 +6,7 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.assertion.assertion.AccessJWTAssertion;
 import online.kheops.auth_server.assertion.assertion.CapabilityAssertion;
 import online.kheops.auth_server.assertion.assertion.GoogleJWTAssertion;
+import online.kheops.auth_server.assertion.assertion.SuperuserJWTAssertion;
 import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 import online.kheops.auth_server.entity.User;
 
@@ -78,6 +79,16 @@ public class SecuredFilter implements ContainerRequestFilter {
                     accessJWTAssertion.setAssertionToken(token, context);
                     userPK = User.findByUsername(accessJWTAssertion.getUsername()).getPk();
                     capabilityAccess = accessJWTAssertion.getCapabilityAccess();
+                    validToken = true;
+                } catch (BadAssertionException e) {/*empty*/}
+            }
+
+            if ( ! validToken) {
+                final SuperuserJWTAssertion superuserJWTAssertion = new SuperuserJWTAssertion();
+                try {
+                    superuserJWTAssertion.setAssertionToken(token);
+                    userPK = User.findByUsername(superuserJWTAssertion.getUsername()).getPk();
+                    capabilityAccess = superuserJWTAssertion.getCapabilityAccess();
                     validToken = true;
                 } catch (BadAssertionException e) {/*empty*/}
             }
