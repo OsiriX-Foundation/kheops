@@ -55,7 +55,7 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}/users/{user}")
+    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}/users/{user}")
     public Response putStudy(@PathParam("user") String username,
                              @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                              @Context SecurityContext securityContext) {
@@ -116,7 +116,7 @@ public class InboxResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}/series/{SeriesInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}/users/{user}")
+    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}/users/{user}")
     public Response putSeries(@PathParam("user") String username,
                               @PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                               @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
@@ -182,7 +182,7 @@ public class InboxResource
 
 @PUT
 @Secured
-@Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}/series/{SeriesInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}")
+@Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}")
 public Response putSeries(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                           @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
                           @Context SecurityContext securityContext) {
@@ -298,7 +298,7 @@ public Response putSeries(@PathParam(Strings.StudyInstanceUID) String studyInsta
 
     @GET
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}/metadata")
+    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}/metadata")
     @Produces("application/dicom+json")
     public Response getStudiesMetadata(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                                        @Context SecurityContext securityContext) throws URISyntaxException {
@@ -349,7 +349,7 @@ public Response putSeries(@PathParam(Strings.StudyInstanceUID) String studyInsta
 
     @DELETE
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}")
+    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}")
     @Produces("application/dicom+json")
     public Response deleteStudy(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                                 @Context SecurityContext securityContext) {
@@ -396,7 +396,7 @@ public Response putSeries(@PathParam(Strings.StudyInstanceUID) String studyInsta
 
     @DELETE
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}/series/{SeriesInstanceUID:([1-9]+[0-9]*[.])*([1-9]+[0-9]*)+}")
+    @Path("studies/{StudyInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9]+[0-9]*[.])*[1-9][0-9]*}")
     @Produces("application/dicom+json")
     public Response deleteSeries(@PathParam(Strings.StudyInstanceUID) String studyInstanceUID,
                                  @PathParam(Strings.SeriesInstanceUID) String seriesInstanceUID,
