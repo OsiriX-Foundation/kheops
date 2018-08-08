@@ -91,6 +91,8 @@ public class SecuredFilter implements ContainerRequestFilter {
                     capabilityAccess = superuserJWTAssertion.getCapabilityAccess();
                     validToken = true;
                 } catch (BadAssertionException e) {/*empty*/}
+                  catch (Exception e) {/*empty*/}
+
             }
         }
 
