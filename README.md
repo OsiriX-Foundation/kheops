@@ -18,5 +18,6 @@ Name : [osirixfoundation/kheops-dicomweb-proxy](https://hub.docker.com/r/osirixf
 
 # Environnement variables
 
-`XXXX`
+`kheops_pacs_url`
+`kheops_authorization_url`
 
