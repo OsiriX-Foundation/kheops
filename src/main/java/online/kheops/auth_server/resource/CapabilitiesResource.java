@@ -104,7 +104,7 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
-    @Path("capabilities/{secret}/revoke")
+    @Path("capabilities/{secret:[a-zA-Z0-9]{22}}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response revokeCapability(@PathParam("secret") String secret,
