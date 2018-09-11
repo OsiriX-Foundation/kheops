@@ -38,6 +38,8 @@ public class SecuredFilter implements ContainerRequestFilter {
             throw new NotAuthorizedException("Bearer authorization header must be provided");
         }
 
+        String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
+
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
@@ -84,20 +86,16 @@ public class SecuredFilter implements ContainerRequestFilter {
             }
 
             if ( ! validToken) {
-                final SuperuserJWTAssertion superuserJWTAssertion = new SuperuserJWTAssertion();
                 try {
-                    superuserJWTAssertion.setAssertionToken(token);
+                    final SuperuserJWTAssertion superuserJWTAssertion = SuperuserJWTAssertion.getBuilder(superuserSecret).build(token);
                     userPK = User.findByUsername(superuserJWTAssertion.getUsername()).getPk();
                     capabilityAccess = superuserJWTAssertion.getCapabilityAccess();
                     validToken = true;
                 } catch (BadAssertionException e) {/*empty*/}
-                  catch (Exception e) {/*empty*/}
-
             }
         }
 
         if (validToken) {
-            Response.Status responseStatus = Response.Status.OK;
             final boolean isSecured = requestContext.getSecurityContext().isSecure();
             final long finalUserPk = userPK;
             final boolean finalCapabilityAccess = capabilityAccess;

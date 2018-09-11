@@ -33,10 +33,7 @@ public class JWTAssertionBuilder implements AssertionBuilder {
 
         switch (issuer) {
             case KHEOPS_ISSUER:
-                SuperuserJWTAssertion superuserJWTAssertion = new SuperuserJWTAssertion();
-                superuserJWTAssertion.setSuperuserSecret(superuserSecret);
-                superuserJWTAssertion.setAssertionToken(assertionToken);
-                return superuserJWTAssertion;
+                return SuperuserJWTAssertion.getBuilder(superuserSecret).build(assertionToken);
             case GOOGLE_ISSUER:
                 GoogleJWTAssertion googleJWTAssertion = new GoogleJWTAssertion();
                 googleJWTAssertion.setAssertionToken(assertionToken);
