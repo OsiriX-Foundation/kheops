@@ -62,7 +62,7 @@ public class CapabilityAssertion implements Assertion {
     }
 
     @Override
-    public Boolean getCapabilityAccess() {
+    public boolean getCapabilityAccess() {
         return false;
     }
 }

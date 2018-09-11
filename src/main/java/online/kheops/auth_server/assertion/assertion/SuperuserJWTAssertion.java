@@ -76,7 +76,7 @@ public class SuperuserJWTAssertion implements Assertion {
 
 
     @Override
-    public Boolean getCapabilityAccess() {
+    public boolean getCapabilityAccess() {
         return true;
     }
 }

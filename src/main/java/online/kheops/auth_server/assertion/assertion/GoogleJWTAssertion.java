@@ -95,7 +95,7 @@ public class GoogleJWTAssertion implements Assertion {
     }
 
     @Override
-    public Boolean getCapabilityAccess() {
+    public boolean getCapabilityAccess() {
         return true;
     }
 }

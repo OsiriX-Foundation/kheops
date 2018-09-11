@@ -116,7 +116,7 @@ public class TokenResource
         EntityTransaction tx;
 
         // try to find the user in the database;
-        User callingUser = User.findByUsername(assertion.getUsername());
+        User callingUser = User.findByUsername(assertion.getUsername()).orElse(null);
 
         // if the user can't be found, try to build a new one;
         if (callingUser == null) {
@@ -142,7 +142,7 @@ public class TokenResource
             }
 
             // At this point there should definitely be a user in the database for the calling user.
-            callingUser = User.findByUsername(assertion.getUsername());
+            callingUser = User.findByUsername(assertion.getUsername()).orElse(null);
         }
 
         em = EntityManagerListener.createEntityManager();

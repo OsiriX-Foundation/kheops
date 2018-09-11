@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static online.kheops.auth_server.generated.tables.Users.USERS;
@@ -89,7 +90,7 @@ public class User {
         return -1;
     }
 
-    public static User findByUsername(String username) {
+    public static Optional<User> findByUsername(String username) {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         User user;
@@ -105,7 +106,7 @@ public class User {
             em.close();
         }
 
-        return user;
+        return Optional.ofNullable(user);
     }
 
     // returns -1 if the user does not exist

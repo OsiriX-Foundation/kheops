@@ -38,7 +38,8 @@ public class SecuredFilter implements ContainerRequestFilter {
             throw new NotAuthorizedException("Bearer authorization header must be provided");
         }
 
-        String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
+        final String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
+        final String authorizationSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
 
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
@@ -60,7 +61,13 @@ public class SecuredFilter implements ContainerRequestFilter {
                 return;
             }
 
-            userPK = User.findByUsername(capabilityAssertion.getUsername()).getPk();
+            User user = User.findByUsername(capabilityAssertion.getUsername()).orElse(null);
+            if (user == null) {
+                requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                return;
+
+            }
+            userPK = user.getPk();
             capabilityAccess = capabilityAssertion.getCapabilityAccess();
             validToken = true;
 
@@ -69,17 +76,26 @@ public class SecuredFilter implements ContainerRequestFilter {
             final GoogleJWTAssertion googleJWTAssertion = new GoogleJWTAssertion();
             try {
                 googleJWTAssertion.setAssertionToken(token);
-                userPK = User.findByUsername(googleJWTAssertion.getUsername()).getPk();
+                User user = User.findByUsername(googleJWTAssertion.getUsername()).orElse(null);
+                if (user == null) {
+                    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                    return;
+                }
+                userPK = user.getPk();
                 capabilityAccess = true;
                 validToken = true;
 
             } catch (BadAssertionException e) { /*empty*/ }
 
             if ( ! validToken) {
-                final AccessJWTAssertion accessJWTAssertion = new AccessJWTAssertion();
                 try {
-                    accessJWTAssertion.setAssertionToken(token, context);
-                    userPK = User.findByUsername(accessJWTAssertion.getUsername()).getPk();
+                    final AccessJWTAssertion accessJWTAssertion = AccessJWTAssertion.getBuilder(authorizationSecret).build(token);
+                    User user = User.findByUsername(accessJWTAssertion.getUsername()).orElse(null);
+                    if (user == null) {
+                        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                        return;
+                    }
+                    userPK = user.getPk();
                     capabilityAccess = accessJWTAssertion.getCapabilityAccess();
                     validToken = true;
                 } catch (BadAssertionException e) {/*empty*/}
@@ -88,7 +104,12 @@ public class SecuredFilter implements ContainerRequestFilter {
             if ( ! validToken) {
                 try {
                     final SuperuserJWTAssertion superuserJWTAssertion = SuperuserJWTAssertion.getBuilder(superuserSecret).build(token);
-                    userPK = User.findByUsername(superuserJWTAssertion.getUsername()).getPk();
+                    User user = User.findByUsername(superuserJWTAssertion.getUsername()).orElse(null);
+                    if (user == null) {
+                        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                        return;
+                    }
+                    userPK = user.getPk();
                     capabilityAccess = superuserJWTAssertion.getCapabilityAccess();
                     validToken = true;
                 } catch (BadAssertionException e) {/*empty*/}
