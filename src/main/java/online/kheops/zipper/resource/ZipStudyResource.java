@@ -121,7 +121,8 @@ public final class ZipStudyResource {
                 tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(jwtForm), TokenResponse.class);
                 accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
             } catch (WebApplicationException webException) {
-                if (webException.getResponse().getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
+                if (webException.getResponse().getStatus() == Response.Status.BAD_REQUEST.getStatusCode() ||
+                        webException.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
                     throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
                 } else {
                     throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
