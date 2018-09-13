@@ -16,9 +16,9 @@ import online.kheops.auth_server.*;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
-import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
-import online.kheops.auth_server.assertion.exceptions.DownloadKeyException;
-import online.kheops.auth_server.assertion.exceptions.UnknownGrantTypeException;
+import online.kheops.auth_server.assertion.BadAssertionException;
+import online.kheops.auth_server.assertion.DownloadKeyException;
+import online.kheops.auth_server.assertion.UnknownGrantTypeException;
 import online.kheops.auth_server.entity.User;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -185,7 +185,7 @@ public class TokenResource
                 .withIssuer("auth.kheops.online")
                 .withSubject(assertion.getUsername())
                 .withAudience("dicom.kheops.online")
-                .withClaim("capability", !assertion.isCapabilityAssertion()) // don't give capability access for capability assertions
+                .withClaim("capability", !assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .withNotBefore(new Date());
 

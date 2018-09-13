@@ -26,7 +26,8 @@ public class FetchContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         executor = new ScheduledThreadPoolExecutor(MAXIMUM_CONCURRENT);
 
-        AssertionVerifier.setSuperuserSecret(sce.getServletContext().getInitParameter("online.kheops.superuser.hmacsecret"));
+        AssertionVerifier.setSecrets(sce.getServletContext().getInitParameter("online.kheops.superuser.hmacsecret"),
+                sce.getServletContext().getInitParameter("online.kheops.auth.hmacsecret"));
         PACSAuthTokenBuilder.setSecret(sce.getServletContext().getInitParameter("online.kheops.auth.hmacsecret"));
 
         try {

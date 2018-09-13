@@ -1,29 +1,26 @@
-package online.kheops.auth_server.assertion.assertion;
+package online.kheops.auth_server.assertion;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
-public class SuperuserJWTAssertion implements Assertion {
+final class SuperuserJWTAssertion implements Assertion {
     private final String username;
     private final String email;
 
-    public static class Builder {
+    static class Builder {
         private final String superuserSecret;
 
         private Builder(String superuserSecret) {
             this.superuserSecret = Objects.requireNonNull(superuserSecret);
         }
 
-        public SuperuserJWTAssertion build(String assertionToken) throws BadAssertionException {
+        SuperuserJWTAssertion build(String assertionToken) throws BadAssertionException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -55,7 +52,7 @@ public class SuperuserJWTAssertion implements Assertion {
         }
     }
 
-    public static Builder getBuilder(String superuserSecret) {
+    static Builder getBuilder(String superuserSecret) {
         return new Builder(superuserSecret);
     }
 
@@ -76,7 +73,7 @@ public class SuperuserJWTAssertion implements Assertion {
 
 
     @Override
-    public boolean getCapabilityAccess() {
+    public boolean hasCapabilityAccess() {
         return true;
     }
 }

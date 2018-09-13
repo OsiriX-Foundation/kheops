@@ -1,20 +1,19 @@
-package online.kheops.auth_server.assertion.builder;
+package online.kheops.auth_server.assertion;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.assertion.GoogleJWTAssertion;
-import online.kheops.auth_server.assertion.assertion.SuperuserJWTAssertion;
-import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
 
-public class JWTAssertionBuilder implements AssertionBuilder {
-    private static final String KHEOPS_ISSUER = "authorization.kheops.online";
+final class JWTAssertionBuilder implements AssertionBuilder {
+    private static final String KHEOPS_ISSUER = "auth.kheops.online";
+    private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
     private static final String GOOGLE_ISSUER = "accounts.google.com";
 
     private final String superuserSecret;
+    private final String authorizationSecret;
 
-    public JWTAssertionBuilder(String superuserSecret) {
+    JWTAssertionBuilder(String superuserSecret, String authorizationSecret) {
         this.superuserSecret = superuserSecret;
+        this.authorizationSecret = authorizationSecret;
     }
 
     @Override
@@ -33,11 +32,11 @@ public class JWTAssertionBuilder implements AssertionBuilder {
 
         switch (issuer) {
             case KHEOPS_ISSUER:
+                return AuthorizationJWTAssertion.getBuilder(authorizationSecret).build(assertionToken);
+            case SUPERUSER_ISSUER:
                 return SuperuserJWTAssertion.getBuilder(superuserSecret).build(assertionToken);
             case GOOGLE_ISSUER:
-                GoogleJWTAssertion googleJWTAssertion = new GoogleJWTAssertion();
-                googleJWTAssertion.setAssertionToken(assertionToken);
-                return googleJWTAssertion;
+                return GoogleJWTAssertion.getBuilder().build(assertionToken);
             default:
                 throw new BadAssertionException("Unknown JWT issuer");
         }

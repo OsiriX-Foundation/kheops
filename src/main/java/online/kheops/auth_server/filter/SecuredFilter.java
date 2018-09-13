@@ -1,18 +1,15 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.Capabilities;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.assertion.assertion.AccessJWTAssertion;
-import online.kheops.auth_server.assertion.assertion.CapabilityAssertion;
-import online.kheops.auth_server.assertion.assertion.GoogleJWTAssertion;
-import online.kheops.auth_server.assertion.assertion.SuperuserJWTAssertion;
-import online.kheops.auth_server.assertion.exceptions.BadAssertionException;
+import online.kheops.auth_server.assertion.Assertion;
+import online.kheops.auth_server.assertion.AssertionVerifier;
+import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.resource.TokenResource;
 
 import javax.annotation.Priority;
 import javax.servlet.ServletContext;
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -22,11 +19,16 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Secured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class SecuredFilter implements ContainerRequestFilter {
+
+    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
+
     @Context
     ServletContext context;
 
@@ -44,109 +46,48 @@ public class SecuredFilter implements ContainerRequestFilter {
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
-        long userPK = -1;
-        boolean capabilityAccess = false;
-        boolean validToken = false;
-
-        if (Capabilities.isValidFormat(token)) {
-            final CapabilityAssertion capabilityAssertion = new CapabilityAssertion();
-
-            try {
-                capabilityAssertion.setCapabilityToken(token);
-            } catch (NotAuthorizedException e) {
-                requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                return;
-            } catch (ForbiddenException e) {
-                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
-                return;
-            }
-
-            User user = User.findByUsername(capabilityAssertion.getUsername()).orElse(null);
-            if (user == null) {
-                requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                return;
-
-            }
-            userPK = user.getPk();
-            capabilityAccess = capabilityAssertion.getCapabilityAccess();
-            validToken = true;
-
-        } else {
-
-            final GoogleJWTAssertion googleJWTAssertion = new GoogleJWTAssertion();
-            try {
-                googleJWTAssertion.setAssertionToken(token);
-                User user = User.findByUsername(googleJWTAssertion.getUsername()).orElse(null);
-                if (user == null) {
-                    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                    return;
-                }
-                userPK = user.getPk();
-                capabilityAccess = true;
-                validToken = true;
-
-            } catch (BadAssertionException e) { /*empty*/ }
-
-            if ( ! validToken) {
-                try {
-                    final AccessJWTAssertion accessJWTAssertion = AccessJWTAssertion.getBuilder(authorizationSecret).build(token);
-                    User user = User.findByUsername(accessJWTAssertion.getUsername()).orElse(null);
-                    if (user == null) {
-                        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                        return;
-                    }
-                    userPK = user.getPk();
-                    capabilityAccess = accessJWTAssertion.getCapabilityAccess();
-                    validToken = true;
-                } catch (BadAssertionException e) {/*empty*/}
-            }
-
-            if ( ! validToken) {
-                try {
-                    final SuperuserJWTAssertion superuserJWTAssertion = SuperuserJWTAssertion.getBuilder(superuserSecret).build(token);
-                    User user = User.findByUsername(superuserJWTAssertion.getUsername()).orElse(null);
-                    if (user == null) {
-                        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                        return;
-                    }
-                    userPK = user.getPk();
-                    capabilityAccess = superuserJWTAssertion.getCapabilityAccess();
-                    validToken = true;
-                } catch (BadAssertionException e) {/*empty*/}
-            }
-        }
-
-        if (validToken) {
-            final boolean isSecured = requestContext.getSecurityContext().isSecure();
-            final long finalUserPk = userPK;
-            final boolean finalCapabilityAccess = capabilityAccess;
-
-            requestContext.setSecurityContext(new SecurityContext() {
-                @Override
-                public KheopsPrincipal getUserPrincipal() {
-                    return new KheopsPrincipal(finalUserPk);
-                }
-
-                @Override
-                public boolean isUserInRole(String role) {
-                    if (role.equals("capability")) {
-                        return finalCapabilityAccess;
-                    }
-                    return false;
-                }
-
-                @Override
-                public boolean isSecure() {
-                    return isSecured;
-                }
-
-                @Override
-                public String getAuthenticationScheme() {
-                    return "BEARER";
-                }
-            });
-        } else {
+        final Assertion assertion;
+        try {
+            assertion = AssertionVerifier.createAssertion(token);
+        } catch (BadAssertionException e) {
+            LOG.log(Level.WARNING, "Received bad assertion", e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
         }
+
+        final User user = User.findByUsername(assertion.getUsername()).orElse(null);
+        if (user == null) {
+            LOG.severe("Unable to find user");
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+
+        }
+        final long userPK = user.getPk();
+        final boolean capabilityAccess = assertion.hasCapabilityAccess();
+        final boolean isSecured = requestContext.getSecurityContext().isSecure();
+        requestContext.setSecurityContext(new SecurityContext() {
+            @Override
+            public KheopsPrincipal getUserPrincipal() {
+                return new KheopsPrincipal(userPK);
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                if (role.equals("capability")) {
+                    return capabilityAccess;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean isSecure() {
+                return isSecured;
+            }
+
+            @Override
+            public String getAuthenticationScheme() {
+                return "BEARER";
+            }
+        });
     }
 }
