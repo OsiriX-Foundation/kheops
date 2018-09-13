@@ -99,10 +99,14 @@ public class TokenResource
         final Assertion assertion;
         try {
             assertion = AssertionVerifier.createAssertion(assertionToken, grantType);
-        } catch (UnknownGrantTypeException | BadAssertionException e) {
+        } catch (UnknownGrantTypeException e) {
+            errorResponse.errorDescription = e.getMessage();
+            LOG.log(Level.WARNING, "Unknown grant type", e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        } catch (BadAssertionException e) {
             errorResponse.errorDescription = e.getMessage();
             LOG.log(Level.WARNING, "Error validating a token", e);
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
             errorResponse.error = "server_error";
