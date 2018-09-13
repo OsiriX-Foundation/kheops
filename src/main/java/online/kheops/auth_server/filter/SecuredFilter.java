@@ -51,7 +51,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             assertion = AssertionVerifier.createAssertion(token);
         } catch (BadAssertionException e) {
             LOG.log(Level.WARNING, "Received bad assertion", e);
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).build());
             return;
         }
 
