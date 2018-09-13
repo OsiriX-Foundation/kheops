@@ -185,7 +185,7 @@ public class TokenResource
                 .withIssuer("auth.kheops.online")
                 .withSubject(assertion.getUsername())
                 .withAudience("dicom.kheops.online")
-                .withClaim("capability", !assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
+                .withClaim("capability", assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .withNotBefore(new Date());
 
