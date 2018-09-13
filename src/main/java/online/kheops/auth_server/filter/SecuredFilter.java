@@ -1,5 +1,6 @@
 package online.kheops.auth_server.filter;
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.assertion.Assertion;
@@ -9,6 +10,8 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.resource.TokenResource;
 
 import javax.annotation.Priority;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
@@ -40,9 +43,6 @@ public class SecuredFilter implements ContainerRequestFilter {
             throw new NotAuthorizedException("Bearer authorization header must be provided");
         }
 
-        final String superuserSecret = context.getInitParameter("online.kheops.superuser.hmacsecret");
-        final String authorizationSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-
         // Extract the token from the HTTP Authorization header
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
@@ -55,13 +55,33 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        final User user = User.findByUsername(assertion.getUsername()).orElse(null);
+        User user = User.findByUsername(assertion.getUsername()).orElse(null);
+        // if the user can't be found, try to build a new one;
         if (user == null) {
-            LOG.severe("Unable to find user");
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-            return;
+            // try to build a new user, building a new user might fail if there is a unique constraint violation
+            // due to a race condition. Catch the violation and do nothing in that case.
+            EntityManager em = EntityManagerListener.createEntityManager();
+            EntityTransaction tx = em.getTransaction();
 
+            try {
+                tx.begin();
+                LOG.info("User not found, creating a new User");
+                User newUser = new User(assertion.getUsername(), assertion.getEmail());
+                em.persist(newUser);
+                tx.commit();
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+
+            // At this point there should definitely be a user in the database for the calling user.
+            user = User.findByUsername(assertion.getUsername()).orElseThrow(() -> new IllegalStateException("Unable to find user"));
         }
+
         final long userPK = user.getPk();
         final boolean capabilityAccess = assertion.hasCapabilityAccess();
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
