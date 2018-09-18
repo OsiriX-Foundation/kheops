@@ -1,0 +1,51 @@
+/* eslint-disable */
+<template>
+		 <!-- Navbar -->
+		<b-navbar toggleable="md" type="light" variant="light" fixed='top'>
+
+		  <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+
+		  <b-navbar-brand href="#"><img src="../assets/sib_logo_small.gif" style="margin-right:5px"><router-link to="/">Vikm App</router-link></b-navbar-brand>
+
+		  <b-collapse is-nav id="nav_collapse">
+
+		    <b-navbar-nav>
+		    </b-navbar-nav>
+
+		    <!-- Right aligned nav items -->
+		    <b-navbar-nav class="ml-auto">
+
+		    <b-navbar-nav right>
+		      <!-- <b-nav-item v-access = '"admin"'><router-link to="/users">Users</router-link></b-nav-item>
+		      <b-nav-item v-access = '"admin"'><router-link to="/groups">Groups</router-link></b-nav-item> -->
+		      <b-nav-item v-access = '"admin"'><router-link to="/admin">Admin</router-link></b-nav-item>
+		      <b-nav-item v-access = '"active"'>Welcome <router-link :to="{name: 'user', params: {user_id: user.user_id}}">{{user.username}}</router-link></b-nav-item>
+		      <b-nav-item v-access = '"active"'><router-link to="/login"><icon name = 'sign-out'></icon></router-link></b-nav-item>
+		    </b-navbar-nav>
+
+
+
+		    </b-navbar-nav>
+
+		  </b-collapse>
+		</b-navbar>
+
+</template>
+
+<script>
+
+import {Bus} from '@/bus';
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'navHeader',
+  computed: {
+	  ...mapGetters({
+	  	  user: 'currentUser'
+	    })
+  }
+}
+
+</script>
+
+/* eslint-disable */
