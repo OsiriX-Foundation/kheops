@@ -7,10 +7,10 @@ final class JWTAssertionBuilder implements AssertionBuilder {
     private static final String KHEOPS_ISSUER = "auth.kheops.online";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
     private static final String GOOGLE_ISSUER = "accounts.google.com";
-    private static final String KEYCLOAK_ISSUER = "https://test.kheops.online:8443/auth/realms/StaticLoginConnect";
+    private static final String KEYCLOAK_ISSUER = "https://test.kheops.online/auth/realms/StaticLoginConnect";
 
     private static final String GOOGLE_CONFIGURATION_URL = "https://accounts.google.com/.well-known/openid-configuration";
-    private static final String KEYCLOAK_CONFIGURATION_URL = "https://test.kheops.online:8443/auth/realms/StaticLoginConnect/.well-known/openid-configuration";
+    private static final String KEYCLOAK_CONFIGURATION_URL = "https://keycloak.kheops.online/auth/realms/StaticLoginConnect/.well-known/openid-configuration";
 
     private final String superuserSecret;
     private final String authorizationSecret;
