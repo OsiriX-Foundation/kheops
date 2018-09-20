@@ -18,9 +18,7 @@ import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-final class GoogleJWTAssertion implements Assertion {
-    private static final String GOOGLE_CONFIGURATION_URL = "https://accounts.google.com/.well-known/openid-configuration";
-    private static final Builder BUILDER = new Builder();
+final class JWTAssertion implements Assertion {
     private static final Client CLIENT = ClientBuilder.newClient();
 
     private static class ConfigurationEntity {
@@ -33,19 +31,25 @@ final class GoogleJWTAssertion implements Assertion {
 
 
     static final class Builder {
-        GoogleJWTAssertion build(String assertionToken) throws BadAssertionException {
+        private final String configurationUrl;
+
+        Builder(String configurationUrl) {
+            this.configurationUrl = configurationUrl;
+        }
+
+        JWTAssertion build(String assertionToken) throws BadAssertionException {
             final ConfigurationEntity configurationEntity;
             try {
-                configurationEntity = CLIENT.target(GOOGLE_CONFIGURATION_URL).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
+                configurationEntity = CLIENT.target(configurationUrl).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
             } catch (RuntimeException e) {
-                throw new DownloadKeyException("Unable to download the google jwks_uri", e);
+                throw new DownloadKeyException("Unable to download the jwks_uri, configuration URL:" + configurationUrl, e);
             }
 
             final URL googleCertsURL;
             try {
                 googleCertsURL = new URL(configurationEntity.jwksURI);
             } catch (MalformedURLException e) {
-                throw new DownloadKeyException("Google jwks_uri is not a valid URI", e);
+                throw new DownloadKeyException("jwks_uri is not a valid URI, configuration URL:\" + configurationUrl", e);
             }
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -54,7 +58,7 @@ final class GoogleJWTAssertion implements Assertion {
                     try {
                         return (RSAPublicKey) new UrlJwkProvider(googleCertsURL).get(kid).getPublicKey();
                     } catch (JwkException e) {
-                        throw new DownloadKeyException("Can't download the Google public RSA key", e);
+                        throw new DownloadKeyException("Can't download the public RSA key, configuration URL:" + configurationUrl, e);
                     }
                 }
                 // implemented to get rid of warnings
@@ -67,29 +71,28 @@ final class GoogleJWTAssertion implements Assertion {
                 jwt = JWT.require(Algorithm.RSA256(keyProvider))
                         .acceptLeeway(120)
                         .acceptExpiresAt(86400)
-                        .withIssuer("accounts.google.com")
                         .build().verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAssertionException("Verification of the Google token failed", e);
+                throw new BadAssertionException("Verification of the token failed, configuration URL:" + configurationUrl, e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAssertionException("No subject present in the Google token");
+                throw new BadAssertionException("No subject present in the token, configuration URL:" + configurationUrl);
             }
             final Claim emailClaim = jwt.getClaim("email");
             if (emailClaim.isNull()) {
-                throw new BadAssertionException("No email present in the Google token");
+                throw new BadAssertionException("No email present in the token, configuration URL:" + configurationUrl);
             }
 
-            return new GoogleJWTAssertion(jwt.getSubject(), emailClaim.asString());
+            return new JWTAssertion(jwt.getSubject(), emailClaim.asString());
         }
     }
 
-    static Builder getBuilder() {
-        return BUILDER;
+    static Builder getBuilder(String configurationUrl) {
+        return new Builder(configurationUrl);
     }
 
-    private GoogleJWTAssertion(String username, String email) {
+    private JWTAssertion(String username, String email) {
         this.username = username;
         this.email = email;
     }

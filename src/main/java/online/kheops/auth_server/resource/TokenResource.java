@@ -120,7 +120,7 @@ public class TokenResource
         EntityTransaction tx;
 
         // try to find the user in the database;
-        User callingUser = User.findByUsername(assertion.getUsername()).orElse(null);
+        User callingUser = User.findByUsername(assertion.getUsername()).orElse(User.findByUsername(assertion.getEmail()).orElse(null));
 
         // if the user can't be found, try to build a new one;
         if (callingUser == null) {

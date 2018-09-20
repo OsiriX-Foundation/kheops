@@ -55,7 +55,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        User user = User.findByUsername(assertion.getUsername()).orElse(null);
+        User user = User.findByUsername(assertion.getUsername()).orElse(User.findByUsername(assertion.getEmail()).orElse(null));
         // if the user can't be found, try to build a new one;
         if (user == null) {
             // try to build a new user, building a new user might fail if there is a unique constraint violation
