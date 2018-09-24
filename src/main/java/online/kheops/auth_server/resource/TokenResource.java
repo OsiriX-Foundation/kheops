@@ -80,11 +80,6 @@ public class TokenResource
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope, @FormParam("return_user") String returnUser) {
-
-        // A scope of 'write' will be given along with the study and series pair by the DICOMweb STOW proxy to
-        // indicate that it wants to know if assertion gives write permission to the study/series pair.
-        // If the assertion does not give write permission, a 403 forbidden should be returned.
-
         UIDPair uidPair = getUIDPairFromScope(scope);
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
