@@ -6,19 +6,22 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.study.StudyQueries;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static online.kheops.auth_server.album.Albums.ifUserMemberOfAlbum;
+import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 
@@ -59,7 +62,7 @@ public class Events {
                     throw new BadQueryParametersException("Self comment forbidden");
                 }
 
-                if (!ifUserMemberOfAlbum(album, targetUser, em)) {
+                if (!isMemberOfAlbum(targetUser, album, em)) {
                     throw new UserNotFoundException("Target user is not a member of the album : " + albumPk);
                 }
 
@@ -114,7 +117,7 @@ public class Events {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+            if (!isMemberOfAlbum(callingUser, album, em)) {
                 throw new AlbumNotFoundException();
             }
 
@@ -148,7 +151,7 @@ public class Events {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+            if (!isMemberOfAlbum(callingUser, album, em)) {
                 throw new AlbumNotFoundException();
             }
 
@@ -178,7 +181,7 @@ public class Events {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+            if (!isMemberOfAlbum(callingUser, album, em)) {
                 throw new AlbumNotFoundException();
             }
 
@@ -237,6 +240,10 @@ public class Events {
             final User callingUser = getUser(callingUserPk, em);
             final Study study = getStudy(studyInstanceUID, em);
 
+            if (!canAccessStudy(callingUser, study, em)) {
+                throw new StudyNotFoundException("Unknown study");
+            }
+
             final Comment comment = new Comment(commentContent, callingUser, study);
 
             if(isPrivateComment) {
@@ -246,8 +253,9 @@ public class Events {
                     throw new BadQueryParametersException("Self comment forbidden");
                 }
 
-                //TODO verifier si l'utilisateur a acces à la study
-
+                if (!canAccessStudy(targetUser, study, em)) {
+                    throw new StudyNotFoundException("Unknown study by the target user");
+                }
                 comment.setPrivateTargetUser(targetUser);
                 targetUser.getComments().add(comment);
                 em.persist(targetUser);

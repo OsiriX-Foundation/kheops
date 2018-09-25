@@ -27,7 +27,6 @@ import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
 import static online.kheops.auth_server.capability.CapabilitiesResponses.CapabilityToCapabilitiesResponses;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUIDFromInbox;
-import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUIDandUser;
 
 public class Capabilities {

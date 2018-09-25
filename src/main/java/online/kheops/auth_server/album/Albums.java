@@ -175,7 +175,7 @@ public class Albums {
             final User callingUser = getUser(callingUserPk, em);
             Album album = getAlbum(albumPk, em);
 
-            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+            if (!isMemberOfAlbum(callingUser, album, em)) {
                 throw new AlbumNotFoundException();
             }
 
@@ -463,7 +463,7 @@ public class Albums {
         return true;
     }
 
-    public static boolean ifUserMemberOfAlbum(Album album, User user, EntityManager em) {
+    public static boolean isMemberOfAlbum(User user, Album album, EntityManager em) {
         try {
             findAlbumUserByUserAndAlbum(user, album, em);
         } catch (NoResultException e) {
