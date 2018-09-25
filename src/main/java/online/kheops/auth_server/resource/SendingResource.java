@@ -61,10 +61,6 @@ public class SendingResource
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
-        if (fromInbox == null && fromAlbumPk == null) {
-            fromInbox = true;
-        }
-
         if (fromInbox != null) {
             fromInbox = true;
         }
@@ -141,16 +137,12 @@ public class SendingResource
                                        @QueryParam("inbox") Boolean fromInbox,
                                        @Context SecurityContext securityContext) throws URISyntaxException {
 
-        if (fromInbox == null && fromAlbumPk == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Use {album} or {inbox} query parameter").build();
+        if ((fromAlbumPk != null && fromInbox != null)) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
         if (fromInbox != null) {
             fromInbox = true;
-        }
-
-        if ((fromAlbumPk != null && fromInbox != null)) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
@@ -277,10 +269,6 @@ public class SendingResource
 
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
-        }
-
-        if (fromInbox == null && fromAlbumPk == null) {
-            fromInbox = true;
         }
 
         if (fromInbox != null) {

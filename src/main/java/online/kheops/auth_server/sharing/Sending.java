@@ -477,12 +477,10 @@ public class Sending {
                 throw new AlbumForbiddenException("Only an admin or a user with send permission can send series");
             }
             availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
-        } else if (fromInbox && fromAlbumPk == null) {
-            availableSeries = findSeriesListByStudyUIDFromAlbumAndInbox(callingUser, studyInstanceUID, em);
         } else if (fromInbox) {
             availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
         } else {
-            availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
+            availableSeries = findSeriesListByStudyUIDFromAlbumAndInbox(callingUser, studyInstanceUID, em);
         }
 
         if (availableSeries.isEmpty()) {
