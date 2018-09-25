@@ -181,7 +181,7 @@ public class Albums {
 
             albumResponse = findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
 
-            if (albumResponse.pk == callingUser.getInbox().getPk()) {
+            if (Long.parseLong(albumResponse.id) == callingUser.getInbox().getPk()) {
                 throw new AlbumNotFoundException();
             }
 

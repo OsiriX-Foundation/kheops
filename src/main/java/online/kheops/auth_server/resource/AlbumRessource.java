@@ -52,7 +52,7 @@ public class AlbumRessource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info("New album pk:"+albumResponse.pk+" created by user pk:"+callingUserPk);
+        LOG.info("New album pk:"+albumResponse.id+" created by user pk:"+callingUserPk);
         return Response.status(Response.Status.CREATED).entity(albumResponse).build();
     }
 
