@@ -1,6 +1,5 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import org.jooq.Record;
 
@@ -17,8 +16,8 @@ public class AlbumResponses {
     }
 
     public static class AlbumResponse {
-        @XmlElement(name = "pk")
-        public long pk;
+        @XmlElement(name = "album_id")
+        public String id;
         @XmlElement(name = "name")
         public String name;
         @XmlElement(name = "description")
@@ -110,7 +109,7 @@ public class AlbumResponses {
     public static AlbumResponse recordToAlbumResponse(Record r) {
         final AlbumResponses.AlbumResponse albumResponse = new AlbumResponse();
 
-        albumResponse.pk = (Long) r.getValue("album_pk");
+        albumResponse.id = r.getValue("album_pk").toString();
         albumResponse.name = r.getValue("album_name").toString();
         albumResponse.description = r.getValue("album_description").toString();
         albumResponse.createdTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_created_time")).getTime()), TimeZone.getDefault().toZoneId());
