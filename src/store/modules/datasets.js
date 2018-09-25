@@ -1,5 +1,5 @@
 import {HTTP} from '@/router/http';
-import Base64 from '@/mixins/base64';
+import dicom from '@/mixins/dicom';
 
 // initial state
 const state = {
@@ -16,9 +16,21 @@ const getters = {
 const actions = {
 
 	getDatasets ({ commit }) {			
-		console.log('getDatasets');
 			HTTP.get('studies',{headers: {'Accept': 'application/dicom+json'}}).then(res => {
-				commit('SET_DATASETS', res.data)
+				let data = [];
+				_.forEach(res.data, d => {
+					let t = {};
+					_.forEach(d, (v,k) => {
+						if (dicom.dicom2name[k] !== undefined){
+							if (dicom.dicom2name[k] == 'PatientName' || dicom.dicom2name[k] == 'ReferringPhysicianName') v.Value = v.Value[0].Alphabetic;
+							t[dicom.dicom2name[k]] = v.Value							
+						}
+						else t[k] = v;
+
+					})
+					data.push(t);
+				})
+				commit('SET_DATASETS', data)
 			});
 	}
 

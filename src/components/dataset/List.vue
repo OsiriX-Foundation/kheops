@@ -1,6 +1,10 @@
 /* eslint-disable */
 <template>
-<p>{{datasets.length}} datasets</p>
+	<div class = 'container'>
+		 <p>{{datasets.length}} datasets</p>
+		 <b-table striped hover :items="datasets"></b-table>
+		
+	</div>
 </template>
 
 
