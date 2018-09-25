@@ -5,6 +5,7 @@ import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.AttributesListMarshaller;
+import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
 
 import javax.persistence.*;
@@ -185,8 +186,8 @@ public class FetchTask implements Runnable {
             try {
                 tx.begin();
 
-                TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :studyInstanceUID", Study.class);
-                query.setParameter("studyInstanceUID", studyInstanceUID);
+                TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
+                query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
                 query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
                 Study study = query.getSingleResult();

@@ -1,38 +1,36 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.CapabilitySecured;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.entity.Capability;
-import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.capability.Capabilities;
+import online.kheops.auth_server.capability.CapabilitiesResponses;
+import online.kheops.auth_server.capability.CapabilitiesResponses.CapabilityResponse;
+import online.kheops.auth_server.capability.CapabilityNotFound;
+import online.kheops.auth_server.capability.NewCapabilityForbidden;
+import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.Consts;
 
-import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import javax.xml.bind.annotation.XmlElement;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.series.Series.checkValidUID;
+
 
 @Path("/")
 public class CapabilitiesResource {
 
-    static class CapabilityResponse {
-        @XmlElement(name = "secret")
-        String secret;
-        @XmlElement(name = "description")
-        String description;
-        @XmlElement(name = "expiration")
-        String expiration;
-        @XmlElement(name = "revoked")
-        boolean revoked;
-    }
+    @Context
+    private UriInfo uriInfo;
 
     @POST
     @Secured
@@ -41,61 +39,64 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCapability(@FormParam("description") String description, @FormParam("expiration") String expirationDate,
-                                     @Context SecurityContext securityContext) {
+    public Response createNewCapability(@NotNull @FormParam("title") String title,
+                                        @FormParam("expiration") String expirationDate,
+                                        @NotNull @FormParam("scope_type") String scopeType,
+                                        @FormParam("album") Long albumPk,
+                                        @FormParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+                                        @FormParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                        @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        CapabilityResponse capabilityResponse;
+        CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
-        if (description == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("No description set").build();
+        if (scopeType.compareTo("album") != 0 ||scopeType.compareTo("series") != 0 ||scopeType.compareTo("study") != 0 || scopeType.compareTo("user") != 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
         }
-
-        // parse the given expiration date
-        LocalDateTime expirationDateTime;
-        if (expirationDate != null) {
-            try {
-                OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
-                expirationDateTime = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
-            } catch (DateTimeParseException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid expiration date").build();
-            }
-        } else {
-            expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
+        switch (scopeType) {
+            case "album":
+                if( albumPk == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("The {album} query parameter must be set").build();
+                }
+                break;
+            case "series":
+                if( seriesInstanceUID == null && studyInstanceUID == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("The {series} and {study} query parameters must be set").build();
+                }
+                checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
+                checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
+                break;
+            case "study":
+                if( studyInstanceUID == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("The {study} query parameter must be set").build();
+                }
+                checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
+                break;
         }
-
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
-
-            final User targetUser = User.findByPk(callingUserPk, em);
-            if (targetUser == null) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
+            switch (scopeType) {
+                case "user":
+                    capabilityResponse = createUserCapability(callingUserPk, title, expirationDate);
+                    break;
+                case "album":
+                    capabilityResponse = createAlbumCapability(callingUserPk, title, expirationDate, albumPk);
+                    break;
+                case "series":
+                    capabilityResponse = createSeriesCapability(callingUserPk, title, expirationDate, studyInstanceUID, seriesInstanceUID);
+                    break;
+                case "study":
+                    capabilityResponse = createStudyCapability(callingUserPk, title, expirationDate, studyInstanceUID);
+                    break;
+                default:
+                    return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
             }
-
-            Capability capability = new Capability();
-            capability.setExpiration(expirationDateTime);
-            capability.setDescription(description);
-            capability.setUser(targetUser);
-            targetUser.getCapabilities().add(capability);
-
-            em.persist(capability);
-            em.persist(targetUser);
-
-            capabilityResponse = new CapabilityResponse();
-            capabilityResponse.secret = capability.getSecret();
-            capabilityResponse.description = capability.getDescription();
-            capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
-            capabilityResponse.revoked = capability.isRevoked();
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
+        } catch (UserNotFoundException | StudyNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (DateTimeParseException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration}").build();
+        } catch (NewCapabilityForbidden e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
         return Response.status(Response.Status.CREATED).entity(capabilityResponse).build();
@@ -113,46 +114,10 @@ public class CapabilitiesResource {
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         CapabilityResponse capabilityResponse;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
         try {
-            tx.begin();
-
-            final User targetUser = User.findByPk(callingUserPk, em);
-            if (targetUser == null) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
-            }
-
-            if (callingUserPk != targetUser.getPk()) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Can't revoke a different user's capability").build();
-            }
-
-            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :targetUser = c.user AND :secret = c.secret", Capability.class);
-            query.setParameter("targetUser", targetUser);
-            query.setParameter("secret", secret);
-            Capability capability;
-            try {
-                capability = query.getSingleResult();
-            } catch (NoResultException e) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Unknown capability").build();
-            }
-
-            capability.setRevoked(true);
-            em.persist(capability);
-
-            capabilityResponse = new CapabilityResponse();
-            capabilityResponse.secret = capability.getSecret();
-            capabilityResponse.description = capability.getDescription();
-            capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
-            capabilityResponse.revoked = capability.isRevoked();
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
+            capabilityResponse = Capabilities.revokeCapability(callingUserPk, secret);
+        } catch (UserNotFoundException |CapabilityNotFound e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         return Response.status(Response.Status.OK).entity(capabilityResponse).build();
@@ -162,49 +127,23 @@ public class CapabilitiesResource {
     @Secured
     @CapabilitySecured
     @Path("capabilities")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCapability(@Context SecurityContext securityContext) {
+    public Response getCapabilities(@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        List<CapabilityResponse> capabilityResponses = new ArrayList<>();
+        List<CapabilityResponse> capabilityResponses;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        try {
-            tx.begin();
-
-            final User targetUser = User.findByPk(callingUserPk, em);
-            if (targetUser == null) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Unknown target user").build();
-            }
-
-            if (callingUserPk != targetUser.getPk()) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Can't get capabilities for a different user").build();
-            }
-
-            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :targetUser = c.user", Capability.class);
-            query.setParameter("targetUser", targetUser);
-            List<Capability> capabilities = query.getResultList();
-
-            for (Capability capability: capabilities) {
-                CapabilityResponse capabilityResponse = new CapabilityResponse();
-                capabilityResponse.secret = capability.getSecret();
-                capabilityResponse.description = capability.getDescription();
-                capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
-                capabilityResponse.revoked = capability.isRevoked();
-
-                capabilityResponses.add(capabilityResponse);
-            }
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
+        boolean showRevoke = false;
+        if (uriInfo.getQueryParameters().containsKey("show_revoked")) {
+            showRevoke = Boolean.parseBoolean(uriInfo.getQueryParameters().get("show_revoked").get(0));
         }
 
+        try {
+            capabilityResponses = Capabilities.getCapabilities(callingUserPk, showRevoke);
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
         GenericEntity<List<CapabilityResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilityResponse>>(capabilityResponses) {};
         return Response.status(Response.Status.OK).entity(genericCapabilityResponsesList).build();
     }

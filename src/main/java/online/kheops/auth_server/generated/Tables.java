@@ -6,10 +6,13 @@ package online.kheops.auth_server.generated;
 
 import javax.annotation.Generated;
 
+import online.kheops.auth_server.generated.tables.Album;
+import online.kheops.auth_server.generated.tables.AlbumSeries;
+import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Event;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
-import online.kheops.auth_server.generated.tables.UserSeries;
 import online.kheops.auth_server.generated.tables.Users;
 
 
@@ -27,9 +30,29 @@ import online.kheops.auth_server.generated.tables.Users;
 public class Tables {
 
     /**
+     * The table <code>kheops.album</code>.
+     */
+    public static final Album ALBUM = online.kheops.auth_server.generated.tables.Album.ALBUM;
+
+    /**
+     * The table <code>kheops.album_series</code>.
+     */
+    public static final AlbumSeries ALBUM_SERIES = online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
+
+    /**
+     * The table <code>kheops.album_user</code>.
+     */
+    public static final AlbumUser ALBUM_USER = online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
+
+    /**
      * The table <code>kheops.capabilities</code>.
      */
     public static final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+
+    /**
+     * The table <code>kheops.event</code>.
+     */
+    public static final Event EVENT = online.kheops.auth_server.generated.tables.Event.EVENT;
 
     /**
      * The table <code>kheops.series</code>.
@@ -45,9 +68,4 @@ public class Tables {
      * The table <code>kheops.users</code>.
      */
     public static final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
-
-    /**
-     * The table <code>kheops.user_series</code>.
-     */
-    public static final UserSeries USER_SERIES = online.kheops.auth_server.generated.tables.UserSeries.USER_SERIES;
 }

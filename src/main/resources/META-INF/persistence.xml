@@ -3,10 +3,15 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
     <persistence-unit name="online.kheops">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>online.kheops.auth_server.entity.Album</class>
         <class>online.kheops.auth_server.entity.User</class>
         <class>online.kheops.auth_server.entity.Series</class>
         <class>online.kheops.auth_server.entity.Study</class>
         <class>online.kheops.auth_server.entity.Capability</class>
+        <class>online.kheops.auth_server.entity.AlbumUser</class>
+        <class>online.kheops.auth_server.entity.Event</class>
+        <class>online.kheops.auth_server.entity.Comment</class>
+        <class>online.kheops.auth_server.entity.Mutation</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.lock.timeout" value="2000"/>

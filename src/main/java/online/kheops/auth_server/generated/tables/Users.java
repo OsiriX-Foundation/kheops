@@ -4,8 +4,6 @@
 package online.kheops.auth_server.generated.tables;
 
 
-
-
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = -319821137;
+    private static final long serialVersionUID = 118966289;
 
     /**
      * The reference instance of <code>kheops.users</code>
@@ -83,6 +81,11 @@ public class Users extends TableImpl<UsersRecord> {
      * The column <code>kheops.users.google_email</code>.
      */
     public final TableField<UsersRecord, String> GOOGLE_EMAIL = createField("google_email", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+
+    /**
+     * The column <code>kheops.users.inbox_fk</code>.
+     */
+    public final TableField<UsersRecord, Long> INBOX_FK = createField("inbox_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>kheops.users</code> table reference
@@ -130,7 +133,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.USERS_GOOGLE_EMAIL_INDEX, Indexes.USERS_GOOGLE_EMAIL_UNIQUE, Indexes.USERS_GOOGLE_ID_INDEX, Indexes.USERS_GOOGLE_ID_UNIQUE, Indexes.USERS_PRIMARY);
+        return Arrays.<Index>asList(Indexes.USERS_GOOGLE_EMAIL_INDEX, Indexes.USERS_GOOGLE_EMAIL_UNIQUE, Indexes.USERS_GOOGLE_ID_INDEX, Indexes.USERS_GOOGLE_ID_UNIQUE, Indexes.USERS_INBOX_FK, Indexes.USERS_PRIMARY);
     }
 
     /**
@@ -154,7 +157,19 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<UniqueKey<UsersRecord>> getKeys() {
-        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.KEY_USERS_PRIMARY, Keys.KEY_USERS_GOOGLE_ID_UNIQUE, Keys.KEY_USERS_GOOGLE_EMAIL_UNIQUE);
+        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.KEY_USERS_PRIMARY, Keys.KEY_USERS_GOOGLE_ID_UNIQUE, Keys.KEY_USERS_GOOGLE_EMAIL_UNIQUE, Keys.KEY_USERS_INBOX_FK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<UsersRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<UsersRecord, ?>>asList(Keys.USERS_IBFK_1);
+    }
+
+    public Album album() {
+        return new Album(this, Keys.USERS_IBFK_1);
     }
 
     /**

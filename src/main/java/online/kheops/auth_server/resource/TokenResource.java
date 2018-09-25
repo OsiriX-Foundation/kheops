@@ -16,10 +16,18 @@ import online.kheops.auth_server.*;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
+
 import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.assertion.DownloadKeyException;
 import online.kheops.auth_server.assertion.UnknownGrantTypeException;
+
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
+
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.Users;
+import online.kheops.auth_server.user.UsersPermission;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
@@ -119,7 +127,16 @@ public class TokenResource
         EntityTransaction tx;
 
         // try to find the user in the database;
-        User callingUser = User.findByUsername(assertion.getUsername()).orElse(User.findByUsername(assertion.getEmail()).orElse(null));
+        User callingUser;
+        try {
+            callingUser = Users.getUser(assertion.getUsername());
+        } catch (UserNotFoundException e) {
+            try {
+                callingUser = Users.getUser(assertion.getEmail());
+            } catch (UserNotFoundException ex) {
+                callingUser = null;
+            }
+        }
 
         // if the user can't be found, try to build a new one;
         if (callingUser == null) {
@@ -131,11 +148,24 @@ public class TokenResource
             try {
                 tx.begin();
                 LOG.info("User not found, creating a new User");
-                User user = new User(assertion.getUsername(), assertion.getEmail());
+                final User user = new User(assertion.getUsername(), assertion.getEmail());
+                final Album inbox = new Album();
+                inbox.setName("inbox");
+                user.setInbox(inbox);
+                final UsersPermission usersPermission = new UsersPermission();
+                usersPermission.setInboxPermission();
+                inbox.setPermission(usersPermission);
+
+                final AlbumUser albumUser = new AlbumUser(inbox, user, false);
+                albumUser.setNewCommentNotifications(false);
+                albumUser.setNewSeriesNotifications(false);
+
+                em.persist(inbox);
                 em.persist(user);
+                em.persist(albumUser);
                 tx.commit();
                 responseStatus = Response.Status.CREATED;
-            } catch (Exception e) {
+            } catch (PersistenceException e) {
                 LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
             } finally {
                 if (tx.isActive()) {
@@ -145,7 +175,11 @@ public class TokenResource
             }
 
             // At this point there should definitely be a user in the database for the calling user.
-            callingUser = User.findByUsername(assertion.getUsername()).orElse(null);
+            try {
+                callingUser = Users.getUser(assertion.getUsername());
+            } catch (UserNotFoundException e) {
+                callingUser = null;
+            }
         }
 
         em = EntityManagerListener.createEntityManager();

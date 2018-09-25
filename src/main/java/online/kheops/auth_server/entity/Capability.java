@@ -1,6 +1,6 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.Capabilities;
+import online.kheops.auth_server.capability.Capabilities;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,11 +9,7 @@ import java.time.ZoneOffset;
 @SuppressWarnings("unused")
 @Entity
 @Table(name = "capabilities")
-@NamedNativeQueries({
-        @NamedNativeQuery(
-                name = "Capability.findCapabilityBySecret",
-                query = "SELECT c from capabilities c where secret = :token")
-})
+
 public class Capability {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -34,17 +30,44 @@ public class Capability {
     @Column(name = "revoked_time")
     private LocalDateTime revokedTime;
 
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
     @Basic(optional = false)
-    @Column(name = "description")
-    private String description;
+    @Column(name = "title")
+    private String title;
 
     @Basic(optional = false)
     @Column(name = "secret", updatable = false)
     private String secret;
 
+    @Basic(optional = false)
+    @Column(name = "read_permission ", updatable = false)
+    private String readPermission ;
+
+    @Basic(optional = false)
+    @Column(name = "write_permission ", updatable = false)
+    private String writePermission ;
+
     @ManyToOne
     @JoinColumn(name = "user_fk", insertable=false, updatable=false)
     private User user;
+
+    @Basic(optional = false)
+    @Column(name = "scope_type ", updatable = false)
+    private String scopeType ;
+
+    @ManyToOne
+    @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
+    private Album album;
+
+    @ManyToOne
+    @JoinColumn(name = "series_fk ", insertable=false, updatable=false)
+    private Series series;
+
+    @ManyToOne
+    @JoinColumn(name = "study_fk ", insertable=false, updatable=false)
+    private Study study;
 
     @PrePersist
     public void onPrePersist() {
@@ -62,16 +85,42 @@ public class Capability {
         this.secret = Capabilities.newCapabilityToken();
     }
 
-    // returns null if the token does not exist
-    public static Capability findCapabilityByCapabilityToken(String token, EntityManager em) {
-        try {
-            Query capabilityTokenQuery = em.createNamedQuery("Capability.findCapabilityBySecret");
-            capabilityTokenQuery.setParameter("token", token);
-            return ((Capability) capabilityTokenQuery.getSingleResult());
-        } catch (NoResultException ignored) {/*empty*/}
-        return null;
+    public Capability(User user, LocalDateTime expirationDate, String title, Series series) {
+        this.secret = Capabilities.newCapabilityToken();
+        this.expiration = expirationDate;
+        this.title  = title;
+        this.user = user;
+        this.scopeType = "series";
+        user.getCapabilities().add(this);
     }
 
+    public Capability(User user, LocalDateTime expirationDate, String title, Album album) {
+        this.secret = Capabilities.newCapabilityToken();
+        this.expiration = expirationDate;
+        this.title  = title;
+        this.user = user;
+        this.scopeType = "album";
+        user.getCapabilities().add(this);
+    }
+
+    public Capability(User user, LocalDateTime expirationDate, String title, Study study) {
+        this.secret = Capabilities.newCapabilityToken();
+        this.expiration = expirationDate;
+        this.title  = title;
+        this.user = user;
+        this.scopeType = "study";
+
+        user.getCapabilities().add(this);
+    }
+
+    public Capability(User user, LocalDateTime expirationDate, String title) {
+        this.secret = Capabilities.newCapabilityToken();
+        this.expiration = expirationDate;
+        this.title  = title;
+        this.user = user;
+        this.scopeType = "user";
+        user.getCapabilities().add(this);
+    }
 
     public LocalDateTime getExpiration() {
         return expiration;
@@ -104,12 +153,12 @@ public class Capability {
         this.revokedTime = revokedTime;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String description) {
+        this.title = description;
     }
 
     public User getUser() {

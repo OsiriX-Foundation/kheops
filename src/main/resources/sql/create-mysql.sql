@@ -4,16 +4,36 @@ CREATE DATABASE kheops
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE kheops;
 
+CREATE TABLE album (
+  pk BIGINT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(2048) NULL,
+  created_time DATETIME NOT NULL,
+  last_event_time DATETIME NOT NULL,
+  add_user_permission BOOLEAN NOT NULL,
+  download_series_permission BOOLEAN NOT NULL,
+  send_series_permission BOOLEAN NOT NULL,
+  delete_series_permission BOOLEAN NOT NULL,
+  add_series_permission BOOLEAN NOT NULL,
+  write_comments_permission BOOLEAN NOT NULL,
+  PRIMARY KEY (pk)
+);
+
 CREATE TABLE users (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   created_time DATETIME NOT NULL,
   updated_time DATETIME NOT NULL,
   google_id VARCHAR(255) NOT NULL,
   google_email VARCHAR(255) NOT NULL,
+  inbox_fk BIGINT NOT NULL UNIQUE,
 
   PRIMARY KEY (pk),
   INDEX google_id_index (google_id),
   INDEX google_email_index (google_email),
+
+  FOREIGN KEY (inbox_fk)
+    REFERENCES album(pk)
+    ON DELETE RESTRICT,
 
   UNIQUE google_id_unique (google_id),
   UNIQUE google_email_unique (google_email)
@@ -75,29 +95,22 @@ CREATE TABLE series (
   UNIQUE series_uid_unique (series_uid)
 );
 
-CREATE TABLE user_series (
-  user_fk BIGINT NOT NULL,
-  series_fk BIGINT NOT NULL,
-
-  PRIMARY KEY (user_fk, series_fk),
-
-  FOREIGN KEY (user_fk)
-    REFERENCES users(pk)
-    ON DELETE RESTRICT,
-  FOREIGN KEY (series_fk)
-    REFERENCES series(pk)
-    ON DELETE RESTRICT
-);
-
 CREATE TABLE capabilities (
   pk BIGINT NOT NULL AUTO_INCREMENT,
   created_time DATETIME NOT NULL,
   updated_time DATETIME NOT NULL,
   expiration_time DATETIME,
+  start_time DATETIME,
   revoked_time DATETIME,
-  description VARCHAR(255),
+  title VARCHAR(255),
   secret VARCHAR(255),
+  read_permission BOOLEAN NOT NULL,
+  write_permission BOOLEAN NOT NULL,
   user_fk BIGINT NOT NULL,
+  scope_type VARCHAR(255),
+  album_fk BIGINT,
+  series_fk BIGINT,
+  study_fk BIGINT,
 
   PRIMARY KEY (pk),
   INDEX secret_index (secret),
@@ -107,5 +120,94 @@ CREATE TABLE capabilities (
 
   FOREIGN KEY (user_fk)
     REFERENCES users(pk)
+    ON DELETE RESTRICT,
+
+  FOREIGN KEY (album_fk)
+    REFERENCES album(pk)
+    ON DELETE RESTRICT,
+
+  FOREIGN KEY (series_fk)
+    REFERENCES series(pk)
+    ON DELETE RESTRICT,
+
+  FOREIGN KEY (study_fk)
+    REFERENCES studies(pk)
     ON DELETE RESTRICT
-)
+);
+
+CREATE TABLE album_series (
+  album_fk BIGINT NOT NULL,
+  series_fk BIGINT NOT NULL,
+  
+  FOREIGN KEY (album_fk)
+    REFERENCES album(pk)
+    ON DELETE RESTRICT,
+  FOREIGN KEY (series_fk)
+    REFERENCES series(pk)
+    ON DELETE RESTRICT,
+	
+  UNIQUE album_series_unique (album_fk,series_fk)
+);
+
+CREATE TABLE album_user (
+  pk BIGINT NOT NULL AUTO_INCREMENT,
+  album_fk BIGINT NOT NULL,
+  user_fk BIGINT NOT NULL,
+  admin BOOLEAN NOT NULL,
+  new_series_notifications BOOLEAN NOT NULL,
+  new_comment_notifications BOOLEAN NOT NULL,
+  favorite BOOLEAN NOT NULL,
+  
+  PRIMARY KEY (pk),
+
+  FOREIGN KEY (album_fk)
+    REFERENCES album(pk)
+    ON DELETE RESTRICT,
+  FOREIGN KEY (user_fk)
+    REFERENCES users(pk)
+    ON DELETE RESTRICT,
+	
+  UNIQUE album_user_unique (album_fk,user_fk)
+);
+
+CREATE TABLE event (
+  pk BIGINT NOT NULL AUTO_INCREMENT,
+  event_type VARCHAR(255),
+  album_fk BIGINT,
+  study_fk BIGINT,
+  event_time DATETIME NOT NULL,
+  user_fk BIGINT NOT NULL,
+  private_target_user_fk BIGINT, 
+   
+  comment VARCHAR(1024),
+
+  mutation_type VARCHAR(255),
+  to_user_fk BIGINT,
+  series_fk BIGINT,
+  
+  PRIMARY KEY (pk),
+
+  FOREIGN KEY (album_fk)
+    REFERENCES album(pk)
+	ON DELETE RESTRICT,
+	
+  FOREIGN KEY (study_fk)
+    REFERENCES studies(pk)
+	ON DELETE RESTRICT,
+	
+  FOREIGN KEY (user_fk)
+    REFERENCES users(pk)
+	ON DELETE RESTRICT,
+	
+  FOREIGN KEY (to_user_fk)
+    REFERENCES users(pk)
+	ON DELETE RESTRICT,
+	
+  FOREIGN KEY (private_target_user_fk)
+    REFERENCES users(pk)
+	ON DELETE RESTRICT,
+	
+  FOREIGN KEY (series_fk)
+    REFERENCES series(pk)
+	ON DELETE RESTRICT
+);

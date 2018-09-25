@@ -5,6 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.Users;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
@@ -29,7 +31,12 @@ final class AuthorizationJWTAssertion implements Assertion {
                         .build()
                         .verify(assertionToken);
 
-                final User user = User.findByUsername(jwt.getSubject()).orElseThrow(() -> new BadAssertionException("Can't find user"));
+                final User user;
+                try {
+                    user = Users.getUser(jwt.getSubject());
+                } catch (UserNotFoundException e) {
+                    throw new BadAssertionException("Can't find user");
+                }
                 final Boolean capabilityClaim = jwt.getClaim("capability").asBoolean();
                 boolean capabilityBoolean = false;
                 if (capabilityClaim != null) {

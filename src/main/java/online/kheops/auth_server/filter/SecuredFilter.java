@@ -8,6 +8,8 @@ import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.resource.TokenResource;
+import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.Users;
 
 import javax.annotation.Priority;
 import javax.persistence.EntityManager;
@@ -55,7 +57,16 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        User user = User.findByUsername(assertion.getUsername()).orElse(User.findByUsername(assertion.getEmail()).orElse(null));
+        User user;
+        try {
+            user = Users.getUser(assertion.getUsername());
+        } catch (UserNotFoundException e) {
+            try {
+                user = Users.getUser(assertion.getEmail());
+            } catch (UserNotFoundException ex) {
+                user = null;
+            }
+        }
         // if the user can't be found, try to build a new one;
         if (user == null) {
             // try to build a new user, building a new user might fail if there is a unique constraint violation
@@ -79,7 +90,12 @@ public class SecuredFilter implements ContainerRequestFilter {
             }
 
             // At this point there should definitely be a user in the database for the calling user.
-            user = User.findByUsername(assertion.getUsername()).orElseThrow(() -> new IllegalStateException("Unable to find user"));
+            try {
+                user = Users.getUser(assertion.getUsername());
+            } catch (UserNotFoundException e) {
+                throw new IllegalStateException("Unable to find user");
+            }
+
         }
 
         final long userPK = user.getPk();

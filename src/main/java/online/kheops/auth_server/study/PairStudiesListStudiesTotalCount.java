@@ -1,13 +1,13 @@
-package online.kheops.auth_server.entity;
+package online.kheops.auth_server.study;
 
 import org.dcm4che3.data.Attributes;
 import java.util.List;
 
-public class Pair {
+public class PairStudiesListStudiesTotalCount {
     private Integer studiesTotalCount;
     private List<Attributes> attributesList;
 
-    Pair(Integer studiesTotalCount, List<Attributes> attributesList) {
+    public PairStudiesListStudiesTotalCount(Integer studiesTotalCount, List<Attributes> attributesList) {
         this.attributesList = attributesList;
         this.studiesTotalCount = studiesTotalCount;
     }

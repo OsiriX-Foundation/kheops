@@ -6,10 +6,13 @@ package online.kheops.auth_server.generated;
 
 import javax.annotation.Generated;
 
+import online.kheops.auth_server.generated.tables.Album;
+import online.kheops.auth_server.generated.tables.AlbumSeries;
+import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Event;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
-import online.kheops.auth_server.generated.tables.UserSeries;
 import online.kheops.auth_server.generated.tables.Users;
 
 import org.jooq.Index;
@@ -34,10 +37,26 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
+    public static final Index ALBUM_PRIMARY = Indexes0.ALBUM_PRIMARY;
+    public static final Index ALBUM_SERIES_ALBUM_SERIES_UNIQUE = Indexes0.ALBUM_SERIES_ALBUM_SERIES_UNIQUE;
+    public static final Index ALBUM_SERIES_SERIES_FK = Indexes0.ALBUM_SERIES_SERIES_FK;
+    public static final Index ALBUM_USER_ALBUM_USER_UNIQUE = Indexes0.ALBUM_USER_ALBUM_USER_UNIQUE;
+    public static final Index ALBUM_USER_PRIMARY = Indexes0.ALBUM_USER_PRIMARY;
+    public static final Index ALBUM_USER_USER_FK = Indexes0.ALBUM_USER_USER_FK;
+    public static final Index CAPABILITIES_ALBUM_FK = Indexes0.CAPABILITIES_ALBUM_FK;
     public static final Index CAPABILITIES_PRIMARY = Indexes0.CAPABILITIES_PRIMARY;
     public static final Index CAPABILITIES_SECRET_INDEX = Indexes0.CAPABILITIES_SECRET_INDEX;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
+    public static final Index CAPABILITIES_SERIES_FK = Indexes0.CAPABILITIES_SERIES_FK;
+    public static final Index CAPABILITIES_STUDY_FK = Indexes0.CAPABILITIES_STUDY_FK;
     public static final Index CAPABILITIES_USER_FK_INDEX = Indexes0.CAPABILITIES_USER_FK_INDEX;
+    public static final Index EVENT_ALBUM_FK = Indexes0.EVENT_ALBUM_FK;
+    public static final Index EVENT_PRIMARY = Indexes0.EVENT_PRIMARY;
+    public static final Index EVENT_PRIVATE_TARGET_USER_FK = Indexes0.EVENT_PRIVATE_TARGET_USER_FK;
+    public static final Index EVENT_SERIES_FK = Indexes0.EVENT_SERIES_FK;
+    public static final Index EVENT_STUDY_FK = Indexes0.EVENT_STUDY_FK;
+    public static final Index EVENT_TO_USER_FK = Indexes0.EVENT_TO_USER_FK;
+    public static final Index EVENT_USER_FK = Indexes0.EVENT_USER_FK;
     public static final Index SERIES_POPULATED_INDEX = Indexes0.SERIES_POPULATED_INDEX;
     public static final Index SERIES_PRIMARY = Indexes0.SERIES_PRIMARY;
     public static final Index SERIES_SERIES_UID_INDEX = Indexes0.SERIES_SERIES_UID_INDEX;
@@ -56,19 +75,34 @@ public class Indexes {
     public static final Index USERS_GOOGLE_EMAIL_UNIQUE = Indexes0.USERS_GOOGLE_EMAIL_UNIQUE;
     public static final Index USERS_GOOGLE_ID_INDEX = Indexes0.USERS_GOOGLE_ID_INDEX;
     public static final Index USERS_GOOGLE_ID_UNIQUE = Indexes0.USERS_GOOGLE_ID_UNIQUE;
+    public static final Index USERS_INBOX_FK = Indexes0.USERS_INBOX_FK;
     public static final Index USERS_PRIMARY = Indexes0.USERS_PRIMARY;
-    public static final Index USER_SERIES_PRIMARY = Indexes0.USER_SERIES_PRIMARY;
-    public static final Index USER_SERIES_SERIES_FK = Indexes0.USER_SERIES_SERIES_FK;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
     private static class Indexes0 {
+        public static Index ALBUM_PRIMARY = Internal.createIndex("PRIMARY", Album.ALBUM, new OrderField[] { Album.ALBUM.PK }, true);
+        public static Index ALBUM_SERIES_ALBUM_SERIES_UNIQUE = Internal.createIndex("album_series_unique", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.ALBUM_FK, AlbumSeries.ALBUM_SERIES.SERIES_FK }, true);
+        public static Index ALBUM_SERIES_SERIES_FK = Internal.createIndex("series_fk", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.SERIES_FK }, false);
+        public static Index ALBUM_USER_ALBUM_USER_UNIQUE = Internal.createIndex("album_user_unique", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.ALBUM_FK, AlbumUser.ALBUM_USER.USER_FK }, true);
+        public static Index ALBUM_USER_PRIMARY = Internal.createIndex("PRIMARY", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.PK }, true);
+        public static Index ALBUM_USER_USER_FK = Internal.createIndex("user_fk", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.USER_FK }, false);
+        public static Index CAPABILITIES_ALBUM_FK = Internal.createIndex("album_fk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.ALBUM_FK }, false);
         public static Index CAPABILITIES_PRIMARY = Internal.createIndex("PRIMARY", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.PK }, true);
         public static Index CAPABILITIES_SECRET_INDEX = Internal.createIndex("secret_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, false);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);
+        public static Index CAPABILITIES_SERIES_FK = Internal.createIndex("series_fk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SERIES_FK }, false);
+        public static Index CAPABILITIES_STUDY_FK = Internal.createIndex("study_fk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.STUDY_FK }, false);
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
+        public static Index EVENT_ALBUM_FK = Internal.createIndex("album_fk", Event.EVENT, new OrderField[] { Event.EVENT.ALBUM_FK }, false);
+        public static Index EVENT_PRIMARY = Internal.createIndex("PRIMARY", Event.EVENT, new OrderField[] { Event.EVENT.PK }, true);
+        public static Index EVENT_PRIVATE_TARGET_USER_FK = Internal.createIndex("private_target_user_fk", Event.EVENT, new OrderField[] { Event.EVENT.PRIVATE_TARGET_USER_FK }, false);
+        public static Index EVENT_SERIES_FK = Internal.createIndex("series_fk", Event.EVENT, new OrderField[] { Event.EVENT.SERIES_FK }, false);
+        public static Index EVENT_STUDY_FK = Internal.createIndex("study_fk", Event.EVENT, new OrderField[] { Event.EVENT.STUDY_FK }, false);
+        public static Index EVENT_TO_USER_FK = Internal.createIndex("to_user_fk", Event.EVENT, new OrderField[] { Event.EVENT.TO_USER_FK }, false);
+        public static Index EVENT_USER_FK = Internal.createIndex("user_fk", Event.EVENT, new OrderField[] { Event.EVENT.USER_FK }, false);
         public static Index SERIES_POPULATED_INDEX = Internal.createIndex("populated_index", Series.SERIES, new OrderField[] { Series.SERIES.POPULATED }, false);
         public static Index SERIES_PRIMARY = Internal.createIndex("PRIMARY", Series.SERIES, new OrderField[] { Series.SERIES.PK }, true);
         public static Index SERIES_SERIES_UID_INDEX = Internal.createIndex("series_uid_index", Series.SERIES, new OrderField[] { Series.SERIES.SERIES_UID }, false);
@@ -87,8 +121,7 @@ public class Indexes {
         public static Index USERS_GOOGLE_EMAIL_UNIQUE = Internal.createIndex("google_email_unique", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_EMAIL }, true);
         public static Index USERS_GOOGLE_ID_INDEX = Internal.createIndex("google_id_index", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_ID }, false);
         public static Index USERS_GOOGLE_ID_UNIQUE = Internal.createIndex("google_id_unique", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_ID }, true);
+        public static Index USERS_INBOX_FK = Internal.createIndex("inbox_fk", Users.USERS, new OrderField[] { Users.USERS.INBOX_FK }, true);
         public static Index USERS_PRIMARY = Internal.createIndex("PRIMARY", Users.USERS, new OrderField[] { Users.USERS.PK }, true);
-        public static Index USER_SERIES_PRIMARY = Internal.createIndex("PRIMARY", UserSeries.USER_SERIES, new OrderField[] { UserSeries.USER_SERIES.USER_FK, UserSeries.USER_SERIES.SERIES_FK }, true);
-        public static Index USER_SERIES_SERIES_FK = Internal.createIndex("series_fk", UserSeries.USER_SERIES, new OrderField[] { UserSeries.USER_SERIES.SERIES_FK }, false);
     }
 }

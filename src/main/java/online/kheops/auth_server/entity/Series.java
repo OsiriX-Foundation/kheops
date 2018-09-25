@@ -10,6 +10,8 @@ import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.series.Series.safeAttributeSetString;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
 @Table(name = "series")
@@ -55,7 +57,15 @@ public class Series {
     private Study study;
 
     @ManyToMany(mappedBy = "series")
-    private Set<User> users = new HashSet<>();
+    private Set<Album> albums = new HashSet<>();
+
+    @OneToMany
+    @JoinColumn (name = "series_fk", nullable=true)
+    private Set<Mutation> mutations = new HashSet<>();
+
+    @OneToMany
+    @JoinColumn (name = "series_fk")
+    private Set<Capability> capabilities = new HashSet<>();
 
     public Series() {}
 
@@ -90,12 +100,6 @@ public class Series {
         attributes.setInt(Tag.NumberOfSeriesRelatedInstances, VR.IS, getNumberOfSeriesRelatedInstances());
 
         return attributes;
-    }
-
-    private void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
-        if (string != null) {
-            attributes.setString(tag, vr, string);
-        }
     }
 
     // doesn't set populated, but the caller probably will want to set populated after calling this method
@@ -179,7 +183,13 @@ public class Series {
         this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
 
-    public Set<User> getUsers() {
-        return users;
-    }
+    public void addAlbum(Album album) { albums.add(album); }
+
+    public void removeAlbum(Album album) { albums.remove(album); }
+
+    public Set<Mutation> getMutations() { return mutations; }
+
+    public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
+
+    public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
 }

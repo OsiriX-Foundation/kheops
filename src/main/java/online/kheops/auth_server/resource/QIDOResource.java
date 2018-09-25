@@ -2,10 +2,9 @@ package online.kheops.auth_server.resource;
 
 import com.mchange.v2.c3p0.C3P0Registry;
 import online.kheops.auth_server.KheopsPrincipal;
-import online.kheops.auth_server.entity.Pair;
+import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.study.PairStudiesListStudiesTotalCount;
 import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.entity.Study;
-import online.kheops.auth_server.entity.User;
 import org.dcm4che3.data.Attributes;
 
 import javax.servlet.ServletContext;
@@ -18,6 +17,8 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 
 
 @Path("/")
@@ -49,7 +50,13 @@ public class QIDOResource {
     @Secured
     @Path("studies")
     @Produces("application/dicom+json")
-    public Response getStudies(@Context SecurityContext securityContext) {
+    public Response getStudies(@QueryParam("album") Long fromAlbumPk,
+                               @QueryParam("inbox") Boolean fromInbox,
+                               @Context SecurityContext securityContext) {
+
+        if (fromAlbumPk != null && fromInbox != null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+        }
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
@@ -57,16 +64,17 @@ public class QIDOResource {
         Integer studiesTotalCount;
 
         try (Connection connection = getDataSource().getConnection()) {
-                Pair pair = Study.findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
+                PairStudiesListStudiesTotalCount pair = findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
                 studiesTotalCount = pair.getStudiesTotalCount();
                 attributesList = pair.getAttributesList();
                 LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
-        }
-        catch (BadRequestException e) {
+        } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             return Response.status(Response.Status.BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
-        }
-        catch (Exception e) {
+        } catch (BadQueryParametersException e) {
+            LOG.log(Level.INFO, e.getMessage(), e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }

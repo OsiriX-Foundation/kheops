@@ -10,10 +10,13 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
+import online.kheops.auth_server.generated.tables.Album;
+import online.kheops.auth_server.generated.tables.AlbumSeries;
+import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Event;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
-import online.kheops.auth_server.generated.tables.UserSeries;
 import online.kheops.auth_server.generated.tables.Users;
 
 import org.jooq.Catalog;
@@ -34,7 +37,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Kheops extends SchemaImpl {
 
-    private static final long serialVersionUID = 1837288791;
+    private static final long serialVersionUID = 1177675592;
 
     /**
      * The reference instance of <code>kheops</code>
@@ -42,9 +45,29 @@ public class Kheops extends SchemaImpl {
     public static final Kheops KHEOPS = new Kheops();
 
     /**
+     * The table <code>kheops.album</code>.
+     */
+    public final Album ALBUM = online.kheops.auth_server.generated.tables.Album.ALBUM;
+
+    /**
+     * The table <code>kheops.album_series</code>.
+     */
+    public final AlbumSeries ALBUM_SERIES = online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
+
+    /**
+     * The table <code>kheops.album_user</code>.
+     */
+    public final AlbumUser ALBUM_USER = online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
+
+    /**
      * The table <code>kheops.capabilities</code>.
      */
     public final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+
+    /**
+     * The table <code>kheops.event</code>.
+     */
+    public final Event EVENT = online.kheops.auth_server.generated.tables.Event.EVENT;
 
     /**
      * The table <code>kheops.series</code>.
@@ -60,11 +83,6 @@ public class Kheops extends SchemaImpl {
      * The table <code>kheops.users</code>.
      */
     public final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
-
-    /**
-     * The table <code>kheops.user_series</code>.
-     */
-    public final UserSeries USER_SERIES = online.kheops.auth_server.generated.tables.UserSeries.USER_SERIES;
 
     /**
      * No further instances allowed
@@ -91,10 +109,13 @@ public class Kheops extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Album.ALBUM,
+            AlbumSeries.ALBUM_SERIES,
+            AlbumUser.ALBUM_USER,
             Capabilities.CAPABILITIES,
+            Event.EVENT,
             Series.SERIES,
             Studies.STUDIES,
-            Users.USERS,
-            UserSeries.USER_SERIES);
+            Users.USERS);
     }
 }

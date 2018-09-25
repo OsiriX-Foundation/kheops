@@ -1,0 +1,270 @@
+package online.kheops.auth_server.event;
+
+import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.album.AlbumForbiddenException;
+import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.user.UserNotFoundException;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+
+import static online.kheops.auth_server.album.Albums.ifUserMemberOfAlbum;
+import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.study.Studies.getStudy;
+import static online.kheops.auth_server.user.Users.getUser;
+
+public class Events {
+
+    private Events() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public enum MutationType {ADD_USER, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES , EDIT_ALBUM}
+
+    public static EventResponses.EventResponse albumPostComment(long callingUserPk,long albumPk,String commentContent, String user)
+            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException{
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        EventResponses.EventResponse eventResponse;
+
+        try {
+            tx.begin();
+
+            final boolean isPrivateComment = user != null;
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Album album = getAlbum(albumPk, em);
+            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
+
+            if (!callingAlbumUser.isAdmin() || !album.isWriteComments()) {
+                throw new AlbumForbiddenException("Only an admin or an user with permission can write comments");
+            }
+
+            final Comment comment = new Comment(commentContent, callingUser, album);
+
+            if(isPrivateComment) {
+                final User targetUser = getUser(user, em);
+
+                if (targetUser == callingUser) {
+                    throw new BadQueryParametersException("Self comment forbidden");
+                }
+
+                if (!ifUserMemberOfAlbum(album, targetUser, em)) {
+                    throw new UserNotFoundException("Target user is not a member of the album : " + albumPk);
+                }
+
+                comment.setPrivateTargetUser(targetUser);
+                targetUser.getComments().add(comment);
+                em.persist(targetUser);
+            } else {
+                album.setLastEventTime(LocalDateTime.now(ZoneOffset.UTC));
+            }
+
+            em.persist(album);
+            em.persist(callingUser);
+            em.persist(comment);
+
+            tx.commit();
+
+            eventResponse = EventResponses.commentToEventResponse(comment);
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return eventResponse;
+    }
+
+    public static Mutation albumPostUserMutation(User callingUser, Album album, MutationType mutationType, User targetUser) {
+        return new Mutation(callingUser, album, mutationType, targetUser);
+    }
+
+    public static Mutation albumPostNewAlbumMutation(User callingUser, Album album) {
+        return new Mutation(callingUser, album, Events.MutationType.CREATE_ALBUM);
+    }
+
+    public static Mutation albumPostSeriesMutation(User callingUser, Album album, MutationType mutationType, Series series) {
+        return new Mutation(callingUser, album, mutationType, series);
+    }
+
+    public static Mutation albumPostStudyMutation(User callingUser, Album album, MutationType mutationType, Study study) {
+        return new Mutation(callingUser, album, mutationType, study);
+    }
+
+    public static List<EventResponses.EventResponse> getEventsAlbum(long callingUserPk, long albumPk, Integer offset, Integer limit)
+            throws UserNotFoundException, AlbumNotFoundException {
+        List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Album album = getAlbum(albumPk, em);
+            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+                throw new AlbumNotFoundException();
+            }
+
+            for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
+                if (e instanceof Comment) {
+                    eventResponses.add(EventResponses.commentToEventResponse((Comment) e));
+                } else if (e instanceof Mutation) {
+                    eventResponses.add(EventResponses.mutationToEventResponse((Mutation) e));
+                }
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return eventResponses;
+    }
+
+    public static List<EventResponses.EventResponse> getMutationsAlbum(long callingUserPk, long albumPk, Integer offset, Integer limit)
+            throws UserNotFoundException, AlbumNotFoundException {
+        List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Album album = getAlbum(albumPk, em);
+            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+                throw new AlbumNotFoundException();
+            }
+
+            for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
+                    eventResponses.add(EventResponses.mutationToEventResponse(m));
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return eventResponses;
+    }
+
+    public static List<EventResponses.EventResponse> getCommentsAlbum(long callingUserPk,long albumPk, Integer offset, Integer limit)
+            throws UserNotFoundException, AlbumNotFoundException {
+        List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Album album = getAlbum(albumPk, em);
+            if (!ifUserMemberOfAlbum(album, callingUser, em)) {
+                throw new AlbumNotFoundException();
+            }
+
+            for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, em, offset, limit)) {
+                eventResponses.add(EventResponses.commentToEventResponse(c));
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return eventResponses;
+    }
+
+    public static List<EventResponses.EventResponse> getCommentsByStudyUID(long callingUserPk, String studyInstanceUID, Integer offset, Integer limit)
+            throws UserNotFoundException {
+        List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final User callingUser = getUser(callingUserPk, em);
+
+            for (Comment c : EventQueries.getCommentsByStudy(callingUser, studyInstanceUID, em, offset, limit)) {
+                eventResponses.add(EventResponses.commentToEventResponse(c));
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return eventResponses;
+    }
+
+
+    public static EventResponses.EventResponse studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String user)
+            throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        EventResponses.EventResponse eventResponse;
+
+        try {
+            tx.begin();
+
+            final boolean isPrivateComment = user != null;
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Study study = getStudy(studyInstanceUID, em);
+
+            final Comment comment = new Comment(commentContent, callingUser, study);
+
+            if(isPrivateComment) {
+                User targetUser = getUser(user, em);
+
+                if (targetUser == callingUser) {
+                    throw new BadQueryParametersException("Self comment forbidden");
+                }
+
+                //TODO verifier si l'utilisateur a acces à la study
+
+                comment.setPrivateTargetUser(targetUser);
+                targetUser.getComments().add(comment);
+                em.persist(targetUser);
+            }
+
+            em.persist(callingUser);
+            em.persist(comment);
+
+            tx.commit();
+
+            eventResponse = EventResponses.commentToEventResponse(comment);
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return eventResponse;
+    }
+}
