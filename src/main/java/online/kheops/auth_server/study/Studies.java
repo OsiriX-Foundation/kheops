@@ -149,7 +149,7 @@ public class Studies {
                         .join(ALBUM_USER).on(ALBUM_USER.USER_FK.eq(USERS.PK))
                         .join(ALBUM).on(ALBUM.PK.eq(ALBUM_USER.ALBUM_FK))
                         .join(ALBUM_SERIES).on(ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK))
-                        //.join(SERIES).on(SERIES.PK.eq(USER_SERIES.SERIES_FK))
+                        .join(SERIES).on(SERIES.PK.eq(ALBUM_SERIES.SERIES_FK))
                         .join(STUDIES).on(STUDIES.PK.eq(SERIES.STUDY_FK))
                         .where(USERS.PK.eq(callingUserPK))
                         .and(SERIES.POPULATED.isTrue())

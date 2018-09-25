@@ -63,6 +63,8 @@ public class SendingResource
 
         if (fromInbox != null) {
             fromInbox = true;
+        } else {
+            fromInbox = false;
         }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
@@ -143,6 +145,8 @@ public class SendingResource
 
         if (fromInbox != null) {
             fromInbox = true;
+        } else {
+            fromInbox = false;
         }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
@@ -273,6 +277,8 @@ public class SendingResource
 
         if (fromInbox != null) {
             fromInbox = true;
+        } else {
+            fromInbox = false;
         }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
