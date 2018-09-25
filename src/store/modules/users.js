@@ -4,10 +4,11 @@ import Base64 from '@/mixins/base64';
 const state = {
 	all: [],
 	current: {
-		user_id: null,
 		username: null,
 		firstname: null,
 		lastname: null,
+		fullname: null,
+		email: null,
 		permissions: [],
 		jwt: null
 	}
@@ -22,21 +23,20 @@ const getters = {
 // actions
 const actions = {
 	login ({ commit }, userData) {
-		console.log('ICI');
 		return new Promise((resolve, reject) => {
-			console.log(userData.jwt);
-				HTTP.defaults.headers.common['authorization'] = 'Bearer '+userData.jwt;
+			
 				var loggedUser = {
 					username: userData.login,
 					jwt: userData.jwt,
+					fullname: userData.fullname,
 					firstname: userData.firstname,
 					lastname: userData.lastname,
-  				  	email: userData.email,
+					email: userData.email,
 					permissions: userData.permissions
 				};
+				HTTP.defaults.headers.common['authorization'] = 'Bearer '+userData.jwt;
 				localStorage.setItem('currentUser',JSON.stringify(loggedUser));
 				commit('LOGIN',loggedUser);
-				HTTP.defaults.headers.common['authorization'] = 'Bearer '+userData.jwt;
 				resolve(userData);
 		})
 	},
@@ -50,6 +50,7 @@ const actions = {
 			if (user){
 				user = JSON.parse(user);
 				if (user.jwt){
+					console.log('ICI: '+user.jwt);
 					HTTP.defaults.headers.common['authorization'] = 'Bearer '+user.jwt;
 				}
 				commit('LOGIN',user);
@@ -61,7 +62,6 @@ const actions = {
 		}
 	},
 	checkPermissions({ commit },params){
-		console.log(params);
 		let permissionsToCheck = params.permissions
 		let condition = params.condition
 		if (condition != 'all') condition = 'any';
@@ -91,7 +91,10 @@ const mutations = {
 		state.current = {
 			user_id: null,
 			username: null,
-			authdata: null,
+			fullname: null,
+			firstname: null,
+			lastname: null,
+			email: null,
 			jwt: null,
 			permissions: null
 		}

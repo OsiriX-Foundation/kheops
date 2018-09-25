@@ -19,10 +19,9 @@ export default {
   },
   created () {
 	  
-	  console.log(this.datasets);
-		//   		this.$store.dispatch('getDatasets').then(res => {
-		//   			console.log(res);
-		// })
+		  		this.$store.dispatch('getDatasets').then(res => {
+		  			console.log(res);
+		})
   		
   }
 }

@@ -1,4 +1,4 @@
-export const serverURL = "api";
+export const serverURL = "https://test.kheops.online/authorization/";
 
 export const siteTitle = 'Keops';
 

@@ -16,7 +16,8 @@ const getters = {
 const actions = {
 
 	getDatasets ({ commit }) {			
-			HTTP.get('authorization/studies').then(res => {
+		console.log('getDatasets');
+			HTTP.get('studies',{headers: {'Accept': 'application/dicom+json'}}).then(res => {
 				commit('SET_DATASETS', res.data)
 			});
 	}

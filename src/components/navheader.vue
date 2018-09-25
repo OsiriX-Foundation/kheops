@@ -19,8 +19,8 @@
 		      <!-- <b-nav-item v-access = '"admin"'><router-link to="/users">Users</router-link></b-nav-item>
 		      <b-nav-item v-access = '"admin"'><router-link to="/groups">Groups</router-link></b-nav-item> -->
 		      <b-nav-item v-access = '"admin"'><router-link to="/admin">Admin</router-link></b-nav-item>
-		      <b-nav-item v-access = '"active"'>Welcome <router-link :to="{name: 'user', params: {user_id: user.user_id}}">{{user.username}}</router-link></b-nav-item>
-		      <b-nav-item v-access = '"active"'><router-link to="/login"><icon name = 'sign-out'></icon></router-link></b-nav-item>
+		      <b-nav-item v-access = '"active"'>Welcome {{user.fullname}}</b-nav-item>
+		      <b-nav-item v-access = '"active"'><a class = 'pointer' @click='logout()'><icon name = 'sign-out'></icon></a></b-nav-item>
 		    </b-navbar-nav>
 
 
@@ -36,6 +36,8 @@
 
 import {Bus} from '@/bus';
 import { mapGetters } from 'vuex'
+import store from '@/store'
+import Vue from 'vue'
 
 export default {
   name: 'navHeader',
@@ -43,6 +45,13 @@ export default {
 	  ...mapGetters({
 	  	  user: 'currentUser'
 	    })
+  },
+  methods: {
+	  logout () {
+	  	store.dispatch('logout').then(data => {
+		`${Vue.prototype.$keycloak.logoutFn()}`
+	  	})
+	  }
   }
 }
 

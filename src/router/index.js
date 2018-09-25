@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
-import Login from '@/components/user/Login'
 import Dataset from '@/components/dataset/List'
 import store from '@/store'
 
@@ -15,11 +14,6 @@ Vue.use(Router);
 const router = new Router({
 	mode: 'history',
   routes: [
-    {
-     path: '/login',
-     name: 'login',
-     component: Login
-     },
 	 {
 		 path: '/datasets',
 		 name: 'datasets',
@@ -39,7 +33,7 @@ function requireAuth (to, from, next){
 	store.dispatch('getCredentials').then(test => {
 		if (!test) {
 			next({
-				path: '/login',
+				path: '/',
 				query: {redirect: to.fullPath}
 			})
 		} else {

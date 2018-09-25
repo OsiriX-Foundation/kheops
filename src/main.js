@@ -16,6 +16,7 @@ import Icon from 'vue-awesome/components/Icon'
 import VeeValidate from 'vee-validate'
 import store from './store'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
+import {HTTP} from '@/router/http';
 
 Vue.config.productionTip = false
 
@@ -34,39 +35,32 @@ const options = {
 }
 
 const keycloakconfig = {
-  authRealm: 'test',
-  authUrl: 'http://test',
-  authClientId: '12345',
-  logoutRedirectUri: 'http://logout'
+  authRealm: 'StaticLoginConnect',
+  authUrl: 'https://keycloak.kheops.online/auth',
+  authClientId: 'loginConnect'
+  // logoutRedirectUri: 'http://logout'
 }
 
 function tokenInterceptor () {
-  axios.interceptors.request.use(config => {
-    config.headers.Authorization = `Bearer ${Vue.prototype.$keycloak.token}`
-    return config
-  }, error => {
-    return Promise.reject(error)
-  })
+	let user = {
+		login: `${Vue.prototype.$keycloak.userName}`,
+		jwt: `${Vue.prototype.$keycloak.token}`,
+		fullname: `${Vue.prototype.$keycloak.fullName}`,
+		lastname: `${Vue.prototype.$keycloak.lastName}`,
+		firstname: `${Vue.prototype.$keycloak.firstName}`,
+		email: `${Vue.prototype.$keycloak.email}`,
+		permissions: ['active']
+	}
+	store.dispatch('login',user).then(user => {})
 }
 
 
 /* eslint-disable no-new */
-// Vue.use(VueKeyCloak, {
-// 	config: keycloakconfig,
-//   onReady: (keycloak) => {
-//     console.log(`I wonder what Keycloak returns: ${keycloak}`)
-// 	   tokenInterceptor()
-//     /* eslint-disable no-new */
-// 	  new Vue({
-// 	    el: '#app',
-// 	    router,
-// 	    store,
-// 	    components: { App },
-// 	    template: '<App/>'
-// 	  })
-//   }
-// })
-
+Vue.use(VueKeyCloak, {
+	config: keycloakconfig,
+    onReady: (keycloak) => {
+	   tokenInterceptor()
+    /* eslint-disable no-new */
 	  new Vue({
 	    el: '#app',
 	    router,
@@ -74,3 +68,13 @@ function tokenInterceptor () {
 	    components: { App },
 	    template: '<App/>'
 	  })
+  }
+})
+
+	  // new Vue({
+	  //   el: '#app',
+	  //   router,
+	  //   store,
+	  //   components: { App },
+	  //   template: '<App/>'
+	  // })
