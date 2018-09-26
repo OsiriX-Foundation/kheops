@@ -272,16 +272,18 @@ public class Albums {
                     throw new AlbumForbiddenException("Use : DELETE /albums/"+albumPk+"/users/"+callingUser.getGoogleId()+"/admin");
                 }
                 targetAlbumUser.setAdmin(isAdmin);
-            } catch (NoResultException e) {
-                targetAlbumUser = new AlbumUser(album, targetUser, isAdmin);
-
-                final Mutation mutationAddUser = Events.albumPostUserMutation(callingUser, album, Events.MutationType.ADD_USER, targetUser);
-                em.persist(mutationAddUser);
-            }
-
-            if (isAdmin) {
                 final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
                 em.persist(mutationPromoteAdmin);
+
+            } catch (NoResultException e) {
+                targetAlbumUser = new AlbumUser(album, targetUser, isAdmin);
+                final Mutation mutation;
+                if (isAdmin) {
+                    mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.ADD_ADMIN, targetUser);
+                } else {
+                    mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.ADD_USER, targetUser);
+                }
+                em.persist(mutation);
             }
 
             em.persist(album);
