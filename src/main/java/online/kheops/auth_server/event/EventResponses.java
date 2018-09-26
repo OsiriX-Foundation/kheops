@@ -61,6 +61,7 @@ public class EventResponses {
         if (mutation.getMutationType().compareTo(Events.MutationType.PROMOTE_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.DEMOTE_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.ADD_USER.toString()) == 0 ||
+                mutation.getMutationType().compareTo(Events.MutationType.ADD_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_USER.toString()) == 0 ) {
             eventResponse.targetName = mutation.getToUser().getGoogleEmail();
         }
