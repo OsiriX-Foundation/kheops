@@ -6,7 +6,7 @@ import javax.persistence.*;
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
 @Table(name = "album_user")
-public class AlbumUser{
+public class AlbumUser {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")
@@ -70,4 +70,5 @@ public class AlbumUser{
     public Album getAlbum() { return album; }
 
     public User getUser() { return user; }
+
 }

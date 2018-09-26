@@ -12,6 +12,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
@@ -219,6 +221,7 @@ public class Albums {
             for (AlbumUser albumUser : album.getAlbumUser()) {
                 usersAlbumResponses.add(AlbumResponses.albumUserToUserAlbumResponce(albumUser));
             }
+            Collections.<AlbumResponses.UserAlbumResponse>sort(usersAlbumResponses);
 
             tx.commit();
         } finally {

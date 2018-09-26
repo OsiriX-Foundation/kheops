@@ -56,7 +56,7 @@ public class AlbumResponses {
         public Boolean isAdmin;
     }
 
-    public static class UserAlbumResponse {
+    public static class UserAlbumResponse  implements Comparable<UserAlbumResponse> {
         @XmlElement(name = "user_name")
         public String userName;
         @XmlElement(name = "is_admin")
@@ -67,6 +67,11 @@ public class AlbumResponses {
         //public Boolean notificationNewComment;
         //@XmlElement(name = "is_favorite")
         //public Boolean isFavorite ;
+
+
+        public int compareTo(UserAlbumResponse userAlbumResponse) {
+            return userName.compareTo(userAlbumResponse.userName);
+        }
     }
 
 
