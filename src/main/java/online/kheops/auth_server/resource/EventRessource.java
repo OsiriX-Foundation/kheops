@@ -74,9 +74,8 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        EventResponses.EventResponse commentResponse;
         try {
-            commentResponse = Events.albumPostComment(callingUserPk, albumPk, comment, user);
+            Events.albumPostComment(callingUserPk, albumPk, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
@@ -85,7 +84,7 @@ public class EventRessource {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.status(Response.Status.OK).entity(commentResponse).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @GET
@@ -127,15 +126,14 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        EventResponses.EventResponse commentResponse;
         try {
-            commentResponse = Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);
+            Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);
         } catch (UserNotFoundException | StudyNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.status(Response.Status.OK).entity(commentResponse).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

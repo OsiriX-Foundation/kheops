@@ -33,12 +33,11 @@ public class Events {
 
     public enum MutationType {ADD_USER, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES , EDIT_ALBUM}
 
-    public static EventResponses.EventResponse albumPostComment(long callingUserPk,long albumPk,String commentContent, String user)
+    public static void albumPostComment(long callingUserPk,long albumPk,String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException{
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        EventResponses.EventResponse eventResponse;
 
         try {
             tx.begin();
@@ -78,15 +77,12 @@ public class Events {
             em.persist(comment);
 
             tx.commit();
-
-            eventResponse = EventResponses.commentToEventResponse(comment);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return eventResponse;
     }
 
     public static Mutation albumPostUserMutation(User callingUser, Album album, MutationType mutationType, User targetUser) {
@@ -226,11 +222,10 @@ public class Events {
     }
 
 
-    public static EventResponses.EventResponse studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String user)
+    public static void studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String user)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        EventResponses.EventResponse eventResponse;
 
         try {
             tx.begin();
@@ -266,13 +261,11 @@ public class Events {
 
             tx.commit();
 
-            eventResponse = EventResponses.commentToEventResponse(comment);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return eventResponse;
     }
 }
