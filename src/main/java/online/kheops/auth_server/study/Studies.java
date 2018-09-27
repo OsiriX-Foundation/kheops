@@ -4,6 +4,7 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.PairListXTotalCount;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
@@ -41,7 +42,7 @@ public class Studies {
 
     private static final Logger LOG = Logger.getLogger(Studies.class.getName());
 
-    public static PairStudiesListStudiesTotalCount findAttributesByUserPKJOOQ(long callingUserPK, MultivaluedMap<String, String> queryParameters, Connection connection)
+    public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, MultivaluedMap<String, String> queryParameters, Connection connection)
             throws BadQueryParametersException {
 
         //queryParameters = ConvertDICOMKeyWordToDICOMTag(queryParameters);
@@ -180,7 +181,7 @@ public class Studies {
 
             attributesList.add(attributes);
         }
-        return new PairStudiesListStudiesTotalCount(studiesTotalCount, attributesList);
+        return new PairListXTotalCount<Attributes>(studiesTotalCount, attributesList);
     }
 
     private static MultivaluedMap<String, String> convertDICOMKeyWordToDICOMTag(MultivaluedMap<String, String> queryParameters) {

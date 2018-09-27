@@ -5,6 +5,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -72,7 +73,7 @@ public class AlbumQueries {
         return dataSource;
     }
 
-    public static PairAlbumsTotalAlbum findAlbumsByUserPk(long userPK, MultivaluedMap<String, String> queryParameters)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(long userPK, MultivaluedMap<String, String> queryParameters)
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -148,7 +149,7 @@ public class AlbumQueries {
 
             final int albumTotalCount = getAlbumTotalCount(userPK, conditionArrayList, connection);
 
-            return new PairAlbumsTotalAlbum(albumTotalCount, albumResponses);
+            return new PairListXTotalCount<AlbumResponses.AlbumResponse>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {
             throw new BadQueryParametersException(e.getMessage());
         } catch (Exception e) {

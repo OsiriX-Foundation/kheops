@@ -11,6 +11,7 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.PairListXTotalCount;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
@@ -40,7 +41,7 @@ public class EventRessource {
                               @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        List<EventResponses.EventResponse> eventsResponses;
+        final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -48,20 +49,20 @@ public class EventRessource {
 
         try {
             if (types.contains("comments") && types.contains("mutations")) {
-                eventsResponses = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
             } else if (types.contains("comments")) {
-                eventsResponses = Events.getCommentsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getCommentsAlbum(callingUserPk, albumPk, offset, limit);
             } else if (types.contains("mutations")) {
-                eventsResponses = Events.getMutationsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getMutationsAlbum(callingUserPk, albumPk, offset, limit);
             } else {
-                eventsResponses = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
             }
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(eventsResponses) {};
-        return Response.status(Response.Status.OK).entity(genericEventsResponsesList).build();
+        final GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(pair.getAttributesList()) {};
+        return Response.status(Response.Status.OK).entity(genericEventsResponsesList).header("X-Total-Count",pair.getXTotalCount()).build();
     }
 
     @POST
@@ -74,6 +75,7 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
         try {
             Events.albumPostComment(callingUserPk, albumPk, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
@@ -100,20 +102,20 @@ public class EventRessource {
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        List<EventResponses.EventResponse> eventsResponses;
+        final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         try {
-            eventsResponses = Events.getCommentsByStudyUID(callingUserPk, studyInstanceUID, offset, limit);
+            pair = Events.getCommentsByStudyUID(callingUserPk, studyInstanceUID, offset, limit);
         } catch(UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(eventsResponses) {};
-        return Response.status(Response.Status.OK).entity(genericEventsResponsesList).build();
+        final GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(pair.getAttributesList()) {};
+        return Response.status(Response.Status.OK).entity(genericEventsResponsesList).header("X-Total-Count", pair.getXTotalCount()).build();
     }
 
     @POST
@@ -126,6 +128,7 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
         try {
             Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);
         } catch (UserNotFoundException | StudyNotFoundException e) {

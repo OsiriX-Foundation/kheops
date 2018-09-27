@@ -6,6 +6,7 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -99,13 +100,13 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairAlbumsTotalAlbum getAlbumList(long callingUserPk, MultivaluedMap<String, String> queryParameters)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(long callingUserPk, MultivaluedMap<String, String> queryParameters)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
-        PairAlbumsTotalAlbum pairAlbumsTotalAlbum;
+        PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
             tx.begin();

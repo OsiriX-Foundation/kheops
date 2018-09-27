@@ -3,8 +3,8 @@ package online.kheops.auth_server.resource;
 import com.mchange.v2.c3p0.C3P0Registry;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.study.PairStudiesListStudiesTotalCount;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.util.PairListXTotalCount;
 import org.dcm4che3.data.Attributes;
 
 import javax.servlet.ServletContext;
@@ -60,14 +60,11 @@ public class QIDOResource {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
-        List<Attributes> attributesList;
-        Integer studiesTotalCount;
+        final PairListXTotalCount<Attributes> pair;
 
         try (Connection connection = getDataSource().getConnection()) {
-                PairStudiesListStudiesTotalCount pair = findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
-                studiesTotalCount = pair.getStudiesTotalCount();
-                attributesList = pair.getAttributesList();
-                LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
+            pair = findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
+            LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             return Response.status(Response.Status.BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
@@ -79,7 +76,7 @@ public class QIDOResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
 
-        GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(attributesList) {};
-        return Response.ok(genericAttributesList).header("X-Total-Count", studiesTotalCount).build();
+        GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
+        return Response.ok(genericAttributesList).header("X-Total-Count", pair.getAttributesList()).build();
     }
 }

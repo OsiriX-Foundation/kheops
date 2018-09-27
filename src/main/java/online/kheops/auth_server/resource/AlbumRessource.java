@@ -1,10 +1,12 @@
 package online.kheops.auth_server.resource;
 
+import javafx.util.Pair;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.album.*;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -41,7 +43,7 @@ public class AlbumRessource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
-        AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponses.AlbumResponse albumResponse;
 
         try {
             albumResponse = Albums.cerateAlbum(callingUserPk, name, description, usersPermission);
@@ -64,7 +66,7 @@ public class AlbumRessource {
     public Response getAlbums(@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        PairAlbumsTotalAlbum pairAlbumsTotalAlbum;
+        final PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
             pairAlbumsTotalAlbum = Albums.getAlbumList(callingUserPk, uriInfo.getQueryParameters());
@@ -79,8 +81,8 @@ public class AlbumRessource {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        GenericEntity<List<AlbumResponses.AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponses.AlbumResponse>>(pairAlbumsTotalAlbum.getAlbumsResponsesList()) {};
-        return Response.status(Response.Status.OK).entity(genericAlbumResponsesList).header("X-Total-Count", pairAlbumsTotalAlbum.getAlbumsTotalCount()).build();
+        final GenericEntity<List<AlbumResponses.AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponses.AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
+        return Response.status(Response.Status.OK).entity(genericAlbumResponsesList).header("X-Total-Count", pairAlbumsTotalAlbum.getXTotalCount()).build();
     }
 
     @GET
@@ -91,7 +93,7 @@ public class AlbumRessource {
     public Response getAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponses.AlbumResponse albumResponse;
 
         try {
             albumResponse = Albums.getAlbum(callingUserPk, albumPk);
@@ -119,7 +121,7 @@ public class AlbumRessource {
                               @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponses.AlbumResponse albumResponse;
         final UsersPermission usersPermission = new UsersPermission();
 
         usersPermission.setAddUser(addUser);
@@ -174,7 +176,7 @@ public class AlbumRessource {
     public Response getUsersAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
-        List<AlbumResponses.UserAlbumResponse> usersAlbumResponse;
+        final List<AlbumResponses.UserAlbumResponse> usersAlbumResponse;
 
         try {
             usersAlbumResponse = Albums.getUsers(callingUserPk, albumPk);
@@ -186,7 +188,7 @@ public class AlbumRessource {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        GenericEntity<List<AlbumResponses.UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<AlbumResponses.UserAlbumResponse>>(usersAlbumResponse) {};
+        final GenericEntity<List<AlbumResponses.UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<AlbumResponses.UserAlbumResponse>>(usersAlbumResponse) {};
         return Response.status(Response.Status.OK).entity(genericUsersAlbumResponsesList).build();
     }
 
@@ -285,6 +287,7 @@ public class AlbumRessource {
     public Response addFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
         try {
             Albums.setFavorites(callingUserPk, albumPk, true);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
@@ -302,6 +305,7 @@ public class AlbumRessource {
     public Response deleteFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+
         try {
             Albums.setFavorites(callingUserPk, albumPk, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
