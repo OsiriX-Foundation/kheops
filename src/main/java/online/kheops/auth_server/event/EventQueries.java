@@ -49,7 +49,7 @@ public class EventQueries {
     }
 
     public static long getTotalMutationByAlbum(Album album, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT m from Mutation m where :album = m.album", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT count(m) from Mutation m where :album = m.album", Long.class);
         query.setParameter("album", album);
         return query.getSingleResult();
     }
