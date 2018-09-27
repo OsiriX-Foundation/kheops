@@ -35,7 +35,7 @@ public class EventQueries {
     }
 
     public static long getTotalCommentsByAlbum(User user, Album album, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where :album = c.album and c.privateTargetUser = null or c.user = :user or c.privateTargetUser = :user", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where :album = c.album and (c.privateTargetUser = null or c.user = :user or c.privateTargetUser = :user)", Long.class);
         query.setParameter("album", album);
         query.setParameter("user", user);
         return (long) query.getSingleResult();
@@ -63,7 +63,7 @@ public class EventQueries {
     }
 
     public static long getTotalCommentsByStudy(User user, String studyUID, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where c.study =  :studyUID and (c.privateTargetUser = null or c.privateTargetUser = :user or c.user = :user)", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where c.study = :studyUID and (c.privateTargetUser = null or c.privateTargetUser = :user or c.user = :user)", Long.class);
         query.setParameter("user", user);
         query.setParameter("studyUID", studyUID);
         return query.getSingleResult();
