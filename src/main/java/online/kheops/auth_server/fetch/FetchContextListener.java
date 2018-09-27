@@ -31,6 +31,7 @@ public class FetchContextListener implements ServletContextListener {
         PACSAuthTokenBuilder.setSecret(sce.getServletContext().getInitParameter("online.kheops.auth.hmacsecret"));
 
         try {
+            Fetcher.setDicomWebURI(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));
             FetchTask task = new FetchTask(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));
             executor.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS);
         } catch (URISyntaxException e) {
