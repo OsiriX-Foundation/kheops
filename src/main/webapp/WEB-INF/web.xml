@@ -5,27 +5,30 @@
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <servlet>
-        <servlet-name>dicomwebproxy</servlet-name>
-        <servlet-class>online.kheops.proxy.DicomWeb</servlet-class>
-        <init-param>
-            <param-name>log</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>dicomwebproxy</servlet-name>
+    <filter>
+        <filter-name>ServletFilter</filter-name>
+        <filter-class>online.kheops.proxy.FixTypeQuoteFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </servlet-mapping>
+    </filter-mapping>
+
     <context-param>
         <description>Base URI for the pacs</description>
         <param-name>online.kheops.pacs.uri</param-name>
-        <param-value>http://test.kheops.online:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
+        <param-value>https://test.kheops.online/dicomweb</param-value>
     </context-param>
     <context-param>
         <description>Base URI for the authentication server</description>
         <param-name>online.kheops.auth_server.uri</param-name>
-        <param-value>https://test.kheops.online:8042/KheopsAuthorization</param-value>
+        <param-value>https://test.kheops.online/authorization</param-value>
+    </context-param>
+    <context-param>
+        <description>HMAC shared secret used to sign tokens used for post</description>
+        <param-name>online.kheops.auth.hmacsecretpost</param-name>
+        <param-value>P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==</param-value>
     </context-param>
 
 
