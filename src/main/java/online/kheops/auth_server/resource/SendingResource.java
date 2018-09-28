@@ -50,7 +50,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/users/{user}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
                                        @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                        @QueryParam("album") Long fromAlbumPk,
@@ -86,7 +86,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/users/{user}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
                                         @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                         @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
@@ -109,7 +109,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response putSeries(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                               @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
                               @Context SecurityContext securityContext) {
@@ -132,7 +132,7 @@ public class SendingResource
 
     @GET
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/metadata")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json")
     public Response getStudiesMetadata(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                        @QueryParam("album") Long fromAlbumPk,
@@ -196,7 +196,7 @@ public class SendingResource
 
     @DELETE
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteStudyFromInbox(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                          @Context SecurityContext securityContext) {
@@ -216,7 +216,7 @@ public class SendingResource
 
     @DELETE
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteSeriesFromInbox(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                           @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
@@ -238,7 +238,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/albums/{album:[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putSeriesInAlbum(@PathParam("album") Long albumPk,
                                      @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                      @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
@@ -264,7 +264,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/albums/{album:[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putStudyInAlbum(@PathParam("album") Long albumPk,
                                     @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                     @QueryParam("album") Long fromAlbumPk,
@@ -300,7 +300,7 @@ public class SendingResource
 
     @DELETE
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/albums/{album:[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteStudyFromAlbum(@PathParam("album") Long albumPk,
                                          @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                          @Context SecurityContext securityContext) {
@@ -323,7 +323,7 @@ public class SendingResource
 
     @DELETE
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/series/{SeriesInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/albums/{album:[1-9][0-9]*}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteSeriesFromAlbum(@PathParam("album") Long albumPk,
                                           @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                           @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,

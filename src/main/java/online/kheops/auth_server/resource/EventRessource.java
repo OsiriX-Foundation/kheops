@@ -93,7 +93,7 @@ public class EventRessource {
     @Secured
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/comments")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     public Response getComments(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                 @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                 @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset,
@@ -120,7 +120,7 @@ public class EventRessource {
 
     @POST
     @Secured
-    @Path("studies/{StudyInstanceUID:([1-9][0-9]*[.])*[1-9][0-9]*}/comments")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postStudiesComment(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
