@@ -118,7 +118,10 @@ public class AlbumRessource {
                               @FormParam("name") String name, @FormParam("description") String description,
                               @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                               @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
-                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,@Context SecurityContext securityContext) {
+                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
+                              @FormParam("notificationNewSeries") Boolean notificationNewSeries,
+                              @FormParam("notificationNewComment") Boolean notificationNewComment,
+                              @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         final AlbumResponses.AlbumResponse albumResponse;
@@ -132,7 +135,7 @@ public class AlbumRessource {
         usersPermission.setWriteComments(writeComments);
 
         try {
-            albumResponse = Albums.editAlbum(callingUserPk, albumPk, name, description, usersPermission);
+            albumResponse = Albums.editAlbum(callingUserPk, albumPk, name, description, usersPermission, notificationNewSeries, notificationNewComment);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Edit album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();

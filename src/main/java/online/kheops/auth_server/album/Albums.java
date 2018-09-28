@@ -59,7 +59,8 @@ public class Albums {
         return albumResponse;
     }
 
-    public static AlbumResponses.AlbumResponse editAlbum(long callingUserPk, long albumPk, String name, String description, UsersPermission usersPermission)
+    public static AlbumResponses.AlbumResponse editAlbum(long callingUserPk, long albumPk, String name, String description, UsersPermission usersPermission,
+                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException{
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -71,22 +72,40 @@ public class Albums {
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
             final AlbumUser targetAlbumUser = getAlbumUser(album, callingUser, em);
+            boolean flagSetNotification = false;
 
-            if(!targetAlbumUser.isAdmin()) {
-                throw new AlbumForbiddenException("Not admin");
+            if (notificationNewComment != null) {
+                targetAlbumUser.setNewCommentNotifications(notificationNewComment);
+                flagSetNotification = true;
+            }
+            if (notificationNewSeries != null) {
+                targetAlbumUser.setNewSeriesNotifications(notificationNewSeries);
+                flagSetNotification = true;
             }
 
-            if (name != null) { album.setName(name); }
-            if (description != null) { album.setDescription(description); }
+            if(!targetAlbumUser.isAdmin() && !flagSetNotification) {
+                throw new AlbumForbiddenException("Not admin");
+            } else if (targetAlbumUser.isAdmin()){
 
-            usersPermission.getAddUser().ifPresent(album::setAddUser);
-            usersPermission.getDownloadSeries().ifPresent(album::setDownloadSeries);
-            usersPermission.getSendSeries().ifPresent(album::setSendSeries);
-            usersPermission.getDeleteSeries().ifPresent(album::setDeleteSeries);
-            usersPermission.getAddSeries().ifPresent(album::setAddSeries);
-            usersPermission.getWriteComments().ifPresent(album::setWriteComments);
+                if (name != null) {
+                    album.setName(name);
+                }
+                if (description != null) {
+                    album.setDescription(description);
+                }
 
-            em.persist(album);
+                usersPermission.getAddUser().ifPresent(album::setAddUser);
+                usersPermission.getDownloadSeries().ifPresent(album::setDownloadSeries);
+                usersPermission.getSendSeries().ifPresent(album::setSendSeries);
+                usersPermission.getDeleteSeries().ifPresent(album::setDeleteSeries);
+                usersPermission.getAddSeries().ifPresent(album::setAddSeries);
+                usersPermission.getWriteComments().ifPresent(album::setWriteComments);
+
+                em.persist(album);
+            }
+            if (flagSetNotification) {
+                em.persist(targetAlbumUser);
+            }
 
             tx.commit();
 
