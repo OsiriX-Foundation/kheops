@@ -82,12 +82,17 @@ public class AlbumQueries {
 
             ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
+            Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
+                    .from(ALBUM_USER)
+                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .asField();
+
             query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
                     isnull(ALBUM.NAME,"NULL").as("album_name"),
                     isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
                     isnull(ALBUM.CREATED_TIME,"NULL").as("album_created_time"),
                     isnull(ALBUM.LAST_EVENT_TIME,"NULL").as("album_last_event_time"),
-                    isnull(countDistinct(ALBUM_USER.PK),"NULL").as("number_of_users"),
+                    isnull(nbUsers,"NULL").as("number_of_users"),
                     isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
                     isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
                     isnull(ALBUM.ADD_USER_PERMISSION,"NULL").as("add_user_permission"),
@@ -99,6 +104,7 @@ public class AlbumQueries {
                     isnull(ALBUM_USER.FAVORITE,"NULL").as("favorite"),
                     isnull(ALBUM_USER.NEW_COMMENT_NOTIFICATIONS,"NULL").as("new_comment_notifications"),
                     isnull(ALBUM_USER.NEW_SERIES_NOTIFICATIONS,"NULL").as("new_series_notifications"),
+                    isnull(ALBUM_USER.ADMIN,"NULL").as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUM);
@@ -164,12 +170,17 @@ public class AlbumQueries {
             final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
             final SelectQuery query = create.selectQuery();
 
+            Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
+                    .from(ALBUM_USER)
+                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .asField();
+
             query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
                     isnull(ALBUM.NAME,"NULL").as("album_name"),
                     isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
                     isnull(ALBUM.CREATED_TIME,"NULL").as("album_created_time"),
                     isnull(ALBUM.LAST_EVENT_TIME,"NULL").as("album_last_event_time"),
-                    isnull(countDistinct(ALBUM_USER.PK),"NULL").as("number_of_users"),
+                    isnull(nbUsers,"NULL").as("number_of_users"),
                     isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
                     isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
                     isnull(ALBUM.ADD_USER_PERMISSION,"NULL").as("add_user_permission"),
@@ -197,7 +208,7 @@ public class AlbumQueries {
 
             query.addConditions(ALBUM.PK.eq(albumPk));
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
-            query.addConditions(ALBUM_USER.USER_FK.eq(userPK).and(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK)));
+            query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
 
             query.addGroupBy(ALBUM.PK);
             Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String> result = (Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>) query.fetchOne();

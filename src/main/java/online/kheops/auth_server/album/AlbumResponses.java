@@ -131,7 +131,7 @@ public class AlbumResponses {
         albumResponse.isFavorite = ((Byte) r.getValue("favorite")) != 0;
         albumResponse.notificationNewComment = ((Byte) r.getValue("new_comment_notifications")) != 0;
         albumResponse.notificationNewSeries = ((Byte) r.getValue("new_series_notifications")) != 0;
-        //albumResponse.isAdmin = ((Byte) r.getValue("admin")) != 0;
+        albumResponse.isAdmin = ((Byte) r.getValue("admin")) != 0;
         if(r.getValue("modalities") != null) {
             albumResponse.modalities = r.getValue("modalities").toString().split("/");
         }

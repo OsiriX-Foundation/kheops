@@ -13,7 +13,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -187,6 +186,7 @@ public class Albums {
 
     public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, long albumPk)
            throws AlbumNotFoundException, UserNotFoundException, JOOQException {
+
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         AlbumResponses.AlbumResponse albumResponse;
@@ -201,11 +201,11 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
-            albumResponse = findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
-
-            if (Long.parseLong(albumResponse.id) == callingUser.getInbox().getPk()) {
+            if (album.getPk() == callingUser.getInbox().getPk()) {
                 throw new AlbumNotFoundException();
             }
+
+            albumResponse = findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
 
             tx.commit();
         } finally {
