@@ -11,6 +11,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -66,10 +67,16 @@ public final class STOWResource {
     }
 
     private Response store(InputStream inputStream, String bearerToken, String albumId, String studyInstanceUID) {
-        final URI STOWServiceURI = getParameterURI("online.kheops.pacs.uri");
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
+        URI STOWServiceURI = getParameterURI("online.kheops.pacs.uri");
 
-        try (StowRS stowRS = new StowRS(STOWServiceURI.toString() + "/studies", getStowContentType(), null, "Bearer " + getPostBearerToken())) {
+        if (studyInstanceUID != null) {
+            STOWServiceURI = UriBuilder.fromUri(STOWServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);
+        } else {
+            STOWServiceURI = UriBuilder.fromUri(STOWServiceURI).path("/studies").build();
+        }
+
+        try (StowRS stowRS = new StowRS(STOWServiceURI.toString(), getStowContentType(), null, "Bearer " + getPostBearerToken())) {
             STOWService stowService = new STOWService(stowRS);
             return new STOWProxy(contentType, inputStream, stowService, new AuthorizationManager(authorizationURI, bearerToken, albumId, studyInstanceUID)).getResponse();
         } catch (STOWGatewayException e) {

@@ -38,14 +38,10 @@ public final class AuthorizationManager {
 
     public AuthorizationManager(URI authorizationServerRoot, String bearerToken, String albumId, String studyInstanceUID) {
         this.bearerToken = Objects.requireNonNull(bearerToken);
-        authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies");
-        if (studyInstanceUID != null) {
-            authorizationUriBuilder.path(studyInstanceUID);
-        }
+        authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
         if (albumId != null) {
-            authorizationUriBuilder.queryParam("album", albumId);
+            authorizationUriBuilder.path("/albums/" + albumId);
         }
-        authorizationUriBuilder.path("{StudyInstanceUID}/series/{SeriesInstanceUID}");
         fetchUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/fetch");
     }
 
