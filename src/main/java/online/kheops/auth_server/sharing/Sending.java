@@ -195,7 +195,7 @@ public class Sending {
 
             Series availableSeries;
             try {
-                availableSeries = findSeriesByStudyUIDandSeriesUID(callingUser, studyInstanceUID, seriesInstanceUID, em);
+                availableSeries = findSeriesByStudyUIDandSeriesUIDwithSharePermission(callingUser, studyInstanceUID, seriesInstanceUID, em);
             } catch (NoResultException e1) {
                 try {
                     availableSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);

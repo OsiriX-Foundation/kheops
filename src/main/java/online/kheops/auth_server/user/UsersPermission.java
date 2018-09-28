@@ -67,4 +67,8 @@ public class UsersPermission {
         addSeries = true;
         writeComments = false;
     }
+
+    public boolean areSet() {
+        return (addUser != null || downloadSeries != null || sendSeries != null || deleteSeries != null || addSeries != null || writeComments != null);
+    }
 }

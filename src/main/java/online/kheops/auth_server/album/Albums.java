@@ -101,6 +101,10 @@ public class Albums {
                 usersPermission.getWriteComments().ifPresent(album::setWriteComments);
 
                 em.persist(album);
+            } else if (!targetAlbumUser.isAdmin() && flagSetNotification) {
+                if (name != null || description != null || usersPermission.areSet()) {
+                    throw new AlbumForbiddenException("Not admin");
+                }
             }
             if (flagSetNotification) {
                 em.persist(targetAlbumUser);
