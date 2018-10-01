@@ -166,4 +166,6 @@ public class Album {
     public void setEvents(Set<Event> events) { this.events = events; }
 
     public void addEvents(Event event) { this.events.add(event); }
+
+    public void addCapability(Capability capability) { this.capabilities.add(capability); }
 }

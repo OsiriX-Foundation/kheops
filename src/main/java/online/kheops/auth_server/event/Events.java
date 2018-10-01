@@ -6,13 +6,11 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.study.StudyQueries;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -138,7 +136,7 @@ public class Events {
             }
             em.close();
         }
-        pair = new PairListXTotalCount<EventResponses.EventResponse>(XTotalCount, eventResponses);
+        pair = new PairListXTotalCount<>(XTotalCount, eventResponses);
         return pair;
     }
 
@@ -174,7 +172,7 @@ public class Events {
             }
             em.close();
         }
-        pair = new PairListXTotalCount<EventResponses.EventResponse>(XTotalCount, eventResponses);
+        pair = new PairListXTotalCount<>(XTotalCount, eventResponses);
         return pair;
     }
 
@@ -208,7 +206,7 @@ public class Events {
             }
             em.close();
         }
-        pair = new PairListXTotalCount<EventResponses.EventResponse>(XTotalCount, eventResponses);
+        pair = new PairListXTotalCount<>(XTotalCount, eventResponses);
         return pair;
     }
 
@@ -239,7 +237,7 @@ public class Events {
             }
             em.close();
         }
-        pair = new PairListXTotalCount<EventResponses.EventResponse>(XTotalCount, eventResponses);
+        pair = new PairListXTotalCount<>(XTotalCount, eventResponses);
         return pair;
     }
 

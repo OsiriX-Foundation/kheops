@@ -181,7 +181,7 @@ public class Studies {
 
             attributesList.add(attributes);
         }
-        return new PairListXTotalCount<Attributes>(studiesTotalCount, attributesList);
+        return new PairListXTotalCount<>(studiesTotalCount, attributesList);
     }
 
     private static MultivaluedMap<String, String> convertDICOMKeyWordToDICOMTag(MultivaluedMap<String, String> queryParameters) {

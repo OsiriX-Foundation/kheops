@@ -92,6 +92,7 @@ public class Capability {
         this.user = user;
         this.scopeType = "series";
         user.getCapabilities().add(this);
+        series.addCapability(this);
     }
 
     public Capability(User user, LocalDateTime expirationDate, String title, Album album) {
@@ -101,6 +102,7 @@ public class Capability {
         this.user = user;
         this.scopeType = "album";
         user.getCapabilities().add(this);
+        album.addCapability(this);
     }
 
     public Capability(User user, LocalDateTime expirationDate, String title, Study study) {
@@ -109,8 +111,8 @@ public class Capability {
         this.title  = title;
         this.user = user;
         this.scopeType = "study";
-
         user.getCapabilities().add(this);
+        study.addCapability(this);
     }
 
     public Capability(User user, LocalDateTime expirationDate, String title) {

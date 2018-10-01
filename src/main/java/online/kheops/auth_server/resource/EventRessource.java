@@ -12,8 +12,6 @@ import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.Oid;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -127,6 +125,7 @@ public class EventRessource {
                                 @FormParam("to_user") String user, @FormParam("comment") String comment,
                                 @Context SecurityContext securityContext) {
 
+        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
 
         try {

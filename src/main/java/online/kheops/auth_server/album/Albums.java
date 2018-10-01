@@ -2,7 +2,6 @@ package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -101,11 +100,10 @@ public class Albums {
                 usersPermission.getWriteComments().ifPresent(album::setWriteComments);
 
                 em.persist(album);
-            } else if (!targetAlbumUser.isAdmin() && flagSetNotification) {
-                if (name != null || description != null || usersPermission.areSet()) {
-                    throw new AlbumForbiddenException("Not admin");
-                }
+            } else if (!targetAlbumUser.isAdmin() && flagSetNotification && (name != null || description != null || usersPermission.areSet())) {
+                throw new AlbumForbiddenException("Not admin");
             }
+            
             if (flagSetNotification) {
                 em.persist(targetAlbumUser);
             }

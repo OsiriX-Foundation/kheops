@@ -1,7 +1,6 @@
 package online.kheops.auth_server.event;
 
 import online.kheops.auth_server.entity.*;
-import org.hibernate.query.Query;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;

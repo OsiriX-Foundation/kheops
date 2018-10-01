@@ -20,7 +20,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Objects;
 
 import static online.kheops.auth_server.capability.Capabilities.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
@@ -53,26 +52,6 @@ public class CapabilitiesResource {
         if (scopeType.compareTo("album") != 0 ||scopeType.compareTo("series") != 0 ||scopeType.compareTo("study") != 0 || scopeType.compareTo("user") != 0) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
         }
-        switch (scopeType) {
-            case "album":
-                if( albumPk == null) {
-                    return Response.status(Response.Status.BAD_REQUEST).entity("The {album} query parameter must be set").build();
-                }
-                break;
-            case "series":
-                if( seriesInstanceUID == null && studyInstanceUID == null) {
-                    return Response.status(Response.Status.BAD_REQUEST).entity("The {series} and {study} query parameters must be set").build();
-                }
-                checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
-                checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-                break;
-            case "study":
-                if( studyInstanceUID == null) {
-                    return Response.status(Response.Status.BAD_REQUEST).entity("The {study} query parameter must be set").build();
-                }
-                checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-                break;
-        }
 
         try {
             switch (scopeType) {
@@ -80,12 +59,24 @@ public class CapabilitiesResource {
                     capabilityResponse = createUserCapability(callingUserPk, title, expirationDate);
                     break;
                 case "album":
+                    if( albumPk == null) {
+                        return Response.status(Response.Status.BAD_REQUEST).entity("The {album} query parameter must be set").build();
+                    }
                     capabilityResponse = createAlbumCapability(callingUserPk, title, expirationDate, albumPk);
                     break;
                 case "series":
+                    if( seriesInstanceUID == null && studyInstanceUID == null) {
+                        return Response.status(Response.Status.BAD_REQUEST).entity("The {series} and {study} query parameters must be set").build();
+                    }
+                    checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
+                    checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
                     capabilityResponse = createSeriesCapability(callingUserPk, title, expirationDate, studyInstanceUID, seriesInstanceUID);
                     break;
                 case "study":
+                    if( studyInstanceUID == null) {
+                        return Response.status(Response.Status.BAD_REQUEST).entity("The {study} query parameter must be set").build();
+                    }
+                    checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
                     capabilityResponse = createStudyCapability(callingUserPk, title, expirationDate, studyInstanceUID);
                     break;
                 default:

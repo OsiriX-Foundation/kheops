@@ -155,7 +155,7 @@ public class AlbumQueries {
 
             final int albumTotalCount = getAlbumTotalCount(userPK, conditionArrayList, connection);
 
-            return new PairListXTotalCount<AlbumResponses.AlbumResponse>(albumTotalCount, albumResponses);
+            return new PairListXTotalCount<>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {
             throw new BadQueryParametersException(e.getMessage());
         } catch (Exception e) {

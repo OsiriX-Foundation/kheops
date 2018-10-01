@@ -192,4 +192,6 @@ public class Series {
     public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
 
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
+
+    public void addCapability(Capability capability) {this.capabilities.add(capability); }
 }

@@ -23,8 +23,6 @@ import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.Oid;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -36,7 +34,6 @@ import java.util.logging.Logger;
 
 import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
-import static online.kheops.auth_server.user.Users.getUser;
 
 
 @Path("/")

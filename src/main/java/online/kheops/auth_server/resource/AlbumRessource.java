@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import javafx.util.Pair;
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.album.*;
 import online.kheops.auth_server.annotation.Secured;
