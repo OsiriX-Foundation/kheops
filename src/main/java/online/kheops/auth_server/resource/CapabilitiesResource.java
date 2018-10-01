@@ -44,25 +44,27 @@ public class CapabilitiesResource {
                                         @FormParam("album") Long albumPk,
                                         @FormParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
                                         @FormParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                        @NotNull @FormParam("read_permission") boolean readPermission,
+                                        @NotNull @FormParam("write_permission") boolean writePermission,
                                         @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
         if (scopeType.compareTo("album") != 0 ||scopeType.compareTo("series") != 0 ||scopeType.compareTo("study") != 0 || scopeType.compareTo("user") != 0) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
         }
 
         try {
             switch (scopeType) {
                 case "user":
-                    capabilityResponse = createUserCapability(callingUserPk, title, expirationDate);
+                    capabilityResponse = createUserCapability(callingUserPk, title, expirationDate, readPermission, writePermission);
                     break;
                 case "album":
                     if( albumPk == null) {
                         return Response.status(Response.Status.BAD_REQUEST).entity("The {album} query parameter must be set").build();
                     }
-                    capabilityResponse = createAlbumCapability(callingUserPk, title, expirationDate, albumPk);
+                    capabilityResponse = createAlbumCapability(callingUserPk, title, expirationDate, albumPk, readPermission, writePermission);
                     break;
                 case "series":
                     if( seriesInstanceUID == null && studyInstanceUID == null) {
@@ -70,14 +72,14 @@ public class CapabilitiesResource {
                     }
                     checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
                     checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-                    capabilityResponse = createSeriesCapability(callingUserPk, title, expirationDate, studyInstanceUID, seriesInstanceUID);
+                    capabilityResponse = createSeriesCapability(callingUserPk, title, expirationDate, studyInstanceUID, seriesInstanceUID, readPermission, writePermission);
                     break;
                 case "study":
                     if( studyInstanceUID == null) {
                         return Response.status(Response.Status.BAD_REQUEST).entity("The {study} query parameter must be set").build();
                     }
                     checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-                    capabilityResponse = createStudyCapability(callingUserPk, title, expirationDate, studyInstanceUID);
+                    capabilityResponse = createStudyCapability(callingUserPk, title, expirationDate, studyInstanceUID, readPermission, writePermission);
                     break;
                 default:
                     return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
