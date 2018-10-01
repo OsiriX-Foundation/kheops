@@ -75,7 +75,7 @@ public class Capabilities {
         try {
             tx.begin();
             final User user = Users.getUser(callingUserPk, em);
-            final Capability capability = new Capability(user, expirationDateTime, title);
+            final Capability capability = new Capability(user, expirationDateTime, title, readPermission, writePermission);
 
             em.persist(capability);
             em.persist(user);
@@ -118,9 +118,9 @@ public class Capabilities {
             final Album album = getAlbum(albumPk, em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
             if (!albumUser.isAdmin()) {
-                throw new NewCapabilityForbidden("Only an admin can générate a capability token for an album");
+                throw new NewCapabilityForbidden("Only an admin can generate a capability token for an album");
             }
-            final Capability capability = new Capability(user, expirationDateTime, title, album);
+            final Capability capability = new Capability(user, expirationDateTime, title, album, readPermission, writePermission);
 
             em.persist(capability);
             em.persist(user);
@@ -166,7 +166,7 @@ public class Capabilities {
             } catch (NotFoundException e) {
                 throw new SeriesNotFoundException("Unknown series");
             }
-            final Capability capability = new Capability(user, expirationDateTime, title, series);
+            final Capability capability = new Capability(user, expirationDateTime, title, series, readPermission, writePermission);
 
             em.persist(capability);
             em.persist(user);
@@ -213,7 +213,7 @@ public class Capabilities {
                 throw new StudyNotFoundException("Unknown study : "+studyInstanceUID);
             }
 
-            final Capability capability = new Capability(user, expirationDateTime, title, study);
+            final Capability capability = new Capability(user, expirationDateTime, title, study, readPermission, writePermission);
 
             em.persist(capability);
             em.persist(user);
@@ -230,7 +230,7 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, String secret)
+    public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, long capabilityId)
     throws UserNotFoundException, CapabilityNotFound {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -241,7 +241,7 @@ public class Capabilities {
             tx.begin();
 
             final User user = Users.getUser(callingUserPk, em);
-            final Capability capability = getCapability(user, secret, em);
+            final Capability capability = getCapability(user, capabilityId, em);
 
             capability.setRevoked(true);
             em.persist(capability);
@@ -292,9 +292,9 @@ public class Capabilities {
         return capabilityResponses;
     }
 
-    public static Capability getCapability(User user, String secret, EntityManager em) throws CapabilityNotFound {
+    public static Capability getCapability(User user, long capabilityId, EntityManager em) throws CapabilityNotFound {
         try {
-            return findCapabilityByCapabilityTokenandUser(user, secret, em);
+            return findCapabilityByCapabilityTokenandUser(user, capabilityId, em);
         } catch (NoResultException e) {
             throw new CapabilityNotFound();
         }

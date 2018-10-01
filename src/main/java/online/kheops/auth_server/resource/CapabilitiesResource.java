@@ -51,7 +51,7 @@ public class CapabilitiesResource {
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
-        if (scopeType.compareTo("album") != 0 ||scopeType.compareTo("series") != 0 ||scopeType.compareTo("study") != 0 || scopeType.compareTo("user") != 0) {
+        if (!(scopeType.compareTo("album") == 0 ||scopeType.compareTo("series") == 0 || scopeType.compareTo("study") == 0 || scopeType.compareTo("user") == 0)) {
             return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
         }
 
@@ -98,17 +98,17 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
-    @Path("capabilities/{secret:[a-zA-Z0-9]{22}}/revoke")
+    @Path("capabilities/{capability_id:[1-9][0-9]*}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response revokeCapability(@PathParam("secret") String secret,
+    public Response revokeCapability(@PathParam("capability_id") long capabilityId,
                                      @Context SecurityContext securityContext) {
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
         CapabilityResponse capabilityResponse;
 
         try {
-            capabilityResponse = Capabilities.revokeCapability(callingUserPk, secret);
+            capabilityResponse = Capabilities.revokeCapability(callingUserPk, capabilityId);
         } catch (UserNotFoundException |CapabilityNotFound e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }

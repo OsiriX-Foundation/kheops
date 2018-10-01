@@ -54,6 +54,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jooq/jooq-codegen
     compile group: 'org.jooq', name: 'jooq-codegen', version: '3.11.2'
 
+    compile group: 'org.glassfish.jersey.ext', name: 'jersey-bean-validation', version: '2.27'
 
 
     compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {

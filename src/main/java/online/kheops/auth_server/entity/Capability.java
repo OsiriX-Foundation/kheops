@@ -85,42 +85,50 @@ public class Capability {
         this.secret = Capabilities.newCapabilityToken();
     }
 
-    public Capability(User user, LocalDateTime expirationDate, String title, Series series) {
+    public Capability(User user, LocalDateTime expirationDate, String title, Series series, boolean readPermission, boolean writePermission) {
         this.secret = Capabilities.newCapabilityToken();
         this.expiration = expirationDate;
         this.title  = title;
         this.user = user;
         this.scopeType = "series";
+        this.readPermission = readPermission;
+        this.writePermission = writePermission;
         user.getCapabilities().add(this);
         series.addCapability(this);
     }
 
-    public Capability(User user, LocalDateTime expirationDate, String title, Album album) {
+    public Capability(User user, LocalDateTime expirationDate, String title, Album album, boolean readPermission, boolean writePermission) {
         this.secret = Capabilities.newCapabilityToken();
         this.expiration = expirationDate;
         this.title  = title;
         this.user = user;
         this.scopeType = "album";
+        this.readPermission = readPermission;
+        this.writePermission = writePermission;
         user.getCapabilities().add(this);
         album.addCapability(this);
     }
 
-    public Capability(User user, LocalDateTime expirationDate, String title, Study study) {
+    public Capability(User user, LocalDateTime expirationDate, String title, Study study, boolean readPermission, boolean writePermission) {
         this.secret = Capabilities.newCapabilityToken();
         this.expiration = expirationDate;
         this.title  = title;
         this.user = user;
         this.scopeType = "study";
+        this.readPermission = readPermission;
+        this.writePermission = writePermission;
         user.getCapabilities().add(this);
         study.addCapability(this);
     }
 
-    public Capability(User user, LocalDateTime expirationDate, String title) {
+    public Capability(User user, LocalDateTime expirationDate, String title, boolean readPermission, boolean writePermission) {
         this.secret = Capabilities.newCapabilityToken();
         this.expiration = expirationDate;
         this.title  = title;
         this.user = user;
         this.scopeType = "user";
+        this.readPermission = readPermission;
+        this.writePermission = writePermission;
         user.getCapabilities().add(this);
     }
 
@@ -184,6 +192,8 @@ public class Capability {
     }
 
     public  LocalDateTime getStartTime() {return startTime; }
+
+    public boolean isActive() {return startTime != null; }
 
     public String getSecret() {
         return secret;

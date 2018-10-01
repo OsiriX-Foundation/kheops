@@ -21,11 +21,11 @@ public class CapabilitiesQueries {
         return query.getSingleResult();
     }
 
-    public static Capability findCapabilityByCapabilityTokenandUser(User user, String secret, EntityManager em)
+    public static Capability findCapabilityByCapabilityTokenandUser(User user, long capabilityId, EntityManager em)
             throws NoResultException {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user AND :secret = c.secret", Capability.class);
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user AND :capabilityId = c.pk", Capability.class);
         query.setParameter("user", user);
-        query.setParameter("secret", secret);
+        query.setParameter("capabilityId", capabilityId);
         return query.getSingleResult();
     }
 
@@ -36,7 +36,7 @@ public class CapabilitiesQueries {
     }
 
     public static  List<Capability> findCapabilitiesByUserWitoutRevoke(User user, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user and c.revokedTime <> null", Capability.class);
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user and c.revokedTime = null", Capability.class);
         query.setParameter("user", user);
         return query.getResultList();
     }
