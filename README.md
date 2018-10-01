@@ -1,14 +1,24 @@
 # KheopsNginx
 
+**Docker image**
+
+Name : [osirixfoundation/kheops-reverse-proxy](https://hub.docker.com/r/osirixfoundation/kheops-reverse-proxy/)
+
 ## Environnement variables
 
 `KHEOPS_ROOT_URL`
 
-`KHOEPS_NGINX_URL_TOMCAT`
+`KHEOPS_NGINX_URL_AUTHORIZATION`
 
-`KHEOPS_NGINX_KHEOPSVIEWER`
+`KHEOPS_NGINX_URL_DICOMWEB_PROXY`
 
-# Secrets
+`KHEOPS_NGINX_URL_AUTHORIZATION_PROXY`
+
+`KHEOPS_NGINX_URL_ZIPPER`
+
+`KHEOPS_NGINX_URL_VIEWER`
+
+## Secrets
 
 `privkey1.pem`
 
