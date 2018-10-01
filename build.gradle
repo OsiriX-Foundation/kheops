@@ -76,7 +76,7 @@ gretty {
     jvmArgs = [*debugArgs]
 
     httpPort = 8042
-    contextPath = ''
+    contextPath = 'capabilities'
     servletContainer = 'tomcat8'
 }
 
