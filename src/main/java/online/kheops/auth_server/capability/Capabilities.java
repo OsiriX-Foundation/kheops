@@ -53,7 +53,7 @@ public class Capabilities {
         return pattern.matcher(token).matches();
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createUserCapability(Long callingUserPk, String title, String expirationDate)
+    public static CapabilitiesResponses.CapabilityResponse createUserCapability(Long callingUserPk, String title, String expirationDate, boolean readPermission, boolean writePermission)
             throws UserNotFoundException, DateTimeParseException {
         // parse the given expiration date
         LocalDateTime expirationDateTime;
@@ -92,7 +92,7 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(Long callingUserPk, String title, String expirationDate, Long albumPk)
+    public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(Long callingUserPk, String title, String expirationDate, Long albumPk, boolean readPermission, boolean writePermission)
             throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden {
         // parse the given expiration date
         LocalDateTime expirationDateTime;
@@ -137,7 +137,7 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createSeriesCapability(Long callingUserPk, String title, String expirationDate, String studyInstanceUID, String seriesInstanceUID)
+    public static CapabilitiesResponses.CapabilityResponse createSeriesCapability(Long callingUserPk, String title, String expirationDate, String studyInstanceUID, String seriesInstanceUID, boolean readPermission, boolean writePermission)
             throws UserNotFoundException, DateTimeParseException, SeriesNotFoundException{
         // parse the given expiration date
         LocalDateTime expirationDateTime;
@@ -183,7 +183,7 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createStudyCapability(Long callingUserPk, String title, String expirationDate, String studyInstanceUID)
+    public static CapabilitiesResponses.CapabilityResponse createStudyCapability(Long callingUserPk, String title, String expirationDate, String studyInstanceUID, boolean readPermission, boolean writePermission)
             throws UserNotFoundException, DateTimeParseException, StudyNotFoundException {
         // parse the given expiration date
         LocalDateTime expirationDateTime;

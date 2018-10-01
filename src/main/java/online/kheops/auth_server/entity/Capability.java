@@ -43,11 +43,11 @@ public class Capability {
 
     @Basic(optional = false)
     @Column(name = "read_permission ", updatable = false)
-    private String readPermission ;
+    private boolean readPermission ;
 
     @Basic(optional = false)
     @Column(name = "write_permission ", updatable = false)
-    private String writePermission ;
+    private boolean writePermission ;
 
     @ManyToOne
     @JoinColumn(name = "user_fk", insertable=false, updatable=false)
@@ -183,7 +183,21 @@ public class Capability {
         return updatedTime;
     }
 
+    public  LocalDateTime getStartTime() {return startTime; }
+
     public String getSecret() {
         return secret;
     }
+
+    public boolean isReadPermission() { return readPermission; }
+
+    public boolean isWritePermission() { return writePermission; }
+
+    public String getScopeType() { return scopeType; }
+
+    public Album getAlbum() { return album; }
+
+    public Series getSeries() { return series; }
+
+    public Study getStudy() { return study; }
 }
