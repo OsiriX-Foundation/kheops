@@ -48,7 +48,7 @@ public class CapabilitiesResponses {
 
     public static CapabilityResponse CapabilityToCapabilitiesResponses(Capability capability) {
 
-        final CapabilityResponse capabilityResponse = new CapabilityResponse();
+        CapabilityResponse capabilityResponse = new CapabilityResponse();
 
         capabilityResponse.id = capability.getPk();
 
@@ -67,20 +67,7 @@ public class CapabilitiesResponses {
         capabilityResponse.readPermission = capability.isReadPermission();
         capabilityResponse.writePermission = capability.isWritePermission();
 
-        capabilityResponse.scopeType = capability.getScopeType();
-        switch (capability.getScopeType()){
-            case "album":
-                capabilityResponse.albumId = capability.getAlbum().getPk();
-                break;
-            case "series":
-                capabilityResponse.series = capability.getSeries().getSeriesInstanceUID();
-                break;
-            case "study":
-                capabilityResponse.study = capability.getStudy().getStudyInstanceUID();
-                break;
-            case "user":
-                break;
-        }
+        capabilityResponse = ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(capabilityResponse, capability);
 
         return capabilityResponse;
     }

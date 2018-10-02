@@ -53,29 +53,23 @@ public class Capabilities {
         return pattern.matcher(token).matches();
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createUserCapability(Long callingUserPk, String title, String expirationDate, boolean readPermission, boolean writePermission)
+    public static CapabilitiesResponses.CapabilityResponse createCapability(CapabilityParameters capabilityParameters)
+            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, SeriesNotFoundException, StudyNotFoundException {
+        return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
+    }
+
+    public static CapabilitiesResponses.CapabilityResponse createUserCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, DateTimeParseException {
-        // parse the given expiration date
-        LocalDateTime expirationDateTime;
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
-
-        if (expirationDate != null) {
-
-            OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
-            expirationDateTime = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
-
-        } else {
-            expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
-        }
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
-            final User user = Users.getUser(callingUserPk, em);
-            final Capability capability = new Capability(user, expirationDateTime, title, readPermission, writePermission);
+            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
+            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
 
             em.persist(capability);
             em.persist(user);
@@ -92,35 +86,24 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(Long callingUserPk, String title, String expirationDate, Long albumPk, boolean readPermission, boolean writePermission)
+    public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden {
-        // parse the given expiration date
-        LocalDateTime expirationDateTime;
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
-
-        if (expirationDate != null) {
-
-            OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
-            expirationDateTime = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
-
-        } else {
-            expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
-        }
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
-            final User user = Users.getUser(callingUserPk, em);
+            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
 
-            final Album album = getAlbum(albumPk, em);
+            final Album album = getAlbum(capabilityParameters.getAlbumPk(), em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
             if (!albumUser.isAdmin()) {
                 throw new NewCapabilityForbidden("Only an admin can generate a capability token for an album");
             }
-            final Capability capability = new Capability(user, expirationDateTime, title, album, readPermission, writePermission);
+            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), album, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
 
             em.persist(capability);
             em.persist(user);
@@ -137,36 +120,25 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createSeriesCapability(Long callingUserPk, String title, String expirationDate, String studyInstanceUID, String seriesInstanceUID, boolean readPermission, boolean writePermission)
-            throws UserNotFoundException, DateTimeParseException, SeriesNotFoundException{
-        // parse the given expiration date
-        LocalDateTime expirationDateTime;
+    public static CapabilitiesResponses.CapabilityResponse createSeriesCapability(CapabilityParameters capabilityParameters)
+            throws UserNotFoundException, DateTimeParseException, SeriesNotFoundException {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
-
-        if (expirationDate != null) {
-
-            OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
-            expirationDateTime = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
-
-        } else {
-            expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
-        }
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
-            final User user = Users.getUser(callingUserPk, em);
+            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
 
             Series series;
             try {
-                series = findSeriesByStudyUIDandSeriesUIDFromInbox(user, studyInstanceUID, seriesInstanceUID, em);
+                series = findSeriesByStudyUIDandSeriesUIDFromInbox(user, capabilityParameters.getStudyInstanceUID(), capabilityParameters.getSeriesInstanceUID(), em);
             } catch (NotFoundException e) {
                 throw new SeriesNotFoundException("Unknown series");
             }
-            final Capability capability = new Capability(user, expirationDateTime, title, series, readPermission, writePermission);
+            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), series, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
 
             em.persist(capability);
             em.persist(user);
@@ -183,37 +155,26 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createStudyCapability(Long callingUserPk, String title, String expirationDate, String studyInstanceUID, boolean readPermission, boolean writePermission)
+    public static CapabilitiesResponses.CapabilityResponse createStudyCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, DateTimeParseException, StudyNotFoundException {
-        // parse the given expiration date
-        LocalDateTime expirationDateTime;
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
-
-        if (expirationDate != null) {
-
-            OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
-            expirationDateTime = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
-
-        } else {
-            expirationDateTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
-        }
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
-            final User user = Users.getUser(callingUserPk, em);
+            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
 
             final Study study;
             try {
-                study = findStudyByStudyUIDandUser(studyInstanceUID, user, em);
+                study = findStudyByStudyUIDandUser(capabilityParameters.getStudyInstanceUID(), user, em);
             } catch (NoResultException e) {
-                throw new StudyNotFoundException("Unknown study : "+studyInstanceUID);
+                throw new StudyNotFoundException("Unknown study : "+capabilityParameters.getStudyInstanceUID());
             }
 
-            final Capability capability = new Capability(user, expirationDateTime, title, study, readPermission, writePermission);
+            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), study, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
 
             em.persist(capability);
             em.persist(user);

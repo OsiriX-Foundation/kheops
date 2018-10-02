@@ -74,6 +74,9 @@ public class Capability {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         updatedTime = now;
+        if(startTime == null) {
+            startTime = now;
+        }
     }
 
     @PreUpdate
@@ -81,55 +84,41 @@ public class Capability {
         updatedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
-    public Capability() {
-        this.secret = Capabilities.newCapabilityToken();
-    }
+    public Capability() {}
 
-    public Capability(User user, LocalDateTime expirationDate, String title, Series series, boolean readPermission, boolean writePermission) {
+    public Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, boolean readPermission, boolean writePermission) {
         this.secret = Capabilities.newCapabilityToken();
         this.expiration = expirationDate;
-        this.title  = title;
-        this.user = user;
-        this.scopeType = "series";
-        this.readPermission = readPermission;
-        this.writePermission = writePermission;
-        user.getCapabilities().add(this);
-        series.addCapability(this);
-    }
-
-    public Capability(User user, LocalDateTime expirationDate, String title, Album album, boolean readPermission, boolean writePermission) {
-        this.secret = Capabilities.newCapabilityToken();
-        this.expiration = expirationDate;
-        this.title  = title;
-        this.user = user;
-        this.scopeType = "album";
-        this.readPermission = readPermission;
-        this.writePermission = writePermission;
-        user.getCapabilities().add(this);
-        album.addCapability(this);
-    }
-
-    public Capability(User user, LocalDateTime expirationDate, String title, Study study, boolean readPermission, boolean writePermission) {
-        this.secret = Capabilities.newCapabilityToken();
-        this.expiration = expirationDate;
-        this.title  = title;
-        this.user = user;
-        this.scopeType = "study";
-        this.readPermission = readPermission;
-        this.writePermission = writePermission;
-        user.getCapabilities().add(this);
-        study.addCapability(this);
-    }
-
-    public Capability(User user, LocalDateTime expirationDate, String title, boolean readPermission, boolean writePermission) {
-        this.secret = Capabilities.newCapabilityToken();
-        this.expiration = expirationDate;
+        this.startTime = startDate;
         this.title  = title;
         this.user = user;
         this.scopeType = "user";
         this.readPermission = readPermission;
         this.writePermission = writePermission;
         user.getCapabilities().add(this);
+    }
+
+    public Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, Series series, boolean readPermission, boolean writePermission) {
+        this(user, expirationDate, startDate, title, readPermission, writePermission);
+        this.scopeType = "series";
+        this.series = series;
+        this.study = series.getStudy();
+        series.addCapability(this);
+        study.addCapability(this);
+    }
+
+    public Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, Album album, boolean readPermission, boolean writePermission) {
+        this(user, expirationDate, startDate, title, readPermission, writePermission);
+        this.scopeType = "album";
+        this.album = album;
+        album.addCapability(this);
+    }
+
+    public Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, Study study, boolean readPermission, boolean writePermission) {
+        this(user, expirationDate, startDate, title, readPermission, writePermission);
+        this.scopeType = "study";
+        this.study = study;
+        study.addCapability(this);
     }
 
     public LocalDateTime getExpiration() {
