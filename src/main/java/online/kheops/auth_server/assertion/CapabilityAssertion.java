@@ -3,17 +3,18 @@ package online.kheops.auth_server.assertion;
 import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.CapabilityNotValidException;
+import online.kheops.auth_server.capability.CapabilityNotFound;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.*;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 final class CapabilityAssertion implements Assertion {
     private final String username;
     private final String email;
     private static final Builder BUILDER = new Builder();
+    private Capability capability;
 
     static final class Builder {
         CapabilityAssertion build(String capabilityToken) throws BadAssertionException {
@@ -26,9 +27,7 @@ final class CapabilityAssertion implements Assertion {
             try {
                 tx.begin();
 
-                final TypedQuery<Capability> query = em.createQuery("SELECT c FROM Capability c where c.secret = :secret", Capability.class);
-                query.setParameter("secret", capabilityToken);
-                final Capability capability = query.getSingleResult();
+                final Capability capability = Capabilities.getCapability(capabilityToken, em);
 
                 capability.isValid();
 
@@ -37,8 +36,8 @@ final class CapabilityAssertion implements Assertion {
 
                 tx.commit();
 
-                return new CapabilityAssertion(username, email);
-            } catch (NoResultException e) {
+                return new CapabilityAssertion(capability, username, email);
+            } catch (CapabilityNotFound e) {
                 throw new BadAssertionException("Unknown capability token");
             } catch (CapabilityNotValidException e) {
                 throw new BadAssertionException(e.getMessage());
@@ -55,7 +54,8 @@ final class CapabilityAssertion implements Assertion {
         return BUILDER;
     }
 
-    private CapabilityAssertion(String username, String email) {
+    private CapabilityAssertion(Capability capability, String username, String email) {
+        this.capability = Objects.requireNonNull(capability);
         this.username = Objects.requireNonNull(username);
         this.email = Objects.requireNonNull(email);
     }
@@ -73,5 +73,10 @@ final class CapabilityAssertion implements Assertion {
     @Override
     public boolean hasCapabilityAccess() {
         return false;
+    }
+
+    @Override
+    public Optional<Capability> getCapability() {
+        return Optional.of(capability);
     }
 }

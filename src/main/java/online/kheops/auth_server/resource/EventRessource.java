@@ -1,7 +1,7 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
@@ -38,7 +38,7 @@ public class EventRessource {
                               @QueryParam("types") final List<String> types, @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
@@ -72,7 +72,7 @@ public class EventRessource {
                                 @FormParam("to_user") String user, @FormParam("comment") String comment,
                                 @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Events.albumPostComment(callingUserPk, albumPk, comment, user);
@@ -99,7 +99,7 @@ public class EventRessource {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
@@ -126,7 +126,7 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);

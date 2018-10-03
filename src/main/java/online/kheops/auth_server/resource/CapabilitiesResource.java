@@ -1,6 +1,6 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.CapabilitySecured;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
@@ -45,7 +45,7 @@ public class CapabilitiesResource {
                                         @NotNull @FormParam("write_permission") boolean writePermission,
                                         @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
         final CapabilityParametersBuilder capabilityParametersBuilder = new CapabilityParametersBuilder()
@@ -100,7 +100,7 @@ public class CapabilitiesResource {
     public Response revokeCapability(@PathParam("capability_id") long capabilityId,
                                      @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         CapabilityResponse capabilityResponse;
 
         try {
@@ -120,7 +120,7 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapabilities(@Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses;
 
         boolean showRevoke = false;

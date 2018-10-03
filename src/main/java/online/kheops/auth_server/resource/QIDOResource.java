@@ -1,8 +1,10 @@
 package online.kheops.auth_server.resource;
 
+
 import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
@@ -68,7 +70,8 @@ public class QIDOResource {
             offset = 0;
         }
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+
 
         final PairListXTotalCount<Attributes> pair;
 

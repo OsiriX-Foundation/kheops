@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.*;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -32,7 +33,7 @@ public class AlbumRessource {
                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                              @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final UsersPermission usersPermission = new UsersPermission();
 
         if (addUser != null) { usersPermission.setAddUser(addUser); }
@@ -64,7 +65,7 @@ public class AlbumRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getAlbums(@Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
@@ -91,7 +92,7 @@ public class AlbumRessource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final AlbumResponses.AlbumResponse albumResponse;
 
         try {
@@ -122,7 +123,7 @@ public class AlbumRessource {
                               @FormParam("notificationNewComment") Boolean notificationNewComment,
                               @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final AlbumResponses.AlbumResponse albumResponse;
         final UsersPermission usersPermission = new UsersPermission();
 
@@ -155,7 +156,7 @@ public class AlbumRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.deleteAlbum(callingUserPk, albumPk);
@@ -177,7 +178,7 @@ public class AlbumRessource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsersAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final List<AlbumResponses.UserAlbumResponse> usersAlbumResponse;
 
         try {
@@ -201,7 +202,7 @@ public class AlbumRessource {
     public Response addUser(@PathParam("album") Long albumPk, @PathParam("user") String user,
                             @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.addUser(callingUserPk, user, albumPk, false);
@@ -223,7 +224,7 @@ public class AlbumRessource {
     public Response addAdmin(@PathParam("album") Long albumPk, @PathParam("user") String user,
                              @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.addUser(callingUserPk, user, albumPk, true);
@@ -245,7 +246,7 @@ public class AlbumRessource {
     public Response removeAdmin(@PathParam("album") Long albumPk, @PathParam("user") String user,
                                 @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.removeAdmin(callingUserPk, user, albumPk);
@@ -267,7 +268,7 @@ public class AlbumRessource {
     public Response deleteUser(@PathParam("album") Long albumPk, @PathParam("user") String user,
                                @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.deleteUser(callingUserPk, user, albumPk);
@@ -288,7 +289,7 @@ public class AlbumRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.setFavorites(callingUserPk, albumPk, true);
@@ -306,7 +307,7 @@ public class AlbumRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Albums.setFavorites(callingUserPk, albumPk, false);
