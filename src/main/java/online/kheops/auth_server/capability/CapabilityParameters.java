@@ -2,7 +2,7 @@ package online.kheops.auth_server.capability;
 
 import java.time.LocalDateTime;
 
-public class CapabilityParameters extends CapabilityParametersBuilder{
+public class CapabilityParameters {
 
     private final Long callingUserPk;
     private final String title;

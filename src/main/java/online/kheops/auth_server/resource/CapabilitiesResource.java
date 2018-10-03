@@ -19,7 +19,6 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import static online.kheops.auth_server.capability.Capabilities.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
 
 
 @Path("/")
@@ -55,30 +54,38 @@ public class CapabilitiesResource {
                 .readPermission(readPermission)
                 .writePermission(writePermission);
         if(startDate != null) {
+            try {
             capabilityParametersBuilder.start(startDate);
+            } catch (DateTimeParseException e) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {start}").build();
+            }
         }
         if(expirationDate != null) {
-            capabilityParametersBuilder.expiration(expirationDate);
+            try {
+                capabilityParametersBuilder.expiration(expirationDate);
+            } catch (DateTimeParseException e) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration}").build();
+            }
         }
 
         try {
-            ScopeType.valueOf(scopeType.toUpperCase()).initScope(capabilityParametersBuilder, albumPk, seriesInstanceUID, studyInstanceUID);
+            capabilityParametersBuilder.scope(scopeType, albumPk, seriesInstanceUID, studyInstanceUID);
         } catch (CapabilityBadRequest e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album. Not : "+scopeType).build();
         }
 
         CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
 
         try {
-            capabilityResponse = createCapability(capabilityParameters);
+            capabilityResponse = generateCapability(capabilityParameters);
         } catch (UserNotFoundException | StudyNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (DateTimeParseException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration}").build();
         } catch (NewCapabilityForbidden e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (CapabilityBadRequest e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         return Response.status(Response.Status.CREATED).entity(capabilityResponse).build();

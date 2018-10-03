@@ -13,10 +13,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.ws.rs.NotFoundException;
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +21,7 @@ import java.util.regex.Pattern;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
-import static online.kheops.auth_server.capability.CapabilitiesResponses.CapabilityToCapabilitiesResponses;
+import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponses;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUIDFromInbox;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUIDandUser;
 
@@ -53,13 +49,13 @@ public class Capabilities {
         return pattern.matcher(token).matches();
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, SeriesNotFoundException, StudyNotFoundException {
+    public static CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, SeriesNotFoundException, StudyNotFoundException , CapabilityBadRequest{
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
     }
 
     public static CapabilitiesResponses.CapabilityResponse createUserCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException {
+            throws UserNotFoundException, CapabilityBadRequest {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
@@ -69,12 +65,20 @@ public class Capabilities {
         try {
             tx.begin();
             final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
-            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
-
+            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
+            final Capability capability = new Capability.CapabilityBuilder()
+                    .user(user)
+                    .expiration(capabilityParameters.getExpirationDate())
+                    .startTime(capabilityParameters.getStartDate())
+                    .title(capabilityParameters.getTitle())
+                    .readPermission(capabilityParameters.isReadPermission())
+                    .writePermission(capabilityParameters.isWritePermission())
+                    .scopeType(ScopeType.USER)
+                    .build();
             em.persist(capability);
             em.persist(user);
 
-            capabilityResponse = CapabilityToCapabilitiesResponses(capability);
+            capabilityResponse = capabilityToCapabilitiesResponses(capability);
 
             tx.commit();
         } finally {
@@ -87,7 +91,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden {
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequest {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
@@ -103,12 +107,21 @@ public class Capabilities {
             if (!albumUser.isAdmin()) {
                 throw new NewCapabilityForbidden("Only an admin can generate a capability token for an album");
             }
-            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), album, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
-
+            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), album, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
+            final Capability capability = new Capability.CapabilityBuilder()
+                    .user(user)
+                    .expiration(capabilityParameters.getExpirationDate())
+                    .startTime(capabilityParameters.getStartDate())
+                    .title(capabilityParameters.getTitle())
+                    .readPermission(capabilityParameters.isReadPermission())
+                    .writePermission(capabilityParameters.isWritePermission())
+                    .scopeType(ScopeType.ALBUM)
+                    .album(album)
+                    .build();
             em.persist(capability);
             em.persist(user);
 
-            capabilityResponse = CapabilityToCapabilitiesResponses(capability);
+            capabilityResponse = capabilityToCapabilitiesResponses(capability);
 
             tx.commit();
         } finally {
@@ -121,7 +134,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse createSeriesCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, SeriesNotFoundException {
+            throws UserNotFoundException, SeriesNotFoundException, CapabilityBadRequest {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
@@ -138,12 +151,23 @@ public class Capabilities {
             } catch (NotFoundException e) {
                 throw new SeriesNotFoundException("Unknown series");
             }
-            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), series, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
+            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), series, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
+            final Capability capability = new Capability.CapabilityBuilder()
+                    .user(user)
+                    .expiration(capabilityParameters.getExpirationDate())
+                    .startTime(capabilityParameters.getStartDate())
+                    .title(capabilityParameters.getTitle())
+                    .readPermission(capabilityParameters.isReadPermission())
+                    .writePermission(capabilityParameters.isWritePermission())
+                    .scopeType(ScopeType.SERIES)
+                    .study(series.getStudy())
+                    .series(series)
+                    .build();
 
             em.persist(capability);
             em.persist(user);
 
-            capabilityResponse = CapabilityToCapabilitiesResponses(capability);
+            capabilityResponse = capabilityToCapabilitiesResponses(capability);
 
             tx.commit();
         } finally {
@@ -156,7 +180,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse createStudyCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, StudyNotFoundException {
+            throws UserNotFoundException, StudyNotFoundException, CapabilityBadRequest{
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
@@ -174,12 +198,22 @@ public class Capabilities {
                 throw new StudyNotFoundException("Unknown study : "+capabilityParameters.getStudyInstanceUID());
             }
 
-            final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), study, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
+            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), study, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
+            final Capability capability = new Capability.CapabilityBuilder()
+                    .user(user)
+                    .expiration(capabilityParameters.getExpirationDate())
+                    .startTime(capabilityParameters.getStartDate())
+                    .title(capabilityParameters.getTitle())
+                    .readPermission(capabilityParameters.isReadPermission())
+                    .writePermission(capabilityParameters.isWritePermission())
+                    .scopeType(ScopeType.STUDY)
+                    .study(study)
+                    .build();
 
             em.persist(capability);
             em.persist(user);
 
-            capabilityResponse = CapabilityToCapabilitiesResponses(capability);
+            capabilityResponse = capabilityToCapabilitiesResponses(capability);
 
             tx.commit();
         } finally {
@@ -207,7 +241,7 @@ public class Capabilities {
             capability.setRevoked(true);
             em.persist(capability);
 
-            capabilityResponse = CapabilityToCapabilitiesResponses(capability);
+            capabilityResponse = capabilityToCapabilitiesResponses(capability);
 
             tx.commit();
         } finally {
@@ -239,7 +273,7 @@ public class Capabilities {
             }
 
             for (Capability capability: capabilities) {
-                CapabilitiesResponses.CapabilityResponse capabilityResponse = CapabilityToCapabilitiesResponses(capability);
+                CapabilitiesResponses.CapabilityResponse capabilityResponse = capabilityToCapabilitiesResponses(capability);
                 capabilityResponses.add(capabilityResponse);
             }
 

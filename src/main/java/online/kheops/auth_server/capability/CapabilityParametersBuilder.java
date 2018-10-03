@@ -1,9 +1,10 @@
 package online.kheops.auth_server.capability;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 public class CapabilityParametersBuilder {
 
@@ -27,20 +28,32 @@ public class CapabilityParametersBuilder {
         return this;
     }
 
+    private LocalDateTime stringToLocalDateTime(String date)  throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        ZoneId defaultZoneId = ZoneOffset.UTC;
+        Instant instant = Date.from(localDate.atStartOfDay().atZone(defaultZoneId).toInstant()).toInstant();
+        return instant.atZone(defaultZoneId).toLocalDateTime();
+    }
+
     public CapabilityParametersBuilder expiration(String expirationDate) throws DateTimeParseException {
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(expirationDate);
-        this.expirationDate = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
+        this.expirationDate = stringToLocalDateTime(expirationDate);
         return this;
     }
 
     public CapabilityParametersBuilder start(String startDate) throws DateTimeParseException{
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(startDate);
-        this.startDate = LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
+        this.startDate = stringToLocalDateTime(startDate);
         return this;
     }
 
-    public CapabilityScopeBuilder scope() {
+    protected CapabilityScopeBuilder scope() {
         return new CapabilityScopeBuilder(this);
+    }
+
+    public CapabilityParametersBuilder scope(String scopeType, Long albumPk, String seriesInstanceUID, String studyInstanceUID)
+    throws CapabilityBadRequest {
+        ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumPk, seriesInstanceUID, studyInstanceUID);
+        return this;
     }
 
     protected CapabilityParametersBuilder scope(CapabilityScopeBuilder capabilityScopeBuilder) {
@@ -64,6 +77,10 @@ public class CapabilityParametersBuilder {
         }
         if (title == null) {
             throw new IllegalStateException("Missing title");
+        }
+
+        if (capabilityScopeBuilder == null) {
+            throw new IllegalStateException("Missing scope");
         }
 
         if (expirationDate == null) {

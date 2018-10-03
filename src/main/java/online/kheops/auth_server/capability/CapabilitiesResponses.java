@@ -46,7 +46,7 @@ public class CapabilitiesResponses {
         String study;
     }
 
-    public static CapabilityResponse CapabilityToCapabilitiesResponses(Capability capability) {
+    public static CapabilityResponse capabilityToCapabilitiesResponses(Capability capability) {
 
         CapabilityResponse capabilityResponse = new CapabilityResponse();
 
@@ -71,6 +71,4 @@ public class CapabilitiesResponses {
 
         return capabilityResponse;
     }
-
-
 }
