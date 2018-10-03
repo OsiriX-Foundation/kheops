@@ -294,4 +294,12 @@ public class Capabilities {
             throw new CapabilityNotFound();
         }
     }
+
+    public static Capability getCapability(String secret, EntityManager em) throws CapabilityNotFound {
+        try {
+            return findCapabilityByCapabilityToken(secret, em);
+        } catch (NoResultException e) {
+            throw new CapabilityNotFound();
+        }
+    }
 }

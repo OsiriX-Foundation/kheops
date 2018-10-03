@@ -1,7 +1,6 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.*;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
@@ -111,13 +110,17 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         }
 
-        final long userPK = user.getPk();
         final boolean capabilityAccess = assertion.hasCapabilityAccess();
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
+        final User finalUser = user;
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
-            public KheopsPrincipal getUserPrincipal() {
-                return new KheopsPrincipal(userPK);
+            public KheopsPrincipalInterface getUserPrincipal() {
+                if(assertion.getCapability().isPresent()) {
+                    return new CapabilityPrincipal(assertion.getCapability().get(), finalUser);
+                } else {
+                    return new UserPrincipal(finalUser);
+                }
             }
 
             @Override
@@ -138,6 +141,7 @@ public class SecuredFilter implements ContainerRequestFilter {
                 return "BEARER";
             }
         });
+
     }
 
     private static String getToken(String authorizationHeader) {

@@ -4,7 +4,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
-import online.kheops.auth_server.KheopsPrincipal;
+import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
@@ -44,7 +44,7 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.shareStudyWithUser(callingUserPk, username, studyInstanceUID, fromAlbumPk, fromInbox);
@@ -70,7 +70,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.shareSeriesWithUser(callingUserPk, username, studyInstanceUID, seriesInstanceUID);
@@ -92,7 +92,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
@@ -114,7 +114,7 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.deleteStudyFromInbox(callingUserPk, studyInstanceUID);
@@ -136,7 +136,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.deleteSeriesFromInbox(callingUserPk, studyInstanceUID, seriesInstanceUID);
@@ -158,7 +158,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
@@ -190,7 +190,7 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.putStudyInAlbum(callingUserPk, albumPk, studyInstanceUID, fromAlbumPk, fromInbox);
@@ -214,7 +214,7 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.deleteStudyFromAlbum(callingUserPk, albumPk, studyInstanceUID);
@@ -239,7 +239,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             Sending.deleteSeriesFromAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
