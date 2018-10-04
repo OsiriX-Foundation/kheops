@@ -13,8 +13,8 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     public boolean hasStudyReadAccess(String study);
     public boolean hasUserReadAccess();
 
-    //public boolean hasSeriesWriteAccess(String study, String series);
-    //public boolean hasStudyWriteAccess(String study);
+    public boolean hasSeriesWriteAccess(String study, String series);
+    public boolean hasStudyWriteAccess(String study);
     public boolean hasUserWriteAccess();
 
     public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId);
