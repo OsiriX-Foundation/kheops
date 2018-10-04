@@ -45,11 +45,6 @@ public class Events {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
-
-            if (!callingAlbumUser.isAdmin() || !album.isWriteComments()) {
-                throw new AlbumForbiddenException("Only an admin or an user with permission can write comments");
-            }
 
             final Comment comment = new Comment(commentContent, callingUser, album);
 
@@ -115,9 +110,6 @@ public class Events {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            if (!isMemberOfAlbum(callingUser, album, em)) {
-                throw new AlbumNotFoundException();
-            }
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
                 if (e instanceof Comment) {
@@ -153,11 +145,7 @@ public class Events {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            if (!isMemberOfAlbum(callingUser, album, em)) {
-                throw new AlbumNotFoundException();
-            }
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
                     eventResponses.add(EventResponses.mutationToEventResponse(m));
@@ -191,9 +179,6 @@ public class Events {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-            if (!isMemberOfAlbum(callingUser, album, em)) {
-                throw new AlbumNotFoundException();
-            }
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
                 eventResponses.add(EventResponses.commentToEventResponse(c));
@@ -255,10 +240,6 @@ public class Events {
             final User callingUser = getUser(callingUserPk, em);
             final Study study = getStudy(studyInstanceUID, em);
 
-            if (!canAccessStudy(callingUser, study, em)) {
-                throw new StudyNotFoundException("Unknown study");
-            }
-
             final Comment comment = new Comment(commentContent, callingUser, study);
 
             if(isPrivateComment) {
@@ -268,9 +249,6 @@ public class Events {
                     throw new BadQueryParametersException("Self comment forbidden");
                 }
 
-                if (!canAccessStudy(targetUser, study, em)) {
-                    throw new StudyNotFoundException("Unknown study by the target user");
-                }
                 comment.setPrivateTargetUser(targetUser);
                 targetUser.getComments().add(comment);
                 em.persist(targetUser);
