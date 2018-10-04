@@ -95,8 +95,6 @@ public class SeriesQueries {
     }
 
 
-
-
     public static Series findSeriesBySeriesAndAlbumWithSendPermission(User callingUser, Series series, EntityManager em) throws NoResultException {
         TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where u=:callingUser and s = :series and (au.admin = true or a.sendSeries = true)", Series.class);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
@@ -146,4 +144,15 @@ public class SeriesQueries {
         query.setParameter("user", callingUser);
         return new HashSet<>(query.getResultList());
     }
+
+    public static Series findSeriesByStudyUIDandSeriesUID(Album album, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
+        TypedQuery<Series> seriesQuery = em.createQuery("select s from Album a join a.series s where a=:album and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        seriesQuery.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
+        seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+        seriesQuery.setParameter("album", album);
+        seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        return seriesQuery.getSingleResult();
+    }
+
+
 }
