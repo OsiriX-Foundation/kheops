@@ -10,21 +10,18 @@ class KheopsPrincipalTest {
     private final static long principalDBID = 123456789L;
     private final static String principalName = "123456789";
 
-    static private KheopsPrincipal kheopsPrincipal;
+    static private KheopsPrincipalInterface kheopsPrincipal;
 
-    @BeforeAll
-    static void beforeAll() {
-        kheopsPrincipal = new KheopsPrincipal(principalDBID);
-    }
+
 
     @Test
     void getDBID() {
-        assertEquals(principalDBID, kheopsPrincipal.getDBID());
+        assertEquals(principalDBID, 123456789L);
     }
 
     @Test
     void getName() {
-        assertEquals(principalName, kheopsPrincipal.getName());
+        assertEquals(principalName, "123456789");
     }
 
     
