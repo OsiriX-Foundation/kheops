@@ -4,6 +4,8 @@ import java.util.Optional;
 
 public class UsersPermission {
 
+    public enum UsersPermissionEnum {ADD_USER, REMOVE_USER, ADD_ADMIN, REMOVE_ADMIN, DOWNLOAD_SERIES, SEND_SERIES, DELETE_SERIES, ADD_SERIES, WRITE_COMMENT, EDIT_ALBUM, DELETE_ALBUM, LIST_USERS}
+
     private Boolean addUser = false;
     private Boolean downloadSeries = true;
     private Boolean sendSeries = true;

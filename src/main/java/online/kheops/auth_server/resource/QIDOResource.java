@@ -45,6 +45,7 @@ import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 public class QIDOResource {
 
     private static final Logger LOG = Logger.getLogger(QIDOResource.class.getName());
+
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
     @Context

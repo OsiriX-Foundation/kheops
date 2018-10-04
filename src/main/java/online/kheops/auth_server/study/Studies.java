@@ -1,6 +1,7 @@
 package online.kheops.auth_server.study;
 
 import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.Consts;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 import static online.kheops.auth_server.util.JOOQTools.*;
 import static online.kheops.auth_server.generated.Tables.ALBUM;
 import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
@@ -419,6 +421,15 @@ public class Studies {
     public static boolean canAccessStudy(User user, Study study, EntityManager em) {
         try {
             StudyQueries.findStudyByStudyandUser(study, user, em);
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        }
+    }
+
+    public static boolean canAccessStudy(Album album, Study study, EntityManager em) {
+        try {
+            StudyQueries.findStudyByStudyandAlbum(study, album, em);
             return true;
         } catch (NoResultException e) {
             return false;

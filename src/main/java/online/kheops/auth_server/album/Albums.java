@@ -162,11 +162,6 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
-            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
-            if ( !callingAlbumUser.isAdmin()) {
-                throw new AlbumForbiddenException("Only an admin can delete an album");
-            }
-
             for (AlbumUser albumUser:album.getAlbumUser()) {
                 em.remove(albumUser);
             }
@@ -196,17 +191,6 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
-            Album album = getAlbum(albumPk, em);
-
-            if (!isMemberOfAlbum(callingUser, album, em)) {
-                throw new AlbumNotFoundException();
-            }
-
-            if (album.getPk() == callingUser.getInbox().getPk()) {
-                throw new AlbumNotFoundException();
-            }
-
             albumResponse = findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
 
             tx.commit();
@@ -230,15 +214,6 @@ public class Albums {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album = getAlbum(albumPk, em);
-
-            if (album.getPk() == callingUser.getInbox().getPk()) {
-                throw new AlbumNotFoundException();
-            }
-
-            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
-            if ( !callingAlbumUser.isAdmin() && !album.isAddUser() ) {
-                throw new AlbumForbiddenException("Only an admin or a user with permission can get users list");
-            }
 
             for (AlbumUser albumUser : album.getAlbumUser()) {
                 usersAlbumResponses.add(AlbumResponses.albumUserToUserAlbumResponce(albumUser));
@@ -271,18 +246,6 @@ public class Albums {
             }
 
             final Album album = getAlbum(albumPk, em);
-
-            if (album.getPk() == callingUser.getInbox().getPk()) {
-                throw new AlbumNotFoundException();
-            }
-
-            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
-            if ( !callingAlbumUser.isAdmin() && !album.isAddUser() ) {
-                throw new AlbumForbiddenException("Only an admin or a user with permission can add an user");
-            }
-            if ( !callingAlbumUser.isAdmin() && isAdmin) {
-                throw new AlbumForbiddenException("Only an admin can add an admin");
-            }
 
             AlbumUser targetAlbumUser;
             try {
@@ -334,9 +297,6 @@ public class Albums {
 
             final Album album = getAlbum(albumPk, em);
 
-            if (album.getPk() == callingUser.getInbox().getPk()) {
-                throw new AlbumNotFoundException();
-            }
 
             if (callingUser.getPk() == removedUser.getPk()) {
                 final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
@@ -348,8 +308,6 @@ public class Albums {
 
                 em.remove(removedAlbumUser);
             } else {
-
-                final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
                 final AlbumUser removedAlbumUser;
                 try {
                     removedAlbumUser = getAlbumUser(album, removedUser, em);
@@ -357,9 +315,6 @@ public class Albums {
                     throw new UserNotFoundException();
                 }
 
-                if (!callingAlbumUser.isAdmin()) {
-                    throw new AlbumForbiddenException("Only an admin can remove an user");
-                }
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.REMOVE_USER, removedUser);
 
                 em.persist(callingUser);
@@ -370,7 +325,7 @@ public class Albums {
                 em.remove(removedAlbumUser);
             }
 
-            //Delete the album if it's the last User
+            //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
                 for (Event event:album.getEvents()) {
                     em.remove(event);
@@ -399,11 +354,6 @@ public class Albums {
             final User callingUser = getUser(callingUserPk, em);
             final User removedUser = getUser(userName, em);
             final Album targetAlbum = getAlbum(albumPk, em);
-
-            final AlbumUser callingAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-            if (!callingAlbumUser.isAdmin()) {
-                throw new AlbumForbiddenException("Only an admin can remove the admin permission");
-            }
 
             final AlbumUser removedAlbumUser;
             try {
@@ -438,7 +388,6 @@ public class Albums {
     throws UserNotFoundException, AlbumNotFoundException{
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        AlbumResponses.UserAlbumResponse userAlbumResponses;
 
         try {
             tx.begin();
@@ -447,16 +396,10 @@ public class Albums {
             final Album album = getAlbum(albumPk, em);
             final AlbumUser albumUser = getAlbumUser(album, callingUser, em);
 
-            if (album.getPk() == callingUser.getInbox().getPk()) {
-                throw new AlbumNotFoundException();
-            }
-
             albumUser.setFavorite(favorite);
             em.persist(albumUser);
 
             tx.commit();
-
-            userAlbumResponses = AlbumResponses.albumUserToUserAlbumResponce(albumUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
