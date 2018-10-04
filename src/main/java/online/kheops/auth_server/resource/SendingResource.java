@@ -12,6 +12,7 @@ import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts;
 
 import java.util.logging.Logger;
@@ -40,11 +41,25 @@ public class SendingResource
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
-        fromInbox = fromInbox != null;
+
+        if (fromInbox == null && fromAlbumPk == null) {
+            fromInbox = true;
+        } else {
+            fromInbox = false;
+        }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
+            fromAlbumPk = null;
+        }
+
+        if(fromInbox == true && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            fromInbox = false;
+        }
 
         try {
             Sending.shareStudyWithUser(callingUserPk, username, studyInstanceUID, fromAlbumPk, fromInbox);
@@ -70,7 +85,12 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.shareSeriesWithUser(callingUserPk, username, studyInstanceUID, seriesInstanceUID);
@@ -92,7 +112,12 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID) || !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
@@ -114,7 +139,12 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.deleteStudyFromInbox(callingUserPk, studyInstanceUID);
@@ -136,7 +166,12 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.deleteSeriesFromInbox(callingUserPk, studyInstanceUID, seriesInstanceUID);
@@ -158,7 +193,16 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
@@ -190,7 +234,8 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
             Sending.putStudyInAlbum(callingUserPk, albumPk, studyInstanceUID, fromAlbumPk, fromInbox);
@@ -214,7 +259,12 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.deleteStudyFromAlbum(callingUserPk, albumPk, studyInstanceUID);
@@ -239,7 +289,12 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         try {
             Sending.deleteSeriesFromAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);

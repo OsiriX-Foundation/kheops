@@ -75,7 +75,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasUserReadAccess() { return true; }
 
-    /*@Override
+    @Override
     public boolean hasSeriesWriteAccess(String study, String series) {
         return false;
     }
@@ -83,7 +83,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasStudyWriteAccess(String study) {
         return false;
-    }*/
+    }
 
     @Override
     public boolean hasUserWriteAccess() {

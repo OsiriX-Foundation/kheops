@@ -50,6 +50,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
         if(getScope() == ScopeType.USER) {
+            if(!capability.isReadPermission()) {
+                return false;
+            }
             this.em = EntityManagerListener.createEntityManager();
             this.tx = em.getTransaction();
             try {
@@ -74,6 +77,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 em.close();
             }
         } else if (getScope() == ScopeType.SERIES) {
+            if(!capability.isReadPermission()) {
+                return false;
+            }
             if(capability.getSeries().getSeriesInstanceUID() == seriesInstanceUID && capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
                 this.em = EntityManagerListener.createEntityManager();
                 this.tx = em.getTransaction();
@@ -88,6 +94,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
             }
         } else if (getScope() == ScopeType.STUDY) {
+            if(!capability.isReadPermission()) {
+                return false;
+            }
             if(capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
                 this.em = EntityManagerListener.createEntityManager();
                 this.tx = em.getTransaction();
@@ -110,6 +119,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasStudyReadAccess(String studyInstanceUID) {
         if(getScope() == ScopeType.USER) {
+            if(!capability.isReadPermission()) {
+                return false;
+            }
             this.em = EntityManagerListener.createEntityManager();
             this.tx = em.getTransaction();
             try {
@@ -129,9 +141,16 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             this.tx = em.getTransaction();
             try {
                 tx.begin();
+                final Album album = getAlbum(capability.getAlbum().getPk(), em);
+                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
                 final Study study = getStudy(studyInstanceUID, em);
                 return canAccessStudy(capability.getAlbum(), study, em);
             } catch (StudyNotFoundException e) {
+                return false;
+            } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {
@@ -140,6 +159,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 em.close();
             }
         } else if (getScope() == ScopeType.SERIES) {
+            if(!capability.isReadPermission()) {
+                return false;
+            }
             if(capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
                 this.em = EntityManagerListener.createEntityManager();
                 this.tx = em.getTransaction();
@@ -157,6 +179,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
             }
         } else if (getScope() == ScopeType.STUDY) {
+            if(!capability.isReadPermission()) {
+                return false;
+            }
             if(capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
                 this.em = EntityManagerListener.createEntityManager();
                 this.tx = em.getTransaction();
@@ -184,7 +209,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         return getScope() == ScopeType.USER && capability.isReadPermission();
     }
 
-   /* @Override
+    @Override
     public boolean hasSeriesWriteAccess(String study, String series) {
         return false;
     }
@@ -192,7 +217,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasStudyWriteAccess(String study) {
         return false;
-    }*/
+    }
 
     @Override
     public boolean hasUserWriteAccess() {
@@ -207,6 +232,13 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             try {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
+                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
+                if(user.getInbox() == album) {
+                    return false;
+                }
 
                 if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && album.isDownloadSeries()) {
                     return true;
@@ -234,6 +266,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
                 final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if(user.getInbox() == album) {
+                    return false;
+                }
                 if (albumUser.isAdmin()) {
                     return true;
                 }
@@ -287,6 +322,13 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             try {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
+                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
+                if(user.getInbox() == album) {
+                    return false;
+                }
                 return true;
             } catch (AlbumNotFoundException e) {
                 return false;
@@ -303,6 +345,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
                 final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if(user.getInbox() == album) {
+                    return false;
+                }
                 return true;
             } catch (AlbumNotFoundException e) {
                 return false;

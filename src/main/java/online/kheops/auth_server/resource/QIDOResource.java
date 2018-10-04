@@ -68,12 +68,23 @@ public class QIDOResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
+
         if (offset == null) {
             offset = 0;
         }
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
 
+        if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumAccess(fromAlbumPk)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        if(fromInbox != null && !kheopsPrincipal.hasUserReadAccess()) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        //TODO if scoopType == series or study : add custom filter
 
         final PairListXTotalCount<Attributes> pair;
 
