@@ -6,10 +6,12 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.event.EventResponses;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
@@ -38,7 +40,15 @@ public class EventRessource {
                               @QueryParam("types") final List<String> types, @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        if(!kheopsPrincipal.hasAlbumAccess(albumPk)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
@@ -72,7 +82,13 @@ public class EventRessource {
                                 @FormParam("to_user") String user, @FormParam("comment") String comment,
                                 @Context SecurityContext securityContext) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+
+        if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.WRITE_COMMENT, albumPk)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
             Events.albumPostComment(callingUserPk, albumPk, comment, user);
@@ -99,7 +115,13 @@ public class EventRessource {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+
+        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
@@ -126,7 +148,13 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+
+        if(!kheopsPrincipal.hasUserWriteAccess()) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
             Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);

@@ -98,6 +98,9 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             tx.begin();
             final Album album = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
+            if(user.getInbox() == album) {
+                return false;
+            }
             if (albumUser.isAdmin()) {
                 return true;
             }
@@ -145,6 +148,9 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             tx.begin();
             final Album album = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
+            if(user.getInbox() == album) {
+                return false;
+            }
             return true;
         } catch (AlbumNotFoundException e) {
             return false;
