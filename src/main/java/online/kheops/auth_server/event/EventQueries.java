@@ -37,7 +37,7 @@ public class EventQueries {
         TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where :album = c.album and (c.privateTargetUser = null or c.user = :user or c.privateTargetUser = :user)", Long.class);
         query.setParameter("album", album);
         query.setParameter("user", user);
-        return (long) query.getSingleResult();
+        return query.getSingleResult();
     }
 
     public static List<Mutation> getMutationByAlbum(Album album, Integer offset, Integer limit, EntityManager em) {

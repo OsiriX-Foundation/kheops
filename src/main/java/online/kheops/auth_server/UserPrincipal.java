@@ -3,16 +3,19 @@ package online.kheops.auth_server;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
 
+import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 
@@ -76,13 +79,40 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     public boolean hasUserReadAccess() { return true; }
 
     @Override
-    public boolean hasSeriesWriteAccess(String study, String series) {
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
+        try {
+            tx.begin();
+
+            final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+
+            // we need to check here if the series that was found is owned by the user
+            try {
+                findSeriesBySeriesAndUserInbox(user, series, em);
+                return true;
+            } catch (NoResultException ignored) {/*empty*/}
+
+            try {
+                findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
+                return true;
+            } catch (NoResultException ignored) {
+                if (!isOrphan(series, em)) {
+                    return true;
+                }
+            }
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
         return false;
     }
 
     @Override
     public boolean hasStudyWriteAccess(String study) {
-        return false;
+        return true;
     }
 
     @Override
@@ -125,11 +155,8 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS){
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM){
-                return true;
-            }
+            return usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM;
 
-            return false;
         } catch (AlbumNotFoundException e) {
             return false;
         } finally {
@@ -148,10 +175,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             tx.begin();
             final Album album = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
-            if(user.getInbox() == album) {
-                return false;
-            }
-            return true;
+            return user.getInbox() != album;
         } catch (AlbumNotFoundException e) {
             return false;
         } finally {

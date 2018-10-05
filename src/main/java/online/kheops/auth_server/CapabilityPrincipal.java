@@ -8,12 +8,17 @@ import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
+import static online.kheops.auth_server.series.Series.getSeries;
+import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
+import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
+import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 
 public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
@@ -210,12 +215,166 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasSeriesWriteAccess(String study, String series) {
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
+        if (!capability.isWritePermission()) {
+            return false;
+        }
+        if (getScope() == ScopeType.USER) {
+            try {
+                tx.begin();
+
+                final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+
+                // we need to check here if the series that was found is owned by the user
+                try {
+                    findSeriesBySeriesAndUserInbox(user, series, em);
+                    return true;
+                } catch (NoResultException ignored) {/*empty*/}
+
+                try {
+                    findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
+                    return true;
+                } catch (NoResultException ignored) {
+                    if (!isOrphan(series, em)) {
+                        return true;
+                    }
+                }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+            return false;
+
+        } else if (getScope() == ScopeType.SERIES) {
+            if(capability.getSeries().getSeriesInstanceUID() != seriesInstanceUID || capability.getStudy().getStudyInstanceUID() != studyInstanceUID) {
+                return false;
+            }
+            try {
+                tx.begin();
+
+                final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+
+                // we need to check here if the series that was found is owned by the user
+                try {
+                    findSeriesBySeriesAndUserInbox(user, series, em);
+                    return true;
+                } catch (NoResultException ignored) {/*empty*/}
+
+                try {
+                    findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
+                    return true;
+                } catch (NoResultException ignored) {
+                    if (!isOrphan(series, em)) {
+                        return true;
+                    }
+                }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+            return false;
+
+        } else if (getScope() == ScopeType.STUDY) {
+            if(capability.getStudy().getStudyInstanceUID() != studyInstanceUID) {
+                return false;
+            }
+            try {
+                tx.begin();
+
+                final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+
+                // we need to check here if the series that was found is owned by the user
+                try {
+                    findSeriesBySeriesAndUserInbox(user, series, em);
+                    return true;
+                } catch (NoResultException ignored) {/*empty*/}
+
+                try {
+                    findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
+                    return true;
+                } catch (NoResultException ignored) {
+                    if (!isOrphan(series, em)) {
+                        return true;
+                    }
+                }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+            return false;
+
+        } else if (getScope() == ScopeType.ALBUM) {
+            if (!capability.getAlbum().isAddSeries() || !capability.isWritePermission()) {
+                return false;
+            }
+            try {
+                tx.begin();
+                final Album album = capability.getAlbum();
+                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
+                Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                if(album.getSeries().contains(series)) {
+                    return true;
+                }
+            } catch (AlbumNotFoundException | NoResultException e) {
+                return false;
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean hasStudyWriteAccess(String study) {
+    public boolean hasStudyWriteAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
+        if (!capability.isWritePermission()) {
+            return false;
+        }
+        if (getScope() == ScopeType.USER) {
+           return true;
+        } else if (getScope() == ScopeType.SERIES || getScope() == ScopeType.STUDY) {
+            if(capability.getStudy().getStudyInstanceUID() != studyInstanceUID) {
+                return false;
+            }
+            return true;
+        } else if (getScope() == ScopeType.ALBUM) {
+            if (!capability.getAlbum().isAddSeries() || !capability.isWritePermission()) {
+                return false;
+            }
+            try {
+                tx.begin();
+                final Album album = capability.getAlbum();
+                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
+                
+                final Study study = findStudyByStudyUID(studyInstanceUID, em);
+                final Study studyInAlbum = findStudyByStudyandAlbum(study, album, em);
+            } catch (AlbumNotFoundException | NoResultException e) {
+                return false;
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+        }
         return false;
     }
 
@@ -246,11 +405,8 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES && album.isSendSeries()) {
                     return true;
                 }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isSendSeries()) {
-                    return true;
-                }
+                return usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isSendSeries();
 
-                return false;
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
@@ -293,11 +449,8 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS) {
                     return true;
                 }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM){
-                    return true;
-                }
+                return usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM;
 
-                return false;
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
@@ -326,10 +479,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
-                if(user.getInbox() == album) {
-                    return false;
-                }
-                return true;
+                return user.getInbox() != album;
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
@@ -345,10 +495,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
                 final AlbumUser albumUser = getAlbumUser(album, user, em);
-                if(user.getInbox() == album) {
-                    return false;
-                }
-                return true;
+                return user.getInbox() != album;
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {

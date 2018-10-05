@@ -42,11 +42,8 @@ public class SendingResource
         }
 
 
-        if (fromInbox == null && fromAlbumPk == null) {
-            fromInbox = true;
-        } else {
-            fromInbox = false;
-        }
+        fromInbox = fromInbox == null && fromAlbumPk == null;
+
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
@@ -65,8 +62,6 @@ public class SendingResource
             Sending.shareStudyWithUser(callingUserPk, username, studyInstanceUID, fromAlbumPk, fromInbox);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
         LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
@@ -129,6 +124,7 @@ public class SendingResource
 
         return Response.status(Response.Status.CREATED).build();
     }
+
 
     @DELETE
     @Secured

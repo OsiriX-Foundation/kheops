@@ -147,7 +147,7 @@ public class Albums {
         return pairAlbumsTotalAlbum;
     }
 
-    public static void deleteAlbum(long callingUserPk, long albumPk) throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
+    public static void deleteAlbum(long callingUserPk, long albumPk) throws AlbumNotFoundException, UserNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -182,7 +182,7 @@ public class Albums {
     }
 
     public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, long albumPk)
-           throws AlbumNotFoundException, UserNotFoundException, JOOQException {
+           throws JOOQException {
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -204,7 +204,7 @@ public class Albums {
     }
 
     public static List<AlbumResponses.UserAlbumResponse> getUsers(long callingUserPk, long albumPk)
-            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
+            throws AlbumNotFoundException, UserNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         List<AlbumResponses.UserAlbumResponse> usersAlbumResponses = new ArrayList<>();
@@ -218,7 +218,7 @@ public class Albums {
             for (AlbumUser albumUser : album.getAlbumUser()) {
                 usersAlbumResponses.add(AlbumResponses.albumUserToUserAlbumResponce(albumUser));
             }
-            Collections.<AlbumResponses.UserAlbumResponse>sort(usersAlbumResponses);
+            Collections.sort(usersAlbumResponses);
 
             tx.commit();
         } finally {
@@ -285,7 +285,7 @@ public class Albums {
     }
 
     public static void deleteUser(long callingUserPk, String userName, long albumPk)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException {
+            throws UserNotFoundException, AlbumNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -344,7 +344,7 @@ public class Albums {
     }
 
     public static void removeAdmin(long callingUserPk, String userName, long albumPk)
-            throws UserNotFoundException, AlbumNotFoundException , AlbumForbiddenException{
+            throws UserNotFoundException, AlbumNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
