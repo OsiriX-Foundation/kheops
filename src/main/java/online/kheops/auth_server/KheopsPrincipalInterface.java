@@ -7,21 +7,21 @@ import online.kheops.auth_server.user.UsersPermission;
 public interface KheopsPrincipalInterface extends java.security.Principal{
 
     //for old version
-    public long getDBID();
+    long getDBID();
 
-    public boolean hasSeriesReadAccess(String study, String series);
-    public boolean hasStudyReadAccess(String study);
-    public boolean hasUserReadAccess();
+    boolean hasSeriesReadAccess(String study, String series);
+    boolean hasStudyReadAccess(String study);
+    boolean hasUserReadAccess();
 
-    public boolean hasSeriesWriteAccess(String study, String series);
-    public boolean hasStudyWriteAccess(String study);
-    public boolean hasUserWriteAccess();
+    boolean hasSeriesWriteAccess(String study, String series);
+    boolean hasStudyWriteAccess(String study);
+    boolean hasUserWriteAccess();
 
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId);
+    boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId);
 
-    public boolean hasAlbumAccess(Long albumId);
+    boolean hasAlbumAccess(Long albumId);
 
-    public User getUser();
+    User getUser();
 
-    public ScopeType getScope();
+    ScopeType getScope();
 }

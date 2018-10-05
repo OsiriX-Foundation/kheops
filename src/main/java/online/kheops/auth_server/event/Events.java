@@ -33,7 +33,7 @@ public class Events {
     public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES, EDIT_ALBUM}
 
     public static void albumPostComment(long callingUserPk,long albumPk,String commentContent, String user)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException{
+            throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -133,7 +133,7 @@ public class Events {
     }
 
     public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(long callingUserPk, long albumPk, Integer offset, Integer limit)
-            throws UserNotFoundException, AlbumNotFoundException {
+            throws AlbumNotFoundException {
 
         final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
         final PairListXTotalCount<EventResponses.EventResponse> pair;

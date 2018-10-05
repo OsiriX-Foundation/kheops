@@ -46,9 +46,8 @@ public class Sending {
                 throw new SeriesNotFoundException("No access to any series with the given studyInstanceUID");
             }
 
-            final Album inbox = callingUser.getInbox();
             for (Series series: seriesList) {
-                inbox.removeSeries(series);
+                callingUser.getInbox().removeSeries(series);
             }
 
             tx.commit();
@@ -77,8 +76,7 @@ public class Sending {
                 throw new SeriesNotFoundException("User does not have access to any series with a study with the given studyInstanceUID");
             }
 
-            final Album inbox = callingUser.getInbox();
-            inbox.removeSeries(series);
+            callingUser.getInbox().removeSeries(series);
 
             tx.commit();
         } finally {
@@ -90,7 +88,7 @@ public class Sending {
     }
 
     public static void deleteStudyFromAlbum(long callingUserPk, long albumPk, String studyInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -99,11 +97,6 @@ public class Sending {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album callingAlbum = getAlbum(albumPk, em);
-            final AlbumUser callingAlbumUser = getAlbumUser(callingAlbum, callingUser, em);
-
-            if (!callingAlbumUser.isAdmin() && !callingAlbum.isDeleteSeries()) {
-                throw new AlbumForbiddenException("Only an admin or a user with write permission can delete series");
-            }
 
             final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
 
@@ -134,7 +127,7 @@ public class Sending {
     }
 
     public static void deleteSeriesFromAlbum(long callingUserPk, long albumPk, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -143,15 +136,6 @@ public class Sending {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album callingAlbum = getAlbum(albumPk, em);
-            final AlbumUser callingAlbumUser = getAlbumUser(callingAlbum, callingUser, em);
-
-            if (!callingAlbumUser.isAdmin() && !callingAlbum.isDeleteSeries()) {
-                throw new AlbumForbiddenException("Only an admin or a user with write permission can delete series");
-            }
-
-            if (callingAlbum == callingUser.getInbox()) {
-                throw new AlbumNotFoundException();
-            }
 
             Series availableSeries;
             try {
@@ -178,7 +162,7 @@ public class Sending {
     }
 
     public static void putSeriesInAlbum(long callingUserPk, long albumPk, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -187,27 +171,13 @@ public class Sending {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album targetAlbum = getAlbum(albumPk, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
 
-            if (!targetAlbumUser.isAdmin() && !targetAlbum.isAddSeries()) {
-                throw new AlbumForbiddenException("Only an admin or a user with write permission can upload series");
-            }
-
-            Series availableSeries;
+            final Series availableSeries;
             try {
-                availableSeries = findSeriesByStudyUIDandSeriesUIDwithSharePermission(callingUser, studyInstanceUID, seriesInstanceUID, em);
-            } catch (NoResultException e1) {
-                try {
-                    availableSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                    if (!isOrphan(availableSeries, em)) {
-                        throw new NotFoundException();
-                    }
-                } catch (NotFoundException e2) {
-                    throw new SeriesNotFoundException("No series with the given StudyInstanceUID and SeriesInstanceUID");
-                }
+                availableSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+            } catch (NotFoundException e2) {
+                throw new SeriesNotFoundException("No series with the given StudyInstanceUID and SeriesInstanceUID");
             }
-
-            // from here, the callingUser can send the series inside the album
 
             if (targetAlbum.getSeries().contains(availableSeries)) {
                 return;
@@ -231,7 +201,7 @@ public class Sending {
     }
 
     public static void putStudyInAlbum(long callingUserPk, long albumPk, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -240,11 +210,6 @@ public class Sending {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album targetAlbum = getAlbum(albumPk, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-
-            if (!targetAlbumUser.isAdmin() && !targetAlbum.isAddSeries()) {
-                throw new AlbumForbiddenException("Only an admin or a user with write permission can upload series");
-            }
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumPk, fromInbox, em);
 
@@ -278,7 +243,7 @@ public class Sending {
     }
 
     public static void shareStudyWithUser(long callingUserPk, String targetUsername, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox)
-            throws UserNotFoundException, AlbumNotFoundException, AlbumForbiddenException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -321,7 +286,6 @@ public class Sending {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
             final User targetUser = getUser(targetUsername, em);
 
             if (targetUser.getPk() == callingUserPk) { // the user is requesting access to a new series
@@ -331,7 +295,7 @@ public class Sending {
 
             Series series;
             try {
-                series = findSeriesByStudyUIDandSeriesUIDwithSharePermission(callingUser, studyInstanceUID, seriesInstanceUID, em);
+                series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
             } catch (NoResultException exception) {
                 throw new SeriesNotFoundException("Unknown series");
             }
@@ -358,7 +322,7 @@ public class Sending {
     }
 
     public static void appropriateSeries(long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
-            throws SeriesForbiddenException, UserNotFoundException {
+            throws UserNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -367,25 +331,8 @@ public class Sending {
 
             final User callingUser = getUser(callingUserPk, em);
 
-            // find if the series already exists
             try {
                 final Series storedSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-
-                // we need to check here if the series that was found is owned by the user
-                try {
-                    findSeriesBySeriesAndUserInbox(callingUser, storedSeries, em);
-                    LOG.info("Nothing to claim, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is accessible by " + callingUser.getGoogleId());
-                    return;
-                } catch (NoResultException ignored) {/*empty*/}
-
-                try {
-                    findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
-                } catch (NoResultException ignored) {
-                    if (!isOrphan(storedSeries, em)) {
-                        LOG.info("Claim denied, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " is not accessible by " + callingUser.getGoogleId());
-                        throw new SeriesForbiddenException("Access to series denied");
-                    }
-                }
 
                 // here the series exists but she is orphan or the calling can send the series from an album
                 final Album inbox = callingUser.getInbox();
@@ -467,15 +414,12 @@ public class Sending {
     }
 
     public static  List<Series> getSeriesList(User callingUser, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox, EntityManager em)
-            throws AlbumNotFoundException, AlbumForbiddenException , SeriesNotFoundException{
+            throws AlbumNotFoundException , SeriesNotFoundException{
         List<Series> availableSeries;
 
         if (fromAlbumPk != null) {
             final Album callingAlbum = getAlbum(fromAlbumPk, em);
-            final AlbumUser callingAlbumUser = getAlbumUser(callingAlbum, callingUser, em);
-            if (!callingAlbumUser.isAdmin() && !callingAlbum.isSendSeries()) {
-                throw new AlbumForbiddenException("Only an admin or a user with send permission can send series");
-            }
+
             availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
         } else if (fromInbox) {
             availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
