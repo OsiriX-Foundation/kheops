@@ -12,6 +12,7 @@ public class ProxyApplication extends Application {
         Set<Class<?>> set = new HashSet<>();
         set.add(STOWResource.class);
         set.add(WadoUriResource.class);
+        set.add(WadoRsResource.class);
         return set;
     }
 
