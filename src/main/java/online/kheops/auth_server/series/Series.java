@@ -40,7 +40,15 @@ public class Series {
         try {
             return findSeriesByPk(seriesPk, em);
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : "+seriesPk+" not found");
+            throw new SeriesNotFoundException("Series PK : "+seriesPk+" not found");
+        }
+    }
+
+    public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws SeriesNotFoundException{
+        try {
+            return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
+        } catch (NoResultException e) {
+            throw new SeriesNotFoundException("seriesInstanceUID : "+seriesInstanceUID+" not found");
         }
     }
 

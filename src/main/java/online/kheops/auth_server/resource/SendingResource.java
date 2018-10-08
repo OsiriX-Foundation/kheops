@@ -5,10 +5,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -50,8 +48,12 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
-            fromAlbumPk = null;
+        try {
+            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
+                fromAlbumPk = null;
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         if(fromInbox == true && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
@@ -83,8 +85,12 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (SeriesNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
@@ -110,14 +116,16 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID) || !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID) || !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (SeriesNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
             Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
-        } catch(SeriesForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -165,8 +173,12 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try{
+            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (SeriesNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
@@ -192,20 +204,26 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (SeriesNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
         LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
@@ -237,8 +255,6 @@ public class SendingResource
             Sending.putStudyInAlbum(callingUserPk, albumPk, studyInstanceUID, fromAlbumPk, fromInbox);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
         LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+" with albumPK "+albumPk);
@@ -258,16 +274,18 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
             Sending.deleteStudyFromAlbum(callingUserPk, albumPk, studyInstanceUID);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
         LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" from albumPK "+albumPk);
@@ -288,16 +306,18 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
             Sending.deleteSeriesFromAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
         LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from albumPK "+albumPk);

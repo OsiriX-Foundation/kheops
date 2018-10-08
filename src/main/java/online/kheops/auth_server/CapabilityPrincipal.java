@@ -3,6 +3,7 @@ package online.kheops.auth_server;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 
@@ -13,7 +14,6 @@ import javax.persistence.NoResultException;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
-import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
@@ -53,7 +53,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     //end old version
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException {
         if(getScope() == ScopeType.USER) {
             if(!capability.isReadPermission()) {
                 return false;
@@ -62,7 +62,11 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             this.tx = em.getTransaction();
             try {
                 tx.begin();
-                return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
+                if (canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em)) {
+                    return true;
+                } else {
+                    throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + "not found");
+                }
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -363,7 +367,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
-                
+
                 final Study study = findStudyByStudyUID(studyInstanceUID, em);
                 final Study studyInAlbum = findStudyByStudyandAlbum(study, album, em);
             } catch (AlbumNotFoundException | NoResultException e) {
