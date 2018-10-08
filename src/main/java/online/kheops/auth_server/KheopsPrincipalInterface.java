@@ -1,7 +1,10 @@
 package online.kheops.auth_server;
 
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 
 public interface KheopsPrincipalInterface extends java.security.Principal{
@@ -9,17 +12,17 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     //for old version
     long getDBID();
 
-    boolean hasSeriesReadAccess(String study, String series);
-    boolean hasStudyReadAccess(String study);
+    boolean hasSeriesReadAccess(String study, String series) throws SeriesNotFoundException;
+    boolean hasStudyReadAccess(String study)  throws StudyNotFoundException;
     boolean hasUserReadAccess();
 
-    boolean hasSeriesWriteAccess(String study, String series);
+    boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;
     boolean hasStudyWriteAccess(String study);
     boolean hasUserWriteAccess();
 
-    boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId);
+    boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId)throws AlbumNotFoundException;
 
-    boolean hasAlbumAccess(Long albumId);
+    boolean hasAlbumAccess(Long albumId) throws AlbumNotFoundException;
 
     User getUser();
 

@@ -41,8 +41,12 @@ public class EventRessource {
                               @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        if(!kheopsPrincipal.hasAlbumAccess(albumPk)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if(!kheopsPrincipal.hasAlbumAccess(albumPk)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
         if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -84,8 +88,12 @@ public class EventRessource {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
-        if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.WRITE_COMMENT, albumPk)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.WRITE_COMMENT, albumPk)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -94,8 +102,6 @@ public class EventRessource {
             Events.albumPostComment(callingUserPk, albumPk, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -117,8 +123,12 @@ public class EventRessource {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
-        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (StudyNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();

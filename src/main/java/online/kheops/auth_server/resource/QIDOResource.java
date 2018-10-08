@@ -5,6 +5,7 @@ import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
@@ -76,8 +77,12 @@ public class QIDOResource {
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumAccess(fromAlbumPk)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumAccess(fromAlbumPk)) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         if(fromInbox != null && !kheopsPrincipal.hasUserReadAccess()) {
