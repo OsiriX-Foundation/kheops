@@ -9,8 +9,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,16 +34,16 @@ public class WadoUriResource {
     @GET
     @Path("/password/dicomweb/wado")
     public Response wado(@HeaderParam("Authorization") String authorizationHeader) {
-        return webAccess(authorizationHeaderToToken(authorizationHeader));
+        return webAccess(AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
 
     @GET
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/wado")
     public Response wadoWithCapability(@PathParam("capability") String capabilityToken) {
-        return webAccess(capabilityToken);
+        return webAccess(AuthorizationToken.from(capabilityToken));
     }
 
-    private Response webAccess(String token) {
+    private Response webAccess(AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");
 
@@ -68,7 +66,7 @@ public class WadoUriResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessToken.createBuilder(authorizationURI)
-                    .withCapability(token)
+                    .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
         } catch (AccessTokenException e) {
@@ -91,44 +89,7 @@ public class WadoUriResource {
             invocationBuilder.header("Accept-Charset", acceptCharsetParam);
         }
 
-        Response wadoResponse =  invocationBuilder.get(Response.class);
-
-        return wadoResponse;
-    }
-
-
-    private String authorizationHeaderToToken(String authorizationHeader) {
-        final String token;
-        if (authorizationHeader != null) {
-
-            if (authorizationHeader.toUpperCase().startsWith("BASIC ")) {
-                final String encodedAuthorization = authorizationHeader.substring(6);
-
-                final String decoded = new String(Base64.getDecoder().decode(encodedAuthorization), StandardCharsets.UTF_8);
-                String[] split = decoded.split(":");
-                if (split.length != 2) {
-                    LOG.log(Level.WARNING, "Basic authentication doesn't have a username and password");
-                    throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-                }
-
-                token = split[1];
-            } else if (authorizationHeader.toUpperCase().startsWith("BEARER ")) {
-                token = authorizationHeader.substring(7);
-            } else {
-                LOG.log(Level.WARNING, "Unknown authorization header");
-                throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-            }
-
-            if (token.length() == 0) {
-                LOG.log(Level.WARNING, "Empty authorization token");
-                throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-            }
-        } else {
-            LOG.log(Level.WARNING, "Missing authorization header");
-            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-        }
-
-        return token;
+        return invocationBuilder.get(Response.class);
     }
 
     private URI getParameterURI(String parameter) {

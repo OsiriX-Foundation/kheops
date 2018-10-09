@@ -3,7 +3,6 @@ package online.kheops.proxy;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import org.dcm4che3.data.Attributes;
 import org.weasis.dicom.web.StowRS;
 
 import javax.servlet.ServletContext;
@@ -16,10 +15,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +36,7 @@ public final class STOWResource {
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
     public Response stow(InputStream inputStream, @HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
-        return store(inputStream, authorizationHeaderToToken(authorizationHeader), albumId, null);
+        return store(inputStream, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
     }
 
     @POST
@@ -47,7 +44,7 @@ public final class STOWResource {
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
     public Response stowWithCapability(InputStream inputStream, @PathParam("capability") String capabilityToken, @QueryParam("album") String albumId) {
-        return store(inputStream, capabilityToken, albumId, null);
+        return store(inputStream, AuthorizationToken.from(capabilityToken), albumId, null);
     }
 
     @POST
@@ -55,7 +52,7 @@ public final class STOWResource {
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
     public Response stowStudy(InputStream inputStream, @HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
-        return store(inputStream, authorizationHeaderToToken(authorizationHeader), albumId, studyInstanceUID);
+        return store(inputStream, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
     }
 
     @POST
@@ -63,10 +60,10 @@ public final class STOWResource {
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
     public Response stowStudyWithCapability(InputStream inputStream, @PathParam("capability") String capabilityToken, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
-        return store(inputStream, capabilityToken, albumId, studyInstanceUID);
+        return store(inputStream, AuthorizationToken.from(capabilityToken), albumId, studyInstanceUID);
     }
 
-    private Response store(InputStream inputStream, String bearerToken, String albumId, String studyInstanceUID) {
+    private Response store(InputStream inputStream, AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI STOWServiceURI = getParameterURI("online.kheops.pacs.uri");
 
@@ -78,7 +75,7 @@ public final class STOWResource {
 
         try (StowRS stowRS = new StowRS(STOWServiceURI.toString(), getStowContentType(), null, "Bearer " + getPostBearerToken())) {
             STOWService stowService = new STOWService(stowRS);
-            return new STOWProxy(contentType, inputStream, stowService, new AuthorizationManager(authorizationURI, bearerToken, albumId, studyInstanceUID)).getResponse();
+            return new STOWProxy(contentType, inputStream, stowService, new AuthorizationManager(authorizationURI, authorizationToken, albumId, studyInstanceUID)).getResponse();
         } catch (STOWGatewayException e) {
             LOG.log(Level.SEVERE, "Gateway Error", e);
             throw new WebApplicationException(Response.Status.BAD_GATEWAY);
@@ -127,39 +124,5 @@ public final class STOWResource {
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
 
         return jwtBuilder.sign(algorithmHMAC);
-    }
-
-    private String authorizationHeaderToToken(String authorizationHeader) {
-        final String token;
-        if (authorizationHeader != null) {
-
-            if (authorizationHeader.toUpperCase().startsWith("BASIC ")) {
-                final String encodedAuthorization = authorizationHeader.substring(6);
-
-                final String decoded = new String(Base64.getDecoder().decode(encodedAuthorization), StandardCharsets.UTF_8);
-                String[] split = decoded.split(":");
-                if (split.length != 2) {
-                    LOG.log(Level.WARNING, "Basic authentication doesn't have a username and password");
-                    throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-                }
-
-                token = split[1];
-            } else if (authorizationHeader.toUpperCase().startsWith("BEARER ")) {
-                token = authorizationHeader.substring(7);
-            } else {
-                LOG.log(Level.WARNING, "Unknown authorization header");
-                throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-            }
-
-            if (token.length() == 0) {
-                LOG.log(Level.WARNING, "Empty authorization token");
-                throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-            }
-        } else {
-            LOG.log(Level.WARNING, "Missing authorization header");
-            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-        }
-
-        return token;
     }
 }

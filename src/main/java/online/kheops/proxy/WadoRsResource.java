@@ -9,9 +9,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -34,7 +31,7 @@ public class WadoRsResource {
     public Response wado(@HeaderParam("Authorization") String authorizationHeader,
                          @PathParam("studyInstanceUID") String studyInstanceUID,
                          @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, authorizationHeaderToToken(authorizationHeader));
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
 
     @GET
@@ -42,17 +39,17 @@ public class WadoRsResource {
     public Response wadoWithCapability(@PathParam("capability") String capabilityToken,
                                        @PathParam("studyInstanceUID") String studyInstanceUID,
                                        @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, capabilityToken);
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.from(capabilityToken));
     }
 
-    private Response webAccess(String studyInstanceUID, String seriesInstanceUID, String token) {
+    private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");
 
         final AccessToken accessToken;
         try {
             accessToken = AccessToken.createBuilder(authorizationURI)
-                    .withCapability(token)
+                    .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
         } catch (AccessTokenException e) {
@@ -73,48 +70,9 @@ public class WadoRsResource {
 
         Invocation.Builder invocationBuilder = webTarget.request();
         invocationBuilder.header("Authorization", "Bearer " + accessToken.getToken());
-
         // TODO don't forget about headers
 
-        Response wadoResponse =  invocationBuilder.get(Response.class);
-
-        return wadoResponse;
-
-
-    }
-
-    private String authorizationHeaderToToken(String authorizationHeader) {
-        final String token;
-        if (authorizationHeader != null) {
-
-            if (authorizationHeader.toUpperCase().startsWith("BASIC ")) {
-                final String encodedAuthorization = authorizationHeader.substring(6);
-
-                final String decoded = new String(Base64.getDecoder().decode(encodedAuthorization), StandardCharsets.UTF_8);
-                String[] split = decoded.split(":");
-                if (split.length != 2) {
-                    LOG.log(Level.WARNING, "Basic authentication doesn't have a username and password");
-                    throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-                }
-
-                token = split[1];
-            } else if (authorizationHeader.toUpperCase().startsWith("BEARER ")) {
-                token = authorizationHeader.substring(7);
-            } else {
-                LOG.log(Level.WARNING, "Unknown authorization header");
-                throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-            }
-
-            if (token.length() == 0) {
-                LOG.log(Level.WARNING, "Empty authorization token");
-                throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-            }
-        } else {
-            LOG.log(Level.WARNING, "Missing authorization header");
-            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
-        }
-
-        return token;
+        return invocationBuilder.get(Response.class);
     }
 
     private URI getParameterURI(String parameter) {

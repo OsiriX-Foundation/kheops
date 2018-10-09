@@ -34,10 +34,10 @@ public final class AuthorizationManager {
     private final Set<ContentLocation> authorizedContentLocations = new HashSet<>();
     private final UriBuilder authorizationUriBuilder;
     private final UriBuilder fetchUriBuilder;
-    private final String bearerToken;
+    private final AuthorizationToken bearerToken;
 
-    public AuthorizationManager(URI authorizationServerRoot, String bearerToken, String albumId, String studyInstanceUID) {
-        this.bearerToken = Objects.requireNonNull(bearerToken);
+    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
+        this.bearerToken = Objects.requireNonNull(authorizationToken);
         authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
         if (albumId != null) {
             authorizationUriBuilder.path("/albums/" + albumId);
