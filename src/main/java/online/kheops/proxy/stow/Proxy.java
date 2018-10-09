@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.stow;
 
 import online.kheops.proxy.part.Part;
 import org.dcm4che3.mime.MultipartInputStream;
@@ -11,20 +11,20 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class STOWProxy {
-    private static final Logger LOG = Logger.getLogger(STOWResource.class.getName());
+public final class Proxy {
+    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
 
     private final InputStream inputStream;
     private final MediaType contentType;
     private final String boundary;
 
-    private final STOWService stowService;
+    private final Service stowService;
 
     private final AuthorizationManager authorizationManager;
 
 
-    public STOWProxy(MediaType contentType, InputStream inputStream, STOWService stowService, AuthorizationManager authorizationManager)
-            throws STOWRequestException {
+    public Proxy(MediaType contentType, InputStream inputStream, Service stowService, AuthorizationManager authorizationManager)
+            throws RequestException {
         this.contentType = contentType;
         this.inputStream = inputStream;
         this.stowService = stowService;
@@ -33,57 +33,57 @@ public final class STOWProxy {
         boundary = boundary();
     }
 
-    public Response getResponse() throws STOWGatewayException, STOWRequestException {
+    public Response getResponse() throws GatewayException, RequestException {
         processMultipart();
 
         try {
             return authorizationManager.getResponse(stowService.getResponse());
         } catch (IOException e ) {
-            throw new STOWGatewayException("Error getting a response", e);
+            throw new GatewayException("Error getting a response", e);
         }
     }
 
-    private void processMultipart() throws STOWRequestException, STOWGatewayException {
+    private void processMultipart() throws RequestException, GatewayException {
         MultipartParser multipartParser = new MultipartParser(boundary);
         try {
             multipartParser.parse(inputStream, this::processPart);
-        } catch (STOWRequestException | STOWGatewayException e) {
+        } catch (RequestException | GatewayException e) {
             throw e;
         } catch (IOException e) {
-            throw new STOWGatewayException("Error parsing input", e);
+            throw new GatewayException("Error parsing input", e);
         }
     }
 
     private void processPart(int partNumber, MultipartInputStream multipartInputStream)
-            throws STOWRequestException, STOWGatewayException {
+            throws RequestException, GatewayException {
 
         String partString = "Unknown part";
         try (Part part = Part.getInstance(multipartInputStream)) {
             partString = part.toString();
             authorizationManager.getAuthorization(part);
             writePart(partNumber, part);
-        } catch (STOWGatewayException e) {
+        } catch (GatewayException e) {
             throw e;
         } catch (IOException e) {
-            throw new STOWRequestException("Unable to parse for part:\n" + partNumber);
+            throw new RequestException("Unable to parse for part:\n" + partNumber);
         } catch (AuthorizationManagerException e) {
             LOG.log(Level.WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString);
             LOG.log(Level.FINE, "Authorization failure exception:\n" , e);
         }
     }
 
-    private void writePart(int partNumber, Part part) throws STOWGatewayException {
+    private void writePart(int partNumber, Part part) throws GatewayException {
         try {
             stowService.write(part);
         } catch (IOException e) {
-            throw new STOWGatewayException("Unable to write part " + partNumber + ": " + part, e);
+            throw new GatewayException("Unable to write part " + partNumber + ": " + part, e);
         }
     }
 
-    private String boundary() throws STOWRequestException {
+    private String boundary() throws RequestException {
         String boundary = contentType.getParameters().get("boundary");
         if (boundary == null) {
-            throw new STOWRequestException("Missing Boundary Parameter");
+            throw new RequestException("Missing Boundary Parameter");
         }
 
         return boundary;

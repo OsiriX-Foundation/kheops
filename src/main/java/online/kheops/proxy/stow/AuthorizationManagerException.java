@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.stow;
 
 public class AuthorizationManagerException extends Exception {
     public static enum Reason {

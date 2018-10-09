@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.tokens;
 
 public class AccessTokenException extends Exception {
     public AccessTokenException(String message) {

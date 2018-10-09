@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.filter;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;

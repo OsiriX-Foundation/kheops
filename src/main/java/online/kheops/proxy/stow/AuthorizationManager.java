@@ -1,7 +1,11 @@
-package online.kheops.proxy;
+package online.kheops.proxy.stow;
 
+import online.kheops.proxy.id.ContentLocation;
+import online.kheops.proxy.id.InstanceID;
+import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.part.MissingAttributeException;
 import online.kheops.proxy.part.Part;
+import online.kheops.proxy.tokens.AuthorizationToken;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Sequence;
 import org.dcm4che3.data.Tag;
@@ -25,7 +29,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class AuthorizationManager {
-    private static final Logger LOG = Logger.getLogger(STOWResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient();
 
     private final Set<SeriesID> authorizedSeriesIDs = new HashSet<>();
@@ -48,7 +52,7 @@ public final class AuthorizationManager {
     // This method blocks while a connection is made to the authorization server
     // Throws an exception that describes the reason the authorization could not be acquired.
     // stores authorizations that have failed so that attributes can be patched
-    public void getAuthorization(Part part) throws AuthorizationManagerException, STOWGatewayException {
+    public void getAuthorization(Part part) throws AuthorizationManagerException, GatewayException {
         try {
             if (part.getInstanceID().isPresent()) {
                 getAuthorization(part.getInstanceID().get());
@@ -96,7 +100,7 @@ public final class AuthorizationManager {
         return Response.status(hasFailedSOPs ? Response.Status.ACCEPTED : Response.Status.OK).entity(attributes).build();
     }
 
-    private void getAuthorization(InstanceID instanceID) throws AuthorizationManagerException, STOWGatewayException {
+    private void getAuthorization(InstanceID instanceID) throws AuthorizationManagerException, GatewayException {
         final SeriesID seriesID = instanceID.getSeriesID();
         if (authorizedSeriesIDs.contains(seriesID)) {
             return;
@@ -117,7 +121,7 @@ public final class AuthorizationManager {
         } catch (ProcessingException e) {
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
-            throw new STOWGatewayException("Error while getting the access token", e);
+            throw new GatewayException("Error while getting the access token", e);
         }  catch (WebApplicationException e) {
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);

@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.marshaller;
 
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.json.JSONWriter;

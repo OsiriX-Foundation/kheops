@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.id;
 
 public final class ContentLocation {
     private final String contentLocation;

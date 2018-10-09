@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.filter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

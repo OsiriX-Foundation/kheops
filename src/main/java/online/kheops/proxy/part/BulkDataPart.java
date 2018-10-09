@@ -1,6 +1,6 @@
 package online.kheops.proxy.part;
 
-import online.kheops.proxy.ContentLocation;
+import online.kheops.proxy.id.ContentLocation;
 
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;

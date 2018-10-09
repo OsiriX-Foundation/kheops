@@ -1,4 +1,6 @@
-package online.kheops.proxy;
+package online.kheops.proxy.tokens;
+
+import online.kheops.proxy.id.SeriesID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;

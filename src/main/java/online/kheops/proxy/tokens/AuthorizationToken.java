@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.tokens;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

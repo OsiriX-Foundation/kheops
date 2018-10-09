@@ -1,8 +1,8 @@
 package online.kheops.proxy.part;
 
-import online.kheops.proxy.ContentLocation;
-import online.kheops.proxy.InstanceID;
-import online.kheops.proxy.SeriesID;
+import online.kheops.proxy.id.ContentLocation;
+import online.kheops.proxy.id.InstanceID;
+import online.kheops.proxy.id.SeriesID;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.ws.rs.MediaTypes;
 

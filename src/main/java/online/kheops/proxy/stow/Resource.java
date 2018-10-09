@@ -1,8 +1,9 @@
-package online.kheops.proxy;
+package online.kheops.proxy.stow;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import online.kheops.proxy.tokens.AuthorizationToken;
 import org.weasis.dicom.web.StowRS;
 
 import javax.servlet.ServletContext;
@@ -22,8 +23,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Path("/")
-public final class STOWResource {
-    private static final Logger LOG = Logger.getLogger(STOWResource.class.getName());
+public final class Resource {
+    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
 
     @Context
     ServletContext context;
@@ -74,12 +75,12 @@ public final class STOWResource {
         }
 
         try (StowRS stowRS = new StowRS(STOWServiceURI.toString(), getStowContentType(), null, "Bearer " + getPostBearerToken())) {
-            STOWService stowService = new STOWService(stowRS);
-            return new STOWProxy(contentType, inputStream, stowService, new AuthorizationManager(authorizationURI, authorizationToken, albumId, studyInstanceUID)).getResponse();
-        } catch (STOWGatewayException e) {
+            Service stowService = new Service(stowRS);
+            return new Proxy(contentType, inputStream, stowService, new AuthorizationManager(authorizationURI, authorizationToken, albumId, studyInstanceUID)).getResponse();
+        } catch (GatewayException e) {
             LOG.log(Level.SEVERE, "Gateway Error", e);
             throw new WebApplicationException(Response.Status.BAD_GATEWAY);
-        } catch (STOWRequestException e) {
+        } catch (RequestException e) {
             LOG.log(Level.WARNING, "Bad request Error", e);
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         } catch (WebApplicationException e) {

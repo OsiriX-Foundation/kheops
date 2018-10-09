@@ -1,4 +1,9 @@
-package online.kheops.proxy;
+package online.kheops.proxy.wadouri;
+
+import online.kheops.proxy.id.SeriesID;
+import online.kheops.proxy.tokens.AccessToken;
+import online.kheops.proxy.tokens.AccessTokenException;
+import online.kheops.proxy.tokens.AuthorizationToken;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;

@@ -1,5 +1,12 @@
 package online.kheops.proxy;
 
+import online.kheops.proxy.filter.CORSFilter;
+import online.kheops.proxy.marshaller.JSONAttributesWriter;
+import online.kheops.proxy.marshaller.XMLAttributesWriter;
+import online.kheops.proxy.stow.Resource;
+import online.kheops.proxy.wadors.WadoRsResource;
+import online.kheops.proxy.wadouri.WadoUriResource;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -10,7 +17,7 @@ public class ProxyApplication extends Application {
 
     public Set<Class<?>> getClasses() {
         Set<Class<?>> set = new HashSet<>();
-        set.add(STOWResource.class);
+        set.add(Resource.class);
         set.add(WadoUriResource.class);
         set.add(WadoRsResource.class);
         return set;

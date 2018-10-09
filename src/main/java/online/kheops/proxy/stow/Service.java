@@ -1,4 +1,4 @@
-package online.kheops.proxy;
+package online.kheops.proxy.stow;
 
 
 import online.kheops.proxy.part.BulkDataPart;
@@ -14,14 +14,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public final class STOWService {
+public final class Service {
     private final StowRS stowRS;
 
-    STOWService(StowRS stowRS) {
+    Service(StowRS stowRS) {
         this.stowRS = stowRS;
     }
 
-    public void write(Part part) throws STOWGatewayException {
+    public void write(Part part) throws GatewayException {
         if (part instanceof DICOMPart) {
             writeDICOM((DICOMPart) part);
         } else if (part instanceof DICOMMetadataPart) {
@@ -41,11 +41,11 @@ public final class STOWService {
 
     }
 
-    public void writeDICOM(DICOMPart dicomPart) throws STOWGatewayException {
+    public void writeDICOM(DICOMPart dicomPart) throws GatewayException {
         try {
             stowRS.uploadDicom(dicomPart.getDataset(), dicomPart.getTransferSyntax());
         } catch (IOException e) {
-            throw new STOWGatewayException("Failed to store DICOMPart", e);
+            throw new GatewayException("Failed to store DICOMPart", e);
         }
     }
 
