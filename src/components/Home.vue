@@ -1,7 +1,7 @@
 /* eslint-disable */
 <template>
-  <div >
-  	<p>{{msg}}</p>
+  <div class = 'container'>
+  	<h3>{{msg}}</h3>
   </div>
 </template>
 

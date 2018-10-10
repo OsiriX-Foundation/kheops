@@ -71,6 +71,8 @@ Vue.use(VueKeyCloak, {
   }
 })
 
+// if we don't need authentication...
+
 	  // new Vue({
 	  //   el: '#app',
 	  //   router,

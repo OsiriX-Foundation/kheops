@@ -1,6 +1,6 @@
 export const serverURL = "https://test.kheops.online/authorization/";
 
-export const siteTitle = 'Keops';
+export const siteTitle = 'Kheops';
 
 export const loginType = 'keycloak';
 

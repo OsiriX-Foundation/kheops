@@ -1,6 +1,6 @@
 /* eslint-disable */
 <template>
-	<div class = 'container'>
+	<div class = 'container-fluid'>
 		 <p>{{datasets.length}} datasets</p>
 		 <b-table striped hover :items="datasets"></b-table>
 		
