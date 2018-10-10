@@ -3,15 +3,16 @@ package online.kheops.proxy.stow;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import online.kheops.proxy.id.SeriesID;
+import online.kheops.proxy.tokens.AccessToken;
+import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
 import org.weasis.dicom.web.StowRS;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -67,6 +68,14 @@ public final class Resource {
     private Response store(InputStream inputStream, AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI STOWServiceURI = getParameterURI("online.kheops.pacs.uri");
+
+        try {
+            AccessToken.createBuilder(authorizationURI)
+                    .withCapability(authorizationToken.getToken())
+                    .build();
+        } catch (AccessTokenException e) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
 
         if (studyInstanceUID != null) {
             STOWServiceURI = UriBuilder.fromUri(STOWServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);

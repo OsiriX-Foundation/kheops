@@ -20,7 +20,6 @@ public class AccessToken {
     private static final Logger LOG = Logger.getLogger(AccessToken.class.getName());
     private static Client client = ClientBuilder.newClient();
 
-
     private String token;
 
     @SuppressWarnings("unused")
@@ -57,16 +56,13 @@ public class AccessToken {
                 throw new IllegalStateException("Capability is not set");
             }
 
-            if (seriesID == null) {
-                throw new IllegalStateException("SeriesID is not set");
+            final Form form = new Form()
+                    .param("assertion", capability)
+                    .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer");
+            if (seriesID != null) {
+                form.param("scope", "StudyInstanceUID=" + seriesID.getStudyUID() + " SeriesInstanceUID=" + seriesID.getSeriesUID());
             }
-
-            Form form = new Form().param("assertion", capability)
-                    .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer")
-                    .param("scope", "StudyInstanceUID=" + seriesID.getStudyUID() + " SeriesInstanceUID=" + seriesID.getSeriesUID());
             URI uri = UriBuilder.fromUri(authorizationServerRoot).path("token").build();
-
-            LOG.info("About to get a token");
 
             final TokenResponse tokenResponse;
             try {
