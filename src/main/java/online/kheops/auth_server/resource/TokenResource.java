@@ -118,7 +118,7 @@ public class TokenResource
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
             errorResponse.error = "server_error";
             errorResponse.errorDescription = "error";
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
+            return Response.status(Response.Status.BAD_GATEWAY).entity(errorResponse).build();
         }
 
         Response.Status responseStatus = Response.Status.OK;
