@@ -28,12 +28,9 @@ public class CapabilityParametersBuilder {
         return this;
     }
 
-    private LocalDateTime stringToLocalDateTime(String date)  throws DateTimeParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        ZoneId defaultZoneId = ZoneOffset.UTC;
-        Instant instant = Date.from(localDate.atStartOfDay().atZone(defaultZoneId).toInstant()).toInstant();
-        return instant.atZone(defaultZoneId).toLocalDateTime();
+    private LocalDateTime stringToLocalDateTime(String dateTime)  throws DateTimeParseException {
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTime);
+        return LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
     }
 
     public CapabilityParametersBuilder expiration(String expirationDate) throws DateTimeParseException {
