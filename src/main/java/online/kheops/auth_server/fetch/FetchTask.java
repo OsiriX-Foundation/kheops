@@ -112,7 +112,7 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedSeries(List<UIDPair> unpopulatedSeriesUIDs) {
-        UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
+        /*UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
 
         Client client = ClientBuilder.newClient();
         client.register(AttributesListMarshaller.class);
@@ -156,11 +156,11 @@ public class FetchTask implements Runnable {
                 }
                 em.close();
             }
-        }
+        }*/
     }
 
     private void fetchUnpopulatedStudies(List<String> unpopulatedStudyUIDs) {
-        UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
+        /*UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
 
         Client client = ClientBuilder.newClient();
         client.register(AttributesListMarshaller.class);
@@ -203,7 +203,7 @@ public class FetchTask implements Runnable {
                 }
                 em.close();
             }
-        }
+        }*/
 
     }
 
