@@ -16,10 +16,11 @@ public class FetchResource {
     @POST
     @Secured
     @Path("studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
-    public void getStudies(@PathParam("studyInstanceUID") String studyInstanceUID,
+    public Response getStudies(@PathParam("studyInstanceUID") String studyInstanceUID,
                                @Context SecurityContext securityContext) {
         checkValidUID(studyInstanceUID);
         Fetcher.fetchStudy(studyInstanceUID);
+        return Response.ok().build();
     }
 
     private void checkValidUID(String uid) {
