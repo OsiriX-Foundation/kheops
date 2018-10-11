@@ -49,13 +49,19 @@ function M.auth(claim_specs, use_post_secret)
                     ngx.log(ngx.WARN,"studyUID: error (not same as JWT)")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
-            end
+            else
+		ngx.log(ngx.WARN,"studyUID: missing")
+                ngx.exit(ngx.HTTP_UNAUTHORIZED)
+	    end
             if ngx.var.arg_seriesUID ~= nil then
                 if ngx.var.arg_seriesUID ~= jwt_obj.payload["series_uid"] then
                     ngx.log(ngx.WARN,"seriesUID: error (not same as JWT)")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
-            end
+            else
+		ngx.log(ngx.WARN,"seriesUID: missing")
+                ngx.exit(ngx.HTTP_UNAUTHORIZED)
+	    end
         else
             ngx.log(ngx.WARN,"requestType: missing")
             ngx.exit(ngx.HTTP_BAD_REQUEST)
