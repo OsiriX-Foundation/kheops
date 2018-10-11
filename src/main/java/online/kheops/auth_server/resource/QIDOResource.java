@@ -77,6 +77,6 @@ public class QIDOResource {
         }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
-        return Response.ok(genericAttributesList).header("X-Total-Count", pair.getAttributesList()).build();
+        return Response.ok(genericAttributesList).header("X-Total-Count", pair.getXTotalCount()).build();
     }
 }
