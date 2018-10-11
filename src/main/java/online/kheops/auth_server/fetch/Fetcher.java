@@ -86,7 +86,7 @@ public abstract class Fetcher {
             Series series = query.getSingleResult();
             series.mergeAttributes(attributes);
             series.setPopulated(true);
-
+            LOG.log(Level.WARNING, "FETCH SERIES : " + series.getSeriesInstanceUID());
             tx.commit();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while storing series: " + seriesUID, e);
