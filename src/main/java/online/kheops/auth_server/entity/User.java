@@ -81,14 +81,6 @@ public class User {
         this.googleEmail = googleEmail;
     }
 
-    public boolean hasAccess(String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from Series s where :user member of s.users and s.seriesInstanceUID = :SeriesInstanceUID and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
-        query.setParameter("user", this);
-        query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-        query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
-        return !query.getResultList().isEmpty();
-    }
-
     public LocalDateTime getCreatedTime() {
         return createdTime;
     }

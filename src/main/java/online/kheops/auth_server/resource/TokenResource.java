@@ -25,6 +25,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.series.SeriesQueries;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 import online.kheops.auth_server.user.UsersPermission;
@@ -118,7 +119,7 @@ public class TokenResource
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
             errorResponse.error = "server_error";
             errorResponse.errorDescription = "error";
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
+            return Response.status(Response.Status.BAD_GATEWAY).entity(errorResponse).build();
         }
 
         Response.Status responseStatus = Response.Status.OK;
@@ -188,7 +189,9 @@ public class TokenResource
             tx.begin();
 
             if (uidPair != null && callingUser != null) {
-                if (!callingUser.hasAccess(uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em)) {
+                try {
+                    SeriesQueries.findSeriesByStudyUIDandSeriesUID(callingUser, uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em);
+                } catch (NoResultException e) {
                     LOG.info("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair");
                     errorResponse.errorDescription = "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair";
                     return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
