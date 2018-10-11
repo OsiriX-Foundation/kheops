@@ -3,7 +3,9 @@ package online.kheops.auth_server.fetch;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.AttributesListMarshaller;
+import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
 
 import javax.persistence.*;
@@ -39,6 +41,21 @@ public abstract class Fetcher {
     }
 
     public static void fetchStudy(String studyInstanceUID) {
+        final URI uri = uriBuilder.build(studyInstanceUID);
+
+        final Attributes attributes;
+        try {
+            String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
+            List<Attributes> studyList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
+            if (studyList == null || studyList.isEmpty()) {
+                throw new WebApplicationException("GET to fetch study returned nothing");
+            }
+            attributes = studyList.get(0);
+        } catch (WebApplicationException e) {
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
+            return;
+        }
+
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         try {
@@ -47,6 +64,14 @@ public abstract class Fetcher {
             final TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID", String.class);
             query.setParameter("studyInstanceUID", studyInstanceUID);
             query.getResultList().forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID));
+
+            TypedQuery<Study> queryStudy = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
+            queryStudy.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
+            queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+
+            Study study = queryStudy.getSingleResult();
+            study.mergeAttributes(attributes);
+            study.setPopulated(true);
 
             tx.commit();
         } finally {
@@ -86,7 +111,7 @@ public abstract class Fetcher {
             Series series = query.getSingleResult();
             series.mergeAttributes(attributes);
             series.setPopulated(true);
-            LOG.log(Level.WARNING, "FETCH SERIES : " + series.getSeriesInstanceUID());
+
             tx.commit();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while storing series: " + seriesUID, e);

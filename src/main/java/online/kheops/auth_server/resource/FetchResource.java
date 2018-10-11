@@ -25,7 +25,6 @@ public class FetchResource {
         LOG.log(Level.WARNING, "Fetch resource called for StudyUID:" + studyInstanceUID);
         checkValidUID(studyInstanceUID);
         Fetcher.fetchStudy(studyInstanceUID);
-        LOG.log(Level.WARNING, "END FETCH JUST BEFORE RETURN 200OK for StudyUID:" + studyInstanceUID);
         return Response.ok().build();
     }
 
