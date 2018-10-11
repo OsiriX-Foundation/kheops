@@ -24,7 +24,8 @@ public abstract class Fetcher {
     private static final Logger LOG = Logger.getLogger(Fetcher.class.getName());
 
     private static final Client CLIENT = newClient();
-    private static UriBuilder uriBuilder = null;
+    private static UriBuilder studyUriBuilder = null;
+    private static UriBuilder seriesUriBuilder = null;
 
 
     private static Client newClient() {
@@ -37,16 +38,17 @@ public abstract class Fetcher {
     }
 
     static void setDicomWebURI(URI dicomWebURI) {
-        uriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
+        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
+        seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
     }
 
     public static void fetchStudy(String studyInstanceUID) {
-        final URI uri = uriBuilder.build(studyInstanceUID);
+        final URI studyUri = studyUriBuilder.build(studyInstanceUID);
 
         final Attributes attributes;
         try {
             String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
-            List<Attributes> studyList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
+            List<Attributes> studyList = CLIENT.target(studyUri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
             if (studyList == null || studyList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch study returned nothing");
             }
@@ -83,7 +85,7 @@ public abstract class Fetcher {
     }
 
     private static boolean fetchSeries(String studyUID, String seriesUID) {
-        final URI uri = uriBuilder.build(studyUID, seriesUID);
+        final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
         try {
