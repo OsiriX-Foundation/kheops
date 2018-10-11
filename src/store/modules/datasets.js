@@ -3,7 +3,8 @@ import dicom from '@/mixins/dicom';
 
 // initial state
 const state = {
-	all: []
+	all: [],
+	end: false
 }
 
 // getters
@@ -15,9 +16,16 @@ const getters = {
 // actions
 const actions = {
 
-	getDatasets ({ commit }) {			
-			HTTP.get('studies',{headers: {'Accept': 'application/dicom+json'}}).then(res => {
-				let data = [];
+	getDatasets ({ commit }, params) {			
+		if (state.end) return;
+		let limit = 10;
+		let offset = (params.pageNb-1) * limit;
+			HTTP.get('studies?limit='+limit+"&offset="+offset,{headers: {'Accept': 'application/dicom+json'}}).then(res => {
+				let data = state.all;
+				if (!res.data.length){
+					commit("SET_END",true);
+					return;
+				}
 				_.forEach(res.data, d => {
 					let t = {};
 					_.forEach(d, (v,k) => {
@@ -44,6 +52,9 @@ const mutations = {
 	},
 	SELECT_DATASET (state, dataset){
 		state.current = dataset;
+	},
+	SET_END (state,value){
+		state.end = value;
 	}
 }
 

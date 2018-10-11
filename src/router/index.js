@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
 import Dataset from '@/components/dataset/List'
 import store from '@/store'
 
@@ -15,14 +14,17 @@ const router = new Router({
 	mode: 'history',
   routes: [
 	 {
-		 path: '/datasets',
+		 path: '/inbox',
 		 name: 'datasets',
-		 component: Dataset
+		 component: Dataset,
+   	    beforeEnter: requireAuth,
+   	    meta: {permissions: 'active',condition: 'any'}
+
 	 },
 	{
 		path: '*',
-		name: 'home',
-		component: Home,
+		name: 'inbox',
+		component: Dataset,
   	    beforeEnter: requireAuth,
   	    meta: {permissions: 'active',condition: 'any'}
 	}

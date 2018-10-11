@@ -2,6 +2,7 @@
 	<div id="app">
 		<vue-snotify></vue-snotify>
 		<nav-header></nav-header>
+		<nav-bar></nav-bar>
 
 		<!-- content -->
 	  <router-view style="margin: 90px auto"/>
@@ -18,9 +19,10 @@
 <script>
 
 import navHeader from '@/components/navheader'
+import navBar from '@/components/navbar'
 
 export default {
-  components: { navHeader },
+  components: { navHeader,navBar },
   name: 'App',
 	computed:{
 		year () {

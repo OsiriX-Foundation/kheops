@@ -11,13 +11,14 @@ import '@/css/bootstrap_dark.css'
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import 'vue-snotify/styles/material.css'
 import Access from '@/directives/access'
-import 'vue-awesome/icons';
+import 'vue-awesome/icons'
 import lodash from 'lodash'
 import Icon from 'vue-awesome/components/Icon'
 import VeeValidate from 'vee-validate'
 import store from './store'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import {HTTP} from '@/router/http';
+import '@/filters/filters.js';
 
 Vue.config.productionTip = false
 
@@ -25,7 +26,7 @@ Vue.use(Snotify, options)
 Vue.use(BootstrapVue)
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 // Vue.use(Vuex)
-Vue.component('icon', Icon)
+Vue.component('v-icon', Icon)
 Vue.directive('access',Access);
 
 // globally (in your main .js file)
