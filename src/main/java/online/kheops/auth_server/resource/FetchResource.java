@@ -9,15 +9,20 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("/")
 public class FetchResource {
+    private static final Logger LOG = Logger.getLogger(FetchResource.class.getName());
+
 
     @POST
     @Secured
     @Path("studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
     public Response getStudies(@PathParam("studyInstanceUID") String studyInstanceUID,
                                @Context SecurityContext securityContext) {
+        LOG.log(Level.WARNING, "Fetch resource called for StudyUID:" + studyInstanceUID);
         checkValidUID(studyInstanceUID);
         Fetcher.fetchStudy(studyInstanceUID);
         return Response.ok().build();
