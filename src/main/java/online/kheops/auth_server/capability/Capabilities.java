@@ -68,8 +68,8 @@ public class Capabilities {
             //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
-                    .expiration(capabilityParameters.getExpirationDate())
-                    .startTime(capabilityParameters.getStartDate())
+                    .expirationTime(capabilityParameters.getExpirationTime())
+                    .notBeforeTime(capabilityParameters.getNotBeforeTime())
                     .title(capabilityParameters.getTitle())
                     .readPermission(capabilityParameters.isReadPermission())
                     .writePermission(capabilityParameters.isWritePermission())
@@ -110,8 +110,8 @@ public class Capabilities {
             //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), album, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
-                    .expiration(capabilityParameters.getExpirationDate())
-                    .startTime(capabilityParameters.getStartDate())
+                    .expirationTime(capabilityParameters.getExpirationTime())
+                    .notBeforeTime(capabilityParameters.getNotBeforeTime())
                     .title(capabilityParameters.getTitle())
                     .readPermission(capabilityParameters.isReadPermission())
                     .writePermission(capabilityParameters.isWritePermission())
@@ -154,8 +154,8 @@ public class Capabilities {
             //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), series, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
-                    .expiration(capabilityParameters.getExpirationDate())
-                    .startTime(capabilityParameters.getStartDate())
+                    .expirationTime(capabilityParameters.getExpirationTime())
+                    .notBeforeTime(capabilityParameters.getNotBeforeTime())
                     .title(capabilityParameters.getTitle())
                     .readPermission(capabilityParameters.isReadPermission())
                     .writePermission(capabilityParameters.isWritePermission())
@@ -201,8 +201,8 @@ public class Capabilities {
             //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), study, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
-                    .expiration(capabilityParameters.getExpirationDate())
-                    .startTime(capabilityParameters.getStartDate())
+                    .expirationTime(capabilityParameters.getExpirationTime())
+                    .notBeforeTime(capabilityParameters.getNotBeforeTime())
                     .title(capabilityParameters.getTitle())
                     .readPermission(capabilityParameters.isReadPermission())
                     .writePermission(capabilityParameters.isWritePermission())

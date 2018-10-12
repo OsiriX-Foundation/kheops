@@ -8,7 +8,7 @@ public class CapabilityParametersBuilder {
     private Long callingUserPk;
     private String title;
     private LocalDateTime expirationTime;
-    private LocalDateTime issuedAtTime;
+    private LocalDateTime notBeforeTime;
     private boolean readPermission;
     private boolean writePermission;
     private CapabilityScopeBuilder capabilityScopeBuilder;
@@ -35,8 +35,8 @@ public class CapabilityParametersBuilder {
         return this;
     }
 
-    public CapabilityParametersBuilder issuedAtTime(String issuedAtTime) throws DateTimeParseException{
-        this.issuedAtTime = stringToLocalDateTime(issuedAtTime);
+    public CapabilityParametersBuilder notBeforeTime(String notBeforeTime) throws DateTimeParseException{
+        this.notBeforeTime = stringToLocalDateTime(notBeforeTime);
         return this;
     }
 
@@ -81,11 +81,11 @@ public class CapabilityParametersBuilder {
             expirationTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
         }
 
-        if (issuedAtTime == null) {
-            issuedAtTime = LocalDateTime.now(ZoneOffset.UTC);
+        if (notBeforeTime == null) {
+            notBeforeTime = LocalDateTime.now(ZoneOffset.UTC);
         }
 
-        return new CapabilityParameters(callingUserPk, title, expirationTime, issuedAtTime,
+        return new CapabilityParameters(callingUserPk, title, expirationTime, notBeforeTime,
                 capabilityScopeBuilder.getScopeType(), capabilityScopeBuilder.getAlbumPk(), capabilityScopeBuilder.getStudyInstanceUID(), capabilityScopeBuilder.getSeriesInstanceUID(),
                 readPermission, writePermission);
     }

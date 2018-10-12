@@ -125,8 +125,8 @@ public class Capability {
 
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequest {
         this.secret = Capabilities.newCapabilityToken();
-        this.expiration = builder.expiration;
-        this.startTime = builder.startTime;
+        this.expiration = builder.expirationTime;
+        this.startTime = builder.notBeforeTime;
         this.title  = builder.title;
         this.user = builder.user;
         builder.scopeType.setCapabilityEntityScope(this, builder.album, builder.study, builder.series);
@@ -198,13 +198,18 @@ public class Capability {
 
     public Study getStudy() { return study; }
 
+
+
+
+
+
     public static class CapabilityBuilder {
 
-        private LocalDateTime createdTime;
+        private LocalDateTime issuedAtTime;
         private LocalDateTime updatedTime;
-        private LocalDateTime expiration;
+        private LocalDateTime expirationTime;
         private LocalDateTime revokedTime;
-        private LocalDateTime startTime;
+        private LocalDateTime notBeforeTime;
         private String title;
         private boolean readPermission;
         private boolean writePermission;
@@ -216,24 +221,24 @@ public class Capability {
 
         public CapabilityBuilder () {}
 
-        public CapabilityBuilder createdTime (LocalDateTime createdTime) {
-            this.createdTime = createdTime;
+        public CapabilityBuilder issuedAtTime (LocalDateTime issuedAtTime) {
+            this.issuedAtTime = issuedAtTime;
             return this;
         }
         public CapabilityBuilder updatedTime (LocalDateTime updatedTime) {
             this.updatedTime = updatedTime;
             return this;
         }
-        public CapabilityBuilder expiration (LocalDateTime expiration) {
-            this.expiration = expiration;
+        public CapabilityBuilder expirationTime (LocalDateTime expirationTime) {
+            this.expirationTime = expirationTime;
             return this;
         }
         public CapabilityBuilder revokedTime (LocalDateTime revokedTime) {
             this.revokedTime = revokedTime;
             return this;
         }
-        public CapabilityBuilder startTime (LocalDateTime startTime) {
-            this.startTime = startTime;
+        public CapabilityBuilder notBeforeTime (LocalDateTime notBeforeTime) {
+            this.notBeforeTime = notBeforeTime;
             return this;
         }
         public CapabilityBuilder title (String title) {
@@ -273,11 +278,11 @@ public class Capability {
             if (user == null) {
                 throw new IllegalStateException("Missing user");
             }
-            if (expiration == null) {
-                throw new IllegalStateException("Missing expiration");
+            if (expirationTime == null) {
+                throw new IllegalStateException("Missing expirationTime");
             }
-            if (startTime == null) {
-                throw new IllegalStateException("Missing startTime");
+            if (notBeforeTime == null) {
+                throw new IllegalStateException("Missing notBeforeTime");
             }
             if (title == null) {
                 throw new IllegalStateException("Missing title");

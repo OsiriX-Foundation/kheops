@@ -6,8 +6,8 @@ public class CapabilityParameters {
 
     private final Long callingUserPk;
     private final String title;
-    private final LocalDateTime expirationDate;
-    private final LocalDateTime startDate;
+    private final LocalDateTime expirationTime;
+    private final LocalDateTime notBeforeTime;
     private final ScopeType scopeType;
     private Long albumPk;
     private String seriesInstanceUID;
@@ -15,13 +15,13 @@ public class CapabilityParameters {
     private final boolean readPermission;
     private final boolean writePermission;
 
-    protected CapabilityParameters(Long callingUserPk, String title, LocalDateTime expirationDate, LocalDateTime startDate,
+    protected CapabilityParameters(Long callingUserPk, String title, LocalDateTime expirationTime, LocalDateTime notBeforeTime,
                                    ScopeType scopeType, Long albumPk, String studyInstanceUID, String seriesInstanceUID,
                                    boolean readPermission, boolean writePermission) {
         this.callingUserPk = callingUserPk;
         this.title = title;
-        this.expirationDate = expirationDate;
-        this.startDate = startDate;
+        this.expirationTime = expirationTime;
+        this.notBeforeTime = notBeforeTime;
         this.albumPk = albumPk;
         this.seriesInstanceUID = seriesInstanceUID;
         this.studyInstanceUID = studyInstanceUID;
@@ -32,8 +32,8 @@ public class CapabilityParameters {
 
     public Long getCallingUserPk() { return callingUserPk; }
     public String getTitle() { return title; }
-    public LocalDateTime getExpirationDate() { return expirationDate; }
-    public LocalDateTime getStartDate() { return startDate; }
+    public LocalDateTime getExpirationTime() { return expirationTime; }
+    public LocalDateTime getNotBeforeTime() { return notBeforeTime; }
     public ScopeType getScopeType() { return scopeType; }
     public Long getAlbumPk() { return albumPk; }
     public String getSeriesInstanceUID() { return seriesInstanceUID; }
