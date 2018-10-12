@@ -1,17 +1,14 @@
 package online.kheops.auth_server.capability;
 
-import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 
 public class CapabilityParametersBuilder {
 
     private Long callingUserPk;
     private String title;
-    private LocalDateTime expirationDate;
-    private LocalDateTime startDate;
+    private LocalDateTime expirationTime;
+    private LocalDateTime issuedAtTime;
     private boolean readPermission;
     private boolean writePermission;
     private CapabilityScopeBuilder capabilityScopeBuilder;
@@ -33,13 +30,13 @@ public class CapabilityParametersBuilder {
         return LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
     }
 
-    public CapabilityParametersBuilder expiration(String expirationDate) throws DateTimeParseException {
-        this.expirationDate = stringToLocalDateTime(expirationDate);
+    public CapabilityParametersBuilder expirationTime(String expirationTime) throws DateTimeParseException {
+        this.expirationTime = stringToLocalDateTime(expirationTime);
         return this;
     }
 
-    public CapabilityParametersBuilder start(String startDate) throws DateTimeParseException{
-        this.startDate = stringToLocalDateTime(startDate);
+    public CapabilityParametersBuilder issuedAtTime(String issuedAtTime) throws DateTimeParseException{
+        this.issuedAtTime = stringToLocalDateTime(issuedAtTime);
         return this;
     }
 
@@ -80,15 +77,15 @@ public class CapabilityParametersBuilder {
             throw new IllegalStateException("Missing scope");
         }
 
-        if (expirationDate == null) {
-            expirationDate = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
+        if (expirationTime == null) {
+            expirationTime = LocalDateTime.now(ZoneOffset.UTC).plusMonths(3);
         }
 
-        if (startDate == null) {
-            startDate = LocalDateTime.now(ZoneOffset.UTC);
+        if (issuedAtTime == null) {
+            issuedAtTime = LocalDateTime.now(ZoneOffset.UTC);
         }
 
-        return new CapabilityParameters(callingUserPk, title, expirationDate, startDate,
+        return new CapabilityParameters(callingUserPk, title, expirationTime, issuedAtTime,
                 capabilityScopeBuilder.getScopeType(), capabilityScopeBuilder.getAlbumPk(), capabilityScopeBuilder.getStudyInstanceUID(), capabilityScopeBuilder.getSeriesInstanceUID(),
                 readPermission, writePermission);
     }

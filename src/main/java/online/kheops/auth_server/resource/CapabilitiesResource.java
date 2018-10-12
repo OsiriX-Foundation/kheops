@@ -35,8 +35,8 @@ public class CapabilitiesResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createNewCapability(@NotNull @FormParam("title") String title,
-                                        @FormParam("expiration") String expirationDate,
-                                        @FormParam("start") String startDate,
+                                        @FormParam("expiration_time") String expirationTime,
+                                        @FormParam("issued_at_time") String issuedAtTime,
                                         @NotNull @FormParam("scope_type") String scopeType,
                                         @FormParam("album") Long albumPk,
                                         @FormParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
@@ -53,18 +53,18 @@ public class CapabilitiesResource {
                 .title(title)
                 .readPermission(readPermission)
                 .writePermission(writePermission);
-        if(startDate != null) {
+        if(issuedAtTime != null) {
             try {
-            capabilityParametersBuilder.start(startDate);
+            capabilityParametersBuilder.issuedAtTime(issuedAtTime);
             } catch (DateTimeParseException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {start}").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {issued_at_time}").build();
             }
         }
-        if(expirationDate != null) {
+        if(expirationTime != null) {
             try {
-                capabilityParametersBuilder.expiration(expirationDate);
+                capabilityParametersBuilder.expirationTime(expirationTime);
             } catch (DateTimeParseException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration}").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
             }
         }
 
