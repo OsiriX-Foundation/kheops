@@ -16,15 +16,15 @@ public class CapabilitiesResponses {
 
         @XmlElement(name = "secret")
         String secret;
-        @XmlElement(name = "description")
-        String description;
+        @XmlElement(name = "title")
+        String title;
 
-        @XmlElement(name = "creation_date")
-        String creation;
-        @XmlElement(name = "start_time")
-        String start;
-        @XmlElement(name = "expiration_date")
-        String expiration;
+        @XmlElement(name = "issued_at")
+        String issuedAt;
+        @XmlElement(name = "not_before_time")
+        String notBeforeTime;
+        @XmlElement(name = "expiration_time")
+        String expirationTime;
         @XmlElement(name = "revoke_date")
         String revoke;
 
@@ -53,15 +53,15 @@ public class CapabilitiesResponses {
         capabilityResponse.id = capability.getPk();
 
         capabilityResponse.secret = capability.getSecret();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        capabilityResponse.description = capability.getTitle();
-        capabilityResponse.expiration = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
+        capabilityResponse.title = capability.getTitle();
+        capabilityResponse.expirationTime = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
         capabilityResponse.revoked = capability.isRevoked();
         if (capability.isRevoked()) {
             capabilityResponse.revoke = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
         }
-        capabilityResponse.creation = ZonedDateTime.of(capability.getCreatedTime(), ZoneOffset.UTC).toString();
+        capabilityResponse.issuedAt = ZonedDateTime.of(capability.getCreatedTime(), ZoneOffset.UTC).toString();
         if (capability.isActive()) {
-            capabilityResponse.start = ZonedDateTime.of(capability.getStartTime(), ZoneOffset.UTC).toString();
+            capabilityResponse.notBeforeTime = ZonedDateTime.of(capability.getStartTime(), ZoneOffset.UTC).toString();
         }
 
         capabilityResponse.readPermission = capability.isReadPermission();
