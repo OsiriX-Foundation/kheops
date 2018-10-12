@@ -19,7 +19,7 @@ public class CapabilitiesResponses {
         @XmlElement(name = "title")
         String title;
 
-        @XmlElement(name = "issued_at")
+        @XmlElement(name = "issued_at_time")
         String issuedAt;
         @XmlElement(name = "not_before_time")
         String notBeforeTime;
