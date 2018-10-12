@@ -54,14 +54,14 @@ public class CapabilitiesResponses {
 
         capabilityResponse.secret = capability.getSecret();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         capabilityResponse.title = capability.getTitle();
-        capabilityResponse.expirationTime = ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).toString();
+        capabilityResponse.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
         capabilityResponse.revoked = capability.isRevoked();
         if (capability.isRevoked()) {
             capabilityResponse.revoke = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
         }
-        capabilityResponse.issuedAt = ZonedDateTime.of(capability.getCreatedTime(), ZoneOffset.UTC).toString();
+        capabilityResponse.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
         if (capability.isActive()) {
-            capabilityResponse.notBeforeTime = ZonedDateTime.of(capability.getStartTime(), ZoneOffset.UTC).toString();
+            capabilityResponse.notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
         }
 
         capabilityResponse.readPermission = capability.isReadPermission();

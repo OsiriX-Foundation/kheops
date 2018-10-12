@@ -20,20 +20,20 @@ public class Capability {
 
     @Basic(optional = false)
     @Column(name = "created_time", updatable = false)
-    private LocalDateTime createdTime;
+    private LocalDateTime issuedAtTime;
 
     @Basic(optional = false)
     @Column(name = "updated_time")
     private LocalDateTime updatedTime;
 
     @Column(name = "expiration_time")
-    private LocalDateTime expiration;
+    private LocalDateTime expirationTime;
 
     @Column(name = "revoked_time")
     private LocalDateTime revokedTime;
 
     @Column(name = "start_time")
-    private LocalDateTime startTime;
+    private LocalDateTime notBeforeTime;
 
     @Basic(optional = false)
     @Column(name = "title")
@@ -74,10 +74,10 @@ public class Capability {
     @PrePersist
     public void onPrePersist() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        createdTime = now;
+        issuedAtTime = now;
         updatedTime = now;
-        if(startTime == null) {
-            startTime = now;
+        if(notBeforeTime == null) {
+            notBeforeTime = now;
         }
     }
 
@@ -125,8 +125,8 @@ public class Capability {
 
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequest {
         this.secret = Capabilities.newCapabilityToken();
-        this.expiration = builder.expirationTime;
-        this.startTime = builder.notBeforeTime;
+        this.expirationTime = builder.expirationTime;
+        this.notBeforeTime = builder.notBeforeTime;
         this.title  = builder.title;
         this.user = builder.user;
         builder.scopeType.setCapabilityEntityScope(this, builder.album, builder.study, builder.series);
@@ -135,9 +135,9 @@ public class Capability {
         builder.user.getCapabilities().add(this);
     }
 
-    public LocalDateTime getExpiration() { return expiration; }
+    public LocalDateTime getExpirationTime() { return expirationTime; }
 
-    public void setExpiration(LocalDateTime expiration) { this.expiration = expiration; }
+    public void setExpirationTime(LocalDateTime expirationTime) { this.expirationTime = expirationTime; }
 
     public boolean isRevoked() { return revokedTime != null; }
 
@@ -168,13 +168,13 @@ public class Capability {
 
     public long getPk() { return pk; }
 
-    public LocalDateTime getCreatedTime() { return createdTime; }
+    public LocalDateTime getIssuedAtTime() { return issuedAtTime; }
 
     public LocalDateTime getUpdatedTime() { return updatedTime; }
 
-    public  LocalDateTime getStartTime() {return startTime; }
+    public  LocalDateTime getNotBeforeTime() {return notBeforeTime; }
 
-    public boolean isActive() {return startTime != null; }
+    public boolean isActive() {return notBeforeTime != null; }
 
     public String getSecret() { return secret; }
 

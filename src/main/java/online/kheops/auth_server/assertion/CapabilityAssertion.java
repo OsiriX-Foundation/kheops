@@ -33,11 +33,11 @@ final class CapabilityAssertion implements Assertion {
                     throw new BadAssertionException("Capability token is revoked");
                 }
 
-                if (ZonedDateTime.of(capability.getStartTime(), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
+                if (ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
                     throw new BadAssertionException("Capability token is not yet valid");
                 }
 
-                if (ZonedDateTime.of(capability.getExpiration(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
+                if (ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
                     throw new BadAssertionException("Capability token is expired");
                 }
 
