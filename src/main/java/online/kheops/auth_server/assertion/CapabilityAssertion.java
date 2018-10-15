@@ -34,7 +34,7 @@ final class CapabilityAssertion implements Assertion {
                 }
 
                 if (ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
-                    throw new BadAssertionException("Capability token is not yet valid    "+ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC)+"  --------  "+ZonedDateTime.now());
+                    throw new BadAssertionException("Capability token is not yet valid");
                 }
 
                 if (ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
