@@ -97,11 +97,11 @@ CREATE TABLE series (
 
 CREATE TABLE capabilities (
   pk BIGINT NOT NULL AUTO_INCREMENT,
-  created_time DATETIME NOT NULL,
-  updated_time DATETIME NOT NULL,
-  expiration_time DATETIME,
-  start_time DATETIME,
-  revoked_time DATETIME,
+  created_time DATETIME(3) NOT NULL,
+  updated_time DATETIME(3) NOT NULL,
+  expiration_time DATETIME(3),
+  start_time DATETIME(3),
+  revoked_time DATETIME(3),
   title VARCHAR(255),
   secret VARCHAR(255),
   read_permission BOOLEAN NOT NULL,

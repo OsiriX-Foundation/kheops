@@ -77,7 +77,7 @@ public class Capability {
         issuedAtTime = now;
         updatedTime = now;
         if(notBeforeTime == null) {
-            notBeforeTime = now.minusSeconds(2);
+            notBeforeTime = now;
         }
     }
 
