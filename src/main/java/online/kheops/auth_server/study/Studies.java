@@ -321,10 +321,10 @@ public class Studies {
     }
 
     private interface CheckMethode {
-        public String intervalBegin();
-        public String intervalEnd();
-        public void check(String s) throws BadQueryParametersException;
-        public TableField getColumn();
+        String intervalBegin();
+        String intervalEnd();
+        void check(String s) throws BadQueryParametersException;
+        TableField getColumn();
     }
 
     private static class CheckTime implements CheckMethode {

@@ -41,22 +41,22 @@ public class AlbumQueries {
     }
 
     public static List<AlbumUser> findAlbumsUserByUser(User targetUser, EntityManager em) {
-        TypedQuery<AlbumUser> query = em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user", AlbumUser.class);
-        query.setParameter("targetUser", targetUser);
-        return query.getResultList();
+        return em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user", AlbumUser.class)
+                .setParameter("targetUser", targetUser)
+                .getResultList();
     }
 
     public static Album findAlbumByPk(long albumPk, EntityManager em) throws NoResultException{
-        TypedQuery<Album> query = em.createQuery("SELECT a from Album a where :albumPk = a.pk", Album.class);
-        query.setParameter("albumPk", albumPk);
-        return query.getSingleResult();
+        return em.createQuery("SELECT a from Album a where :albumPk = a.pk", Album.class)
+                .setParameter("albumPk", albumPk)
+                .getSingleResult();
     }
 
     public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em ) throws NoResultException {
-        TypedQuery<AlbumUser> query = em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user and :targetAlbum = a.album", AlbumUser.class);
-        query.setParameter("targetUser", user);
-        query.setParameter("targetAlbum", album);
-        return query.getSingleResult();
+        return em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user and :targetAlbum = a.album", AlbumUser.class)
+                .setParameter("targetUser", user)
+                .setParameter("targetAlbum", album)
+                .getSingleResult();
     }
 
     private static DataSource getDataSource() {
