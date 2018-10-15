@@ -70,7 +70,7 @@ final class JWTAssertion implements Assertion {
             try {
                 jwt = JWT.require(Algorithm.RSA256(keyProvider))
                         .acceptLeeway(120)
-                        .acceptExpiresAt(86400)
+                        .acceptExpiresAt(86400) //TODO
                         .build().verify(assertionToken);
             } catch (JWTVerificationException e) {
                 throw new BadAssertionException("Verification of the token failed, configuration URL:" + configurationUrl, e);

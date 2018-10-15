@@ -13,4 +13,6 @@ public class Consts {
     public static final String QUERY_PARAMETER_OFFSET = "offset";
     public static final String QUERY_PARAMETER_FUZZY_MATCHING = "fuzzymatching";
 
+    public static final long CAPABILITY_LEEWAY_SECONDE = 5;
+
 }

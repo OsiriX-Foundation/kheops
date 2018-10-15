@@ -1,12 +1,17 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.util.Consts.*;
 import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.capability.CapabilityBadRequest;
+import online.kheops.auth_server.capability.CapabilityNotValidException;
 import online.kheops.auth_server.capability.ScopeType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
+import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECONDE;
 
 @SuppressWarnings("unused")
 @Entity
@@ -175,6 +180,19 @@ public class Capability {
     public  LocalDateTime getNotBeforeTime() {return notBeforeTime; }
 
     public boolean isActive() {return notBeforeTime != null; }
+
+    public void isValid() throws CapabilityNotValidException {
+        if (isRevoked()) {
+            throw new CapabilityNotValidException("Capability token is revoked");
+        }
+        if (ZonedDateTime.of(getNotBeforeTime().minusSeconds(CAPABILITY_LEEWAY_SECONDE), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
+            throw new CapabilityNotValidException("Capability token is not yet valid");
+        }
+
+        if (ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECONDE), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
+            throw new CapabilityNotValidException("Capability token is expired");
+        }
+    }
 
     public String getSecret() { return secret; }
 

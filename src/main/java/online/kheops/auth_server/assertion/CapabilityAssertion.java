@@ -2,6 +2,7 @@ package online.kheops.auth_server.assertion;
 
 import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.capability.CapabilityNotValidException;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.*;
@@ -29,17 +30,7 @@ final class CapabilityAssertion implements Assertion {
                 query.setParameter("secret", capabilityToken);
                 final Capability capability = query.getSingleResult();
 
-                if (capability.isRevoked()) {
-                    throw new BadAssertionException("Capability token is revoked");
-                }
-
-                if (ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
-                    throw new BadAssertionException("Capability token is not yet valid");
-                }
-
-                if (ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
-                    throw new BadAssertionException("Capability token is expired");
-                }
+                capability.isValid();
 
                 final String username = capability.getUser().getGoogleId();
                 final String email = capability.getUser().getGoogleEmail();
@@ -49,6 +40,8 @@ final class CapabilityAssertion implements Assertion {
                 return new CapabilityAssertion(username, email);
             } catch (NoResultException e) {
                 throw new BadAssertionException("Unknown capability token");
+            } catch (CapabilityNotValidException e) {
+                throw new BadAssertionException(e.getMessage());
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
