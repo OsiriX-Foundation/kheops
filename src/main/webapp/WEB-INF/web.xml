@@ -44,6 +44,4 @@
         <param-name>online.kheops.jdbc.password</param-name>
         <param-value>root</param-value>
     </context-param>
-
-
 </web-app>

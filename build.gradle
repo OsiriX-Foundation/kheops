@@ -36,6 +36,7 @@ dependencies {
     compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.26'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.26'
 
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.46'
 

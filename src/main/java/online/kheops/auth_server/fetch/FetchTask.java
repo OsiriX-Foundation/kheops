@@ -1,19 +1,8 @@
 package online.kheops.auth_server.fetch;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.PACSAuthTokenBuilder;
-import online.kheops.auth_server.entity.Series;
-import online.kheops.auth_server.entity.Study;
-import online.kheops.auth_server.marshaller.AttributesListMarshaller;
-import online.kheops.auth_server.util.Consts;
-import org.dcm4che3.data.Attributes;
 
 import javax.persistence.*;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
@@ -115,7 +104,7 @@ public class FetchTask implements Runnable {
         /*UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
 
         Client client = ClientBuilder.newClient();
-        client.register(AttributesListMarshaller.class);
+        client.register(JSONAttributesListMarshaller.class);
 
         for (UIDPair seriesUID: unpopulatedSeriesUIDs) {
             URI uri = uriBuilder.build(seriesUID.getStudyInstanceUID(), seriesUID.getSeriesInstanceUID());
@@ -163,7 +152,7 @@ public class FetchTask implements Runnable {
         /*UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
 
         Client client = ClientBuilder.newClient();
-        client.register(AttributesListMarshaller.class);
+        client.register(JSONAttributesListMarshaller.class);
 
         for (String studyInstanceUID: unpopulatedStudyUIDs) {
             final URI uri = uriBuilder.build(studyInstanceUID);

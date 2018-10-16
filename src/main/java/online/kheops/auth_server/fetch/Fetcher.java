@@ -4,7 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
-import online.kheops.auth_server.marshaller.AttributesListMarshaller;
+import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
 
@@ -30,7 +30,7 @@ public abstract class Fetcher {
 
     private static Client newClient() {
         final Client client = ClientBuilder.newClient();
-        client.register(AttributesListMarshaller.class);
+        client.register(JSONAttributesListMarshaller.class);
         return client;
     }
 

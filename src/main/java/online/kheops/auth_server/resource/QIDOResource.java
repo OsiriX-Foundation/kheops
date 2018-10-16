@@ -49,7 +49,7 @@ public class QIDOResource {
     @GET
     @Secured
     @Path("studies")
-    @Produces("application/dicom+json")
+    @Produces({"application/dicom+json; qs=1, application/dicom+xml; qs=0.9"})
     public Response getStudies(@QueryParam("album") Long fromAlbumPk,
                                @QueryParam("inbox") Boolean fromInbox,
                                @Context SecurityContext securityContext) {
