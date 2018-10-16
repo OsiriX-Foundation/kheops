@@ -75,8 +75,18 @@ public class QIDOResource {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
+        if(pair.getXTotalCount() == 0) {
+            return Response.status(Response.Status.NO_CONTENT).header("X-Total-Count", pair.getXTotalCount()).build();
+        }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
-        return Response.ok(genericAttributesList).header("X-Total-Count", pair.getXTotalCount()).build();
+        Response.ResponseBuilder response = Response.ok(genericAttributesList).header("X-Total-Count", pair.getXTotalCount());
+
+        final long remaining = pair.getAttributesList().size() - pair.getXTotalCount();
+        if ( remaining > 0) {
+            response.header("Warning","Warning: 299 {+service}: There are "+ remaining +" additional results that can be requested");
+        }
+
+        return response.build();
     }
 }
