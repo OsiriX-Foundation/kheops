@@ -6,10 +6,13 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.resource.TokenResource;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
+import online.kheops.auth_server.user.UsersPermission;
 
 import javax.annotation.Priority;
 import javax.persistence.EntityManager;
@@ -74,8 +77,21 @@ public class SecuredFilter implements ContainerRequestFilter {
             try {
                 tx.begin();
                 LOG.info("User not found, creating a new User");
-                User newUser = new User(assertion.getUsername(), assertion.getEmail());
+                final User newUser = new User(assertion.getUsername(), assertion.getEmail());
+                final Album inbox = new Album();
+                inbox.setName("inbox");
+                newUser.setInbox(inbox);
+                final UsersPermission usersPermission = new UsersPermission();
+                usersPermission.setInboxPermission();
+                inbox.setPermission(usersPermission);
+
+                final AlbumUser albumUser = new AlbumUser(inbox, newUser, false);
+                albumUser.setNewCommentNotifications(false);
+                albumUser.setNewSeriesNotifications(false);
+
+                em.persist(inbox);
                 em.persist(newUser);
+                em.persist(albumUser);
                 tx.commit();
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
@@ -90,7 +106,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             try {
                 user = Users.getUser(assertion.getUsername());
             } catch (UserNotFoundException e) {
-                throw new IllegalStateException("Unable to find user");
+                throw new IllegalStateException("Unable to find user");//TODO
             }
 
         }
