@@ -21,7 +21,7 @@ import java.util.List;
 import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_ANNOTATIONS;
 
 @Provider
-@Produces("application/dicom+xml")
+@Produces("multipart/related;type=\"application/dicom+xml\"")
 public class XMLAttributesListWriter implements MessageBodyWriter<List<Attributes>> {
 
     private final Providers providers;

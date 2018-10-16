@@ -20,10 +20,13 @@ import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,21 +35,21 @@ import java.util.logging.Logger;
 @Priority(Priorities.AUTHENTICATION)
 public class SecuredFilter implements ContainerRequestFilter {
 
-    private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
 
     @Context
     ServletContext context;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new NotAuthorizedException("Bearer authorization header must be provided");
+        final String token;
+        try {
+            token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
+        } catch (IllegalArgumentException e) {
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
         }
-
-        // Extract the token from the HTTP Authorization header
-        String token = authorizationHeader.substring("Bearer".length()).trim();
 
         final Assertion assertion;
         try {
@@ -138,5 +141,39 @@ public class SecuredFilter implements ContainerRequestFilter {
                 return "BEARER";
             }
         });
+    }
+
+    public static String getToken(String authorizationHeader) {
+        final String token;
+        if (authorizationHeader != null) {
+
+            if (authorizationHeader.toUpperCase().startsWith("BASIC ")) {
+                final String encodedAuthorization = authorizationHeader.substring(6);
+
+                final String decoded = new String(Base64.getDecoder().decode(encodedAuthorization), StandardCharsets.UTF_8);
+                String[] split = decoded.split(":");
+                if (split.length != 2) {
+                    LOG.log(Level.WARNING, "Basic authentication doesn't have a username and password");
+                    throw new IllegalArgumentException();
+                }
+
+                token = split[1];
+            } else if (authorizationHeader.toUpperCase().startsWith("BEARER ")) {
+                token = authorizationHeader.substring(7);
+            } else {
+                LOG.log(Level.WARNING, "Unknown authorization header");
+                throw new IllegalArgumentException();
+            }
+
+            if (token.length() == 0) {
+                LOG.log(Level.WARNING, "Empty authorization token");
+                throw new IllegalArgumentException();
+            }
+        } else {
+            LOG.log(Level.WARNING, "Missing authorization header");
+            throw new IllegalArgumentException();
+        }
+
+        return token;
     }
 }

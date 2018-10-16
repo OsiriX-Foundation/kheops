@@ -80,7 +80,7 @@ gretty {
     jvmArgs = [*debugArgs]
 
     httpPort = 7575
-    contextPath = ''
+    contextPath = 'authorization'
     servletContainer = 'tomcat8'
 
     contextConfigFile = 'tomcat-config.xml'

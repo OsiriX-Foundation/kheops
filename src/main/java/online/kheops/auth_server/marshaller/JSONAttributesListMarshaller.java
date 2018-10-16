@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Provider
-@Consumes("application/dicom+json")
-@Produces("application/dicom+json")
+@Consumes("application/dicom+json,application/json")
+@Produces("application/dicom+json,application/json")
 public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
     @Override
