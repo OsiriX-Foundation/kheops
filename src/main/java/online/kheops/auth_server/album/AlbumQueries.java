@@ -1,6 +1,5 @@
 package online.kheops.auth_server.album;
 
-import com.mchange.v2.c3p0.C3P0Registry;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
@@ -11,15 +10,11 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
-import javax.sql.DataSource;
 import javax.ws.rs.core.MultivaluedMap;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.generated.tables.Users.USERS;
@@ -57,20 +52,6 @@ public class AlbumQueries {
                 .setParameter("targetUser", user)
                 .setParameter("targetAlbum", album)
                 .getSingleResult();
-    }
-
-    private static DataSource getDataSource() {
-        Iterator iterator = C3P0Registry.getPooledDataSources().iterator();
-
-        if (!iterator.hasNext()) {
-            throw new RuntimeException("No C3P0 DataSource available");
-        }
-        DataSource dataSource = (DataSource) iterator.next();
-        if (iterator.hasNext()) {
-            LOG.log(Level.SEVERE, "More than one C3P0 Datasource present, picked the first one");
-        }
-
-        return dataSource;
     }
 
     public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(long userPK, MultivaluedMap<String, String> queryParameters)

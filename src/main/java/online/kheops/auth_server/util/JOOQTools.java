@@ -1,18 +1,25 @@
 package online.kheops.auth_server.util;
 
+import com.mchange.v2.c3p0.C3P0Registry;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import org.jooq.Condition;
 import org.jooq.Field;
 
+import javax.sql.DataSource;
 import javax.ws.rs.core.MultivaluedMap;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class JOOQTools {
+public abstract class JOOQTools {
 
     private JOOQTools() { throw new IllegalStateException("Utility class"); }
+
+    private static final Logger LOG = Logger.getLogger(JOOQTools.class.getName());
 
     public static int getLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
         Integer limit;
@@ -56,7 +63,7 @@ public class JOOQTools {
         }
     }
 
-    public static void checkDate (String date) throws BadQueryParametersException {
+    public static void checkDate(String date) throws BadQueryParametersException {
         if (!date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
             throw new BadQueryParametersException("Bad date format : yyyyMMdd");
         }
@@ -116,4 +123,19 @@ public class JOOQTools {
         }
         return null;
     }
+
+    public static DataSource getDataSource() {
+        Iterator iterator = C3P0Registry.getPooledDataSources().iterator();
+
+        if (!iterator.hasNext()) {
+            throw new RuntimeException("No C3P0 DataSource available");
+        }
+        DataSource dataSource = (DataSource) iterator.next();
+        if (iterator.hasNext()) {
+            LOG.log(Level.SEVERE, "More than one C3P0 Datasource present, picked the first one");
+        }
+
+        return dataSource;
+    }
+
 }
