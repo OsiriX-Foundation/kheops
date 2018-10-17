@@ -9,7 +9,6 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.resource.TokenResource;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 import online.kheops.auth_server.user.UsersPermission;
@@ -18,9 +17,7 @@ import javax.annotation.Priority;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.*;
@@ -143,7 +140,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         });
     }
 
-    public static String getToken(String authorizationHeader) {
+    private static String getToken(String authorizationHeader) {
         final String token;
         if (authorizationHeader != null) {
 
