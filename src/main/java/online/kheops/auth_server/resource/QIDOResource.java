@@ -52,10 +52,15 @@ public class QIDOResource {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam("album") Long fromAlbumPk,
                                @QueryParam("inbox") Boolean fromInbox,
+                               @QueryParam("offset") Integer offset,
                                @Context SecurityContext securityContext) {
 
         if (fromAlbumPk != null && fromInbox != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+        }
+
+        if (offset == null) {
+            offset = 0;
         }
 
         final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
@@ -82,8 +87,9 @@ public class QIDOResource {
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
         Response.ResponseBuilder response = Response.ok(genericAttributesList).header("X-Total-Count", pair.getXTotalCount());
 
-        final long remaining = pair.getAttributesList().size() - pair.getXTotalCount();
+        final long remaining = pair.getXTotalCount() - (offset + pair.getAttributesList().size());
         if ( remaining > 0) {
+            // TODO fix {+service}
             response.header("Warning","Warning: 299 {+service}: There are "+ remaining +" additional results that can be requested");
         }
 
