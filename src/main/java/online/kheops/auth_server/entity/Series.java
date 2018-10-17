@@ -95,6 +95,7 @@ public class Series {
         safeAttributeSetString(attributes, Tag.Modality, VR.CS, getModality());
         safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, getTimezoneOffsetFromUTC());
         safeAttributeSetString(attributes, Tag.SeriesDescription, VR.LO, getSeriesDescription());
+        safeAttributeSetString(attributes, Tag.SeriesInstanceUID, VR.UI, getSeriesInstanceUID());
 
         attributes.setInt(Tag.SeriesNumber, VR.IS, getSeriesNumber());
         attributes.setInt(Tag.NumberOfSeriesRelatedInstances, VR.IS, getNumberOfSeriesRelatedInstances());
