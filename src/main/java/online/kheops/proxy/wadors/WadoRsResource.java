@@ -26,10 +26,13 @@ public class WadoRsResource {
     private static final Client CLIENT = ClientBuilder.newClient();
 
     @Context
-    private UriInfo uriInfo;
+    UriInfo uriInfo;
 
     @Context
-    private ServletContext context;
+    ServletContext context;
+
+    @Context
+    HttpHeaders httpHeaders;
 
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}")
@@ -75,7 +78,13 @@ public class WadoRsResource {
 
         Invocation.Builder invocationBuilder = webTarget.request();
         invocationBuilder.header("Authorization", "Bearer " + accessToken.getToken());
-        // TODO don't forget about headers
+
+        MultivaluedMap<String, String> headers = httpHeaders.getRequestHeaders();
+        for (String header: headers.keySet()) {
+            if (!header.equals("Authorization")) {
+                headers.get(header).forEach(value -> invocationBuilder.header(header, value));
+            }
+        }
 
         return invocationBuilder.get(Response.class);
     }

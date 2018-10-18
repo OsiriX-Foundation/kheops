@@ -25,16 +25,16 @@ public class WadoUriResource {
     private static final Client CLIENT = ClientBuilder.newClient();
 
     @Context
-    private UriInfo uriInfo;
+    UriInfo uriInfo;
 
     @Context
-    private ServletContext context;
+    ServletContext context;
 
     @HeaderParam("Accept")
-    private String acceptParam;
+    String acceptParam;
 
     @HeaderParam("Accept-Charset")
-    private String acceptCharsetParam;
+    String acceptCharsetParam;
 
     @GET
     @Path("/password/dicomweb/wado")
