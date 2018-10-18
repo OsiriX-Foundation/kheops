@@ -113,6 +113,8 @@ public class QIDOResource {
                               @Context SecurityContext securityContext,
                               @Context UriInfo uriInfo) {
 
+        LOG.log(Level.SEVERE, "in getSeries");
+
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
@@ -134,6 +136,8 @@ public class QIDOResource {
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
 
+        LOG.log(Level.SEVERE, "getSeries URI:" + uri);
+
         WebTarget webTarget = CLIENT.target(uri);
 
         for (String parameter: queryParameters.keySet()) {
@@ -151,9 +155,13 @@ public class QIDOResource {
             return Response.status(Response.Status.NO_CONTENT).header("X-Total-Count", 0).build();
         }
 
+        LOG.log(Level.SEVERE, "getting all series");
+
         List<Attributes> allSeries = webTarget.request("application/dicom+json")
                 .header("Authorization", "Bearer "+authToken)
                 .get(new GenericType<List<Attributes>>() {});
+
+        LOG.log(Level.SEVERE, "got all series");
 
         List<Attributes> availableSeries = new ArrayList<>();
 

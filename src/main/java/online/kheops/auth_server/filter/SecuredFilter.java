@@ -42,6 +42,8 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         LOG.log(Level.SEVERE, "in SecuredFilter");
 
+        LOG.log(Level.SEVERE, "URI:" + requestContext.getUriInfo().getPath());
+
         LOG.log(Level.SEVERE, "Headers:");
         MultivaluedMap<String, String> headers = requestContext.getHeaders();
         for (String key: headers.keySet()) {
