@@ -202,6 +202,10 @@ public class Capability {
 
     public boolean isWritePermission() { return writePermission; }
 
+    public boolean isAppropriatePermission() { return appropriatePermission; }
+
+    public boolean isDownloadPermission() { return downloadPermission; }
+
     public String getScopeType() { return scopeType; }
 
     public Album getAlbum() { return album; }

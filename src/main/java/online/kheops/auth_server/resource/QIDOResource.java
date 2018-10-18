@@ -85,7 +85,7 @@ public class QIDOResource {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        if(fromInbox != null && !kheopsPrincipal.hasUserReadAccess()) {
+        if(fromInbox != null && !kheopsPrincipal.hasUserAccess()) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
