@@ -59,6 +59,8 @@ public enum ScopeType {
         public CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability) {
             capabilityResponse.albumId = capability.getAlbum().getPk();
             capabilityResponse.scopeType = this.name().toLowerCase();
+            capabilityResponse.appropriatePermission = capability.isAppropriatePermission();
+            capabilityResponse.downloadPermission = capability.isDownloadPermission();
             return capabilityResponse;
         }
 

@@ -35,6 +35,10 @@ public class CapabilitiesResponses {
         boolean readPermission;
         @XmlElement(name = "write_permission")
         boolean writePermission;
+        @XmlElement(name = "download_permission")
+        boolean downloadPermission;
+        @XmlElement(name = "appropriate_permission")
+        boolean appropriatePermission;
 
         @XmlElement(name = "scope_type")
         String scopeType;
@@ -63,9 +67,6 @@ public class CapabilitiesResponses {
         if (capability.isActive()) {
             capabilityResponse.notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
         }
-
-        capabilityResponse.readPermission = capability.isReadPermission();
-        capabilityResponse.writePermission = capability.isWritePermission();
 
         capabilityResponse = ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(capabilityResponse, capability);
 

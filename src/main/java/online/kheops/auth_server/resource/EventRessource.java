@@ -160,7 +160,7 @@ public class EventRessource {
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
-        if(!kheopsPrincipal.hasUserWriteAccess()) {
+        if(!kheopsPrincipal.hasUserAccess()) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 

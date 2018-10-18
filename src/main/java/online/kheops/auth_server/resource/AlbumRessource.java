@@ -35,7 +35,7 @@ public class AlbumRessource {
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if(!kheopsPrincipal.hasUserWriteAccess()) {
+        if(!kheopsPrincipal.hasUserAccess()) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -74,7 +74,7 @@ public class AlbumRessource {
         final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
 
-        if(!kheopsPrincipal.hasUserReadAccess()){
+        if(!kheopsPrincipal.hasUserAccess()){
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -361,7 +361,7 @@ public class AlbumRessource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!(kheopsPrincipal.hasUserWriteAccess() && kheopsPrincipal.hasAlbumAccess(albumPk))){
+            if(!(kheopsPrincipal.hasUserAccess() && kheopsPrincipal.hasAlbumAccess(albumPk))){
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -388,7 +388,7 @@ public class AlbumRessource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!(kheopsPrincipal.hasUserWriteAccess() && kheopsPrincipal.hasAlbumAccess(albumPk))){
+            if(!(kheopsPrincipal.hasUserAccess() && kheopsPrincipal.hasAlbumAccess(albumPk))){
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
