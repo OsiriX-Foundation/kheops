@@ -14,10 +14,12 @@ public class CapabilityParameters {
     private String studyInstanceUID;
     private final boolean readPermission;
     private final boolean writePermission;
+    private final boolean appropriatePermission;
+    private final boolean downloadPermission;
 
     protected CapabilityParameters(Long callingUserPk, String title, LocalDateTime expirationTime, LocalDateTime notBeforeTime,
                                    ScopeType scopeType, Long albumPk, String studyInstanceUID, String seriesInstanceUID,
-                                   boolean readPermission, boolean writePermission) {
+                                   boolean readPermission, boolean writePermission, boolean appropriatePermission, boolean downloadPermission) {
         this.callingUserPk = callingUserPk;
         this.title = title;
         this.expirationTime = expirationTime;
@@ -28,6 +30,8 @@ public class CapabilityParameters {
         this.readPermission = readPermission;
         this.writePermission = writePermission;
         this.scopeType = scopeType;
+        this.appropriatePermission = appropriatePermission;
+        this.downloadPermission = downloadPermission;
     }
 
     public Long getCallingUserPk() { return callingUserPk; }
@@ -40,6 +44,7 @@ public class CapabilityParameters {
     public String getStudyInstanceUID() { return studyInstanceUID; }
     public boolean isReadPermission() {  return readPermission; }
     public boolean isWritePermission() { return writePermission; }
-
+    public boolean isAppropriatePermission() { return appropriatePermission; }
+    public boolean isDownloadPermission() { return downloadPermission; }
 }
 

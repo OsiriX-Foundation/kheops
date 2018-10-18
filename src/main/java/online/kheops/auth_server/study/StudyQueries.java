@@ -24,7 +24,7 @@ public class StudyQueries {
     }
 
     public static Study findStudyByStudyUIDandUser(String studyInstanceUID, User user, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s  join s.study st where u=:user and a = u.inbox st.studyInstanceUID = :StudyInstanceUID", Study.class);
+        TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.series s  join s.study st where u=:user and a = u.inbox and st.studyInstanceUID = :StudyInstanceUID", Study.class);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter("user", user);
@@ -32,7 +32,7 @@ public class StudyQueries {
     }
 
     public static Study findStudyByStudyandUser(Study study, User user, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.series s join s.study st where u=:user and a = u.inbox st = :study", Study.class);
+        TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.series s join s.study st where u=:user and st = :study", Study.class);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         query.setParameter("study", study);
         query.setParameter("user", user);

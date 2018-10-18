@@ -76,10 +76,6 @@ public class Study {
     @JoinColumn (name = "study_fk", nullable=true)
     private Set<Event> events = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "study_fk")
-    private Set<Capability> capabilities = new HashSet<>();
-
     @PrePersist
     public void onPrePersist() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -245,8 +241,6 @@ public class Study {
     public void setEvents(Set<Event> events) { this.events = events; }
 
     public void addEvents(Event event) { this.events.add(event); }
-
-    public void addCapability(Capability capability) { this.capabilities.add(capability); }
 }
 
 

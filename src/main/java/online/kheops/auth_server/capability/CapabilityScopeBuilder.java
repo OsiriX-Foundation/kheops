@@ -17,17 +17,6 @@ public class CapabilityScopeBuilder{
         scopeType = ScopeType.ALBUM;
         return capabilityParametersBuilder.scope(this);
     }
-    public CapabilityParametersBuilder seriesScope(String seriesInstanceUID, String studyInstanceUID) {
-        this.seriesInstanceUID = seriesInstanceUID;
-        this.studyInstanceUID = studyInstanceUID;
-        scopeType = ScopeType.SERIES;
-        return capabilityParametersBuilder.scope(this);
-    }
-    public CapabilityParametersBuilder studyScope(String studyInstanceUID) {
-        this.studyInstanceUID = studyInstanceUID;
-        scopeType = ScopeType.STUDY;
-        return capabilityParametersBuilder.scope(this);
-    }
     public CapabilityParametersBuilder userScope() {
         scopeType = ScopeType.USER;
         return capabilityParametersBuilder.scope(this);

@@ -39,9 +39,9 @@ public class CapabilitiesResource {
                                         @FormParam("not_before_time") String notBeforeTime,
                                         @NotNull @FormParam("scope_type") String scopeType,
                                         @FormParam("album") Long albumPk,
-                                        @FormParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
-                                        @FormParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                         @NotNull @FormParam("read_permission") boolean readPermission,
+                                        @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
+                                        @NotNull @FormParam("download_permission") boolean downloadPermission,
                                         @NotNull @FormParam("write_permission") boolean writePermission,
                                         @Context SecurityContext securityContext) {
 
@@ -53,6 +53,13 @@ public class CapabilitiesResource {
                 .title(title)
                 .readPermission(readPermission)
                 .writePermission(writePermission);
+
+
+
+        if (readPermission) {
+            capabilityParametersBuilder.appropriatePermission(appropriatePermission)
+                    .downloadPermission(downloadPermission);
+        }
         if(notBeforeTime != null) {
             try {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
@@ -63,17 +70,18 @@ public class CapabilitiesResource {
         if(expirationTime != null) {
             try {
                 capabilityParametersBuilder.expirationTime(expirationTime);
+
             } catch (DateTimeParseException e) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
             }
         }
 
         try {
-            capabilityParametersBuilder.scope(scopeType, albumPk, seriesInstanceUID, studyInstanceUID);
+            capabilityParametersBuilder.scope(scopeType, albumPk);
         } catch (CapabilityBadRequest e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = series or study or user or album. Not : "+scopeType).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
         }
 
         CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();

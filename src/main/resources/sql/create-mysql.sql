@@ -97,20 +97,20 @@ CREATE TABLE series (
 
 CREATE TABLE capabilities (
   pk BIGINT NOT NULL AUTO_INCREMENT,
-  created_time DATETIME NOT NULL,
+  issued_at_time DATETIME NOT NULL,
   updated_time DATETIME NOT NULL,
   expiration_time DATETIME,
-  start_time DATETIME,
+  not_before_time DATETIME,
   revoked_time DATETIME,
   title VARCHAR(255),
   secret VARCHAR(255),
   read_permission BOOLEAN NOT NULL,
+  appropriate_permission BOOLEAN,
+  download_permission BOOLEAN,
   write_permission BOOLEAN NOT NULL,
   user_fk BIGINT NOT NULL,
   scope_type VARCHAR(255),
   album_fk BIGINT,
-  series_fk BIGINT,
-  study_fk BIGINT,
 
   PRIMARY KEY (pk),
   INDEX secret_index (secret),
@@ -124,14 +124,6 @@ CREATE TABLE capabilities (
 
   FOREIGN KEY (album_fk)
     REFERENCES album(pk)
-    ON DELETE RESTRICT,
-
-  FOREIGN KEY (series_fk)
-    REFERENCES series(pk)
-    ON DELETE RESTRICT,
-
-  FOREIGN KEY (study_fk)
-    REFERENCES studies(pk)
     ON DELETE RESTRICT
 );
 

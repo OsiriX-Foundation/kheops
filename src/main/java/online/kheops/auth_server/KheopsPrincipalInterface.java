@@ -14,11 +14,10 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     boolean hasSeriesReadAccess(String study, String series) throws SeriesNotFoundException;
     boolean hasStudyReadAccess(String study)  throws StudyNotFoundException;
-    boolean hasUserReadAccess();
+    boolean hasUserAccess();
 
     boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;
     boolean hasStudyWriteAccess(String study);
-    boolean hasUserWriteAccess();
 
     boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId)throws AlbumNotFoundException;
 

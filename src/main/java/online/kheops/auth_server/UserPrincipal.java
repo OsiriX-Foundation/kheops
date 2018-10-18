@@ -84,7 +84,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasUserReadAccess() { return true; }
+    public boolean hasUserAccess() { return true; }
 
     @Override
     public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
@@ -123,9 +123,6 @@ public class UserPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public boolean hasStudyWriteAccess(String study) { return true; }
-
-    @Override
-    public boolean hasUserWriteAccess() { return true; }
 
     @Override
     public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) throws AlbumNotFoundException {
