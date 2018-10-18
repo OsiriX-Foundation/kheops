@@ -32,13 +32,13 @@ public class CapabilitiesResponses {
         boolean revoked;
 
         @XmlElement(name = "read_permission")
-        boolean readPermission;
+        Boolean readPermission;
         @XmlElement(name = "write_permission")
-        boolean writePermission;
+        Boolean writePermission;
         @XmlElement(name = "download_permission")
-        boolean downloadPermission;
+        Boolean downloadPermission;
         @XmlElement(name = "appropriate_permission")
-        boolean appropriatePermission;
+        Boolean appropriatePermission;
 
         @XmlElement(name = "scope_type")
         String scopeType;
