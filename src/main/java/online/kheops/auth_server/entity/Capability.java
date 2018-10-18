@@ -24,7 +24,7 @@ public class Capability {
     private long pk;
 
     @Basic(optional = false)
-    @Column(name = "created_time", updatable = false)
+    @Column(name = "issued_at_time", updatable = false)
     private LocalDateTime issuedAtTime;
 
     @Basic(optional = false)
@@ -37,7 +37,7 @@ public class Capability {
     @Column(name = "revoked_time")
     private LocalDateTime revokedTime;
 
-    @Column(name = "start_time")
+    @Column(name = "not_before_time")
     private LocalDateTime notBeforeTime;
 
     @Basic(optional = false)
@@ -51,6 +51,14 @@ public class Capability {
     @Basic(optional = false)
     @Column(name = "read_permission ", updatable = false)
     private boolean readPermission ;
+
+    @Basic
+    @Column(name = "appropriate_permission ", updatable = false)
+    private boolean appropriatePermission ;
+
+    @Basic
+    @Column(name = "download_permission ", updatable = false)
+    private boolean downloadPermission ;
 
     @Basic(optional = false)
     @Column(name = "write_permission ", updatable = false)
@@ -67,14 +75,6 @@ public class Capability {
     @ManyToOne
     @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
     private Album album;
-
-    @ManyToOne
-    @JoinColumn(name = "series_fk ", insertable=false, updatable=false)
-    private Series series;
-
-    @ManyToOne
-    @JoinColumn(name = "study_fk ", insertable=false, updatable=false)
-    private Study study;
 
     @PrePersist
     public void onPrePersist() {
@@ -137,6 +137,8 @@ public class Capability {
         builder.scopeType.setCapabilityEntityScope(this, builder.album, builder.study, builder.series);
         this.readPermission = builder.readPermission;
         this.writePermission = builder.writePermission;
+        this.appropriatePermission = builder.appropriatePermission;
+        this.downloadPermission = builder.downloadPermission;
         builder.user.getCapabilities().add(this);
     }
 
@@ -208,19 +210,6 @@ public class Capability {
 
     public void setAlbum(Album album) { this.album = album; }
 
-    public void setSeries(Series series) { this.series = series; }
-
-    public void setStudy(Study study) { this.study = study; }
-
-    public Series getSeries() { return series; }
-
-    public Study getStudy() { return study; }
-
-
-
-
-
-
     public static class CapabilityBuilder {
 
         private LocalDateTime issuedAtTime;
@@ -231,6 +220,8 @@ public class Capability {
         private String title;
         private boolean readPermission;
         private boolean writePermission;
+        private boolean appropriatePermission;
+        private boolean downloadPermission;
         private User user;
         private ScopeType scopeType;
         private Album album;
@@ -265,6 +256,14 @@ public class Capability {
         }
         public CapabilityBuilder readPermission (boolean readPermission) {
             this.readPermission = readPermission;
+            return this;
+        }
+        public CapabilityBuilder appropriatePermission (boolean appropriatePermission) {
+            this.appropriatePermission = appropriatePermission;
+            return this;
+        }
+        public CapabilityBuilder downloadPermission (boolean downloadPermission) {
+            this.downloadPermission = downloadPermission;
             return this;
         }
         public CapabilityBuilder writePermission (boolean writePermission) {

@@ -115,6 +115,8 @@ public class Capabilities {
                     .title(capabilityParameters.getTitle())
                     .readPermission(capabilityParameters.isReadPermission())
                     .writePermission(capabilityParameters.isWritePermission())
+                    .appropriatePermission(capabilityParameters.isAppropriatePermission())
+                    .downloadPermission(capabilityParameters.isDownloadPermission())
                     .scopeType(ScopeType.ALBUM)
                     .album(album)
                     .build();
@@ -132,99 +134,7 @@ public class Capabilities {
         }
         return capabilityResponse;
     }
-
-    public static CapabilitiesResponses.CapabilityResponse createSeriesCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, SeriesNotFoundException, CapabilityBadRequest {
-
-        CapabilitiesResponses.CapabilityResponse capabilityResponse;
-
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        try {
-            tx.begin();
-            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
-
-            Series series;
-            try {
-                series = findSeriesByStudyUIDandSeriesUIDFromInbox(user, capabilityParameters.getStudyInstanceUID(), capabilityParameters.getSeriesInstanceUID(), em);
-            } catch (NotFoundException e) {
-                throw new SeriesNotFoundException("Unknown series");
-            }
-            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), series, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
-            final Capability capability = new Capability.CapabilityBuilder()
-                    .user(user)
-                    .expirationTime(capabilityParameters.getExpirationTime())
-                    .notBeforeTime(capabilityParameters.getNotBeforeTime())
-                    .title(capabilityParameters.getTitle())
-                    .readPermission(capabilityParameters.isReadPermission())
-                    .writePermission(capabilityParameters.isWritePermission())
-                    .scopeType(ScopeType.SERIES)
-                    .study(series.getStudy())
-                    .series(series)
-                    .build();
-
-            em.persist(capability);
-            em.persist(user);
-
-            capabilityResponse = capabilityToCapabilitiesResponses(capability);
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-        return capabilityResponse;
-    }
-
-    public static CapabilitiesResponses.CapabilityResponse createStudyCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, StudyNotFoundException, CapabilityBadRequest{
-
-        CapabilitiesResponses.CapabilityResponse capabilityResponse;
-
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        try {
-            tx.begin();
-            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
-
-            final Study study;
-            try {
-                study = findStudyByStudyUIDandUser(capabilityParameters.getStudyInstanceUID(), user, em);
-            } catch (NoResultException e) {
-                throw new StudyNotFoundException("Unknown study : "+capabilityParameters.getStudyInstanceUID());
-            }
-
-            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), study, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
-            final Capability capability = new Capability.CapabilityBuilder()
-                    .user(user)
-                    .expirationTime(capabilityParameters.getExpirationTime())
-                    .notBeforeTime(capabilityParameters.getNotBeforeTime())
-                    .title(capabilityParameters.getTitle())
-                    .readPermission(capabilityParameters.isReadPermission())
-                    .writePermission(capabilityParameters.isWritePermission())
-                    .scopeType(ScopeType.STUDY)
-                    .study(study)
-                    .build();
-
-            em.persist(capability);
-            em.persist(user);
-
-            capabilityResponse = capabilityToCapabilitiesResponses(capability);
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-        return capabilityResponse;
-    }
-
+    
     public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, long capabilityId)
     throws UserNotFoundException, CapabilityNotFound {
         EntityManager em = EntityManagerListener.createEntityManager();

@@ -54,177 +54,69 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException {
-        if(getScope() == ScopeType.USER) {
-            if(!capability.isReadPermission()) {
-                return false;
-            }
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
-            try {
-                tx.begin();
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
+        try {
+            tx.begin();
+            if(getScope() == ScopeType.USER) {
                 if (canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em)) {
                     return true;
                 } else {
                     throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + "not found");
                 }
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
+            } else if (getScope() == ScopeType.ALBUM && capability.isReadPermission()) {
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
                 }
-                em.close();
-            }
-        } else if (getScope() == ScopeType.ALBUM) {
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
-            try {
-                tx.begin();
                 return canAccessSeries(capability.getAlbum(), studyInstanceUID, seriesInstanceUID, em);
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
             }
-        } else if (getScope() == ScopeType.SERIES) {
-            if(!capability.isReadPermission()) {
-                return false;
-            }
-            if(capability.getSeries().getSeriesInstanceUID() == seriesInstanceUID && capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
-                this.em = EntityManagerListener.createEntityManager();
-                this.tx = em.getTransaction();
-                try {
-                    tx.begin();
-                    return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
-                } finally {
-                    if (tx.isActive()) {
-                        tx.rollback();
-                    }
-                    em.close();
-                }
-            }
-        } else if (getScope() == ScopeType.STUDY) {
-            if(!capability.isReadPermission()) {
-                return false;
-            }
-            if(capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
-                this.em = EntityManagerListener.createEntityManager();
-                this.tx = em.getTransaction();
-                try {
-                    tx.begin();
-                    return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
-                } finally {
-                    if (tx.isActive()) {
-                        tx.rollback();
-                    }
-                    em.close();
-                }
-            }
-        } else {
+        } catch (AlbumNotFoundException e) {
             return false;
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
         return false;
     }
 
     @Override
     public boolean hasStudyReadAccess(String studyInstanceUID) {
-        if(getScope() == ScopeType.USER) {
-            if(!capability.isReadPermission()) {
-                return false;
-            }
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
-            try {
-                tx.begin();
-                final Study study = getStudy(studyInstanceUID, em);
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
+        try {
+            tx.begin();
+            final Study study = getStudy(studyInstanceUID, em);
+            if(getScope() == ScopeType.USER) {
                 return canAccessStudy(user, study, em);
-            } catch (StudyNotFoundException e) {
-                return false;
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-        } else if (getScope() == ScopeType.ALBUM) {
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
-            try {
-                tx.begin();
-                final Album album = getAlbum(capability.getAlbum().getPk(), em);
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
+            } else if (getScope() == ScopeType.ALBUM && capability.isReadPermission()) {
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
-                final Study study = getStudy(studyInstanceUID, em);
                 return canAccessStudy(capability.getAlbum(), study, em);
-            } catch (StudyNotFoundException e) {
-                return false;
-            } catch (AlbumNotFoundException e) {
-                return false;
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
             }
-        } else if (getScope() == ScopeType.SERIES) {
-            if(!capability.isReadPermission()) {
-                return false;
-            }
-            if(capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
-                this.em = EntityManagerListener.createEntityManager();
-                this.tx = em.getTransaction();
-                try {
-                    tx.begin();
-                    final Study study = getStudy(studyInstanceUID, em);
-                    return canAccessStudy(user, study, em);
-                } catch (StudyNotFoundException e) {
-                    return false;
-                } finally {
-                    if (tx.isActive()) {
-                        tx.rollback();
-                    }
-                    em.close();
-                }
-            }
-        } else if (getScope() == ScopeType.STUDY) {
-            if(!capability.isReadPermission()) {
-                return false;
-            }
-            if(capability.getStudy().getStudyInstanceUID() == studyInstanceUID ) {
-                this.em = EntityManagerListener.createEntityManager();
-                this.tx = em.getTransaction();
-                try {
-                    tx.begin();
-                    final Study study = getStudy(studyInstanceUID, em);
-                    return canAccessStudy(user, study, em);
-                } catch (StudyNotFoundException e) {
-                    return false;
-                } finally {
-                    if (tx.isActive()) {
-                        tx.rollback();
-                    }
-                    em.close();
-                }
-            }
-        } else {
+        } catch (StudyNotFoundException | AlbumNotFoundException e) {
             return false;
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
         return false;
     }
 
     @Override
-    public boolean hasUserReadAccess() {
-        return getScope() == ScopeType.USER && capability.isReadPermission();
-    }
+    public boolean hasUserAccess() { return getScope() == ScopeType.USER; }
 
     @Override
     public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
-        if (!capability.isWritePermission()) {
-            return false;
-        }
+
         if (getScope() == ScopeType.USER) {
             try {
                 tx.begin();
@@ -241,69 +133,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                     findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
                     return true;
                 } catch (NoResultException ignored) {
-                    if (!isOrphan(series, em)) {
-                        return true;
-                    }
-                }
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-            return false;
-
-        } else if (getScope() == ScopeType.SERIES) {
-            if(capability.getSeries().getSeriesInstanceUID() != seriesInstanceUID || capability.getStudy().getStudyInstanceUID() != studyInstanceUID) {
-                return false;
-            }
-            try {
-                tx.begin();
-
-                final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-
-                // we need to check here if the series that was found is owned by the user
-                try {
-                    findSeriesBySeriesAndUserInbox(user, series, em);
-                    return true;
-                } catch (NoResultException ignored) {/*empty*/}
-
-                try {
-                    findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
-                    return true;
-                } catch (NoResultException ignored) {
-                    if (!isOrphan(series, em)) {
-                        return true;
-                    }
-                }
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-            return false;
-
-        } else if (getScope() == ScopeType.STUDY) {
-            if(capability.getStudy().getStudyInstanceUID() != studyInstanceUID) {
-                return false;
-            }
-            try {
-                tx.begin();
-
-                final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-
-                // we need to check here if the series that was found is owned by the user
-                try {
-                    findSeriesBySeriesAndUserInbox(user, series, em);
-                    return true;
-                } catch (NoResultException ignored) {/*empty*/}
-
-                try {
-                    findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
-                    return true;
-                } catch (NoResultException ignored) {
-                    if (!isOrphan(series, em)) {
+                    if (isOrphan(series, em)) {
                         return true;
                     }
                 }
@@ -316,18 +146,17 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             return false;
 
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!capability.getAlbum().isAddSeries() || !capability.isWritePermission()) {
+            if (!capability.isWritePermission()) {
                 return false;
             }
             try {
                 tx.begin();
-                final Album album = capability.getAlbum();
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
                 Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                if(album.getSeries().contains(series)) {
+                if(capability.getAlbum().getSeries().contains(series)) {
                     return true;
                 }
             } catch (AlbumNotFoundException | NoResultException e) {
@@ -346,71 +175,19 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     public boolean hasStudyWriteAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
-        if (!capability.isWritePermission()) {
-            return false;
-        }
         if (getScope() == ScopeType.USER) {
            return true;
-        } else if (getScope() == ScopeType.SERIES || getScope() == ScopeType.STUDY) {
-            if(capability.getStudy().getStudyInstanceUID() != studyInstanceUID) {
-                return false;
-            }
-            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!capability.getAlbum().isAddSeries() || !capability.isWritePermission()) {
+
+            if (!capability.isWritePermission()) {
                 return false;
             }
             try {
                 tx.begin();
-                final Album album = capability.getAlbum();
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
-
-                final Study study = findStudyByStudyUID(studyInstanceUID, em);
-                final Study studyInAlbum = findStudyByStudyandAlbum(study, album, em);
-            } catch (AlbumNotFoundException | NoResultException e) {
-                return false;
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean hasUserWriteAccess() {
-        return getScope() == ScopeType.USER && capability.isWritePermission();
-    }
-
-    @Override
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) {
-        if(getScope() == ScopeType.ALBUM){
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
-            try {
-                tx.begin();
-                final Album album = getAlbum(albumId, em);
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
-                if (!albumUser.isAdmin()) {
-                    return false;
-                }
-                if(user.getInbox() == album) {
-                    return false;
-                }
-
-                if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && album.isDownloadSeries()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES && album.isSendSeries()) {
-                    return true;
-                }
-                return usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isSendSeries();
-
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
@@ -419,11 +196,39 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
                 em.close();
             }
-        } else if (getScope() == ScopeType.USER) {
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
-            try {
-                tx.begin();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) {
+
+        if (!this.hasAlbumAccess(albumId)) {
+            return false;
+        }
+
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
+        try {
+            tx.begin();
+            if(getScope() == ScopeType.ALBUM){
+
+                final Album album = em.merge(capability.getAlbum());
+                final AlbumUser albumUser = getAlbumUser(album, user, em);
+
+                if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && capability.isReadPermission()/* && capability.isDownloadPermission*/) {
+                    return true;
+                }
+                if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES  && capability.isReadPermission()/* && capability.isAppropriatePermission*/) {
+                    return true;
+                }
+                if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && capability.isWritePermission()) {
+                    return true;
+                }
+                return false;
+
+            } else if (getScope() == ScopeType.USER) {
+
                 final Album album = getAlbum(albumId, em);
                 final AlbumUser albumUser = getAlbumUser(album, user, em);
                 if(user.getInbox() == album) {
@@ -453,29 +258,30 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS) {
                     return true;
                 }
-                return usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM;
-
-            } catch (AlbumNotFoundException e) {
-                return false;
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
+                if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM) {
+                    return true;
                 }
-                em.close();
+                return false;
             }
-        } else {
+        } catch (AlbumNotFoundException e) {
             return false;
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
+        return false;
     }
 
     @Override
     public boolean hasAlbumAccess(Long albumId) {
+        this.em = EntityManagerListener.createEntityManager();
+        this.tx = em.getTransaction();
         if (getScope() == ScopeType.ALBUM) {
             if (albumId != capability.getAlbum().getPk()) {
                 return false;
             }
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
             try {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
@@ -493,8 +299,6 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 em.close();
             }
         } else if (getScope() == ScopeType.USER) {
-            this.em = EntityManagerListener.createEntityManager();
-            this.tx = em.getTransaction();
             try {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);

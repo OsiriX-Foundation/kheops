@@ -11,6 +11,8 @@ public class CapabilityParametersBuilder {
     private LocalDateTime notBeforeTime;
     private boolean readPermission;
     private boolean writePermission;
+    private boolean downloadPermission;
+    private boolean appropriatePermission;
     private CapabilityScopeBuilder capabilityScopeBuilder;
 
     public CapabilityParametersBuilder() { }
@@ -44,9 +46,9 @@ public class CapabilityParametersBuilder {
         return new CapabilityScopeBuilder(this);
     }
 
-    public CapabilityParametersBuilder scope(String scopeType, Long albumPk, String seriesInstanceUID, String studyInstanceUID)
+    public CapabilityParametersBuilder scope(String scopeType, Long albumPk)
     throws CapabilityBadRequest {
-        ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumPk, seriesInstanceUID, studyInstanceUID);
+        ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumPk);
         return this;
     }
 
@@ -57,6 +59,16 @@ public class CapabilityParametersBuilder {
 
     public CapabilityParametersBuilder readPermission(boolean readPermission) {
         this.readPermission = readPermission;
+        return this;
+    }
+
+    public CapabilityParametersBuilder appropriatePermission(boolean appropriatePermission) {
+        this.appropriatePermission = appropriatePermission;
+        return this;
+    }
+
+    public CapabilityParametersBuilder downloadPermission(boolean downloadPermission) {
+        this.downloadPermission = downloadPermission;
         return this;
     }
 
@@ -87,7 +99,7 @@ public class CapabilityParametersBuilder {
 
         return new CapabilityParameters(callingUserPk, title, expirationTime, notBeforeTime,
                 capabilityScopeBuilder.getScopeType(), capabilityScopeBuilder.getAlbumPk(), capabilityScopeBuilder.getStudyInstanceUID(), capabilityScopeBuilder.getSeriesInstanceUID(),
-                readPermission, writePermission);
+                readPermission, writePermission, appropriatePermission, downloadPermission);
     }
 
 
