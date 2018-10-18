@@ -88,7 +88,9 @@ public class TokenResource
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken, @FormParam("scope") String scope, @FormParam("return_user") String returnUser) {
+    public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken,
+                          @FormParam("scope") String scope,
+                          @FormParam("return_user") String returnUser) {
         UIDPair uidPair = getUIDPairFromScope(scope);
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";

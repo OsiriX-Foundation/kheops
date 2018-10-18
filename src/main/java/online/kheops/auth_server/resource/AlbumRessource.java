@@ -108,7 +108,7 @@ public class AlbumRessource {
 
         try {
             if(!kheopsPrincipal.hasAlbumAccess(albumPk)){
-                return Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
         } catch (AlbumNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
