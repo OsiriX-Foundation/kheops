@@ -8,10 +8,7 @@ import online.kheops.proxy.tokens.AuthorizationToken;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -94,7 +91,13 @@ public class WadoUriResource {
             invocationBuilder.header("Accept-Charset", acceptCharsetParam);
         }
 
-        return invocationBuilder.get(Response.class);
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+
+        Response.ResponseBuilder responseBuilder = Response.fromResponse(invocationBuilder.get(Response.class));
+        responseBuilder.cacheControl(cacheControl);
+
+        return responseBuilder.build();
     }
 
     private URI getParameterURI(String parameter) {

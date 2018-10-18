@@ -61,7 +61,8 @@ public class WadoRsResource {
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
         } catch (AccessTokenException e) {
-            throw new WebApplicationException(Response.Status.BAD_GATEWAY);
+            LOG.log(Level.WARNING, "Unable to get an access token", e);
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
 
         Pattern p = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)");
@@ -86,7 +87,13 @@ public class WadoRsResource {
             }
         }
 
-        return invocationBuilder.get(Response.class);
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+
+        Response.ResponseBuilder responseBuilder = Response.fromResponse(invocationBuilder.get(Response.class));
+        responseBuilder.cacheControl(cacheControl);
+
+        return responseBuilder.build();
     }
 
     private URI getParameterURI(String parameter) {
