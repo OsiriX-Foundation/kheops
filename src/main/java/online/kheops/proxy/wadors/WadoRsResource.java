@@ -90,10 +90,9 @@ public class WadoRsResource {
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        Response.ResponseBuilder responseBuilder = Response.fromResponse(invocationBuilder.get(Response.class));
-        responseBuilder.cacheControl(cacheControl);
-
-        return responseBuilder.build();
+        return Response.fromResponse(invocationBuilder.get(Response.class))
+                .cacheControl(cacheControl)
+                .build();
     }
 
     private URI getParameterURI(String parameter) {
