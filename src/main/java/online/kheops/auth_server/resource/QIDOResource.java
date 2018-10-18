@@ -197,6 +197,8 @@ public class QIDOResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
+        LOG.log(Level.SEVERE, "in getStudiesMetadata");
+
         fromInbox = fromInbox != null;
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
