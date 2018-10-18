@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.KheopsPrincipal;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
@@ -147,7 +146,8 @@ public class QIDOResource {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
 
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
@@ -221,7 +221,8 @@ public class QIDOResource {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        final long callingUserPk = ((KheopsPrincipal)securityContext.getUserPrincipal()).getDBID();
+        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
