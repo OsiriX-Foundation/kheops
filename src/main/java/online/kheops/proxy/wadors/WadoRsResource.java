@@ -34,6 +34,12 @@ public class WadoRsResource {
     @Context
     HttpHeaders httpHeaders;
 
+    @HeaderParam("Accept")
+    String acceptParam;
+
+    @HeaderParam("Accept-Charset")
+    String acceptCharsetParam;
+
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response wado(@HeaderParam("Authorization") String authorizationHeader,
@@ -79,12 +85,11 @@ public class WadoRsResource {
 
         Invocation.Builder invocationBuilder = webTarget.request();
         invocationBuilder.header("Authorization", "Bearer " + accessToken.getToken());
-
-        MultivaluedMap<String, String> headers = httpHeaders.getRequestHeaders();
-        for (String header: headers.keySet()) {
-            if (!header.equals("Authorization")) {
-                headers.get(header).forEach(value -> invocationBuilder.header(header, value));
-            }
+        if (acceptParam != null) {
+            invocationBuilder.header("Accept", acceptParam);
+        }
+        if (acceptCharsetParam != null) {
+            invocationBuilder.header("Accept-Charset", acceptCharsetParam);
         }
 
         final CacheControl cacheControl = new CacheControl();
