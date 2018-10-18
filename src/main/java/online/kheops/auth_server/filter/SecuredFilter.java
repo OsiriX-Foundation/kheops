@@ -40,6 +40,8 @@ public class SecuredFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
+        LOG.log(Level.SEVERE, "in SecuredFilter");
+
         final String token;
         try {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
