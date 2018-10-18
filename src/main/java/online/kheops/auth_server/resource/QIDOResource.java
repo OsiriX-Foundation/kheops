@@ -137,6 +137,7 @@ public class QIDOResource {
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
 
         LOG.log(Level.SEVERE, "getSeries URI:" + uri);
+        LOG.log(Level.SEVERE, "authToken:" + authToken);
 
         WebTarget webTarget = CLIENT.target(uri);
 
