@@ -40,16 +40,6 @@ public class SecuredFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-        LOG.log(Level.SEVERE, "in SecuredFilter");
-
-        LOG.log(Level.SEVERE, "URI:" + requestContext.getUriInfo().getPath());
-
-        LOG.log(Level.SEVERE, "Headers:");
-        MultivaluedMap<String, String> headers = requestContext.getHeaders();
-        for (String key: headers.keySet()) {
-            headers.get(key).forEach(value -> LOG.log(Level.SEVERE, key + ": " + value));
-        }
-
         final String token;
         try {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
@@ -57,8 +47,6 @@ public class SecuredFilter implements ContainerRequestFilter {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
-
-        LOG.log(Level.SEVERE, "token: " + token);
 
         final Assertion assertion;
         try {
@@ -68,8 +56,6 @@ public class SecuredFilter implements ContainerRequestFilter {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
-
-        LOG.log(Level.SEVERE, "assertion: " + assertion);
 
         User user;
         try {
@@ -81,9 +67,6 @@ public class SecuredFilter implements ContainerRequestFilter {
                 user = null;
             }
         }
-
-        LOG.log(Level.SEVERE, "1 user: " + user);
-
         // if the user can't be found, try to build a new one;
         if (user == null) {
             // try to build a new user, building a new user might fail if there is a unique constraint violation
@@ -111,7 +94,7 @@ public class SecuredFilter implements ContainerRequestFilter {
                 em.persist(albumUser);
                 tx.commit();
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Caught exception while creating a new user", e);
+                LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -127,8 +110,6 @@ public class SecuredFilter implements ContainerRequestFilter {
             }
 
         }
-
-        LOG.log(Level.SEVERE, "2 user: " + user);
 
         final long userPK = user.getPk();
         final boolean capabilityAccess = assertion.hasCapabilityAccess();
@@ -157,8 +138,6 @@ public class SecuredFilter implements ContainerRequestFilter {
                 return "BEARER";
             }
         });
-
-        LOG.log(Level.SEVERE, "Finished secure filter");
     }
 
     private static String getToken(String authorizationHeader) {
