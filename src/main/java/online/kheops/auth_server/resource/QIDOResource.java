@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 
 import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
@@ -97,6 +98,11 @@ public class QIDOResource {
             // TODO fix {+service}
             response.header("Warning","Warning: 299 {+service}: There are "+ remaining +" additional results that can be requested");
         }
+
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setPrivate(true);
+        cacheControl.setNoCache(true);
+        response.cacheControl(cacheControl);
 
         return response.build();
     }
