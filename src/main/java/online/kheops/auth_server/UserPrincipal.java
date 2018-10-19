@@ -159,6 +159,9 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             if (usersPermission == UsersPermission.UsersPermissionEnum.WRITE_COMMENT && album.isWriteComments()){
                 return true;
             }
+            if (usersPermission == UsersPermission.UsersPermissionEnum.REMOVE_USER){
+                return true;
+            }
             if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS){
                 return true;
             }
