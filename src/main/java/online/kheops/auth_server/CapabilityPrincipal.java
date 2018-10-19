@@ -160,7 +160,17 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
-                Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                final Series series;
+                try {
+                    series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                } catch (NoResultException e) {
+                    //if the series not exist
+                    return true;
+                }
+                if (isOrphan(series, em)) {
+                    return true;
+                }
+
                 if(capability.getAlbum().getSeries().contains(series)) {
                     return true;
                 }
@@ -190,7 +200,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             try {
                 tx.begin();
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
-                if (!albumUser.isAdmin()) {
+                if (albumUser.isAdmin()) {
+                    return true;
+                } else {
                     return false;
                 }
             } catch (AlbumNotFoundException e) {
@@ -201,8 +213,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
                 em.close();
             }
+        } else {
+            return false;
         }
-        return true;
     }
 
     @Override
