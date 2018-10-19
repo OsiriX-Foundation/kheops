@@ -94,7 +94,12 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             tx.begin();
 
             //find if the series exist
-            final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+            final Series series;
+            try {
+                series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+            } catch (SeriesNotFoundException e) {
+                return true;
+            }
 
             // we need to check here if the series that was found is owned by the user
             try {
