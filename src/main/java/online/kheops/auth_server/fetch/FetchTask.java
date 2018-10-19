@@ -1,10 +1,22 @@
 package online.kheops.auth_server.fetch;
 
+import com.fasterxml.classmate.GenericType;
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.PACSAuthTokenBuilder;
+import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.entity.Study;
+import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
+import online.kheops.auth_server.util.Consts;
 
 import javax.persistence.*;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
+import org.dcm4che3.data.Attributes;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,7 +113,7 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedSeries(List<UIDPair> unpopulatedSeriesUIDs) {
-        /*UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
+       /* UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
 
         Client client = ClientBuilder.newClient();
         client.register(JSONAttributesListMarshaller.class);
@@ -112,8 +124,7 @@ public class FetchTask implements Runnable {
             final Attributes attributes;
             try {
                 String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(seriesUID.getStudyInstanceUID()).withSeriesUID(seriesUID.getSeriesInstanceUID()).build();
-                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {
-                });
+                List<Attributes> seriesList = client.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
                 if (seriesList == null || seriesList.isEmpty()) {
                     throw new WebApplicationException("GET to fetch series returned nothing");
                 }
@@ -149,7 +160,7 @@ public class FetchTask implements Runnable {
     }
 
     private void fetchUnpopulatedStudies(List<String> unpopulatedStudyUIDs) {
-        /*UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
+       /* UriBuilder uriBuilder = UriBuilder.fromUri(dicomWebURI).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
 
         Client client = ClientBuilder.newClient();
         client.register(JSONAttributesListMarshaller.class);
@@ -161,6 +172,7 @@ public class FetchTask implements Runnable {
             try {
                 String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
                 List<Attributes> studyList = client.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
+
                 if (studyList == null || studyList.isEmpty()) {
                     throw new WebApplicationException("GET to fetch study returned nothing");
                 }
@@ -192,8 +204,8 @@ public class FetchTask implements Runnable {
                 }
                 em.close();
             }
-        }*/
-
+        }
+*/
     }
 
 }
