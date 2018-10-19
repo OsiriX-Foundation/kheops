@@ -96,6 +96,7 @@ function M.auth(claim_specs, use_post_secret)
                 ["string"] = function (pattern, val)
 		    ngx.log(ngx.WARN, "pattern: ".. pattern)
 		    ngx.log(ngx.WARN, "val: ".. val)
+		    ngx.log(ngx.WARN, "val: ".. string.match(val, pattern))
                     return string.match(val, pattern) ~= nil
                 end,
 
