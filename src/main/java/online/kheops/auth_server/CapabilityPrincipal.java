@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
+import org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -116,21 +117,27 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
-
+        final User mergeUser = em.merge(user);
         if (getScope() == ScopeType.USER) {
             try {
                 tx.begin();
-
-                final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                final Series series;
+                try {
+                    series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                } catch (NoResultException e) {
+                    //if the series not exist
+                    return true;
+                }
 
                 // we need to check here if the series that was found is owned by the user
+
                 try {
-                    findSeriesBySeriesAndUserInbox(user, series, em);
+                    findSeriesBySeriesAndUserInbox(mergeUser, series, em);
                     return true;
                 } catch (NoResultException ignored) {/*empty*/}
 
                 try {
-                    findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
+                    findSeriesBySeriesAndAlbumWithSendPermission(mergeUser, series, em);
                     return true;
                 } catch (NoResultException ignored) {
                     if (isOrphan(series, em)) {
@@ -151,7 +158,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             }
             try {
                 tx.begin();
-                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), mergeUser, em);
                 if (!albumUser.isAdmin()) {
                     return false;
                 }
