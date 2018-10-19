@@ -47,8 +47,6 @@ public class Indexes {
     public static final Index CAPABILITIES_PRIMARY = Indexes0.CAPABILITIES_PRIMARY;
     public static final Index CAPABILITIES_SECRET_INDEX = Indexes0.CAPABILITIES_SECRET_INDEX;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
-    public static final Index CAPABILITIES_SERIES_FK = Indexes0.CAPABILITIES_SERIES_FK;
-    public static final Index CAPABILITIES_STUDY_FK = Indexes0.CAPABILITIES_STUDY_FK;
     public static final Index CAPABILITIES_USER_FK_INDEX = Indexes0.CAPABILITIES_USER_FK_INDEX;
     public static final Index EVENT_ALBUM_FK = Indexes0.EVENT_ALBUM_FK;
     public static final Index EVENT_PRIMARY = Indexes0.EVENT_PRIMARY;
@@ -93,8 +91,6 @@ public class Indexes {
         public static Index CAPABILITIES_PRIMARY = Internal.createIndex("PRIMARY", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.PK }, true);
         public static Index CAPABILITIES_SECRET_INDEX = Internal.createIndex("secret_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, false);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);
-        public static Index CAPABILITIES_SERIES_FK = Internal.createIndex("series_fk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SERIES_FK }, false);
-        public static Index CAPABILITIES_STUDY_FK = Internal.createIndex("study_fk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.STUDY_FK }, false);
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
         public static Index EVENT_ALBUM_FK = Internal.createIndex("album_fk", Event.EVENT, new OrderField[] { Event.EVENT.ALBUM_FK }, false);
         public static Index EVENT_PRIMARY = Internal.createIndex("PRIMARY", Event.EVENT, new OrderField[] { Event.EVENT.PK }, true);
