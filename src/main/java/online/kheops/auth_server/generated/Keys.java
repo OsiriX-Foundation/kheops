@@ -85,8 +85,6 @@ public class Keys {
     public static final ForeignKey<AlbumUserRecord, UsersRecord> ALBUM_USER_IBFK_2 = ForeignKeys0.ALBUM_USER_IBFK_2;
     public static final ForeignKey<CapabilitiesRecord, UsersRecord> CAPABILITIES_IBFK_1 = ForeignKeys0.CAPABILITIES_IBFK_1;
     public static final ForeignKey<CapabilitiesRecord, AlbumRecord> CAPABILITIES_IBFK_2 = ForeignKeys0.CAPABILITIES_IBFK_2;
-    public static final ForeignKey<CapabilitiesRecord, SeriesRecord> CAPABILITIES_IBFK_3 = ForeignKeys0.CAPABILITIES_IBFK_3;
-    public static final ForeignKey<CapabilitiesRecord, StudiesRecord> CAPABILITIES_IBFK_4 = ForeignKeys0.CAPABILITIES_IBFK_4;
     public static final ForeignKey<EventRecord, AlbumRecord> EVENT_IBFK_1 = ForeignKeys0.EVENT_IBFK_1;
     public static final ForeignKey<EventRecord, StudiesRecord> EVENT_IBFK_2 = ForeignKeys0.EVENT_IBFK_2;
     public static final ForeignKey<EventRecord, UsersRecord> EVENT_IBFK_3 = ForeignKeys0.EVENT_IBFK_3;
@@ -135,8 +133,6 @@ public class Keys {
         public static final ForeignKey<AlbumUserRecord, UsersRecord> ALBUM_USER_IBFK_2 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_USERS_PRIMARY, AlbumUser.ALBUM_USER, "album_user_ibfk_2", AlbumUser.ALBUM_USER.USER_FK);
         public static final ForeignKey<CapabilitiesRecord, UsersRecord> CAPABILITIES_IBFK_1 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_USERS_PRIMARY, Capabilities.CAPABILITIES, "capabilities_ibfk_1", Capabilities.CAPABILITIES.USER_FK);
         public static final ForeignKey<CapabilitiesRecord, AlbumRecord> CAPABILITIES_IBFK_2 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_ALBUM_PRIMARY, Capabilities.CAPABILITIES, "capabilities_ibfk_2", Capabilities.CAPABILITIES.ALBUM_FK);
-        public static final ForeignKey<CapabilitiesRecord, SeriesRecord> CAPABILITIES_IBFK_3 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_SERIES_PRIMARY, Capabilities.CAPABILITIES, "capabilities_ibfk_3", Capabilities.CAPABILITIES.SERIES_FK);
-        public static final ForeignKey<CapabilitiesRecord, StudiesRecord> CAPABILITIES_IBFK_4 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_STUDIES_PRIMARY, Capabilities.CAPABILITIES, "capabilities_ibfk_4", Capabilities.CAPABILITIES.STUDY_FK);
         public static final ForeignKey<EventRecord, AlbumRecord> EVENT_IBFK_1 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_ALBUM_PRIMARY, Event.EVENT, "event_ibfk_1", Event.EVENT.ALBUM_FK);
         public static final ForeignKey<EventRecord, StudiesRecord> EVENT_IBFK_2 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_STUDIES_PRIMARY, Event.EVENT, "event_ibfk_2", Event.EVENT.STUDY_FK);
         public static final ForeignKey<EventRecord, UsersRecord> EVENT_IBFK_3 = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.KEY_USERS_PRIMARY, Event.EVENT, "event_ibfk_3", Event.EVENT.USER_FK);

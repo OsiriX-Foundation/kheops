@@ -88,8 +88,6 @@ public class QIDOResource {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        //TODO if scoopType == series or study : add custom filter
-
         final PairListXTotalCount<Attributes> pair;
 
         try (Connection connection = getDataSource().getConnection()) {

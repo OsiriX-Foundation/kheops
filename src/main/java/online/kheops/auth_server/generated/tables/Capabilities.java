@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
-    private static final long serialVersionUID = 682505441;
+    private static final long serialVersionUID = 413675862;
 
     /**
      * The reference instance of <code>kheops.capabilities</code>
@@ -63,9 +63,9 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     public final TableField<CapabilitiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>kheops.capabilities.created_time</code>.
+     * The column <code>kheops.capabilities.issued_at_time</code>.
      */
-    public final TableField<CapabilitiesRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, Timestamp> ISSUED_AT_TIME = createField("issued_at_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
      * The column <code>kheops.capabilities.updated_time</code>.
@@ -78,9 +78,9 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     public final TableField<CapabilitiesRecord, Timestamp> EXPIRATION_TIME = createField("expiration_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
-     * The column <code>kheops.capabilities.start_time</code>.
+     * The column <code>kheops.capabilities.not_before_time</code>.
      */
-    public final TableField<CapabilitiesRecord, Timestamp> START_TIME = createField("start_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+    public final TableField<CapabilitiesRecord, Timestamp> NOT_BEFORE_TIME = createField("not_before_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
      * The column <code>kheops.capabilities.revoked_time</code>.
@@ -103,6 +103,16 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     public final TableField<CapabilitiesRecord, Byte> READ_PERMISSION = createField("read_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
 
     /**
+     * The column <code>kheops.capabilities.appropriate_permission</code>.
+     */
+    public final TableField<CapabilitiesRecord, Byte> APPROPRIATE_PERMISSION = createField("appropriate_permission", org.jooq.impl.SQLDataType.TINYINT, this, "");
+
+    /**
+     * The column <code>kheops.capabilities.download_permission</code>.
+     */
+    public final TableField<CapabilitiesRecord, Byte> DOWNLOAD_PERMISSION = createField("download_permission", org.jooq.impl.SQLDataType.TINYINT, this, "");
+
+    /**
      * The column <code>kheops.capabilities.write_permission</code>.
      */
     public final TableField<CapabilitiesRecord, Byte> WRITE_PERMISSION = createField("write_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
@@ -121,16 +131,6 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      * The column <code>kheops.capabilities.album_fk</code>.
      */
     public final TableField<CapabilitiesRecord, Long> ALBUM_FK = createField("album_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>kheops.capabilities.series_fk</code>.
-     */
-    public final TableField<CapabilitiesRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>kheops.capabilities.study_fk</code>.
-     */
-    public final TableField<CapabilitiesRecord, Long> STUDY_FK = createField("study_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * Create a <code>kheops.capabilities</code> table reference
@@ -178,7 +178,7 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.CAPABILITIES_ALBUM_FK, Indexes.CAPABILITIES_PRIMARY, Indexes.CAPABILITIES_SECRET_INDEX, Indexes.CAPABILITIES_SECRET_UNIQUE, Indexes.CAPABILITIES_SERIES_FK, Indexes.CAPABILITIES_STUDY_FK, Indexes.CAPABILITIES_USER_FK_INDEX);
+        return Arrays.<Index>asList(Indexes.CAPABILITIES_ALBUM_FK, Indexes.CAPABILITIES_PRIMARY, Indexes.CAPABILITIES_SECRET_INDEX, Indexes.CAPABILITIES_SECRET_UNIQUE, Indexes.CAPABILITIES_USER_FK_INDEX);
     }
 
     /**
@@ -210,7 +210,7 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      */
     @Override
     public List<ForeignKey<CapabilitiesRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CapabilitiesRecord, ?>>asList(Keys.CAPABILITIES_IBFK_1, Keys.CAPABILITIES_IBFK_2, Keys.CAPABILITIES_IBFK_3, Keys.CAPABILITIES_IBFK_4);
+        return Arrays.<ForeignKey<CapabilitiesRecord, ?>>asList(Keys.CAPABILITIES_IBFK_1, Keys.CAPABILITIES_IBFK_2);
     }
 
     public Users users() {
@@ -219,14 +219,6 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
     public Album album() {
         return new Album(this, Keys.CAPABILITIES_IBFK_2);
-    }
-
-    public Series series() {
-        return new Series(this, Keys.CAPABILITIES_IBFK_3);
-    }
-
-    public Studies studies() {
-        return new Studies(this, Keys.CAPABILITIES_IBFK_4);
     }
 
     /**
