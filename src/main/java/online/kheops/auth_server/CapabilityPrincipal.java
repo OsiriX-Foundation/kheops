@@ -6,7 +6,6 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
-import org.graalvm.compiler.virtual.phases.ea.PartialEscapeClosure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -18,8 +17,7 @@ import static online.kheops.auth_server.series.Series.canAccessSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
-import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
-import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
+
 
 public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
