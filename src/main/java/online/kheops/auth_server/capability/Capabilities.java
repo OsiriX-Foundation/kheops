@@ -50,7 +50,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, SeriesNotFoundException, StudyNotFoundException , CapabilityBadRequest{
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequest{
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
     }
 

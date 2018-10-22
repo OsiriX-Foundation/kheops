@@ -88,7 +88,7 @@ public class CapabilitiesResource {
 
         try {
             capabilityResponse = generateCapability(capabilityParameters);
-        } catch (UserNotFoundException | StudyNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
@@ -126,16 +126,12 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCapabilities(@Context SecurityContext securityContext) {
+    public Response getCapabilities(@Context SecurityContext securityContext,
+                                    @FormParam("show_revoked") boolean showRevoke ) {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses;
-
-        boolean showRevoke = false;
-        if (uriInfo.getQueryParameters().containsKey("show_revoked")) {
-            showRevoke = Boolean.parseBoolean(uriInfo.getQueryParameters().get("show_revoked").get(0));
-        }
-
+        
         try {
             capabilityResponses = Capabilities.getCapabilities(callingUserPk, showRevoke);
         } catch (UserNotFoundException e) {

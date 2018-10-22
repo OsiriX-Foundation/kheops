@@ -30,13 +30,13 @@ public class CapabilitiesQueries {
     }
 
     public static  List<Capability> findCapabilitiesByUserWithRevoke(User user, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user", Capability.class);
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user order by c.issuedAtTime desc", Capability.class);
         query.setParameter("user", user);
         return query.getResultList();
     }
 
     public static  List<Capability> findCapabilitiesByUserWitoutRevoke(User user, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user and c.revokedTime = null", Capability.class);
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user and c.revokedTime = null order by c.issuedAtTime desc", Capability.class);
         query.setParameter("user", user);
         return query.getResultList();
     }
