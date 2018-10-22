@@ -207,12 +207,8 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public User getUser() {
-        return user;
-    }
+    public User getUser() { return user; }
 
     @Override
-    public ScopeType getScope() {
-        return ScopeType.USER;
-    }
+    public ScopeType getScope() { return ScopeType.USER; }
 }
