@@ -234,10 +234,10 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Album album = em.merge(capability.getAlbum());
                 final AlbumUser albumUser = getAlbumUser(album, user, em);
 
-                if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && capability.isReadPermission()/* && capability.isDownloadPermission*/) {
+                if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && capability.isReadPermission() && capability.isDownloadPermission()) {
                     return true;
                 }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES  && capability.isReadPermission()/* && capability.isAppropriatePermission*/) {
+                if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES  && capability.isReadPermission() && capability.isAppropriatePermission()) {
                     return true;
                 }
                 if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && capability.isWritePermission()) {

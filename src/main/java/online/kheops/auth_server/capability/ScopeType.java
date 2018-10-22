@@ -61,6 +61,8 @@ public enum ScopeType {
             capabilityResponse.scopeType = this.name().toLowerCase();
             capabilityResponse.appropriatePermission = capability.isAppropriatePermission();
             capabilityResponse.downloadPermission = capability.isDownloadPermission();
+            capabilityResponse.readPermission = capability.isReadPermission();
+            capabilityResponse.writePermission = capability.isWritePermission();
             return capabilityResponse;
         }
 
@@ -76,8 +78,7 @@ public enum ScopeType {
     };
 
     public abstract CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException,
-            NewCapabilityForbidden, SeriesNotFoundException, StudyNotFoundException, CapabilityBadRequest;
+            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequest;
 
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk)
             throws CapabilityBadRequest;
