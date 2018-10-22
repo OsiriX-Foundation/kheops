@@ -45,7 +45,6 @@ public class UserPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
-
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
