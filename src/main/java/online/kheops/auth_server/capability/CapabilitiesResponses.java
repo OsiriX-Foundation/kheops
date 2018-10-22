@@ -25,8 +25,8 @@ public class CapabilitiesResponses {
         String notBeforeTime;
         @XmlElement(name = "expiration_time")
         String expirationTime;
-        @XmlElement(name = "revoke_date")
-        String revoke;
+        @XmlElement(name = "revoke_time")
+        String revokeTime;
 
         @XmlElement(name = "revoked")
         boolean revoked;
@@ -61,7 +61,7 @@ public class CapabilitiesResponses {
         capabilityResponse.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
         capabilityResponse.revoked = capability.isRevoked();
         if (capability.isRevoked()) {
-            capabilityResponse.revoke = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
+            capabilityResponse.revokeTime = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
         }
         capabilityResponse.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
         if (capability.isActive()) {
