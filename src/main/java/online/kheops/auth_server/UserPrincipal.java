@@ -190,7 +190,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             tx.begin();
             final User userMerge = em.merge(user);
             final Album album = getAlbum(albumId, em);
-            final AlbumUser albumUser = getAlbumUser(album, userMerge, em);
+            final AlbumUser albumUser = getAlbumUser(album, userMerge, em);//user.memberOf(album)
             if (userMerge.getInbox() == album) {
                 throw new AlbumNotFoundException("Album id : " + albumId + " not found");
             } else {
