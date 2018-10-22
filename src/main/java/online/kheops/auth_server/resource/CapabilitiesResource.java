@@ -131,7 +131,7 @@ public class CapabilitiesResource {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses;
-        
+
         try {
             capabilityResponses = Capabilities.getCapabilities(callingUserPk, showRevoke);
         } catch (UserNotFoundException e) {
