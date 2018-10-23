@@ -203,17 +203,22 @@ public class Sending {
             if (targetAlbum.getSeries().contains(availableSeries)) {
                 return;
             }
-            LOG.info("add mutation");
+
             targetAlbum.addSeries(availableSeries);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
-
+            LOG.info("add mutation");
             em.persist(mutation);
+            LOG.info("persist mutation");
             em.persist(availableSeries);
+            LOG.info("persist availableSeries");
             em.persist(targetAlbum);
+            LOG.info("persist targetAlbum");
             em.persist(callingUser);//todo if the series is upload with a token...
-
+            LOG.info("persist callingUser");
             tx.commit();
             LOG.info("COMMIT");
+        } catch(Exception e) {
+            LOG.info("EXCEPTION" + e.getMessage());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
