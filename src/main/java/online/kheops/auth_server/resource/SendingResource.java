@@ -207,7 +207,7 @@ public class SendingResource
         LOG.info("DEBUG: putSeriesInAlbum START StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
+        LOG.info("DEBUG: putSeriesInAlbum START");
         try {
             if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
                 LOG.info("DEBUG: putSeriesInAlbum Forbidden StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
@@ -217,7 +217,7 @@ public class SendingResource
             LOG.info("DEBUG: putSeriesInAlbum not found StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-
+        LOG.info("NEXT NEXT");
         try {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                 LOG.info("DEBUG: putSeriesInAlbum Forbidden2 StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
@@ -227,7 +227,7 @@ public class SendingResource
             LOG.info("DEBUG: putSeriesInAlbum not found 2 StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-
+        LOG.info("NEXT NEXT NEXT NEXT");
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
