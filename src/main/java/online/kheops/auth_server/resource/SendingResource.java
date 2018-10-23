@@ -86,8 +86,8 @@ public class SendingResource
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) && !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(Response.Status.FORBIDDEN).build();
+            if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
         } catch (SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
