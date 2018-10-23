@@ -50,7 +50,6 @@ const actions = {
 			if (user){
 				user = JSON.parse(user);
 				if (user.jwt){
-					console.log('ICI: '+user.jwt);
 					HTTP.defaults.headers.common['authorization'] = 'Bearer '+user.jwt;
 				}
 				commit('LOGIN',user);
