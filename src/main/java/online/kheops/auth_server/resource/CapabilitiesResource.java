@@ -127,7 +127,7 @@ public class CapabilitiesResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapabilities(@Context SecurityContext securityContext,
-                                    @FormParam("show_revoked") boolean showRevoke ) {
+                                    @QueryParam("show_revoked") boolean showRevoke ) {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses;
