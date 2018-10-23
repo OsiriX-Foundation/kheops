@@ -20,6 +20,9 @@ import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import {HTTP} from '@/router/http';
 import '@/filters/filters.js';
 
+
+
+
 Vue.config.productionTip = false
 
 Vue.use(Snotify, options)

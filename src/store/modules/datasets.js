@@ -15,13 +15,20 @@ const getters = {
 
 // actions
 const actions = {
-
-	getDatasets ({ commit }, params) {			
+// +'&sort=PatientID'
+	getDatasets ({ commit }, params) {
 		if (state.end) return;
 		let limit = 10;
 		let offset = (params.pageNb-1) * limit;
-			HTTP.get('studies?limit='+limit+"&offset="+offset,{headers: {'Accept': 'application/dicom+json'}}).then(res => {
+		if (params.filterParams){
+			var request = 'studies?limit='+limit+"&offset="+offset+params.filterParams;
+			commit("SET_END",false);
+		}
+		else {
+			var request = 'studies?limit='+limit+"&offset="+offset} 
+			HTTP.get(request,{headers: {'Accept': 'application/dicom+json'}}).then(res => {
 				let data = state.all;
+				console.log(data);
 				if (!res.data.length){
 					commit("SET_END",true);
 					return;
@@ -36,6 +43,12 @@ const actions = {
 						else t[k] = v;
 
 					})
+					t.is_selected = false;
+					t.is_favorite = false;
+					t.comment = false;
+					t.show_icon = null;
+					data.allSelected =false;
+					data.selectedStudiesNb = 0;
 					data.push(t);
 				})
 				commit('SET_DATASETS', data)
