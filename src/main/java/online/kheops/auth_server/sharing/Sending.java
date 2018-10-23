@@ -175,28 +175,35 @@ public class Sending {
             Series availableSeries;
             try {
                 availableSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+
+                //Todo series already exist ?? if upload with capability token => verify if orphelin => if not => return forbidden
             } catch (NoResultException e2) {
                 // from here the series does not exists
                 // find if the study already exists
+                LOG.info("no result");
                 Study study;
                 try {
                     study = getStudy(studyInstanceUID, em);
                 } catch (StudyNotFoundException ignored) {
+                    LOG.info("it is a new study");
                     // the study doesn't exist, we need to create it
                     study = new Study();
                     study.setStudyInstanceUID(studyInstanceUID);
                     em.persist(study);
+                    LOG.info("new study OK");
                 }
 
                 availableSeries = new Series(seriesInstanceUID);
                 study.getSeries().add(availableSeries);
                 em.persist(study);
                 em.persist(availableSeries);
+                LOG.info("new series OK");
             }
 
             if (targetAlbum.getSeries().contains(availableSeries)) {
                 return;
             }
+            LOG.info("add mutation");
             targetAlbum.addSeries(availableSeries);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
 
@@ -206,6 +213,7 @@ public class Sending {
             em.persist(callingUser);//todo if the series is upload with a token...
 
             tx.commit();
+            LOG.info("COMMIT");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
