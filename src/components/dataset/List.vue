@@ -195,7 +195,6 @@ export default {
 				_.forEach(filters, function(value,filterName) {
 					if (value){
 						filterParams += '&'+filterName+'='+value;
-
 					}
 				});
 					if(filterParams)this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filterParams:filterParams});

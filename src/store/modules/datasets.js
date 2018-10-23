@@ -17,6 +17,7 @@ const getters = {
 const actions = {
 // +'&sort=PatientID'
 	getDatasets ({ commit }, params) {
+		console.log(params);
 		if (state.end) return;
 		let limit = 10;
 		let offset = (params.pageNb-1) * limit;
