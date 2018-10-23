@@ -45,15 +45,16 @@
 				<b-form-checkbox v-model = "data.item.is_selected" @click.native.stop @change="toggleSelected(data.item.is_selected)" >
 				</b-form-checkbox>
 			</template>
-		 	<template slot = 'PatientName' slot-scope='data' @mouseover.native="mouseOver()">{{data.item.PatientName}}<span v-show="data.item.show_icon">
+		 	<template slot = 'PatientName' slot-scope='data'>
+				{{data.item.PatientName}}
+				<div class = 'patientNameIcons'>
 					<span @click = "addFavorite(data.index,'is_favorite')" ><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
 					<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
 					</span>
 						<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
 						</span>
 					<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
-				
-		 	</span>
+				</div>				
 			</template>
 			
 	 	 	<template slot = 'StudyDate' slot-scope='data'>{{data.item.StudyDate[0] | formatDate}}</template>
@@ -85,6 +86,7 @@ export default {
 				{
 					key: "PatientName",
 					label: "Patient Name",
+					tdClass: 'patientName',
 					sortable: true
 				},
 				{
@@ -227,6 +229,19 @@ select{
   background-color: transparent;
   border-color: transparent;
 }
+
+.patientNameIcons{
+	margin-left: 10px;
+	display: none;
+}
+
+.patientName:hover .patientNameIcons {
+	 display:inline; 
+ }
+ 
+ .patientNameIcons span{
+	 margin: 0 3px;
+ }
 </style>
 
 /* eslint-disable */
