@@ -166,23 +166,29 @@ public class Sending {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
+        LOG.info("inside putSeriesInAlbum");
         try {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
             final Album targetAlbum = getAlbum(albumPk, em);
 
+            LOG.info("get album / get user");
+
             final Series availableSeries;
             try {
                 availableSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                LOG.info("series OK");
             } catch (NotFoundException e2) {
+                LOG.info("series PAS OK");
                 throw new SeriesNotFoundException("No series with the given StudyInstanceUID and SeriesInstanceUID");
             }
 
             if (targetAlbum.getSeries().contains(availableSeries)) {
+                LOG.info("series already exist");
                 return;
             }
-
+            LOG.info("add in album");
             targetAlbum.addSeries(availableSeries);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
 
@@ -198,6 +204,7 @@ public class Sending {
             }
             em.close();
         }
+        LOG.info("END");
     }
 
     public static void putStudyInAlbum(long callingUserPk, long albumPk, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox)
