@@ -252,7 +252,8 @@ public class SendingResource
             if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
-            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
+
+            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
