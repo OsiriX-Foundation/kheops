@@ -195,6 +195,7 @@ public class Sending {
 
                 availableSeries = new Series(seriesInstanceUID);
                 study.getSeries().add(availableSeries);
+                availableSeries.setStudy(study);
                 em.persist(study);
                 em.persist(availableSeries);
                 LOG.info("new series OK");
@@ -220,6 +221,7 @@ public class Sending {
             LOG.info("COMMIT");
         } catch(Exception e) {
             LOG.info("EXCEPTION " +e.getStackTrace());
+            e.printStackTrace();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
