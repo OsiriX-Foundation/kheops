@@ -180,17 +180,14 @@ public class Sending {
             } catch (NoResultException e2) {
                 // from here the series does not exists
                 // find if the study already exists
-                LOG.info("no result");
                 Study study;
                 try {
                     study = getStudy(studyInstanceUID, em);
                 } catch (StudyNotFoundException ignored) {
-                    LOG.info("it is a new study");
                     // the study doesn't exist, we need to create it
                     study = new Study();
                     study.setStudyInstanceUID(studyInstanceUID);
                     em.persist(study);
-                    LOG.info("new study OK");
                 }
 
                 availableSeries = new Series(seriesInstanceUID);
@@ -198,7 +195,6 @@ public class Sending {
                 availableSeries.setStudy(study);
                 em.persist(study);
                 em.persist(availableSeries);
-                LOG.info("new series OK");
             }
 
             if (targetAlbum.getSeries().contains(availableSeries)) {
@@ -206,22 +202,12 @@ public class Sending {
             }
 
             em.persist(availableSeries);
-            LOG.info("persist availableSeries");
             targetAlbum.addSeries(availableSeries);
-            LOG.info("add series in album");
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
-            LOG.info("add mutation");
             em.persist(mutation);
-            LOG.info("persist mutation");
             em.persist(targetAlbum);
-            LOG.info("persist targetAlbum");
             em.persist(callingUser);//todo if the series is upload with a token...
-            LOG.info("persist callingUser");
             tx.commit();
-            LOG.info("COMMIT");
-        } catch(Exception e) {
-            LOG.info("EXCEPTION " +e.getStackTrace());
-            e.printStackTrace();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
