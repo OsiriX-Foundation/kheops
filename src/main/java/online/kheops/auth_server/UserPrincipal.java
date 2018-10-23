@@ -110,12 +110,10 @@ public class UserPrincipal implements KheopsPrincipalInterface {
                 findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
                 return true;
             } catch (NoResultException ignored) {
-                if (!isOrphan(series, em)) {
+                if (isOrphan(series, em)) {
                     return true;
                 }
             }
-        } catch (NotFoundException e) {
-            throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + " not found");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
