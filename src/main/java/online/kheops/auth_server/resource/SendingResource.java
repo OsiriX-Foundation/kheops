@@ -204,29 +204,34 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
-
+        LOG.info("DEBUG: putSeriesInAlbum START StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
             if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
+                LOG.info("DEBUG: putSeriesInAlbum Forbidden StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
+            LOG.info("DEBUG: putSeriesInAlbum not found StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                LOG.info("DEBUG: putSeriesInAlbum Forbidden2 StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
+            LOG.info("DEBUG: putSeriesInAlbum not found 2 StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
         } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            LOG.info("DEBUG: putSeriesInAlbum not found 3 StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
