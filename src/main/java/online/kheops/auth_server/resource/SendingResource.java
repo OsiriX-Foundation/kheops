@@ -110,7 +110,6 @@ public class SendingResource
                               @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
                               @Context SecurityContext securityContext) {
 
-        LOG.info("inside appropriate");
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
@@ -119,21 +118,17 @@ public class SendingResource
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                LOG.info("inside appropriate forbidden");
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
-            LOG.info("inside appropriate not found");
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
-            LOG.info("inside appropriate OK");
             Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("inside appropriate YEAH");
         return Response.status(Response.Status.CREATED).build();
     }
 
