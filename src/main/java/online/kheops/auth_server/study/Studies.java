@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
@@ -44,36 +45,55 @@ public class Studies {
 
     private static final Logger LOG = Logger.getLogger(Studies.class.getName());
 
-    public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, MultivaluedMap<String, String> queryParameters, Connection connection)
+    public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, QIDOParams qidoParams, Connection connection)
             throws BadQueryParametersException {
 
         //queryParameters = ConvertDICOMKeyWordToDICOMTag(queryParameters);
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
         Condition fromCondition = trueCondition();
-        if (queryParameters.containsKey("album")) {
-            final Long fromAlbumPk = Long.parseLong(queryParameters.get("album").get(0));
-            fromCondition = ALBUM.PK.eq(fromAlbumPk);
+        if (qidoParams.getAlbum_id().isPresent()) {
+            fromCondition = ALBUM.PK.eq(qidoParams.getAlbum_id().get());
             conditionArrayList.add(fromCondition);
         }
 
-        if (queryParameters.containsKey("inbox")) {
+        if (qidoParams.isFromInbox()) {
             fromCondition = ALBUM.PK.eq(USERS.INBOX_FK);
             conditionArrayList.add(fromCondition);
         }
 
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
-        conditionArrayList.add(createConditonStudyDate(queryParameters));
-        conditionArrayList.add(createConditonStudyTime(queryParameters));
+        if (qidoParams.getStudyDateFilter().isPresent()) {
+            conditionArrayList.add(createConditonStudyDate(qidoParams.getStudyDateFilter().get()));
+        }
+        if (qidoParams.getStudyTimeFilter().isPresent()) {
+            conditionArrayList.add(createConditonStudyTime(qidoParams.getStudyTimeFilter().get()));
+        }
 
-        conditionArrayList.add(createConditon(Tag.AccessionNumber, queryParameters, STUDIES.ACCESSION_NUMBER));
-        conditionArrayList.add(createConditonModality(queryParameters));
-        conditionArrayList.add(createConditon(Tag.ReferringPhysicianName, queryParameters, STUDIES.REFERRING_PHYSICIAN_NAME));
-        conditionArrayList.add(createConditon(Tag.PatientName, queryParameters, STUDIES.PATIENT_NAME));
-        conditionArrayList.add(createConditon(Tag.PatientID, queryParameters, STUDIES.PATIENT_ID));
-        conditionArrayList.add(createConditon(Tag.StudyInstanceUID, queryParameters, STUDIES.STUDY_UID));
-        conditionArrayList.add(createConditon(Tag.StudyID, queryParameters, STUDIES.STUDY_ID));
+        if (qidoParams.getAccessionNumberFilter().isPresent()) {
+            conditionArrayList.add(createConditon(Tag.AccessionNumber, qidoParams.getAccessionNumberFilter().get(), STUDIES.ACCESSION_NUMBER, qidoParams.isFuzzyMatching()));
+        }
+        if (qidoParams.getReferringPhysicianNameFilter().isPresent()) {
+            conditionArrayList.add(createConditon(Tag.ReferringPhysicianName, qidoParams.getReferringPhysicianNameFilter().get(), STUDIES.REFERRING_PHYSICIAN_NAME, qidoParams.isFuzzyMatching()));
+        }
+        if (qidoParams.getPatientNameFilter().isPresent()) {
+            conditionArrayList.add(createConditon(Tag.PatientName, qidoParams.getPatientNameFilter().get(), STUDIES.PATIENT_NAME, qidoParams.isFuzzyMatching()));
+        }
+        if (qidoParams.getPatientIDFilter().isPresent()) {
+            conditionArrayList.add(createConditon(Tag.PatientID, qidoParams.getPatientIDFilter().get(), STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching()));
+        }
+        if (qidoParams.getStudyInstanceUIDFilter().isPresent()) {
+            conditionArrayList.add(createConditon(Tag.StudyInstanceUID, qidoParams.getStudyInstanceUIDFilter().get(), STUDIES.STUDY_UID, qidoParams.isFuzzyMatching()));
+        }
+        if (qidoParams.getStudyIDFilter().isPresent()) {
+            conditionArrayList.add(createConditon(Tag.StudyID, qidoParams.getStudyIDFilter().get(), STUDIES.STUDY_ID, qidoParams.isFuzzyMatching()));
+        }
+
+        if (qidoParams.getModalityFilter().isPresent()) {
+            conditionArrayList.add(createConditonModality(qidoParams.getModalityFilter().get()));
+        }
+
 
         SelectQuery query = create.selectQuery();
         query.addSelect(countDistinct(STUDIES.PK));
@@ -126,14 +146,16 @@ public class Studies {
         }
 
         query.addGroupBy(STUDIES.STUDY_UID);
-        query.addOrderBy(orderBy(queryParameters));
 
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-            query.addLimit(getLimit(queryParameters));
+
+        query.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
+
+        if (qidoParams.getLimit().isPresent()) {
+            query.addLimit(qidoParams.getLimit().get());
         }
 
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-            query.addOffset(getOffset(queryParameters));
+        if (qidoParams.getOffset().isPresent()) {
+            query.addOffset(qidoParams.getOffset().get());
         }
 
         Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = query.fetch();
@@ -145,7 +167,7 @@ public class Studies {
 
             Attributes attributes = new Attributes();
 
-            if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy))) {
+            if (qidoParams.getModalityFilter().isPresent()) {
                 //get all the modalities for the STUDY_UID
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
@@ -218,78 +240,45 @@ public class Studies {
         return queryParameters;
     }
 
-    private static SortField orderBy(MultivaluedMap<String, String> queryParameters) {
+    private static SortField orderBy(int orderBy, boolean descending) {
+        TableField ord =  STUDIES.STUDY_DATE;
 
-        if (queryParameters.containsKey("sort")) {
-            TableField ord;
+        if (orderBy == Tag.StudyDate)
+            ord = STUDIES.STUDY_DATE;
+        else if (orderBy == Tag.StudyTime)
+            ord = STUDIES.STUDY_TIME;
+        else if (orderBy == Tag.AccessionNumber)
+            ord = STUDIES.ACCESSION_NUMBER;
+        else if (orderBy == Tag.ReferringPhysicianName)
+            ord = STUDIES.REFERRING_PHYSICIAN_NAME;
+        else if (orderBy == Tag.PatientName)
+            ord = STUDIES.PATIENT_NAME;
+        else if (orderBy == Tag.PatientID)
+            ord = STUDIES.PATIENT_ID;
+        else if (orderBy == Tag.StudyInstanceUID)
+            ord = STUDIES.STUDY_UID;
+        else if (orderBy == Tag.StudyID)
+            ord = STUDIES.STUDY_ID;
 
-            final Boolean ascDesc = queryParameters.get("sort").get(0).startsWith("-");
-            final String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
-
-            if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.StudyDate)) == 0)
-                ord = STUDIES.STUDY_DATE;
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.StudyTime)) == 0)
-                ord = STUDIES.STUDY_TIME;
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.AccessionNumber)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.AccessionNumber)) == 0)
-                ord = STUDIES.ACCESSION_NUMBER;
-                //ModalitiesInStudy
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.ReferringPhysicianName)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.ReferringPhysicianName)) == 0)
-                ord = STUDIES.REFERRING_PHYSICIAN_NAME;
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.PatientName)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.PatientName)) == 0)
-                ord = STUDIES.PATIENT_NAME;
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.PatientID)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.PatientID)) == 0)
-                ord = STUDIES.PATIENT_ID;
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.StudyInstanceUID)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.StudyInstanceUID)) == 0)
-                ord = STUDIES.STUDY_UID;
-            else if (orderByParameter.compareTo(org.dcm4che3.data.Keyword.valueOf(Tag.StudyID)) == 0 || orderByParameter.compareTo(String.format("%08X", Tag.StudyID)) == 0)
-                ord = STUDIES.STUDY_ID;
-            else throw new BadRequestException("sort: " + queryParameters.get("sort").get(0));
-
-            return ascDesc ? ord.desc() : ord.asc();
-        }
-        //Default sort
-        return STUDIES.STUDY_DATE.desc();
+        return descending ? ord.desc() : ord.asc();
     }
 
-    private static Condition createConditonModality(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy))) {
-            String parameter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy)).get(0);
-            if (parameter.equalsIgnoreCase("null")) {
-                return SERIES.MODALITY.isNull();
-            } else {
-                return SERIES.MODALITY.lower().equal(parameter.toLowerCase());
-            }
-        } else if (queryParameters.containsKey(String.format("%08X", Tag.ModalitiesInStudy))) {
-            String parameter = queryParameters.get(String.format("%08X", Tag.ModalitiesInStudy)).get(0);
-            if (parameter.equalsIgnoreCase("null")) {
-                return SERIES.MODALITY.isNull();
-            } else {
-                return SERIES.MODALITY.lower().equal(parameter.toLowerCase());
-            }
-        }
-        return null;
-    }
-
-    private static Condition createConditonStudyDate(MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException {
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate))) {
-            return createIntervalConditon(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate)).get(0), new CheckDate());
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0), new CheckDate());
+    private static Condition createConditonModality(String filter) {
+        if (filter.equalsIgnoreCase("null")) {
+            return SERIES.MODALITY.isNull();
         } else {
-            return null;
+            return SERIES.MODALITY.lower().equal(filter.toLowerCase());
         }
     }
 
-    private static Condition createConditonStudyTime(MultivaluedMap<String, String> queryParameters)
+    private static Condition createConditonStudyDate(String filter)
             throws BadQueryParametersException {
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime))) {
-            return createIntervalConditon(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime)).get(0), new CheckTime());
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            return createIntervalConditon(queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0), new CheckTime());
-        } else {
-            return null;
-        }
+        return createIntervalConditon(filter, new CheckDate());
+    }
+
+    private static Condition createConditonStudyTime(String filter)
+            throws BadQueryParametersException {
+            return createIntervalConditon(filter, new CheckTime());
     }
 
     private static Condition createIntervalConditon(String parameter, CheckMethode checkMethode)
@@ -361,24 +350,20 @@ public class Studies {
         }
     }
 
-    private static Condition createConditon(Integer tag,  MultivaluedMap<String, String> queryParameters, TableField column)
+    private static Condition createConditon(Integer tag,  String filter, TableField column, Boolean isFuzzyMatching)
             throws BadQueryParametersException {
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
-            return createConditon(queryParameters, Keyword.valueOf(tag), column);
-        } else if (queryParameters.containsKey(String.format("%08X",tag))) {
-            return createConditon(queryParameters, String.format("%08X",tag), column);
-        }
-        return null;
+        return createConditon(filter, Keyword.valueOf(tag), column, isFuzzyMatching);
+
     }
 
-    private static Condition createConditon(MultivaluedMap<String, String> queryParameters, String key, TableField column)
+    private static Condition createConditon(String filter, String key, TableField column, Boolean isFuzzyMatching)
             throws BadQueryParametersException {
-        String parameterNoStar = queryParameters.get(key).get(0).replace("*", "")
+        String parameterNoStar = filter.replace("*", "")
                 .replace(", ", "^")
                 .replace(" ","^")
                 .replace(",", "^");
 
-        String parameter = queryParameters.get(key).get(0);
+        String parameter = filter;
         if (parameterNoStar.length() == 0) {
             return null;
         }
@@ -396,7 +381,7 @@ public class Studies {
                 condition = column.lower().equal(parameterNoStar.toLowerCase());
             }
 
-            if (isFuzzyMatching(queryParameters)) {
+            if (isFuzzyMatching) {
                 Condition fuzzyCondition = condition("SOUNDEX(\""+parameterNoStar+"\") = SOUNDEX("+column.getName()+")");
                 return condition.or(fuzzyCondition);
             }
