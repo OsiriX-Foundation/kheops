@@ -23,6 +23,7 @@ const actions = {
 		let offset = (params.pageNb-1) * limit;
 		if (params.filterParams){
 			var request = 'studies?limit='+limit+"&offset="+offset+params.filterParams;
+			console.log(request);
 			commit("SET_END",false);
 		}
 		else {
@@ -54,6 +55,21 @@ const actions = {
 				})
 				commit('SET_DATASETS', data)
 			});
+	},
+	deleteStudy ({ commit },params) {
+		HTTP.delete('/studies/'+params.StudyInstanceUID[0]+"&inbox=true");
+
+	},
+	downloadStudy ({ commit },params) {
+		console.log(params);
+		
+		// var request = "/zipper/studies/"+params.StudyInstanceUID[0]+"/stream";
+			// var request = '/zipper/studies?limit='+limit+"&offset="+offset+params.filterParams;
+	// 	var request = "/zipper/&studies="+params.StudyInstanceUID[0]+"/stream";
+		// studies?limit=10&offset=0&PatientName=a
+		// HTTP.get(request);
+		// HTTP.GET('/studies/'+params.StudyInstanceUID[0]+"&inbox=true");
+
 	}
 
 

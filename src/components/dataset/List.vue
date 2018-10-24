@@ -5,9 +5,9 @@
 			<span v-if="selectedStudiesNb > 0" >number of studies {{selectedStudiesNb}}</span>
 			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>Send</button>
 			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>add to an album</button>
-			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="download"></v-icon></span><br>Download</button>
+			<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()"><span><v-icon class="align-middle" name="download"></v-icon></span><br>Download</button>
 			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="star"></v-icon></span><br>add to favorites</button>
-			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>Delete</button>
+			<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>Delete</button>
 
 		</div>
 		
@@ -119,7 +119,6 @@ export default {
 				StudyDate: '',
 				ModalitiesInStudy: '',
 			},
-			test:"",
 		}
 	},
   computed: {
@@ -147,18 +146,7 @@ export default {
 		
 		  
 	  },
-	  mouseOver(item, index, event){
-          // item.show_icon = true;
-		  // console.log(item);
-		  console.log('test');
-		  // console.log(index);
- // 		  console.log(event);
-		  
-		  // for (let datasetIndex in this.datasets ){
-//  			  if (datasetIndex != index && this.datasets[datasetIndex].show_icon!== 'undefined' &&  this.datasets[datasetIndex]!== false)this.datasets[datasetIndex].show_icon = false;
-//
-//  		  }
-	  },
+	  
 	  addFavorite(index,entity){
 		  this.datasets[index][entity]= !this.datasets[index][entity];
 		  console.log(this.datasets[index]);
@@ -178,6 +166,27 @@ export default {
 			 
 		});
 		this.datasets.allSelected = ! this.datasets.allSelected;
+	  },
+	  deleteSelectedStudies(){
+		 var vm = this;
+		 var i;
+		 for (i = this.datasets.length-1; i > -1; i--) { 
+			 if(this.datasets[i].is_selected){
+ 			 	vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.datasets[i].StudyInstanceUID})
+ 				vm.$delete(vm.datasets, i);
+ 			 }
+		 }
+		
+	  },
+	  downloadSelectedStudies(){
+		   var vm = this;
+		   _.forEach(this.datasets, function(dataset,index) {
+			   if( dataset.is_selected){
+				   console.log(dataset);
+				   vm.$store.dispatch('downloadStudy',{StudyInstanceUID:dataset.StudyInstanceUID})
+			   }
+		   });
+		
 	  }
 	 
   	
