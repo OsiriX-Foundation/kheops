@@ -10,8 +10,10 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.json.JSONReader;
@@ -77,7 +79,7 @@ public class QIDOResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumAccess(fromAlbumPk)) {
+            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, fromAlbumPk)) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -91,7 +93,8 @@ public class QIDOResource {
         final PairListXTotalCount<Attributes> pair;
 
         try (Connection connection = getDataSource().getConnection()) {
-            pair = findAttributesByUserPKJOOQ(callingUserPk, uriInfo.getQueryParameters(), connection);
+            QIDOParams qidoParams = new QIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
+            pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
             LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
