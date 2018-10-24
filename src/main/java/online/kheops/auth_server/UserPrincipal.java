@@ -120,7 +120,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             }
             em.close();
         }
-        return false;
+        throw new SeriesNotFoundException("SeriesUID : " + seriesInstanceUID + "from studyUID : " + studyInstanceUID + "not found");
     }
 
     @Override
