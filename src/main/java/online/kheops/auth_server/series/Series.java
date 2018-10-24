@@ -56,7 +56,7 @@ public class Series {
         try {
             findSeriesByStudyUIDandSeriesUID(user, studyInstanceUID,  seriesInstanceUID, em);
             return true;
-        }catch (NotFoundException e) {
+        }catch (NoResultException e) {
             return false;
         }
     }
@@ -65,7 +65,7 @@ public class Series {
         try {
             findSeriesByStudyUIDandSeriesUID(album, studyInstanceUID,  seriesInstanceUID, em);
             return true;
-        }catch (NotFoundException e) {
+        }catch (NoResultException e) {
             return false;
         }
     }

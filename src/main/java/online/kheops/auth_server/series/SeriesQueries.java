@@ -118,7 +118,7 @@ public class SeriesQueries {
             query.setParameter("series", series);
             query.getSingleResult();
             return false;
-        } catch (NotFoundException e) {
+        } catch (NoResultException e) {
             return true;
         }
     }
