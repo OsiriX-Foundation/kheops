@@ -1,5 +1,5 @@
 /* eslint-disable */
-<template>	
+<!-- <template>
 	<div class = 'container-fluid'>
 		<div class="my-3">
 			<span v-if="selectedStudiesNb > 0" >number of studies {{selectedStudiesNb}}</span>
@@ -10,9 +10,8 @@
 			<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>Delete</button>
 
 		</div>
-		
-		<b-table striped hover :items="datasets" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  > <!-- @row-hovered="rowOver" -->
-		  <!-- <b-table striped hover :items="datasets" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"> -->
+
+		<b-table striped hover :items="datasets" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  >
 		<template slot="HEAD_PatientName" slot-scope="data">
 				{{data.label}} <br>
 				<input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientName' placeholder="filter">
@@ -33,17 +32,22 @@
 				{{data.label}} <br>
 				<input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' placeholder="filter">
 			</template>
-			
+
 			<template slot="HEAD_is_selected" scope="head">
-			      <!-- <input type="checkbox" @click.stop="toggleSelected" v-model="datasets.allSelected"> -->
   				<b-form-checkbox @click.native.stop @change="selectAll(datasets.allSelected)" v-model="datasets.allSelected" name="allSelected">
   				</b-form-checkbox>
 			    </template>
 			<template slot="is_selected" slot-scope="data">
-				<!-- <b-form-checkbox @click.native.stop @change="row.is_selected = true  " >
-				</b-form-checkbox> -->
-				<b-form-checkbox v-model = "data.item.is_selected" @click.native.stop @change="toggleSelected(data.item.is_selected)" >
-				</b-form-checkbox>
+				<b-form-group>
+					<span><v-icon class="align-middle" name="chevron-right"></v-icon></span>
+					<span><v-icon class="align-middle" name="chevron-down"></v-icon></span>
+				    <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
+				          {{ data.detailsShowing ? 'Hide' : 'Show'}} Details
+				         </b-button>
+					<b-form-checkbox v-model = "data.item.is_selected" @click.native.stop @change="toggleSelected(data.item.is_selected)" >
+					</b-form-checkbox>
+				</b-form-group>
+
 			</template>
 		 	<template slot = 'PatientName' slot-scope='data'>
 				{{data.item.PatientName}}
@@ -54,22 +58,133 @@
 						<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
 						</span>
 					<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
-				</div>				
+				</div>
 			</template>
-			
+
 	 	 	<template slot = 'StudyDate' slot-scope='data'>{{data.item.StudyDate[0] | formatDate}}</template>
-			
 		 </b-table>
 	</div>
-</template>
+</template> -->
+<!-- <template>
+	<b-table :items="items" :fields="fields">
+		<template slot="is_selected" slot-scope="row">
+			<b-form-group>
 
+				<b-button variant="link" size="sm" @click.stop="row.toggleDetails" class="mr-2">
+					<v-icon v-if= "row.detailsShowing" class="align-middle"  @click.stop="row.toggleDetails" name="chevron-down"></v-icon>
+					<v-icon v-else class="align-middle"  @click.stop="row.toggleDetails" name="chevron-right"></v-icon>
+
+				</b-button>
+			</b-form-group>
+
+		</template>
+		<template slot="row-details" slot-scope="row">
+			<b-card>
+				<b-row class="mb-2">
+					<b-col sm="3" class="text-sm-right"><b>Age:</b></b-col>
+					<b-col>{{ row.item.age }}</b-col>
+				</b-row>
+				<b-row class="mb-2">
+					<b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
+					<b-col>{{ row.item.isActive }}</b-col>
+				</b-row>
+				<b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
+			</b-card>
+		</template>
+	</b-table>
+</template> -->
+
+<template>
+	<div class = 'container-fluid'>
+		<div class="my-3">
+			<span v-if="selectedStudiesNb > 0" >{{selectedStudiesNb}} studies are selected</span>
+			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>Send</button>
+			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>add to an album</button>
+			<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()"><span><v-icon class="align-middle" name="download"></v-icon></span><br>Download</button>
+			<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="star"></v-icon></span><br>add to favorites</button>
+			<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>Delete</button>
+
+		</div>
+		<b-table  striped :items="datasets" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy" >
+	
+			<template slot="HEAD_is_selected" scope="head">
+				<b-button variant="link" size="sm"  class="mr-2" >
+					<v-icon  class="align-middle"   name="chevron-down"></v-icon>
+				</b-button>
+  				<b-form-checkbox @click.native.stop @change="selectAll(datasets.allSelected)" v-model="datasets.allSelected" name="allSelected">
+  				</b-form-checkbox>
+			</template>
+			<template slot="HEAD_PatientName" slot-scope="data">
+					{{data.label}} <br>
+					<input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientName' placeholder="filter">
+			</template>
+		 	<template slot="HEAD_PatientID" slot-scope="data">
+				{{data.label}} <br>
+				<input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientID' placeholder="filter">
+			</template>
+		 	<template slot="HEAD_AccessionNumber" slot-scope="data">
+				{{data.label}} <br>
+				<input type = 'search' class = 'form-control form-control-sm' v-model='filters.AccessionNumber' placeholder="filter">
+			</template>
+		 	<template slot="HEAD_StudyDate" slot-scope="data">
+				{{data.label}} <br>
+				<input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDate' placeholder="filter">
+			</template>
+		 	<template slot="HEAD_ModalitiesInStudy" slot-scope="data">
+				{{data.label}} <br>
+				<input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' placeholder="filter">
+			</template>
+		
+			<template slot="is_selected" slot-scope="row">
+				<b-form-group>
+
+					<b-button variant="link" size="sm" @click.stop="row.toggleDetails" class="mr-2">
+						<v-icon v-if= "row.detailsShowing" class="align-middle"  @click.stop="row.toggleDetails" name="chevron-down"></v-icon>
+						<v-icon v-else class="align-middle"  @click.stop="row.toggleDetails" name="chevron-right"></v-icon>
+
+					</b-button>
+					<b-form-checkbox v-model = "row.item.is_selected" @click.native.stop @change="toggleSelected(row.item.is_selected)" >
+					</b-form-checkbox>
+					
+				</b-form-group>
+				
+
+			</template>
+			<template slot="row-details" slot-scope="row">
+				<b-card>
+					<p>here will come the Series</p>
+					<!-- <b-row class="mb-2">
+						<b-col sm="3" class="text-sm-right"><b>Age:</b></b-col>
+						<b-col>{{ row.item.age }}</b-col>
+					</b-row>
+					<b-row class="mb-2">
+						<b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
+						<b-col>{{ row.item.isActive }}</b-col>
+					</b-row> -->
+					<b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
+				</b-card>
+			</template>
+		 	<template slot = 'PatientName' slot-scope='data'>
+				{{data.item.PatientName}}
+				<div class = 'patientNameIcons'>
+					<span @click = "addFavorite(data.index,'is_favorite')" ><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
+					<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
+					</span>
+						<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+						</span>
+					<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+				</div>
+			</template>
+
+	 	 	<template slot = 'StudyDate' slot-scope='data'>{{data.item.StudyDate[0] | formatDate}}</template>
+		</b-table>
+	</div>
+</template>
 
 <script>
 
 import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
-
-
 export default {
   name: 'datasets',
 	data () {
@@ -143,40 +258,40 @@ export default {
 	  toggleSelected(is_selected) {
 		  if(is_selected ) this.selectedStudiesNb = this.selectedStudiesNb -1;
 		  else{this.selectedStudiesNb += 1 }
-		
-		  
+
+
 	  },
-	  
+
 	  addFavorite(index,entity){
 		  this.datasets[index][entity]= !this.datasets[index][entity];
 		  console.log(this.datasets[index]);
-	  	
+
 	  },
 	  handleComments(index,entity){
 		  this.datasets[index][entity]= !this.datasets[index][entity];
-	  	
+
 	  },
 	  selectAll(is_selected){
-		 
+
 		  if (is_selected) this.selectedStudiesNb = 0;
 		  else{this.selectedStudiesNb =  _.size(this.datasets)}
 		_.forEach(this.datasets, function(dataset,index) {
 			dataset.is_selected = !is_selected;
-			
-			 
+
+
 		});
 		this.datasets.allSelected = ! this.datasets.allSelected;
 	  },
 	  deleteSelectedStudies(){
 		 var vm = this;
 		 var i;
-		 for (i = this.datasets.length-1; i > -1; i--) { 
+		 for (i = this.datasets.length-1; i > -1; i--) {
 			 if(this.datasets[i].is_selected){
  			 	vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.datasets[i].StudyInstanceUID})
  				vm.$delete(vm.datasets, i);
  			 }
 		 }
-		
+
 	  },
 	  downloadSelectedStudies(){
 		   var vm = this;
@@ -186,15 +301,15 @@ export default {
 				   vm.$store.dispatch('downloadStudy',{StudyInstanceUID:dataset.StudyInstanceUID})
 			   }
 		   });
-		
+
 	  }
-	 
-  	
+
+
   },
   created () {
-	  
+
 	  this.$store.dispatch('getDatasets',{pageNb: this.pageNb});
-  		
+
   },
   mounted () {
 	  this.scroll();
@@ -209,14 +324,13 @@ export default {
 					}
 				});
 					if(filterParams)this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filterParams:filterParams});
-			 
+
 			},
 			deep: true
 		}
-	  
-	  
+
+
   }
-  
 }
 
 </script>
