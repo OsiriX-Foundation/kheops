@@ -1,8 +1,7 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.util.Consts.*;
 import online.kheops.auth_server.capability.Capabilities;
-import online.kheops.auth_server.capability.CapabilityBadRequest;
+import online.kheops.auth_server.capability.CapabilityBadRequestException;
 import online.kheops.auth_server.capability.CapabilityNotValidException;
 import online.kheops.auth_server.capability.ScopeType;
 
@@ -128,7 +127,7 @@ public class Capability {
         study.addCapability(this);
     }*/
 
-    private Capability(CapabilityBuilder builder) throws CapabilityBadRequest {
+    private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
         this.secret = Capabilities.newCapabilityToken();
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
@@ -295,7 +294,7 @@ public class Capability {
             return this;
         }
 
-        public Capability build() throws CapabilityBadRequest{
+        public Capability build() throws CapabilityBadRequestException {
             if (user == null) {
                 throw new IllegalStateException("Missing user");
             }

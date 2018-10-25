@@ -2,6 +2,7 @@ package online.kheops.auth_server.resource;
 
 
 import online.kheops.auth_server.PACSAuthTokenBuilder;
+import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
@@ -102,6 +103,8 @@ public class QIDOResource {
         } catch (BadQueryParametersException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (AlbumForbiddenException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();

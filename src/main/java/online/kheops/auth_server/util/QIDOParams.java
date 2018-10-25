@@ -2,6 +2,7 @@ package online.kheops.auth_server.util;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
@@ -39,7 +40,7 @@ public class QIDOParams {
     private final Set<Integer> acceptedTagForSorting = new HashSet<Integer>(Arrays.asList(acceptedTagForSortingArray));
 
 
-    public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException {
+    public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException{
         if (queryParameters.containsKey("album")) {
             album_id = Long.parseLong(queryParameters.get("album").get(0));
         }
@@ -47,11 +48,14 @@ public class QIDOParams {
             fromInbox = true;
         }
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, album_id);
-            fromInbox = false;
-            try {
-                album_id = kheopsPrincipal.getAlbumID();
-            } catch (NotAlbumScopeTypeException notUsed) { /*empty*/ }
+            if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, album_id)) {
+                fromInbox = false;
+                try {
+                    album_id = kheopsPrincipal.getAlbumID();
+                } catch (NotAlbumScopeTypeException notUsed) { /*empty*/ }
+            } else {
+                throw new AlbumForbiddenException("Token doesn't have read access");
+            }
         }
         if (queryParameters.containsKey("sort")) {
             descending = queryParameters.get("sort").get(0).startsWith("-");

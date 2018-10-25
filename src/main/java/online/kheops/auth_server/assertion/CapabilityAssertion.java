@@ -3,7 +3,7 @@ package online.kheops.auth_server.assertion;
 import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.CapabilityNotValidException;
-import online.kheops.auth_server.capability.CapabilityNotFound;
+import online.kheops.auth_server.capability.CapabilityNotFoundException;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.*;
@@ -37,7 +37,7 @@ final class CapabilityAssertion implements Assertion {
                 tx.commit();
 
                 return new CapabilityAssertion(capability, username, email);
-            } catch (CapabilityNotFound e) {
+            } catch (CapabilityNotFoundException e) {
                 throw new BadAssertionException("Unknown capability token");
             } catch (CapabilityNotValidException e) {
                 throw new BadAssertionException(e.getMessage());

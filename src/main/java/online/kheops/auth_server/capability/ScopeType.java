@@ -5,21 +5,17 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
-import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.Consts;
 
 import java.time.format.DateTimeParseException;
 
 import static online.kheops.auth_server.capability.Capabilities.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
 
 public enum ScopeType {
     USER {
         @Override
         public CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-                throws UserNotFoundException, DateTimeParseException, CapabilityBadRequest {
+                throws UserNotFoundException, DateTimeParseException, CapabilityBadRequestException {
             return createUserCapability(capabilityParameters);
         }
 
@@ -43,15 +39,15 @@ public enum ScopeType {
     ALBUM {
         @Override
         public CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-                throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequest {
+                throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException {
             return createAlbumCapability(capabilityParameters);
         }
 
         @Override
         public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk)
-                throws CapabilityBadRequest {
+                throws CapabilityBadRequestException {
             if( albumPk == null) {
-                throw new CapabilityBadRequest("The {album} query parameter must be set");
+                throw new CapabilityBadRequestException("The {album} query parameter must be set");
             }
             return capabilityParametersBuilder.scope().albumScope(albumPk);
         }
@@ -67,9 +63,9 @@ public enum ScopeType {
         }
 
         @Override
-        public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequest{
+        public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException {
             if (album == null) {
-                throw new CapabilityBadRequest("\"album\" must be set");
+                throw new CapabilityBadRequestException("\"album\" must be set");
             }
             capability.setAlbum(album);
             capability.setScopeType(this.name().toLowerCase());
@@ -78,13 +74,13 @@ public enum ScopeType {
     };
 
     public abstract CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequest;
+            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException;
 
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk)
-            throws CapabilityBadRequest;
+            throws CapabilityBadRequestException;
 
     public abstract CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability);
 
-    public abstract void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequest;
+    public abstract void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException;
 
 }
