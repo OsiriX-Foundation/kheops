@@ -2,6 +2,7 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.CapabilitySecured;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.Secured;
@@ -85,7 +86,7 @@ public class CapabilitiesResource {
 
         try {
             capabilityResponse = generateCapability(capabilityParameters);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();

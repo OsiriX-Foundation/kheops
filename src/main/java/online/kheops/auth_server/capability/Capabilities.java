@@ -2,6 +2,7 @@ package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
@@ -45,7 +46,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException {
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException, UserNotMemberException {
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
     }
 
@@ -85,7 +86,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException {
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 

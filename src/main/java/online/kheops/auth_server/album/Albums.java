@@ -28,25 +28,26 @@ public class Albums {
     public static AlbumResponses.AlbumResponse cerateAlbum(long callingUserPk, String name, String description, UsersPermission usersPermission)
             throws UserNotFoundException, JOOQException {
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        AlbumResponses.AlbumResponse albumResponse;
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final AlbumResponses.AlbumResponse albumResponse;
 
         try {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
 
-            final Album album = new Album(name, description, usersPermission);
-            final AlbumUser albumUser = new AlbumUser(album, callingUser, true);
-            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, album);
+            final Album newAlbum = new Album(name, description, usersPermission);
+            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
+            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
 
-            em.persist(album);
-            em.persist(albumUser);
+            em.persist(newAlbum);
+            em.persist(newAlbumUser);
             em.persist(newAlbumMutation);
 
             tx.commit();
-            albumResponse = findAlbumByUserPkAndAlbumPk(album.getPk(), callingUserPk);
+
+            albumResponse = findAlbumByUserPkAndAlbumPk(newAlbum.getPk(), callingUserPk);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -58,53 +59,48 @@ public class Albums {
 
     public static AlbumResponses.AlbumResponse editAlbum(long callingUserPk, long albumPk, String name, String description, UsersPermission usersPermission,
                                                          Boolean notificationNewComment , Boolean notificationNewSeries)
-            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException{
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        AlbumResponses.AlbumResponse albumResponse;
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException, UserNotMemberException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final AlbumResponses.AlbumResponse albumResponse;
 
         try {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album album = getAlbum(albumPk, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(album, callingUser, em);
-            boolean flagSetNotification = false;
+            final Album editAlbum = getAlbum(albumPk, em);
+            final AlbumUser callingAlbumUser = getAlbumUser(editAlbum, callingUser, em);
 
             if (notificationNewComment != null) {
-                targetAlbumUser.setNewCommentNotifications(notificationNewComment);
-                flagSetNotification = true;
+                callingAlbumUser.setNewCommentNotifications(notificationNewComment);
             }
             if (notificationNewSeries != null) {
-                targetAlbumUser.setNewSeriesNotifications(notificationNewSeries);
-                flagSetNotification = true;
+                callingAlbumUser.setNewSeriesNotifications(notificationNewSeries);
             }
 
-            if(!targetAlbumUser.isAdmin() && !flagSetNotification) {
-                throw new AlbumForbiddenException("Not admin");
-            } else if (targetAlbumUser.isAdmin()){
+            if (callingAlbumUser.isAdmin()){
 
                 if (name != null) {
-                    album.setName(name);
+                    editAlbum.setName(name);
                 }
                 if (description != null) {
-                    album.setDescription(description);
+                    editAlbum.setDescription(description);
                 }
+                usersPermission.getAddUser().ifPresent(editAlbum::setAddUser);
+                usersPermission.getDownloadSeries().ifPresent(editAlbum::setDownloadSeries);
+                usersPermission.getSendSeries().ifPresent(editAlbum::setSendSeries);
+                usersPermission.getDeleteSeries().ifPresent(editAlbum::setDeleteSeries);
+                usersPermission.getAddSeries().ifPresent(editAlbum::setAddSeries);
+                usersPermission.getWriteComments().ifPresent(editAlbum::setWriteComments);
 
-                usersPermission.getAddUser().ifPresent(album::setAddUser);
-                usersPermission.getDownloadSeries().ifPresent(album::setDownloadSeries);
-                usersPermission.getSendSeries().ifPresent(album::setSendSeries);
-                usersPermission.getDeleteSeries().ifPresent(album::setDeleteSeries);
-                usersPermission.getAddSeries().ifPresent(album::setAddSeries);
-                usersPermission.getWriteComments().ifPresent(album::setWriteComments);
-
-            } else if (!targetAlbumUser.isAdmin() && flagSetNotification && (name != null || description != null || usersPermission.areSet())) {
-                throw new AlbumForbiddenException("Not admin");
+            } else if (name != null || description != null || usersPermission.areSet()) {
+                throw new AlbumForbiddenException("Not admin: The user must be an admin for editing name, description or permission");
             }
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumPk(album.getPk(), callingUserPk);
+            albumResponse = findAlbumByUserPkAndAlbumPk(editAlbum.getPk(), callingUserPk);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -117,39 +113,26 @@ public class Albums {
     public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(long callingUserPk, MultivaluedMap<String, String> queryParameters)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
+        final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
-            tx.begin();
-
             if (!userExist(callingUserPk, em)) {
                 throw new UserNotFoundException();
             }
-
-            pairAlbumsTotalAlbum = findAlbumsByUserPk(callingUserPk, queryParameters);
-
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
-        return pairAlbumsTotalAlbum;
+        return findAlbumsByUserPk(callingUserPk, queryParameters);
     }
 
     public static void deleteAlbum(long callingUserPk, long albumPk) throws AlbumNotFoundException, UserNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-
             final Album album = getAlbum(albumPk, em);
 
             if (album.getPk() == callingUser.getInbox().getPk()) {
@@ -178,56 +161,36 @@ public class Albums {
     public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, long albumPk)
            throws JOOQException {
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        AlbumResponses.AlbumResponse albumResponse;
-
-        try {
-            tx.begin();
-
-            albumResponse = findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
-
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-        return albumResponse;
+        return findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
     }
 
     public static List<AlbumResponses.UserAlbumResponse> getUsers(long callingUserPk, long albumPk)
             throws AlbumNotFoundException, UserNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        List<AlbumResponses.UserAlbumResponse> usersAlbumResponses = new ArrayList<>();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final List<AlbumResponses.UserAlbumResponse> usersAlbumResponses = new ArrayList<>();
 
         try {
-            tx.begin();
-
-            final User callingUser = getUser(callingUserPk, em);
+            if (!userExist(callingUserPk, em)) {
+                throw new UserNotFoundException();
+            }
             final Album album = getAlbum(albumPk, em);
 
             for (AlbumUser albumUser : album.getAlbumUser()) {
                 usersAlbumResponses.add(AlbumResponses.albumUserToUserAlbumResponce(albumUser));
             }
             Collections.sort(usersAlbumResponses);
-
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
         return usersAlbumResponses;
     }
 
-    public static void addUser(long callingUserPk, String userName, long albumPk, Boolean isAdmin)
+    public static void addUser(long callingUserPk, String userName, long albumPk, boolean isAdmin)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -241,27 +204,34 @@ public class Albums {
 
             final Album album = getAlbum(albumPk, em);
 
-            AlbumUser targetAlbumUser;
-            try {
-                targetAlbumUser = findAlbumUserByUserAndAlbum(targetUser, album, em);
-                if (targetAlbumUser.isAdmin() == isAdmin) {
-                    return;
-                }
-                if (targetAlbumUser.isAdmin() && !isAdmin) {
-                    throw new AlbumForbiddenException("Use : DELETE /albums/"+albumPk+"/users/"+callingUser.getGoogleId()+"/admin");
-                }
-                targetAlbumUser.setAdmin(isAdmin);
-                final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
-                em.persist(mutationPromoteAdmin);
+            if (isMemberOfAlbum(targetUser, album, em)) {
+                try {
+                    final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
+                    if (targetAlbumUser.isAdmin() == isAdmin) {
+                        return; // the target is already a member of the album with the same profile (admin / non-admin)
+                    }
+                    if (targetAlbumUser.isAdmin() && !isAdmin) {
+                        throw new AlbumForbiddenException("The user: " + targetUser.getGoogleEmail() + "is an admin. Use : DELETE /albums/" + albumPk + "/users/" + callingUser.getGoogleId() + "/admin");
+                    }
+                    //From here, the targetUser is an normal member and he will be promot admin
+                    targetAlbumUser.setAdmin(isAdmin);
+                    final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
+                    em.persist(mutationPromoteAdmin);
 
-            } catch (NoResultException e) {
-                targetAlbumUser = new AlbumUser(album, targetUser, isAdmin);
-                final Mutation mutation;
-                if (isAdmin) {
-                    mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.ADD_ADMIN, targetUser);
-                } else {
-                    mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.ADD_USER, targetUser);
+                } catch (UserNotMemberException e) {
+                    throw new AlbumNotFoundException("Album not found");//normally, this exception should never happen
                 }
+            } else {
+                final AlbumUser targetAlbumUser = new AlbumUser(album, targetUser, isAdmin);
+
+                final Events.MutationType mutationType;
+                if (isAdmin) {
+                    mutationType = Events.MutationType.ADD_ADMIN;
+                } else {
+                    mutationType = Events.MutationType.ADD_USER;
+                }
+
+                final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, targetUser);
                 em.persist(mutation);
                 em.persist(targetAlbumUser);
             }
@@ -276,37 +246,30 @@ public class Albums {
     }
 
     public static void deleteUser(long callingUserPk, String userName, long albumPk)
-            throws UserNotFoundException, AlbumNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
             final User removedUser = getUser(userName, em);
-
             final Album album = getAlbum(albumPk, em);
-
 
             if (callingUser.getPk() == removedUser.getPk()) {
                 final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.LEAVE_ALBUM, callingUser);
 
                 em.persist(mutation);
-
                 em.remove(removedAlbumUser);
             } else {
-                final AlbumUser removedAlbumUser;
-                try {
-                    removedAlbumUser = getAlbumUser(album, removedUser, em);
-                } catch (AlbumNotFoundException exception) {
-                    throw new UserNotFoundException();
-                }
+                final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.REMOVE_USER, removedUser);
-                em.persist(mutation);
 
+                em.persist(mutation);
                 em.remove(removedAlbumUser);
             }
 
@@ -319,7 +282,6 @@ public class Albums {
             }
 
             tx.commit();
-
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -329,9 +291,10 @@ public class Albums {
     }
 
     public static void removeAdmin(long callingUserPk, String userName, long albumPk)
-            throws UserNotFoundException, AlbumNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -339,13 +302,7 @@ public class Albums {
             final User callingUser = getUser(callingUserPk, em);
             final User removedUser = getUser(userName, em);
             final Album targetAlbum = getAlbum(albumPk, em);
-
-            final AlbumUser removedAlbumUser;
-            try {
-                removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
-            } catch (AlbumNotFoundException exception) {
-                throw new UserNotFoundException();
-            }
+            final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 
             final Mutation mutation = Events.albumPostUserMutation(callingUser, targetAlbum, Events.MutationType.DEMOTE_ADMIN, removedUser);
 
@@ -353,7 +310,6 @@ public class Albums {
             removedAlbumUser.setAdmin(false);
 
             tx.commit();
-
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -363,9 +319,10 @@ public class Albums {
     }
 
     public static void setFavorites(long callingUserPk, long albumPk, Boolean favorite)
-    throws UserNotFoundException, AlbumNotFoundException{
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -393,11 +350,11 @@ public class Albums {
         }
     }
 
-    public static AlbumUser getAlbumUser(Album album, User user, EntityManager em) throws AlbumNotFoundException{
+    public static AlbumUser getAlbumUser(Album album, User user, EntityManager em) throws UserNotMemberException{
         try {
         return findAlbumUserByUserAndAlbum(user, album, em);
         } catch (NoResultException e) {
-            throw new AlbumNotFoundException(e);
+            throw new UserNotMemberException(e);
         }
     }
 
