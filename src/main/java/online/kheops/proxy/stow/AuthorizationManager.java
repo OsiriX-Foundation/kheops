@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,14 +55,16 @@ public final class AuthorizationManager {
     // stores authorizations that have failed so that attributes can be patched
     public void getAuthorization(Part part) throws AuthorizationManagerException, GatewayException {
         try {
-            if (part.getInstanceID().isPresent()) {
-                getAuthorization(part.getInstanceID().get());
+            Optional<InstanceID> instanceIDOptional = part.getInstanceID();
+            if (instanceIDOptional.isPresent()) {
+                getAuthorization(instanceIDOptional.get());
             }
         } catch (MissingAttributeException e) {
             throw new AuthorizationManagerException("Unable to get instance", AuthorizationManagerException.Reason.MISSING_ATTRIBUTE, e);
         }
-        if (part.getContentLocation().isPresent()) {
-            getAuthorization(part.getContentLocation().get());
+        Optional<ContentLocation> contentLocationOptional = part.getContentLocation();
+        if (contentLocationOptional.isPresent()) {
+            getAuthorization(contentLocationOptional.get());
         }
 
         authorizeContentLocations(part.getBulkDataLocations());

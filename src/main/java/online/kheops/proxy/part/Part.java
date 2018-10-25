@@ -25,7 +25,7 @@ public abstract class Part implements AutoCloseable {
 
         if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
             return new DICOMPart(multipartInputStream, mediaType);
-        } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
+        } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
             return new DICOMMetadataPart(multipartInputStream, mediaType);
         } else {
             return new BulkDataPart(multipartInputStream, mediaType, contentLocation);

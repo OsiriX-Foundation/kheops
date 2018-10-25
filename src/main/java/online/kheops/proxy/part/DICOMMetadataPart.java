@@ -36,7 +36,7 @@ public class DICOMMetadataPart extends Part {
             } catch (ParserConfigurationException | SAXException e) {
                 throw new IOException("Unable to read DICOM XML", e);
             }
-        } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE)) {
+        } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
             try {
                 JSONReader reader = new JSONReader(Json.createParser(new InputStreamReader(inputStream, "UTF-8")));
                 dataset = reader.readDataset(null);
