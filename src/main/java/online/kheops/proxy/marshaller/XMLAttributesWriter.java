@@ -27,7 +27,7 @@ public class XMLAttributesWriter implements MessageBodyWriter<Attributes> {
     }
 
     @Override
-    public void writeTo(Attributes attributes, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo(Attributes attributes, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         try {
             SAXTransformer.getSAXWriter(new StreamResult(entityStream)).write(attributes);
         } catch (TransformerConfigurationException | SAXException e) {

@@ -15,6 +15,7 @@ import java.util.Set;
 @ApplicationPath("/*")
 public class ProxyApplication extends Application {
 
+    @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> set = new HashSet<>();
         set.add(Resource.class);
@@ -23,6 +24,7 @@ public class ProxyApplication extends Application {
         return set;
     }
 
+    @Override
     public Set<Object> getSingletons() {
         Set<Object> set = new HashSet<>();
         set.add(new JSONAttributesWriter());

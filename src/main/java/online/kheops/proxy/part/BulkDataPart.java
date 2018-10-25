@@ -17,6 +17,7 @@ public class BulkDataPart extends Part {
         this.contentLocation = contentLocation;
     }
 
+    @Override
     public Optional<ContentLocation> getContentLocation() {
         return Optional.of(contentLocation);
     }

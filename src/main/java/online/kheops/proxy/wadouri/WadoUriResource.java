@@ -12,6 +12,7 @@ import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,8 +76,8 @@ public class WadoUriResource {
             throw new WebApplicationException(Response.Status.BAD_GATEWAY);
         }
 
-        for (String parameter: queryParameters.keySet()) {
-            webTarget = webTarget.queryParam(parameter, queryParameters.get(parameter).toArray());
+        for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
+            webTarget = webTarget.queryParam(parameter.getKey(), parameter.getValue().toArray());
         }
 
         Invocation.Builder invocationBuilder = webTarget.request();

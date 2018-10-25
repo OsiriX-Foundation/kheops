@@ -48,18 +48,19 @@ public class DICOMMetadataPart extends Part {
         }
 
         try {
-            bulkDataLocations = parseBulkDataLocations();
+            bulkDataLocations = parseBulkDataLocations(dataset);
         } catch (Exception e) {
             throw new IOException("Error while parsing for Bulk Data", e);
         }
     }
 
-    DICOMMetadataPart(Attributes dataset, MediaType mediaType) throws IOException {
+    DICOMMetadataPart(Attributes dataset, MediaType mediaType) {
         super(mediaType);
         this.dataset = dataset;
         this.bulkDataLocations = Collections.emptySet();
     }
 
+    @Override
     public Optional<SeriesID> getSeriesID() throws MissingAttributeException {
         try {
             return Optional.of(SeriesID.from(dataset));
@@ -68,6 +69,7 @@ public class DICOMMetadataPart extends Part {
         }
     }
 
+    @Override
     public Optional<InstanceID> getInstanceID() throws MissingAttributeException {
         try {
             return Optional.of(InstanceID.from(dataset));
@@ -80,7 +82,7 @@ public class DICOMMetadataPart extends Part {
         return MediaTypes.getTransferSyntax(getMediaType());
     }
 
-    private Set<ContentLocation> parseBulkDataLocations() throws Exception {
+    private static Set<ContentLocation> parseBulkDataLocations(Attributes dataset) throws Exception {
         Set<ContentLocation> bulkDataLocations = new HashSet<>();
 
         dataset.accept((attrs1, tag, vr, value) -> {

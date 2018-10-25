@@ -3,7 +3,6 @@ package online.kheops.proxy.stow;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
@@ -11,7 +10,6 @@ import org.weasis.dicom.web.StowRS;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -67,7 +65,7 @@ public final class Resource {
 
     private Response store(InputStream inputStream, AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
-        URI STOWServiceURI = getParameterURI("online.kheops.pacs.uri");
+        URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
         try {
             AccessToken.createBuilder(authorizationURI)
@@ -78,12 +76,12 @@ public final class Resource {
         }
 
         if (studyInstanceUID != null) {
-            STOWServiceURI = UriBuilder.fromUri(STOWServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);
+            stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);
         } else {
-            STOWServiceURI = UriBuilder.fromUri(STOWServiceURI).path("/studies").build();
+            stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies").build();
         }
 
-        try (StowRS stowRS = new StowRS(STOWServiceURI.toString(), getStowContentType(), null, "Bearer " + getPostBearerToken())) {
+        try (StowRS stowRS = new StowRS(stowServiceURI.toString(), getStowContentType(), null, "Bearer " + getPostBearerToken())) {
             Service stowService = new Service(stowRS);
             return new Proxy(contentType, inputStream, stowService, new AuthorizationManager(authorizationURI, authorizationToken, albumId, studyInstanceUID)).getResponse();
         } catch (GatewayException e) {

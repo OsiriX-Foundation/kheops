@@ -13,7 +13,7 @@ public final class SeriesID extends MultiPart {
         this.seriesUID = seriesUID;
     }
 
-    public static SeriesID from(Attributes attributes) throws IllegalArgumentException {
+    public static SeriesID from(Attributes attributes) {
         final String studyUID = attributes.getString(Tag.StudyInstanceUID);
         if (studyUID == null) {
             throw new IllegalArgumentException("Missing StudyInstanceUID");

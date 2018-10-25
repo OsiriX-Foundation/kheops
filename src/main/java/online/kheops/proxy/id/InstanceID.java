@@ -16,7 +16,7 @@ public final class InstanceID {
         this.sopClassUID = Objects.requireNonNull(sopClassUID);
     }
 
-    public static InstanceID from(Attributes attributes) throws IllegalArgumentException {
+    public static InstanceID from(Attributes attributes) {
         final String sopInstanceUID = attributes.getString(Tag.SOPInstanceUID);
         if (sopInstanceUID == null) {
             throw new IllegalArgumentException("Missing SOPInstanceUID");
