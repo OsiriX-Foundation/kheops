@@ -61,13 +61,10 @@ public class Events {
 
                 comment.setPrivateTargetUser(targetUser);
                 targetUser.getComments().add(comment);
-                //em.persist(targetUser);
             } else {
                 album.setLastEventTime(LocalDateTime.now(ZoneOffset.UTC));
             }
 
-            //em.persist(album);
-            //em.persist(callingUser);
             em.persist(comment);
 
             tx.commit();
@@ -251,10 +248,8 @@ public class Events {
 
                 comment.setPrivateTargetUser(targetUser);
                 targetUser.getComments().add(comment);
-                //em.persist(targetUser);
             }
 
-            //em.persist(callingUser);
             em.persist(comment);
 
             tx.commit();
