@@ -100,7 +100,7 @@ public class AlbumRessource {
     @Path("album/{album:[1-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
+    public Response getAlbum(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
