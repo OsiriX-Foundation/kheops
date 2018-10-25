@@ -1,6 +1,7 @@
 package online.kheops.auth_server;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
@@ -70,7 +71,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
                 return canAccessSeries(capability.getAlbum(), studyInstanceUID, seriesInstanceUID, em);
             }
-        } catch (AlbumNotFoundException e) {
+        } catch (UserNotMemberException e) {
             return false;
         } finally {
             if (tx.isActive()) {
@@ -97,7 +98,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
                 return canAccessStudy(capability.getAlbum(), study, em);
             }
-        } catch (StudyNotFoundException | AlbumNotFoundException e) {
+        } catch (StudyNotFoundException | UserNotMemberException e) {
             return false;
         } finally {
             if (tx.isActive()) {
@@ -174,7 +175,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if(capability.getAlbum().getSeries().contains(series)) {
                     return true;
                 }
-            } catch (AlbumNotFoundException | NoResultException e) {
+            } catch (UserNotMemberException | NoResultException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {
@@ -205,7 +206,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 } else {
                     return false;
                 }
-            } catch (AlbumNotFoundException e) {
+            } catch (UserNotMemberException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {
@@ -284,7 +285,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
                 return false;
             }
-        } catch (AlbumNotFoundException e) {
+        } catch (UserNotMemberException | AlbumNotFoundException e) {
             return false;
         } finally {
             if (tx.isActive()) {
@@ -314,7 +315,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                     return false;
                 }
                 return user.getInbox() != album;
-            } catch (AlbumNotFoundException e) {
+            } catch (UserNotMemberException | AlbumNotFoundException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {
@@ -331,7 +332,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Album album = getAlbum(albumId, em);
                 final AlbumUser albumUser = getAlbumUser(album, user, em);
                 return user.getInbox() != album;
-            } catch (AlbumNotFoundException e) {
+            } catch (UserNotMemberException  | AlbumNotFoundException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {

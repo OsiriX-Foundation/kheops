@@ -1,10 +1,12 @@
 package online.kheops.auth_server;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.EntityManager;
@@ -13,6 +15,7 @@ import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
 
 import static online.kheops.auth_server.series.Series.getSeries;
@@ -168,7 +171,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             }
             return usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM;
 
-        } catch (AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException | UserNotMemberException e) {
             throw new AlbumNotFoundException("Album id : " + albumId + " not found");
         } finally {
             if (tx.isActive()) {
@@ -186,7 +189,10 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             tx.begin();
             final User userMerge = em.merge(user);
             final Album album = getAlbum(albumId, em);
-            final AlbumUser albumUser = getAlbumUser(album, userMerge, em);//user.memberOf(album)
+
+            if (!isMemberOfAlbum(userMerge, album, em)) {
+                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+            }
             if (userMerge.getInbox() == album) {
                 throw new AlbumNotFoundException("Album id : " + albumId + " not found");
             } else {

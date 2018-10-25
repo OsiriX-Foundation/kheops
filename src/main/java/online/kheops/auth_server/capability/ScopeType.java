@@ -1,6 +1,7 @@
 package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.Series;
@@ -39,7 +40,7 @@ public enum ScopeType {
     ALBUM {
         @Override
         public CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-                throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException {
+                throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
             return createAlbumCapability(capabilityParameters);
         }
 
@@ -74,7 +75,7 @@ public enum ScopeType {
     };
 
     public abstract CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException;
+            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk)
             throws CapabilityBadRequestException;

@@ -161,7 +161,7 @@ public class AlbumRessource {
 
         try {
             albumResponse = Albums.editAlbum(callingUserPk, albumPk, name, description, usersPermission, notificationNewSeries, notificationNewComment);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Edit album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
@@ -315,7 +315,7 @@ public class AlbumRessource {
 
         try {
             Albums.removeAdmin(callingUserPk, user, albumPk);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -343,7 +343,7 @@ public class AlbumRessource {
 
         try {
             Albums.deleteUser(callingUserPk, user, albumPk);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -370,7 +370,7 @@ public class AlbumRessource {
 
         try {
             Albums.setFavorites(callingUserPk, albumPk, true);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO,"Add an album pk:" +albumPk+ " to favorites by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -397,7 +397,7 @@ public class AlbumRessource {
 
         try {
             Albums.setFavorites(callingUserPk, albumPk, false);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Remove an album pk:" +albumPk+ " from favorites by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
