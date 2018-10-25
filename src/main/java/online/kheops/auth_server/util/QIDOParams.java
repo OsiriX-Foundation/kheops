@@ -1,6 +1,7 @@
 package online.kheops.auth_server.util;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
@@ -48,6 +49,9 @@ public class QIDOParams {
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, album_id);
             fromInbox = false;
+            try {
+                album_id = kheopsPrincipal.getAlbumID();
+            } catch (NotAlbumScopeTypeException notUsed) { /*empty*/ }
         }
         if (queryParameters.containsKey("sort")) {
             descending = queryParameters.get("sort").get(0).startsWith("-");

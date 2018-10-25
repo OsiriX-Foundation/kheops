@@ -208,4 +208,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public ScopeType getScope() { return ScopeType.USER; }
+
+    @Override
+    public long getAlbumID() throws NotAlbumScopeTypeException { throw new NotAlbumScopeTypeException(""); }
 }
