@@ -3,15 +3,12 @@ package online.kheops.auth_server.capability;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
-import javax.ws.rs.NotFoundException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +19,6 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
 import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponses;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUIDFromInbox;
-import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUIDandUser;
 
 public class Capabilities {
     private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -50,12 +45,12 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequest{
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException {
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
     }
 
     public static CapabilitiesResponses.CapabilityResponse createUserCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, CapabilityBadRequest {
+            throws UserNotFoundException, CapabilityBadRequestException {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
@@ -91,7 +86,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequest {
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException {
 
         CapabilitiesResponses.CapabilityResponse capabilityResponse;
 
@@ -136,7 +131,7 @@ public class Capabilities {
     }
     
     public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, long capabilityId)
-    throws UserNotFoundException, CapabilityNotFound {
+    throws UserNotFoundException, CapabilityNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -197,19 +192,19 @@ public class Capabilities {
         return capabilityResponses;
     }
 
-    public static Capability getCapability(User user, long capabilityId, EntityManager em) throws CapabilityNotFound {
+    public static Capability getCapability(User user, long capabilityId, EntityManager em) throws CapabilityNotFoundException {
         try {
             return findCapabilityByCapabilityTokenandUser(user, capabilityId, em);
         } catch (NoResultException e) {
-            throw new CapabilityNotFound();
+            throw new CapabilityNotFoundException();
         }
     }
 
-    public static Capability getCapability(String secret, EntityManager em) throws CapabilityNotFound {
+    public static Capability getCapability(String secret, EntityManager em) throws CapabilityNotFoundException {
         try {
             return findCapabilityByCapabilityToken(secret, em);
         } catch (NoResultException e) {
-            throw new CapabilityNotFound();
+            throw new CapabilityNotFoundException();
         }
     }
 }

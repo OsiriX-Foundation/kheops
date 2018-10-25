@@ -7,10 +7,7 @@ import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.capability.CapabilitiesResponses.CapabilityResponse;
-import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.Consts;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -78,7 +75,7 @@ public class CapabilitiesResource {
 
         try {
             capabilityParametersBuilder.scope(scopeType, albumPk);
-        } catch (CapabilityBadRequest e) {
+        } catch (CapabilityBadRequestException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
@@ -92,7 +89,7 @@ public class CapabilitiesResource {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
-        } catch (CapabilityBadRequest e) {
+        } catch (CapabilityBadRequestException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
@@ -113,7 +110,7 @@ public class CapabilitiesResource {
 
         try {
             capabilityResponse = Capabilities.revokeCapability(callingUserPk, capabilityId);
-        } catch (UserNotFoundException |CapabilityNotFound e) {
+        } catch (UserNotFoundException |CapabilityNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 

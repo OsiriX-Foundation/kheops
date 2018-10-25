@@ -47,7 +47,7 @@ public class CapabilityParametersBuilder {
     }
 
     public CapabilityParametersBuilder scope(String scopeType, Long albumPk)
-    throws CapabilityBadRequest {
+    throws CapabilityBadRequestException {
         ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumPk);
         return this;
     }
