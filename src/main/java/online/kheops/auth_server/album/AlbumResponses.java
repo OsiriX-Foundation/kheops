@@ -23,7 +23,7 @@ public class AlbumResponses {
         @XmlElement(name = "description")
         public String description;
         @XmlElement(name = "modalities")
-        public String[] modalities;
+        private String[] modalities;
         @XmlElement(name = "created_time")
         public LocalDateTime createdTime;
         @XmlElement(name = "last_event_time")
@@ -112,7 +112,7 @@ public class AlbumResponses {
     }
 
     public static AlbumResponse recordToAlbumResponse(Record r) {
-        final AlbumResponses.AlbumResponse albumResponse = new AlbumResponse();
+        final AlbumResponse albumResponse = new AlbumResponse();
 
         albumResponse.id = r.getValue("album_pk").toString();
         albumResponse.name = r.getValue("album_name").toString();

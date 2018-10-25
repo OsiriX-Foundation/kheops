@@ -132,7 +132,6 @@ public class SendingResource
         return Response.status(Response.Status.CREATED).build();
     }
 
-
     @DELETE
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
