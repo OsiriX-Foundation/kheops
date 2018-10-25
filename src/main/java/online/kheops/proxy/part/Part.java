@@ -40,10 +40,16 @@ public abstract class Part implements AutoCloseable {
         return Optional.empty();
     }
 
+    /**
+     * @throws MissingAttributeException Overriding classes may throw this exception
+     */
     public Optional<SeriesID> getSeriesID() throws MissingAttributeException {
         return Optional.empty();
     }
 
+    /**
+     * @throws MissingAttributeException Overriding classes may throw this exception
+     */
     public Optional<InstanceID> getInstanceID() throws MissingAttributeException {
         return Optional.empty();
     }
