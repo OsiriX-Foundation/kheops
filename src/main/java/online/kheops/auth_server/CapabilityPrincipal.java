@@ -300,6 +300,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         if (getScope() == ScopeType.ALBUM) {
+            if (albumId  == null) {
+                albumId = capability.getAlbum().getPk();
+            }
             if (albumId != capability.getAlbum().getPk()) {
                 return false;
             }
@@ -320,6 +323,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 em.close();
             }
         } else if (getScope() == ScopeType.USER) {
+            if (albumId == null) {
+                return false;
+            }
             try {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);

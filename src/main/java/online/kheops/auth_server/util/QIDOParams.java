@@ -14,11 +14,15 @@ public class QIDOParams {
 
     private Long album_id = null;
     private boolean fromInbox = false;
+
     private boolean descending = true;
-    private boolean fuzzyMatching = false;
     private int orderByTag = Tag.StudyDate;
+
+    private boolean fuzzyMatching = false;
+
     private Integer limit = null;
     private Integer offset = null;
+
     private String studyDateFilter = null;
     private String studyTimeFilter = null;
     private String accessionNumberFilter = null;
