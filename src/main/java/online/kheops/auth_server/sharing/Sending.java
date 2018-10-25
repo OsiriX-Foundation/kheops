@@ -106,16 +106,16 @@ public class Sending {
 
             for (Series series: availableSeries) {
                 callingAlbum.removeSeries(series);
-                em.persist(series);
+                //em.persist(series);
             }
 
             final Study study = availableSeries.get(0).getStudy();
             final Mutation mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
 
             em.persist(mutation);
-            em.persist(study);
-            em.persist(callingAlbum);
-            em.persist(callingUser);
+            //em.persist(study);
+            //em.persist(callingAlbum);
+            //em.persist(callingUser);
 
             tx.commit();
         } finally {
@@ -148,9 +148,9 @@ public class Sending {
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_SERIES, availableSeries);
 
             em.persist(mutation);
-            em.persist(availableSeries);
-            em.persist(callingAlbum);
-            em.persist(callingUser);
+            //em.persist(availableSeries);
+            //em.persist(callingAlbum);
+            //em.persist(callingUser);
 
             tx.commit();
         } finally {
@@ -193,7 +193,7 @@ public class Sending {
                 availableSeries = new Series(seriesInstanceUID);
                 study.getSeries().add(availableSeries);
                 availableSeries.setStudy(study);
-                em.persist(study);
+                //em.persist(study);
                 em.persist(availableSeries);
             }
 
@@ -201,12 +201,12 @@ public class Sending {
                 return;
             }
 
-            em.persist(availableSeries);
+            //em.persist(availableSeries);
             targetAlbum.addSeries(availableSeries);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             em.persist(mutation);
-            em.persist(targetAlbum);
-            em.persist(callingUser);//todo if the series is upload with a token...
+            //em.persist(targetAlbum);
+            //em.persist(callingUser);//todo if the series is upload with a token...
             tx.commit();
         } finally {
             if (tx.isActive()) {
@@ -233,7 +233,7 @@ public class Sending {
             for (Series series: availableSeries) {
                 if (!targetAlbum.getSeries().contains(series)) {
                     targetAlbum.addSeries(series);
-                    em.persist(series);
+                    //em.persist(series);
                     allSeriesAlreadyExist = false;
                 }
             }
@@ -245,8 +245,8 @@ public class Sending {
                 final Mutation mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
 
                 em.persist(mutation);
-                em.persist(targetAlbum);
-                em.persist(callingUser);
+                //em.persist(targetAlbum);
+                //em.persist(callingUser);
 
 
             tx.commit();
@@ -280,10 +280,10 @@ public class Sending {
             for (Series series : availableSeries) {
                 if (!inbox.getSeries().contains(series)) {
                     inbox.addSeries(series);
-                    em.persist(series);
+                    //em.persist(series);
                 }
             }
-            em.persist(inbox);
+            //em.persist(inbox);
 
             tx.commit();
         } finally {
@@ -324,9 +324,9 @@ public class Sending {
 
             inbox.addSeries(series);
 
-            em.persist(inbox);
-            em.persist(series);
-            em.persist(targetUser);
+            //em.persist(inbox);
+            //em.persist(series);
+            //em.persist(targetUser);
 
             tx.commit();
         } finally {
@@ -353,9 +353,9 @@ public class Sending {
                 // here the series exists but she is orphan or the calling can send the series from an album
                 final Album inbox = callingUser.getInbox();
                 inbox.addSeries(storedSeries);
-                em.persist(inbox);
-                em.persist(storedSeries);
-                em.persist(callingUser);
+                //em.persist(inbox);
+                //em.persist(storedSeries);
+                //em.persist(callingUser);
                 tx.commit();
                 LOG.info("Claim accepted because the series is inside an album where the calling user (" + callingUser.getGoogleId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
                 return;
@@ -379,10 +379,10 @@ public class Sending {
             Album inbox = callingUser.getInbox();
             inbox.addSeries(series);
 
-            em.persist(inbox);
-            em.persist(study);
+            //em.persist(inbox);
+            //em.persist(study);
             em.persist(series);
-            em.persist(callingUser);
+            //em.persist(callingUser);
             LOG.info("finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
 
             tx.commit();

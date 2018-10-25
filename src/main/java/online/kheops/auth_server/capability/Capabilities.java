@@ -71,7 +71,7 @@ public class Capabilities {
                     .scopeType(ScopeType.USER)
                     .build();
             em.persist(capability);
-            em.persist(user);
+            //em.persist(user);
 
             capabilityResponse = capabilityToCapabilitiesResponses(capability);
 
@@ -116,7 +116,7 @@ public class Capabilities {
                     .album(album)
                     .build();
             em.persist(capability);
-            em.persist(user);
+            //em.persist(user);
 
             capabilityResponse = capabilityToCapabilitiesResponses(capability);
 

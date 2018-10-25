@@ -5,7 +5,6 @@ import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
-import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;

@@ -41,7 +41,7 @@ public class Albums {
             final AlbumUser albumUser = new AlbumUser(album, callingUser, true);
             final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, album);
 
-            em.persist(callingUser);
+            //em.persist(callingUser);
             em.persist(album);
             em.persist(albumUser);
             em.persist(newAlbumMutation);
@@ -99,14 +99,14 @@ public class Albums {
                 usersPermission.getAddSeries().ifPresent(album::setAddSeries);
                 usersPermission.getWriteComments().ifPresent(album::setWriteComments);
 
-                em.persist(album);
+                //em.persist(album);
             } else if (!targetAlbumUser.isAdmin() && flagSetNotification && (name != null || description != null || usersPermission.areSet())) {
                 throw new AlbumForbiddenException("Not admin");
             }
             
-            if (flagSetNotification) {
-                em.persist(targetAlbumUser);
-            }
+            //if (flagSetNotification) {
+                //em.persist(targetAlbumUser);
+            //}
 
             tx.commit();
 
@@ -269,11 +269,12 @@ public class Albums {
                     mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.ADD_USER, targetUser);
                 }
                 em.persist(mutation);
+                em.persist(targetAlbumUser);
             }
 
-            em.persist(album);
-            em.persist(targetUser);
-            em.persist(targetAlbumUser);
+            //em.persist(album);
+            //em.persist(targetUser);
+
 
             tx.commit();
         } finally {
@@ -302,9 +303,9 @@ public class Albums {
                 final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.LEAVE_ALBUM, callingUser);
 
-                em.persist(callingUser);
+                //em.persist(callingUser);
                 em.persist(mutation);
-                em.persist(album);
+                //em.persist(album);
 
                 em.remove(removedAlbumUser);
             } else {
@@ -317,10 +318,10 @@ public class Albums {
 
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.REMOVE_USER, removedUser);
 
-                em.persist(callingUser);
-                em.persist(removedUser);
+                //em.persist(callingUser);
+                //em.persist(removedUser);
                 em.persist(mutation);
-                em.persist(album);
+                //em.persist(album);
 
                 em.remove(removedAlbumUser);
             }
@@ -364,15 +365,15 @@ public class Albums {
 
             final Mutation mutation = Events.albumPostUserMutation(callingUser, targetAlbum, Events.MutationType.DEMOTE_ADMIN, removedUser);
 
-            em.persist(callingUser);
+            //em.persist(callingUser);
             em.persist(mutation);
-            em.persist(targetAlbum);
-            em.persist(removedUser);
+            //em.persist(targetAlbum);
+            //em.persist(removedUser);
 
             em.remove(removedAlbumUser);
 
-            removedAlbumUser.setAdmin(false);
-            em.persist(removedAlbumUser);
+            //removedAlbumUser.setAdmin(false);
+            //em.persist(removedAlbumUser);
 
             tx.commit();
 
@@ -397,7 +398,7 @@ public class Albums {
             final AlbumUser albumUser = getAlbumUser(album, callingUser, em);
 
             albumUser.setFavorite(favorite);
-            em.persist(albumUser);
+            //em.persist(albumUser);
 
             tx.commit();
         } finally {

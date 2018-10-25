@@ -7,8 +7,6 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 
-import javax.persistence.NoResultException;
-
 public interface KheopsPrincipalInterface extends java.security.Principal{
 
     //for old version
