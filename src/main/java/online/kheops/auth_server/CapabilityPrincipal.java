@@ -353,4 +353,13 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     public ScopeType getScope() {
         return ScopeType.valueOf(capability.getScopeType().toUpperCase());
     }
+
+    @Override
+    public long getAlbumID() throws NotAlbumScopeTypeException {
+        if(getScope() == ScopeType.ALBUM) {
+            return capability.getAlbum().getPk();
+        } else {
+            throw new NotAlbumScopeTypeException("");
+        }
+    }
 }
