@@ -32,20 +32,19 @@ public abstract class Part implements AutoCloseable {
         final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, CONTENT_TYPE));
 
         final Path cacheFilePath = Files.createTempFile("PartCache", null);
-        final OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(cacheFilePath));
-        final TeeInputStream teeInputStream = new TeeInputStream(multipartInputStream, outputStream);
-
         final Part newPart;
-        if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
-            newPart = new DICOMPart(teeInputStream, mediaType, cacheFilePath);
-        } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
-            newPart = new DICOMMetadataPart(teeInputStream, mediaType, cacheFilePath);
-        } else {
-            newPart = new BulkDataPart(teeInputStream, mediaType, contentLocation, cacheFilePath);
-        }
+        try (final OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(cacheFilePath))) {
+            final TeeInputStream teeInputStream = new TeeInputStream(multipartInputStream, outputStream);
 
-        outputStream.flush();
-        outputStream.close();
+            if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
+                newPart = new DICOMPart(teeInputStream, mediaType, cacheFilePath);
+            } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
+                newPart = new DICOMMetadataPart(teeInputStream, mediaType, cacheFilePath);
+            } else {
+                newPart = new BulkDataPart(teeInputStream, mediaType, contentLocation, cacheFilePath);
+            }
+            outputStream.flush();
+        }
         return newPart;
     }
 
