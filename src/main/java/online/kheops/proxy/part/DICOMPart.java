@@ -6,7 +6,6 @@ import org.dcm4che3.io.DicomInputStream;
 
 import javax.ws.rs.core.MediaType;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DICOMPart extends DICOMMetadataPart {
@@ -30,7 +29,7 @@ public class DICOMPart extends DICOMMetadataPart {
         }
     }
 
-    private DICOMPart(final ParsedData parsedData, final MediaType mediaType, final Path cacheFilePath) throws IOException {
+    private DICOMPart(final ParsedData parsedData, final MediaType mediaType, final Path cacheFilePath) {
         super(parsedData.getDataset(), mediaType, cacheFilePath);
 
         this.fileMetaInformation = parsedData.getFileMetaInformation();

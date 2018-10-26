@@ -37,7 +37,7 @@ public class TeeInputStream extends FilterInputStream {
     }
 
     @Override
-    public int read(final byte b[], final int off, final int len) throws IOException {
+    public int read(final byte[] b, final int off, final int len) throws IOException {
         final int readCount = super.read(b, off, len);
         if (readCount == -1) {
             return readCount;

@@ -105,6 +105,7 @@ public class MultipartOutputStream extends FilterOutputStream {
         }
         writer.write(getBoundary());
         writer.write("\r\n");
+        writer.flush();
     }
 
     private void writeHeaders(final MultivaluedMap<String, String> headers) throws IOException {
@@ -124,5 +125,6 @@ public class MultipartOutputStream extends FilterOutputStream {
             }
             writer.write("\r\n");
         }
+        writer.flush();
     }
 }

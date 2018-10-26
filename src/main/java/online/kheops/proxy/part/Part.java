@@ -44,6 +44,7 @@ public abstract class Part implements AutoCloseable {
             newPart = new BulkDataPart(teeInputStream, mediaType, contentLocation, cacheFilePath);
         }
 
+        outputStream.flush();
         outputStream.close();
         return newPart;
     }
