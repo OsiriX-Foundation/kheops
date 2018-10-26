@@ -161,7 +161,7 @@ public final class AuthorizationManager {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken)
                     .post(Entity.text(""));
             if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-                LOG.log(Level.SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
+                LOG.log(Level.SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
             }
         } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID, e);
