@@ -17,6 +17,7 @@ import org.dcm4che3.ws.rs.MediaTypes;
 import org.xml.sax.SAXException;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -58,39 +59,42 @@ public final class Resource {
     @HeaderParam("Content-Type")
     MediaType contentType;
 
+    @Context
+    HttpServletRequest request;
+
     @POST
     @Path("/password/dicomweb/studies")
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
-    public Response stow(InputStream inputStream, @HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
-        return store(inputStream, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
+    public Response stow(@HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
+        return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
     }
 
     @POST
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies")
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
-    public Response stowWithCapability(InputStream inputStream, @PathParam("capability") String capabilityToken, @QueryParam("album") String albumId) {
-        return store(inputStream, AuthorizationToken.from(capabilityToken), albumId, null);
+    public Response stowWithCapability(@PathParam("capability") String capabilityToken, @QueryParam("album") String albumId) {
+        return store(AuthorizationToken.from(capabilityToken), albumId, null);
     }
 
     @POST
     @Path("/password/dicomweb/studies/{studyInstanceUID}")
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
-    public Response stowStudy(InputStream inputStream, @HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
-        return store(inputStream, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
+    public Response stowStudy(@HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
+        return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
     }
 
     @POST
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID}")
     @Consumes("multipart/related")
     @Produces({"application/dicom+json; qs=0.9, application/dicom+xml; qs=1"})
-    public Response stowStudyWithCapability(InputStream inputStream, @PathParam("capability") String capabilityToken, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
-        return store(inputStream, AuthorizationToken.from(capabilityToken), albumId, studyInstanceUID);
+    public Response stowStudyWithCapability(@PathParam("capability") String capabilityToken, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
+        return store(AuthorizationToken.from(capabilityToken), albumId, studyInstanceUID);
     }
 
-    private Response store(InputStream inputStream, AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
+    private Response store(AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
@@ -100,6 +104,13 @@ public final class Resource {
                     .build();
         } catch (AccessTokenException e) {
             throw new WebApplicationException(UNAUTHORIZED);
+        }
+
+        final InputStream inputStream;
+        try {
+            inputStream = request.getInputStream();
+        } catch (IOException e) {
+            throw new WebApplicationException(BAD_REQUEST);
         }
 
         if (studyInstanceUID != null) {
