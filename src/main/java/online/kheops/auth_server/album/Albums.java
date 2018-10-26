@@ -125,7 +125,9 @@ public class Albums {
         return findAlbumsByUserPk(callingUserPk, queryParameters);
     }
 
-    public static void deleteAlbum(long callingUserPk, long albumPk) throws AlbumNotFoundException, UserNotFoundException {
+    public static void deleteAlbum(long callingUserPk, long albumPk)
+            throws AlbumNotFoundException, UserNotFoundException {
+
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -145,6 +147,11 @@ public class Albums {
 
             for (Event event:album.getEvents()) {
                 em.remove(event);
+            }
+
+            for (Capability capability:album.getCapabilities()) {
+                capability.setRevoked(true);
+                em.remove(capability);
             }
 
             em.remove(album);
@@ -257,28 +264,32 @@ public class Albums {
             final User callingUser = getUser(callingUserPk, em);
             final User removedUser = getUser(userName, em);
             final Album album = getAlbum(albumPk, em);
+            final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
+
+            final Events.MutationType mutationType;
 
             if (callingUser.getPk() == removedUser.getPk()) {
-                final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
-                final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.LEAVE_ALBUM, callingUser);
-
-                em.persist(mutation);
-                em.remove(removedAlbumUser);
+                mutationType = Events.MutationType.LEAVE_ALBUM;
             } else {
-                final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
-
-                final Mutation mutation = Events.albumPostUserMutation(callingUser, album, Events.MutationType.REMOVE_USER, removedUser);
-
-                em.persist(mutation);
-                em.remove(removedAlbumUser);
+                mutationType = Events.MutationType.REMOVE_USER;
             }
+
+            final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
+
+            if (removedAlbumUser.isAdmin()) {
+                for (Capability capability: album.getCapabilities()) {
+                    if (capability.getUser() == removedUser) {
+                        capability.setRevoked(true);
+                    }
+                }
+            }
+
+            em.persist(mutation);
+            em.remove(removedAlbumUser);
 
             //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
-                for (Event event:album.getEvents()) {
-                    em.remove(event);
-                }
-                em.remove(album);
+                deleteAlbum(callingUserPk, albumPk);
             }
 
             tx.commit();
@@ -308,6 +319,12 @@ public class Albums {
 
             em.persist(mutation);
             removedAlbumUser.setAdmin(false);
+
+            for (Capability capability: targetAlbum.getCapabilities()) {
+                if (capability.getUser() == removedUser) {
+                    capability.setRevoked(true);
+                }
+            }
 
             tx.commit();
         } finally {
@@ -342,7 +359,9 @@ public class Albums {
         }
     }
 
-    public static Album getAlbum(long albumPk, EntityManager em) throws AlbumNotFoundException{
+    public static Album getAlbum(long albumPk, EntityManager em)
+            throws AlbumNotFoundException {
+
         try {
             return findAlbumByPk(albumPk, em);
         } catch (NoResultException e) {
@@ -350,7 +369,9 @@ public class Albums {
         }
     }
 
-    public static AlbumUser getAlbumUser(Album album, User user, EntityManager em) throws UserNotMemberException{
+    public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)
+            throws UserNotMemberException {
+
         try {
         return findAlbumUserByUserAndAlbum(user, album, em);
         } catch (NoResultException e) {
