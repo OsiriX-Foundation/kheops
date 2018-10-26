@@ -56,12 +56,4 @@ public class DICOMPart extends DICOMMetadataPart {
     public String getTransferSyntax() {
         return fileMetaInformation.getString(Tag.TransferSyntaxUID);
     }
-
-    @Override
-    public void close() throws IOException
-    {
-        // TODO erase the bulk file cache
-        super.close();
-    }
-
 }

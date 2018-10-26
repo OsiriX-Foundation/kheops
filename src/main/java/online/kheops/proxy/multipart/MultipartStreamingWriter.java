@@ -1,5 +1,6 @@
 package online.kheops.proxy.multipart;
 
+import online.kheops.proxy.part.MissingAttributeException;
 import org.glassfish.jersey.media.multipart.Boundary;
 import org.glassfish.jersey.message.MessageUtils;
 
@@ -43,6 +44,12 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
         return MultipartStreamingOutput.class.isAssignableFrom(type);
     }
 
+    /**
+     * @throws java.io.IOException if an IO error arises.
+     * @throws javax.ws.rs.WebApplicationException
+     *                             if a specific HTTP error response needs to be produced.
+     *                             Only effective if thrown prior to the message being committed.
+     */
     @Override
     public void writeTo(final MultipartStreamingOutput multipartStreamingOutput,
                         final Class<?> type,

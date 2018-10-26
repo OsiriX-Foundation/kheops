@@ -17,6 +17,10 @@ import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.WARNING;
+import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
+
 public final class Proxy {
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
 
@@ -60,23 +64,23 @@ public final class Proxy {
         } catch (IOException e) {
             throw new RequestException("Unable to parse for part:\n" + partNumber);
         } catch (AuthorizationManagerException e) {
-            LOG.log(Level.WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString);
-            LOG.log(Level.FINE, "Authorization failure exception:\n" , e);
+            LOG.log(WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString);
+            LOG.log(FINE, "Authorization failure exception:\n" , e);
         }
     }
 
     private void writePart(final int partNumber, final Part part) throws GatewayException {
         try {
-            final InputStream inputStream = Files.newInputStream(part.getCacheFilePath());
-            multipartOutputStream.writePart(new StreamingBodyPart(inputStream, MediaTypes.APPLICATION_DICOM_TYPE));
-            inputStream.close();
+            final InputStream fileStream = Files.newInputStream(part.getCacheFilePath());
+            multipartOutputStream.writePart(new StreamingBodyPart(fileStream, MediaTypes.APPLICATION_DICOM_TYPE));
+            fileStream.close();
         } catch (IOException e) {
             throw new GatewayException("Unable to write part " + partNumber + ": " + part, e);
         }
     }
 
     private String getBoundary() throws RequestException {
-        final String boundary = contentType.getParameters().get("boundary");
+        final String boundary = contentType.getParameters().get(BOUNDARY_PARAMETER);
         if (boundary == null) {
             throw new RequestException("Missing Boundary Parameter");
         }

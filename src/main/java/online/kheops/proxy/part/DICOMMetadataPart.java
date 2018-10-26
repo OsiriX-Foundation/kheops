@@ -96,6 +96,7 @@ public class DICOMMetadataPart extends Part {
         return bulkDataLocations;
     }
 
+    @Override
     public Set<ContentLocation> getBulkDataLocations() {
         return bulkDataLocations;
     }
