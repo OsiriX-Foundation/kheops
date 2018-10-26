@@ -86,7 +86,7 @@ public class DICOMMetadataPart extends Part {
     private static Set<ContentLocation> parseBulkDataLocations(Attributes dataset) throws Exception {
         Set<ContentLocation> bulkDataLocations = new HashSet<>();
 
-        dataset.accept((attrs1, tag, vr, value) -> {
+        dataset.accept((attrs, tag, vr, value) -> {
             if (value instanceof BulkData) {
                 bulkDataLocations.add(ContentLocation.valueOf(((BulkData) value).getURI()));
             }

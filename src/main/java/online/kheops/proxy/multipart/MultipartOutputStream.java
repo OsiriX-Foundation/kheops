@@ -1,5 +1,6 @@
 package online.kheops.proxy.multipart;
 
+import org.glassfish.jersey.media.multipart.Boundary;
 import org.glassfish.jersey.media.multipart.internal.LocalizationMessages;
 import org.glassfish.jersey.message.MessageUtils;
 
@@ -11,6 +12,10 @@ import java.io.*;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
+
+import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 public class MultipartOutputStream extends FilterOutputStream {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
@@ -39,10 +44,10 @@ public class MultipartOutputStream extends FilterOutputStream {
         }
 
         final MultivaluedMap<String, String> bodyHeaders = bodyPart.getHeaders();
-        bodyHeaders.putSingle("Content-Type", bodyMediaType.toString());
+        bodyHeaders.putSingle(CONTENT_TYPE, bodyMediaType.toString());
 
-        if (bodyHeaders.getFirst("Content-Disposition") == null && bodyPart.getContentDisposition() != null) {
-            bodyHeaders.putSingle("Content-Disposition", bodyPart.getContentDisposition().toString());
+        if (bodyHeaders.getFirst(CONTENT_DISPOSITION) == null && bodyPart.getContentDisposition() != null) {
+            bodyHeaders.putSingle(CONTENT_DISPOSITION, bodyPart.getContentDisposition().toString());
         }
 
         writeHeaders(bodyHeaders);
@@ -84,7 +89,7 @@ public class MultipartOutputStream extends FilterOutputStream {
     }
 
     private String getBoundary() {
-        return mediaType.getParameters().get("boundary");
+        return mediaType.getParameters().get(BOUNDARY_PARAMETER);
     }
 
     private void writeLeadingBoundary() throws IOException {

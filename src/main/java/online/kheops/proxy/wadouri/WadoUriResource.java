@@ -4,6 +4,7 @@ import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
+import org.dcm4che3.ws.rs.MediaTypes;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -15,6 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT_CHARSET;
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 @Path("/")
 public class WadoUriResource {
@@ -28,15 +37,15 @@ public class WadoUriResource {
     @Context
     ServletContext context;
 
-    @HeaderParam("Accept")
+    @HeaderParam(ACCEPT)
     String acceptParam;
 
-    @HeaderParam("Accept-Charset")
+    @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
 
     @GET
     @Path("/password/dicomweb/wado")
-    public Response wado(@HeaderParam("Authorization") String authorizationHeader) {
+    public Response wado(@HeaderParam(AUTHORIZATION) String authorizationHeader) {
         return webAccess(AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
 
@@ -56,11 +65,11 @@ public class WadoUriResource {
 
         final List<String> studyInstanceUIDs = queryParameters.get("studyUID");
         if (studyInstanceUIDs == null || studyInstanceUIDs.size() != 1) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new WebApplicationException(BAD_REQUEST);
         }
         final List<String> seriesInstanceUIDs = queryParameters.get("seriesUID");
         if (seriesInstanceUIDs == null || seriesInstanceUIDs.size() != 1) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new WebApplicationException(BAD_REQUEST);
         }
 
         final String studyInstanceUID = studyInstanceUIDs.get(0);
@@ -73,7 +82,7 @@ public class WadoUriResource {
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
         } catch (AccessTokenException e) {
-            throw new WebApplicationException(Response.Status.BAD_GATEWAY);
+            throw new WebApplicationException(BAD_GATEWAY);
         }
 
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
@@ -81,15 +90,15 @@ public class WadoUriResource {
         }
 
         Invocation.Builder invocationBuilder = webTarget.request();
-        invocationBuilder.header("Authorization", "Bearer " + accessToken.getToken());
+        invocationBuilder.header(AUTHORIZATION, "Bearer " + accessToken.getToken());
         if (acceptParam != null) {
             invocationBuilder.accept(acceptParam);
         } else {
-            invocationBuilder.accept("application/dicom");
+            invocationBuilder.accept(MediaTypes.APPLICATION_DICOM);
         }
 
         if (acceptCharsetParam != null) {
-            invocationBuilder.header("Accept-Charset", acceptCharsetParam);
+            invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
         final CacheControl cacheControl = new CacheControl();
@@ -104,8 +113,8 @@ public class WadoUriResource {
         try {
             return new URI(context.getInitParameter(parameter));
         } catch (URISyntaxException e) {
-            LOG.log(Level.SEVERE, "Error with the STOWServiceURI", e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            LOG.log(SEVERE, "Error with the STOWServiceURI", e);
+            throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }
 }

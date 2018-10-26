@@ -19,6 +19,15 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT_CHARSET;
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+
 @Path("/")
 public class WadoRsResource {
     private static final Logger LOG = Logger.getLogger(WadoRsResource.class.getName());
@@ -34,15 +43,15 @@ public class WadoRsResource {
     @Context
     HttpHeaders httpHeaders;
 
-    @HeaderParam("Accept")
+    @HeaderParam(ACCEPT)
     String acceptParam;
 
-    @HeaderParam("Accept-Charset")
+    @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
 
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}")
-    public Response wado(@HeaderParam("Authorization") String authorizationHeader,
+    public Response wado(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                          @PathParam("studyInstanceUID") String studyInstanceUID,
                          @PathParam("seriesInstanceUID") String seriesInstanceUID) {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
@@ -67,8 +76,8 @@ public class WadoRsResource {
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
         } catch (AccessTokenException e) {
-            LOG.log(Level.WARNING, "Unable to get an access token", e);
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            LOG.log(WARNING, "Unable to get an access token", e);
+            throw new WebApplicationException(UNAUTHORIZED);
         }
 
         Pattern p = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)");
@@ -78,18 +87,18 @@ public class WadoRsResource {
         if (m.find()) {
             resource = m.group(1);
         } else {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new WebApplicationException(BAD_REQUEST);
         }
 
         WebTarget webTarget = CLIENT.target(wadoServiceURI).path(resource);
 
         Invocation.Builder invocationBuilder = webTarget.request();
-        invocationBuilder.header("Authorization", "Bearer " + accessToken.getToken());
+        invocationBuilder.header(AUTHORIZATION, "Bearer " + accessToken.getToken());
         if (acceptParam != null) {
-            invocationBuilder.header("Accept", acceptParam);
+            invocationBuilder.header(ACCEPT, acceptParam);
         }
         if (acceptCharsetParam != null) {
-            invocationBuilder.header("Accept-Charset", acceptCharsetParam);
+            invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
         final CacheControl cacheControl = new CacheControl();
@@ -104,8 +113,8 @@ public class WadoRsResource {
         try {
             return new URI(context.getInitParameter(parameter));
         } catch (URISyntaxException e) {
-            LOG.log(Level.SEVERE, "Error with the STOWServiceURI", e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            LOG.log(SEVERE, "Error with the STOWServiceURI", e);
+            throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }
 

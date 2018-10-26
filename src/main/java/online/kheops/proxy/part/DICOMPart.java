@@ -11,17 +11,14 @@ import java.nio.file.Path;
 
 public class DICOMPart extends DICOMMetadataPart {
     private final Attributes fileMetaInformation;
-    private final File bulkDataDirectory;
 
     private static class ParsedData {
         private final Attributes dataset;
         private final Attributes fileMetaInformation;
-        private final File bulkDataDirectory;
 
-        ParsedData(Attributes dataset, Attributes fileMetaInformation, File bulkDataDirectory) {
+        ParsedData(Attributes dataset, Attributes fileMetaInformation) {
             this.dataset = dataset;
             this.fileMetaInformation = fileMetaInformation;
-            this.bulkDataDirectory = bulkDataDirectory;
         }
 
         Attributes getDataset() {
@@ -31,17 +28,12 @@ public class DICOMPart extends DICOMMetadataPart {
         Attributes getFileMetaInformation() {
             return fileMetaInformation;
         }
-
-        File getBulkDataDirectory() {
-            return bulkDataDirectory;
-        }
     }
 
     private DICOMPart(final ParsedData parsedData, final MediaType mediaType, final Path cacheFilePath) throws IOException {
         super(parsedData.getDataset(), mediaType, cacheFilePath);
 
         this.fileMetaInformation = parsedData.getFileMetaInformation();
-        this.bulkDataDirectory = parsedData.getBulkDataDirectory();
     }
 
     DICOMPart(InputStream inputStream, MediaType mediaType, final Path cacheFilePath) throws IOException {
@@ -53,16 +45,11 @@ public class DICOMPart extends DICOMMetadataPart {
         dicomInputStream.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
 
         return new ParsedData(dicomInputStream.readDataset(-1, -1),
-                              dicomInputStream.getFileMetaInformation(),
-                              dicomInputStream.getBulkDataDirectory());
+                              dicomInputStream.getFileMetaInformation());
     }
 
     public Attributes getFileMetaInformation() {
         return fileMetaInformation;
-    }
-
-    public File getBulkDataDirectory() {
-        return bulkDataDirectory;
     }
 
     @Override

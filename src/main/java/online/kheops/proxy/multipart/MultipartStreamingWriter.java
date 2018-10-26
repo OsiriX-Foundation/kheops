@@ -52,14 +52,10 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
                         final MultivaluedMap<String, Object> headers,
                         final OutputStream stream) throws IOException, WebApplicationException {
 
-        // If our entity is not nested, make sure the MIME-Version header is set.
-        // TODO
-//        if (entity.getParent() == null) {
-            final Object value = headers.getFirst("MIME-Version");
-            if (value == null) {
-                headers.putSingle("MIME-Version", "1.0");
-            }
-//        }
+        final Object value = headers.getFirst("MIME-Version");
+        if (value == null) {
+            headers.putSingle("MIME-Version", "1.0");
+        }
 
         // Determine the boundary string to be used, creating one if needed.
         final MediaType boundaryMediaType = Boundary.addBoundary(mediaType);

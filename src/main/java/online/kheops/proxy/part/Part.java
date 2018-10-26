@@ -13,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static javax.ws.rs.core.HttpHeaders.CONTENT_LOCATION;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+
 
 public abstract class Part implements AutoCloseable {
     private final MediaType mediaType;
@@ -25,8 +28,8 @@ public abstract class Part implements AutoCloseable {
 
     public static Part getInstance(MultipartInputStream multipartInputStream) throws IOException {
         final Map<String, List<String>> headerParams = multipartInputStream.readHeaderParams();
-        final ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, "content-location"));
-        final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, "content-type"));
+        final ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, CONTENT_LOCATION));
+        final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, CONTENT_TYPE));
 
         final Path cacheFilePath = Files.createTempFile("PartCache", null);
         final OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(cacheFilePath));
@@ -86,16 +89,16 @@ public abstract class Part implements AutoCloseable {
 
     @Override
     public String toString() {
-        final InstanceID instanceID;
         try {
-            instanceID = getInstanceID().orElse(null);
+            final InstanceID instanceID = getInstanceID().orElse(null);
+            if (instanceID == null) {
+                return "Part with unknown Instance ID";
+            } else {
+                return "Part: " + instanceID;
+            }
+
         } catch (MissingAttributeException e) {
             return "Part with missing attribute";
-        }
-        if (instanceID == null) {
-            return "Part with unknown Instance ID";
-        } else {
-            return "Part: " + instanceID;
         }
     }
 }

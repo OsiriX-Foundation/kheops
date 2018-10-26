@@ -34,6 +34,9 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.Response.Status.*;
 import static org.glassfish.jersey.client.ClientProperties.REQUEST_ENTITY_PROCESSING;
 import static org.glassfish.jersey.client.RequestEntityProcessing.CHUNKED;
 
@@ -96,7 +99,7 @@ public final class Resource {
                     .withCapability(authorizationToken.getToken())
                     .build();
         } catch (AccessTokenException e) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            throw new WebApplicationException(UNAUTHORIZED);
         }
 
         if (studyInstanceUID != null) {
@@ -112,29 +115,29 @@ public final class Resource {
                 new Proxy(contentType, inputStream, output, authorizationManager);
             } catch (GatewayException e) {
                 LOG.log(Level.SEVERE, "Gateway Error", e);
-                throw new WebApplicationException(Response.Status.BAD_GATEWAY);
+                throw new WebApplicationException(BAD_GATEWAY);
             } catch (RequestException e) {
                 LOG.log(Level.WARNING, "Bad request Error", e);
-                throw new WebApplicationException(Response.Status.BAD_REQUEST);
+                throw new WebApplicationException(BAD_REQUEST);
             } catch (WebApplicationException e) {
                 throw e;
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Error in the proxy", e);
-                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+                throw new WebApplicationException(INTERNAL_SERVER_ERROR);
             }
         };
 
         try {
             InputStream responseStream = CLIENT.target(stowServiceURI)
                     .request()
-                    .header("Authorization", "Bearer " + getPostBearerToken())
-                    .header("Accept", MediaTypes.APPLICATION_DICOM_XML)
+                    .header(AUTHORIZATION, "Bearer " + getPostBearerToken())
+                    .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, contentType), InputStream.class);
 
             return authorizationManager.getResponse(SAXReader.parse(responseStream));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOG.log(Level.WARNING, "Error parsing response", e);
-            throw new WebApplicationException(Response.Status.BAD_GATEWAY);
+            throw new WebApplicationException(BAD_GATEWAY);
         }
     }
 
@@ -143,7 +146,7 @@ public final class Resource {
             return new URI(context.getInitParameter(parameter));
         } catch (URISyntaxException e) {
             LOG.log(Level.SEVERE, "Error with the STOWServiceURI", e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -154,7 +157,7 @@ public final class Resource {
             algorithmHMAC = Algorithm.HMAC256(authSecret);
         } catch (UnsupportedEncodingException e) {
             LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecretpost is not a valid HMAC secret", e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
 
         JWTCreator.Builder jwtBuilder = JWT.create()
