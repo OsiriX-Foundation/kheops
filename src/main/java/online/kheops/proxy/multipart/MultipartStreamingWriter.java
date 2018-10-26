@@ -45,9 +45,7 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
 
     /**
      * @throws IOException if an IO error arises.
-     * @throws WebApplicationException
-     *                             if a specific HTTP error response needs to be produced.
-     *                             Only effective if thrown prior to the message being committed.
+     * @throws WebApplicationException if a specific HTTP error response needs to be produced.
      */
     @Override
     public void writeTo(final MultipartStreamingOutput multipartStreamingOutput,
