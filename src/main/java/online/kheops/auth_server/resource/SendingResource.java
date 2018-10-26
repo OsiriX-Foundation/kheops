@@ -5,8 +5,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -125,8 +128,21 @@ public class SendingResource
         }
 
         try {
-            Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
-        } catch (UserNotFoundException e) {
+            if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, kheopsPrincipal.getAlbumID())) {
+
+                    try {
+                        Sending.putSeriesInAlbum(callingUserPk, kheopsPrincipal.getAlbumID(), studyInstanceUID, seriesInstanceUID);
+                    } catch (NotAlbumScopeTypeException notUsed) {
+                        return Response.status(Response.Status.FORBIDDEN).entity("todo").build();
+                    }
+                } else {
+                    return Response.status(Response.Status.FORBIDDEN).entity("todo").build();
+                }
+            } else {
+                Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
+            }
+        } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(Response.Status.CREATED).build();
@@ -219,7 +235,7 @@ public class SendingResource
         }
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
-        } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch(UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 

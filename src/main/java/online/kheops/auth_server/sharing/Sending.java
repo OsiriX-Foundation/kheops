@@ -155,7 +155,7 @@ public class Sending {
     }
 
     public static void putSeriesInAlbum(long callingUserPk, long albumPk, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
