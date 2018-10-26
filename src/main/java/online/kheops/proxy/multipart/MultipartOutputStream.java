@@ -1,6 +1,5 @@
 package online.kheops.proxy.multipart;
 
-import org.glassfish.jersey.media.multipart.Boundary;
 import org.glassfish.jersey.media.multipart.internal.LocalizationMessages;
 import org.glassfish.jersey.message.MessageUtils;
 
@@ -34,7 +33,8 @@ public class MultipartOutputStream extends FilterOutputStream {
 
     }
 
-    public void write(final byte b[], final int off, final int len) throws IOException {
+    @Override
+    public void write(final byte[] b, final int off, final int len) throws IOException {
         out.write(b, off, len);
     }
 
