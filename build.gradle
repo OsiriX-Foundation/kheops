@@ -8,7 +8,7 @@ apply plugin: "jacoco"
 apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
 
 // Enable debugging of gretty started webapp in IDEA
-// For debuging a gradle task, IDEA creates a gradle init script (in /tmp/ijinit#.gradle), that sets JVM arguments
+// For debugging a gradle task, IDEA creates a gradle init script (in /tmp/ijinit#.gradle), that sets JVM arguments
 // to enable remote debugging.
 // Unfortunately by default that only works for gradle tasks that implement JavaForkOptions - which gretty doesn't do.
 // So parse the JVM args that IDEA uses from that init script and set them as JVM args to be used by gretty:
