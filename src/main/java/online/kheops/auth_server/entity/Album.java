@@ -168,4 +168,6 @@ public class Album {
     public void addEvents(Event event) { this.events.add(event); }
 
     public void addCapability(Capability capability) { this.capabilities.add(capability); }
+
+    public Set<Capability> getCapabilities() { return capabilities; }
 }

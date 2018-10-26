@@ -129,7 +129,7 @@ public class SendingResource
 
         try {
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, kheopsPrincipal.getAlbumID())) {
+                if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, kheopsPrincipal.getAlbumID())) {
 
                     try {
                         Sending.putSeriesInAlbum(callingUserPk, kheopsPrincipal.getAlbumID(), studyInstanceUID, seriesInstanceUID);
