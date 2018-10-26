@@ -5,9 +5,9 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomInputStream;
 
 import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class DICOMPart extends DICOMMetadataPart {
     private final Attributes fileMetaInformation;
@@ -37,19 +37,20 @@ public class DICOMPart extends DICOMMetadataPart {
         }
     }
 
-    private DICOMPart(ParsedData parsedData, MediaType mediaType) throws IOException {
-        super(parsedData.getDataset(), mediaType);
+    private DICOMPart(final ParsedData parsedData, final MediaType mediaType, final Path cacheFilePath) throws IOException {
+        super(parsedData.getDataset(), mediaType, cacheFilePath);
 
         this.fileMetaInformation = parsedData.getFileMetaInformation();
         this.bulkDataDirectory = parsedData.getBulkDataDirectory();
     }
 
-    DICOMPart(InputStream inputStream, MediaType mediaType) throws IOException {
-        this(parseInputStream(inputStream), mediaType);
+    DICOMPart(InputStream inputStream, MediaType mediaType, final Path cacheFilePath) throws IOException {
+        this(parseInputStream(inputStream), mediaType, cacheFilePath);
     }
 
     private static ParsedData parseInputStream(InputStream inputStream) throws IOException{
-        DicomInputStream dicomInputStream = new DicomInputStream(inputStream);
+        final DicomInputStream dicomInputStream = new DicomInputStream(inputStream);
+        dicomInputStream.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
 
         return new ParsedData(dicomInputStream.readDataset(-1, -1),
                               dicomInputStream.getFileMetaInformation(),

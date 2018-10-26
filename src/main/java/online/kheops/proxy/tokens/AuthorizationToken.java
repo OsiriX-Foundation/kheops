@@ -12,7 +12,7 @@ public class AuthorizationToken {
 
     private final String token;
 
-    public AuthorizationToken(String token) {
+    private AuthorizationToken(String token) {
         this.token = token;
     }
 

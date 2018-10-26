@@ -1,4 +1,4 @@
-package online.kheops.proxy.stow;
+package online.kheops.proxy.stow.authorization;
 
 public class AuthorizationManagerException extends Exception {
     public enum Reason {
@@ -9,18 +9,23 @@ public class AuthorizationManagerException extends Exception {
 
     private final Reason reason;
 
-    public AuthorizationManagerException(String message, Reason reason, Throwable cause) {
+    AuthorizationManagerException(String message, Reason reason, Throwable cause) {
         super(message, cause);
         this.reason = reason;
     }
 
 
-    public AuthorizationManagerException(String message, Reason reason) {
+    AuthorizationManagerException(String message, Reason reason) {
         super(message);
         this.reason = reason;
     }
 
-    public Reason getReason() {
+    @Override
+    public String toString() {
+        return "Reason:" + getReason() + "\n" + super.toString();
+    }
+
+    private Reason getReason() {
         return reason;
     }
 }

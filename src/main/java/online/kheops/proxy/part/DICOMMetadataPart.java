@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -27,8 +28,8 @@ public class DICOMMetadataPart extends Part {
     private final Set<ContentLocation> bulkDataLocations;
 
 
-    DICOMMetadataPart(InputStream inputStream, MediaType mediaType) throws IOException {
-        super(mediaType);
+    DICOMMetadataPart(final InputStream inputStream, final MediaType mediaType, final Path cacheFilePath) throws IOException {
+        super(mediaType, cacheFilePath);
 
         if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE)) {
             try {
@@ -54,8 +55,8 @@ public class DICOMMetadataPart extends Part {
         }
     }
 
-    DICOMMetadataPart(Attributes dataset, MediaType mediaType) {
-        super(mediaType);
+    DICOMMetadataPart(final Attributes dataset, final MediaType mediaType, final Path cacheFilePath) {
+        super(mediaType, cacheFilePath);
         this.dataset = dataset;
         this.bulkDataLocations = Collections.emptySet();
     }

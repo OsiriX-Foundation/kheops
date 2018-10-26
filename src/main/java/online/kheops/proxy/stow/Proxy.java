@@ -1,13 +1,19 @@
 package online.kheops.proxy.stow;
 
+import online.kheops.proxy.multipart.MultipartOutputStream;
+import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.part.Part;
+import online.kheops.proxy.stow.authorization.AuthorizationManager;
+import online.kheops.proxy.stow.authorization.AuthorizationManagerException;
+import online.kheops.proxy.stow.resource.Resource;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.mime.MultipartParser;
+import org.dcm4che3.ws.rs.MediaTypes;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,35 +22,22 @@ public final class Proxy {
 
     private final InputStream inputStream;
     private final MediaType contentType;
-    private final String boundary;
 
-    private final Service stowService;
-
+    private final MultipartOutputStream multipartOutputStream;
     private final AuthorizationManager authorizationManager;
 
-
-    public Proxy(MediaType contentType, InputStream inputStream, Service stowService, AuthorizationManager authorizationManager)
-            throws RequestException {
+    public Proxy(final MediaType contentType, final InputStream inputStream, final MultipartOutputStream multipartOutputStream, final AuthorizationManager authorizationManager)
+                    throws GatewayException, RequestException {
         this.contentType = contentType;
         this.inputStream = inputStream;
-        this.stowService = stowService;
         this.authorizationManager = authorizationManager;
+        this.multipartOutputStream = multipartOutputStream;
 
-        boundary = boundary();
-    }
-
-    public Response getResponse() throws GatewayException, RequestException {
         processMultipart();
-
-        try {
-            return authorizationManager.getResponse(stowService.getResponse());
-        } catch (IOException e ) {
-            throw new GatewayException("Error getting a response", e);
-        }
     }
 
     private void processMultipart() throws RequestException, GatewayException {
-        MultipartParser multipartParser = new MultipartParser(boundary);
+        final MultipartParser multipartParser = new MultipartParser(getBoundary());
         try {
             multipartParser.parse(inputStream, this::processPart);
         } catch (RequestException | GatewayException e) {
@@ -54,7 +47,7 @@ public final class Proxy {
         }
     }
 
-    private void processPart(int partNumber, MultipartInputStream multipartInputStream)
+    private void processPart(final int partNumber, final MultipartInputStream multipartInputStream)
             throws RequestException, GatewayException {
 
         String partString = "Unknown part";
@@ -72,16 +65,18 @@ public final class Proxy {
         }
     }
 
-    private void writePart(int partNumber, Part part) throws GatewayException {
+    private void writePart(final int partNumber, final Part part) throws GatewayException {
         try {
-            stowService.write(part);
+            final InputStream inputStream = Files.newInputStream(part.getCacheFilePath());
+            multipartOutputStream.writePart(new StreamingBodyPart(inputStream, MediaTypes.APPLICATION_DICOM_TYPE));
+            inputStream.close();
         } catch (IOException e) {
             throw new GatewayException("Unable to write part " + partNumber + ": " + part, e);
         }
     }
 
-    private String boundary() throws RequestException {
-        String boundary = contentType.getParameters().get("boundary");
+    private String getBoundary() throws RequestException {
+        final String boundary = contentType.getParameters().get("boundary");
         if (boundary == null) {
             throw new RequestException("Missing Boundary Parameter");
         }

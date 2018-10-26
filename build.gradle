@@ -28,21 +28,13 @@ repositories {
         //noinspection GroovyAssignabilityCheck
         url "https://www.dcm4che.org/maven2/"
     }
-
-    maven {
-        //noinspection GroovyAssignabilityCheck
-        url "https://raw.github.com/nroduit/mvn-repo/master/"
-    }
 }
 
 dependencies {
     compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.27'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.27'
-
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.27'
-
-    compile group: 'org.weasis.core', name: 'weasis-core-util', version: '3.0.1'
 
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
 

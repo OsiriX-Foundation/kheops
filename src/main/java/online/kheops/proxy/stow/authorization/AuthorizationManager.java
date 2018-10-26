@@ -1,10 +1,12 @@
-package online.kheops.proxy.stow;
+package online.kheops.proxy.stow.authorization;
 
 import online.kheops.proxy.id.ContentLocation;
 import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.part.MissingAttributeException;
 import online.kheops.proxy.part.Part;
+import online.kheops.proxy.stow.GatewayException;
+import online.kheops.proxy.stow.resource.Resource;
 import online.kheops.proxy.tokens.AuthorizationToken;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Sequence;

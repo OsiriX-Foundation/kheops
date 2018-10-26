@@ -3,33 +3,46 @@ package online.kheops.proxy.part;
 import online.kheops.proxy.id.ContentLocation;
 import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.id.SeriesID;
+import online.kheops.proxy.stream.TeeInputStream;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.ws.rs.MediaTypes;
 
 import javax.ws.rs.core.MediaType;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 
 public abstract class Part implements AutoCloseable {
     private final MediaType mediaType;
+    private final Path cacheFilePath;
 
-    Part(MediaType mediaType) {
+    Part(MediaType mediaType, Path cacheFilePath) {
         this.mediaType = mediaType;
+        this.cacheFilePath = cacheFilePath;
     }
 
     public static Part getInstance(MultipartInputStream multipartInputStream) throws IOException {
-        Map<String, List<String>> headerParams = multipartInputStream.readHeaderParams();
-        ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, "content-location"));
-        MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, "content-type"));
+        final Map<String, List<String>> headerParams = multipartInputStream.readHeaderParams();
+        final ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, "content-location"));
+        final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, "content-type"));
 
+        final Path cacheFilePath = Files.createTempFile("PartCache", null);
+        final OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(cacheFilePath));
+        final TeeInputStream teeInputStream = new TeeInputStream(multipartInputStream, outputStream);
+
+        final Part newPart;
         if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
-            return new DICOMPart(multipartInputStream, mediaType);
+            newPart = new DICOMPart(teeInputStream, mediaType, cacheFilePath);
         } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
-            return new DICOMMetadataPart(multipartInputStream, mediaType);
+            newPart = new DICOMMetadataPart(teeInputStream, mediaType, cacheFilePath);
         } else {
-            return new BulkDataPart(multipartInputStream, mediaType, contentLocation);
+            newPart = new BulkDataPart(teeInputStream, mediaType, contentLocation, cacheFilePath);
         }
+
+        outputStream.close();
+        return newPart;
     }
 
     public Set<ContentLocation> getBulkDataLocations() {
@@ -63,7 +76,13 @@ public abstract class Part implements AutoCloseable {
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public void close() throws IOException {}
+    public void close() throws IOException {
+        Files.delete(cacheFilePath);
+    }
+
+    public Path getCacheFilePath() {
+        return cacheFilePath;
+    }
 
     @Override
     public String toString() {

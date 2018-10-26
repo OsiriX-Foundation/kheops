@@ -18,12 +18,12 @@
     <context-param>
         <description>Base URI for the pacs</description>
         <param-name>online.kheops.pacs.uri</param-name>
-        <param-value>https://test.kheops.online/dicomweb</param-value>
+        <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
     </context-param>
     <context-param>
         <description>Base URI for the authentication server</description>
         <param-name>online.kheops.auth_server.uri</param-name>
-        <param-value>https://test.kheops.online/authorization</param-value>
+        <param-value>http://localhost:7575/authorization</param-value>
     </context-param>
     <context-param>
         <description>HMAC shared secret used to sign tokens used for post</description>
