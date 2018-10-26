@@ -69,7 +69,6 @@ public class QIDOResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
-
         if (offset == null) {
             offset = 0;
         }

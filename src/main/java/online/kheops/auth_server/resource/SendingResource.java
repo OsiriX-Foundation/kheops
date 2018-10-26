@@ -6,7 +6,6 @@ import javax.ws.rs.core.*;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.capability.ScopeType;
@@ -42,10 +41,7 @@ public class SendingResource
             return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
-
         fromInbox = fromInbox == null && fromAlbumPk == null;
-
-
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
@@ -129,15 +125,11 @@ public class SendingResource
 
         try {
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, kheopsPrincipal.getAlbumID())) {
-
-                    try {
-                        Sending.putSeriesInAlbum(callingUserPk, kheopsPrincipal.getAlbumID(), studyInstanceUID, seriesInstanceUID);
-                    } catch (NotAlbumScopeTypeException notUsed) {
-                        return Response.status(Response.Status.FORBIDDEN).entity("todo").build();
-                    }
+                final Long albumID = kheopsPrincipal.getAlbumID();
+                if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumID)) {
+                        Sending.putSeriesInAlbum(callingUserPk, albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
-                    return Response.status(Response.Status.FORBIDDEN).entity("todo").build();
+                    return Response.status(Response.Status.FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
             } else {
                 Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
@@ -157,11 +149,19 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
             return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        if (!kheopsPrincipal.hasUserAccess()) {
+            try {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
+            } catch (NotAlbumScopeTypeException e) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
         }
 
         try {
@@ -184,7 +184,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try{
@@ -193,6 +193,14 @@ public class SendingResource
             }
         } catch (SeriesNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+
+        if (!kheopsPrincipal.hasUserAccess()) {
+            try {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
+            } catch (NotAlbumScopeTypeException e) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
         }
 
         try {
@@ -215,7 +223,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
         try {
             if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
@@ -230,9 +238,9 @@ public class SendingResource
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
-
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
+
         try {
             Sending.putSeriesInAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
         } catch(UserNotFoundException | AlbumNotFoundException e) {
@@ -297,7 +305,7 @@ public class SendingResource
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -329,7 +337,7 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {

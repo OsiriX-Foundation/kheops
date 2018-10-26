@@ -25,7 +25,7 @@ public class Albums {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AlbumResponses.AlbumResponse cerateAlbum(long callingUserPk, String name, String description, UsersPermission usersPermission)
+    public static AlbumResponses.AlbumResponse createAlbum(long callingUserPk, String name, String description, UsersPermission usersPermission)
             throws UserNotFoundException, JOOQException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -253,7 +253,7 @@ public class Albums {
     }
 
     public static void deleteUser(long callingUserPk, String userName, long albumPk)
-            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
+            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException, AlbumForbiddenException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -264,14 +264,17 @@ public class Albums {
             final User callingUser = getUser(callingUserPk, em);
             final User removedUser = getUser(userName, em);
             final Album album = getAlbum(albumPk, em);
+            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
             final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
             final Events.MutationType mutationType;
 
             if (callingUser.getPk() == removedUser.getPk()) {
                 mutationType = Events.MutationType.LEAVE_ALBUM;
-            } else {
+            } else if (callingAlbumUser.isAdmin()){
                 mutationType = Events.MutationType.REMOVE_USER;
+            } else {
+                throw new AlbumForbiddenException("You must be an admin for removing another user");
             }
 
             final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
