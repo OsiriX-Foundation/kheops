@@ -145,31 +145,34 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             if (albumUser.isAdmin()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isAddSeries()){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isAddSeries()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_USER && album.isAddUser()){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_USER && album.isAddUser()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.DELETE_SERIES && album.isDeleteSeries()){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.DELETE_SERIES && album.isDeleteSeries()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && album.isDownloadSeries()){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && album.isDownloadSeries()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES && album.isSendSeries()){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES && album.isSendSeries()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.WRITE_COMMENT && album.isWriteComments()){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.WRITE_COMMENT && album.isWriteComments()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.REMOVE_USER){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.REMOVE_USER) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS){
+            if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS) {
                 return true;
             }
-            return usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM;
+            if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM) {
+                return true;
+            }
+            return false;
 
         } catch (AlbumNotFoundException | UserNotMemberException e) {
             throw new AlbumNotFoundException("Album id : " + albumId + " not found");

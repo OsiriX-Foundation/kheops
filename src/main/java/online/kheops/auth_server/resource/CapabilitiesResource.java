@@ -52,8 +52,6 @@ public class CapabilitiesResource {
                 .readPermission(readPermission)
                 .writePermission(writePermission);
 
-
-
         if (readPermission) {
             capabilityParametersBuilder.appropriatePermission(appropriatePermission)
                     .downloadPermission(downloadPermission);

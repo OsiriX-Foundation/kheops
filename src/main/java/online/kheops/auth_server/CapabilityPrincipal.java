@@ -248,6 +248,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && capability.isWritePermission()) {
                     return true;
                 }
+                if (usersPermission == UsersPermission.UsersPermissionEnum.DELETE_SERIES && capability.isReadPermission() && capability.isWritePermission()) {
+                    return true;
+                }
                 return false;
 
             } else if (getScope() == ScopeType.USER) {
