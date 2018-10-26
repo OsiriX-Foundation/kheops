@@ -1,10 +1,10 @@
 package online.kheops.proxy.id;
 
 public final class ContentLocation {
-    private final String contentLocation;
+    private final String location;
 
     private ContentLocation(String contentLocation) {
-        this.contentLocation = contentLocation;
+        this.location = contentLocation;
     }
 
     public static ContentLocation valueOf(String contentLocation) {
@@ -18,7 +18,7 @@ public final class ContentLocation {
 
     @Override
     public String toString() {
-        return contentLocation;
+        return location;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class MultipartOutputStream extends FilterOutputStream {
 
     private boolean firstPartWritten = false;
 
-    MultipartOutputStream(OutputStream out, MediaType mediaType, final Providers providers) {
+    MultipartOutputStream(final OutputStream out, final MediaType mediaType, final Providers providers) {
         super(out);
         this.mediaType = mediaType;
         this.providers = providers;
@@ -34,7 +34,11 @@ public class MultipartOutputStream extends FilterOutputStream {
 
     }
 
-    public void writePart(StreamingBodyPart bodyPart) throws IOException {
+    public void write(final byte b[], final int off, final int len) throws IOException {
+        out.write(b, off, len);
+    }
+
+    public void writePart(final StreamingBodyPart bodyPart) throws IOException {
         writeLeadingBoundary();
 
         // Write the headers for this body part

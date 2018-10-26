@@ -5,7 +5,6 @@ import org.dcm4che3.io.SAXTransformer;
 import org.xml.sax.SAXException;
 
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
