@@ -14,6 +14,7 @@ import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
@@ -233,7 +234,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             if(getScope() == ScopeType.ALBUM){
 
                 final Album album = em.merge(capability.getAlbum());
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
+                isMemberOfAlbum(user, album, em);
 
                 if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && capability.isReadPermission() && capability.isDownloadPermission()) {
                     return true;
