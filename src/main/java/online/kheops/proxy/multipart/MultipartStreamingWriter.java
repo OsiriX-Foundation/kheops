@@ -43,10 +43,6 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
         return MultipartStreamingOutput.class.isAssignableFrom(type);
     }
 
-    /**
-     * @throws IOException if an IO error arises.
-     * @throws WebApplicationException if a specific HTTP error response needs to be produced.
-     */
     @Override
     public void writeTo(final MultipartStreamingOutput multipartStreamingOutput,
                         final Class<?> type,
@@ -54,7 +50,7 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
                         final Annotation[] annotations,
                         final MediaType mediaType,
                         final MultivaluedMap<String, Object> headers,
-                        final OutputStream stream) throws IOException, WebApplicationException {
+                        final OutputStream stream) throws IOException {
 
         final Object value = headers.getFirst("MIME-Version");
         if (value == null) {

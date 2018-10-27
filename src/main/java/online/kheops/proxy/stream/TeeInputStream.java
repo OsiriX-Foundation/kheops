@@ -18,7 +18,7 @@ public class TeeInputStream extends FilterInputStream {
     }
 
     @Override
-    public int read() throws IOException {
+    public synchronized int read() throws IOException {
         final int readInt = super.read();
 
         if (readInt == -1) {
@@ -37,7 +37,7 @@ public class TeeInputStream extends FilterInputStream {
     }
 
     @Override
-    public int read(final byte[] b, final int off, final int len) throws IOException {
+    public synchronized int read(final byte[] b, final int off, final int len) throws IOException {
         final int readCount = super.read(b, off, len);
         if (readCount == -1) {
             return readCount;
@@ -58,7 +58,7 @@ public class TeeInputStream extends FilterInputStream {
     }
 
     @Override
-    public long skip(final long n) throws IOException {
+    public synchronized long skip(final long n) throws IOException {
         long skippedBytes = 0;
 
         while (skippedBytes < n) {
