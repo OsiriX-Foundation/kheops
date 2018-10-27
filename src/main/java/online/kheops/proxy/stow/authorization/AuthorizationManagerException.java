@@ -14,9 +14,13 @@ public class AuthorizationManagerException extends Exception {
         this.reason = reason;
     }
 
+    AuthorizationManagerException(Reason reason, Throwable cause) {
+        super(cause);
+        this.reason = reason;
+    }
 
-    AuthorizationManagerException(String message, Reason reason) {
-        super(message);
+    AuthorizationManagerException(Reason reason) {
+        super();
         this.reason = reason;
     }
 

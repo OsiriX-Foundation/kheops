@@ -19,7 +19,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -27,9 +26,16 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.SEVERE;
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.Response.Status.ACCEPTED;
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
+import static javax.ws.rs.core.Response.Status.OK;
+import static online.kheops.proxy.stow.authorization.AuthorizationManagerException.Reason.SERIES_ACCESS_FORBIDDEN;
+import static online.kheops.proxy.stow.authorization.AuthorizationManagerException.Reason.UNKNOWN_CONTENT_LOCATION;
 
 public final class AuthorizationManager {
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
@@ -102,7 +108,7 @@ public final class AuthorizationManager {
                 .collect(Collectors.toSet())
                 .forEach(this::triggerFetch);
 
-        return Response.status(hasFailedSOPs ? Response.Status.ACCEPTED : Response.Status.OK).entity(attributes).build();
+        return Response.status(hasFailedSOPs ? ACCEPTED : OK).entity(attributes).build();
     }
 
     private void getAuthorization(InstanceID instanceID) throws AuthorizationManagerException, GatewayException {
@@ -112,7 +118,7 @@ public final class AuthorizationManager {
         }
         if (forbiddenSeriesIDs.contains(seriesID)) {
             forbiddenInstanceIDs.add(instanceID);
-            throw new AuthorizationManagerException("Series access forbidden", AuthorizationManagerException.Reason.SERIES_ACCESS_FORBIDDEN);
+            throw new AuthorizationManagerException(SERIES_ACCESS_FORBIDDEN);
         }
 
         URI uri = authorizationUriBuilder.build(seriesID.getStudyUID(), seriesID.getSeriesUID());
@@ -121,7 +127,7 @@ public final class AuthorizationManager {
         try {
             response = CLIENT.target(uri)
                     .request()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken)
+                    .header(AUTHORIZATION, "Bearer " + bearerToken)
                     .put(Entity.text(""));
         } catch (ProcessingException e) {
             forbiddenSeriesIDs.add(seriesID);
@@ -130,21 +136,21 @@ public final class AuthorizationManager {
         }  catch (WebApplicationException e) {
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
-            throw new AuthorizationManagerException("Series access forbidden", AuthorizationManagerException.Reason.SERIES_ACCESS_FORBIDDEN, e);
+            throw new AuthorizationManagerException(SERIES_ACCESS_FORBIDDEN, e);
         }
 
-        if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+        if (response.getStatusInfo().getFamily() == SUCCESSFUL) {
             authorizedSeriesIDs.add(seriesID);
         } else {
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
-            throw new AuthorizationManagerException("Series access forbidden", AuthorizationManagerException.Reason.SERIES_ACCESS_FORBIDDEN);
+            throw new AuthorizationManagerException(SERIES_ACCESS_FORBIDDEN);
         }
     }
 
     private void getAuthorization(ContentLocation contentLocation) throws AuthorizationManagerException{
         if (!authorizedContentLocations.contains(contentLocation)) {
-            throw new AuthorizationManagerException("Unknown content location", AuthorizationManagerException.Reason.UNKNOWN_CONTENT_LOCATION);
+            throw new AuthorizationManagerException(UNKNOWN_CONTENT_LOCATION);
         }
     }
 
@@ -158,13 +164,13 @@ public final class AuthorizationManager {
         try {
             Response response = CLIENT.target(uri)
                     .request()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken)
+                    .header(AUTHORIZATION, "Bearer " + bearerToken)
                     .post(Entity.text(""));
-            if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-                LOG.log(Level.SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
+            if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
+                LOG.log(SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
             }
         } catch (ProcessingException | WebApplicationException e) {
-            LOG.log(Level.SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID, e);
+            LOG.log(SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID, e);
         }
     }
 }
