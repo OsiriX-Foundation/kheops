@@ -128,10 +128,13 @@ CREATE TABLE capabilities (
 );
 
 CREATE TABLE album_series (
+  pk BIGINT NOT NULL AUTO_INCREMENT,
   album_fk BIGINT NOT NULL,
   series_fk BIGINT NOT NULL,
   favorite BOOLEAN NOT NULL,
-  
+
+  PRIMARY KEY (pk),
+
   FOREIGN KEY (album_fk)
     REFERENCES album(pk)
     ON DELETE RESTRICT,
