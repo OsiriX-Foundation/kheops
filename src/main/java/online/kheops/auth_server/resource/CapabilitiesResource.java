@@ -16,6 +16,7 @@ import javax.ws.rs.core.*;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.*;
 
 
@@ -60,7 +61,7 @@ public class CapabilitiesResource {
             try {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
             } catch (DateTimeParseException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {not_before_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter {not_before_time}").build();
             }
         }
         if(expirationTime != null) {
@@ -68,16 +69,16 @@ public class CapabilitiesResource {
                 capabilityParametersBuilder.expirationTime(expirationTime);
 
             } catch (DateTimeParseException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
             }
         }
 
         try {
             capabilityParametersBuilder.scope(scopeType, albumPk);
         } catch (CapabilityBadRequestException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
+            return Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
         }
 
         CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
@@ -85,14 +86,14 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = generateCapability(capabilityParameters);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (CapabilityBadRequestException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.status(Response.Status.CREATED).entity(capabilityResponse).build();
+        return Response.status(CREATED).entity(capabilityResponse).build();
     }
 
     @POST
@@ -110,10 +111,10 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = Capabilities.revokeCapability(callingUserPk, capabilityId);
         } catch (UserNotFoundException |CapabilityNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        return Response.status(Response.Status.OK).entity(capabilityResponse).build();
+        return Response.status(OK).entity(capabilityResponse).build();
     }
 
     @GET
@@ -131,9 +132,26 @@ public class CapabilitiesResource {
         try {
             capabilityResponses = Capabilities.getCapabilities(callingUserPk, showRevoke);
         } catch (UserNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         GenericEntity<List<CapabilityResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilityResponse>>(capabilityResponses) {};
-        return Response.status(Response.Status.OK).entity(genericCapabilityResponsesList).build();
+        return Response.status(OK).entity(genericCapabilityResponsesList).build();
+    }
+
+    @GET
+    @Path("capabilities/{capability_token:"+Capabilities.TOKEN_PATTERN+"}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken,
+                                      @Context SecurityContext securityContext) {
+
+        CapabilityResponse capabilityResponses;
+
+        try {
+            capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
+        } catch (CapabilityNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
+        return Response.status(OK).entity(capabilityResponses).build();
     }
 }
