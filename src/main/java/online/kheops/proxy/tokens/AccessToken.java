@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+
 @SuppressWarnings("WeakerAccess")
 public class AccessToken {
     private static final Logger LOG = Logger.getLogger(AccessToken.class.getName());
@@ -66,7 +68,7 @@ public class AccessToken {
 
             final TokenResponse tokenResponse;
             try {
-                tokenResponse = CLIENT.target(uri).request("application/json").post(Entity.form(form), TokenResponse.class);
+                tokenResponse = CLIENT.target(uri).request(APPLICATION_JSON_TYPE).post(Entity.form(form), TokenResponse.class);
             } catch (ResponseProcessingException e) {
                 LOG.log(Level.WARNING,"Unable to obtain a token for capability token", e);
                 throw new AccessTokenException("Unable to get a request token for the capability URL", e);
@@ -89,6 +91,11 @@ public class AccessToken {
     }
 
     public String getToken() {
+        return token;
+    }
+
+    @Override
+    public String toString() {
         return token;
     }
 }
