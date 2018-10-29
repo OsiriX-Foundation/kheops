@@ -63,7 +63,7 @@ public class WadoRSSeries {
 
 
     @GET
-    @Path("/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/")
+    @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/")
     @Produces("multipart/related")
     public Response wado(@PathParam("StudyInstanceUID") String studyInstanceUID,
                          @QueryParam("album") Long fromAlbumPk,
