@@ -197,7 +197,7 @@ public class SendingResource
 
         if (!kheopsPrincipal.hasUserAccess()) {
             try {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }

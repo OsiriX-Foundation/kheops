@@ -158,6 +158,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             }
             try {
                 tx.begin();
+
+                Capability mergeCapability = em.merge(capability);
+
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), mergeUser, em);
                 if (!albumUser.isAdmin()) {
                     return false;
@@ -173,7 +176,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                     return true;
                 }
 
-                if(capability.getAlbum().getSeries().contains(series)) {
+                if(mergeCapability.getAlbum().getSeries().contains(series)) {
                     return true;
                 }
             } catch (UserNotMemberException | NoResultException e) {
