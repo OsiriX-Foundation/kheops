@@ -3,6 +3,7 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.*;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -119,7 +120,7 @@ public class AlbumRessource {
         final AlbumResponses.AlbumResponse albumResponse;
 
         try {
-            albumResponse = Albums.getAlbum(callingUserPk, albumPk);
+            albumResponse = Albums.getAlbum(callingUserPk, albumPk, kheopsPrincipal.getScope()==ScopeType.ALBUM);
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
