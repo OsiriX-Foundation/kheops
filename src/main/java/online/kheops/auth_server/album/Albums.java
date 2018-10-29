@@ -165,12 +165,12 @@ public class Albums {
         }
     }
 
-    public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, long albumPk, boolean withAlbumCapabilityToken)
+    public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, long albumPk, boolean withUserAccess)
            throws JOOQException {
-        if (withAlbumCapabilityToken) {
-            return findAlbumByAlbumPk(albumPk);
-        } else {
+        if (withUserAccess) {
             return findAlbumByUserPkAndAlbumPk(albumPk, callingUserPk);
+        } else {
+            return findAlbumByAlbumPk(albumPk);
         }
     }
 

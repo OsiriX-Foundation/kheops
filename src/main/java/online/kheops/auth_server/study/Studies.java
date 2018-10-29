@@ -420,4 +420,12 @@ public class Studies {
             return false;
         }
     }
+
+    public static void addToFavorites(Long callingUserPk, String studyInstanceUID) {
+
+    }
+
+    public static void removeFromFavorites(Long callingUserPk, String studyInstanceUID) {
+
+    }
 }
