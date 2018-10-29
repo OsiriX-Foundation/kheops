@@ -130,6 +130,7 @@ CREATE TABLE capabilities (
 CREATE TABLE album_series (
   album_fk BIGINT NOT NULL,
   series_fk BIGINT NOT NULL,
+  favorite BOOLEAN NOT NULL,
   
   FOREIGN KEY (album_fk)
     REFERENCES album(pk)
