@@ -29,23 +29,23 @@ public class AlbumResponses {
         @XmlElement(name = "last_event_time")
         public LocalDateTime lastEventTime;
         @XmlElement(name = "number_of_users")
-        public long numberOfUsers;
+        public Integer numberOfUsers;
         @XmlElement(name = "number_of_comments")
         public long numberOfComments;
         @XmlElement(name = "number_of_studies")
         public long numberOfStudies;
         @XmlElement(name = "add_user")
-        public boolean addUser;
+        public Boolean addUser;
         @XmlElement(name = "download_series")
-        public boolean downloadSeries;
+        public Boolean downloadSeries;
         @XmlElement(name = "send_series")
-        public boolean sendSeries;
+        public Boolean sendSeries;
         @XmlElement(name = "delete_series")
-        public boolean deleteSeries;
+        public Boolean deleteSeries;
         @XmlElement(name = "add_series")
-        public boolean addSeries;
+        public Boolean addSeries;
         @XmlElement(name = "write_comments")
-        public boolean writeComments;
+        public Boolean writeComments;
         @XmlElement(name = "is_favorite")
         public Boolean isFavorite ;
         @XmlElement(name = "notification_new_series")
@@ -61,12 +61,6 @@ public class AlbumResponses {
         public String userName;
         @XmlElement(name = "is_admin")
         public Boolean isAdmin;
-        //@XmlElement(name = "notification_new_series")
-        //public Boolean notificationNewSeries;
-        //@XmlElement(name = "notification_new_comment")
-        //public Boolean notificationNewComment;
-        //@XmlElement(name = "is_favorite")
-        //public Boolean isFavorite ;
 
 
         public int compareTo(UserAlbumResponse userAlbumResponse) {
@@ -74,39 +68,11 @@ public class AlbumResponses {
         }
     }
 
-
-  /*  public static AlbumResponse albumToAlbumResponce(Album album, boolean isFavorite, long numberOfComments) {
-        final AlbumResponses.AlbumResponse albumResponse = new AlbumResponse();
-
-        albumResponse.pk = album.getPk();
-        albumResponse.name = album.getName();
-        albumResponse.description = album.getDescription();
-        albumResponse.createdTime = album.getCreatedTime();
-        albumResponse.lastEventTime = album.getLastEventTime();
-        albumResponse.numberOfUsers = album.getAlbumUser().size();
-        albumResponse.numberOfStudies = album.getSeries().size();
-        albumResponse.addSeries = album.isAddSeries();
-        albumResponse.addUser = album.isAddUser();
-        albumResponse.deleteSeries = album.isDeleteSeries();
-        albumResponse.downloadSeries = album.isDownloadSeries();
-        albumResponse.sendSeries = album.isSendSeries();
-        albumResponse.writeComments = album.isWriteComments();
-
-        albumResponse.numberOfComments = numberOfComments;
-
-        albumResponse.isFavorite = isFavorite;
-
-        return albumResponse;
-    }*/
-
     public static UserAlbumResponse albumUserToUserAlbumResponce(AlbumUser albumUser) {
         final UserAlbumResponse userAlbumResponse = new UserAlbumResponse();
 
         userAlbumResponse.userName = albumUser.getUser().getGoogleEmail();
         userAlbumResponse.isAdmin = albumUser.isAdmin();
-        //userAlbumResponse.isFavorite = albumUser.isFavorite();
-        //userAlbumResponse.notificationNewComment = albumUser.isNewCommentNotifications();
-        //userAlbumResponse.notificationNewSeries = albumUser.isNewSeriesNotifications();
 
         return userAlbumResponse;
     }
@@ -132,6 +98,21 @@ public class AlbumResponses {
         albumResponse.notificationNewComment = ((Byte) r.getValue("new_comment_notifications")) != 0;
         albumResponse.notificationNewSeries = ((Byte) r.getValue("new_series_notifications")) != 0;
         albumResponse.isAdmin = ((Byte) r.getValue("admin")) != 0;
+        if(r.getValue("modalities") != null) {
+            albumResponse.modalities = r.getValue("modalities").toString().split("/");
+        }
+
+        return albumResponse;
+    }
+
+    public static AlbumResponse recordToAlbumResponseForCapabilityToken(Record r) {
+        final AlbumResponse albumResponse = new AlbumResponse();
+
+        albumResponse.id = r.getValue("album_pk").toString();
+        albumResponse.name = r.getValue("album_name").toString();
+        albumResponse.description = r.getValue("album_description").toString();
+        albumResponse.numberOfStudies = (Integer) r.getValue("number_of_studies");
+        albumResponse.numberOfComments = (Integer) r.getValue("number_of_comments");
         if(r.getValue("modalities") != null) {
             albumResponse.modalities = r.getValue("modalities").toString().split("/");
         }

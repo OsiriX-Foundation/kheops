@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponseForCapabilityToken;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.JOOQTools.*;
 import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponse;
@@ -195,6 +196,45 @@ public class AlbumQueries {
             Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String> result = (Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>) query.fetchOne();
 
             return recordToAlbumResponse(result);
+        } catch (Exception e) {
+            throw new JOOQException("Error during request");
+        }
+    }
+
+    public static AlbumResponses.AlbumResponse findAlbumByAlbumPk(long albumPk)
+            throws JOOQException {
+        try (Connection connection = getDataSource().getConnection()) {
+
+            final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+            final SelectQuery query = create.selectQuery();
+
+            Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
+                    .from(ALBUM_USER)
+                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .asField();
+
+            query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
+                    isnull(ALBUM.NAME,"NULL").as("album_name"),
+                    isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
+                    isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
+                    isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
+                    groupConcatDistinct(SERIES.MODALITY).as("modalities"));
+
+            query.addFrom(ALBUM);
+            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+            query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUM.PK));
+
+            query.addJoin(EVENT, JoinType.LEFT_OUTER_JOIN, EVENT.ALBUM_FK.eq(ALBUM.PK)
+                    .and(EVENT.EVENT_TYPE.eq("Comment"))
+                    .and(EVENT.PRIVATE_TARGET_USER_FK.isNull()));
+
+            query.addConditions(ALBUM.PK.eq(albumPk));;
+
+            query.addGroupBy(ALBUM.PK);
+            Record6<BigDecimal, String, String, Long, Long, String> result = (Record6<BigDecimal, String, String, Long, Long, String>) query.fetchOne();
+
+            return recordToAlbumResponseForCapabilityToken(result);
         } catch (Exception e) {
             throw new JOOQException("Error during request");
         }
