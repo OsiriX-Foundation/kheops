@@ -22,6 +22,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
 
+import java.io.EOFException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -89,8 +90,7 @@ public class WadoRSSeries {
 
         final List<Attributes> seriesList = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
                 .header(AUTHORIZATION, authorizationHeader)
-                .get(new GenericType<List<Attributes>>() {
-                });
+                .get(new GenericType<List<Attributes>>() {});
 
         final WebTarget webTarget = CLIENT.target(wadoServiceURI)
                 .path("/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
@@ -131,7 +131,12 @@ public class WadoRSSeries {
                     output.writePart(new StreamingBodyPart(multipartInputStream, MediaType.valueOf(headers.getFirst(CONTENT_TYPE)), headers));
                 };
 
-                new MultipartParser(boundary).parse(inputStream, handler);
+                try {
+                    new MultipartParser(boundary).parse(inputStream, handler);
+                } catch (EOFException e) {
+                    LOG.log(WARNING, "InvocationBuilder: " + invocationBuilder, e);
+                    throw e;
+                }
                 wadoResponse.close();
             }
         };
