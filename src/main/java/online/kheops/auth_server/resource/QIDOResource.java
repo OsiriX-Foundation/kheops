@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
@@ -66,7 +67,7 @@ public class QIDOResource {
                                @Context SecurityContext securityContext) {
 
         if (fromAlbumPk != null && fromInbox != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
         if (offset == null) {
@@ -78,14 +79,14 @@ public class QIDOResource {
 
         try {
             if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, fromAlbumPk)) {
-                return Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         if(fromInbox != null && !kheopsPrincipal.hasUserAccess()) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(FORBIDDEN).build();
         }
 
         final PairListXTotalCount<Attributes> pair;
@@ -96,18 +97,18 @@ public class QIDOResource {
             LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
-            return Response.status(Response.Status.BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
+            return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
         } catch (BadQueryParametersException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
+            return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
         if(pair.getXTotalCount() == 0) {
-            return Response.status(Response.Status.NO_CONTENT).header("X-Total-Count", pair.getXTotalCount()).build();
+            return Response.status(NO_CONTENT).header("X-Total-Count", pair.getXTotalCount()).build();
         }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
@@ -135,7 +136,7 @@ public class QIDOResource {
                               @Context UriInfo uriInfo) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
         fromInbox = fromInbox != null;
@@ -166,11 +167,11 @@ public class QIDOResource {
         try {
             availableSeriesUIDs = availableSeriesUIDs(callingUserPk, studyInstanceUID, fromAlbumPk, fromInbox);
         } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         if (availableSeriesUIDs.isEmpty()) {
-            return Response.status(Response.Status.NO_CONTENT).header("X-Total-Count", 0).build();
+            return Response.status(NO_CONTENT).header("X-Total-Count", 0).build();
         }
 
         List<Attributes> allSeries = webTarget.request("application/dicom+json")
@@ -216,7 +217,7 @@ public class QIDOResource {
                                        @QueryParam("inbox") Boolean fromInbox, @Context SecurityContext securityContext) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
         fromInbox = fromInbox != null;
@@ -237,7 +238,7 @@ public class QIDOResource {
         try {
             availableSeriesUIDs = availableSeriesUIDs(callingUserPk, studyInstanceUID, fromAlbumPk, fromInbox);
         } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final StreamingOutput stream = os -> {

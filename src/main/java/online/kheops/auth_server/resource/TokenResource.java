@@ -39,6 +39,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.Response.Status.*;
+
 @Path("/")
 public class TokenResource
 {
@@ -98,12 +100,12 @@ public class TokenResource
         if (grantType == null) {
             errorResponse.errorDescription = "Missing grant_type";
             LOG.warning("Request for a token is missing a grant_type");
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
         if (assertionToken == null) {
             errorResponse.errorDescription = "Missing assertion";
             LOG.warning("Request for a token is missing an assertion");
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final Assertion assertion;
@@ -112,19 +114,19 @@ public class TokenResource
         } catch (UnknownGrantTypeException e) {
             errorResponse.errorDescription = e.getMessage();
             LOG.log(Level.WARNING, "Unknown grant type", e);
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         } catch (BadAssertionException e) {
             errorResponse.errorDescription = e.getMessage();
             LOG.log(Level.WARNING, "Error validating a token", e);
-            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
             errorResponse.error = "server_error";
             errorResponse.errorDescription = "error";
-            return Response.status(Response.Status.BAD_GATEWAY).entity(errorResponse).build();
+            return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
-        Response.Status responseStatus = Response.Status.OK;
+        Response.Status responseStatus = OK;
 
         EntityManager em;
         EntityTransaction tx;
@@ -167,7 +169,7 @@ public class TokenResource
                 em.persist(user);
                 em.persist(albumUser);
                 tx.commit();
-                responseStatus = Response.Status.CREATED;
+                responseStatus = CREATED;
             } catch (PersistenceException e) {
                 LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
             } finally {
@@ -196,7 +198,7 @@ public class TokenResource
                 } catch (NoResultException e) {
                     LOG.info("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair");
                     errorResponse.errorDescription = "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair";
-                    return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
             }
 
@@ -205,7 +207,7 @@ public class TokenResource
             LOG.log(Level.SEVERE, "Error while accessing the database", e);
             errorResponse.error = "server_error";
             errorResponse.errorDescription = "error";
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
+            return Response.status(INTERNAL_SERVER_ERROR).entity(errorResponse).build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -220,7 +222,7 @@ public class TokenResource
             algorithmHMAC = Algorithm.HMAC256(authSecret);
         } catch (UnsupportedEncodingException e) {
             LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(INTERNAL_SERVER_ERROR).build();
         }
 
         JWTCreator.Builder jwtBuilder = JWT.create()
@@ -268,7 +270,7 @@ public class TokenResource
                } catch (GSSException exception) {
                    LOG.info("scope StudyInstanceUID is not a valid UID");
                    errorResponse.errorDescription = "scope StudyInstanceUID is not a valid UID";
-                   throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build());
+                   throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
                }
            } else if (item.startsWith("SeriesInstanceUID=")) {
                seriesUID = item.substring(18);
@@ -277,7 +279,7 @@ public class TokenResource
                } catch (GSSException exception) {
                    LOG.info("scope SeriesInstanceUID is not a valid UID");
                    errorResponse.errorDescription = "scope SeriesInstanceUID is not a valid UID";
-                   throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build());
+                   throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
                }
            } else {
                LOG.info("Unknown scope requested: " +item);
@@ -289,12 +291,12 @@ public class TokenResource
        } else if (studyUID == null) {
            LOG.info("no StudyInstanceUID provided in the scope");
            errorResponse.errorDescription = "no StudyInstanceUID provided in the scope";
-           throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build());
+           throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
        } else if (seriesUID == null) {
            errorResponse.errorDescription = "no StudyInstanceUID provided in the scope";
            LOG.info("no SeriesInstanceUID provided in the scope");
            errorResponse.errorDescription = "no SeriesInstanceUID provided in the scope";
-           throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build());
+           throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
        } else {
            return new UIDPair(studyUID, seriesUID);
        }

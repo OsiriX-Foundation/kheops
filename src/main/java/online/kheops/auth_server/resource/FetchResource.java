@@ -12,6 +12,8 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 @Path("/")
 public class FetchResource {
     private static final Logger LOG = Logger.getLogger(FetchResource.class.getName());
@@ -32,7 +34,7 @@ public class FetchResource {
         try {
             new Oid(uid);
         } catch (GSSException exception) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("StudyInstanceUID is not a valid UID").build());
+            throw new WebApplicationException(Response.status(BAD_REQUEST).entity("StudyInstanceUID is not a valid UID").build());
         }
     }
 }

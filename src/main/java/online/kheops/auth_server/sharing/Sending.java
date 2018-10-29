@@ -293,7 +293,7 @@ public class Sending {
                 return;
             }
 
-            Series series;
+            final Series series;
             try {
                 series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
             } catch (NoResultException exception) {
