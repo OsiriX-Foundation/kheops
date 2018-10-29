@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.Response.Status.*;
 import static org.glassfish.jersey.client.ClientProperties.REQUEST_ENTITY_PROCESSING;
 import static org.glassfish.jersey.client.RequestEntityProcessing.CHUNKED;
@@ -56,7 +57,7 @@ public final class Resource {
     @Context
     ServletContext context;
 
-    @HeaderParam("Content-Type")
+    @HeaderParam(CONTENT_TYPE)
     MediaType contentType;
 
     @Context
@@ -145,7 +146,11 @@ public final class Resource {
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, contentType), InputStream.class);
 
-            return authorizationManager.getResponse(SAXReader.parse(responseStream));
+            //TODO this should go through a MessageBody Reader
+            Response response = authorizationManager.getResponse(SAXReader.parse(responseStream));
+            inputStream.close();
+            responseStream.close();
+            return response;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOG.log(Level.WARNING, "Error parsing response", e);
             throw new WebApplicationException(BAD_GATEWAY);

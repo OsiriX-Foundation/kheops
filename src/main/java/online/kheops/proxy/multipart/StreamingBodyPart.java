@@ -17,6 +17,12 @@ public class StreamingBodyPart {
         this.mediaType = mediaType;
     }
 
+    public StreamingBodyPart(final Object entity, final MediaType mediaType, final MultivaluedMap<String, String> headers) {
+        this.entity = entity;
+        this.mediaType = mediaType;
+        this.headers = headers;
+    }
+
     public Object getEntity() {
         return entity;
     }
