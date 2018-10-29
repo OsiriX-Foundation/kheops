@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
@@ -158,6 +159,28 @@ public class QIDOResource {
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
+        try {
+            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                return Response.status(NOT_FOUND).build();
+            }
+        } catch (StudyNotFoundException e) {
+            return Response.status(NOT_FOUND).build();
+        }
+
+        //BEGIN kheopsPrincipal
+        if (fromInbox && !kheopsPrincipal.hasUserAccess()) {
+            return Response.status(FORBIDDEN).build();
+        }
+
+        try {
+            if (fromAlbumPk != null && fromAlbumPk != kheopsPrincipal.getAlbumID()) {
+                return Response.status(FORBIDDEN).build();
+            } else if (fromAlbumPk == null) {
+                fromAlbumPk = kheopsPrincipal.getAlbumID();
+            }
+        } catch (NotAlbumScopeTypeException e) { /*empty*/ }
+        //END kheopsPrincipal
+
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
@@ -232,6 +255,28 @@ public class QIDOResource {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
+
+        try {
+            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                return Response.status(NOT_FOUND).build();
+            }
+        } catch (StudyNotFoundException e) {
+            return Response.status(NOT_FOUND).build();
+        }
+
+        //BEGIN kheopsPrincipal
+        if (fromInbox && !kheopsPrincipal.hasUserAccess()) {
+            return Response.status(FORBIDDEN).build();
+        }
+
+        try {
+            if (fromAlbumPk != null && fromAlbumPk != kheopsPrincipal.getAlbumID()) {
+                return Response.status(FORBIDDEN).build();
+            } else if (fromAlbumPk == null) {
+                fromAlbumPk = kheopsPrincipal.getAlbumID();
+            }
+        } catch (NotAlbumScopeTypeException e) { /*empty*/ }
+        //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();

@@ -1,13 +1,16 @@
 package online.kheops.auth_server.series;
 
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.user.UserNotFoundException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.VR;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
@@ -15,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByPk;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUID;
+import static online.kheops.auth_server.user.Users.getUser;
 
 public class Series {
 
@@ -68,6 +72,36 @@ public class Series {
         }catch (NoResultException e) {
             return false;
         }
+    }
+
+
+    public static void addToFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
+    throws UserNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Album album = callingUser.getInbox();
+
+
+
+
+
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+
+    public static void removeFromFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID) {
+
     }
 
 }

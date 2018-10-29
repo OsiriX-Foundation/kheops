@@ -17,9 +17,9 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/")
-public class AlbumRessource {
+public class AlbumResource {
 
-    private static final Logger LOG = Logger.getLogger(AlbumRessource.class.getName());
+    private static final Logger LOG = Logger.getLogger(AlbumResource.class.getName());
 
     @Context
     private UriInfo uriInfo;
@@ -120,7 +120,7 @@ public class AlbumRessource {
         final AlbumResponses.AlbumResponse albumResponse;
 
         try {
-            albumResponse = Albums.getAlbum(callingUserPk, albumPk, kheopsPrincipal.getScope()==ScopeType.ALBUM);
+            albumResponse = Albums.getAlbum(callingUserPk, albumPk, kheopsPrincipal.hasUserAccess());
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
