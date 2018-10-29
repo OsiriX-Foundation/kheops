@@ -117,7 +117,11 @@ public class InboxResource {
             return Response.status(NOT_FOUND).build();
         }
 
-        Series.addToFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID);
+        try {
+            Series.addToFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID);
+        } catch (UserNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
 
         return Response.status(NO_CONTENT).build();
     }
