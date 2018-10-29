@@ -6,6 +6,7 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
+import org.dcm4che3.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -20,11 +21,14 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
 import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponses;
+import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponsesInfo;
 
 public class Capabilities {
     private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int TOKEN_LENGTH = 22;
-    private static final Pattern pattern = Pattern.compile("^[A-Za-z0-9]{" + TOKEN_LENGTH + "}$");
+    public static final String TOKEN_PATTERN = "[A-Za-z0-9]{" + TOKEN_LENGTH + "}";
+    private static final String TOKEN_PATTERN_STRICT = "^" + TOKEN_PATTERN + "$";
+    private static final Pattern pattern = Pattern.compile(TOKEN_PATTERN_STRICT);
     private static final Random rdm = new SecureRandom();
 
     private Capabilities() {
@@ -192,6 +196,21 @@ public class Capabilities {
         return capabilityResponses;
     }
 
+    public static CapabilitiesResponses.CapabilityResponse getCapabilityInfo(String capabilityToken)
+            throws CapabilityNotFoundException {
+        CapabilitiesResponses.CapabilityResponse capabilityResponse;
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            Capability capability = getCapability(capabilityToken, em);
+            capabilityResponse = capabilityToCapabilitiesResponsesInfo(capability);
+        } finally {
+            em.close();
+        }
+        return capabilityResponse;
+    }
+
     public static Capability getCapability(User user, long capabilityId, EntityManager em) throws CapabilityNotFoundException {
         try {
             return findCapabilityByCapabilityTokenandUser(user, capabilityId, em);
@@ -204,7 +223,7 @@ public class Capabilities {
         try {
             return findCapabilityByCapabilityToken(secret, em);
         } catch (NoResultException e) {
-            throw new CapabilityNotFoundException();
+            throw new CapabilityNotFoundException("Capabability token not found");
         }
     }
 }

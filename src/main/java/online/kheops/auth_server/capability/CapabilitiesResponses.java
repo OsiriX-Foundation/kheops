@@ -12,7 +12,7 @@ public class CapabilitiesResponses {
 
     public static class CapabilityResponse {
         @XmlElement(name = "id")
-        long id;
+        Long id;
 
         @XmlElement(name = "secret")
         String secret;
@@ -72,4 +72,25 @@ public class CapabilitiesResponses {
 
         return capabilityResponse;
     }
+
+    public static CapabilityResponse capabilityToCapabilitiesResponsesInfo(Capability capability) {
+
+        CapabilityResponse capabilityResponse = new CapabilityResponse();
+
+        capabilityResponse.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
+        capabilityResponse.revoked = capability.isRevoked();
+        if (capability.isRevoked()) {
+            capabilityResponse.revokeTime = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
+        }
+
+        if (capability.isActive()) {
+            capabilityResponse.notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
+        }
+
+        capabilityResponse = ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(capabilityResponse, capability);
+
+        return capabilityResponse;
+    }
+
+
 }
