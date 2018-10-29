@@ -21,6 +21,7 @@ import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
 
 @Path("/")
@@ -43,20 +44,20 @@ public class EventRessource {
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         try {
             if(!kheopsPrincipal.hasAlbumAccess(albumPk)) {
-                return Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(FORBIDDEN).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(BAD_REQUEST).build();
         }
 
         try {
@@ -70,11 +71,11 @@ public class EventRessource {
                 pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
             }
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(pair.getAttributesList()) {};
-        return Response.status(Response.Status.OK).entity(genericEventsResponsesList).header("X-Total-Count",pair.getXTotalCount()).build();
+        return Response.status(OK).entity(genericEventsResponsesList).header("X-Total-Count",pair.getXTotalCount()).build();
     }
 
     @POST
@@ -90,10 +91,10 @@ public class EventRessource {
 
         try {
             if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.WRITE_COMMENT, albumPk)) {
-                return Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -101,12 +102,12 @@ public class EventRessource {
         try {
             Events.albumPostComment(callingUserPk, albumPk, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.status(NO_CONTENT).build();
     }
 
     @GET
@@ -125,27 +126,27 @@ public class EventRessource {
 
         try {
             if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                return Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(FORBIDDEN).build();
             }
         } catch (StudyNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
         if( offset < 0 || limit < 0 ) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(BAD_REQUEST).build();
         }
 
         try {
             pair = Events.getCommentsByStudyUID(callingUserPk, studyInstanceUID, offset, limit);
         } catch(UserNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(pair.getAttributesList()) {};
-        return Response.status(Response.Status.OK).entity(genericEventsResponsesList).header("X-Total-Count", pair.getXTotalCount()).build();
+        return Response.status(OK).entity(genericEventsResponsesList).header("X-Total-Count", pair.getXTotalCount()).build();
     }
 
     @POST
@@ -161,7 +162,7 @@ public class EventRessource {
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         if(!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(FORBIDDEN).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -169,11 +170,11 @@ public class EventRessource {
         try {
             Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);
         } catch (UserNotFoundException | StudyNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.status(NO_CONTENT).build();
     }
 }

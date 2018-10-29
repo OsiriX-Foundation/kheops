@@ -25,7 +25,7 @@ public class Albums {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AlbumResponses.AlbumResponse createAlbum(long callingUserPk, String name, String description, UsersPermission usersPermission)
+    public static AlbumResponses.AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
             throws UserNotFoundException, JOOQException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -35,11 +35,11 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            final User mergedCallingUser = em.merge(callingUser);
 
             final Album newAlbum = new Album(name, description, usersPermission);
-            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
-            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
+            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, mergedCallingUser, true);
+            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(mergedCallingUser, newAlbum);
 
             em.persist(newAlbum);
             em.persist(newAlbumUser);
@@ -47,7 +47,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumPk(newAlbum.getPk(), callingUserPk);
+            albumResponse = findAlbumByUserPkAndAlbumPk(newAlbum.getPk(), mergedCallingUser.getPk());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
