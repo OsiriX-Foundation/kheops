@@ -14,8 +14,10 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
+
 @Provider
-@Produces("application/dicom+json")
+@Produces(APPLICATION_DICOM_JSON)
 public class JSONAttributesWriter implements MessageBodyWriter<Attributes> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

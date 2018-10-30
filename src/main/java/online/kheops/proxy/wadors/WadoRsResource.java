@@ -92,7 +92,7 @@ public class WadoRsResource {
         WebTarget webTarget = CLIENT.target(wadoServiceURI).path(resource);
 
         Invocation.Builder invocationBuilder = webTarget.request();
-        invocationBuilder.header(AUTHORIZATION, "Bearer " + accessToken.getToken());
+        invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
         if (acceptParam != null) {
             invocationBuilder.header(ACCEPT, acceptParam);
         }

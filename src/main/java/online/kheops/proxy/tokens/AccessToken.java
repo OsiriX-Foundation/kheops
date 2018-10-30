@@ -90,6 +90,10 @@ public class AccessToken {
         return new AccessTokenBuilder(authorizationServerRoot);
     }
 
+    public String getHeaderValue() {
+        return "Bearer " + getToken();
+    }
+
     public String getToken() {
         return token;
     }

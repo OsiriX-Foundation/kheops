@@ -89,7 +89,7 @@ public class WadoUriResource {
         }
 
         Invocation.Builder invocationBuilder = webTarget.request();
-        invocationBuilder.header(AUTHORIZATION, "Bearer " + accessToken.getToken());
+        invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
         if (acceptParam != null) {
             invocationBuilder.accept(acceptParam);
         } else {

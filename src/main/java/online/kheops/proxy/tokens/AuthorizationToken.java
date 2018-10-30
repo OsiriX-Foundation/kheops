@@ -64,6 +64,10 @@ public class AuthorizationToken {
         return getToken();
     }
 
+    public String getHeaderValue() {
+        return "Bearer " + getToken();
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof AuthorizationToken && token.equals(((AuthorizationToken) o).getToken());

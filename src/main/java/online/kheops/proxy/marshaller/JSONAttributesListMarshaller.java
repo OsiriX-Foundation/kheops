@@ -3,7 +3,6 @@ package online.kheops.proxy.marshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
-import org.dcm4che3.ws.rs.MediaTypes;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
@@ -24,9 +23,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
+
 @Provider
-@Consumes(MediaTypes.APPLICATION_DICOM_JSON + "," + MediaType.APPLICATION_JSON)
-@Produces(MediaTypes.APPLICATION_DICOM_JSON + "," + MediaType.APPLICATION_JSON)
+@Consumes(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
+@Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
 public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
     @Override

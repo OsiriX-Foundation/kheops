@@ -23,6 +23,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
@@ -97,47 +99,42 @@ public class WadoRSSeries {
                 .resolveTemplate("StudyInstanceUID", studyInstanceUID);
 
         final MultipartStreamingOutput multipartStreamingOutput = output -> {
-            for (Attributes series : seriesList) {
-                final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
-                final WebTarget wadoWebTarget = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID);
+            try {
+                for (Attributes series : seriesList) {
+                    final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
+                    final AccessToken accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
+                    final Invocation.Builder invocationBuilder = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID).request();
 
-                final AccessToken accessToken;
-                try {
-                    accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
-                } catch (AccessTokenException e) {
-                    LOG.log(WARNING, "Unable to get an access token", e);
-                    throw new WebApplicationException(UNAUTHORIZED);
-                }
+                    invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
+                    if (acceptParam != null) {
+                        invocationBuilder.header(ACCEPT, acceptParam);
+                    }
+                    if (acceptCharsetParam != null) {
+                        invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
+                    }
 
-                final Invocation.Builder invocationBuilder = wadoWebTarget.request();
-                invocationBuilder.header(AUTHORIZATION, "Bearer " + accessToken);
-                if (acceptParam != null) {
-                    invocationBuilder.header(ACCEPT, acceptParam);
-                }
-                if (acceptCharsetParam != null) {
-                    invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
-                }
+                    final Response wadoResponse = invocationBuilder.get(Response.class);
+                    final InputStream inputStream = wadoResponse.readEntity(InputStream.class);
+                    final String boundary = wadoResponse.getMediaType().getParameters().get(BOUNDARY_PARAMETER);
 
-                final Response wadoResponse = invocationBuilder.get(Response.class);
-                final InputStream inputStream = wadoResponse.readEntity(InputStream.class);
-                final String boundary = wadoResponse.getMediaType().getParameters().get(BOUNDARY_PARAMETER);
+                    final MultipartParser.Handler handler = (partNumber, multipartInputStream) -> {
+                        Map<String, List<String>> sourceHeaders = multipartInputStream.readHeaderParams();
+                        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+                        headers.putSingle(CONTENT_TYPE, sourceHeaders.get(CONTENT_TYPE).get(0));
+                        // TODO handle content Location if needed
 
-                final MultipartParser.Handler handler = (partNumber, multipartInputStream) -> {
-                    Map<String, List<String>> sourceHeaders = multipartInputStream.readHeaderParams();
-                    MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-                    headers.putSingle(CONTENT_TYPE, sourceHeaders.get(CONTENT_TYPE).get(0));
-                    // TODO handle content Location if needed
+                        output.writePart(new StreamingBodyPart(multipartInputStream, MediaType.valueOf(headers.getFirst(CONTENT_TYPE)), headers));
+                    };
 
-                    output.writePart(new StreamingBodyPart(multipartInputStream, MediaType.valueOf(headers.getFirst(CONTENT_TYPE)), headers));
-                };
-
-                try {
                     new MultipartParser(boundary).parse(inputStream, handler);
-                } catch (EOFException e) {
-                    LOG.log(WARNING, "InvocationBuilder: " + invocationBuilder, e);
-                    throw e;
+                    wadoResponse.close();
                 }
-                wadoResponse.close();
+            } catch (IOException e) {
+                LOG.log(SEVERE, "Error while streaming the output", e);
+                throw new WebApplicationException(BAD_GATEWAY);
+            } catch (AccessTokenException e) {
+                LOG.log(WARNING, "Unable to get an access token", e);
+                throw new WebApplicationException(UNAUTHORIZED);
             }
         };
 
