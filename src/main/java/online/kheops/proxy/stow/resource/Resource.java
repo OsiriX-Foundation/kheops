@@ -148,8 +148,6 @@ public final class Resource {
 
             //TODO this should go through a MessageBody Reader
             Response response = authorizationManager.getResponse(SAXReader.parse(responseStream));
-            inputStream.close();
-            responseStream.close();
             return response;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOG.log(Level.WARNING, "Error parsing response", e);

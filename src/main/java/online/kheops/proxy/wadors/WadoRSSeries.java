@@ -126,7 +126,6 @@ public final class WadoRSSeries {
                     };
 
                     new MultipartParser(boundary).parse(inputStream, handler);
-                    wadoResponse.close();
                 }
             } catch (IOException e) {
                 LOG.log(SEVERE, "Error while streaming the output", e);
