@@ -27,11 +27,12 @@ import static java.lang.Math.min;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 @Path("/")
-public class WadoRSStudyInstance {
+public final class WadoRSStudyInstance {
     private static final Logger LOG = Logger.getLogger(WadoRSSeries.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
@@ -44,15 +45,14 @@ public class WadoRSStudyInstance {
     @Context
     UriInfo uriInfo;
 
-
     @GET
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/instances")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response wado(@PathParam("StudyInstanceUID") String studyInstanceUID,
-                         @QueryParam("offset") Integer offsetParam,
-                         @QueryParam("limit") Integer limitParam,
-                         @QueryParam("album") Long fromAlbumPk,
-                         @QueryParam("inbox") Boolean fromInbox) {
+    public Response wado(@PathParam("StudyInstanceUID") final String studyInstanceUID,
+                         @QueryParam("offset") final Integer offsetParam,
+                         @QueryParam("limit") final Integer limitParam,
+                         @QueryParam("album") final Long fromAlbumPk,
+                         @QueryParam("inbox") final Boolean fromInbox) {
 
         final int offset = offsetParam != null ? max(offsetParam, 0) : 0;
         final int limit = limitParam != null ? limitParam : Integer.MAX_VALUE;
@@ -76,16 +76,37 @@ public class WadoRSStudyInstance {
 
         final URI qidoServiceURI = qidoServiceURIBuilder.build(studyInstanceUID);
 
-        final List<Attributes> seriesList = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
-                .header(AUTHORIZATION, authorizationHeader)
-                .get(new GenericType<List<Attributes>>() {});
+        final List<Attributes> seriesList;
+        try {
+            seriesList = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
+                    .header(AUTHORIZATION, authorizationHeader)
+                    .get(new GenericType<List<Attributes>>() {});
 
+        } catch (ProcessingException e) {
+            LOG.log(SEVERE, "Error getting the series list", e);
+            throw new WebApplicationException(BAD_GATEWAY);
+        } catch (WebApplicationException e) {
+            if (e.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
+                LOG.log(WARNING, "User Unauthorized", e);
+                throw new WebApplicationException(UNAUTHORIZED);
+            } else {
+                LOG.log(WARNING, "Unexpected response", e);
+                throw new WebApplicationException(BAD_GATEWAY);
+            }
+        }
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
         UriBuilder instanceQidoServiceURIBuilder = UriBuilder.fromUri(instanceQidoServiceURI);
 
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
-            instanceQidoServiceURIBuilder = instanceQidoServiceURIBuilder.queryParam(parameter.getKey(), parameter.getValue().toArray());
+            if (!parameter.getKey().equalsIgnoreCase("offset") &&
+                    !parameter.getKey().equalsIgnoreCase("limit") &&
+                    !parameter.getKey().equalsIgnoreCase("album") &&
+                    !parameter.getKey().equalsIgnoreCase("inbox")) {
+                instanceQidoServiceURIBuilder = instanceQidoServiceURIBuilder.queryParam(parameter.getKey(), parameter.getValue().toArray());
+            } else if (parameter.getKey().equalsIgnoreCase("limit")) {
+                instanceQidoServiceURIBuilder = instanceQidoServiceURIBuilder.queryParam(parameter.getKey(), limit+1);
+            }
         }
 
         final WebTarget webTarget = CLIENT.target(instanceQidoServiceURIBuilder.build())
@@ -93,8 +114,10 @@ public class WadoRSStudyInstance {
                 .resolveTemplate("StudyInstanceUID", studyInstanceUID);
 
         int instancesToSkip = offset;
+        boolean additionalInstances = false;
         final List<Attributes> instanceList = new ArrayList<>();
-        for (int i = 0; i < seriesList.size() && instanceList.size() < limit; i++) {
+        int i = 0;
+        for (i = 0; i < seriesList.size() && instanceList.size() < limit; i++) {
             String seriesInstanceUID = seriesList.get(i).getString(Tag.SeriesInstanceUID);
             final WebTarget instanceWebTarget = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID);
 
@@ -102,20 +125,32 @@ public class WadoRSStudyInstance {
             try {
                 accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
             } catch (AccessTokenException e) {
-                LOG.log(WARNING, "Unable to get an access token", e);
+                LOG.log(SEVERE, "Unable to get an access token", e);
                 throw new WebApplicationException(UNAUTHORIZED);
             }
 
-            final List<Attributes> seriesInstanceList = instanceWebTarget.request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
-                    .header(AUTHORIZATION, accessToken.getHeaderValue())
-                    .get(new GenericType<List<Attributes>>() {});
+            final List<Attributes> seriesInstanceList;
+            try {
+                seriesInstanceList = instanceWebTarget.request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
+                        .header(AUTHORIZATION, accessToken.getHeaderValue())
+                        .get(new GenericType<List<Attributes>>() {});
+            } catch (ProcessingException | WebApplicationException e) {
+                LOG.log(SEVERE, "Unable to get instances for a series", e);
+                throw new WebApplicationException(BAD_GATEWAY);
+            }
 
             final int localInstancesToSkip = min(instancesToSkip, seriesInstanceList.size());
             if (localInstancesToSkip < seriesInstanceList.size()) {
                 int instancesToAdd = min(seriesInstanceList.size() - localInstancesToSkip, limit - instanceList.size());
+                if (instancesToAdd < seriesInstanceList.size() - localInstancesToSkip) {
+                    additionalInstances = true;
+                }
                 instanceList.addAll(seriesInstanceList.subList(localInstancesToSkip, localInstancesToSkip + instancesToAdd));
             }
             instancesToSkip -= localInstancesToSkip;
+        }
+        if (i < seriesList.size()) {
+            additionalInstances = true;
         }
 
         final CacheControl cacheControl = new CacheControl();
@@ -125,7 +160,12 @@ public class WadoRSStudyInstance {
             return Response.noContent().cacheControl(cacheControl).build();
         } else {
             final GenericEntity<List<Attributes>> genericInstanceList = new GenericEntity<List<Attributes>>(instanceList) {};
-            return Response.ok(genericInstanceList).cacheControl(cacheControl).build();
+            if (additionalInstances) {
+                return Response.ok(genericInstanceList).header("Warning", "299 {+service}: There are unknown additional results that can be requested")
+                        .cacheControl(cacheControl).build();
+            } else {
+                return Response.ok(genericInstanceList).cacheControl(cacheControl).build();
+            }
         }
     }
 
