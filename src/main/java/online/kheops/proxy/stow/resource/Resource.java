@@ -55,9 +55,6 @@ public final class Resource {
     }
 
     @Context
-    UriInfo uriInfo;
-
-    @Context
     ServletContext context;
 
     @HeaderParam(CONTENT_TYPE)
@@ -69,7 +66,7 @@ public final class Resource {
     @POST
     @Path("/password/dicomweb/studies")
     @Consumes("multipart/related")
-    @Produces({"application/dicom+json;qs=1.0, application/dicom+xml;qs=0.9, application/json;qs=0.8"})
+    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stow(@HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
     }
@@ -77,7 +74,7 @@ public final class Resource {
     @POST
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies")
     @Consumes("multipart/related")
-    @Produces({"application/dicom+json;qs=1.0, application/dicom+xml;qs=0.9, application/json;qs=0.8"})
+    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stowWithCapability(@PathParam("capability") String capabilityToken, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.from(capabilityToken), albumId, null);
     }
@@ -85,7 +82,7 @@ public final class Resource {
     @POST
     @Path("/password/dicomweb/studies/{studyInstanceUID}")
     @Consumes("multipart/related")
-    @Produces({"application/dicom+json;qs=1.0, application/dicom+xml;qs=0.9, application/json;qs=0.8"})
+    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stowStudy(@HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
     }
@@ -93,7 +90,7 @@ public final class Resource {
     @POST
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID}")
     @Consumes("multipart/related")
-    @Produces({"application/dicom+json;qs=1.0, application/dicom+xml;qs=0.9, application/json;qs=0.8"})
+    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stowStudyWithCapability(@PathParam("capability") String capabilityToken, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.from(capabilityToken), albumId, studyInstanceUID);
     }
