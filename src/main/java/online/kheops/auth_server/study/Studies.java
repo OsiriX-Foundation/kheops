@@ -3,10 +3,9 @@ package online.kheops.auth_server.study;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.Series;
-import online.kheops.auth_server.entity.Study;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -104,6 +103,8 @@ public class Studies {
             conditionArrayList.add(createConditonModality(qidoParams.getModalityFilter().get()));
         }
 
+        //TODO add fav condition
+
 
         SelectQuery query = create.selectQuery();
         query.addSelect(countDistinct(STUDIES.PK));
@@ -141,7 +142,8 @@ public class Studies {
                 isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
                 isnull(count(SERIES.PK), 0).as("count:" + SERIES.PK.getName()),
                 sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
-                isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"));
+                isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
+                sum(ALBUM_SERIES.FAVORITE).as("sum_fav"));
         query.addFrom(USERS);
         query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
         query.addJoin(ALBUM, ALBUM.PK.eq(ALBUM_USER.ALBUM_FK));
@@ -168,7 +170,7 @@ public class Studies {
             query.addOffset(qidoParams.getOffset().get());
         }
 
-        Result<Record14<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String>> result = query.fetch();
+        Result<Record15<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String, BigDecimal>> result = query.fetch();
 
         List<Attributes> attributesList;
         attributesList = new ArrayList<>();
@@ -210,6 +212,7 @@ public class Studies {
             safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer) r.getValue("count:" + SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal) r.getValue("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
+            //TODO add sum_fav
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
@@ -431,7 +434,7 @@ public class Studies {
         }
     }
 
-    public static void editFavorites(Long callingUserPk, String studyInstanceUID, Long fromAlbumPk, boolean favorite) throws UserNotFoundException, AlbumNotFoundException {
+    public static void editFavorites(Long callingUserPk, String studyInstanceUID, Long fromAlbumPk, boolean favorite) throws UserNotFoundException, AlbumNotFoundException, StudyNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -452,6 +455,15 @@ public class Studies {
             for(Series s: seriesList) {
                 editSeriesFavorites(s, album, favorite, em);
             }
+            final Study study = getStudy(studyInstanceUID, em);
+            final Events.MutationType mutation;
+            if (favorite) {
+                mutation = Events.MutationType.ADD_FAV;
+            } else {
+                mutation = Events.MutationType.REMOVE_FAV;
+            }
+            final Mutation newAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
+            em.persist(newAlbumMutation);
 
             tx.commit();
         } finally {

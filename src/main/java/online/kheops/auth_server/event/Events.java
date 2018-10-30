@@ -30,7 +30,7 @@ public class Events {
         throw new IllegalStateException("Utility class");
     }
 
-    public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES, EDIT_ALBUM}
+    public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES, EDIT_ALBUM, ADD_FAV, REMOVE_FAV}
 
     public static void albumPostComment(long callingUserPk,long albumPk,String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
