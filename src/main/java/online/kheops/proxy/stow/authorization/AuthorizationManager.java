@@ -79,7 +79,7 @@ public final class AuthorizationManager {
         authorizeContentLocations(part.getBulkDataLocations());
     }
 
-    public Response getResponse(final Attributes attributes, final Response.Status status) {
+    public Response getResponse(final Attributes attributes, final int status) {
         if (attributes == null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
@@ -103,8 +103,20 @@ public final class AuthorizationManager {
                 .collect(Collectors.toSet())
                 .forEach(this::triggerFetch);
 
-        Response.Status responseStatus = status;
-        if (status.equals(OK) && !forbiddenInstanceIDs.isEmpty()) {
+        Response.Status responseStatus;
+        switch (status) {
+            case 200:
+                responseStatus = OK;
+                break;
+            case 202:
+                responseStatus = ACCEPTED;
+                break;
+            default:
+                responseStatus = CONFLICT;
+                break;
+        }
+
+        if (status == OK.getStatusCode() && !forbiddenInstanceIDs.isEmpty()) {
             responseStatus = ACCEPTED;
         }
 
