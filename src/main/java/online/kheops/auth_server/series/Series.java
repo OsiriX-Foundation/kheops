@@ -2,7 +2,10 @@ package online.kheops.auth_server.series;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.entity.*;
+
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumSeries;
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.VR;
@@ -16,6 +19,8 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByPk;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUID;
 import static online.kheops.auth_server.user.Users.getUser;
@@ -75,8 +80,8 @@ public class Series {
     }
 
 
-    public static void addToFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
-    throws UserNotFoundException {
+    public static void editFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID, Long fromAlbumPk, boolean favorite)
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -84,13 +89,14 @@ public class Series {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album album = callingUser.getInbox();
-
-
-
-
-
-
+            final Album album;
+            if (fromAlbumPk == null) {
+                album = callingUser.getInbox();
+            } else {
+                album = getAlbum(fromAlbumPk, em);
+            }
+            final online.kheops.auth_server.entity.Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+            editSeriesFavorites(series, album, favorite, em);
 
             tx.commit();
         } finally {
@@ -101,8 +107,9 @@ public class Series {
         }
     }
 
-    public static void removeFromFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID) {
-
+    public static void editSeriesFavorites(online.kheops.auth_server.entity.Series series, Album album, boolean favorite, EntityManager em) {
+        final AlbumSeries albumSeries = getAlbumSeries(album, series, em);
+        albumSeries.setFavorite(favorite);
     }
 
 }

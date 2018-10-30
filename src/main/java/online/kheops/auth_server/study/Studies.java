@@ -1,9 +1,13 @@
 package online.kheops.auth_server.study;
 
+import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
@@ -15,6 +19,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -26,7 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.series.Series.editSeriesFavorites;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.JOOQTools.*;
 import static online.kheops.auth_server.generated.Tables.ALBUM;
 import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
@@ -421,11 +431,34 @@ public class Studies {
         }
     }
 
-    public static void addToFavorites(Long callingUserPk, String studyInstanceUID) {
+    public static void editFavorites(Long callingUserPk, String studyInstanceUID, Long fromAlbumPk, boolean favorite) throws UserNotFoundException, AlbumNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
-    }
+        try {
+            tx.begin();
 
-    public static void removeFromFavorites(Long callingUserPk, String studyInstanceUID) {
+            final User callingUser = getUser(callingUserPk, em);
+            List<Series> seriesList;
+            final Album album;
+            if (fromAlbumPk == null) {
+                seriesList = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
+                album = callingUser.getInbox();
+            } else {
+                album = getAlbum(fromAlbumPk, em);
+                seriesList = findSeriesListByStudyUIDFromAlbum(callingUser,album, studyInstanceUID, em);
+            }
 
+            for(Series s: seriesList) {
+                editSeriesFavorites(s, album, favorite, em);
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
     }
 }

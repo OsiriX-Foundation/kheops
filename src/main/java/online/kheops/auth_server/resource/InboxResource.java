@@ -38,7 +38,13 @@ public class InboxResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                        @QueryParam("album") Long fromAlbumPk,
+                                        @QueryParam("inbox") Boolean fromInbox,
                                         @Context SecurityContext securityContext) {
+
+        if ((fromInbox == null && fromAlbumPk == null) || (fromInbox != null && fromAlbumPk != null)) {
+            return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
+        }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
@@ -57,7 +63,12 @@ public class InboxResource {
             return Response.status(NOT_FOUND).build();
         }
 
-        Studies.addToFavorites(callingUserPk, studyInstanceUID);
+        try {
+            Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumPk, true);
+        } catch (UserNotFoundException | AlbumNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
+
 
         return Response.status(NO_CONTENT).build();
     }
@@ -67,7 +78,13 @@ public class InboxResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                             @QueryParam("album") Long fromAlbumPk,
+                                             @QueryParam("inbox") Boolean fromInbox,
                                              @Context SecurityContext securityContext) {
+
+        if ((fromInbox == null && fromAlbumPk == null) || (fromInbox != null && fromAlbumPk != null)) {
+            return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
+        }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
@@ -85,9 +102,11 @@ public class InboxResource {
         } catch (StudyNotFoundException e) {
             return Response.status(NOT_FOUND).build();
         }
-
-        Studies.removeFromFavorites(callingUserPk, studyInstanceUID);
-
+        try {
+            Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumPk, false);
+        } catch (UserNotFoundException | AlbumNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
         return Response.status(NO_CONTENT).build();
     }
 
@@ -98,7 +117,13 @@ public class InboxResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addSeriesToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                          @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+                                         @QueryParam("album") Long fromAlbumPk,
+                                         @QueryParam("inbox") Boolean fromInbox,
                                          @Context SecurityContext securityContext) {
+
+        if ((fromInbox == null && fromAlbumPk == null) || (fromInbox != null && fromAlbumPk != null)) {
+            return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
+        }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
@@ -118,8 +143,8 @@ public class InboxResource {
         }
 
         try {
-            Series.addToFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID);
-        } catch (UserNotFoundException e) {
+            Series.editFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID, fromAlbumPk, true);
+        } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -132,7 +157,13 @@ public class InboxResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeSeriesFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                               @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+                                              @QueryParam("album") Long fromAlbumPk,
+                                              @QueryParam("inbox") Boolean fromInbox,
                                               @Context SecurityContext securityContext) {
+
+        if ((fromInbox == null && fromAlbumPk == null) || (fromInbox != null && fromAlbumPk != null)) {
+            return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
+        }
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
@@ -151,7 +182,11 @@ public class InboxResource {
             return Response.status(NOT_FOUND).build();
         }
 
-        Series.removeFromFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID);
+        try {
+            Series.editFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID, fromAlbumPk, false);
+        } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
 
         return Response.status(NO_CONTENT).build();
     }

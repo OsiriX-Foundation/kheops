@@ -21,14 +21,14 @@ public class SeriesQueries {
     }
 
     public static List<Series> findSeriesListByStudyUIDFromInbox(User callingUser, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter("callingUser", callingUser);
         return query.getResultList();
     }
 
     public static Series findSeriesByStudyUIDandSeriesUIDFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
         query.setParameter("callingUser", callingUser);
@@ -36,7 +36,7 @@ public class SeriesQueries {
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where a <> u.inbox and :album = a and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a <> u.inbox and :album = a and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID,studyInstanceUID);
         query.setParameter("callingUser",callingUser);
         query.setParameter("album",album);
@@ -45,7 +45,7 @@ public class SeriesQueries {
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbumAndInbox(User callingUser, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID,studyInstanceUID);
         query.setParameter("callingUser",callingUser);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
@@ -53,7 +53,7 @@ public class SeriesQueries {
     }
 
     public static Series findSeriesByStudyUIDandSeriesUIDFromAlbum(User callingUser, Album album, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where a <> u.inbox and :album = a and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a <> u.inbox and :album = a and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
         query.setParameter("callingUser",callingUser);
         query.setParameter("album",album);
         query.setParameter(Consts.SeriesInstanceUID,seriesInstanceUID);
@@ -62,7 +62,7 @@ public class SeriesQueries {
         return query.getSingleResult();
     }
     public static Series findSeriesByStudyUIDandSeriesUID(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
         query.setParameter("callingUser", callingUser);
@@ -71,7 +71,7 @@ public class SeriesQueries {
     }
 
     public static Series findSeriesByStudyUIDandSeriesUIDwithSharePermission(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Series> seriesQuery = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where (a = u.inbox or au.admin = true or a.sendSeries = true)and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        TypedQuery<Series> seriesQuery = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where (a = u.inbox or au.admin = true or a.sendSeries = true)and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
         seriesQuery.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
         seriesQuery.setParameter("callingUser", callingUser);
@@ -96,7 +96,7 @@ public class SeriesQueries {
 
 
     public static Series findSeriesBySeriesAndAlbumWithSendPermission(User callingUser, Series series, EntityManager em) throws NoResultException {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where u=:callingUser and s = :series and (au.admin = true or a.sendSeries = true)", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and (au.admin = true or a.sendSeries = true)", Series.class);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         query.setParameter("series", series);
         query.setParameter("callingUser", callingUser);
@@ -104,7 +104,7 @@ public class SeriesQueries {
     }
 
     public static Series findSeriesBySeriesAndUserInbox(User callingUser, Series series, EntityManager em) throws NoResultException {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where u=:callingUser and s = :series and a = u.inbox", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and a = u.inbox", Series.class);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         query.setParameter("series", series);
         query.setParameter("callingUser", callingUser);
@@ -113,7 +113,7 @@ public class SeriesQueries {
 
     public static boolean isOrphan(Series series, EntityManager em) {
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.series s where s = :series", Series.class);
+            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s = :series", Series.class);
             query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.getSingleResult();
@@ -124,7 +124,7 @@ public class SeriesQueries {
     }
 
     public static Set<String> findAllSeriesInstanceUIDbySeriesIUIDfromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox <> a and :user = u and a = :album", String.class);
+        TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox <> a and :user = u and a = :album", String.class);
         query.setParameter("album", album);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter("user", callingUser);
@@ -132,21 +132,21 @@ public class SeriesQueries {
     }
 
     public static Set<String> findAllSeriesInstanceUIDbySeriesIUIDfromInbox(User callingUser, String studyInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox = a and :user = u", String.class);
+        TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox = a and :user = u", String.class);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter("user", callingUser);
         return new HashSet<>(query.getResultList());
     }
 
     public static Set<String> findAllSeriesInstanceUIDbySeriesIUIDfromAlbumandInbox(User callingUser, String studyInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.series s where s.study.studyInstanceUID = :StudyInstanceUID and :user = u", String.class);
+        TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and :user = u", String.class);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         query.setParameter("user", callingUser);
         return new HashSet<>(query.getResultList());
     }
 
     public static Series findSeriesByStudyUIDandSeriesUID(Album album, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Series> seriesQuery = em.createQuery("select s from Album a join a.series s where a=:album and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        TypedQuery<Series> seriesQuery = em.createQuery("select s from Album a join a.albumSeries alS join alS.series s where a=:album and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
         seriesQuery.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
         seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
         seriesQuery.setParameter("album", album);
