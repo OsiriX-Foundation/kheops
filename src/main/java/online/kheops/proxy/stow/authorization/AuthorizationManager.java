@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import static java.util.logging.Level.SEVERE;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.ACCEPTED;
+import static javax.ws.rs.core.Response.Status.CONFLICT;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.OK;
 import static online.kheops.proxy.stow.authorization.AuthorizationManagerException.Reason.SERIES_ACCESS_FORBIDDEN;
@@ -78,20 +79,14 @@ public final class AuthorizationManager {
         authorizeContentLocations(part.getBulkDataLocations());
     }
 
-    public Response getResponse(Attributes attributes) {
+    public Response getResponse(final Attributes attributes, final Response.Status status) {
         if (attributes == null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
 
-        boolean hasFailedSOPs = false;
-
-        // look at the attributes, and see if there were any failures
         Sequence failedSOPs = attributes.getSequence(Tag.FailedSOPSequence);
-        if (failedSOPs != null) {
-            hasFailedSOPs = true;
-        } else if (!forbiddenInstanceIDs.isEmpty()) {
+        if (failedSOPs == null && !forbiddenInstanceIDs.isEmpty()) {
             failedSOPs = attributes.newSequence(Tag.FailedSOPSequence, forbiddenInstanceIDs.size());
-            hasFailedSOPs = true;
         }
 
         for (InstanceID forbiddenInstance: forbiddenInstanceIDs) {
@@ -108,7 +103,12 @@ public final class AuthorizationManager {
                 .collect(Collectors.toSet())
                 .forEach(this::triggerFetch);
 
-        return Response.status(hasFailedSOPs ? ACCEPTED : OK).entity(attributes).build();
+        Response.Status responseStatus = status;
+        if (status.equals(OK) && !forbiddenInstanceIDs.isEmpty()) {
+            responseStatus = ACCEPTED;
+        }
+
+        return Response.status(responseStatus).entity(attributes).build();
     }
 
     private void getAuthorization(InstanceID instanceID) throws AuthorizationManagerException, GatewayException {

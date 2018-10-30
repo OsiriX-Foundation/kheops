@@ -72,6 +72,7 @@ public final class Proxy {
         try {
             final InputStream fileStream = Files.newInputStream(part.getCacheFilePath());
             multipartOutputStream.writePart(new StreamingBodyPart(fileStream, MediaTypes.APPLICATION_DICOM_TYPE));
+            fileStream.close();
         } catch (IOException e) {
             throw new GatewayException("Unable to write part " + partNumber + ": " + part, e);
         }
