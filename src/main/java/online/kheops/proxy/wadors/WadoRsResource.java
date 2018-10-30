@@ -28,7 +28,7 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 @Path("/")
-public class WadoRsResource {
+public final class WadoRsResource {
     private static final Logger LOG = Logger.getLogger(WadoRsResource.class.getName());
 
     private static final Client CLIENT = ClientBuilder.newClient();

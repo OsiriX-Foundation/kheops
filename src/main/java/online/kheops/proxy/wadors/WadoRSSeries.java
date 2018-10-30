@@ -22,7 +22,6 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -40,7 +39,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 @Path("/")
-public class WadoRSSeries {
+public final class WadoRSSeries {
     private static final Logger LOG = Logger.getLogger(WadoRSSeries.class.getName());
     private static final Client CLIENT = newClient();
 
