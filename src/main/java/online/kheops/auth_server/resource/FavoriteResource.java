@@ -8,6 +8,7 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts;
 
 import javax.ws.rs.*;
@@ -66,6 +67,14 @@ public class FavoriteResource {
         }
 
         try {
+            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
+                return Response.status(FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+        }
+
+        try {
             if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
             }
@@ -120,6 +129,14 @@ public class FavoriteResource {
 
         if (!kheopsPrincipal.hasUserAccess()) {
             return Response.status(FORBIDDEN).build();
+        }
+
+        try {
+            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
+                return Response.status(FORBIDDEN).build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
         try {

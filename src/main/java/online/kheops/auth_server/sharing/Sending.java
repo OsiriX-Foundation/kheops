@@ -4,6 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -326,7 +327,7 @@ public class Sending {
     }
 
     public static void appropriateSeries(long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException {
+            throws UserNotFoundException, SeriesForbiddenException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -337,6 +338,10 @@ public class Sending {
 
             try {
                 final Series storedSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+
+                if(!isOrphan(storedSeries, em)) {
+                    throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                }
 
                 // here the series exists but she is orphan or the calling can send the series from an album
                 final Album inbox = callingUser.getInbox();
