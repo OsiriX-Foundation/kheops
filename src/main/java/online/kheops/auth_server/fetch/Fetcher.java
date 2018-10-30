@@ -90,8 +90,7 @@ public abstract class Fetcher {
         final Attributes attributes;
         try {
             String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyUID).withSeriesUID(seriesUID).build();
-            List<Attributes> seriesList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer " + authToken).get(new GenericType<List<Attributes>>() {
-            });
+            List<Attributes> seriesList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer " + authToken).get(new GenericType<List<Attributes>>() {});
             if (seriesList == null || seriesList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch series returned nothing");
             }

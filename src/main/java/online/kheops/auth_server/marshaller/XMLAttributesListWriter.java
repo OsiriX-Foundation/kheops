@@ -53,7 +53,7 @@ public class XMLAttributesListWriter implements MessageBodyWriter<List<Attribute
                 MultiPart.class,
                 MultiPart.class,
                 EMPTY_ANNOTATIONS,
-        new MediaType("multipart", "related"));
+                new MediaType("multipart", "related"));
 
         if (bodyWriter == null) {
             throw new IllegalArgumentException();
