@@ -27,8 +27,8 @@ public class AlbumSeries {
     public AlbumSeries() {}
 
     public AlbumSeries(Album album, Series series, Boolean isFavorite) {
-        album = album;
-        series = series;
+        this.album = album;
+        this.series = series;
         favorite = isFavorite;
     }
 
