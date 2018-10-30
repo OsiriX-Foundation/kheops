@@ -9,6 +9,7 @@
         <class>online.kheops.auth_server.entity.Study</class>
         <class>online.kheops.auth_server.entity.Capability</class>
         <class>online.kheops.auth_server.entity.AlbumUser</class>
+        <class>online.kheops.auth_server.entity.AlbumSeries</class>
         <class>online.kheops.auth_server.entity.Event</class>
         <class>online.kheops.auth_server.entity.Comment</class>
         <class>online.kheops.auth_server.entity.Mutation</class>

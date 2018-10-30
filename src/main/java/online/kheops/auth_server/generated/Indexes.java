@@ -39,6 +39,7 @@ public class Indexes {
 
     public static final Index ALBUM_PRIMARY = Indexes0.ALBUM_PRIMARY;
     public static final Index ALBUM_SERIES_ALBUM_SERIES_UNIQUE = Indexes0.ALBUM_SERIES_ALBUM_SERIES_UNIQUE;
+    public static final Index ALBUM_SERIES_PRIMARY = Indexes0.ALBUM_SERIES_PRIMARY;
     public static final Index ALBUM_SERIES_SERIES_FK = Indexes0.ALBUM_SERIES_SERIES_FK;
     public static final Index ALBUM_USER_ALBUM_USER_UNIQUE = Indexes0.ALBUM_USER_ALBUM_USER_UNIQUE;
     public static final Index ALBUM_USER_PRIMARY = Indexes0.ALBUM_USER_PRIMARY;
@@ -83,6 +84,7 @@ public class Indexes {
     private static class Indexes0 {
         public static Index ALBUM_PRIMARY = Internal.createIndex("PRIMARY", Album.ALBUM, new OrderField[] { Album.ALBUM.PK }, true);
         public static Index ALBUM_SERIES_ALBUM_SERIES_UNIQUE = Internal.createIndex("album_series_unique", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.ALBUM_FK, AlbumSeries.ALBUM_SERIES.SERIES_FK }, true);
+        public static Index ALBUM_SERIES_PRIMARY = Internal.createIndex("PRIMARY", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.PK }, true);
         public static Index ALBUM_SERIES_SERIES_FK = Internal.createIndex("series_fk", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.SERIES_FK }, false);
         public static Index ALBUM_USER_ALBUM_USER_UNIQUE = Internal.createIndex("album_user_unique", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.ALBUM_FK, AlbumUser.ALBUM_USER.USER_FK }, true);
         public static Index ALBUM_USER_PRIMARY = Internal.createIndex("PRIMARY", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.PK }, true);

@@ -48,6 +48,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final Identity<AlbumRecord, Long> IDENTITY_ALBUM = Identities0.IDENTITY_ALBUM;
+    public static final Identity<AlbumSeriesRecord, Long> IDENTITY_ALBUM_SERIES = Identities0.IDENTITY_ALBUM_SERIES;
     public static final Identity<AlbumUserRecord, Long> IDENTITY_ALBUM_USER = Identities0.IDENTITY_ALBUM_USER;
     public static final Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Identities0.IDENTITY_CAPABILITIES;
     public static final Identity<EventRecord, Long> IDENTITY_EVENT = Identities0.IDENTITY_EVENT;
@@ -60,6 +61,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<AlbumRecord> KEY_ALBUM_PRIMARY = UniqueKeys0.KEY_ALBUM_PRIMARY;
+    public static final UniqueKey<AlbumSeriesRecord> KEY_ALBUM_SERIES_PRIMARY = UniqueKeys0.KEY_ALBUM_SERIES_PRIMARY;
     public static final UniqueKey<AlbumSeriesRecord> KEY_ALBUM_SERIES_ALBUM_SERIES_UNIQUE = UniqueKeys0.KEY_ALBUM_SERIES_ALBUM_SERIES_UNIQUE;
     public static final UniqueKey<AlbumUserRecord> KEY_ALBUM_USER_PRIMARY = UniqueKeys0.KEY_ALBUM_USER_PRIMARY;
     public static final UniqueKey<AlbumUserRecord> KEY_ALBUM_USER_ALBUM_USER_UNIQUE = UniqueKeys0.KEY_ALBUM_USER_ALBUM_USER_UNIQUE;
@@ -100,6 +102,7 @@ public class Keys {
 
     private static class Identities0 {
         public static Identity<AlbumRecord, Long> IDENTITY_ALBUM = Internal.createIdentity(Album.ALBUM, Album.ALBUM.PK);
+        public static Identity<AlbumSeriesRecord, Long> IDENTITY_ALBUM_SERIES = Internal.createIdentity(AlbumSeries.ALBUM_SERIES, AlbumSeries.ALBUM_SERIES.PK);
         public static Identity<AlbumUserRecord, Long> IDENTITY_ALBUM_USER = Internal.createIdentity(AlbumUser.ALBUM_USER, AlbumUser.ALBUM_USER.PK);
         public static Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Internal.createIdentity(Capabilities.CAPABILITIES, Capabilities.CAPABILITIES.PK);
         public static Identity<EventRecord, Long> IDENTITY_EVENT = Internal.createIdentity(Event.EVENT, Event.EVENT.PK);
@@ -110,6 +113,7 @@ public class Keys {
 
     private static class UniqueKeys0 {
         public static final UniqueKey<AlbumRecord> KEY_ALBUM_PRIMARY = Internal.createUniqueKey(Album.ALBUM, "KEY_album_PRIMARY", Album.ALBUM.PK);
+        public static final UniqueKey<AlbumSeriesRecord> KEY_ALBUM_SERIES_PRIMARY = Internal.createUniqueKey(AlbumSeries.ALBUM_SERIES, "KEY_album_series_PRIMARY", AlbumSeries.ALBUM_SERIES.PK);
         public static final UniqueKey<AlbumSeriesRecord> KEY_ALBUM_SERIES_ALBUM_SERIES_UNIQUE = Internal.createUniqueKey(AlbumSeries.ALBUM_SERIES, "KEY_album_series_album_series_unique", AlbumSeries.ALBUM_SERIES.ALBUM_FK, AlbumSeries.ALBUM_SERIES.SERIES_FK);
         public static final UniqueKey<AlbumUserRecord> KEY_ALBUM_USER_PRIMARY = Internal.createUniqueKey(AlbumUser.ALBUM_USER, "KEY_album_user_PRIMARY", AlbumUser.ALBUM_USER.PK);
         public static final UniqueKey<AlbumUserRecord> KEY_ALBUM_USER_ALBUM_USER_UNIQUE = Internal.createUniqueKey(AlbumUser.ALBUM_USER, "KEY_album_user_album_user_unique", AlbumUser.ALBUM_USER.ALBUM_FK, AlbumUser.ALBUM_USER.USER_FK);

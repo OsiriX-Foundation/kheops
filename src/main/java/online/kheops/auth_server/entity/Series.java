@@ -56,8 +56,9 @@ public class Series {
     @JoinColumn(name = "study_fk", insertable=false, updatable=false)
     private Study study;
 
-    @ManyToMany(mappedBy = "series")
-    private Set<Album> albums = new HashSet<>();
+    @OneToMany
+    @JoinColumn (name = "series_fk", nullable = false)
+    private Set<AlbumSeries> albumsSeries = new HashSet<>();
 
     @OneToMany
     @JoinColumn (name = "series_fk", nullable=true)
@@ -180,9 +181,9 @@ public class Series {
         this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
 
-    public void addAlbum(Album album) { albums.add(album); }
+    public void addAlbumSeries(AlbumSeries albumSeries) { albumsSeries.add(albumSeries); }
 
-    public void removeAlbum(Album album) { albums.remove(album); }
+    public void removeAlbumSeries(AlbumSeries albumSeries) { albumsSeries.remove(albumSeries); }
 
     public Set<Mutation> getMutations() { return mutations; }
 

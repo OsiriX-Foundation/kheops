@@ -1,0 +1,36 @@
+package online.kheops.auth_server.entity;
+
+
+import javax.persistence.*;
+
+@SuppressWarnings({"WeakerAccess", "unused"})
+@Entity
+@Table(name = "album_series")
+public class AlbumSeries {
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name = "pk")
+    private long pk;
+
+    @Basic(optional = false)
+    @Column(name = "favorite")
+    private boolean favorite   = true;
+
+    @ManyToOne
+    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    private Album album;
+
+    @ManyToOne
+    @JoinColumn (name = "series_fk", nullable=false, insertable = false, updatable = false)
+    private Series series;
+
+    public AlbumSeries() {}
+
+    public AlbumSeries(Album album, Series series, Boolean isFavorite) {
+        album = album;
+        series = series;
+        favorite = isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) { this.favorite = favorite; }
+}
