@@ -172,6 +172,9 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM) {
                 return true;
             }
+            if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_FAVORITES && album.isAddSeries()) {
+                return true;
+            }
             return false;
 
         } catch (AlbumNotFoundException | UserNotMemberException e) {

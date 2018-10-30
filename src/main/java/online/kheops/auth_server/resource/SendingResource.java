@@ -9,6 +9,7 @@ import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -142,7 +143,7 @@ public class SendingResource
             } else {
                 Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
             }
-        } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(CREATED).build();
