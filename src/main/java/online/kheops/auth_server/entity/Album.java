@@ -57,7 +57,7 @@ public class Album {
     private boolean writeComments;
 
     @OneToMany
-    @JoinColumn (name = "album_series",nullable = false)
+    @JoinColumn (name = "album_fk",nullable = false)
     private Set<AlbumSeries> albumSeries = new HashSet<>();
 
     @OneToMany
@@ -142,11 +142,8 @@ public class Album {
         return true;
     }
 
-    public AlbumSeries addSeries(Series series) {
-        final AlbumSeries albumSeries = new AlbumSeries(this, series, false );
+    public void addSeries(AlbumSeries albumSeries) {
         this.albumSeries.add(albumSeries);
-        series.addAlbumSeries(albumSeries);
-        return albumSeries;
     }
 
     public void removeSeries(Series series, EntityManager em) {

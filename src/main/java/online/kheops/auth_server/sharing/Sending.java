@@ -189,7 +189,9 @@ public class Sending {
                 return;
             }
 
-            final AlbumSeries albumSeries = targetAlbum.addSeries(availableSeries);
+            final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries, false );
+            availableSeries.addAlbumSeries(albumSeries);
+            targetAlbum.addSeries(albumSeries);
             em.persist(albumSeries);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             em.persist(mutation);
@@ -219,7 +221,9 @@ public class Sending {
             Boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
                 if (!targetAlbum.containsSeries(series, em)) {
-                    final AlbumSeries albumSeries = targetAlbum.addSeries(series);
+                    final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, series, false );
+                    series.addAlbumSeries(albumSeries);
+                    targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
                 }
@@ -263,7 +267,9 @@ public class Sending {
             final Album inbox = targetUser.getInbox();
             for (Series series : availableSeries) {
                 if (!inbox.containsSeries(series, em)) {
-                    final AlbumSeries albumSeries = inbox.addSeries(series);
+                    final AlbumSeries albumSeries = new AlbumSeries(inbox, series, false );
+                    series.addAlbumSeries(albumSeries);
+                    inbox.addSeries(albumSeries);
                     em.persist(albumSeries);
                 }
             }
@@ -305,7 +311,9 @@ public class Sending {
                 return;
             }
 
-            final AlbumSeries albumSeries = inbox.addSeries(series);
+            final AlbumSeries albumSeries = new AlbumSeries(inbox, series, false );
+            series.addAlbumSeries(albumSeries);
+            inbox.addSeries(albumSeries);
             em.persist(albumSeries);
 
             tx.commit();
@@ -332,7 +340,9 @@ public class Sending {
 
                 // here the series exists but she is orphan or the calling can send the series from an album
                 final Album inbox = callingUser.getInbox();
-                final AlbumSeries albumSeries = inbox.addSeries(storedSeries);
+                final AlbumSeries albumSeries = new AlbumSeries(inbox, storedSeries, false );
+                storedSeries.addAlbumSeries(albumSeries);
+                inbox.addSeries(albumSeries);
                 em.persist(albumSeries);
                 tx.commit();
                 LOG.info("Claim accepted because the series is inside an album where the calling user (" + callingUser.getGoogleId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
@@ -355,10 +365,12 @@ public class Sending {
             final Series series = new Series(seriesInstanceUID);
             study.getSeries().add(series);
             Album inbox = callingUser.getInbox();
-            final AlbumSeries albumSeries = inbox.addSeries(series);
-            em.persist(albumSeries);
+            final AlbumSeries albumSeries = new AlbumSeries(inbox, series, false );
+            series.addAlbumSeries(albumSeries);
+            inbox.addSeries(albumSeries);
 
             em.persist(series);
+            em.persist(albumSeries);
             LOG.info("finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
 
             tx.commit();
