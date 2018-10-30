@@ -16,6 +16,7 @@ import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
-    private static final long serialVersionUID = -1693105903;
+    private static final long serialVersionUID = 394336091;
 
     /**
      * The reference instance of <code>kheops.album_series</code>
@@ -56,6 +57,11 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
     }
 
     /**
+     * The column <code>kheops.album_series.pk</code>.
+     */
+    public final TableField<AlbumSeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+    /**
      * The column <code>kheops.album_series.album_fk</code>.
      */
     public final TableField<AlbumSeriesRecord, Long> ALBUM_FK = createField("album_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
@@ -64,6 +70,11 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      * The column <code>kheops.album_series.series_fk</code>.
      */
     public final TableField<AlbumSeriesRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>kheops.album_series.favorite</code>.
+     */
+    public final TableField<AlbumSeriesRecord, Byte> FAVORITE = createField("favorite", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
 
     /**
      * Create a <code>kheops.album_series</code> table reference
@@ -111,7 +122,23 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ALBUM_SERIES_ALBUM_SERIES_UNIQUE, Indexes.ALBUM_SERIES_SERIES_FK);
+        return Arrays.<Index>asList(Indexes.ALBUM_SERIES_ALBUM_SERIES_UNIQUE, Indexes.ALBUM_SERIES_PRIMARY, Indexes.ALBUM_SERIES_SERIES_FK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<AlbumSeriesRecord, Long> getIdentity() {
+        return Keys.IDENTITY_ALBUM_SERIES;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UniqueKey<AlbumSeriesRecord> getPrimaryKey() {
+        return Keys.KEY_ALBUM_SERIES_PRIMARY;
     }
 
     /**
@@ -119,7 +146,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<UniqueKey<AlbumSeriesRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlbumSeriesRecord>>asList(Keys.KEY_ALBUM_SERIES_ALBUM_SERIES_UNIQUE);
+        return Arrays.<UniqueKey<AlbumSeriesRecord>>asList(Keys.KEY_ALBUM_SERIES_PRIMARY, Keys.KEY_ALBUM_SERIES_ALBUM_SERIES_UNIQUE);
     }
 
     /**

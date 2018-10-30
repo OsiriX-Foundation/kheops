@@ -176,7 +176,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                     return true;
                 }
 
-                if(mergeCapability.getAlbum().getSeries().contains(series)) {
+                if(mergeCapability.getAlbum().containsSeries(series, em)) {
                     return true;
                 }
             } catch (UserNotMemberException | NoResultException e) {

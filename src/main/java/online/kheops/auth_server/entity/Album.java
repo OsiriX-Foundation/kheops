@@ -56,11 +56,9 @@ public class Album {
     @Column(name = "write_comments_permission")
     private boolean writeComments;
 
-    @ManyToMany
-    @JoinTable (name = "album_series",
-            joinColumns = @JoinColumn(name = "album_fk"),
-            inverseJoinColumns = @JoinColumn(name = "series_fk"))
-    private Set<Series> series = new HashSet<>();
+    @OneToMany
+    @JoinColumn (name = "album_series",nullable = false)
+    private Set<AlbumSeries> albumSeries = new HashSet<>();
 
     @OneToMany
     @JoinColumn (name = "album_fk", nullable=false)
@@ -132,16 +130,32 @@ public class Album {
 
     public void setWriteComments( boolean writeComments ) { this.writeComments = writeComments; }
 
-    public Set<Series> getSeries() { return series; }
-
-    public void addSeries(Series series) {
-        this.series.add(series);
-        series.addAlbum(this);
+    public boolean containsSeries(Series series, EntityManager em) {
+        try {
+            final AlbumSeries albumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
+                    .setParameter("series", series)
+                    .setParameter("album", this)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return false;
+        }
+        return true;
     }
 
-    public void removeSeries(Series series) {
-        this.series.remove(series);
-        series.removeAlbum(this);
+    public AlbumSeries addSeries(Series series) {
+        final AlbumSeries albumSeries = new AlbumSeries(this, series, false );
+        this.albumSeries.add(albumSeries);
+        series.addAlbumSeries(albumSeries);
+        return albumSeries;
+    }
+
+    public void removeSeries(Series series, EntityManager em) {
+        AlbumSeries albumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
+                .setParameter("series", series)
+                .setParameter("album", this)
+                .getSingleResult();
+        em.remove(albumSeries);
+        series.removeAlbumSeries(albumSeries);
     }
 
     public Set<AlbumUser> getAlbumUser() { return albumUser; }

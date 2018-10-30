@@ -1,23 +1,19 @@
 package online.kheops.auth_server.sharing;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.persistence.*;
-import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
@@ -47,7 +43,7 @@ public class Sending {
             }
 
             for (Series series: seriesList) {
-                callingUser.getInbox().removeSeries(series);
+                callingUser.getInbox().removeSeries(series, em);
             }
 
             tx.commit();
@@ -76,7 +72,7 @@ public class Sending {
                 throw new SeriesNotFoundException("User does not have access to any series with a study with the given studyInstanceUID");
             }
 
-            callingUser.getInbox().removeSeries(series);
+            callingUser.getInbox().removeSeries(series, em);
 
             tx.commit();
         } finally {
@@ -105,7 +101,7 @@ public class Sending {
             }
 
             for (Series series: availableSeries) {
-                callingAlbum.removeSeries(series);
+                callingAlbum.removeSeries(series, em);
             }
 
             final Study study = availableSeries.get(0).getStudy();
@@ -140,7 +136,7 @@ public class Sending {
                 throw new SeriesNotFoundException("No study with the given StudyInstanceUID in the album");
             }
 
-            callingAlbum.removeSeries(availableSeries);
+            callingAlbum.removeSeries(availableSeries, em);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_SERIES, availableSeries);
 
             em.persist(mutation);
@@ -189,11 +185,12 @@ public class Sending {
                 em.persist(availableSeries);
             }
 
-            if (targetAlbum.getSeries().contains(availableSeries)) {
+            if (targetAlbum.containsSeries(availableSeries, em)) {
                 return;
             }
 
-            targetAlbum.addSeries(availableSeries);
+            final AlbumSeries albumSeries = targetAlbum.addSeries(availableSeries);
+            em.persist(albumSeries);
             final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             em.persist(mutation);
             //todo if the series is upload with a token...
@@ -221,8 +218,9 @@ public class Sending {
 
             Boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
-                if (!targetAlbum.getSeries().contains(series)) {
-                    targetAlbum.addSeries(series);
+                if (!targetAlbum.containsSeries(series, em)) {
+                    final AlbumSeries albumSeries = targetAlbum.addSeries(series);
+                    em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
                 }
             }
@@ -264,8 +262,9 @@ public class Sending {
 
             final Album inbox = targetUser.getInbox();
             for (Series series : availableSeries) {
-                if (!inbox.getSeries().contains(series)) {
-                    inbox.addSeries(series);
+                if (!inbox.containsSeries(series, em)) {
+                    final AlbumSeries albumSeries = inbox.addSeries(series);
+                    em.persist(albumSeries);
                 }
             }
 
@@ -301,12 +300,13 @@ public class Sending {
             }
 
             final Album inbox = targetUser.getInbox();
-            if(inbox.getSeries().contains(series)) {
+            if(inbox.containsSeries(series, em)) {
                 //return Response.status(Response.Status.OK).build();
                 return;
             }
 
-            inbox.addSeries(series);
+            final AlbumSeries albumSeries = inbox.addSeries(series);
+            em.persist(albumSeries);
 
             tx.commit();
         } finally {
@@ -332,7 +332,8 @@ public class Sending {
 
                 // here the series exists but she is orphan or the calling can send the series from an album
                 final Album inbox = callingUser.getInbox();
-                inbox.addSeries(storedSeries);
+                final AlbumSeries albumSeries = inbox.addSeries(storedSeries);
+                em.persist(albumSeries);
                 tx.commit();
                 LOG.info("Claim accepted because the series is inside an album where the calling user (" + callingUser.getGoogleId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
                 return;
@@ -354,7 +355,8 @@ public class Sending {
             final Series series = new Series(seriesInstanceUID);
             study.getSeries().add(series);
             Album inbox = callingUser.getInbox();
-            inbox.addSeries(series);
+            final AlbumSeries albumSeries = inbox.addSeries(series);
+            em.persist(albumSeries);
 
             em.persist(series);
             LOG.info("finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
