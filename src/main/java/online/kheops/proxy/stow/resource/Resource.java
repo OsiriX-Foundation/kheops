@@ -55,6 +55,9 @@ public final class Resource {
     }
 
     @Context
+    UriInfo uriInfo;
+
+    @Context
     ServletContext context;
 
     @HeaderParam(CONTENT_TYPE)

@@ -103,7 +103,7 @@ public class WadoUriResource {
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        return Response.fromResponse(invocationBuilder.get(Response.class))
+        return Response.fromResponse(invocationBuilder.get())
                 .cacheControl(cacheControl)
                 .build();
     }
