@@ -151,6 +151,10 @@ public final class Resource {
             throw new WebApplicationException(BAD_GATEWAY);
         }
 
+        if (gatewayResponse.getStatus() != 200) {
+            throw new IllegalStateException("Status is: " + gatewayResponse.getStatus());
+        }
+
         try (InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
             Response response = authorizationManager.getResponse(SAXReader.parse(responseStream), gatewayResponse.getStatusInfo().toEnum());
             inputStream.close();
