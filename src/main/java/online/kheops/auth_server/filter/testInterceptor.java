@@ -1,6 +1,6 @@
 package online.kheops.auth_server.filter;
 
-import javax.ws.rs.WebApplicationException;
+/*import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -16,3 +16,4 @@ public class testInterceptor implements ReaderInterceptor {
         return null;
     }
 }
+*/
