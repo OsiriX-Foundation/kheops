@@ -340,7 +340,13 @@ public class Sending {
                 final Series storedSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
 
                 if(!isOrphan(storedSeries, em)) {
-                    throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                    try {
+                        findSeriesBySeriesAndUserInbox(callingUser, storedSeries, em);
+                        return;
+                    } catch (NoResultException e) {
+                        throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                    }
+
                 }
 
                 // here the series exists but she is orphan or the calling can send the series from an album
