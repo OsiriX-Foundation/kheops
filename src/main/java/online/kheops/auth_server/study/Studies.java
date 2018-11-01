@@ -128,6 +128,7 @@ public class Studies {
 
         Integer studiesTotalCount = (Integer) query.fetch().getValues("count").get(0);
 
+        query = create.selectQuery();
         query.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
                 isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
                 isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
