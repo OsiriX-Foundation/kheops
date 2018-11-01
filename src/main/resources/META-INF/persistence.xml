@@ -14,13 +14,7 @@
         <class>online.kheops.auth_server.entity.Comment</class>
         <class>online.kheops.auth_server.entity.Mutation</class>
         <properties>
-            <!--
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-            -->
-
             <property name="javax.persistence.lock.timeout" value="2000"/>
-
 
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
