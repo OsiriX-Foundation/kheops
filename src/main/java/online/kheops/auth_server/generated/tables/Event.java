@@ -12,7 +12,7 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.EventRecord;
 
 import org.jooq.Field;
@@ -42,10 +42,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Event extends TableImpl<EventRecord> {
 
-    private static final long serialVersionUID = 2051550633;
+    private static final long serialVersionUID = -1485630852;
 
     /**
-     * The reference instance of <code>kheops.event</code>
+     * The reference instance of <code>public.event</code>
      */
     public static final Event EVENT = new Event();
 
@@ -58,76 +58,76 @@ public class Event extends TableImpl<EventRecord> {
     }
 
     /**
-     * The column <code>kheops.event.pk</code>.
+     * The column <code>public.event.pk</code>.
      */
-    public final TableField<EventRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<EventRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('event_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>kheops.event.event_type</code>.
+     * The column <code>public.event.event_type</code>.
      */
     public final TableField<EventRecord, String> EVENT_TYPE = createField("event_type", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.event.album_fk</code>.
+     * The column <code>public.event.album_fk</code>.
      */
     public final TableField<EventRecord, Long> ALBUM_FK = createField("album_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * The column <code>kheops.event.study_fk</code>.
+     * The column <code>public.event.study_fk</code>.
      */
     public final TableField<EventRecord, Long> STUDY_FK = createField("study_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * The column <code>kheops.event.event_time</code>.
+     * The column <code>public.event.event_time</code>.
      */
     public final TableField<EventRecord, Timestamp> EVENT_TIME = createField("event_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.event.user_fk</code>.
+     * The column <code>public.event.user_fk</code>.
      */
     public final TableField<EventRecord, Long> USER_FK = createField("user_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.event.private_target_user_fk</code>.
+     * The column <code>public.event.private_target_user_fk</code>.
      */
     public final TableField<EventRecord, Long> PRIVATE_TARGET_USER_FK = createField("private_target_user_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * The column <code>kheops.event.comment</code>.
+     * The column <code>public.event.comment</code>.
      */
     public final TableField<EventRecord, String> COMMENT = createField("comment", org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
 
     /**
-     * The column <code>kheops.event.mutation_type</code>.
+     * The column <code>public.event.mutation_type</code>.
      */
     public final TableField<EventRecord, String> MUTATION_TYPE = createField("mutation_type", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.event.to_user_fk</code>.
+     * The column <code>public.event.to_user_fk</code>.
      */
     public final TableField<EventRecord, Long> TO_USER_FK = createField("to_user_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * The column <code>kheops.event.series_fk</code>.
+     * The column <code>public.event.series_fk</code>.
      */
     public final TableField<EventRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * Create a <code>kheops.event</code> table reference
+     * Create a <code>public.event</code> table reference
      */
     public Event() {
         this(DSL.name("event"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.event</code> table reference
+     * Create an aliased <code>public.event</code> table reference
      */
     public Event(String alias) {
         this(DSL.name(alias), EVENT);
     }
 
     /**
-     * Create an aliased <code>kheops.event</code> table reference
+     * Create an aliased <code>public.event</code> table reference
      */
     public Event(Name alias) {
         this(alias, EVENT);
@@ -150,7 +150,7 @@ public class Event extends TableImpl<EventRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Event extends TableImpl<EventRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EVENT_ALBUM_FK, Indexes.EVENT_PRIMARY, Indexes.EVENT_PRIVATE_TARGET_USER_FK, Indexes.EVENT_SERIES_FK, Indexes.EVENT_STUDY_FK, Indexes.EVENT_TO_USER_FK, Indexes.EVENT_USER_FK);
+        return Arrays.<Index>asList(Indexes.EVENT_PK);
     }
 
     /**
@@ -174,7 +174,7 @@ public class Event extends TableImpl<EventRecord> {
      */
     @Override
     public UniqueKey<EventRecord> getPrimaryKey() {
-        return Keys.KEY_EVENT_PRIMARY;
+        return Keys.EVENT_PK;
     }
 
     /**
@@ -182,7 +182,7 @@ public class Event extends TableImpl<EventRecord> {
      */
     @Override
     public List<UniqueKey<EventRecord>> getKeys() {
-        return Arrays.<UniqueKey<EventRecord>>asList(Keys.KEY_EVENT_PRIMARY);
+        return Arrays.<UniqueKey<EventRecord>>asList(Keys.EVENT_PK);
     }
 
     /**
@@ -190,31 +190,31 @@ public class Event extends TableImpl<EventRecord> {
      */
     @Override
     public List<ForeignKey<EventRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<EventRecord, ?>>asList(Keys.EVENT_IBFK_1, Keys.EVENT_IBFK_2, Keys.EVENT_IBFK_3, Keys.EVENT_IBFK_5, Keys.EVENT_IBFK_4, Keys.EVENT_IBFK_6);
+        return Arrays.<ForeignKey<EventRecord, ?>>asList(Keys.EVENT__EVENT_ALBUM_FK_FKEY, Keys.EVENT__EVENT_STUDY_FK_FKEY, Keys.EVENT__EVENT_USER_FK_FKEY, Keys.EVENT__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENT__EVENT_TO_USER_FK_FKEY, Keys.EVENT__EVENT_SERIES_FK_FKEY);
     }
 
     public Album album() {
-        return new Album(this, Keys.EVENT_IBFK_1);
+        return new Album(this, Keys.EVENT__EVENT_ALBUM_FK_FKEY);
     }
 
     public Studies studies() {
-        return new Studies(this, Keys.EVENT_IBFK_2);
+        return new Studies(this, Keys.EVENT__EVENT_STUDY_FK_FKEY);
     }
 
-    public Users eventIbfk_3() {
-        return new Users(this, Keys.EVENT_IBFK_3);
+    public Users event_EventUserFkFkey() {
+        return new Users(this, Keys.EVENT__EVENT_USER_FK_FKEY);
     }
 
-    public Users eventIbfk_5() {
-        return new Users(this, Keys.EVENT_IBFK_5);
+    public Users event_EventPrivateTargetUserFkFkey() {
+        return new Users(this, Keys.EVENT__EVENT_PRIVATE_TARGET_USER_FK_FKEY);
     }
 
-    public Users eventIbfk_4() {
-        return new Users(this, Keys.EVENT_IBFK_4);
+    public Users event_EventToUserFkFkey() {
+        return new Users(this, Keys.EVENT__EVENT_TO_USER_FK_FKEY);
     }
 
     public Series series() {
-        return new Series(this, Keys.EVENT_IBFK_6);
+        return new Series(this, Keys.EVENT__EVENT_SERIES_FK_FKEY);
     }
 
     /**

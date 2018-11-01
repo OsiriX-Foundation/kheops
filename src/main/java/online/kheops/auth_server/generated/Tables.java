@@ -17,7 +17,7 @@ import online.kheops.auth_server.generated.tables.Users;
 
 
 /**
- * Convenience access to all tables in kheops
+ * Convenience access to all tables in public
  */
 @Generated(
     value = {
@@ -30,42 +30,42 @@ import online.kheops.auth_server.generated.tables.Users;
 public class Tables {
 
     /**
-     * The table <code>kheops.album</code>.
+     * The table <code>public.album</code>.
      */
     public static final Album ALBUM = online.kheops.auth_server.generated.tables.Album.ALBUM;
 
     /**
-     * The table <code>kheops.album_series</code>.
+     * The table <code>public.album_series</code>.
      */
     public static final AlbumSeries ALBUM_SERIES = online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
 
     /**
-     * The table <code>kheops.album_user</code>.
+     * The table <code>public.album_user</code>.
      */
     public static final AlbumUser ALBUM_USER = online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 
     /**
-     * The table <code>kheops.capabilities</code>.
+     * The table <code>public.capabilities</code>.
      */
     public static final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
 
     /**
-     * The table <code>kheops.event</code>.
+     * The table <code>public.event</code>.
      */
     public static final Event EVENT = online.kheops.auth_server.generated.tables.Event.EVENT;
 
     /**
-     * The table <code>kheops.series</code>.
+     * The table <code>public.series</code>.
      */
     public static final Series SERIES = online.kheops.auth_server.generated.tables.Series.SERIES;
 
     /**
-     * The table <code>kheops.studies</code>.
+     * The table <code>public.studies</code>.
      */
     public static final Studies STUDIES = online.kheops.auth_server.generated.tables.Studies.STUDIES;
 
     /**
-     * The table <code>kheops.users</code>.
+     * The table <code>public.users</code>.
      */
     public static final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
 }

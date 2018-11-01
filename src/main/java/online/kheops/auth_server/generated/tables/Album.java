@@ -12,7 +12,7 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.AlbumRecord;
 
 import org.jooq.Field;
@@ -42,10 +42,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Album extends TableImpl<AlbumRecord> {
 
-    private static final long serialVersionUID = -1296472159;
+    private static final long serialVersionUID = 238587591;
 
     /**
-     * The reference instance of <code>kheops.album</code>
+     * The reference instance of <code>public.album</code>
      */
     public static final Album ALBUM = new Album();
 
@@ -58,76 +58,76 @@ public class Album extends TableImpl<AlbumRecord> {
     }
 
     /**
-     * The column <code>kheops.album.pk</code>.
+     * The column <code>public.album.pk</code>.
      */
-    public final TableField<AlbumRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<AlbumRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('album_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>kheops.album.name</code>.
+     * The column <code>public.album.name</code>.
      */
     public final TableField<AlbumRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.description</code>.
+     * The column <code>public.album.description</code>.
      */
     public final TableField<AlbumRecord, String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR(2048), this, "");
 
     /**
-     * The column <code>kheops.album.created_time</code>.
+     * The column <code>public.album.created_time</code>.
      */
     public final TableField<AlbumRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.last_event_time</code>.
+     * The column <code>public.album.last_event_time</code>.
      */
     public final TableField<AlbumRecord, Timestamp> LAST_EVENT_TIME = createField("last_event_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.add_user_permission</code>.
+     * The column <code>public.album.add_user_permission</code>.
      */
-    public final TableField<AlbumRecord, Byte> ADD_USER_PERMISSION = createField("add_user_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumRecord, Boolean> ADD_USER_PERMISSION = createField("add_user_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.download_series_permission</code>.
+     * The column <code>public.album.download_series_permission</code>.
      */
-    public final TableField<AlbumRecord, Byte> DOWNLOAD_SERIES_PERMISSION = createField("download_series_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumRecord, Boolean> DOWNLOAD_SERIES_PERMISSION = createField("download_series_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.send_series_permission</code>.
+     * The column <code>public.album.send_series_permission</code>.
      */
-    public final TableField<AlbumRecord, Byte> SEND_SERIES_PERMISSION = createField("send_series_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumRecord, Boolean> SEND_SERIES_PERMISSION = createField("send_series_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.delete_series_permission</code>.
+     * The column <code>public.album.delete_series_permission</code>.
      */
-    public final TableField<AlbumRecord, Byte> DELETE_SERIES_PERMISSION = createField("delete_series_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumRecord, Boolean> DELETE_SERIES_PERMISSION = createField("delete_series_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.add_series_permission</code>.
+     * The column <code>public.album.add_series_permission</code>.
      */
-    public final TableField<AlbumRecord, Byte> ADD_SERIES_PERMISSION = createField("add_series_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumRecord, Boolean> ADD_SERIES_PERMISSION = createField("add_series_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album.write_comments_permission</code>.
+     * The column <code>public.album.write_comments_permission</code>.
      */
-    public final TableField<AlbumRecord, Byte> WRITE_COMMENTS_PERMISSION = createField("write_comments_permission", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumRecord, Boolean> WRITE_COMMENTS_PERMISSION = createField("write_comments_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * Create a <code>kheops.album</code> table reference
+     * Create a <code>public.album</code> table reference
      */
     public Album() {
         this(DSL.name("album"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.album</code> table reference
+     * Create an aliased <code>public.album</code> table reference
      */
     public Album(String alias) {
         this(DSL.name(alias), ALBUM);
     }
 
     /**
-     * Create an aliased <code>kheops.album</code> table reference
+     * Create an aliased <code>public.album</code> table reference
      */
     public Album(Name alias) {
         this(alias, ALBUM);
@@ -150,7 +150,7 @@ public class Album extends TableImpl<AlbumRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Album extends TableImpl<AlbumRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ALBUM_PRIMARY);
+        return Arrays.<Index>asList(Indexes.ALBUM_PK);
     }
 
     /**
@@ -174,7 +174,7 @@ public class Album extends TableImpl<AlbumRecord> {
      */
     @Override
     public UniqueKey<AlbumRecord> getPrimaryKey() {
-        return Keys.KEY_ALBUM_PRIMARY;
+        return Keys.ALBUM_PK;
     }
 
     /**
@@ -182,7 +182,7 @@ public class Album extends TableImpl<AlbumRecord> {
      */
     @Override
     public List<UniqueKey<AlbumRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlbumRecord>>asList(Keys.KEY_ALBUM_PRIMARY);
+        return Arrays.<UniqueKey<AlbumRecord>>asList(Keys.ALBUM_PK);
     }
 
     /**

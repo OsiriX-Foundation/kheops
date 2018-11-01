@@ -30,157 +30,157 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventRecord extends UpdatableRecordImpl<EventRecord> implements Record11<Long, String, Long, Long, Timestamp, Long, Long, String, String, Long, Long> {
 
-    private static final long serialVersionUID = -1897464986;
+    private static final long serialVersionUID = -1574307040;
 
     /**
-     * Setter for <code>kheops.event.pk</code>.
+     * Setter for <code>public.event.pk</code>.
      */
     public void setPk(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>kheops.event.pk</code>.
+     * Getter for <code>public.event.pk</code>.
      */
     public Long getPk() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>kheops.event.event_type</code>.
+     * Setter for <code>public.event.event_type</code>.
      */
     public void setEventType(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>kheops.event.event_type</code>.
+     * Getter for <code>public.event.event_type</code>.
      */
     public String getEventType() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>kheops.event.album_fk</code>.
+     * Setter for <code>public.event.album_fk</code>.
      */
     public void setAlbumFk(Long value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>kheops.event.album_fk</code>.
+     * Getter for <code>public.event.album_fk</code>.
      */
     public Long getAlbumFk() {
         return (Long) get(2);
     }
 
     /**
-     * Setter for <code>kheops.event.study_fk</code>.
+     * Setter for <code>public.event.study_fk</code>.
      */
     public void setStudyFk(Long value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>kheops.event.study_fk</code>.
+     * Getter for <code>public.event.study_fk</code>.
      */
     public Long getStudyFk() {
         return (Long) get(3);
     }
 
     /**
-     * Setter for <code>kheops.event.event_time</code>.
+     * Setter for <code>public.event.event_time</code>.
      */
     public void setEventTime(Timestamp value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>kheops.event.event_time</code>.
+     * Getter for <code>public.event.event_time</code>.
      */
     public Timestamp getEventTime() {
         return (Timestamp) get(4);
     }
 
     /**
-     * Setter for <code>kheops.event.user_fk</code>.
+     * Setter for <code>public.event.user_fk</code>.
      */
     public void setUserFk(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>kheops.event.user_fk</code>.
+     * Getter for <code>public.event.user_fk</code>.
      */
     public Long getUserFk() {
         return (Long) get(5);
     }
 
     /**
-     * Setter for <code>kheops.event.private_target_user_fk</code>.
+     * Setter for <code>public.event.private_target_user_fk</code>.
      */
     public void setPrivateTargetUserFk(Long value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>kheops.event.private_target_user_fk</code>.
+     * Getter for <code>public.event.private_target_user_fk</code>.
      */
     public Long getPrivateTargetUserFk() {
         return (Long) get(6);
     }
 
     /**
-     * Setter for <code>kheops.event.comment</code>.
+     * Setter for <code>public.event.comment</code>.
      */
     public void setComment(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>kheops.event.comment</code>.
+     * Getter for <code>public.event.comment</code>.
      */
     public String getComment() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>kheops.event.mutation_type</code>.
+     * Setter for <code>public.event.mutation_type</code>.
      */
     public void setMutationType(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>kheops.event.mutation_type</code>.
+     * Getter for <code>public.event.mutation_type</code>.
      */
     public String getMutationType() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>kheops.event.to_user_fk</code>.
+     * Setter for <code>public.event.to_user_fk</code>.
      */
     public void setToUserFk(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>kheops.event.to_user_fk</code>.
+     * Getter for <code>public.event.to_user_fk</code>.
      */
     public Long getToUserFk() {
         return (Long) get(9);
     }
 
     /**
-     * Setter for <code>kheops.event.series_fk</code>.
+     * Setter for <code>public.event.series_fk</code>.
      */
     public void setSeriesFk(Long value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>kheops.event.series_fk</code>.
+     * Getter for <code>public.event.series_fk</code>.
      */
     public Long getSeriesFk() {
         return (Long) get(10);

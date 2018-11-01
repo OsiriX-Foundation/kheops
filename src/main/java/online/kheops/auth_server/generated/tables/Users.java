@@ -12,7 +12,7 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.UsersRecord;
 
 import org.jooq.Field;
@@ -42,10 +42,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = 118966289;
+    private static final long serialVersionUID = 545905177;
 
     /**
-     * The reference instance of <code>kheops.users</code>
+     * The reference instance of <code>public.users</code>
      */
     public static final Users USERS = new Users();
 
@@ -58,51 +58,51 @@ public class Users extends TableImpl<UsersRecord> {
     }
 
     /**
-     * The column <code>kheops.users.pk</code>.
+     * The column <code>public.users.pk</code>.
      */
-    public final TableField<UsersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<UsersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('users_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>kheops.users.created_time</code>.
+     * The column <code>public.users.created_time</code>.
      */
     public final TableField<UsersRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.users.updated_time</code>.
+     * The column <code>public.users.updated_time</code>.
      */
     public final TableField<UsersRecord, Timestamp> UPDATED_TIME = createField("updated_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.users.google_id</code>.
+     * The column <code>public.users.google_id</code>.
      */
     public final TableField<UsersRecord, String> GOOGLE_ID = createField("google_id", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>kheops.users.google_email</code>.
+     * The column <code>public.users.google_email</code>.
      */
     public final TableField<UsersRecord, String> GOOGLE_EMAIL = createField("google_email", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>kheops.users.inbox_fk</code>.
+     * The column <code>public.users.inbox_fk</code>.
      */
     public final TableField<UsersRecord, Long> INBOX_FK = createField("inbox_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * Create a <code>kheops.users</code> table reference
+     * Create a <code>public.users</code> table reference
      */
     public Users() {
         this(DSL.name("users"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.users</code> table reference
+     * Create an aliased <code>public.users</code> table reference
      */
     public Users(String alias) {
         this(DSL.name(alias), USERS);
     }
 
     /**
-     * Create an aliased <code>kheops.users</code> table reference
+     * Create an aliased <code>public.users</code> table reference
      */
     public Users(Name alias) {
         this(alias, USERS);
@@ -125,7 +125,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -133,7 +133,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.USERS_GOOGLE_EMAIL_INDEX, Indexes.USERS_GOOGLE_EMAIL_UNIQUE, Indexes.USERS_GOOGLE_ID_INDEX, Indexes.USERS_GOOGLE_ID_UNIQUE, Indexes.USERS_INBOX_FK, Indexes.USERS_PRIMARY);
+        return Arrays.<Index>asList(Indexes.GOOGLE_EMAIL_INDEX, Indexes.GOOGLE_EMAIL_UNIQUE, Indexes.GOOGLE_ID_INDEX, Indexes.GOOGLE_ID_UNIQUE, Indexes.USERS_PK);
     }
 
     /**
@@ -149,7 +149,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public UniqueKey<UsersRecord> getPrimaryKey() {
-        return Keys.KEY_USERS_PRIMARY;
+        return Keys.USERS_PK;
     }
 
     /**
@@ -157,7 +157,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<UniqueKey<UsersRecord>> getKeys() {
-        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.KEY_USERS_PRIMARY, Keys.KEY_USERS_GOOGLE_ID_UNIQUE, Keys.KEY_USERS_GOOGLE_EMAIL_UNIQUE, Keys.KEY_USERS_INBOX_FK);
+        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.GOOGLE_ID_UNIQUE, Keys.GOOGLE_EMAIL_UNIQUE);
     }
 
     /**
@@ -165,11 +165,11 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<ForeignKey<UsersRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<UsersRecord, ?>>asList(Keys.USERS_IBFK_1);
+        return Arrays.<ForeignKey<UsersRecord, ?>>asList(Keys.USERS__USERS_INBOX_FK_FKEY);
     }
 
     public Album album() {
-        return new Album(this, Keys.USERS_IBFK_1);
+        return new Album(this, Keys.USERS__USERS_INBOX_FK_FKEY);
     }
 
     /**

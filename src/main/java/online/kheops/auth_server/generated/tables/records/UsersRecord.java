@@ -30,87 +30,87 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UsersRecord extends UpdatableRecordImpl<UsersRecord> implements Record6<Long, Timestamp, Timestamp, String, String, Long> {
 
-    private static final long serialVersionUID = -1954387881;
+    private static final long serialVersionUID = -2125150731;
 
     /**
-     * Setter for <code>kheops.users.pk</code>.
+     * Setter for <code>public.users.pk</code>.
      */
     public void setPk(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>kheops.users.pk</code>.
+     * Getter for <code>public.users.pk</code>.
      */
     public Long getPk() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>kheops.users.created_time</code>.
+     * Setter for <code>public.users.created_time</code>.
      */
     public void setCreatedTime(Timestamp value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>kheops.users.created_time</code>.
+     * Getter for <code>public.users.created_time</code>.
      */
     public Timestamp getCreatedTime() {
         return (Timestamp) get(1);
     }
 
     /**
-     * Setter for <code>kheops.users.updated_time</code>.
+     * Setter for <code>public.users.updated_time</code>.
      */
     public void setUpdatedTime(Timestamp value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>kheops.users.updated_time</code>.
+     * Getter for <code>public.users.updated_time</code>.
      */
     public Timestamp getUpdatedTime() {
         return (Timestamp) get(2);
     }
 
     /**
-     * Setter for <code>kheops.users.google_id</code>.
+     * Setter for <code>public.users.google_id</code>.
      */
     public void setGoogleId(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>kheops.users.google_id</code>.
+     * Getter for <code>public.users.google_id</code>.
      */
     public String getGoogleId() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>kheops.users.google_email</code>.
+     * Setter for <code>public.users.google_email</code>.
      */
     public void setGoogleEmail(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>kheops.users.google_email</code>.
+     * Getter for <code>public.users.google_email</code>.
      */
     public String getGoogleEmail() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>kheops.users.inbox_fk</code>.
+     * Setter for <code>public.users.inbox_fk</code>.
      */
     public void setInboxFk(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>kheops.users.inbox_fk</code>.
+     * Getter for <code>public.users.inbox_fk</code>.
      */
     public Long getInboxFk() {
         return (Long) get(5);

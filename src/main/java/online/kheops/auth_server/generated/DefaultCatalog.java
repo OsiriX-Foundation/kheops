@@ -27,7 +27,7 @@ import org.jooq.impl.CatalogImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultCatalog extends CatalogImpl {
 
-    private static final long serialVersionUID = 1950740553;
+    private static final long serialVersionUID = 1863611528;
 
     /**
      * The reference instance of <code></code>
@@ -35,9 +35,9 @@ public class DefaultCatalog extends CatalogImpl {
     public static final DefaultCatalog DEFAULT_CATALOG = new DefaultCatalog();
 
     /**
-     * The schema <code>kheops</code>.
+     * The schema <code>public</code>.
      */
-    public final Kheops KHEOPS = online.kheops.auth_server.generated.Kheops.KHEOPS;
+    public final Public PUBLIC = online.kheops.auth_server.generated.Public.PUBLIC;
 
     /**
      * No further instances allowed
@@ -55,6 +55,6 @@ public class DefaultCatalog extends CatalogImpl {
 
     private final List<Schema> getSchemas0() {
         return Arrays.<Schema>asList(
-            Kheops.KHEOPS);
+            Public.PUBLIC);
     }
 }

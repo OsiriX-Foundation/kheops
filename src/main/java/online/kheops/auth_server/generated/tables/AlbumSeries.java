@@ -11,12 +11,11 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -41,10 +40,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
-    private static final long serialVersionUID = 394336091;
+    private static final long serialVersionUID = 704489828;
 
     /**
-     * The reference instance of <code>kheops.album_series</code>
+     * The reference instance of <code>public.album_series</code>
      */
     public static final AlbumSeries ALBUM_SERIES = new AlbumSeries();
 
@@ -57,41 +56,36 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
     }
 
     /**
-     * The column <code>kheops.album_series.pk</code>.
-     */
-    public final TableField<AlbumSeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
-
-    /**
-     * The column <code>kheops.album_series.album_fk</code>.
+     * The column <code>public.album_series.album_fk</code>.
      */
     public final TableField<AlbumSeriesRecord, Long> ALBUM_FK = createField("album_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_series.series_fk</code>.
+     * The column <code>public.album_series.series_fk</code>.
      */
     public final TableField<AlbumSeriesRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_series.favorite</code>.
+     * The column <code>public.album_series.favorite</code>.
      */
-    public final TableField<AlbumSeriesRecord, Byte> FAVORITE = createField("favorite", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumSeriesRecord, Boolean> FAVORITE = createField("favorite", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * Create a <code>kheops.album_series</code> table reference
+     * Create a <code>public.album_series</code> table reference
      */
     public AlbumSeries() {
         this(DSL.name("album_series"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.album_series</code> table reference
+     * Create an aliased <code>public.album_series</code> table reference
      */
     public AlbumSeries(String alias) {
         this(DSL.name(alias), ALBUM_SERIES);
     }
 
     /**
-     * Create an aliased <code>kheops.album_series</code> table reference
+     * Create an aliased <code>public.album_series</code> table reference
      */
     public AlbumSeries(Name alias) {
         this(alias, ALBUM_SERIES);
@@ -114,7 +108,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -122,23 +116,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ALBUM_SERIES_ALBUM_SERIES_UNIQUE, Indexes.ALBUM_SERIES_PRIMARY, Indexes.ALBUM_SERIES_SERIES_FK);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<AlbumSeriesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_ALBUM_SERIES;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public UniqueKey<AlbumSeriesRecord> getPrimaryKey() {
-        return Keys.KEY_ALBUM_SERIES_PRIMARY;
+        return Arrays.<Index>asList(Indexes.ALBUM_SERIES_UNIQUE);
     }
 
     /**
@@ -146,7 +124,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<UniqueKey<AlbumSeriesRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlbumSeriesRecord>>asList(Keys.KEY_ALBUM_SERIES_PRIMARY, Keys.KEY_ALBUM_SERIES_ALBUM_SERIES_UNIQUE);
+        return Arrays.<UniqueKey<AlbumSeriesRecord>>asList(Keys.ALBUM_SERIES_UNIQUE);
     }
 
     /**
@@ -154,15 +132,15 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<ForeignKey<AlbumSeriesRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AlbumSeriesRecord, ?>>asList(Keys.ALBUM_SERIES_IBFK_1, Keys.ALBUM_SERIES_IBFK_2);
+        return Arrays.<ForeignKey<AlbumSeriesRecord, ?>>asList(Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY, Keys.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY);
     }
 
     public Album album() {
-        return new Album(this, Keys.ALBUM_SERIES_IBFK_1);
+        return new Album(this, Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY);
     }
 
     public Series series() {
-        return new Series(this, Keys.ALBUM_SERIES_IBFK_2);
+        return new Series(this, Keys.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY);
     }
 
     /**
