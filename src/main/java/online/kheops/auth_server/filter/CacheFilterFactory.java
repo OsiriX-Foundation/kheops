@@ -4,14 +4,16 @@ import online.kheops.auth_server.annotation.CacheControlHeader;
 
 import javax.ws.rs.container.*;
 import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
+
+import static javax.ws.rs.HttpMethod.GET;
+import static javax.ws.rs.HttpMethod.PUT;
+import static javax.ws.rs.core.HttpHeaders.CACHE_CONTROL;
 
 @Provider
 public class CacheFilterFactory implements DynamicFeature {
 
-    private static final CacheResponseFilter NO_CACHE_FILTER =
-            new CacheResponseFilter("no-cache");
+    private static final CacheResponseFilter NO_CACHE_FILTER = new CacheResponseFilter("no-cache");
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
@@ -34,9 +36,11 @@ public class CacheFilterFactory implements DynamicFeature {
         @Override
         public void filter(ContainerRequestContext containerRequestContext,
                            ContainerResponseContext containerResponseContext) {
-            // attache Cache Control header to each response
-            // based on the annotation value
-            containerResponseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, headerValue);
+            if (headerValue == null) {
+                containerResponseContext.getHeaders().remove(CACHE_CONTROL);
+            } else if (containerRequestContext.getMethod().equals(GET) || containerRequestContext.getMethod().equals(PUT)) {
+                containerResponseContext.getHeaders().putSingle(CACHE_CONTROL, headerValue);
+            }
         }
     }
 }
