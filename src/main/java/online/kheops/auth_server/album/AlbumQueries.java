@@ -59,7 +59,7 @@ public class AlbumQueries {
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
-            DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+            DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             SelectQuery query = create.selectQuery();
 
             ArrayList<Condition> conditionArrayList = new ArrayList<>();
@@ -69,24 +69,24 @@ public class AlbumQueries {
                     .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
                     .asField();
 
-            query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
-                    isnull(ALBUM.NAME,"NULL").as("album_name"),
+            query.addSelect(ALBUM.PK.as("album_pk"),
+                    ALBUM.NAME.as("album_name"),
                     isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
-                    isnull(ALBUM.CREATED_TIME,"NULL").as("album_created_time"),
-                    isnull(ALBUM.LAST_EVENT_TIME,"NULL").as("album_last_event_time"),
-                    isnull(nbUsers,"NULL").as("number_of_users"),
-                    isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
-                    isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
-                    isnull(ALBUM.ADD_USER_PERMISSION,"NULL").as("add_user_permission"),
-                    isnull(ALBUM.DOWNLOAD_SERIES_PERMISSION,"NULL").as("download_user_permission"),
-                    isnull(ALBUM.SEND_SERIES_PERMISSION,"NULL").as("send_series_permission"),
-                    isnull(ALBUM.DELETE_SERIES_PERMISSION,"NULL").as("delete_series_permision"),
-                    isnull(ALBUM.ADD_SERIES_PERMISSION,"NULL").as("add_series_permission"),
-                    isnull(ALBUM.WRITE_COMMENTS_PERMISSION,"NULL").as("write_comment_permission"),
-                    isnull(ALBUM_USER.FAVORITE,"NULL").as("favorite"),
-                    isnull(ALBUM_USER.NEW_COMMENT_NOTIFICATIONS,"NULL").as("new_comment_notifications"),
-                    isnull(ALBUM_USER.NEW_SERIES_NOTIFICATIONS,"NULL").as("new_series_notifications"),
-                    isnull(ALBUM_USER.ADMIN,"NULL").as("admin"),
+                    ALBUM.CREATED_TIME.as("album_created_time"),
+                    ALBUM.LAST_EVENT_TIME.as("album_last_event_time"),
+                    nbUsers.as("number_of_users"),
+                    countDistinct(EVENT.PK).as("number_of_comments"),
+                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
+                    ALBUM.ADD_USER_PERMISSION.as("add_user_permission"),
+                    ALBUM.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
+                    ALBUM.SEND_SERIES_PERMISSION.as("send_series_permission"),
+                    ALBUM.DELETE_SERIES_PERMISSION.as("delete_series_permision"),
+                    ALBUM.ADD_SERIES_PERMISSION.as("add_series_permission"),
+                    ALBUM.WRITE_COMMENTS_PERMISSION.as("write_comment_permission"),
+                    ALBUM_USER.FAVORITE.as("favorite"),
+                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as("new_comment_notifications"),
+                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
+                    ALBUM_USER.ADMIN.as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUM);
@@ -125,7 +125,7 @@ public class AlbumQueries {
 
             query.addOrderBy(getOrderBy(queryParameters, create));
 
-            query.addGroupBy(ALBUM.PK);
+            query.addGroupBy(ALBUM.PK, ALBUM_USER.PK);
 
             Result<Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>> result = query.fetch();
 
@@ -141,6 +141,7 @@ public class AlbumQueries {
         } catch (BadQueryParametersException e) {
             throw new BadQueryParametersException(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new JOOQException("Error during request");
         }
     }
@@ -149,32 +150,32 @@ public class AlbumQueries {
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
-            final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+            final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery query = create.selectQuery();
 
             Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
                     .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .where(ALBUM_USER.ALBUM_FK.eq(albumPk))
                     .asField();
 
-            query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
-                    isnull(ALBUM.NAME,"NULL").as("album_name"),
+            query.addSelect(ALBUM.PK.as("album_pk"),
+                    ALBUM.NAME.as("album_name"),
                     isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
-                    isnull(ALBUM.CREATED_TIME,"NULL").as("album_created_time"),
-                    isnull(ALBUM.LAST_EVENT_TIME,"NULL").as("album_last_event_time"),
-                    isnull(nbUsers,"NULL").as("number_of_users"),
-                    isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
-                    isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
-                    isnull(ALBUM.ADD_USER_PERMISSION,"NULL").as("add_user_permission"),
-                    isnull(ALBUM.DOWNLOAD_SERIES_PERMISSION,"NULL").as("download_user_permission"),
-                    isnull(ALBUM.SEND_SERIES_PERMISSION,"NULL").as("send_series_permission"),
-                    isnull(ALBUM.DELETE_SERIES_PERMISSION,"NULL").as("delete_series_permision"),
-                    isnull(ALBUM.ADD_SERIES_PERMISSION,"NULL").as("add_series_permission"),
-                    isnull(ALBUM.WRITE_COMMENTS_PERMISSION,"NULL").as("write_comment_permission"),
-                    isnull(ALBUM_USER.FAVORITE,"NULL").as("favorite"),
-                    isnull(ALBUM_USER.NEW_COMMENT_NOTIFICATIONS,"NULL").as("new_comment_notifications"),
-                    isnull(ALBUM_USER.NEW_SERIES_NOTIFICATIONS,"NULL").as("new_series_notifications"),
-                    isnull(ALBUM_USER.ADMIN,"NULL").as("admin"),
+                    ALBUM.CREATED_TIME.as("album_created_time"),
+                    ALBUM.LAST_EVENT_TIME.as("album_last_event_time"),
+                    nbUsers.as("number_of_users"),
+                    countDistinct(EVENT.PK).as("number_of_comments"),
+                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
+                    ALBUM.ADD_USER_PERMISSION.as("add_user_permission"),
+                    ALBUM.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
+                    ALBUM.SEND_SERIES_PERMISSION.as("send_series_permission"),
+                    ALBUM.DELETE_SERIES_PERMISSION.as("delete_series_permision"),
+                    ALBUM.ADD_SERIES_PERMISSION.as("add_series_permission"),
+                    ALBUM.WRITE_COMMENTS_PERMISSION.as("write_comment_permission"),
+                    ALBUM_USER.FAVORITE.as("favorite"),
+                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as("new_comment_notifications"),
+                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
+                    ALBUM_USER.ADMIN.as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUM);
@@ -192,11 +193,13 @@ public class AlbumQueries {
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
             query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
 
-            query.addGroupBy(ALBUM.PK);
+            query.addGroupBy(ALBUM.PK, ALBUM_USER.PK);
+
             Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String> result = (Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>) query.fetchOne();
 
             return recordToAlbumResponse(result);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new JOOQException("Error during request");
         }
     }
@@ -241,7 +244,7 @@ public class AlbumQueries {
     }
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
-        final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
         final SelectQuery query = create.selectQuery();
         query.addSelect(countDistinct(ALBUM.PK));
         query.addFrom(ALBUM);
@@ -311,7 +314,7 @@ public class AlbumQueries {
                 }
 
                 if (isFuzzyMatching(queryParameters)) {
-                    Condition fuzzyCondition = condition("SOUNDEX(\""+parameterNoStar+"\") = SOUNDEX("+column.getName()+")");
+                    Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
                     return condition.or(fuzzyCondition);
                 }
                 return condition;

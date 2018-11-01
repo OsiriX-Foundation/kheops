@@ -3,7 +3,11 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.*;
 import online.kheops.auth_server.annotation.Secured;
+
 import online.kheops.auth_server.capability.ScopeType;
+
+import online.kheops.auth_server.entity.Album;
+
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;

@@ -26,7 +26,7 @@ public class Albums {
     }
 
     public static AlbumResponses.AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
-            throws UserNotFoundException, JOOQException {
+            throws JOOQException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

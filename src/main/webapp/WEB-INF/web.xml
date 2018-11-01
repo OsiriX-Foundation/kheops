@@ -30,18 +30,18 @@
         <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
     </context-param>
     <context-param>
-        <description>URL for the connection to the MySQL database</description>
+        <description>URL for the connection to the PostgreSQL database</description>
         <param-name>online.kheops.jdbc.url</param-name>
-        <param-value>jdbc:mysql://localhost/kheops</param-value>
+        <param-value>jdbc:postgresql://localhost/kheops</param-value>
     </context-param>
     <context-param>
-        <description>User name for the mySQL databse</description>
+        <description>User name for the PostgreSQL databse</description>
         <param-name>online.kheops.jdbc.user</param-name>
-        <param-value>root</param-value>
+        <param-value>kheopsuser</param-value>
     </context-param>
     <context-param>
-        <description>Password for the mySQL databse</description>
+        <description>Password for the PostgreSQL databse</description>
         <param-name>online.kheops.jdbc.password</param-name>
-        <param-value>root</param-value>
+        <param-value>mypwd</param-value>
     </context-param>
 </web-app>

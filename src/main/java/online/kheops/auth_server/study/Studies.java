@@ -71,7 +71,7 @@ public class Studies {
             conditionArrayList.add(fromCondition);
         }
 
-        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
 
         if (qidoParams.getStudyDateFilter().isPresent()) {
             conditionArrayList.add(createConditonStudyDate(qidoParams.getStudyDateFilter().get()));
@@ -140,7 +140,7 @@ public class Studies {
                 isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
                 isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
                 isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
-                isnull(count(SERIES.PK), 0).as("count:" + SERIES.PK.getName()),
+                count(SERIES.PK).as("count:" + SERIES.PK.getName()),
                 sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
                 sum(ALBUM_SERIES.FAVORITE).as("sum_fav"));
@@ -157,8 +157,7 @@ public class Studies {
             }
         }
 
-        query.addGroupBy(STUDIES.STUDY_UID);
-
+        query.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
 
         query.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
 
