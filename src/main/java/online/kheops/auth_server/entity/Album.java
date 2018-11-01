@@ -10,7 +10,7 @@ import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
-@Table(name = "album")
+@Table(name = "albums")
 public class Album {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
