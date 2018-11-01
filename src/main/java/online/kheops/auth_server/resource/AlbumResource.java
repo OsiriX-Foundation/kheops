@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
 public class AlbumResource {
@@ -96,7 +97,9 @@ public class AlbumResource {
         }
 
         final GenericEntity<List<AlbumResponses.AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponses.AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
-        return Response.status(OK).entity(genericAlbumResponsesList).header("X-Total-Count", pairAlbumsTotalAlbum.getXTotalCount()).build();
+        return Response.ok(genericAlbumResponsesList)
+                .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
+                .build();
     }
 
     @GET

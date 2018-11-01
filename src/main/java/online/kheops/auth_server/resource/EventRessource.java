@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
+import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
 public class EventRessource {
@@ -75,7 +76,9 @@ public class EventRessource {
         }
 
         final GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(pair.getAttributesList()) {};
-        return Response.status(OK).entity(genericEventsResponsesList).header("X-Total-Count",pair.getXTotalCount()).build();
+        return Response.ok(genericEventsResponsesList)
+                .header(X_TOTAL_COUNT, pair.getXTotalCount())
+                .build();
     }
 
     @POST
@@ -146,7 +149,9 @@ public class EventRessource {
         }
 
         final GenericEntity<List<EventResponses.EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponses.EventResponse>>(pair.getAttributesList()) {};
-        return Response.status(OK).entity(genericEventsResponsesList).header("X-Total-Count", pair.getXTotalCount()).build();
+        return Response.ok(genericEventsResponsesList)
+                .header(X_TOTAL_COUNT, pair.getXTotalCount())
+                .build();
     }
 
     @POST
