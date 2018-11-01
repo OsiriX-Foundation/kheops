@@ -44,6 +44,7 @@ import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
+import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
 @Path("/")
@@ -110,11 +111,14 @@ public class QIDOResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
         if(pair.getXTotalCount() == 0) {
-            return Response.status(NO_CONTENT).header("X-Total-Count", pair.getXTotalCount()).build();
+            return Response.status(NO_CONTENT)
+                    .header(X_TOTAL_COUNT, pair.getXTotalCount())
+                    .build();
         }
 
         GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
-        Response.ResponseBuilder response = Response.ok(genericAttributesList).header("X-Total-Count", pair.getXTotalCount());
+        Response.ResponseBuilder response = Response.ok(genericAttributesList)
+                .header(X_TOTAL_COUNT, pair.getXTotalCount());
 
         final long remaining = pair.getXTotalCount() - (offset + pair.getAttributesList().size());
         if ( remaining > 0) {
@@ -200,7 +204,9 @@ public class QIDOResource {
         }
 
         if (availableSeriesUIDs.isEmpty()) {
-            return Response.status(NO_CONTENT).header("X-Total-Count", 0).build();
+            return Response.status(NO_CONTENT)
+                    .header(X_TOTAL_COUNT, 0)
+                    .build();
         }
 
         List<Attributes> allSeries = webTarget.request("application/dicom+json")
@@ -226,7 +232,8 @@ public class QIDOResource {
         }
         GenericEntity<List<Attributes>> genericAvailableSeries = new GenericEntity<List<Attributes>>(availableSeries) {};
 
-        Response.ResponseBuilder responseBuilder = Response.ok().entity(genericAvailableSeries).header("X-Total-Count", totalAvailableSeries);
+        Response.ResponseBuilder responseBuilder = Response.ok(genericAvailableSeries)
+                .header(X_TOTAL_COUNT, totalAvailableSeries);
 
         if (totalAvailableSeries > availableSeries.size() + offset) {
             int remaining = totalAvailableSeries - (offset + availableSeries.size());
