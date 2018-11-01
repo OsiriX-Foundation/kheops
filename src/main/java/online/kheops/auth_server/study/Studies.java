@@ -128,8 +128,7 @@ public class Studies {
 
         Integer studiesTotalCount = (Integer) query.fetch().getValues("count").get(0);
 
-        query = create.selectQuery();
-        query.addSelect(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
+        query.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
                 isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
                 isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
                 isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
@@ -143,7 +142,8 @@ public class Studies {
                 count(SERIES.PK).as("count:" + SERIES.PK.getName()),
                 sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
-                sum(ALBUM_SERIES.FAVORITE).as("sum_fav"));
+                count(when(ALBUM_SERIES.FAVORITE.eq(true), 1)).as("sum_fav"));
+
         query.addFrom(USERS);
         query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
         query.addJoin(ALBUM, ALBUM.PK.eq(ALBUM_USER.ALBUM_FK));
@@ -394,7 +394,7 @@ public class Studies {
             }
 
             if (isFuzzyMatching) {
-                Condition fuzzyCondition = condition("SOUNDEX(\""+parameterNoStar+"\") = SOUNDEX("+column.getName()+")");
+                Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
                 return condition.or(fuzzyCondition);
             }
             return condition;
