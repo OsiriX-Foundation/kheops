@@ -59,9 +59,6 @@ public class AlbumResource {
 
         try {
             albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.INFO, "Creating new album by user pk:"+callingUserPk+ " FAILED", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
