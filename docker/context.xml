@@ -9,6 +9,6 @@
                override="false"/>
     <Parameter name="online.kheops.jdbc.user" value="${kheops_postgresql_user}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.password" value="${kheops_postgresql_password}"
+    <Parameter name="online.kheops.jdbc.password" value="mypwd"
                override="false"/>
 </Context>
