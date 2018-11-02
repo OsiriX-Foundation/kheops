@@ -37,7 +37,7 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.JOOQTools.*;
-import static online.kheops.auth_server.generated.Tables.ALBUM;
+import static online.kheops.auth_server.generated.Tables.ALBUMS;
 import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
@@ -62,12 +62,12 @@ public class Studies {
 
         Condition fromCondition = trueCondition();
         if (qidoParams.getAlbum_id().isPresent()) {
-            fromCondition = ALBUM.PK.eq(qidoParams.getAlbum_id().get());
+            fromCondition = ALBUMS.PK.eq(qidoParams.getAlbum_id().get());
             conditionArrayList.add(fromCondition);
         }
 
         if (qidoParams.isFromInbox()) {
-            fromCondition = ALBUM.PK.eq(USERS.INBOX_FK);
+            fromCondition = ALBUMS.PK.eq(USERS.INBOX_FK);
             conditionArrayList.add(fromCondition);
         }
 
@@ -110,8 +110,8 @@ public class Studies {
         query.addSelect(countDistinct(STUDIES.PK));
         query.addFrom(USERS);
         query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
-        query.addJoin(ALBUM, ALBUM.PK.eq(ALBUM_USER.ALBUM_FK));
-        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+        query.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
         query.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
         query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
 
@@ -147,8 +147,8 @@ public class Studies {
 
         query.addFrom(USERS);
         query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
-        query.addJoin(ALBUM, ALBUM.PK.eq(ALBUM_USER.ALBUM_FK));
-        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+        query.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
         query.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
         query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
 
@@ -184,8 +184,8 @@ public class Studies {
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
                         .join(ALBUM_USER).on(ALBUM_USER.USER_FK.eq(USERS.PK))
-                        .join(ALBUM).on(ALBUM.PK.eq(ALBUM_USER.ALBUM_FK))
-                        .join(ALBUM_SERIES).on(ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK))
+                        .join(ALBUMS).on(ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK))
+                        .join(ALBUM_SERIES).on(ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK))
                         .join(SERIES).on(SERIES.PK.eq(ALBUM_SERIES.SERIES_FK))
                         .join(STUDIES).on(STUDIES.PK.eq(SERIES.STUDY_FK))
                         .where(USERS.PK.eq(callingUserPK))

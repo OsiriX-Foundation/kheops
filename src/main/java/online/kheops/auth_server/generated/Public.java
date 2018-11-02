@@ -10,11 +10,11 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import online.kheops.auth_server.generated.tables.Album;
 import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
+import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Event;
+import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
@@ -38,17 +38,12 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 2136541828;
+    private static final long serialVersionUID = 1803600431;
 
     /**
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
-
-    /**
-     * The table <code>public.album</code>.
-     */
-    public final Album ALBUM = online.kheops.auth_server.generated.tables.Album.ALBUM;
 
     /**
      * The table <code>public.album_series</code>.
@@ -61,14 +56,19 @@ public class Public extends SchemaImpl {
     public final AlbumUser ALBUM_USER = online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 
     /**
+     * The table <code>public.albums</code>.
+     */
+    public final Albums ALBUMS = online.kheops.auth_server.generated.tables.Albums.ALBUMS;
+
+    /**
      * The table <code>public.capabilities</code>.
      */
     public final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
 
     /**
-     * The table <code>public.event</code>.
+     * The table <code>public.events</code>.
      */
-    public final Event EVENT = online.kheops.auth_server.generated.tables.Event.EVENT;
+    public final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
 
     /**
      * The table <code>public.series</code>.
@@ -111,6 +111,7 @@ public class Public extends SchemaImpl {
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
             Sequences.ALBUM_PK_SEQ,
+            Sequences.ALBUM_SERIES_PK_SEQ,
             Sequences.ALBUM_USER_PK_SEQ,
             Sequences.CAPABILITIES_PK_SEQ,
             Sequences.EVENT_PK_SEQ,
@@ -128,11 +129,11 @@ public class Public extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            Album.ALBUM,
             AlbumSeries.ALBUM_SERIES,
             AlbumUser.ALBUM_USER,
+            Albums.ALBUMS,
             Capabilities.CAPABILITIES,
-            Event.EVENT,
+            Events.EVENTS,
             Series.SERIES,
             Studies.STUDIES,
             Users.USERS);

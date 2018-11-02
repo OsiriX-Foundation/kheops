@@ -16,6 +16,7 @@ import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
-    private static final long serialVersionUID = 704489828;
+    private static final long serialVersionUID = -1898231029;
 
     /**
      * The reference instance of <code>public.album_series</code>
@@ -54,6 +55,11 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
     public Class<AlbumSeriesRecord> getRecordType() {
         return AlbumSeriesRecord.class;
     }
+
+    /**
+     * The column <code>public.album_series.pk</code>.
+     */
+    public final TableField<AlbumSeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('album_series_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>public.album_series.album_fk</code>.
@@ -116,7 +122,23 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ALBUM_SERIES_UNIQUE);
+        return Arrays.<Index>asList(Indexes.ALBUM_SERIES_PK, Indexes.ALBUM_SERIES_UNIQUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<AlbumSeriesRecord, Long> getIdentity() {
+        return Keys.IDENTITY_ALBUM_SERIES;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UniqueKey<AlbumSeriesRecord> getPrimaryKey() {
+        return Keys.ALBUM_SERIES_PK;
     }
 
     /**
@@ -124,7 +146,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<UniqueKey<AlbumSeriesRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlbumSeriesRecord>>asList(Keys.ALBUM_SERIES_UNIQUE);
+        return Arrays.<UniqueKey<AlbumSeriesRecord>>asList(Keys.ALBUM_SERIES_PK, Keys.ALBUM_SERIES_UNIQUE);
     }
 
     /**
@@ -135,8 +157,8 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
         return Arrays.<ForeignKey<AlbumSeriesRecord, ?>>asList(Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY, Keys.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY);
     }
 
-    public Album album() {
-        return new Album(this, Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY);
+    public Albums albums() {
+        return new Albums(this, Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY);
     }
 
     public Series series() {

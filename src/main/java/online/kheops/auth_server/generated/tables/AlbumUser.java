@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumUser extends TableImpl<AlbumUserRecord> {
 
-    private static final long serialVersionUID = -1956564033;
+    private static final long serialVersionUID = -1009662100;
 
     /**
      * The reference instance of <code>public.album_user</code>
@@ -172,8 +172,8 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
         return Arrays.<ForeignKey<AlbumUserRecord, ?>>asList(Keys.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY, Keys.ALBUM_USER__ALBUM_USER_USER_FK_FKEY);
     }
 
-    public Album album() {
-        return new Album(this, Keys.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY);
+    public Albums albums() {
+        return new Albums(this, Keys.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY);
     }
 
     public Users users() {

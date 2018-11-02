@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
-    private static final long serialVersionUID = 153638598;
+    private static final long serialVersionUID = 1777657534;
 
     /**
      * The reference instance of <code>public.capabilities</code>
@@ -63,9 +63,9 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     public final TableField<CapabilitiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('capabilities_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>public.capabilities.created_time</code>.
+     * The column <code>public.capabilities.issued_at_time</code>.
      */
-    public final TableField<CapabilitiesRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, Timestamp> ISSUED_AT_TIME = createField("issued_at_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.updated_time</code>.
@@ -78,9 +78,9 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     public final TableField<CapabilitiesRecord, Timestamp> EXPIRATION_TIME = createField("expiration_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
-     * The column <code>public.capabilities.start_time</code>.
+     * The column <code>public.capabilities.not_before_time</code>.
      */
-    public final TableField<CapabilitiesRecord, Timestamp> START_TIME = createField("start_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+    public final TableField<CapabilitiesRecord, Timestamp> NOT_BEFORE_TIME = createField("not_before_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
      * The column <code>public.capabilities.revoked_time</code>.
@@ -103,6 +103,16 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     public final TableField<CapabilitiesRecord, Boolean> READ_PERMISSION = createField("read_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
+     * The column <code>public.capabilities.appropriate_permission</code>.
+     */
+    public final TableField<CapabilitiesRecord, Boolean> APPROPRIATE_PERMISSION = createField("appropriate_permission", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+    /**
+     * The column <code>public.capabilities.download_permission</code>.
+     */
+    public final TableField<CapabilitiesRecord, Boolean> DOWNLOAD_PERMISSION = createField("download_permission", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+    /**
      * The column <code>public.capabilities.write_permission</code>.
      */
     public final TableField<CapabilitiesRecord, Boolean> WRITE_PERMISSION = createField("write_permission", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
@@ -121,16 +131,6 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      * The column <code>public.capabilities.album_fk</code>.
      */
     public final TableField<CapabilitiesRecord, Long> ALBUM_FK = createField("album_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>public.capabilities.series_fk</code>.
-     */
-    public final TableField<CapabilitiesRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>public.capabilities.study_fk</code>.
-     */
-    public final TableField<CapabilitiesRecord, Long> STUDY_FK = createField("study_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * Create a <code>public.capabilities</code> table reference
@@ -210,23 +210,15 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      */
     @Override
     public List<ForeignKey<CapabilitiesRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CapabilitiesRecord, ?>>asList(Keys.CAPABILITIES__CAPABILITIES_USER_FK_FKEY, Keys.CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY, Keys.CAPABILITIES__CAPABILITIES_SERIES_FK_FKEY, Keys.CAPABILITIES__CAPABILITIES_STUDY_FK_FKEY);
+        return Arrays.<ForeignKey<CapabilitiesRecord, ?>>asList(Keys.CAPABILITIES__CAPABILITIES_USER_FK_FKEY, Keys.CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY);
     }
 
     public Users users() {
         return new Users(this, Keys.CAPABILITIES__CAPABILITIES_USER_FK_FKEY);
     }
 
-    public Album album() {
-        return new Album(this, Keys.CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY);
-    }
-
-    public Series series() {
-        return new Series(this, Keys.CAPABILITIES__CAPABILITIES_SERIES_FK_FKEY);
-    }
-
-    public Studies studies() {
-        return new Studies(this, Keys.CAPABILITIES__CAPABILITIES_STUDY_FK_FKEY);
+    public Albums albums() {
+        return new Albums(this, Keys.CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY);
     }
 
     /**

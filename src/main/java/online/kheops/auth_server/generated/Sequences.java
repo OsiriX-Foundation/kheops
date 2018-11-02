@@ -29,6 +29,11 @@ public class Sequences {
     public static final Sequence<Long> ALBUM_PK_SEQ = new SequenceImpl<Long>("album_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
+     * The sequence <code>public.album_series_pk_seq</code>
+     */
+    public static final Sequence<Long> ALBUM_SERIES_PK_SEQ = new SequenceImpl<Long>("album_series_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
      * The sequence <code>public.album_user_pk_seq</code>
      */
     public static final Sequence<Long> ALBUM_USER_PK_SEQ = new SequenceImpl<Long>("album_user_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

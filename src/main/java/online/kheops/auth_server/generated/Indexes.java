@@ -6,11 +6,11 @@ package online.kheops.auth_server.generated;
 
 import javax.annotation.Generated;
 
-import online.kheops.auth_server.generated.tables.Album;
 import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
+import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Event;
+import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
@@ -37,10 +37,11 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
-    public static final Index ALBUM_PK = Indexes0.ALBUM_PK;
+    public static final Index ALBUM_SERIES_PK = Indexes0.ALBUM_SERIES_PK;
     public static final Index ALBUM_SERIES_UNIQUE = Indexes0.ALBUM_SERIES_UNIQUE;
     public static final Index ALBUM_USER_PK = Indexes0.ALBUM_USER_PK;
     public static final Index ALBUM_USER_UNIQUE = Indexes0.ALBUM_USER_UNIQUE;
+    public static final Index ALBUM_PK = Indexes0.ALBUM_PK;
     public static final Index CAPABILITIES_PK = Indexes0.CAPABILITIES_PK;
     public static final Index CAPABILITIES_SECRET_INDEX = Indexes0.CAPABILITIES_SECRET_INDEX;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
@@ -71,15 +72,16 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     private static class Indexes0 {
-        public static Index ALBUM_PK = Internal.createIndex("album_pk", Album.ALBUM, new OrderField[] { Album.ALBUM.PK }, true);
+        public static Index ALBUM_SERIES_PK = Internal.createIndex("album_series_pk", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.PK }, true);
         public static Index ALBUM_SERIES_UNIQUE = Internal.createIndex("album_series_unique", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.ALBUM_FK, AlbumSeries.ALBUM_SERIES.SERIES_FK }, true);
         public static Index ALBUM_USER_PK = Internal.createIndex("album_user_pk", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.PK }, true);
         public static Index ALBUM_USER_UNIQUE = Internal.createIndex("album_user_unique", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.ALBUM_FK, AlbumUser.ALBUM_USER.USER_FK }, true);
+        public static Index ALBUM_PK = Internal.createIndex("album_pk", Albums.ALBUMS, new OrderField[] { Albums.ALBUMS.PK }, true);
         public static Index CAPABILITIES_PK = Internal.createIndex("capabilities_pk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.PK }, true);
         public static Index CAPABILITIES_SECRET_INDEX = Internal.createIndex("capabilities_secret_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, false);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("capabilities_secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("capabilities_user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
-        public static Index EVENT_PK = Internal.createIndex("event_pk", Event.EVENT, new OrderField[] { Event.EVENT.PK }, true);
+        public static Index EVENT_PK = Internal.createIndex("event_pk", Events.EVENTS, new OrderField[] { Events.EVENTS.PK }, true);
         public static Index SERIES_PK = Internal.createIndex("series_pk", Series.SERIES, new OrderField[] { Series.SERIES.PK }, true);
         public static Index SERIES_POPULATED_INDEX = Internal.createIndex("series_populated_index", Series.SERIES, new OrderField[] { Series.SERIES.POPULATED }, false);
         public static Index SERIES_UID_INDEX = Internal.createIndex("series_uid_index", Series.SERIES, new OrderField[] { Series.SERIES.SERIES_UID }, false);

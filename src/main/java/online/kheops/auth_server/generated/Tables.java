@@ -6,11 +6,11 @@ package online.kheops.auth_server.generated;
 
 import javax.annotation.Generated;
 
-import online.kheops.auth_server.generated.tables.Album;
 import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
+import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Event;
+import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
@@ -30,11 +30,6 @@ import online.kheops.auth_server.generated.tables.Users;
 public class Tables {
 
     /**
-     * The table <code>public.album</code>.
-     */
-    public static final Album ALBUM = online.kheops.auth_server.generated.tables.Album.ALBUM;
-
-    /**
      * The table <code>public.album_series</code>.
      */
     public static final AlbumSeries ALBUM_SERIES = online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
@@ -45,14 +40,19 @@ public class Tables {
     public static final AlbumUser ALBUM_USER = online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 
     /**
+     * The table <code>public.albums</code>.
+     */
+    public static final Albums ALBUMS = online.kheops.auth_server.generated.tables.Albums.ALBUMS;
+
+    /**
      * The table <code>public.capabilities</code>.
      */
     public static final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
 
     /**
-     * The table <code>public.event</code>.
+     * The table <code>public.events</code>.
      */
-    public static final Event EVENT = online.kheops.auth_server.generated.tables.Event.EVENT;
+    public static final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
 
     /**
      * The table <code>public.series</code>.
