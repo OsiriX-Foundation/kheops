@@ -25,8 +25,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
+import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+
 @Path("/studies")
 public final class ZipStudyResource {
+    private static final String ALBUM = "album";
+    private static final String INBOX = "inbox";
+    private static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
+    private static final String ASSERTION = "assertion";
+    private static final String GRANT_TYPE = "grant_type";
 
     private static final Client CLIENT = newClient();
     private static final String DICOM_ZIP_FILENAME = "DICOM.ZIP";
@@ -58,13 +67,16 @@ public final class ZipStudyResource {
     ServletContext context;
 
     @GET
-    @Path("/{StudyInstanceUID}")
+    @Path("/{" + STUDY_INSTANCE_UID +"}")
     @Produces("application/zip")
-    public Response streamStudy(@PathParam("StudyInstanceUID") String studyInstanceUID, @HeaderParam("authorization") String authorizationHeader) {
-        checkValidUID(studyInstanceUID, "studyInstanceUID");
+    public Response streamStudy(@PathParam(STUDY_INSTANCE_UID) String studyInstanceUID,
+                                @HeaderParam(AUTHORIZATION) String authorizationHeader,
+                                @QueryParam(ALBUM) Long fromAlbum,
+                                @QueryParam(INBOX) Boolean fromInbox) {
+        checkValidUID(studyInstanceUID, STUDY_INSTANCE_UID);
 
         final Tokens tokens = getTokens(getUserTokenFromHeader(authorizationHeader));
-        final Set<Instance> instances = getInstances(tokens, studyInstanceUID);
+        final Set<Instance> instances = getInstances(tokens, studyInstanceUID, fromAlbum, fromInbox);
         final BearerTokenRetriever bearerTokenRetriever = new BearerTokenRetriever.Builder()
                 .client(CLIENT)
                 .authorizationURI(authorizationURI())
@@ -78,7 +90,7 @@ public final class ZipStudyResource {
                 .build();
 
         return Response.ok(InstanceZipper.newInstance(instanceRetrievalService).getStreamingOutput())
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + DICOM_ZIP_FILENAME + "\"")
+                .header(CONTENT_DISPOSITION, "attachment; filename=\"" + DICOM_ZIP_FILENAME + "\"")
                 .build();
     }
 
@@ -90,19 +102,19 @@ public final class ZipStudyResource {
 
     private String getUserTokenFromHeader(String authorizationHeader) {
         if (authorizationHeader == null) {
-            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
+            throw new WebApplicationException(UNAUTHORIZED);
         }
 
         if (!authorizationHeader.toUpperCase().startsWith("BEARER ")) {
-            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
+            throw new WebApplicationException(UNAUTHORIZED);
         }
 
         return authorizationHeader.substring(7);
     }
 
     private Tokens getTokens(String userToken) {
-        Form capabilityForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.CAPABILITY_TOKEN.getUrn());
-        Form jwtForm = new Form().param("assertion", userToken).param("grant_type", AccessTokenType.JWT_BEARER_TOKEN.getUrn());
+        Form capabilityForm = new Form().param(ASSERTION, userToken).param(GRANT_TYPE, AccessTokenType.CAPABILITY_TOKEN.getUrn());
+        Form jwtForm = new Form().param(ASSERTION, userToken).param(GRANT_TYPE, AccessTokenType.JWT_BEARER_TOKEN.getUrn());
 
         URI tokenURI = UriBuilder.fromUri(authorizationURI()).path("/token").build();
 
@@ -122,8 +134,8 @@ public final class ZipStudyResource {
                 accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
             } catch (WebApplicationException webException) {
                 if (webException.getResponse().getStatus() == Response.Status.BAD_REQUEST.getStatusCode() ||
-                        webException.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-                    throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
+                        webException.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
+                    throw new WebApplicationException(Response.status(UNAUTHORIZED).build());
                 } else {
                     throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
                 }
@@ -135,12 +147,23 @@ public final class ZipStudyResource {
         return new Tokens(accessToken, tokenResponse.accessToken);
     }
 
-    private Set<Instance> getInstances(Tokens tokens, String studyInstanceUID) {
-        final URI metadataURI = UriBuilder.fromUri(authorizationURI()).path("/studies/{studyInstanceUID}/metadata").build(studyInstanceUID);
+    private Set<Instance> getInstances(final Tokens tokens,
+                                       final String studyInstanceUID,
+                                       final Long fromAlbum,
+                                       final Boolean fromInbox) {
+        final UriBuilder metadataUriBuilder = UriBuilder.fromUri(authorizationURI()).path("/studies/{studyInstanceUID}/metadata");
+        if (fromAlbum != null) {
+            metadataUriBuilder.queryParam(ALBUM, fromAlbum);
+        }
+        if (fromInbox != null) {
+            metadataUriBuilder.queryParam(INBOX, fromInbox);
+        }
+
+        final URI metadataURI = metadataUriBuilder.build(studyInstanceUID);
 
         List<Attributes> attributesList;
         try {
-            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header("Authorization", "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {});
+            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {});
         } catch (WebApplicationException e) {
             if (e.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
