@@ -24,13 +24,18 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
 import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/studies")
 public final class ZipStudyResource {
+    private static final Logger LOG = Logger.getLogger(ZipStudyResource.class.getName());
+
     private static final String ALBUM = "album";
     private static final String INBOX = "inbox";
     private static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
@@ -135,11 +140,14 @@ public final class ZipStudyResource {
             } catch (WebApplicationException webException) {
                 if (webException.getResponse().getStatus() == BAD_REQUEST.getStatusCode() ||
                         webException.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
-                    throw new WebApplicationException(Response.status(UNAUTHORIZED).build());
+                    LOG.log(WARNING, "Unauthorized", webException);
+                    throw new WebApplicationException(UNAUTHORIZED);
                 } else {
+                    LOG.log(SEVERE, "Bad Gateway", webException);
                     throw new WebApplicationException(BAD_GATEWAY);
                 }
             } catch (Exception e) {
+                LOG.log(SEVERE, "Bad Gateway", e);
                 throw new WebApplicationException(BAD_GATEWAY);
             }
         }
