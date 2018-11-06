@@ -14,6 +14,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,6 +69,7 @@ public final class WadoRsResource {
     private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");
+        final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
         final AccessToken accessToken;
         try {
@@ -90,6 +93,9 @@ public final class WadoRsResource {
         }
 
         WebTarget webTarget = CLIENT.target(wadoServiceURI).path(resource);
+        for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
+            webTarget = webTarget.queryParam(parameter.getKey(), parameter.getValue().toArray());
+        }
 
         Invocation.Builder invocationBuilder = webTarget.request();
         invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
