@@ -14,8 +14,8 @@ public class ExposeHeadersFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)  {
         final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
-//        if (headers.containsKey(X_TOTAL_COUNT)) {
+        if (headers.containsKey(X_TOTAL_COUNT)) {
             headers.add(ACCESS_CONTROL_EXPOSE_HEADERS, X_TOTAL_COUNT);
-//        }
+        }
     }
 }
