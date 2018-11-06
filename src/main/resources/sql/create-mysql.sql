@@ -135,13 +135,14 @@ CREATE TABLE album_series (
 
   PRIMARY KEY (pk),
 
+
   FOREIGN KEY (album_fk)
     REFERENCES album(pk)
     ON DELETE RESTRICT,
   FOREIGN KEY (series_fk)
     REFERENCES series(pk)
     ON DELETE RESTRICT,
-	
+
   UNIQUE album_series_unique (album_fk,series_fk)
 );
 
@@ -153,7 +154,7 @@ CREATE TABLE album_user (
   new_series_notifications BOOLEAN NOT NULL,
   new_comment_notifications BOOLEAN NOT NULL,
   favorite BOOLEAN NOT NULL,
-  
+
   PRIMARY KEY (pk),
 
   FOREIGN KEY (album_fk)
@@ -162,7 +163,7 @@ CREATE TABLE album_user (
   FOREIGN KEY (user_fk)
     REFERENCES users(pk)
     ON DELETE RESTRICT,
-	
+
   UNIQUE album_user_unique (album_fk,user_fk)
 );
 
@@ -173,36 +174,36 @@ CREATE TABLE event (
   study_fk BIGINT,
   event_time DATETIME NOT NULL,
   user_fk BIGINT NOT NULL,
-  private_target_user_fk BIGINT, 
-   
+  private_target_user_fk BIGINT,
+
   comment VARCHAR(1024),
 
   mutation_type VARCHAR(255),
   to_user_fk BIGINT,
   series_fk BIGINT,
-  
+
   PRIMARY KEY (pk),
 
   FOREIGN KEY (album_fk)
     REFERENCES album(pk)
 	ON DELETE RESTRICT,
-	
+
   FOREIGN KEY (study_fk)
     REFERENCES studies(pk)
 	ON DELETE RESTRICT,
-	
+
   FOREIGN KEY (user_fk)
     REFERENCES users(pk)
 	ON DELETE RESTRICT,
-	
+
   FOREIGN KEY (to_user_fk)
     REFERENCES users(pk)
 	ON DELETE RESTRICT,
-	
+
   FOREIGN KEY (private_target_user_fk)
     REFERENCES users(pk)
 	ON DELETE RESTRICT,
-	
+
   FOREIGN KEY (series_fk)
     REFERENCES series(pk)
 	ON DELETE RESTRICT

@@ -8,6 +8,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.sql.*;
 
 @WebListener
 public class EntityManagerListener implements ServletContextListener {
@@ -19,7 +21,7 @@ public class EntityManagerListener implements ServletContextListener {
 
         properties.put("javax.persistence.jdbc.user", event.getServletContext().getInitParameter("online.kheops.jdbc.user"));
         properties.put("javax.persistence.jdbc.password", event.getServletContext().getInitParameter("online.kheops.jdbc.password"));
-        properties.put("javax.persistence.jdbc.url", event.getServletContext().getInitParameter("online.kheops.jdbc.url") + "?amp;characterEncoding=UTF-8");
+        properties.put("javax.persistence.jdbc.url", event.getServletContext().getInitParameter("online.kheops.jdbc.url"));
 //        properties.put("javax.persistence.jdbc.url", event.getServletContext().getInitParameter("online.kheops.jdbc.url") + "?useSSL=false&useUnicode=yes&amp;characterEncoding=UTF-8");
 
         emf = Persistence.createEntityManagerFactory("online.kheops", properties);

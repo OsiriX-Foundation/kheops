@@ -5,10 +5,10 @@
                override="false"/>
     <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.url" value="jdbc:${kheops_mysql_url}"
+    <Parameter name="online.kheops.jdbc.url" value="jdbc:${kheops_postgresql_url}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.user" value="${kheops_mysql_user}"
+    <Parameter name="online.kheops.jdbc.user" value="${kheops_postgresql_user}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.password" value="${mysql_password}"
+    <Parameter name="online.kheops.jdbc.password" value="${kheops_postgresql_password}"
                override="false"/>
 </Context>

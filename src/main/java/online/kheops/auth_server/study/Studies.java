@@ -37,7 +37,7 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.JOOQTools.*;
-import static online.kheops.auth_server.generated.Tables.ALBUM;
+import static online.kheops.auth_server.generated.Tables.ALBUMS;
 import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
@@ -62,16 +62,16 @@ public class Studies {
 
         Condition fromCondition = trueCondition();
         if (qidoParams.getAlbum_id().isPresent()) {
-            fromCondition = ALBUM.PK.eq(qidoParams.getAlbum_id().get());
+            fromCondition = ALBUMS.PK.eq(qidoParams.getAlbum_id().get());
             conditionArrayList.add(fromCondition);
         }
 
         if (qidoParams.isFromInbox()) {
-            fromCondition = ALBUM.PK.eq(USERS.INBOX_FK);
+            fromCondition = ALBUMS.PK.eq(USERS.INBOX_FK);
             conditionArrayList.add(fromCondition);
         }
 
-        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
 
         if (qidoParams.getStudyDateFilter().isPresent()) {
             conditionArrayList.add(createConditonStudyDate(qidoParams.getStudyDateFilter().get()));
@@ -110,8 +110,8 @@ public class Studies {
         query.addSelect(countDistinct(STUDIES.PK));
         query.addFrom(USERS);
         query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
-        query.addJoin(ALBUM, ALBUM.PK.eq(ALBUM_USER.ALBUM_FK));
-        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+        query.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
         query.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
         query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
 
@@ -129,7 +129,7 @@ public class Studies {
         Integer studiesTotalCount = (Integer) query.fetch().getValues("count").get(0);
 
         query = create.selectQuery();
-        query.addSelect(isnull(STUDIES.STUDY_UID, "NULL").as(STUDIES.STUDY_UID.getName()),
+        query.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
                 isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
                 isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
                 isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
@@ -140,14 +140,15 @@ public class Studies {
                 isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
                 isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
                 isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
-                isnull(count(SERIES.PK), 0).as("count:" + SERIES.PK.getName()),
+                count(SERIES.PK).as("count:" + SERIES.PK.getName()),
                 sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
-                sum(ALBUM_SERIES.FAVORITE).as("sum_fav"));
+                count(when(ALBUM_SERIES.FAVORITE.eq(true), 1)).as("sum_fav"));
+
         query.addFrom(USERS);
         query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
-        query.addJoin(ALBUM, ALBUM.PK.eq(ALBUM_USER.ALBUM_FK));
-        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+        query.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
         query.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
         query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
 
@@ -157,8 +158,7 @@ public class Studies {
             }
         }
 
-        query.addGroupBy(STUDIES.STUDY_UID);
-
+        query.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
 
         query.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
 
@@ -184,8 +184,8 @@ public class Studies {
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
                         .join(ALBUM_USER).on(ALBUM_USER.USER_FK.eq(USERS.PK))
-                        .join(ALBUM).on(ALBUM.PK.eq(ALBUM_USER.ALBUM_FK))
-                        .join(ALBUM_SERIES).on(ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK))
+                        .join(ALBUMS).on(ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK))
+                        .join(ALBUM_SERIES).on(ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK))
                         .join(SERIES).on(SERIES.PK.eq(ALBUM_SERIES.SERIES_FK))
                         .join(STUDIES).on(STUDIES.PK.eq(SERIES.STUDY_FK))
                         .where(USERS.PK.eq(callingUserPK))
@@ -395,7 +395,7 @@ public class Studies {
             }
 
             if (isFuzzyMatching) {
-                Condition fuzzyCondition = condition("SOUNDEX(\""+parameterNoStar+"\") = SOUNDEX("+column.getName()+")");
+                Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
                 return condition.or(fuzzyCondition);
             }
             return condition;

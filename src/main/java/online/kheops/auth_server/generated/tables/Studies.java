@@ -12,7 +12,7 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.StudiesRecord;
 
 import org.jooq.Field;
@@ -42,10 +42,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Studies extends TableImpl<StudiesRecord> {
 
-    private static final long serialVersionUID = -824167851;
+    private static final long serialVersionUID = 432005038;
 
     /**
-     * The reference instance of <code>kheops.studies</code>
+     * The reference instance of <code>public.studies</code>
      */
     public static final Studies STUDIES = new Studies();
 
@@ -58,96 +58,96 @@ public class Studies extends TableImpl<StudiesRecord> {
     }
 
     /**
-     * The column <code>kheops.studies.pk</code>.
+     * The column <code>public.studies.pk</code>.
      */
-    public final TableField<StudiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<StudiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('studies_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>kheops.studies.created_time</code>.
+     * The column <code>public.studies.created_time</code>.
      */
     public final TableField<StudiesRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.studies.updated_time</code>.
+     * The column <code>public.studies.updated_time</code>.
      */
     public final TableField<StudiesRecord, Timestamp> UPDATED_TIME = createField("updated_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.studies.study_uid</code>.
+     * The column <code>public.studies.study_uid</code>.
      */
     public final TableField<StudiesRecord, String> STUDY_UID = createField("study_uid", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>kheops.studies.study_date</code>.
+     * The column <code>public.studies.study_date</code>.
      */
     public final TableField<StudiesRecord, String> STUDY_DATE = createField("study_date", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.study_time</code>.
+     * The column <code>public.studies.study_time</code>.
      */
     public final TableField<StudiesRecord, String> STUDY_TIME = createField("study_time", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.timezone_offset_from_utc</code>.
+     * The column <code>public.studies.timezone_offset_from_utc</code>.
      */
     public final TableField<StudiesRecord, String> TIMEZONE_OFFSET_FROM_UTC = createField("timezone_offset_from_utc", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.accession_number</code>.
+     * The column <code>public.studies.accession_number</code>.
      */
     public final TableField<StudiesRecord, String> ACCESSION_NUMBER = createField("accession_number", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.referring_physician_name</code>.
+     * The column <code>public.studies.referring_physician_name</code>.
      */
     public final TableField<StudiesRecord, String> REFERRING_PHYSICIAN_NAME = createField("referring_physician_name", org.jooq.impl.SQLDataType.VARCHAR(4095), this, "");
 
     /**
-     * The column <code>kheops.studies.patient_name</code>.
+     * The column <code>public.studies.patient_name</code>.
      */
     public final TableField<StudiesRecord, String> PATIENT_NAME = createField("patient_name", org.jooq.impl.SQLDataType.VARCHAR(4095), this, "");
 
     /**
-     * The column <code>kheops.studies.patient_id</code>.
+     * The column <code>public.studies.patient_id</code>.
      */
     public final TableField<StudiesRecord, String> PATIENT_ID = createField("patient_id", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.patient_birth_date</code>.
+     * The column <code>public.studies.patient_birth_date</code>.
      */
     public final TableField<StudiesRecord, String> PATIENT_BIRTH_DATE = createField("patient_birth_date", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.patient_sex</code>.
+     * The column <code>public.studies.patient_sex</code>.
      */
     public final TableField<StudiesRecord, String> PATIENT_SEX = createField("patient_sex", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.study_id</code>.
+     * The column <code>public.studies.study_id</code>.
      */
     public final TableField<StudiesRecord, String> STUDY_ID = createField("study_id", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.studies.populated</code>.
+     * The column <code>public.studies.populated</code>.
      */
-    public final TableField<StudiesRecord, Byte> POPULATED = createField("populated", org.jooq.impl.SQLDataType.TINYINT, this, "");
+    public final TableField<StudiesRecord, Boolean> POPULATED = createField("populated", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * Create a <code>kheops.studies</code> table reference
+     * Create a <code>public.studies</code> table reference
      */
     public Studies() {
         this(DSL.name("studies"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.studies</code> table reference
+     * Create an aliased <code>public.studies</code> table reference
      */
     public Studies(String alias) {
         this(DSL.name(alias), STUDIES);
     }
 
     /**
-     * Create an aliased <code>kheops.studies</code> table reference
+     * Create an aliased <code>public.studies</code> table reference
      */
     public Studies(Name alias) {
         this(alias, STUDIES);
@@ -170,7 +170,7 @@ public class Studies extends TableImpl<StudiesRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -178,7 +178,7 @@ public class Studies extends TableImpl<StudiesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.STUDIES_ACCESSION_NUMBER_INDEX, Indexes.STUDIES_PATIENT_ID_INDEX, Indexes.STUDIES_POPULATED_INDEX, Indexes.STUDIES_PRIMARY, Indexes.STUDIES_STUDY_DATE_INDEX, Indexes.STUDIES_STUDY_ID_INDEX, Indexes.STUDIES_STUDY_TIME_INDEX, Indexes.STUDIES_STUDY_UID_INDEX, Indexes.STUDIES_STUDY_UID_UNIQUE);
+        return Arrays.<Index>asList(Indexes.ACCESSION_NUMBER_INDEX, Indexes.PATIENT_ID_INDEX, Indexes.POPULATED_INDEX, Indexes.STUDIES_PK, Indexes.STUDY_DATE_INDEX, Indexes.STUDY_ID_INDEX, Indexes.STUDY_TIME_INDEX, Indexes.STUDY_UID_INDEX, Indexes.STUDY_UID_UNIQUE);
     }
 
     /**
@@ -194,7 +194,7 @@ public class Studies extends TableImpl<StudiesRecord> {
      */
     @Override
     public UniqueKey<StudiesRecord> getPrimaryKey() {
-        return Keys.KEY_STUDIES_PRIMARY;
+        return Keys.STUDIES_PK;
     }
 
     /**
@@ -202,7 +202,7 @@ public class Studies extends TableImpl<StudiesRecord> {
      */
     @Override
     public List<UniqueKey<StudiesRecord>> getKeys() {
-        return Arrays.<UniqueKey<StudiesRecord>>asList(Keys.KEY_STUDIES_PRIMARY, Keys.KEY_STUDIES_STUDY_UID_UNIQUE);
+        return Arrays.<UniqueKey<StudiesRecord>>asList(Keys.STUDIES_PK, Keys.STUDY_UID_UNIQUE);
     }
 
     /**

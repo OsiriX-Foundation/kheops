@@ -12,7 +12,7 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.SeriesRecord;
 
 import org.jooq.Field;
@@ -42,10 +42,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Series extends TableImpl<SeriesRecord> {
 
-    private static final long serialVersionUID = -839069016;
+    private static final long serialVersionUID = -1426854373;
 
     /**
-     * The reference instance of <code>kheops.series</code>
+     * The reference instance of <code>public.series</code>
      */
     public static final Series SERIES = new Series();
 
@@ -58,76 +58,76 @@ public class Series extends TableImpl<SeriesRecord> {
     }
 
     /**
-     * The column <code>kheops.series.pk</code>.
+     * The column <code>public.series.pk</code>.
      */
-    public final TableField<SeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<SeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('series_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>kheops.series.created_time</code>.
+     * The column <code>public.series.created_time</code>.
      */
     public final TableField<SeriesRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.series.updated_time</code>.
+     * The column <code>public.series.updated_time</code>.
      */
     public final TableField<SeriesRecord, Timestamp> UPDATED_TIME = createField("updated_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.series.modality</code>.
+     * The column <code>public.series.modality</code>.
      */
     public final TableField<SeriesRecord, String> MODALITY = createField("modality", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.series.timezone_offset_from_utc</code>.
+     * The column <code>public.series.timezone_offset_from_utc</code>.
      */
     public final TableField<SeriesRecord, String> TIMEZONE_OFFSET_FROM_UTC = createField("timezone_offset_from_utc", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.series.series_description</code>.
+     * The column <code>public.series.series_description</code>.
      */
     public final TableField<SeriesRecord, String> SERIES_DESCRIPTION = createField("series_description", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>kheops.series.series_uid</code>.
+     * The column <code>public.series.series_uid</code>.
      */
     public final TableField<SeriesRecord, String> SERIES_UID = createField("series_uid", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>kheops.series.series_number</code>.
+     * The column <code>public.series.series_number</code>.
      */
     public final TableField<SeriesRecord, Integer> SERIES_NUMBER = createField("series_number", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>kheops.series.number_of_series_related_instances</code>.
+     * The column <code>public.series.number_of_series_related_instances</code>.
      */
     public final TableField<SeriesRecord, Integer> NUMBER_OF_SERIES_RELATED_INSTANCES = createField("number_of_series_related_instances", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>kheops.series.study_fk</code>.
+     * The column <code>public.series.study_fk</code>.
      */
     public final TableField<SeriesRecord, Long> STUDY_FK = createField("study_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.series.populated</code>.
+     * The column <code>public.series.populated</code>.
      */
-    public final TableField<SeriesRecord, Byte> POPULATED = createField("populated", org.jooq.impl.SQLDataType.TINYINT, this, "");
+    public final TableField<SeriesRecord, Boolean> POPULATED = createField("populated", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * Create a <code>kheops.series</code> table reference
+     * Create a <code>public.series</code> table reference
      */
     public Series() {
         this(DSL.name("series"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.series</code> table reference
+     * Create an aliased <code>public.series</code> table reference
      */
     public Series(String alias) {
         this(DSL.name(alias), SERIES);
     }
 
     /**
-     * Create an aliased <code>kheops.series</code> table reference
+     * Create an aliased <code>public.series</code> table reference
      */
     public Series(Name alias) {
         this(alias, SERIES);
@@ -150,7 +150,7 @@ public class Series extends TableImpl<SeriesRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -158,7 +158,7 @@ public class Series extends TableImpl<SeriesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SERIES_POPULATED_INDEX, Indexes.SERIES_PRIMARY, Indexes.SERIES_SERIES_UID_INDEX, Indexes.SERIES_SERIES_UID_UNIQUE, Indexes.SERIES_STUDY_FK_INDEX);
+        return Arrays.<Index>asList(Indexes.SERIES_PK, Indexes.SERIES_POPULATED_INDEX, Indexes.SERIES_UID_INDEX, Indexes.SERIES_UID_UNIQUE, Indexes.STUDY_FK_INDEX);
     }
 
     /**
@@ -174,7 +174,7 @@ public class Series extends TableImpl<SeriesRecord> {
      */
     @Override
     public UniqueKey<SeriesRecord> getPrimaryKey() {
-        return Keys.KEY_SERIES_PRIMARY;
+        return Keys.SERIES_PK;
     }
 
     /**
@@ -182,7 +182,7 @@ public class Series extends TableImpl<SeriesRecord> {
      */
     @Override
     public List<UniqueKey<SeriesRecord>> getKeys() {
-        return Arrays.<UniqueKey<SeriesRecord>>asList(Keys.KEY_SERIES_PRIMARY, Keys.KEY_SERIES_SERIES_UID_UNIQUE);
+        return Arrays.<UniqueKey<SeriesRecord>>asList(Keys.SERIES_PK, Keys.SERIES_UID_UNIQUE);
     }
 
     /**
@@ -190,11 +190,11 @@ public class Series extends TableImpl<SeriesRecord> {
      */
     @Override
     public List<ForeignKey<SeriesRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<SeriesRecord, ?>>asList(Keys.SERIES_IBFK_1);
+        return Arrays.<ForeignKey<SeriesRecord, ?>>asList(Keys.SERIES__SERIES_STUDY_FK_FKEY);
     }
 
     public Studies studies() {
-        return new Studies(this, Keys.SERIES_IBFK_1);
+        return new Studies(this, Keys.SERIES__SERIES_STUDY_FK_FKEY);
     }
 
     /**

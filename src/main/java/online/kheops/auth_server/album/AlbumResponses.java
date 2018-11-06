@@ -87,17 +87,18 @@ public class AlbumResponses {
         albumResponse.lastEventTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_last_event_time")).getTime()), TimeZone.getDefault().toZoneId());
         albumResponse.numberOfUsers = (Integer) r.getValue("number_of_users");
         albumResponse.numberOfStudies = (Integer) r.getValue("number_of_studies");
-        albumResponse.addSeries = ((Byte) r.getValue("add_series_permission")) != 0;
-        albumResponse.addUser = ((Byte) r.getValue("add_user_permission")) != 0;
-        albumResponse.deleteSeries = ((Byte) r.getValue("delete_series_permision")) != 0;
-        albumResponse.downloadSeries = ((Byte) r.getValue("download_user_permission")) != 0;
-        albumResponse.sendSeries = ((Byte) r.getValue("send_series_permission")) != 0;
-        albumResponse.writeComments = ((Byte) r.getValue("write_comment_permission")) != 0;
+
+        albumResponse.addSeries = (boolean) (r.getValue("add_series_permission"));
+        albumResponse.addUser = ((boolean) r.getValue("add_user_permission"));
+        albumResponse.deleteSeries = ((boolean) r.getValue("delete_series_permision"));
+        albumResponse.downloadSeries = ((boolean) r.getValue("download_user_permission"));
+        albumResponse.sendSeries = ((boolean) r.getValue("send_series_permission"));
+        albumResponse.writeComments = ((boolean) r.getValue("write_comment_permission"));
         albumResponse.numberOfComments = (Integer) r.getValue("number_of_comments");
-        albumResponse.isFavorite = ((Byte) r.getValue("favorite")) != 0;
-        albumResponse.notificationNewComment = ((Byte) r.getValue("new_comment_notifications")) != 0;
-        albumResponse.notificationNewSeries = ((Byte) r.getValue("new_series_notifications")) != 0;
-        albumResponse.isAdmin = ((Byte) r.getValue("admin")) != 0;
+        albumResponse.isFavorite = ((boolean) r.getValue("favorite"));
+        albumResponse.notificationNewComment = ((boolean) r.getValue("new_comment_notifications"));
+        albumResponse.notificationNewSeries = ((boolean) r.getValue("new_series_notifications"));
+        albumResponse.isAdmin = ((boolean) r.getValue("admin"));
         if(r.getValue("modalities") != null) {
             albumResponse.modalities = r.getValue("modalities").toString().split("/");
         }

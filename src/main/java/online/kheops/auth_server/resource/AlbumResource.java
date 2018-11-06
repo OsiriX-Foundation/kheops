@@ -3,7 +3,11 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.*;
 import online.kheops.auth_server.annotation.Secured;
+
 import online.kheops.auth_server.capability.ScopeType;
+
+import online.kheops.auth_server.entity.Album;
+
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -56,9 +60,6 @@ public class AlbumResource {
 
         try {
             albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.INFO, "Creating new album by user pk:"+callingUserPk+ " FAILED", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();

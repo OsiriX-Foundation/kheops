@@ -11,7 +11,7 @@ import javax.annotation.Generated;
 
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
-import online.kheops.auth_server.generated.Kheops;
+import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
 
 import org.jooq.Field;
@@ -41,10 +41,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumUser extends TableImpl<AlbumUserRecord> {
 
-    private static final long serialVersionUID = 1045122212;
+    private static final long serialVersionUID = -1009662100;
 
     /**
-     * The reference instance of <code>kheops.album_user</code>
+     * The reference instance of <code>public.album_user</code>
      */
     public static final AlbumUser ALBUM_USER = new AlbumUser();
 
@@ -57,56 +57,56 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
     }
 
     /**
-     * The column <code>kheops.album_user.pk</code>.
+     * The column <code>public.album_user.pk</code>.
      */
-    public final TableField<AlbumUserRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<AlbumUserRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('album_user_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>kheops.album_user.album_fk</code>.
+     * The column <code>public.album_user.album_fk</code>.
      */
     public final TableField<AlbumUserRecord, Long> ALBUM_FK = createField("album_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_user.user_fk</code>.
+     * The column <code>public.album_user.user_fk</code>.
      */
     public final TableField<AlbumUserRecord, Long> USER_FK = createField("user_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_user.admin</code>.
+     * The column <code>public.album_user.admin</code>.
      */
-    public final TableField<AlbumUserRecord, Byte> ADMIN = createField("admin", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> ADMIN = createField("admin", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_user.new_series_notifications</code>.
+     * The column <code>public.album_user.new_series_notifications</code>.
      */
-    public final TableField<AlbumUserRecord, Byte> NEW_SERIES_NOTIFICATIONS = createField("new_series_notifications", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> NEW_SERIES_NOTIFICATIONS = createField("new_series_notifications", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_user.new_comment_notifications</code>.
+     * The column <code>public.album_user.new_comment_notifications</code>.
      */
-    public final TableField<AlbumUserRecord, Byte> NEW_COMMENT_NOTIFICATIONS = createField("new_comment_notifications", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> NEW_COMMENT_NOTIFICATIONS = createField("new_comment_notifications", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * The column <code>kheops.album_user.favorite</code>.
+     * The column <code>public.album_user.favorite</code>.
      */
-    public final TableField<AlbumUserRecord, Byte> FAVORITE = createField("favorite", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> FAVORITE = createField("favorite", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
-     * Create a <code>kheops.album_user</code> table reference
+     * Create a <code>public.album_user</code> table reference
      */
     public AlbumUser() {
         this(DSL.name("album_user"), null);
     }
 
     /**
-     * Create an aliased <code>kheops.album_user</code> table reference
+     * Create an aliased <code>public.album_user</code> table reference
      */
     public AlbumUser(String alias) {
         this(DSL.name(alias), ALBUM_USER);
     }
 
     /**
-     * Create an aliased <code>kheops.album_user</code> table reference
+     * Create an aliased <code>public.album_user</code> table reference
      */
     public AlbumUser(Name alias) {
         this(alias, ALBUM_USER);
@@ -129,7 +129,7 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Kheops.KHEOPS;
+        return Public.PUBLIC;
     }
 
     /**
@@ -137,7 +137,7 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ALBUM_USER_ALBUM_USER_UNIQUE, Indexes.ALBUM_USER_PRIMARY, Indexes.ALBUM_USER_USER_FK);
+        return Arrays.<Index>asList(Indexes.ALBUM_USER_PK, Indexes.ALBUM_USER_UNIQUE);
     }
 
     /**
@@ -153,7 +153,7 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
      */
     @Override
     public UniqueKey<AlbumUserRecord> getPrimaryKey() {
-        return Keys.KEY_ALBUM_USER_PRIMARY;
+        return Keys.ALBUM_USER_PK;
     }
 
     /**
@@ -161,7 +161,7 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
      */
     @Override
     public List<UniqueKey<AlbumUserRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlbumUserRecord>>asList(Keys.KEY_ALBUM_USER_PRIMARY, Keys.KEY_ALBUM_USER_ALBUM_USER_UNIQUE);
+        return Arrays.<UniqueKey<AlbumUserRecord>>asList(Keys.ALBUM_USER_PK, Keys.ALBUM_USER_UNIQUE);
     }
 
     /**
@@ -169,15 +169,15 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
      */
     @Override
     public List<ForeignKey<AlbumUserRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AlbumUserRecord, ?>>asList(Keys.ALBUM_USER_IBFK_1, Keys.ALBUM_USER_IBFK_2);
+        return Arrays.<ForeignKey<AlbumUserRecord, ?>>asList(Keys.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY, Keys.ALBUM_USER__ALBUM_USER_USER_FK_FKEY);
     }
 
-    public Album album() {
-        return new Album(this, Keys.ALBUM_USER_IBFK_1);
+    public Albums albums() {
+        return new Albums(this, Keys.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY);
     }
 
     public Users users() {
-        return new Users(this, Keys.ALBUM_USER_IBFK_2);
+        return new Users(this, Keys.ALBUM_USER__ALBUM_USER_USER_FK_FKEY);
     }
 
     /**

@@ -21,10 +21,10 @@ import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumRespon
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.JOOQTools.*;
 import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponse;
-import static online.kheops.auth_server.generated.tables.Album.ALBUM;
+import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
-import static online.kheops.auth_server.generated.tables.Event.EVENT;
+import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static org.jooq.impl.DSL.*;
 
@@ -59,55 +59,55 @@ public class AlbumQueries {
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
-            DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+            DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             SelectQuery query = create.selectQuery();
 
             ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
             Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
                     .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
-            query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
-                    isnull(ALBUM.NAME,"NULL").as("album_name"),
-                    isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
-                    isnull(ALBUM.CREATED_TIME,"NULL").as("album_created_time"),
-                    isnull(ALBUM.LAST_EVENT_TIME,"NULL").as("album_last_event_time"),
-                    isnull(nbUsers,"NULL").as("number_of_users"),
-                    isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
-                    isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
-                    isnull(ALBUM.ADD_USER_PERMISSION,"NULL").as("add_user_permission"),
-                    isnull(ALBUM.DOWNLOAD_SERIES_PERMISSION,"NULL").as("download_user_permission"),
-                    isnull(ALBUM.SEND_SERIES_PERMISSION,"NULL").as("send_series_permission"),
-                    isnull(ALBUM.DELETE_SERIES_PERMISSION,"NULL").as("delete_series_permision"),
-                    isnull(ALBUM.ADD_SERIES_PERMISSION,"NULL").as("add_series_permission"),
-                    isnull(ALBUM.WRITE_COMMENTS_PERMISSION,"NULL").as("write_comment_permission"),
-                    isnull(ALBUM_USER.FAVORITE,"NULL").as("favorite"),
-                    isnull(ALBUM_USER.NEW_COMMENT_NOTIFICATIONS,"NULL").as("new_comment_notifications"),
-                    isnull(ALBUM_USER.NEW_SERIES_NOTIFICATIONS,"NULL").as("new_series_notifications"),
-                    isnull(ALBUM_USER.ADMIN,"NULL").as("admin"),
+            query.addSelect(ALBUMS.PK.as("album_pk"),
+                    ALBUMS.NAME.as("album_name"),
+                    isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
+                    ALBUMS.CREATED_TIME.as("album_created_time"),
+                    ALBUMS.LAST_EVENT_TIME.as("album_last_event_time"),
+                    nbUsers.as("number_of_users"),
+                    countDistinct(EVENTS.PK).as("number_of_comments"),
+                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
+                    ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
+                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
+                    ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
+                    ALBUMS.DELETE_SERIES_PERMISSION.as("delete_series_permision"),
+                    ALBUMS.ADD_SERIES_PERMISSION.as("add_series_permission"),
+                    ALBUMS.WRITE_COMMENTS_PERMISSION.as("write_comment_permission"),
+                    ALBUM_USER.FAVORITE.as("favorite"),
+                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as("new_comment_notifications"),
+                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
+                    ALBUM_USER.ADMIN.as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
-            query.addFrom(ALBUM);
-            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+            query.addFrom(ALBUMS);
+            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUM.PK));
+            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(USERS, ALBUM_USER.USER_FK.eq(USERS.PK));
 
-            query.addJoin(EVENT, JoinType.LEFT_OUTER_JOIN, EVENT.ALBUM_FK.eq(ALBUM.PK)
-                    .and(EVENT.EVENT_TYPE.eq("Comment"))
-                    .and(EVENT.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENT.PRIVATE_TARGET_USER_FK.eq(userPK))
-                            .or(EVENT.USER_FK.eq(userPK))));
+            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
+                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
+                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
+                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(userPK))
+                            .or(EVENTS.USER_FK.eq(userPK))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
-            conditionArrayList.add(createConditon(queryParameters, "name", ALBUM.NAME));
+            conditionArrayList.add(createConditon(queryParameters, "name", ALBUMS.NAME));
             conditionArrayList.add(favoriteCondition(queryParameters));
-            conditionArrayList.add(createDateCondition(queryParameters, "created_time", ALBUM.CREATED_TIME));
-            conditionArrayList.add(createDateCondition(queryParameters, "last_event_time", ALBUM.LAST_EVENT_TIME));
-            conditionArrayList.add(ALBUM.PK.notEqual(USERS.INBOX_FK));
-            query.addConditions(ALBUM_USER.USER_FK.eq(userPK).and(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK)));
+            conditionArrayList.add(createDateCondition(queryParameters, "created_time", ALBUMS.CREATED_TIME));
+            conditionArrayList.add(createDateCondition(queryParameters, "last_event_time", ALBUMS.LAST_EVENT_TIME));
+            conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
+            query.addConditions(ALBUM_USER.USER_FK.eq(userPK).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
 
             for (Condition c : conditionArrayList) {
                 if (c != null) {
@@ -125,7 +125,7 @@ public class AlbumQueries {
 
             query.addOrderBy(getOrderBy(queryParameters, create));
 
-            query.addGroupBy(ALBUM.PK);
+            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
             Result<Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>> result = query.fetch();
 
@@ -141,6 +141,7 @@ public class AlbumQueries {
         } catch (BadQueryParametersException e) {
             throw new BadQueryParametersException(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new JOOQException("Error during request");
         }
     }
@@ -149,54 +150,56 @@ public class AlbumQueries {
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
-            final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+            final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery query = create.selectQuery();
 
             Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
                     .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .where(ALBUM_USER.ALBUM_FK.eq(albumPk))
                     .asField();
 
-            query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
-                    isnull(ALBUM.NAME,"NULL").as("album_name"),
-                    isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
-                    isnull(ALBUM.CREATED_TIME,"NULL").as("album_created_time"),
-                    isnull(ALBUM.LAST_EVENT_TIME,"NULL").as("album_last_event_time"),
-                    isnull(nbUsers,"NULL").as("number_of_users"),
-                    isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
-                    isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
-                    isnull(ALBUM.ADD_USER_PERMISSION,"NULL").as("add_user_permission"),
-                    isnull(ALBUM.DOWNLOAD_SERIES_PERMISSION,"NULL").as("download_user_permission"),
-                    isnull(ALBUM.SEND_SERIES_PERMISSION,"NULL").as("send_series_permission"),
-                    isnull(ALBUM.DELETE_SERIES_PERMISSION,"NULL").as("delete_series_permision"),
-                    isnull(ALBUM.ADD_SERIES_PERMISSION,"NULL").as("add_series_permission"),
-                    isnull(ALBUM.WRITE_COMMENTS_PERMISSION,"NULL").as("write_comment_permission"),
-                    isnull(ALBUM_USER.FAVORITE,"NULL").as("favorite"),
-                    isnull(ALBUM_USER.NEW_COMMENT_NOTIFICATIONS,"NULL").as("new_comment_notifications"),
-                    isnull(ALBUM_USER.NEW_SERIES_NOTIFICATIONS,"NULL").as("new_series_notifications"),
-                    isnull(ALBUM_USER.ADMIN,"NULL").as("admin"),
+            query.addSelect(ALBUMS.PK.as("album_pk"),
+                    ALBUMS.NAME.as("album_name"),
+                    isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
+                    ALBUMS.CREATED_TIME.as("album_created_time"),
+                    ALBUMS.LAST_EVENT_TIME.as("album_last_event_time"),
+                    nbUsers.as("number_of_users"),
+                    countDistinct(EVENTS.PK).as("number_of_comments"),
+                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
+                    ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
+                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
+                    ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
+                    ALBUMS.DELETE_SERIES_PERMISSION.as("delete_series_permision"),
+                    ALBUMS.ADD_SERIES_PERMISSION.as("add_series_permission"),
+                    ALBUMS.WRITE_COMMENTS_PERMISSION.as("write_comment_permission"),
+                    ALBUM_USER.FAVORITE.as("favorite"),
+                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as("new_comment_notifications"),
+                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
+                    ALBUM_USER.ADMIN.as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
-            query.addFrom(ALBUM);
-            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+            query.addFrom(ALBUMS);
+            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUM.PK));
+            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
-            query.addJoin(EVENT, JoinType.LEFT_OUTER_JOIN, EVENT.ALBUM_FK.eq(ALBUM.PK)
-                    .and(EVENT.EVENT_TYPE.eq("Comment"))
-                    .and(EVENT.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENT.PRIVATE_TARGET_USER_FK.eq(userPK))
-                            .or(EVENT.USER_FK.eq(userPK))));
+            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
+                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
+                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
+                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(userPK))
+                            .or(EVENTS.USER_FK.eq(userPK))));
 
-            query.addConditions(ALBUM.PK.eq(albumPk));
+            query.addConditions(ALBUMS.PK.eq(albumPk));
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
             query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
 
-            query.addGroupBy(ALBUM.PK);
+            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
+
             Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String> result = (Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>) query.fetchOne();
 
             return recordToAlbumResponse(result);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new JOOQException("Error during request");
         }
     }
@@ -210,28 +213,28 @@ public class AlbumQueries {
 
             Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
                     .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUM.PK))
+                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
-            query.addSelect(isnull(ALBUM.PK,"NULL").as("album_pk"),
-                    isnull(ALBUM.NAME,"NULL").as("album_name"),
-                    isnull(ALBUM.DESCRIPTION,"NULL").as("album_description"),
-                    isnull(countDistinct(EVENT.PK),"NULL").as("number_of_comments"),
+            query.addSelect(isnull(ALBUMS.PK,"NULL").as("album_pk"),
+                    isnull(ALBUMS.NAME,"NULL").as("album_name"),
+                    isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
+                    isnull(countDistinct(EVENTS.PK),"NULL").as("number_of_comments"),
                     isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
-            query.addFrom(ALBUM);
-            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUM.PK));
+            query.addFrom(ALBUMS);
+            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUM.PK));
+            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
-            query.addJoin(EVENT, JoinType.LEFT_OUTER_JOIN, EVENT.ALBUM_FK.eq(ALBUM.PK)
-                    .and(EVENT.EVENT_TYPE.eq("Comment"))
-                    .and(EVENT.PRIVATE_TARGET_USER_FK.isNull()));
+            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
+                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
+                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
 
-            query.addConditions(ALBUM.PK.eq(albumPk));;
+            query.addConditions(ALBUMS.PK.eq(albumPk));;
 
-            query.addGroupBy(ALBUM.PK);
+            query.addGroupBy(ALBUMS.PK);
             Record6<BigDecimal, String, String, Long, Long, String> result = (Record6<BigDecimal, String, String, Long, Long, String>) query.fetchOne();
 
             return recordToAlbumResponseForCapabilityToken(result);
@@ -241,11 +244,11 @@ public class AlbumQueries {
     }
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
-        final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
         final SelectQuery query = create.selectQuery();
-        query.addSelect(countDistinct(ALBUM.PK));
-        query.addFrom(ALBUM);
-        query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUM.PK).and(ALBUM_USER.USER_FK.eq(userPk)));
+        query.addSelect(countDistinct(ALBUMS.PK));
+        query.addFrom(ALBUMS);
+        query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK).and(ALBUM_USER.USER_FK.eq(userPk)));
         query.addJoin(USERS, USERS.PK.eq(ALBUM_USER.USER_FK));
         for (Condition c : conditionArrayList) {
             if (c != null) {
@@ -263,15 +266,15 @@ public class AlbumQueries {
             final Boolean ascDesc = queryParameters.get("sort").get(0).startsWith("-");
             final String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
 
-            if (orderByParameter.compareTo("created_time") == 0) ord = ALBUM.CREATED_TIME;
-            else if (orderByParameter.compareTo("last_event_time") == 0) ord = ALBUM.LAST_EVENT_TIME;
-            else if (orderByParameter.compareTo("name") == 0) ord = ALBUM.NAME;
+            if (orderByParameter.compareTo("created_time") == 0) ord = ALBUMS.CREATED_TIME;
+            else if (orderByParameter.compareTo("last_event_time") == 0) ord = ALBUMS.LAST_EVENT_TIME;
+            else if (orderByParameter.compareTo("name") == 0) ord = ALBUMS.NAME;
             else if (orderByParameter.compareTo("number_of_users") == 0) {
                 final Field<Object> fieldNumberOfUsers = create.select(countDistinct(ALBUM_USER.PK)).asField();
                 ord = fieldNumberOfUsers;
             }
             else if (orderByParameter.compareTo("number_of_studies") == 0) {
-                final Field<Object> fieldNumberOfStudies = create.select(countDistinct(EVENT.PK)).asField();
+                final Field<Object> fieldNumberOfStudies = create.select(countDistinct(EVENTS.PK)).asField();
                 ord = fieldNumberOfStudies;
             }
             else if (orderByParameter.compareTo("number_of_comments") == 0) {
@@ -283,7 +286,7 @@ public class AlbumQueries {
             return ascDesc ? ord.desc() : ord.asc();
         }
         //Default sort
-        return ALBUM.CREATED_TIME.desc();
+        return ALBUMS.CREATED_TIME.desc();
     }
 
 
@@ -311,7 +314,7 @@ public class AlbumQueries {
                 }
 
                 if (isFuzzyMatching(queryParameters)) {
-                    Condition fuzzyCondition = condition("SOUNDEX(\""+parameterNoStar+"\") = SOUNDEX("+column.getName()+")");
+                    Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
                     return condition.or(fuzzyCondition);
                 }
                 return condition;
