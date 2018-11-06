@@ -58,7 +58,7 @@ public final class ZipStudyResource {
     ServletContext context;
 
     @GET
-    @Path("/{StudyInstanceUID}/stream")
+    @Path("/{StudyInstanceUID}")
     @Produces("application/zip")
     public Response streamStudy(@PathParam("StudyInstanceUID") String studyInstanceUID, @HeaderParam("authorization") String authorizationHeader) {
         checkValidUID(studyInstanceUID, "studyInstanceUID");
