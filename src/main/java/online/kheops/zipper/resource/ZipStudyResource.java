@@ -27,7 +27,7 @@ import java.util.Set;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/studies")
 public final class ZipStudyResource {
@@ -133,14 +133,14 @@ public final class ZipStudyResource {
                 tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(jwtForm), TokenResponse.class);
                 accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
             } catch (WebApplicationException webException) {
-                if (webException.getResponse().getStatus() == Response.Status.BAD_REQUEST.getStatusCode() ||
+                if (webException.getResponse().getStatus() == BAD_REQUEST.getStatusCode() ||
                         webException.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
                     throw new WebApplicationException(Response.status(UNAUTHORIZED).build());
                 } else {
-                    throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+                    throw new WebApplicationException(BAD_GATEWAY);
                 }
             } catch (Exception e) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+                throw new WebApplicationException(BAD_GATEWAY);
             }
         }
 
@@ -165,13 +165,13 @@ public final class ZipStudyResource {
         try {
             attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {});
         } catch (WebApplicationException e) {
-            if (e.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-                throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+            if (e.getResponse().getStatus() == NOT_FOUND.getStatusCode()) {
+                throw new WebApplicationException(NOT_FOUND);
             } else {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+                throw new WebApplicationException(BAD_GATEWAY);
             }
         } catch (Exception e) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+            throw new WebApplicationException(BAD_GATEWAY);
         }
 
         Set<Instance> instances = new HashSet<>();
@@ -181,7 +181,7 @@ public final class ZipStudyResource {
                 instances.add(instance);
             }
         } catch (Exception e) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_GATEWAY).build());
+            throw new WebApplicationException(BAD_GATEWAY);
         }
 
         return instances;
@@ -211,7 +211,7 @@ public final class ZipStudyResource {
         try {
             new Oid(uid);
         } catch (GSSException exception) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(name + " is not a valid UID").build());
+            throw new WebApplicationException(name + " is not a valid UID", BAD_REQUEST);
         }
     }
 }
