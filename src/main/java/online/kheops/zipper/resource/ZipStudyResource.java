@@ -1,8 +1,7 @@
 package online.kheops.zipper.resource;
 
-import online.kheops.zipper.token.AccessToken;
-import online.kheops.zipper.token.AccessTokenType;
-import online.kheops.zipper.token.BearerTokenRetriever;
+import online.kheops.zipper.AccessToken.AccessToken;
+import online.kheops.zipper.BearerToken.BearerTokenRetriever;
 import online.kheops.zipper.instance.Instance;
 import online.kheops.zipper.instance.InstanceRetrievalService;
 import online.kheops.zipper.InstanceZipper;
@@ -16,9 +15,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
-import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -39,34 +36,9 @@ public final class ZipStudyResource {
     private static final String ALBUM = "album";
     private static final String INBOX = "inbox";
     private static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
-    private static final String ASSERTION = "assertion";
-    private static final String GRANT_TYPE = "grant_type";
 
     private static final Client CLIENT = newClient();
     private static final String DICOM_ZIP_FILENAME = "DICOM.ZIP";
-
-    private static class TokenResponse {
-        @XmlElement(name = "access_token")
-        String accessToken;
-    }
-
-    private static class Tokens {
-        private final AccessToken accessToken;
-        private final String bearerToken;
-
-        private Tokens(AccessToken accessToken, String bearerToken) {
-            this.accessToken = accessToken;
-            this.bearerToken = bearerToken;
-        }
-
-        AccessToken getAccessToken() {
-            return accessToken;
-        }
-
-        String getBearerToken() {
-            return bearerToken;
-        }
-    }
 
     @Context
     ServletContext context;
@@ -80,12 +52,12 @@ public final class ZipStudyResource {
                                 @QueryParam(INBOX) Boolean fromInbox) {
         checkValidUID(studyInstanceUID, STUDY_INSTANCE_UID);
 
-        final Tokens tokens = getTokens(getUserTokenFromHeader(authorizationHeader));
-        final Set<Instance> instances = getInstances(tokens, studyInstanceUID, fromAlbum, fromInbox);
+        final AccessToken accessToken = AccessToken.fromAuthorizationHeader(authorizationHeader);
+        final Set<Instance> instances = getInstances(accessToken, studyInstanceUID, fromAlbum, fromInbox);
         final BearerTokenRetriever bearerTokenRetriever = new BearerTokenRetriever.Builder()
                 .client(CLIENT)
                 .authorizationURI(authorizationURI())
-                .accessToken(tokens.getAccessToken())
+                .accessToken(accessToken)
                 .build();
         final InstanceRetrievalService instanceRetrievalService = new InstanceRetrievalService.Builder()
                 .client(CLIENT)
@@ -105,57 +77,7 @@ public final class ZipStudyResource {
         return client;
     }
 
-    private String getUserTokenFromHeader(String authorizationHeader) {
-        if (authorizationHeader == null) {
-            throw new WebApplicationException(UNAUTHORIZED);
-        }
-
-        if (!authorizationHeader.toUpperCase().startsWith("BEARER ")) {
-            throw new WebApplicationException(UNAUTHORIZED);
-        }
-
-        return authorizationHeader.substring(7);
-    }
-
-    private Tokens getTokens(String userToken) {
-        Form capabilityForm = new Form().param(ASSERTION, userToken).param(GRANT_TYPE, AccessTokenType.CAPABILITY_TOKEN.getUrn());
-        Form jwtForm = new Form().param(ASSERTION, userToken).param(GRANT_TYPE, AccessTokenType.JWT_BEARER_TOKEN.getUrn());
-
-        URI tokenURI = UriBuilder.fromUri(authorizationURI()).path("/token").build();
-
-        TokenResponse tokenResponse = null;
-        AccessToken accessToken = null;
-
-        try {
-            tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(capabilityForm), TokenResponse.class);
-            accessToken = AccessToken.getInstance(userToken, AccessTokenType.CAPABILITY_TOKEN);
-        } catch (Exception ignored) {
-            /* go on and try a different token type */
-        }
-
-        if (tokenResponse == null) {
-            try {
-                tokenResponse = CLIENT.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(jwtForm), TokenResponse.class);
-                accessToken = AccessToken.getInstance(userToken, AccessTokenType.JWT_BEARER_TOKEN);
-            } catch (WebApplicationException webException) {
-                if (webException.getResponse().getStatus() == BAD_REQUEST.getStatusCode() ||
-                        webException.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
-                    LOG.log(WARNING, "Unauthorized", webException);
-                    throw new WebApplicationException(UNAUTHORIZED);
-                } else {
-                    LOG.log(SEVERE, "Bad Gateway", webException);
-                    throw new WebApplicationException(BAD_GATEWAY);
-                }
-            } catch (Exception e) {
-                LOG.log(SEVERE, "Bad Gateway", e);
-                throw new WebApplicationException(BAD_GATEWAY);
-            }
-        }
-
-        return new Tokens(accessToken, tokenResponse.accessToken);
-    }
-
-    private Set<Instance> getInstances(final Tokens tokens,
+    private Set<Instance> getInstances(final AccessToken accessToken,
                                        final String studyInstanceUID,
                                        final Long fromAlbum,
                                        final Boolean fromInbox) {
@@ -171,14 +93,20 @@ public final class ZipStudyResource {
 
         List<Attributes> attributesList;
         try {
-            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + tokens.getBearerToken()).get(new GenericType<List<Attributes>>() {});
+            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + accessToken.toString()).get(new GenericType<List<Attributes>>() {});
         } catch (WebApplicationException e) {
-            if (e.getResponse().getStatus() == NOT_FOUND.getStatusCode()) {
+            if (e.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
+                LOG.log(WARNING, "Unauthorized", e);
+                throw new WebApplicationException(UNAUTHORIZED);
+            } else if (e.getResponse().getStatus() == NOT_FOUND.getStatusCode()) {
+                LOG.log(WARNING, "Metadata not found", e);
                 throw new WebApplicationException(NOT_FOUND);
             } else {
+                LOG.log(SEVERE, "Bad Gateway", e);
                 throw new WebApplicationException(BAD_GATEWAY);
             }
-        } catch (Exception e) {
+        } catch (ProcessingException e) {
+            LOG.log(SEVERE, "Processing Error", e);
             throw new WebApplicationException(BAD_GATEWAY);
         }
 
@@ -189,6 +117,7 @@ public final class ZipStudyResource {
                 instances.add(instance);
             }
         } catch (Exception e) {
+            LOG.log(SEVERE, "Parsing Error", e);
             throw new WebApplicationException(BAD_GATEWAY);
         }
 

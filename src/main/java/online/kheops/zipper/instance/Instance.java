@@ -4,14 +4,18 @@ package online.kheops.zipper.instance;
 import java.util.Objects;
 
 public final class Instance {
+    public static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
+    public static final String SERIES_INSTANCE_UID = "SeriesInstanceUID";
+    public static final String SOP_INSTANCE_UID = "SopInstanceUID";
+
     private final String studyInstanceUID;
     private final String seriesInstanceUID;
     private final String sopInstanceUID;
 
     private Instance(String studyInstanceUID, String seriesInstanceUID, String sopInstanceUID) {
-        this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID, "studyInstanceUID");
-        this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID, "seriesInstanceUID");
-        this.sopInstanceUID = Objects.requireNonNull(sopInstanceUID, "sopInstanceUID");
+        this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID, STUDY_INSTANCE_UID);
+        this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID, SERIES_INSTANCE_UID);
+        this.sopInstanceUID = Objects.requireNonNull(sopInstanceUID, SOP_INSTANCE_UID);
     }
 
     public static Instance newInstance(String studyInstanceUID, String seriesInstanceUID, String sopInstanceUID) {
@@ -32,6 +36,6 @@ public final class Instance {
 
     @Override
     public String toString() {
-        return "studyInstanceUID:" + studyInstanceUID + " seriesInstanceUID:" + seriesInstanceUID + " sopInstanceUID:" + sopInstanceUID;
+        return STUDY_INSTANCE_UID + ":" + studyInstanceUID + " " + SERIES_INSTANCE_UID + ":" + seriesInstanceUID + " " + SOP_INSTANCE_UID + ":" + sopInstanceUID;
     }
 }

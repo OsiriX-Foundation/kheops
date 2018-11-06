@@ -1,16 +1,20 @@
-package online.kheops.zipper.token;
+package online.kheops.zipper.BearerToken;
 
 import online.kheops.zipper.instance.Instance;
+import online.kheops.zipper.AccessToken.AccessToken;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.util.Objects;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static online.kheops.zipper.instance.Instance.SERIES_INSTANCE_UID;
+import static online.kheops.zipper.instance.Instance.STUDY_INSTANCE_UID;
 
 public final class BearerTokenRetriever {
     private final Client client;
@@ -56,7 +60,7 @@ public final class BearerTokenRetriever {
     public void get(Instance instance, InvocationCallback<BearerToken> callback) {
         final Form form = getInstanceForm(instance);
 
-        client.target(tokenURI).request(MediaType.APPLICATION_JSON_TYPE).async().post(Entity.form(form), new InvocationCallback<TokenResponse>() {
+        client.target(tokenURI).request(APPLICATION_JSON_TYPE).async().post(Entity.form(form), new InvocationCallback<TokenResponse>() {
 
             @Override
             public void completed(TokenResponse tokenResponse) {
@@ -71,10 +75,10 @@ public final class BearerTokenRetriever {
     }
 
     private Form getForm() {
-        return new Form().param("assertion", accessToken.getToken()).param("grant_type", accessToken.getTypeUrn());
+        return new Form().param("assertion", accessToken.toString()).param("grant_type", AccessToken.UNKNOWN_TOKEN_URN);
     }
 
     private Form getInstanceForm(Instance instance) {
-        return getForm().param("scope", "StudyInstanceUID=" + instance.getStudyInstanceUID() + " SeriesInstanceUID=" + instance.getSeriesInstanceUID());
+        return getForm().param("scope", STUDY_INSTANCE_UID +"=" + instance.getStudyInstanceUID() + " " + SERIES_INSTANCE_UID + "=" + instance.getSeriesInstanceUID());
     }
 }
