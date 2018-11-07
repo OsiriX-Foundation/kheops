@@ -11,6 +11,7 @@ import online.kheops.proxy.wadors.WadoRSSeries;
 import online.kheops.proxy.wadors.WadoRSStudyInstance;
 import online.kheops.proxy.wadors.WadoRsResource;
 import online.kheops.proxy.wadouri.WadoUriResource;
+import org.glassfish.jersey.server.ServerProperties;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -53,8 +54,9 @@ public class ProxyApplication extends Application {
     @Override
     public Map<String, Object> getProperties() {
         Map<String, Object> props = new HashMap<>();
-        props.put("jersey.config.server.provider.classnames",
-                "org.glassfish.jersey.media.multipart.MultiPartFeature");
+        props.put(ServerProperties.PROVIDER_CLASSNAMES, "org.glassfish.jersey.media.multipart.MultiPartFeature");
+        props.put(ServerProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, 0);
+
         return props;
     }
 }
