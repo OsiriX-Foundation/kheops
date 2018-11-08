@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Dataset from '@/components/dataset/List'
+import Study from '@/components/study/List'
 import store from '@/store'
 
 import PermissionDenied from '@/components/user/PermissionDenied'
@@ -15,8 +15,8 @@ const router = new Router({
   routes: [
 	 {
 		 path: '/inbox',
-		 name: 'datasets',
-		 component: Dataset,
+		 name: 'studies',
+		 component: Study,
    	    beforeEnter: requireAuth,
    	    meta: {permissions: 'active',condition: 'any'}
 
@@ -24,7 +24,7 @@ const router = new Router({
 	{
 		path: '*',
 		name: 'inbox',
-		component: Dataset,
+		component: Study,
   	    beforeEnter: requireAuth,
   	    meta: {permissions: 'active',condition: 'any'}
 	}

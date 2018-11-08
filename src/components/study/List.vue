@@ -36,13 +36,13 @@
 			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'><v-icon name = 'search' scale='2'/></button>
 
 		</div>
-		<b-table  striped :items="datasets" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
+		<b-table  striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
 	
 			<template slot="HEAD_is_selected" scope="head">
 				<b-button variant="link" size="sm"  class="mr-2" >
 					<v-icon  class="align-middle"   name="chevron-down"></v-icon>
 				</b-button>
-  				<b-form-checkbox @click.native.stop @change="selectAll(datasets.allSelected)" v-model="datasets.allSelected" name="allSelected">
+  				<b-form-checkbox @click.native.stop @change="selectAll(studies.allSelected)" v-model="studies.allSelected" name="allSelected">
   				</b-form-checkbox>
 			</template>
 			<template slot="HEAD_PatientName" slot-scope="data">
@@ -136,10 +136,10 @@
 import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
 
-import seriesSummary from '@/components/dataset/seriesSummary'
+import seriesSummary from '@/components/study/seriesSummary'
 
 export default {
-  name: 'datasets',
+  name: 'studies',
 	data () {
 		return {
 			pageNb: 1,
@@ -197,10 +197,10 @@ export default {
 	components: {seriesSummary},
   computed: {
 	  ...mapGetters({
-	  	  datasets: 'datasets'
+	  	  studies: 'studies'
 	    }),
 		totalRows () {
-			return this.datasets.length;
+			return this.studies.length;
 		}
   },
   methods: {
@@ -210,7 +210,7 @@ export default {
 
 	      if (bottomOfWindow) {
 			  this.pageNb++;
-			  this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+			  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 	      }
 	    };
 	  },
@@ -221,8 +221,8 @@ export default {
 		  this.pageNb = ctx.currentPage;
 		  this.sortBy = ctx.sortBy;
 		  this.sortDesc = ctx.sortDesc;
-		  this.limit = this.datasets.length;
-		  this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+		  this.limit = this.studies.length;
+		  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 
 	    },
 		showSeries (row) {
@@ -244,55 +244,55 @@ export default {
 			  if (res) vm.$snotify.success(type+ 'is now in favorites');
 			  else vm.$snotify.error('Sorry, an error occured');		  	
 		  })
-		  // this.datasets[index][entity]= !this.datasets[index][entity];
-		  // console.log(this.datasets[index]);
+		  // this.studies[index][entity]= !this.studies[index][entity];
+		  // console.log(this.studies[index]);
 
 	  },
 	  handleComments(index,entity){
-		  this.datasets[index][entity]= !this.datasets[index][entity];
+		  this.studies[index][entity]= !this.studies[index][entity];
 
 	  },
 	  selectAll(is_selected){
 
 		  if (is_selected) this.selectedStudiesNb = 0;
-		  else{this.selectedStudiesNb =  _.size(this.datasets)}
-		_.forEach(this.datasets, function(dataset,index) {
-			dataset.is_selected = !is_selected;
+		  else{this.selectedStudiesNb =  _.size(this.studies)}
+		_.forEach(this.studies, function(study,index) {
+			study.is_selected = !is_selected;
 
 
 		});
-		this.datasets.allSelected = ! this.datasets.allSelected;
+		this.studies.allSelected = ! this.studies.allSelected;
 	  },
 	  deleteSelectedStudies(){
 		 var vm = this;
 		 var i;
-		 for (i = this.datasets.length-1; i > -1; i--) {
-			 if(this.datasets[i].is_selected){
- 			 	vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.datasets[i].StudyInstanceUID})
- 				vm.$delete(vm.datasets, i);
+		 for (i = this.studies.length-1; i > -1; i--) {
+			 if(this.studies[i].is_selected){
+ 			 	vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.studies[i].StudyInstanceUID})
+ 				vm.$delete(vm.studies, i);
  			 }
 		 }
 
 	  },
 	  downloadSelectedStudies(){
 		   var vm = this;
-		   _.forEach(this.datasets, function(dataset,index) {
-			   if( dataset.is_selected){
-				   console.log(dataset);
-				   vm.$store.dispatch('downloadStudy',{StudyInstanceUID:dataset.StudyInstanceUID})
+		   _.forEach(this.studies, function(study,index) {
+			   if( study.is_selected){
+				   console.log(study);
+				   vm.$store.dispatch('downloadStudy',{StudyInstanceUID:study.StudyInstanceUID})
 			   }
 		   });
 
 	  },
 	  searchOnline(filters){
-		  this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+		  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 	  }
 
 
   },
   created () {
 
-	  this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+	  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 
   },
   mounted () {

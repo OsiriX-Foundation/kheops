@@ -16,14 +16,14 @@ const state = {
 
 // getters
 const getters = {
-	datasets: state => state.all,
-	currentDataset: state => state.current
+	studies: state => state.all,
+	currentStudy: state => state.current
 }
 
 // actions
 const actions = {
 // +'&sort=PatientID'
-	getDatasets ({ commit }, params) {
+	getStudies ({ commit }, params) {
 		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy == params.sortBy && state.filterParams.sortDesc == params.sortDesc && _.isEqual(state.filterParams.filters,params.filters)){
 			return;	
 		} 
@@ -192,33 +192,33 @@ const actions = {
 // mutations
 const mutations = {
 	SET_DATASETS (state, data) {
-		let datasets = data.data;
+		let studies = data.data;
 		let reset = data.reset;
-		_.forEach(datasets, (d,i) => {
+		_.forEach(studies, (d,i) => {
 			d.is_selected = false;
 			d.is_favorite = false;
 			d.comment = null;
 
 			_.forEach(state.flags, (flag,StudyInstanceUID) => {
 				if (d.StudyInstanceUID[0] == StudyInstanceUID){
-					datasets[i].is_selected = flag.is_selected;
-					datasets[i].is_favorite = flag.is_favorite;
-					datasets[i].comment = flag.comment;
+					studies[i].is_selected = flag.is_selected;
+					studies[i].is_favorite = flag.is_favorite;
+					studies[i].comment = flag.comment;
 				}
 			})
 		})
-		if (reset) 	state.all = datasets;
+		if (reset) 	state.all = studies;
 		else {
 			
-			state.all = _.uniqBy(state.all.concat(datasets),function(d){return d.StudyInstanceUID});
+			state.all = _.uniqBy(state.all.concat(studies),function(d){return d.StudyInstanceUID});
 		}
 	},
 	SET_SERIES (state,data){
 		let idx = _.findIndex(state.all, s => {return s.StudyInstanceUID == data.StudyInstanceUID});
 		if (idx > -1) state.all[idx].series = data.series;
 	},
-	SELECT_DATASET (state, dataset){
-		state.current = dataset;
+	SELECT_DATASET (state, study){
+		state.current = study;
 	},
 	SET_FILTER_PARAMS (state,params){
 		state.filterParams = params;
