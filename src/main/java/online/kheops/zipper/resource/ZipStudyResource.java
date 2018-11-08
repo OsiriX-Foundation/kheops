@@ -15,6 +15,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -94,7 +95,7 @@ public final class ZipStudyResource {
         List<Attributes> attributesList;
         try {
             attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + accessToken.toString()).get(new GenericType<List<Attributes>>() {});
-        } catch (WebApplicationException e) {
+        } catch (ResponseProcessingException e) {
             if (e.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
                 LOG.log(WARNING, "Unauthorized", e);
                 throw new WebApplicationException(UNAUTHORIZED);
@@ -105,7 +106,7 @@ public final class ZipStudyResource {
                 LOG.log(SEVERE, "Bad Gateway", e);
                 throw new WebApplicationException(BAD_GATEWAY);
             }
-        } catch (ProcessingException e) {
+        } catch (ProcessingException | WebApplicationException e) {
             LOG.log(SEVERE, "Processing Error", e);
             throw new WebApplicationException(BAD_GATEWAY);
         }
