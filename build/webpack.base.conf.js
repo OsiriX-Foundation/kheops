@@ -46,6 +46,7 @@ module.exports = {
         loader: 'vue-loader',
         options: vueLoaderConfig
       },
+	  
 	  {
 	    test: /\.scss$/,
 	    use: [
