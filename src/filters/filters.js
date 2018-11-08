@@ -6,3 +6,10 @@ Vue.filter('formatDate', value => {
     return moment(String(value)).format('MMM Do YYYY')
   }
 })
+
+Vue.filter('formatTime', value => {
+  if (value) {
+	  return value;
+    // return moment(String(value)).format('hh:ii')
+  }
+})

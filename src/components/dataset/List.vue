@@ -1,4 +1,27 @@
 /* eslint-disable */
+
+<i18n>
+{
+  "en": {
+    "PatientName": "Patient Name",
+	"Modality": "Modality",
+	"StudyDate": "Study Date",
+	"AccessionNumber": "Accession #",
+	"PatientID": "Patient ID"
+  },
+  "fr": {
+    "PatientName": "Nom du patient",
+	"Modality": "Modalité",
+	"StudyDate": "Date de l'étude",
+	"AccessionNumber": "# accession",
+	"PatientID": "ID patient"
+	
+  }
+}
+</i18n>
+
+
+
 <template>
 	<div class = 'container-fluid'>
 		<div class="my-3 selection-button-container">
@@ -24,34 +47,38 @@
 			</template>
 			<template slot="HEAD_PatientName" slot-scope="data">
 					<div v-if='showFilters' @click.stop='' ><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientName' placeholder="filter"> <br></div>
-					{{data.label}} 
+					{{$t(data.label)}}
 					
 			</template>
 		 	<template slot="HEAD_PatientID" slot-scope="data">
 				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientID' placeholder="filter"> <br></div>
-				{{data.label}}
+				{{$t(data.label)}}
 
 			</template>
 		 	<template slot="HEAD_AccessionNumber" slot-scope="data">
 				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.AccessionNumber' placeholder="filter"> <br></div>
-				{{data.label}}
+				{{$t(data.label)}}
 				
 			</template>
 		 	<template slot="HEAD_StudyDate" slot-scope="data">
 				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDate' placeholder="filter"> <br></div>
-				{{data.label}}
+				{{$t(data.label)}}
 				
 			</template>
 		 	<template slot="HEAD_ModalitiesInStudy" slot-scope="data">
 				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' placeholder="filter"><br></div>
-				{{data.label}} <br>
+				{{$t(data.label)}}
 				
+			</template>
+		
+			<template slot='ModalitiesInStudy' slot-scope="data">
+				{{data.value[0].replace(","," / ")}}
 			</template>
 		
 			<template slot="is_selected" slot-scope="row">
 				<b-form-group>
 
-					<b-button variant="link" size="sm" @click.stop="row.toggleDetails" class="mr-2">
+					<b-button variant="link" size="sm" @click.stop="showSeries(row)" class="mr-2">
 						<v-icon v-if= "row.detailsShowing" class="align-middle"  @click.stop="row.toggleDetails" name="chevron-down"></v-icon>
 						<v-icon v-else class="align-middle"  @click.stop="row.toggleDetails" name="chevron-right"></v-icon>
 
@@ -65,7 +92,18 @@
 			</template>
 			<template slot="row-details" slot-scope="row">
 				<b-card>
-					<p>here will come the Series</p>
+					<!-- <p>{{row.item.series.length}} serie{{row.item.series.length>1?"s":""}}</p> -->
+					<div class = 'row'>
+						<div class = 'col-sm-12 col-md-6' v-for='serie in row.item.series'>
+							<series-summary
+							      v-bind:series="serie"
+								  v-bind:StudyInstanceUID="row.item.StudyInstanceUID[0]"
+							      v-bind:key="serie.SerieInstanceUID">
+							    </series-summary>
+						</div>
+						
+					</div>
+
 					<!-- <b-row class="mb-2">
 						<b-col sm="3" class="text-sm-right"><b>Age:</b></b-col>
 						<b-col>{{ row.item.age }}</b-col>
@@ -74,13 +112,12 @@
 						<b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
 						<b-col>{{ row.item.isActive }}</b-col>
 					</b-row> -->
-					<b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
 				</b-card>
 			</template>
 		 	<template slot = 'PatientName' slot-scope='data'>
 				{{data.item.PatientName}}
 				<div class = 'patientNameIcons'>
-					<span @click = "toggleFavorite(data.index)" :class="data.item.is_favorite?'selected':''"><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
+					<span @click = "toggleFavorite(data.index,'study')" :class="data.item.is_favorite?'selected':''"><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
 					<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
 					</span>
 						<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
@@ -98,6 +135,9 @@
 
 import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
+
+import seriesSummary from '@/components/dataset/seriesSummary'
+
 export default {
   name: 'datasets',
 	data () {
@@ -109,11 +149,12 @@ export default {
 				{
 					key: 'is_selected',
 					label: '',
-					sortable: true
+					sortable: true,
+					class: 'td_checkbox'
 				},
 				{
 					key: "PatientName",
-					label: "Patient Name",
+					label: "PatientName",
 					tdClass: 'patientName',
 					sortable: true
 				},
@@ -124,12 +165,12 @@ export default {
 				},
 				{
 					key: "AccessionNumber",
-					label: "Accession #",
+					label: "AccessionNumber",
 					sortable: true
 				},
 				{
 					key: 'StudyDate',
-					label: "Study Date",
+					label: "StudyDate",
 					sortable: true
 				},
 				{
@@ -140,7 +181,7 @@ export default {
 			],
 			sortBy: 'StudyDate',
 			sortDesc: true,
-			limit: 10,
+			limit: 8,
 			optionsNbPages: [5,10,25,50,100],
 			showFilters: false,
 			filterTimeout: null,
@@ -153,6 +194,7 @@ export default {
 			},
 		}
 	},
+	components: {seriesSummary},
   computed: {
 	  ...mapGetters({
 	  	  datasets: 'datasets'
@@ -182,8 +224,13 @@ export default {
 		  this.limit = this.datasets.length;
 		  this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 
-		  console.log(ctx);
 	    },
+		showSeries (row) {
+			if (!row.detailsShowing){
+				this.$store.dispatch('getSeries',{StudyInstanceUID: row.item.StudyInstanceUID[0]})
+			}
+			row.toggleDetails();
+		},
 	  toggleSelected(is_selected) {
 		  if (is_selected ) this.selectedStudiesNb = this.selectedStudiesNb -1;
 		  else {this.selectedStudiesNb += 1 }
@@ -191,8 +238,12 @@ export default {
 
 	  },
 
-	  toggleFavorite(index){
-		  this.$store.commit('TOGGLE_FAVORITE',{index: index})
+	  toggleFavorite(index,type){
+		  var vm = this;
+		  this.$store.dispatch('toggleFavorite',{type: type, index: index}).then(res => {
+			  if (res) vm.$snotify.success(type+ 'is now in favorites');
+			  else vm.$snotify.error('Sorry, an error occured');		  	
+		  })
 		  // this.datasets[index][entity]= !this.datasets[index][entity];
 		  // console.log(this.datasets[index]);
 
@@ -234,12 +285,6 @@ export default {
 
 	  },
 	  searchOnline(filters){
-		let filterParams = "";
-		_.forEach(filters, function(value,filterName) {
-			if (value){
-				filterParams += '&'+filterName+'=*'+value+"*";
-			}
-		});
 		  this.$store.dispatch('getDatasets',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 	  }
 
@@ -262,6 +307,19 @@ export default {
 				this.filterTimeout = setTimeout( () => this.searchOnline(filters), 300);
 			},
 			deep: true
+		},
+		showFilters: {
+			handler: function(showFilters){
+				if (!showFilters){
+					this.filters = {
+						PatientName: '',
+						PatientID: '',
+						AccessionNumber: '',
+						StudyDate: '',
+						ModalitiesInStudy: '',
+					}
+				}
+			}
 		}
 
 
@@ -309,6 +367,10 @@ select{
  
  .selection-button-container{
 	 height: 60px;
+ }
+ 
+ .td_checkbox {
+	 width: 150px;
  }
 </style>
 

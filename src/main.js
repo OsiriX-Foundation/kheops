@@ -19,7 +19,7 @@ import store from './store'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import {HTTP} from '@/router/http';
 import '@/filters/filters.js';
-
+import VueI18n from 'vue-i18n'
 
 
 
@@ -28,6 +28,8 @@ Vue.config.productionTip = false
 Vue.use(Snotify, options)
 Vue.use(BootstrapVue)
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
+Vue.use(VueI18n)
+
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon)
 Vue.directive('access',Access);
@@ -60,21 +62,30 @@ function tokenInterceptor () {
 }
 
 
+// Create VueI18n instance with options
+const i18n = new VueI18n({
+  locale: 'en'
+})
+
+
+
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
 	config: keycloakconfig,
     onReady: (keycloak) => {
 	   tokenInterceptor()
     /* eslint-disable no-new */
-	  new Vue({
+	new Vue({
 	    el: '#app',
 	    router,
 	    store,
+  	    i18n,
 	    components: { App },
 	    template: '<App/>'
 	  })
   }
 })
+
 
 // if we don't need authentication...
 

@@ -1,4 +1,24 @@
 /* eslint-disable */
+<i18n>
+
+{
+	"en" : {
+		"inbox": "Inbox",
+		"albums": "Albums",
+		"favorites": "Favorites",
+		"recents": "Recents"
+	},
+	"fr": {
+		"inbox": "Boîte de réception",
+		"albums": "Albums",
+		"favorites": "Favorits",
+		"recents": "Récents"
+
+	}
+}
+
+</i18n>
+
 <template>
 	<div class = 'container' id = 'navbar_container'>
 		<div class = 'buttons-container'>
@@ -8,16 +28,16 @@
 		<div class = 'nav-container'>
 			<ul class="nav nav-pills nav-fill">
 				<li class="nav-item">
-					<a class="nav-link active" href="/inbox"><v-icon name='bars'/>Inbox</a>
+					<a class="nav-link active" href="/inbox"><v-icon name='bars'/>{{ $t("inbox") }}</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="/albums"><v-icon name='book' />Albums</a>
+					<a class="nav-link" href="/albums"><v-icon name='book' />{{ $t("albums") }}</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="/favorites"><v-icon name='star' />Favorites</a>
+					<a class="nav-link" href="/favorites"><v-icon name='star' />{{ $t("favorites") }}</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link disabled" href="/recents"><v-icon name='clock-o'/>Recents</a>
+					<a class="nav-link disabled" href="/recents"><v-icon name='clock-o'/>{{ $t("recents") }}</a>
 				</li>
 			</ul>
 		</div>

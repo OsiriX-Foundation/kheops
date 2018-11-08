@@ -2,8 +2,9 @@ import Vue from 'vue';
 export default {
 
 		keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-
+	
 		encode (input) {
+			console.log(input);
 			var output = "";
 			var chr1, chr2, chr3 = "";
 			var enc1, enc2, enc3, enc4 = "";
@@ -78,6 +79,6 @@ export default {
 
 			return output;
 		}
-
+		
 
 }
