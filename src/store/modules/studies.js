@@ -115,8 +115,8 @@ const actions = {
 							if (state.flags[t.SeriesInstanceUID[0]] === undefined){
 								let flag = {
 									id: t.SeriesInstanceUID[0],
-									is_selected: false,
-									is_favorite: false,
+									is_selected: study.is_selected,
+									is_favorite: study.is_favorite,
 									comment: false
 								}
 								commit('SET_FLAG',flag);
@@ -184,7 +184,11 @@ const actions = {
 			}
 
 		}
+	},
+	toggleSelected ({ commit }, params){
+		commit("TOGGLE_SELECTED",params)
 	}
+	
 
 
 }
@@ -216,8 +220,32 @@ const mutations = {
 	SET_SERIES (state,data){
 		let idx = _.findIndex(state.all, s => {return s.StudyInstanceUID == data.StudyInstanceUID});
 		if (idx > -1) state.all[idx].series = data.series;
+		_.forEach(state.all[idx].series, (d,i) => {
+			state.all[idx].series[i].is_selected = state.all[idx].is_selected;
+			state.all[idx].series[i].is_favorite = state.all[idx].is_favorite;
+			state.all[idx].series[i].comment = null;
+
+			_.forEach(state.flags, (flag,SeriesInstanceUID) => {
+				if (d.SeriesInstanceUID == SeriesInstanceUID){
+					console.log('OK'+ "=> "+ flag.is_selected);
+					state.all[idx].series[i].is_selected = flag.is_selected;
+					state.all[idx].series[i].is_favorite = flag.is_favorite;
+					state.all[idx].series[i].comment = flag.comment;
+				}
+			})
+		})
+
 	},
-	SELECT_DATASET (state, study){
+	SELECT_ALL_STUDIES (state, is_selected){
+		_.forEach(state.all, function(study,index) {
+			study.is_selected = is_selected;
+			_.forEach(study.series, (serie,serieIdx) => {
+				serie.is_selected = study.is_selected
+			})
+		});
+		
+	},
+	SELECT_STUDIES (state, study){
 		state.current = study;
 	},
 	SET_FILTER_PARAMS (state,params){
@@ -230,7 +258,26 @@ const mutations = {
 		if (params.type == 'study'){
 			state.all[params.index].is_favorite = !state.all[params.index].is_favorite;
 			state.flags[state.all[params.index].StudyInstanceUID[0]].is_favorite = state.all[params.index].is_favorite;		
-			if (state.all[params.index].is_favorite) HTTP	
+		}
+	},
+	TOGGLE_SELECTED (state,params){
+		if (params.type == 'study'){
+			state.all[params.index].is_selected = !state.all[params.index].is_selected;
+			state.flags[state.all[params.index].StudyInstanceUID[0]].is_selected = state.all[params.index].is_selected;		
+			_.forEach(state.all[params.index].series, (serie,serieIdx) => {
+				serie.is_selected = state.all[params.index].is_selected;
+			})
+		}
+		else if (params.type == 'series'){
+			let studies_selected = false;
+			let indices = params.index.split(":");
+			_.forEach(state.all[indices[0]].series, (serie,serieIdx) => {
+				if (serieIdx == indices[1]){
+					state.all[indices[0]].series[serieIdx].is_selected = params.selected;
+				}
+				if (serie.is_selected) studies_selected = true;
+			})
+			state.all[indices[0]].is_selected = studies_selected;
 		}
 	},
 	SET_FLAG (state,flag){

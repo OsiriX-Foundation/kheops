@@ -3,6 +3,12 @@
 <i18n>
 {
   "en": {
+	  "selectednbstudies": "{count} study is selected | {count} studies are selected",
+	  "send": "Send",
+	  "addalbum": "Add to an album",
+	  "download": "Download",
+	  "addfavorite": "Add to favorite",
+	  "delete": "Delete",
     "PatientName": "Patient Name",
 	"Modality": "Modality",
 	"StudyDate": "Study Date",
@@ -10,6 +16,12 @@
 	"PatientID": "Patient ID"
   },
   "fr": {
+	  "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
+	  "send": "Envoyer",
+	  "addalbum": "Ajouter à un album",
+	  "download": "Télécharger",
+	  "addfavorite": "Ajouter aux favoris",
+	  "delete": "Supprimer",
     "PatientName": "Nom du patient",
 	"Modality": "Modalité",
 	"StudyDate": "Date de l'étude",
@@ -26,12 +38,12 @@
 	<div class = 'container-fluid'>
 		<div class="my-3 selection-button-container">
 			<span  v-if="selectedStudiesNb > 0">
-				<span >{{selectedStudiesNb}} studies are selected</span>
-				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>Send</button>
-				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>add to an album</button>
-				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()"><span><v-icon class="align-middle" name="download"></v-icon></span><br>Download</button>
-				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="star"></v-icon></span><br>add to favorites</button>
-				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>Delete</button>
+				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
+				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>{{ $t("send") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()"><span><v-icon class="align-middle" name="download"></v-icon></span><br>{{ $t("download") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="star"></v-icon></span><br>{{ $t("addfavorite") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>{{ $t("delete") }}</button>
 			</span>
 			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'><v-icon name = 'search' scale='2'/></button>
 
@@ -83,7 +95,7 @@
 						<v-icon v-else class="align-middle"  @click.stop="row.toggleDetails" name="chevron-right"></v-icon>
 
 					</b-button>
-					<b-form-checkbox v-model = "row.item.is_selected" @click.native.stop @change="toggleSelected(row.item.is_selected)" >
+					<b-form-checkbox v-model = "row.item.is_selected" @click.native.stop @change="toggleSelected(row.item,'study',!row.item.is_selected)" >
 					</b-form-checkbox>
 					
 				</b-form-group>
@@ -96,10 +108,11 @@
 					<div class = 'row'>
 						<div class = 'col-sm-12 col-md-6' v-for='serie in row.item.series'>
 							<series-summary
-							      v-bind:series="serie"
-								  v-bind:StudyInstanceUID="row.item.StudyInstanceUID[0]"
-							      v-bind:key="serie.SerieInstanceUID">
-							    </series-summary>
+							      :SeriesInstanceUID="serie.SeriesInstanceUID[0]"
+								  :selected="serie.is_selected"
+								  :StudyInstanceUID="row.item.StudyInstanceUID[0]"
+							      :key="serie.SeriesInstanceUID[0]">
+							</series-summary>
 						</div>
 						
 					</div>
@@ -144,7 +157,6 @@ export default {
 		return {
 			pageNb: 1,
 			active: false,
-			selectedStudiesNb:0,
 			fields: [
 				{
 					key: 'is_selected',
@@ -191,7 +203,7 @@ export default {
 				AccessionNumber: '',
 				StudyDate: '',
 				ModalitiesInStudy: '',
-			},
+			}
 		}
 	},
 	components: {seriesSummary},
@@ -201,6 +213,9 @@ export default {
 	    }),
 		totalRows () {
 			return this.studies.length;
+		},
+		selectedStudiesNb () {
+			return _.filter(this.studies,s => {return s.is_selected === true;}).length;
 		}
   },
   methods: {
@@ -231,11 +246,11 @@ export default {
 			}
 			row.toggleDetails();
 		},
-	  toggleSelected(is_selected) {
-		  if (is_selected ) this.selectedStudiesNb = this.selectedStudiesNb -1;
-		  else {this.selectedStudiesNb += 1 }
-
-
+	  toggleSelected(item,type,is_selected) {
+		  let index = _.findIndex(this.studies,s => {return s.StudyInstanceUID[0] == item.StudyInstanceUID[0]})
+		  var vm = this;
+		  this.$store.dispatch('toggleSelected',{type: type, index: index,is_selected: is_selected}).then(res => {
+		  })
 	  },
 
 	  toggleFavorite(index,type){
@@ -244,8 +259,6 @@ export default {
 			  if (res) vm.$snotify.success(type+ 'is now in favorites');
 			  else vm.$snotify.error('Sorry, an error occured');		  	
 		  })
-		  // this.studies[index][entity]= !this.studies[index][entity];
-		  // console.log(this.studies[index]);
 
 	  },
 	  handleComments(index,entity){
@@ -253,14 +266,7 @@ export default {
 
 	  },
 	  selectAll(is_selected){
-
-		  if (is_selected) this.selectedStudiesNb = 0;
-		  else{this.selectedStudiesNb =  _.size(this.studies)}
-		_.forEach(this.studies, function(study,index) {
-			study.is_selected = !is_selected;
-
-
-		});
+		this.$store.commit("SELECT_ALL_STUDIES",!is_selected);
 		this.studies.allSelected = ! this.studies.allSelected;
 	  },
 	  deleteSelectedStudies(){
@@ -278,7 +284,6 @@ export default {
 		   var vm = this;
 		   _.forEach(this.studies, function(study,index) {
 			   if( study.is_selected){
-				   console.log(study);
 				   vm.$store.dispatch('downloadStudy',{StudyInstanceUID:study.StudyInstanceUID})
 			   }
 		   });

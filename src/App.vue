@@ -9,7 +9,7 @@
 
 		 <!-- footer -->
 		<b-navbar toggleable="md" type="info" navbar-dark bg-primary>
-		  <b-navbar-brand href="https://www.vital-it.ch/"  tag='h4'>© SIB Swiss Institute of Bioinformatics / Vital-IT {{year}}</b-navbar-brand>
+		  <b-navbar-brand href="#"  tag='h4'>© KHEOPS, inc {{year}}</b-navbar-brand>
 		</b-navbar>
 
 	</div>

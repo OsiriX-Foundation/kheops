@@ -11,7 +11,7 @@
 	"fr": {
 		"inbox": "Boîte de réception",
 		"albums": "Albums",
-		"favorites": "Favorits",
+		"favorites": "Favoris",
 		"recents": "Récents"
 
 	}
