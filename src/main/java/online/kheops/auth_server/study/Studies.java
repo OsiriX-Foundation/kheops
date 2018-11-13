@@ -69,7 +69,7 @@ public class Studies {
         if (qidoParams.isFromInbox()) {
             conditionArrayList.add(ALBUMS.PK.eq(USERS.INBOX_FK));
         }
-        qidoParams.getAlbum_id().ifPresent(albumId -> conditionArrayList.add(ALBUMS.PK.eq(albumId)));
+        qidoParams.getAlbumID().ifPresent(albumId -> conditionArrayList.add(ALBUMS.PK.eq(albumId)));
 
         final Condition fromCondition;
         if (conditionArrayList.isEmpty()) {
