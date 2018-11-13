@@ -4,18 +4,8 @@ import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.*;
 
 import online.kheops.auth_server.annotation.Secured;
-
-import online.kheops.auth_server.annotation.*;
-
-
-import online.kheops.auth_server.capability.ScopeType;
-
-import online.kheops.auth_server.entity.Album;
-
-
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
-import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -67,12 +57,6 @@ public class AlbumResource {
 
         try {
             albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
-<<<<<<< HEAD
-=======
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.INFO, "Creating new album by user pk:"+kheopsPrincipal.getUser().getGoogleEmail()+ " FAILED", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
->>>>>>> use em.find()
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
