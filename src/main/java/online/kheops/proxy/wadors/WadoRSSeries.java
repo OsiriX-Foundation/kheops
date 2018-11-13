@@ -33,9 +33,8 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.*;
-import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 @Path("/")
@@ -89,9 +88,30 @@ public final class WadoRSSeries {
 
         final URI qidoServiceURI = qidoServiceURIBuilder.build(studyInstanceUID);
 
-        final List<Attributes> seriesList = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
-                .header(AUTHORIZATION, authorizationHeader)
-                .get(new GenericType<List<Attributes>>() {});
+        final Response listResponse;
+        try {
+            listResponse = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
+                    .header(AUTHORIZATION, authorizationHeader)
+                    .get();
+        } catch (ProcessingException e) {
+            LOG.log(SEVERE, "Error while accessing the studies list", e);
+            throw new WebApplicationException(BAD_GATEWAY);
+        }
+        if (listResponse.getStatus() == UNAUTHORIZED.getStatusCode() || listResponse.getStatus() == FORBIDDEN.getStatusCode()) {
+            LOG.log(WARNING, () -> "Authentication error while getting the series list, status: " + listResponse.getStatus());
+            throw new WebApplicationException(listResponse.getStatus());
+        } else if (listResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
+            LOG.log(SEVERE, () -> "Unable to successfully get the series list, status: " + listResponse.getStatus());
+            throw new WebApplicationException(BAD_GATEWAY);
+        }
+
+        final List<Attributes> seriesList;
+        try {
+            seriesList = listResponse.readEntity(new GenericType<List<Attributes>>() {});
+        } catch (ProcessingException e) {
+            LOG.log(SEVERE, "Unable to parse the series list");
+            throw new WebApplicationException(BAD_GATEWAY);
+        }
 
         final WebTarget webTarget = CLIENT.target(wadoServiceURI)
                 .path("/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}")
