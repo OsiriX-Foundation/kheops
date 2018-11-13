@@ -7,11 +7,9 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
-import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.jooq.*;
@@ -21,22 +19,20 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.MultivaluedMap;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.series.Series.editSeriesFavorites;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
-import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 import static online.kheops.auth_server.user.Users.getUser;
-import static online.kheops.auth_server.util.JOOQTools.*;
 import static online.kheops.auth_server.generated.Tables.ALBUMS;
 import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
@@ -52,7 +48,17 @@ public class Studies {
         throw new IllegalStateException("Utility class");
     }
 
-    private static final Logger LOG = Logger.getLogger(Studies.class.getName());
+    @FunctionalInterface
+    private interface ThrowingConsumer<T> {
+        void accept(T t) throws BadQueryParametersException;
+    }
+
+    private static <T> void applyIfPresent(Supplier<Optional<T>> supplier, ThrowingConsumer<T> consumer) throws BadQueryParametersException {
+        Optional<T> optional = supplier.get();
+        if (optional.isPresent()) {
+            consumer.accept(optional.get());
+        }
+    }
 
     public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, QIDOParams qidoParams, Connection connection)
             throws BadQueryParametersException {
@@ -60,60 +66,42 @@ public class Studies {
         //queryParameters = ConvertDICOMKeyWordToDICOMTag(queryParameters);
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
-        Condition fromCondition = trueCondition();
-        if (qidoParams.getAlbum_id().isPresent()) {
-            fromCondition = ALBUMS.PK.eq(qidoParams.getAlbum_id().get());
-            conditionArrayList.add(fromCondition);
-        }
-
         if (qidoParams.isFromInbox()) {
-            fromCondition = ALBUMS.PK.eq(USERS.INBOX_FK);
-            conditionArrayList.add(fromCondition);
+            conditionArrayList.add(ALBUMS.PK.eq(USERS.INBOX_FK));
+        }
+        qidoParams.getAlbum_id().ifPresent(albumId -> conditionArrayList.add(ALBUMS.PK.eq(albumId)));
+
+        final Condition fromCondition;
+        if (conditionArrayList.isEmpty()) {
+            fromCondition = trueCondition();
+        } else {
+            fromCondition = conditionArrayList.get(0);
         }
 
         DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
 
-        if (qidoParams.getStudyDateFilter().isPresent()) {
-            conditionArrayList.add(createConditonStudyDate(qidoParams.getStudyDateFilter().get()));
-        }
-        if (qidoParams.getStudyTimeFilter().isPresent()) {
-            conditionArrayList.add(createConditonStudyTime(qidoParams.getStudyTimeFilter().get()));
-        }
+        applyIfPresent(qidoParams::getStudyDateFilter, filter -> conditionArrayList.add(createConditionStudyDate(filter)));
+        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> conditionArrayList.add(createConditionStudyTime(filter)));
+        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.ACCESSION_NUMBER, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.REFERRING_PHYSICIAN_NAME, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getPatientNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_NAME, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getPatientIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getStudyInstanceUIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_UID, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getStudyIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_ID, qidoParams.isFuzzyMatching())));
 
-        if (qidoParams.getAccessionNumberFilter().isPresent()) {
-            conditionArrayList.add(createConditon(Tag.AccessionNumber, qidoParams.getAccessionNumberFilter().get(), STUDIES.ACCESSION_NUMBER, qidoParams.isFuzzyMatching()));
-        }
-        if (qidoParams.getReferringPhysicianNameFilter().isPresent()) {
-            conditionArrayList.add(createConditon(Tag.ReferringPhysicianName, qidoParams.getReferringPhysicianNameFilter().get(), STUDIES.REFERRING_PHYSICIAN_NAME, qidoParams.isFuzzyMatching()));
-        }
-        if (qidoParams.getPatientNameFilter().isPresent()) {
-            conditionArrayList.add(createConditon(Tag.PatientName, qidoParams.getPatientNameFilter().get(), STUDIES.PATIENT_NAME, qidoParams.isFuzzyMatching()));
-        }
-        if (qidoParams.getPatientIDFilter().isPresent()) {
-            conditionArrayList.add(createConditon(Tag.PatientID, qidoParams.getPatientIDFilter().get(), STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching()));
-        }
-        if (qidoParams.getStudyInstanceUIDFilter().isPresent()) {
-            conditionArrayList.add(createConditon(Tag.StudyInstanceUID, qidoParams.getStudyInstanceUIDFilter().get(), STUDIES.STUDY_UID, qidoParams.isFuzzyMatching()));
-        }
-        if (qidoParams.getStudyIDFilter().isPresent()) {
-            conditionArrayList.add(createConditon(Tag.StudyID, qidoParams.getStudyIDFilter().get(), STUDIES.STUDY_ID, qidoParams.isFuzzyMatching()));
-        }
-
-        if (qidoParams.getModalityFilter().isPresent()) {
-            conditionArrayList.add(createConditonModality(qidoParams.getModalityFilter().get()));
-        }
+        qidoParams.getModalityFilter().ifPresent(filter -> conditionArrayList.add(createConditionModality(filter)));
 
         //TODO add fav condition
 
 
-        SelectQuery query = create.selectQuery();
-        query.addSelect(countDistinct(STUDIES.PK));
-        query.addFrom(USERS);
-        query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
-        query.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
-        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
-        query.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-        query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+        final SelectQuery<Record> countQuery = create.selectQuery();
+        countQuery.addSelect(countDistinct(STUDIES.PK));
+        countQuery.addFrom(USERS);
+        countQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
+        countQuery.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        countQuery.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
+        countQuery.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+        countQuery.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
 
 
         conditionArrayList.add(USERS.PK.eq(callingUserPK));
@@ -122,14 +110,14 @@ public class Studies {
 
         for (Condition c : conditionArrayList) {
             if (c != null) {
-                query.addConditions(c);
+                countQuery.addConditions(c);
             }
         }
 
-        Integer studiesTotalCount = (Integer) query.fetch().getValues("count").get(0);
+        Integer studiesTotalCount = (Integer) countQuery.fetch().getValues("count").get(0);
 
-        query = create.selectQuery();
-        query.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
+        final SelectQuery<? extends Record> selectQuery = create.selectQuery();
+        selectQuery.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
                 isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
                 isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
                 isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
@@ -145,32 +133,27 @@ public class Studies {
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
                 count(when(ALBUM_SERIES.FAVORITE.eq(true), 1)).as("sum_fav"));
 
-        query.addFrom(USERS);
-        query.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
-        query.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
-        query.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
-        query.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-        query.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+        selectQuery.addFrom(USERS);
+        selectQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
+        selectQuery.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        selectQuery.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
+        selectQuery.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+        selectQuery.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
 
         for (Condition c : conditionArrayList) {
             if (c != null) {
-                query.addConditions(c);
+                selectQuery.addConditions(c);
             }
         }
 
-        query.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
+        selectQuery.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
 
-        query.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
+        selectQuery.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
 
-        if (qidoParams.getLimit().isPresent()) {
-            query.addLimit(qidoParams.getLimit().get());
-        }
+        qidoParams.getLimit().ifPresent(selectQuery::addLimit);
+        qidoParams.getOffset().ifPresent(selectQuery::addOffset);
 
-        if (qidoParams.getOffset().isPresent()) {
-            query.addOffset(qidoParams.getOffset().get());
-        }
-
-        Result<Record15<String, String, String, String, String, String, String, String, String, String, String, Integer, BigDecimal, String, BigDecimal>> result = query.fetch();
+        Result<? extends Record> result = selectQuery.fetch();
 
         List<Attributes> attributesList;
         attributesList = new ArrayList<>();
@@ -179,7 +162,7 @@ public class Studies {
 
             Attributes attributes = new Attributes();
 
-            if (qidoParams.getModalityFilter().isPresent()) {
+            qidoParams.getModalityFilter().ifPresent(filter -> {
                 //get all the modalities for the STUDY_UID
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
@@ -196,7 +179,8 @@ public class Studies {
                         .groupBy(STUDIES.STUDY_UID)
                         .fetch().get(0).getValue(0).toString();
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
-            } else {
+            });
+            if (!qidoParams.getModalityFilter().isPresent()) {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
             }
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
@@ -221,40 +205,8 @@ public class Studies {
         return new PairListXTotalCount<>(studiesTotalCount, attributesList);
     }
 
-    private static MultivaluedMap<String, String> convertDICOMKeyWordToDICOMTag(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate))) {
-            queryParameters.add(String.format("%08X", Tag.StudyDate), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime))) {
-            queryParameters.add(String.format("%08X", Tag.StudyTime), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.AccessionNumber))) {
-            queryParameters.add(String.format("%08X", Tag.AccessionNumber), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.AccessionNumber)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy))) {
-            queryParameters.add(String.format("%08X", Tag.ModalitiesInStudy), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.ReferringPhysicianName))) {
-            queryParameters.add(String.format("%08X", Tag.ReferringPhysicianName), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.ReferringPhysicianName)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.PatientName))) {
-            queryParameters.add(String.format("%08X", Tag.PatientName), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.PatientName)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.PatientID))) {
-            queryParameters.add(String.format("%08X", Tag.PatientID), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.PatientID)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyInstanceUID))) {
-            queryParameters.add(String.format("%08X", Tag.StudyInstanceUID), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyInstanceUID)).get(0));
-        }
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyID))) {
-            queryParameters.add(String.format("%08X", Tag.StudyID), queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyID)).get(0));
-        }
-
-        return queryParameters;
-    }
-
     private static SortField orderBy(int orderBy, boolean descending) {
-        TableField ord =  STUDIES.STUDY_DATE;
+        final TableField ord;
 
         if (orderBy == Tag.StudyDate)
             ord = STUDIES.STUDY_DATE;
@@ -272,11 +224,13 @@ public class Studies {
             ord = STUDIES.STUDY_UID;
         else if (orderBy == Tag.StudyID)
             ord = STUDIES.STUDY_ID;
+        else
+            ord = STUDIES.STUDY_DATE;
 
         return descending ? ord.desc() : ord.asc();
     }
 
-    private static Condition createConditonModality(String filter) {
+    private static Condition createConditionModality(String filter) {
         if (filter.equalsIgnoreCase("null")) {
             return SERIES.MODALITY.isNull();
         } else {
@@ -284,17 +238,17 @@ public class Studies {
         }
     }
 
-    private static Condition createConditonStudyDate(String filter)
+    private static Condition createConditionStudyDate(String filter)
             throws BadQueryParametersException {
-        return createIntervalConditon(filter, new CheckDate());
+        return createIntervalCondition(filter, new CheckDate());
     }
 
-    private static Condition createConditonStudyTime(String filter)
+    private static Condition createConditionStudyTime(String filter)
             throws BadQueryParametersException {
-            return createIntervalConditon(filter, new CheckTime());
+            return createIntervalCondition(filter, new CheckTime());
     }
 
-    private static Condition createIntervalConditon(String parameter, CheckMethode checkMethode)
+    private static Condition createIntervalCondition(String parameter, CheckMethod checkMethod)
             throws BadQueryParametersException {
         if (parameter.contains("-")) {
             String begin;
@@ -304,37 +258,37 @@ public class Studies {
                 begin = parameters[0];
                 end = parameters[1];
                 if (begin.length() == 0) {
-                    begin = checkMethode.intervalBegin();
+                    begin = checkMethod.intervalBegin();
                 }
-                checkMethode.check(begin);
-                checkMethode.check(end);
-                return checkMethode.getColumn().between(begin, end);
+                checkMethod.check(begin);
+                checkMethod.check(end);
+                return checkMethod.getColumn().between(begin, end);
 
             }else if(parameters.length == 1) {
                 begin = parameters[0];
-                end = checkMethode.intervalEnd();
-                checkMethode.check(begin);
-                return checkMethode.getColumn().between(begin, end);
+                end = checkMethod.intervalEnd();
+                checkMethod.check(begin);
+                return checkMethod.getColumn().between(begin, end);
             } else {
-                throw new BadRequestException(checkMethode.getColumn().getName() + ": " + parameter);
+                throw new BadRequestException(checkMethod.getColumn().getName() + ": " + parameter);
             }
         } else {
-            checkMethode.check(parameter);
-            return checkMethode.getColumn().eq(parameter);
+            checkMethod.check(parameter);
+            return checkMethod.getColumn().eq(parameter);
         }
     }
 
-    private interface CheckMethode {
+    private interface CheckMethod {
         String intervalBegin();
         String intervalEnd();
         void check(String s) throws BadQueryParametersException;
-        TableField getColumn();
+        TableField<? extends Record, String> getColumn();
     }
 
-    private static class CheckTime implements CheckMethode {
+    private static class CheckTime implements CheckMethod {
         public String intervalBegin() {return "000000.000000";}
         public String intervalEnd() {return "235959.999999";}
-        public TableField getColumn() {return STUDIES.STUDY_TIME;}
+        public TableField<? extends Record, String> getColumn() {return STUDIES.STUDY_TIME;}
 
         public void check(String time) throws BadQueryParametersException {
             if (! time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$") ) {
@@ -343,10 +297,10 @@ public class Studies {
         }
     }
 
-    private static class CheckDate implements CheckMethode {
+    private static class CheckDate implements CheckMethod {
         public String intervalBegin() {return "00010101";}
         public String intervalEnd() {return "99991231";}
-        public TableField getColumn() {return STUDIES.STUDY_DATE;}
+        public TableField<? extends Record, String> getColumn() {return STUDIES.STUDY_DATE;}
 
         public void check(String date) throws BadQueryParametersException {
             if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
@@ -363,20 +317,12 @@ public class Studies {
         }
     }
 
-    private static Condition createConditon(Integer tag,  String filter, TableField column, Boolean isFuzzyMatching)
-            throws BadQueryParametersException {
-        return createConditon(filter, Keyword.valueOf(tag), column, isFuzzyMatching);
-
-    }
-
-    private static Condition createConditon(String filter, String key, TableField column, Boolean isFuzzyMatching)
-            throws BadQueryParametersException {
+    private static Condition createCondition(String filter, TableField<? extends Record, String> column, Boolean isFuzzyMatching) {
         String parameterNoStar = filter.replace("*", "")
                 .replace(", ", "^")
                 .replace(" ","^")
                 .replace(",", "^");
 
-        String parameter = filter;
         if (parameterNoStar.length() == 0) {
             return null;
         }
@@ -384,11 +330,11 @@ public class Studies {
             return column.isNull();
         } else {
             Condition condition;
-            if (parameter.startsWith("*") && parameter.endsWith("*")) {
+            if (filter.startsWith("*") && filter.endsWith("*")) {
                 condition = column.lower().contains(parameterNoStar.toLowerCase());
-            } else if (parameter.startsWith("*")) {
+            } else if (filter.startsWith("*")) {
                 condition = column.lower().endsWith(parameterNoStar.toLowerCase());
-            } else if (parameter.endsWith("*")) {
+            } else if (filter.endsWith("*")) {
                 condition = column.lower().startsWith(parameterNoStar.toLowerCase());
             } else {
                 condition = column.lower().equal(parameterNoStar.toLowerCase());
