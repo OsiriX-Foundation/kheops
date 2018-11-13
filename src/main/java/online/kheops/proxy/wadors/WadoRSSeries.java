@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -53,8 +54,8 @@ public final class WadoRSSeries {
     @Context
     ServletContext context;
 
-    @HeaderParam(ACCEPT)
-    String acceptParam;
+    @HeaderParam(CONTENT_TYPE)
+    MediaType contentType;
 
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
@@ -84,6 +85,16 @@ public final class WadoRSSeries {
         }
         if (fromInbox != null) {
             qidoServiceURIBuilder.queryParam("inbox", fromInbox);
+        }
+
+        final MediaType requestContentType;
+        if (contentType.isWildcardType()) {
+            requestContentType = new MediaType("multipart", "related", Collections.singletonMap("type", "application/octet-stream"));
+        } else if (contentType.getParameters().get("type") == null) {
+            LOG.log(WARNING, "Missing content type of multipart/related request");
+            throw new WebApplicationException(BAD_REQUEST);
+        } else {
+            requestContentType = contentType;
         }
 
         final URI qidoServiceURI = qidoServiceURIBuilder.build(studyInstanceUID);
@@ -122,12 +133,10 @@ public final class WadoRSSeries {
                 for (Attributes series : seriesList) {
                     final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
                     final AccessToken accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
-                    final Invocation.Builder invocationBuilder = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID).request();
+                    final Invocation.Builder invocationBuilder = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID)
+                            .request(requestContentType)
+                            .header(AUTHORIZATION, accessToken.getHeaderValue());
 
-                    invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
-                    if (acceptParam != null) {
-                        invocationBuilder.header(ACCEPT, acceptParam);
-                    }
                     if (acceptCharsetParam != null) {
                         invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
                     }
@@ -160,7 +169,7 @@ public final class WadoRSSeries {
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        return Response.ok(multipartStreamingOutput).cacheControl(cacheControl).build();
+        return Response.ok(multipartStreamingOutput, requestContentType).cacheControl(cacheControl).build();
     }
 
     private URI getParameterURI(String parameter) {
