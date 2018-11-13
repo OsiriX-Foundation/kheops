@@ -7,6 +7,7 @@ import online.kheops.auth_server.annotation.CacheControlHeader;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.user.UsersPermission;
 
+import javax.annotation.Priority;
 import javax.ws.rs.container.*;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.MultivaluedMap;
@@ -18,6 +19,7 @@ import static javax.ws.rs.HttpMethod.PUT;
 import static javax.ws.rs.core.HttpHeaders.CACHE_CONTROL;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
 
 @Provider
 public class AlbumPermissionFilterFactory implements DynamicFeature {
@@ -31,6 +33,8 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
         }
     }
 
+
+    @Priority(ALBUM_PERMISSION_ACCESS_PRIORITY)
     private static class AlbumPermissionFilter implements ContainerRequestFilter {
         private final UsersPermission.UsersPermissionEnum permission;
 

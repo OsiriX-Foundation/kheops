@@ -16,10 +16,11 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
 
 @AlbumAccessSecured
 @Provider
-@Priority(Priorities.USER)
+@Priority(ALBUM_ACCESS_PRIORITY)
 public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = Logger.getLogger(AlbumAccessSecuredFilter.class.getName());

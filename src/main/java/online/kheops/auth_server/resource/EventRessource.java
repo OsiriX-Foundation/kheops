@@ -6,6 +6,7 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
+import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.capability.ScopeType;
@@ -48,6 +49,7 @@ public class EventRessource {
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         //TODO check if permission read comments
+        //TODO if album token : only comments not mutations
 
         if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
             return Response.status(FORBIDDEN).build();
@@ -82,6 +84,9 @@ public class EventRessource {
 
     @POST
     @Secured
+    @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.WRITE_COMMENT)
     @Path("album/{album:[1-9][0-9]*}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -90,15 +95,6 @@ public class EventRessource {
                                 @Context SecurityContext securityContext) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-
-        try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.WRITE_COMMENT, albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {

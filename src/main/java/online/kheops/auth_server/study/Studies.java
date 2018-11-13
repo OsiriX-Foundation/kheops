@@ -34,9 +34,7 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.series.Series.editSeriesFavorites;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
-import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 import static online.kheops.auth_server.user.Users.getUser;
-import static online.kheops.auth_server.util.JOOQTools.*;
 import static online.kheops.auth_server.generated.Tables.ALBUMS;
 import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
@@ -414,6 +412,19 @@ public class Studies {
         } catch (NoResultException e) {
             throw new StudyNotFoundException("StudyInstanceUID : "+studyInstanceUID+" not found");
         }
+    }
+
+    public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
+        Study study;
+        try {
+            study = getStudy(studyInstanceUID, em);
+        } catch (StudyNotFoundException ignored) {
+            // the study doesn't exist, we need to create it
+            study = new Study();
+            study.setStudyInstanceUID(studyInstanceUID);
+            em.persist(study);
+        }
+        return study;
     }
 
     public static boolean canAccessStudy(User user, Study study, EntityManager em) {

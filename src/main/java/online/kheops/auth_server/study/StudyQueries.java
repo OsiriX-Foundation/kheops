@@ -23,13 +23,6 @@ public class StudyQueries {
         return query.getSingleResult();
     }
 
-    public static Study findStudyByStudyUIDandUser(String studyInstanceUID, User user, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and a = u.inbox and st.studyInstanceUID = :StudyInstanceUID", Study.class);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
-        query.setParameter("user", user);
-        return query.getSingleResult();
-    }
 
     public static Study findStudyByStudyandUser(Study study, User user, EntityManager em) throws NoResultException {
         TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study", Study.class);

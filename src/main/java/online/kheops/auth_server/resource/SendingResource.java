@@ -7,6 +7,8 @@ import javax.ws.rs.core.*;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.annotation.AlbumAccessSecured;
+import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.capability.ScopeType;
@@ -146,6 +148,7 @@ public class SendingResource
 
     @DELETE
     @Secured
+    //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteStudyFromInbox(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -154,7 +157,6 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
             return Response.status(FORBIDDEN).build();
@@ -170,16 +172,17 @@ public class SendingResource
         }
 
         try {
-            Sending.deleteStudyFromInbox(callingUserPk, studyInstanceUID);
-        } catch(UserNotFoundException | SeriesNotFoundException e) {
+            Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID);
+        } catch(SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + callingUserPk);
+        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + kheopsPrincipal.getDBID());
         return Response.status(NO_CONTENT).build();
     }
 
     @DELETE
     @Secured
+    //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteSeriesFromInbox(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -190,7 +193,6 @@ public class SendingResource
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try{
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
@@ -210,17 +212,19 @@ public class SendingResource
         }
 
         try {
-            Sending.deleteSeriesFromInbox(callingUserPk, studyInstanceUID, seriesInstanceUID);
-        } catch(UserNotFoundException | SeriesNotFoundException e) {
+            Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
+        } catch(SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + callingUserPk);
+        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + kheopsPrincipal.getDBID());
         return Response.status(NO_CONTENT).build();
     }
 
     @PUT
     @Secured
     @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putSeriesInAlbum(@PathParam("album") Long albumPk,
                                      @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -232,14 +236,6 @@ public class SendingResource
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
-        try {
-            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
 
         try {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
@@ -263,6 +259,7 @@ public class SendingResource
     @PUT
     @Secured
     @UserAccessSecured
+    @AlbumAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putStudyInAlbum(@PathParam("album") Long albumPk,
                                     @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -307,6 +304,8 @@ public class SendingResource
 
     @DELETE
     @Secured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteStudyFromAlbum(@PathParam("album") Long albumPk,
                                          @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -315,19 +314,10 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-
-        try {
-            Sending.deleteStudyFromAlbum(callingUserPk, albumPk, studyInstanceUID);
-        } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            Sending.deleteStudyFromAlbum(kheopsPrincipal.getUser(), albumPk, studyInstanceUID);
+        } catch(AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -337,6 +327,8 @@ public class SendingResource
 
     @DELETE
     @Secured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteSeriesFromAlbum(@PathParam("album") Long albumPk,
                                           @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -347,19 +339,10 @@ public class SendingResource
         checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_SERIES, albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-
-        try {
-            Sending.deleteSeriesFromAlbum(callingUserPk, albumPk, studyInstanceUID, seriesInstanceUID);
-        } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            Sending.deleteSeriesFromAlbum(kheopsPrincipal.getUser(), albumPk, studyInstanceUID, seriesInstanceUID);
+        } catch(AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

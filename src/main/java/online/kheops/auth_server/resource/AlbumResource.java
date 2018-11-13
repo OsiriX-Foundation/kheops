@@ -223,15 +223,14 @@ public class AlbumResource {
                             @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.addUser(callingUserPk, user, albumPk, false);
+            Albums.addUser(kheopsPrincipal.getUser(), user, albumPk, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -249,15 +248,15 @@ public class AlbumResource {
                              @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
+
 
         try {
-            Albums.addUser(callingUserPk, user, albumPk, true);
+            Albums.addUser(kheopsPrincipal.getUser(), user, albumPk, true);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -275,12 +274,11 @@ public class AlbumResource {
                                 @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.removeAdmin(callingUserPk, user, albumPk);
+            Albums.removeAdmin(kheopsPrincipal.getUser(), user, albumPk);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -298,15 +296,14 @@ public class AlbumResource {
                                @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.deleteUser(callingUserPk, user, albumPk);
+            Albums.deleteUser(kheopsPrincipal.getUser(), user, albumPk);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -322,12 +319,11 @@ public class AlbumResource {
     public Response addFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.setFavorites(callingUserPk, albumPk, true);
-        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO,"Add an album pk:" +albumPk+ " to favorites by user pk:"+callingUserPk+ " FAILED", e);
+            Albums.setFavorites(kheopsPrincipal.getUser(), albumPk, true);
+        } catch (AlbumNotFoundException | UserNotMemberException e) {
+            LOG.log(Level.INFO,"Add an album pk:" +albumPk+ " to favorites by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -336,19 +332,18 @@ public class AlbumResource {
 
     @DELETE
     @Secured
-    @AlbumAccessSecured
     @UserAccessSecured
+    @AlbumAccessSecured
     @Path("album/{album:[1-9][0-9]*}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.setFavorites(callingUserPk, albumPk, false);
-        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an album pk:" +albumPk+ " from favorites by user pk:"+callingUserPk+ " FAILED", e);
+            Albums.setFavorites(kheopsPrincipal.getUser(), albumPk, false);
+        } catch (AlbumNotFoundException | UserNotMemberException e) {
+            LOG.log(Level.INFO, "Remove an album pk:" +albumPk+ " from favorites by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

@@ -197,7 +197,7 @@ public class Albums {
         return usersAlbumResponses;
     }
 
-    public static void addUser(long callingUserPk, String userName, long albumPk, boolean isAdmin)
+    public static void addUser(User callingUser, String userName, long albumPk, boolean isAdmin)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -206,7 +206,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User targetUser = getUser(userName, em);
 
             if (targetUser.getPk() == callingUser.getPk()) {
@@ -222,7 +222,7 @@ public class Albums {
                         return; // the target is already a member of the album with the same profile (admin / non-admin)
                     }
                     if (targetAlbumUser.isAdmin() && !isAdmin) {
-                        throw new AlbumForbiddenException("The user: " + targetUser.getGoogleEmail() + "is an admin. Use : DELETE /albums/" + albumPk + "/users/" + callingUser.getGoogleId() + "/admin");
+                        throw new AlbumForbiddenException("The user: " + targetUser.getGoogleEmail() + "is an admin. Use : DELETE /album/" + albumPk + "/users/" + callingUser.getGoogleId() + "/admin");
                     }
                     //From here, the targetUser is an normal member and he will be promot admin
                     targetAlbumUser.setAdmin(isAdmin);
@@ -256,7 +256,7 @@ public class Albums {
         }
     }
 
-    public static void deleteUser(long callingUserPk, String userName, long albumPk)
+    public static void deleteUser(User callingUser, String userName, long albumPk)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException, AlbumForbiddenException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -265,7 +265,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User removedUser = getUser(userName, em);
             final Album album = getAlbum(albumPk, em);
             final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
@@ -296,7 +296,7 @@ public class Albums {
 
             //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
-                deleteAlbum(callingUserPk, albumPk);
+                deleteAlbum(callingUser.getPk(), albumPk);
             }
 
             tx.commit();
@@ -308,7 +308,7 @@ public class Albums {
         }
     }
 
-    public static void removeAdmin(long callingUserPk, String userName, long albumPk)
+    public static void removeAdmin(User callingUser, String userName, long albumPk)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -317,7 +317,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User removedUser = getUser(userName, em);
             final Album targetAlbum = getAlbum(albumPk, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
@@ -342,8 +342,8 @@ public class Albums {
         }
     }
 
-    public static void setFavorites(long callingUserPk, long albumPk, Boolean favorite)
-            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
+    public static void setFavorites(User callingUser, long albumPk, Boolean favorite)
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -351,7 +351,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumPk, em);
             final AlbumUser albumUser = getAlbumUser(album, callingUser, em);
 
