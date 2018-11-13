@@ -12,7 +12,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
@@ -69,11 +68,7 @@ public class AccessToken {
             final TokenResponse tokenResponse;
             try {
                 tokenResponse = CLIENT.target(uri).request(APPLICATION_JSON_TYPE).post(Entity.form(form), TokenResponse.class);
-            } catch (ResponseProcessingException e) {
-                LOG.log(Level.WARNING,"Unable to obtain a token for capability token", e);
-                throw new AccessTokenException("Unable to get a request token for the capability URL", e);
-            } catch (WebApplicationException e) {
-                LOG.log(Level.WARNING,"Other exception Unable to obtain a token for capability token", e);
+            } catch (ResponseProcessingException | WebApplicationException e) {
                 throw new AccessTokenException("Unable to get a request token for the capability URL", e);
             }
 

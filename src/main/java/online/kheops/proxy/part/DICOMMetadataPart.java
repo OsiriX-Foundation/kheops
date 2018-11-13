@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class DICOMMetadataPart extends Part {
     private final Attributes dataset;
     private final Set<ContentLocation> bulkDataLocations;
@@ -39,7 +41,7 @@ public class DICOMMetadataPart extends Part {
             }
         } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
             try {
-                JSONReader reader = new JSONReader(Json.createParser(new InputStreamReader(inputStream, "UTF-8")));
+                JSONReader reader = new JSONReader(Json.createParser(new InputStreamReader(inputStream, UTF_8)));
                 dataset = reader.readDataset(null);
             } catch (JsonParsingException e) {
                 throw new IOException("Unable to parse the DICOM JSON", e);
