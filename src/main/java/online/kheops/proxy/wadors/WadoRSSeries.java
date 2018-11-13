@@ -148,6 +148,9 @@ public final class WadoRSSeries {
                     }
 
                     final Response wadoResponse = invocationBuilder.get(Response.class);
+                    if (!wadoResponse.getMediaType().isCompatible(acceptMediaType)) {
+                        throw new ProcessingException("The response is not compatible");
+                    }
                     final InputStream inputStream = wadoResponse.readEntity(InputStream.class);
                     final String boundary = wadoResponse.getMediaType().getParameters().get(BOUNDARY_PARAMETER);
 
@@ -163,7 +166,7 @@ public final class WadoRSSeries {
                     new MultipartParser(boundary).parse(inputStream, handler);
                     wadoResponse.close();
                 }
-            } catch (IOException e) {
+            } catch (IOException | ProcessingException | WebApplicationException e) {
                 LOG.log(SEVERE, "Error while streaming the output", e);
                 throw new WebApplicationException(BAD_GATEWAY);
             } catch (AccessTokenException e) {
