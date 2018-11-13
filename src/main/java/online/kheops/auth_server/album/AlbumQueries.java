@@ -36,20 +36,13 @@ public class AlbumQueries {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<AlbumUser> findAlbumsUserByUser(User targetUser, EntityManager em) {
-        return em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user", AlbumUser.class)
-                .setParameter("targetUser", targetUser)
-                .getResultList();
-    }
 
-    public static Album findAlbumByPk(long albumPk, EntityManager em) throws NoResultException{
-        return em.createQuery("SELECT a from Album a where :albumPk = a.pk", Album.class)
-                .setParameter("albumPk", albumPk)
-                .getSingleResult();
+    public static Album findAlbumByPk(long albumPk, EntityManager em) {
+        return em.find(Album.class, albumPk);
     }
 
     public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em ) throws NoResultException {
-        return em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user and :targetAlbum = a.album", AlbumUser.class)
+        return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album", AlbumUser.class)
                 .setParameter("targetUser", user)
                 .setParameter("targetAlbum", album)
                 .getSingleResult();

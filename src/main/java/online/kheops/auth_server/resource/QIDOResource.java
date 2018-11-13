@@ -7,6 +7,7 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.study.StudyNotFoundException;
@@ -62,6 +63,7 @@ public class QIDOResource {
 
     @GET
     @Secured
+    @AlbumAccessSecured
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam("album") Long fromAlbumPk,

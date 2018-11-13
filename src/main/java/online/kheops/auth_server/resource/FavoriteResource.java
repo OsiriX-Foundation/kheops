@@ -3,6 +3,7 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
@@ -27,6 +28,7 @@ public class FavoriteResource {
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -39,6 +41,7 @@ public class FavoriteResource {
 
     @DELETE
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -61,10 +64,6 @@ public class FavoriteResource {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         try {
             if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
@@ -91,6 +90,7 @@ public class FavoriteResource {
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addSeriesToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -104,6 +104,7 @@ public class FavoriteResource {
 
     @DELETE
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeSeriesFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -126,10 +127,6 @@ public class FavoriteResource {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         try {
             if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {

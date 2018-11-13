@@ -22,7 +22,7 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId)throws AlbumNotFoundException;
 
-    boolean hasAlbumAccess(Long albumId) throws AlbumNotFoundException;
+    boolean hasAlbumAccess(Long albumId);
 
     User getUser();
 

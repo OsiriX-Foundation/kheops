@@ -5,7 +5,9 @@ import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.event.EventResponses;
 import online.kheops.auth_server.event.Events;
@@ -35,6 +37,7 @@ public class EventRessource {
 
     @GET
     @Secured
+    @AlbumAccessSecured
     @Path("album/{album:[1-9][0-9]*}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -43,13 +46,9 @@ public class EventRessource {
                               @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        try {
-            if(!kheopsPrincipal.hasAlbumAccess(albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+
+        //TODO check if permission read comments
+
         if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
             return Response.status(FORBIDDEN).build();
         }
@@ -156,6 +155,7 @@ public class EventRessource {
 
     @POST
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -165,10 +165,6 @@ public class EventRessource {
 
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-
-        if(!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
 

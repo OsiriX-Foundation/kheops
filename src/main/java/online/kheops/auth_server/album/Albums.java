@@ -35,6 +35,7 @@ public class Albums {
         try {
             tx.begin();
 
+            callingUser = em.merge(callingUser);
             final User mergedCallingUser = em.merge(callingUser);
 
             final Album newAlbum = new Album(name, description, usersPermission);
@@ -368,10 +369,11 @@ public class Albums {
     public static Album getAlbum(long albumPk, EntityManager em)
             throws AlbumNotFoundException {
 
-        try {
-            return findAlbumByPk(albumPk, em);
-        } catch (NoResultException e) {
-            throw new AlbumNotFoundException(e);
+        final Album album = findAlbumByPk(albumPk, em);
+        if (album != null) {
+            return album;
+        } else {
+            throw new AlbumNotFoundException("Album : " + albumPk + " does not exist.");
         }
     }
 

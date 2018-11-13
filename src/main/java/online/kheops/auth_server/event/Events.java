@@ -5,6 +5,7 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -244,6 +245,10 @@ public class Events {
 
                 if (targetUser == callingUser) {
                     throw new BadQueryParametersException("Self comment forbidden");
+                }
+
+                if (!Studies.canAccessStudy(targetUser, study, em)) {
+                    throw new UserNotFoundException("Target user can't access to this study : " + studyInstanceUID);
                 }
 
                 comment.setPrivateTargetUser(targetUser);

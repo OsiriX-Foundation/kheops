@@ -6,7 +6,6 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.EntityManager;
@@ -188,7 +187,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumAccess(Long albumId) throws AlbumNotFoundException{
+    public boolean hasAlbumAccess(Long albumId){
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
@@ -197,15 +196,15 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             final Album album = getAlbum(albumId, em);
 
             if (!isMemberOfAlbum(userMerge, album, em)) {
-                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                return false;
             }
             if (userMerge.getInbox() == album) {
-                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                return false;
             } else {
                 return true;
             }
         } catch (AlbumNotFoundException e) {
-            throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+            return false;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

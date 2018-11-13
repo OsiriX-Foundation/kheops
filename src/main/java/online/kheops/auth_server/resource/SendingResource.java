@@ -8,6 +8,7 @@ import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
@@ -32,6 +33,7 @@ public class SendingResource
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
                                        @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -48,10 +50,6 @@ public class SendingResource
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         try {
             if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
@@ -77,6 +75,7 @@ public class SendingResource
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
                                         @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -88,10 +87,6 @@ public class SendingResource
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
@@ -225,6 +220,7 @@ public class SendingResource
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putSeriesInAlbum(@PathParam("album") Long albumPk,
                                      @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -236,10 +232,6 @@ public class SendingResource
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         try {
             if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
@@ -270,6 +262,7 @@ public class SendingResource
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putStudyInAlbum(@PathParam("album") Long albumPk,
                                     @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
@@ -286,10 +279,6 @@ public class SendingResource
         checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         try {
             if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
