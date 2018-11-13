@@ -11,11 +11,10 @@ import org.jooq.impl.DSL;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.ws.rs.core.MultivaluedMap;
-import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponseForCapabilityToken;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
@@ -29,8 +28,6 @@ import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
-
-    private static final Logger LOG = Logger.getLogger(AlbumQueries.class.getName());
 
     private AlbumQueries() {
         throw new IllegalStateException("Utility class");
@@ -60,7 +57,7 @@ public class AlbumQueries {
         try (Connection connection = getDataSource().getConnection()) {
 
             DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-            SelectQuery query = create.selectQuery();
+            SelectQuery<Record> query = create.selectQuery();
 
             ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
@@ -127,7 +124,7 @@ public class AlbumQueries {
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
-            Result<Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>> result = query.fetch();
+            Result<? extends Record> result = query.fetch();
 
             final List<AlbumResponses.AlbumResponse> albumResponses = new ArrayList<>();
 
@@ -140,9 +137,8 @@ public class AlbumQueries {
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {
             throw new BadQueryParametersException(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new JOOQException("Error during request");
+        } catch (SQLException e) {
+            throw new JOOQException("Error during request", e);
         }
     }
 
@@ -151,7 +147,7 @@ public class AlbumQueries {
         try (Connection connection = getDataSource().getConnection()) {
 
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-            final SelectQuery query = create.selectQuery();
+            final SelectQuery<Record> query = create.selectQuery();
 
             Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
                     .from(ALBUM_USER)
@@ -195,12 +191,11 @@ public class AlbumQueries {
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
-            Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String> result = (Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>) query.fetchOne();
+            Record result = query.fetchOne();
 
             return recordToAlbumResponse(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new JOOQException("Error during request");
+        } catch (SQLException e) {
+            throw new JOOQException("Error during request", e);
         }
     }
 
@@ -209,12 +204,7 @@ public class AlbumQueries {
         try (Connection connection = getDataSource().getConnection()) {
 
             final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
-            final SelectQuery query = create.selectQuery();
-
-            Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
-                    .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
-                    .asField();
+            final SelectQuery<Record> query = create.selectQuery();
 
             query.addSelect(isnull(ALBUMS.PK,"NULL").as("album_pk"),
                     isnull(ALBUMS.NAME,"NULL").as("album_name"),
@@ -232,10 +222,10 @@ public class AlbumQueries {
                     .and(EVENTS.EVENT_TYPE.eq("Comment"))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
 
-            query.addConditions(ALBUMS.PK.eq(albumPk));;
+            query.addConditions(ALBUMS.PK.eq(albumPk));
 
             query.addGroupBy(ALBUMS.PK);
-            Record6<BigDecimal, String, String, Long, Long, String> result = (Record6<BigDecimal, String, String, Long, Long, String>) query.fetchOne();
+            Record result = query.fetchOne();
 
             return recordToAlbumResponseForCapabilityToken(result);
         } catch (Exception e) {
@@ -245,7 +235,7 @@ public class AlbumQueries {
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
         final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-        final SelectQuery query = create.selectQuery();
+        final SelectQuery<Record> query = create.selectQuery();
         query.addSelect(countDistinct(ALBUMS.PK));
         query.addFrom(ALBUMS);
         query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK).and(ALBUM_USER.USER_FK.eq(userPk)));
@@ -270,16 +260,13 @@ public class AlbumQueries {
             else if (orderByParameter.compareTo("last_event_time") == 0) ord = ALBUMS.LAST_EVENT_TIME;
             else if (orderByParameter.compareTo("name") == 0) ord = ALBUMS.NAME;
             else if (orderByParameter.compareTo("number_of_users") == 0) {
-                final Field<Object> fieldNumberOfUsers = create.select(countDistinct(ALBUM_USER.PK)).asField();
-                ord = fieldNumberOfUsers;
+                ord = create.select(countDistinct(ALBUM_USER.PK)).asField();
             }
             else if (orderByParameter.compareTo("number_of_studies") == 0) {
-                final Field<Object> fieldNumberOfStudies = create.select(countDistinct(EVENTS.PK)).asField();
-                ord = fieldNumberOfStudies;
+                ord = create.select(countDistinct(EVENTS.PK)).asField();
             }
             else if (orderByParameter.compareTo("number_of_comments") == 0) {
-                final Field<Object> fieldNumberOfComments = create.select(countDistinct(SERIES.STUDY_FK)).asField();
-                ord = fieldNumberOfComments;
+                ord = create.select(countDistinct(SERIES.STUDY_FK)).asField();
             }
             else throw new BadQueryParametersException("sort: " + queryParameters.get("sort").get(0));
 
@@ -290,7 +277,7 @@ public class AlbumQueries {
     }
 
 
-    private static Condition createConditon(MultivaluedMap<String, String> queryParameters, String key, TableField column)
+    private static Condition createConditon(MultivaluedMap<String, String> queryParameters, String key, TableField<? extends Record, String> column)
     throws BadQueryParametersException {
         if (queryParameters.containsKey(key)) {
             String parameterNoStar = queryParameters.get(key).get(0).replace("*", "");
