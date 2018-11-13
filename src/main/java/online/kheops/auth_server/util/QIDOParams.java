@@ -12,35 +12,36 @@ import org.dcm4che3.data.Tag;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class QIDOParams {
 
-    private Long album_id = null;
-    private boolean fromInbox = false;
+    private static final Integer[] ACCEPTED_TAGS_FOR_SORTING_ARRAY = {Tag.StudyDate, Tag.StudyTime, Tag.AccessionNumber, Tag.ReferringPhysicianName, Tag.PatientName, Tag.PatientID, Tag.StudyInstanceUID, Tag.StudyID};
+    private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_TAGS_FOR_SORTING_ARRAY));
 
-    private boolean descending = true;
-    private int orderByTag = Tag.StudyDate;
+    private final Long album_id;
+    private final boolean fromInbox;
 
-    private boolean fuzzyMatching = false;
+    private final boolean descending;
+    private final int orderByTag;
 
-    private Integer limit = null;
-    private Integer offset = null;
+    private final boolean fuzzyMatching;
 
-    private String studyDateFilter = null;
-    private String studyTimeFilter = null;
-    private String accessionNumberFilter = null;
-    private String modalityFilter = null;
-    private String referringPhysicianNameFilter = null;
-    private String patientNameFilter = null;
-    private String patientIDFilter = null;
-    private String studyInstanceUIDFilter = null;
-    private String studyIDFilter = null;
+    private final OptionalInt limit;
+    private final OptionalInt offset;
 
-
-    private final Integer[]acceptedTagForSortingArray = {Tag.StudyDate, Tag.StudyTime, Tag.AccessionNumber, Tag.ReferringPhysicianName, Tag.PatientName, Tag.PatientID, Tag.StudyInstanceUID, Tag.StudyID};
-    private final Set<Integer> acceptedTagForSorting = new HashSet<Integer>(Arrays.asList(acceptedTagForSortingArray));
-
+    private final String studyDateFilter;
+    private final String studyTimeFilter;
+    private final String accessionNumberFilter;
+    private final String modalityFilter;
+    private final String referringPhysicianNameFilter;
+    private final String patientNameFilter;
+    private final String patientIDFilter;
+    private final String studyInstanceUIDFilter;
+    private final String studyIDFilter;
 
     public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException{
+        Long album_id = null;
+        boolean fromInbox = false;
         if (queryParameters.containsKey("album")) {
             album_id = Long.parseLong(queryParameters.get("album").get(0));
         }
@@ -57,83 +58,42 @@ public class QIDOParams {
                 throw new AlbumForbiddenException("Token doesn't have read access");
             }
         }
+        this.album_id = album_id;
+        this.fromInbox = fromInbox;
         if (queryParameters.containsKey("sort")) {
             descending = queryParameters.get("sort").get(0).startsWith("-");
             final String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
             orderByTag = org.dcm4che3.util.TagUtils.forName(orderByParameter);
-            if (orderByTag == -1 || !acceptedTagForSorting.contains(orderByTag)) {
+            if (orderByTag == -1 || !ACCEPTED_TAGS_FOR_SORTING.contains(orderByTag)) {
                 throw new BadQueryParametersException("sort: " + queryParameters.get("sort").get(0));
             }
-        }
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-            setLimit(queryParameters);
-        }
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-            setOffset(queryParameters);
+        } else {
+            descending = true;
+            orderByTag = Tag.StudyDate;
         }
 
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate))) {
-            studyDateFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyDate))) {
-            studyDateFilter = queryParameters.get(String.format("%08X",Tag.StudyDate)).get(0);
-        }
+        limit = getLimit(queryParameters);
+        offset = getOffset(queryParameters);
 
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime))) {
-            studyTimeFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyTime))) {
-            studyTimeFilter = queryParameters.get(String.format("%08X",Tag.StudyTime)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.AccessionNumber))) {
-            accessionNumberFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.AccessionNumber)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.AccessionNumber))) {
-            accessionNumberFilter = queryParameters.get(String.format("%08X",Tag.AccessionNumber)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy))) {
-            modalityFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.ModalitiesInStudy)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.ModalitiesInStudy))) {
-            modalityFilter = queryParameters.get(String.format("%08X",Tag.ModalitiesInStudy)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.ReferringPhysicianName))) {
-            referringPhysicianNameFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.ReferringPhysicianName)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.ReferringPhysicianName))) {
-            referringPhysicianNameFilter = queryParameters.get(String.format("%08X",Tag.ReferringPhysicianName)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.PatientName))) {
-            patientNameFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.PatientName)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.PatientName))) {
-            patientNameFilter = queryParameters.get(String.format("%08X",Tag.PatientName)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.PatientID))) {
-            patientIDFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.PatientID)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.PatientID))) {
-            patientIDFilter = queryParameters.get(String.format("%08X",Tag.PatientID)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyInstanceUID))) {
-            studyInstanceUIDFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyInstanceUID)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyInstanceUID))) {
-            studyInstanceUIDFilter = queryParameters.get(String.format("%08X",Tag.StudyInstanceUID)).get(0);
-        }
-
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyID))) {
-            studyIDFilter = queryParameters.get(org.dcm4che3.data.Keyword.valueOf(Tag.StudyID)).get(0);
-        } else if (queryParameters.containsKey(String.format("%08X",Tag.StudyID))) {
-            studyIDFilter = queryParameters.get(String.format("%08X",Tag.StudyID)).get(0);
-        }
+        studyDateFilter = getFilter(Tag.StudyDate, queryParameters);
+        studyTimeFilter = getFilter(Tag.StudyTime, queryParameters);
+        accessionNumberFilter = getFilter(Tag.AccessionNumber, queryParameters);
+        modalityFilter = getFilter(Tag.ModalitiesInStudy, queryParameters);
+        referringPhysicianNameFilter = getFilter(Tag.ReferringPhysicianName, queryParameters);
+        patientNameFilter = getFilter(Tag.PatientName, queryParameters);
+        patientIDFilter = getFilter(Tag.PatientID, queryParameters);
+        studyInstanceUIDFilter = getFilter(Tag.StudyInstanceUID, queryParameters);
+        studyIDFilter = getFilter(Tag.StudyID, queryParameters);
 
         if (queryParameters.containsKey("fuzzyMatching")) {
             fuzzyMatching = Boolean.parseBoolean(queryParameters.get("fuzzyMatching").get(0));
+        } else {
+            fuzzyMatching = false;
         }
     }
 
-
-    public Optional<Long> getAlbum_id() {
-        return Optional.ofNullable(album_id);
+    public OptionalLong getAlbum_id() {
+        return Optional.ofNullable(album_id).map(OptionalLong::of).orElseGet(OptionalLong::empty);
     }
 
     public boolean isFromInbox() {
@@ -148,12 +108,12 @@ public class QIDOParams {
         return orderByTag;
     }
 
-    public Optional<Integer> getLimit() {
-        return Optional.ofNullable(limit);
+    public OptionalInt getLimit() {
+        return limit;
     }
 
-    public Optional<Integer> getOffset() {
-        return Optional.ofNullable(offset);
+    public OptionalInt getOffset() {
+        return offset;
     }
 
     public Optional<String> getStudyDateFilter() {
@@ -196,27 +156,48 @@ public class QIDOParams {
         return fuzzyMatching;
     }
 
-    private void setLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
-        try {
-            limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        } catch (Exception e) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        }
-        if (limit < 1) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        }
-    }
-
-    private void setOffset(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
-        try {
-            offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-        } catch (Exception e) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-        }
-
-        if (offset < 0) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
+    private static OptionalInt getLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
+        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
+            final int limit;
+            try {
+                limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
+            } catch (Exception e) {
+                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
+            }
+            if (limit < 1) {
+                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
+            }
+            return OptionalInt.of(limit);
+        } else {
+            return OptionalInt.empty();
         }
     }
 
+    private static OptionalInt getOffset(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
+        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
+            final int offset;
+            try {
+                offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
+            } catch (Exception e) {
+                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
+            }
+
+            if (offset < 0) {
+                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
+            }
+            return OptionalInt.of(offset);
+        } else {
+            return OptionalInt.empty();
+        }
+    }
+
+    private String getFilter(int tag, MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
+            return queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0);
+        } else if (queryParameters.containsKey(String.format("%08X",tag))) {
+            return queryParameters.get(String.format("%08X", tag)).get(0);
+        } else {
+            return null;
+        }
+    }
 }
