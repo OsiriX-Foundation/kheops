@@ -175,7 +175,7 @@ public final class WadoRSSeries {
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        return Response.ok(multipartStreamingOutput, requestContentType).cacheControl(cacheControl).build();
+        return Response.ok(multipartStreamingOutput, requestAcceptType).cacheControl(cacheControl).build();
     }
 
     private URI getParameterURI(String parameter) {
