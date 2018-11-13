@@ -151,8 +151,9 @@ public class Album {
                 .setParameter("series", series)
                 .setParameter("album", this)
                 .getSingleResult();
-        em.remove(albumSeries);
         series.removeAlbumSeries(albumSeries);
+        this.albumSeries.remove(albumSeries);
+        em.remove(albumSeries);
     }
 
     public Set<AlbumUser> getAlbumUser() { return albumUser; }
