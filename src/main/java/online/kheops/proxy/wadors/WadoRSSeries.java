@@ -54,8 +54,8 @@ public final class WadoRSSeries {
     @Context
     ServletContext context;
 
-    @HeaderParam(CONTENT_TYPE)
-    MediaType contentType;
+    @HeaderParam(ACCEPT)
+    String acceptParam;
 
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
@@ -87,14 +87,20 @@ public final class WadoRSSeries {
             qidoServiceURIBuilder.queryParam("inbox", fromInbox);
         }
 
-        final MediaType requestContentType;
-        if (contentType.isWildcardType()) {
-            requestContentType = new MediaType("multipart", "related", Collections.singletonMap("type", "application/octet-stream"));
-        } else if (contentType.getParameters().get("type") == null) {
-            LOG.log(WARNING, "Missing content type of multipart/related request");
-            throw new WebApplicationException(BAD_REQUEST);
+        final MediaType acceptMediaType;
+        try {
+            // TODO this is not quite right, because the accept header might have multiple types
+            acceptMediaType = MediaType.valueOf(acceptParam);
+        } catch (IllegalArgumentException e) {
+            LOG.log(WARNING, "Error while getting the accept media type", e);
+            throw new WebApplicationException(NOT_ACCEPTABLE);
+
+        }
+        final MediaType requestAcceptType;
+        if (acceptMediaType.isWildcardType()) {
+            requestAcceptType = new MediaType("multipart", "related", Collections.singletonMap("type", "application/octet-stream"));
         } else {
-            requestContentType = contentType;
+            requestAcceptType = acceptMediaType;
         }
 
         final URI qidoServiceURI = qidoServiceURIBuilder.build(studyInstanceUID);
@@ -134,7 +140,7 @@ public final class WadoRSSeries {
                     final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
                     final AccessToken accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
                     final Invocation.Builder invocationBuilder = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID)
-                            .request(requestContentType)
+                            .request(requestAcceptType)
                             .header(AUTHORIZATION, accessToken.getHeaderValue());
 
                     if (acceptCharsetParam != null) {
