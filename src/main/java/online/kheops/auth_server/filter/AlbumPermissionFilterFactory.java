@@ -14,12 +14,11 @@ import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
 
 @Provider
 public class AlbumPermissionFilterFactory implements DynamicFeature {
-
-    private final static String ALBUM = "album";
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {

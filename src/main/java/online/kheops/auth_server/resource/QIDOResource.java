@@ -44,6 +44,8 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_LIMIT;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
@@ -67,7 +69,7 @@ public class QIDOResource {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam("album") Long fromAlbumPk,
                                @QueryParam("inbox") Boolean fromInbox,
-                               @QueryParam("offset") Integer offset,
+                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
                                @Context SecurityContext securityContext) {
 
         if (fromAlbumPk != null && fromInbox != null) {
@@ -142,8 +144,8 @@ public class QIDOResource {
     public Response getSeries(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                               @QueryParam("album") Long fromAlbumPk,
                               @QueryParam("inbox") Boolean fromInbox,
-                              @QueryParam("offset") Integer offset,
-                              @QueryParam("limit") Integer limit,
+                              @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
+                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit,
                               @Context SecurityContext securityContext,
                               @Context UriInfo uriInfo) {
 

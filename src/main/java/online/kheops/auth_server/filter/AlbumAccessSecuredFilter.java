@@ -12,14 +12,13 @@ import javax.ws.rs.ext.Provider;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
 
 @AlbumAccessSecured
 @Provider
 @Priority(ALBUM_ACCESS_PRIORITY)
 public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
-
-    private final static String ALBUM = "album";
 
     private static final Logger LOG = Logger.getLogger(AlbumAccessSecuredFilter.class.getName());
 

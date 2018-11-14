@@ -12,15 +12,12 @@ import org.dcm4che3.data.Tag;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
+import static online.kheops.auth_server.util.Consts.*;
+
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class QIDOParams {
     private static final Integer[] ACCEPTED_TAGS_FOR_SORTING_ARRAY = {Tag.StudyDate, Tag.StudyTime, Tag.AccessionNumber, Tag.ReferringPhysicianName, Tag.PatientName, Tag.PatientID, Tag.StudyInstanceUID, Tag.StudyID};
     private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_TAGS_FOR_SORTING_ARRAY));
-
-    private static final String SORT = "sort";
-    private static final String FUZZY_MATCHING = "fuzzyMatching";
-    private static final String ALBUM = "album";
-    private static final String INBOX = "inbox";
 
     private final OptionalLong albumID;
     private final boolean fromInbox;
@@ -64,12 +61,12 @@ public final class QIDOParams {
         }
         albumID = Optional.ofNullable(albumIDLocal).map(OptionalLong::of).orElseGet(OptionalLong::empty);
         fromInbox = fromInboxLocal;
-        if (queryParameters.containsKey(SORT)) {
-            descending = queryParameters.get(SORT).get(0).startsWith("-");
-            final String orderByParameter = queryParameters.get(SORT).get(0).replace("-", "");
+        if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
+            descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
+            final String orderByParameter = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
             orderByTag = org.dcm4che3.util.TagUtils.forName(orderByParameter);
             if (orderByTag == -1 || !ACCEPTED_TAGS_FOR_SORTING.contains(orderByTag)) {
-                throw new BadQueryParametersException("sort: " + queryParameters.get(SORT).get(0));
+                throw new BadQueryParametersException("sort: " + queryParameters.get(QUERY_PARAMETER_SORT).get(0));
             }
         } else {
             descending = true;
@@ -99,8 +96,8 @@ public final class QIDOParams {
         studyInstanceUIDFilter = getFilter(Tag.StudyInstanceUID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
 
-        if (queryParameters.containsKey(FUZZY_MATCHING)) {
-            fuzzyMatching = Boolean.parseBoolean(queryParameters.get(FUZZY_MATCHING).get(0));
+        if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
+            fuzzyMatching = Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
         } else {
             fuzzyMatching = false;
         }

@@ -1,11 +1,12 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.JOOQTools;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
+
+import static online.kheops.auth_server.util.Consts.*;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 
@@ -13,13 +14,6 @@ public final class AlbumParams {
 
     private static final String[] ACCEPTED_VALUES_FOR_SORTING_ARRAY = {"created_time", "last_event_time", "name", "number_of_users", "number_of_studies", "number_of_comments"};
     private static final Set<String> ACCEPTED_VALUES_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_VALUES_FOR_SORTING_ARRAY));
-
-    private static final String SORT = "sort";
-    private static final String FUZZY_MATCHING = "fuzzymatching";
-    private static final String FAVORITE = "favorite";
-    private static final String NAME = "name";
-    private static final String CREATED_TIME = "created_time";
-    private static final String LAST_EVENT_TIME = "last_event_time";
 
     private final boolean descending;
     private final String orderBy;
@@ -58,9 +52,9 @@ public final class AlbumParams {
             lastEventTime = Optional.empty();
         }
 
-        if (queryParameters.containsKey(SORT)) {
-            descending = queryParameters.get(SORT).get(0).startsWith("-");
-            orderBy = queryParameters.get(SORT).get(0).replace("-", "");
+        if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
+            descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
+            orderBy = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
             if (!ACCEPTED_VALUES_FOR_SORTING.contains(orderBy)) {
                 throw new BadQueryParametersException("sort: " + orderBy);
             }
@@ -75,16 +69,16 @@ public final class AlbumParams {
             }
         }
 
-        if (queryParameters.containsKey(FUZZY_MATCHING)) {
-            fuzzyMatching = Boolean.parseBoolean(queryParameters.get(FUZZY_MATCHING).get(0));
+        if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
+            fuzzyMatching = Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
         }
 
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
+        if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
             limit = JOOQTools.getLimit(queryParameters);
         } else {
             limit = OptionalInt.empty();
         }
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
+        if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
             offset = JOOQTools.getOffset(queryParameters);
         } else {
             offset = OptionalInt.empty();
