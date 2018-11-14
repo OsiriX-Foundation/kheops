@@ -15,7 +15,7 @@ public final class AlbumParams {
     private static final Set<String> ACCEPTED_VALUES_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_VALUES_FOR_SORTING_ARRAY));
 
     private static final String SORT = "sort";
-    private static final String FUZZY_MATCHING = "fuzzyMatching";
+    private static final String FUZZY_MATCHING = "fuzzymatching";
     private static final String FAVORITE = "favorite";
     private static final String NAME = "name";
     private static final String CREATED_TIME = "created_time";
