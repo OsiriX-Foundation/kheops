@@ -68,7 +68,7 @@ public class EventRessource {
             } else if (types.contains("comments")) {
                 pair = Events.getCommentsAlbum(callingUserPk, albumPk, offset, limit);
             } else if (types.contains("mutations")) {
-                pair = Events.getMutationsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getMutationsAlbum(albumPk, offset, limit);
             } else {
                 pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
             }

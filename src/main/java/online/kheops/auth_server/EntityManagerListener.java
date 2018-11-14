@@ -8,8 +8,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.sql.*;
 
 @WebListener
 public class EntityManagerListener implements ServletContextListener {

@@ -306,18 +306,4 @@ public class AlbumQueries {
             return condition;
         }
     }
-
-    private static Condition favoriteCondition(MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException {
-        if (queryParameters.containsKey("favorite")) {
-            if (queryParameters.get("favorite").get(0).compareTo("true") == 0) {
-                return ALBUM_USER.FAVORITE.isTrue();
-            } else if (queryParameters.get("favorite").get(0).compareTo("false") == 0) {
-                return ALBUM_USER.FAVORITE.isFalse();
-            } else {
-                throw new BadQueryParametersException("favorite: " + queryParameters.get("favorite").get(0));
-            }
-        }
-        return null;
-    }
 }

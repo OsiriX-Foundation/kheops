@@ -1,7 +1,6 @@
 package online.kheops.auth_server.event;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.*;
@@ -20,8 +19,6 @@ import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
-import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 
@@ -130,7 +127,7 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(long callingUserPk, long albumPk, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(long albumPk, Integer offset, Integer limit)
             throws AlbumNotFoundException {
 
         final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
