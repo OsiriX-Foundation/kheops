@@ -3,8 +3,6 @@ package online.kheops.auth_server.filter;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
-import online.kheops.auth_server.annotation.CacheControlHeader;
-import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.annotation.Priority;
@@ -14,15 +12,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import static javax.ws.rs.HttpMethod.GET;
-import static javax.ws.rs.HttpMethod.PUT;
-import static javax.ws.rs.core.HttpHeaders.CACHE_CONTROL;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
 
 @Provider
 public class AlbumPermissionFilterFactory implements DynamicFeature {
+
+    private final static String ALBUM = "album";
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
@@ -32,7 +29,6 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
             featureContext.register(new AlbumPermissionFilter(aps.value()));
         }
     }
-
 
     @Priority(ALBUM_PERMISSION_ACCESS_PRIORITY)
     private static class AlbumPermissionFilter implements ContainerRequestFilter {
@@ -49,15 +45,15 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
                 final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)requestContext.getSecurityContext().getUserPrincipal());
 
                 final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
-                if(pathParam.containsKey("album")) {
-                    final Long albumID = Long.valueOf(pathParam.get("album").get(0));
+                if(pathParam.containsKey(ALBUM)) {
+                    final Long albumID = Long.valueOf(pathParam.get(ALBUM).get(0));
                     tryPermission(kheopsPrincipal, albumID, requestContext);
                 }
 
                 final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
                 //TODO album or albums ??
-                if(queryParam.containsKey("album")) {
-                    final Long albumID = Long.valueOf(queryParam.get("album").get(0));
+                if(queryParam.containsKey(ALBUM)) {
+                    final Long albumID = Long.valueOf(queryParam.get(ALBUM).get(0));
                     tryPermission(kheopsPrincipal, albumID, requestContext);
                 }
             }
