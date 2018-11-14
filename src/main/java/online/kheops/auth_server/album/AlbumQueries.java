@@ -53,7 +53,7 @@ public class AlbumQueries {
         try (Connection connection = getDataSource().getConnection()) {
 
             DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-            SelectQuery query = create.selectQuery();
+            SelectQuery<Record> query = create.selectQuery();
 
             ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
@@ -91,16 +91,29 @@ public class AlbumQueries {
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
                     .and(EVENTS.EVENT_TYPE.eq("Comment"))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(userPK))
-                            .or(EVENTS.USER_FK.eq(userPK))));
+                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumParams.getDBID()))
+                            .or(EVENTS.USER_FK.eq(albumParams.getDBID()))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
-            conditionArrayList.add(createConditon(queryParameters, "name", ALBUMS.NAME));
-            conditionArrayList.add(favoriteCondition(queryParameters));
-            conditionArrayList.add(createDateCondition(queryParameters, "created_time", ALBUMS.CREATED_TIME));
-            conditionArrayList.add(createDateCondition(queryParameters, "last_event_time", ALBUMS.LAST_EVENT_TIME));
+
+            if (albumParams.getName().isPresent()) {
+                conditionArrayList.add(createConditon(albumParams.getName().get(), ALBUMS.NAME, albumParams.isFuzzyMatching()));
+            }
+
+            if (albumParams.isFavorite()) {
+                conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
+            }
+
+            if (albumParams.getCreatedTime().isPresent()) {
+                conditionArrayList.add(createDateCondition(albumParams.getCreatedTime().get(), ALBUMS.CREATED_TIME));
+            }
+
+            if (albumParams.getLastEventTime().isPresent()) {
+                conditionArrayList.add(createDateCondition(albumParams.getLastEventTime().get(), ALBUMS.LAST_EVENT_TIME));
+            }
+
             conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
-            query.addConditions(ALBUM_USER.USER_FK.eq(userPK).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
+            query.addConditions(ALBUM_USER.USER_FK.eq(albumParams.getDBID()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
 
             for (Condition c : conditionArrayList) {
                 if (c != null) {
@@ -108,19 +121,19 @@ public class AlbumQueries {
                 }
             }
 
-            if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-                query.addLimit(getLimit(queryParameters));
+            if (albumParams.getLimit().isPresent()) {
+                query.addLimit(albumParams.getLimit().get());
             }
 
-            if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-                query.addOffset(getOffset(queryParameters));
+            if (albumParams.getOffset().isPresent()) {
+                query.addOffset(albumParams.getOffset().get());
             }
 
-            query.addOrderBy(getOrderBy(queryParameters, create));
+            query.addOrderBy(getOrderBy(albumParams.getOrderBy(), albumParams.isDescending(), create));
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
-            Result<Record18<BigDecimal, String, String, String, String, Long, Long, Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String>> result = query.fetch();
+            final Result<? extends Record> result = query.fetch();
 
             final List<AlbumResponses.AlbumResponse> albumResponses = new ArrayList<>();
 
@@ -128,7 +141,7 @@ public class AlbumQueries {
                 albumResponses.add(recordToAlbumResponse(r));
             }
 
-            final int albumTotalCount = getAlbumTotalCount(userPK, conditionArrayList, connection);
+            final int albumTotalCount = getAlbumTotalCount(albumParams.getDBID(), conditionArrayList, connection);
 
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {
@@ -252,12 +265,9 @@ public class AlbumQueries {
         return (int) query.fetchOne().getValue(0);
     }
 
-    private static SortField getOrderBy(MultivaluedMap<String, String> queryParameters, DSLContext create) throws  BadQueryParametersException{
-        if (queryParameters.containsKey("sort")) {
-            Field ord;
+    private static SortField getOrderBy(String orderByParameter, boolean descending, DSLContext create) throws  BadQueryParametersException{
 
-            final Boolean ascDesc = queryParameters.get("sort").get(0).startsWith("-");
-            final String orderByParameter = queryParameters.get("sort").get(0).replace("-", "");
+            Field ord;
 
             if (orderByParameter.compareTo("created_time") == 0) ord = ALBUMS.CREATED_TIME;
             else if (orderByParameter.compareTo("last_event_time") == 0) ord = ALBUMS.LAST_EVENT_TIME;
@@ -274,46 +284,39 @@ public class AlbumQueries {
                 final Field<Object> fieldNumberOfComments = create.select(countDistinct(SERIES.STUDY_FK)).asField();
                 ord = fieldNumberOfComments;
             }
-            else throw new BadQueryParametersException("sort: " + queryParameters.get("sort").get(0));
+            else throw new BadQueryParametersException("sort: " + orderByParameter);
 
-            return ascDesc ? ord.desc() : ord.asc();
-        }
-        //Default sort
-        return ALBUMS.CREATED_TIME.desc();
+            return descending ? ord.desc() : ord.asc();
+
     }
 
 
-    private static Condition createConditon(MultivaluedMap<String, String> queryParameters, String key, TableField column)
-    throws BadQueryParametersException {
-        if (queryParameters.containsKey(key)) {
-            String parameterNoStar = queryParameters.get(key).get(0).replace("*", "");
+    private static Condition createConditon(String parameter, TableField column, boolean fuzzyMatching) {
 
-            String parameter = queryParameters.get(key).get(0);
-            if (parameterNoStar.length() == 0) {
-                return null;
-            }
-            if ("null".equalsIgnoreCase(parameterNoStar)) {
-                return column.isNull();
-            } else {
-                Condition condition;
-                if (parameter.startsWith("*") && parameter.endsWith("*")) {
-                    condition = column.lower().contains(parameterNoStar.toLowerCase());
-                } else if (parameter.startsWith("*")) {
-                    condition = column.lower().endsWith(parameterNoStar.toLowerCase());
-                } else if (parameter.endsWith("*")) {
-                    condition = column.lower().startsWith(parameterNoStar.toLowerCase());
-                } else {
-                    condition = column.lower().equal(parameterNoStar.toLowerCase());
-                }
+        String parameterNoStar = parameter.replace("*", "");
 
-                if (isFuzzyMatching(queryParameters)) {
-                    Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
-                    return condition.or(fuzzyCondition);
-                }
-                return condition;
-            }
-        } else {
+        if (parameterNoStar.length() == 0) {
             return null;
+        }
+        if ("null".equalsIgnoreCase(parameterNoStar)) {
+            return column.isNull();
+        } else {
+            Condition condition;
+            if (parameter.startsWith("*") && parameter.endsWith("*")) {
+                condition = column.lower().contains(parameterNoStar.toLowerCase());
+            } else if (parameter.startsWith("*")) {
+                condition = column.lower().endsWith(parameterNoStar.toLowerCase());
+            } else if (parameter.endsWith("*")) {
+                condition = column.lower().startsWith(parameterNoStar.toLowerCase());
+            } else {
+                condition = column.lower().equal(parameterNoStar.toLowerCase());
+            }
+
+            if (fuzzyMatching) {
+                Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
+                return condition.or(fuzzyCondition);
+            }
+            return condition;
         }
     }
 
