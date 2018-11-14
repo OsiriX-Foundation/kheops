@@ -1,7 +1,7 @@
-package online.kheops.zipper.BearerToken;
+package online.kheops.zipper.bearertoken;
 
 import online.kheops.zipper.instance.Instance;
-import online.kheops.zipper.AccessToken.AccessToken;
+import online.kheops.zipper.accesstoken.AccessToken;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -54,7 +54,7 @@ public final class BearerTokenRetriever {
         client = Objects.requireNonNull(builder.client, "client");
         accessToken = Objects.requireNonNull(builder.accessToken, "accessToken");
         URI authorizationURI = Objects.requireNonNull(builder.authorizationURI, "authorizationURI");
-        tokenURI = UriBuilder.fromUri(authorizationURI).path("/token").build();
+        tokenURI = UriBuilder.fromUri(authorizationURI).path("/accesstoken").build();
     }
 
     public void get(Instance instance, InvocationCallback<BearerToken> callback) {
@@ -69,7 +69,7 @@ public final class BearerTokenRetriever {
 
             @Override
             public void failed(Throwable throwable) {
-                callback.failed(new BearerTokenRetrievalException("Unable to retrieve bearer token", throwable));
+                callback.failed(new BearerTokenRetrievalException("Unable to retrieve bearer accesstoken", throwable));
             }
         });
     }

@@ -1,4 +1,4 @@
-package online.kheops.zipper.BearerToken;
+package online.kheops.zipper.bearertoken;
 
 final class BearerTokenRetrievalException extends Exception {
     BearerTokenRetrievalException(String message, Throwable cause) {

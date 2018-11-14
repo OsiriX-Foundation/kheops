@@ -1,4 +1,4 @@
-package online.kheops.zipper.AccessToken;
+package online.kheops.zipper.accesstoken;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -16,7 +16,7 @@ public final class AccessToken {
     private final String token;
 
     private AccessToken(String token) {
-        this.token = Objects.requireNonNull(token, "token");
+        this.token = Objects.requireNonNull(token, "accesstoken");
     }
 
     private static AccessToken from(String token) {
@@ -46,7 +46,7 @@ public final class AccessToken {
             }
 
             if (token.length() == 0) {
-                LOG.log(Level.WARNING, "Empty authorization token");
+                LOG.log(Level.WARNING, "Empty authorization accesstoken");
                 throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
             }
         } else {

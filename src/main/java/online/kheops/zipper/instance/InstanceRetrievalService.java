@@ -1,7 +1,7 @@
 package online.kheops.zipper.instance;
 
-import online.kheops.zipper.BearerToken.BearerToken;
-import online.kheops.zipper.BearerToken.BearerTokenRetriever;
+import online.kheops.zipper.bearertoken.BearerToken;
+import online.kheops.zipper.bearertoken.BearerTokenRetriever;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.InvocationCallback;
