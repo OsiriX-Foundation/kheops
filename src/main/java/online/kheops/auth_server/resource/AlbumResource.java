@@ -80,7 +80,7 @@ public class AlbumResource {
 
         try {
             final AlbumParams albumParams = new AlbumParams(kheopsPrincipal, uriInfo.getQueryParameters());
-            pairAlbumsTotalAlbum = Albums.getAlbumList(kheopsPrincipal.getDBID(), uriInfo.getQueryParameters());
+            pairAlbumsTotalAlbum = Albums.getAlbumList(albumParams);
         } catch (UserNotFoundException e) {
             LOG.log(Level.INFO, "Get albums list by user pk:"+callingUserPk+" FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();

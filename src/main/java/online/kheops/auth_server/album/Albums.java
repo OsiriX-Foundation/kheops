@@ -111,19 +111,19 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(long callingUserPk, MultivaluedMap<String, String> queryParameters)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(AlbumParams albumParams)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
-            if (!userExist(callingUserPk, em)) {
+            if (!userExist(albumParams.getDBID(), em)) {
                 throw new UserNotFoundException();
             }
         } finally {
             em.close();
         }
-        return findAlbumsByUserPk(callingUserPk, queryParameters);
+        return findAlbumsByUserPk(albumParams);
     }
 
     public static void deleteAlbum(long callingUserPk, long albumPk)

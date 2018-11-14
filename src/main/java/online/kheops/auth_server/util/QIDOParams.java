@@ -66,10 +66,10 @@ public class QIDOParams {
             }
         }
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-            setLimit(queryParameters);
+            limit = JOOQTools.getLimit(queryParameters);
         }
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-            setOffset(queryParameters);
+            offset = JOOQTools.getOffset(queryParameters);
         }
 
         if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate))) {
@@ -194,29 +194,6 @@ public class QIDOParams {
 
     public boolean isFuzzyMatching() {
         return fuzzyMatching;
-    }
-
-    private void setLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
-        try {
-            limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        } catch (Exception e) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        }
-        if (limit < 1) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        }
-    }
-
-    private void setOffset(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
-        try {
-            offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-        } catch (Exception e) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-        }
-
-        if (offset < 0) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-        }
     }
 
 }

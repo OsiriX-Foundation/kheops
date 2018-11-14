@@ -48,7 +48,7 @@ public class AlbumQueries {
                 .getSingleResult();
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(long userPK, MultivaluedMap<String, String> queryParameters)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(AlbumParams albumParams)
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
