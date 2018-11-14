@@ -79,6 +79,7 @@ public class AlbumResource {
         final PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
+            final AlbumParams albumParams = new AlbumParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pairAlbumsTotalAlbum = Albums.getAlbumList(kheopsPrincipal.getDBID(), uriInfo.getQueryParameters());
         } catch (UserNotFoundException e) {
             LOG.log(Level.INFO, "Get albums list by user pk:"+callingUserPk+" FAILED", e);
