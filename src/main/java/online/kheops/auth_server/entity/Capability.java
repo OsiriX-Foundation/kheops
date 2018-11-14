@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECONDE;
+import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
 @SuppressWarnings("unused")
 @Entity
@@ -151,11 +151,11 @@ public class Capability {
         if (isRevoked()) {
             throw new CapabilityNotValidException("Capability token is revoked");
         }
-        if (ZonedDateTime.of(getNotBeforeTime().minusSeconds(CAPABILITY_LEEWAY_SECONDE), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
+        if (ZonedDateTime.of(getNotBeforeTime().minusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
             throw new CapabilityNotValidException("Capability token is not yet valid");
         }
 
-        if (ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECONDE), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
+        if (ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
             throw new CapabilityNotValidException("Capability token is expired");
         }
     }

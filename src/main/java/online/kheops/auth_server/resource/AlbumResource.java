@@ -8,6 +8,7 @@ import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 
+
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
