@@ -10,7 +10,6 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -381,19 +380,10 @@ public class Albums {
             throws UserNotMemberException {
 
         try {
-        return findAlbumUserByUserAndAlbum(user, album, em);
+            return findAlbumUserByUserAndAlbum(user, album, em);
         } catch (NoResultException e) {
             throw new UserNotMemberException(e);
         }
-    }
-
-    public static boolean albumExist(long albumPk, EntityManager em) {
-        try {
-            findAlbumByPk(albumPk, em);
-        } catch (NoResultException e) {
-            return false;
-        }
-        return true;
     }
 
     public static boolean isMemberOfAlbum(User user, Album album, EntityManager em) {

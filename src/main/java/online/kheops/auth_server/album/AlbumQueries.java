@@ -3,7 +3,6 @@ package online.kheops.auth_server.album;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -15,6 +14,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponseForCapabilityToken;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
@@ -43,6 +44,18 @@ public class AlbumQueries {
                 .setParameter("targetUser", user)
                 .setParameter("targetAlbum", album)
                 .getSingleResult();
+    }
+
+    @FunctionalInterface
+    private interface ThrowingConsumer<T> {
+        void accept(T t) throws BadQueryParametersException;
+    }
+
+    private static <T> void applyIfPresent(Supplier<Optional<T>> supplier, ThrowingConsumer<T> consumer) throws BadQueryParametersException {
+        Optional<T> optional = supplier.get();
+        if (optional.isPresent()) {
+            consumer.accept(optional.get());
+        }
     }
 
     public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(AlbumParams albumParams)
@@ -93,20 +106,12 @@ public class AlbumQueries {
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
 
-            if (albumParams.getName().isPresent()) {
-                conditionArrayList.add(createConditon(albumParams.getName().get(), ALBUMS.NAME, albumParams.isFuzzyMatching()));
-            }
+            applyIfPresent(albumParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumParams.isFuzzyMatching())));
+            applyIfPresent(albumParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
+            applyIfPresent(albumParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
 
             if (albumParams.isFavorite()) {
                 conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
-            }
-
-            if (albumParams.getCreatedTime().isPresent()) {
-                conditionArrayList.add(createDateCondition(albumParams.getCreatedTime().get(), ALBUMS.CREATED_TIME));
-            }
-
-            if (albumParams.getLastEventTime().isPresent()) {
-                conditionArrayList.add(createDateCondition(albumParams.getLastEventTime().get(), ALBUMS.LAST_EVENT_TIME));
             }
 
             conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
@@ -118,13 +123,8 @@ public class AlbumQueries {
                 }
             }
 
-            if (albumParams.getLimit().isPresent()) {
-                query.addLimit(albumParams.getLimit().get());
-            }
-
-            if (albumParams.getOffset().isPresent()) {
-                query.addOffset(albumParams.getOffset().get());
-            }
+            albumParams.getLimit().ifPresent(query::addLimit);
+            albumParams.getOffset().ifPresent(query::addOffset);
 
             query.addOrderBy(getOrderBy(albumParams.getOrderBy(), albumParams.isDescending(), create));
 

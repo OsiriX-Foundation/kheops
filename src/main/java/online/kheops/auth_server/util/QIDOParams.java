@@ -43,7 +43,7 @@ public final class QIDOParams {
     private final Optional<String> studyInstanceUIDFilter;
     private final Optional<String> studyIDFilter;
 
-    public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException{
+    public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
         Long albumIDLocal = null;
         boolean fromInboxLocal = false;
         if (queryParameters.containsKey(ALBUM)) {
@@ -76,16 +76,18 @@ public final class QIDOParams {
             orderByTag = Tag.StudyDate;
         }
 
-        /*
+
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
             limit = JOOQTools.getLimit(queryParameters);
+        } else {
+            limit = OptionalInt.empty();
         }
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
             offset = JOOQTools.getOffset(queryParameters);
-        */
+        } else {
+            offset = OptionalInt.empty();
+        }
 
-        limit = getLimit(queryParameters);
-        offset = getOffset(queryParameters);
 
         studyDateFilter = getFilter(Tag.StudyDate, queryParameters);
         studyTimeFilter = getFilter(Tag.StudyTime, queryParameters);
@@ -166,42 +168,6 @@ public final class QIDOParams {
 
     public boolean isFuzzyMatching() {
         return fuzzyMatching;
-    }
-
-
-    private static OptionalInt getLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-            final int limit;
-            try {
-                limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-            } catch (Exception e) {
-                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-            }
-            if (limit < 1) {
-                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-            }
-            return OptionalInt.of(limit);
-        } else {
-            return OptionalInt.empty();
-        }
-    }
-
-    private static OptionalInt getOffset(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
-        if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-            final int offset;
-            try {
-                offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-            } catch (Exception e) {
-                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-            }
-
-            if (offset < 0) {
-                throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
-            }
-            return OptionalInt.of(offset);
-        } else {
-            return OptionalInt.empty();
-        }
     }
 
     private static Optional<String> getFilter(int tag, MultivaluedMap<String, String> queryParameters) {

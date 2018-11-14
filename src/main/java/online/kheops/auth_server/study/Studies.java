@@ -63,7 +63,6 @@ public class Studies {
     public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, QIDOParams qidoParams, Connection connection)
             throws BadQueryParametersException {
 
-        //queryParameters = ConvertDICOMKeyWordToDICOMTag(queryParameters);
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
         if (qidoParams.isFromInbox()) {

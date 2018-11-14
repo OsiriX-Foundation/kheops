@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.OptionalInt;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,8 +22,8 @@ public abstract class JOOQTools {
 
     private static final Logger LOG = Logger.getLogger(JOOQTools.class.getName());
 
-    public static int getLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
-        Integer limit;
+    public static OptionalInt getLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
+        final Integer limit;
         try {
             limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
         } catch (Exception e) {
@@ -31,11 +32,11 @@ public abstract class JOOQTools {
         if (limit < 1) {
             throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
         }
-        return limit;
+        return OptionalInt.of(limit);
     }
 
-    public static int getOffset(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
-        Integer offset;
+    public static OptionalInt getOffset(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
+        final Integer offset;
         try {
             offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
         } catch (Exception e) {
@@ -45,7 +46,7 @@ public abstract class JOOQTools {
         if (offset < 0) {
             throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
         }
-        return offset;
+        return OptionalInt.of(offset);
     }
 
 
