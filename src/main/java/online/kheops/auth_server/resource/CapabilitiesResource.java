@@ -18,6 +18,7 @@ import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.util.Consts.ALBUM;
 
 
 @Path("/")
@@ -37,7 +38,7 @@ public class CapabilitiesResource {
                                         @FormParam("expiration_time") String expirationTime,
                                         @FormParam("not_before_time") String notBeforeTime,
                                         @NotNull @FormParam("scope_type") String scopeType,
-                                        @FormParam("album") Long albumPk,
+                                        @FormParam(ALBUM) Long albumPk,
                                         @NotNull @FormParam("read_permission") boolean readPermission,
                                         @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
                                         @NotNull @FormParam("download_permission") boolean downloadPermission,

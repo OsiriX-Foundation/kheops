@@ -44,8 +44,7 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
-import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_LIMIT;
-import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
+import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
@@ -67,8 +66,8 @@ public class QIDOResource {
     @AlbumAccessSecured
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response getStudies(@QueryParam("album") Long fromAlbumPk,
-                               @QueryParam("inbox") Boolean fromInbox,
+    public Response getStudies(@QueryParam(ALBUM) Long fromAlbumPk,
+                               @QueryParam(INBOX) Boolean fromInbox,
                                @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
                                @Context SecurityContext securityContext) {
 
@@ -142,8 +141,8 @@ public class QIDOResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getSeries(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                              @QueryParam("album") Long fromAlbumPk,
-                              @QueryParam("inbox") Boolean fromInbox,
+                              @QueryParam(ALBUM) Long fromAlbumPk,
+                              @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
                               @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit,
                               @Context SecurityContext securityContext,
@@ -252,8 +251,8 @@ public class QIDOResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                       @QueryParam("album") Long fromAlbumPk,
-                                       @QueryParam("inbox") Boolean fromInbox, @Context SecurityContext securityContext) {
+                                       @QueryParam(ALBUM) Long fromAlbumPk,
+                                       @QueryParam(INBOX) Boolean fromInbox, @Context SecurityContext securityContext) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();

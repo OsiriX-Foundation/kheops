@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
+import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.util.Consts.INBOX;
 
 @Path("/")
 public class SendingResource
@@ -39,8 +41,8 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
                                        @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                       @QueryParam("album") Long fromAlbumPk,
-                                       @QueryParam("inbox") Boolean fromInbox,
+                                       @QueryParam(ALBUM) Long fromAlbumPk,
+                                       @QueryParam(INBOX) Boolean fromInbox,
                                        @Context SecurityContext securityContext) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
@@ -263,8 +265,8 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putStudyInAlbum(@PathParam("album") Long albumPk,
                                     @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                    @QueryParam("album") Long fromAlbumPk,
-                                    @QueryParam("inbox") Boolean fromInbox,
+                                    @QueryParam(ALBUM) Long fromAlbumPk,
+                                    @QueryParam(INBOX) Boolean fromInbox,
                                     @Context SecurityContext securityContext) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
