@@ -1,9 +1,8 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.fetch.Fetcher;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.Oid;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -12,7 +11,7 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 
 @Path("/")
 public class FetchResource {
@@ -21,20 +20,11 @@ public class FetchResource {
 
     @POST
     @Secured
-    @Path("studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
-    public Response getStudies(@PathParam("studyInstanceUID") String studyInstanceUID,
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
+    public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @Context SecurityContext securityContext) {
         LOG.log(Level.WARNING, "Fetch resource called for StudyUID:" + studyInstanceUID);
-        checkValidUID(studyInstanceUID);
         Fetcher.fetchStudy(studyInstanceUID);
         return Response.ok().build();
-    }
-
-    private void checkValidUID(String uid) {
-        try {
-            new Oid(uid);
-        } catch (GSSException exception) {
-            throw new WebApplicationException(Response.status(BAD_REQUEST).entity("StudyInstanceUID is not a valid UID").build());
-        }
     }
 }

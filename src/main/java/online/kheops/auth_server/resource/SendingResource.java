@@ -7,24 +7,18 @@ import javax.ws.rs.core.*;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.annotation.AlbumAccessSecured;
-import online.kheops.auth_server.annotation.AlbumPermissionSecured;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UserAccessSecured;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts;
 
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
-import static online.kheops.auth_server.util.Consts.ALBUM;
-import static online.kheops.auth_server.util.Consts.INBOX;
+import static online.kheops.auth_server.util.Consts.*;
 
 @Path("/")
 public class SendingResource
@@ -40,7 +34,7 @@ public class SendingResource
     @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
-                                       @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                       @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) Long fromAlbumPk,
                                        @QueryParam(INBOX) Boolean fromInbox,
                                        @Context SecurityContext securityContext) {
@@ -50,7 +44,6 @@ public class SendingResource
         }
 
         fromInbox = fromInbox == null && fromAlbumPk == null;
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -82,12 +75,9 @@ public class SendingResource
     @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
-                                        @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                        @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+                                        @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                        @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                         @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -113,12 +103,9 @@ public class SendingResource
     @PUT
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
-    public Response putSeries(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                              @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+    public Response putSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                              @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                               @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -153,10 +140,8 @@ public class SendingResource
     //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
-    public Response deleteStudyFromInbox(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+    public Response deleteStudyFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                          @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -187,12 +172,9 @@ public class SendingResource
     //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
-    public Response deleteSeriesFromInbox(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                          @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+    public Response deleteSeriesFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                           @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -229,12 +211,9 @@ public class SendingResource
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putSeriesInAlbum(@PathParam("album") Long albumPk,
-                                     @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                     @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                     @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                      @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -264,7 +243,7 @@ public class SendingResource
     @AlbumAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putStudyInAlbum(@PathParam("album") Long albumPk,
-                                    @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                    @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) Long fromAlbumPk,
                                     @QueryParam(INBOX) Boolean fromInbox,
                                     @Context SecurityContext securityContext) {
@@ -274,8 +253,6 @@ public class SendingResource
         }
 
         fromInbox = fromInbox != null;
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -310,10 +287,8 @@ public class SendingResource
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteStudyFromAlbum(@PathParam("album") Long albumPk,
-                                         @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                          @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -333,12 +308,10 @@ public class SendingResource
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteSeriesFromAlbum(@PathParam("album") Long albumPk,
-                                          @PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                          @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
+                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                           @Context SecurityContext securityContext) {
 
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 

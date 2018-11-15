@@ -9,6 +9,7 @@ import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -41,7 +42,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 import static online.kheops.auth_server.util.Consts.*;
@@ -140,7 +140,7 @@ public class QIDOResource {
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response getSeries(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+    public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                               @QueryParam(ALBUM) Long fromAlbumPk,
                               @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
@@ -159,8 +159,6 @@ public class QIDOResource {
         if (limit == null) {
             limit = Integer.MAX_VALUE;
         }
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -250,7 +248,7 @@ public class QIDOResource {
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
-    public Response getStudiesMetadata(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+    public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) Long fromAlbumPk,
                                        @QueryParam(INBOX) Boolean fromInbox, @Context SecurityContext securityContext) {
 
@@ -259,8 +257,6 @@ public class QIDOResource {
         }
 
         fromInbox = fromInbox != null;
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();

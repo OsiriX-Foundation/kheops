@@ -33,14 +33,6 @@ public class Series {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void checkValidUID(String uid, String name) {
-        try {
-            new Oid(uid);
-        } catch (GSSException exception) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(name + " is not a valid UID").build());
-        }
-    }
-
     public static void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
         if (string != null) {
             attributes.setString(tag, vr, string);

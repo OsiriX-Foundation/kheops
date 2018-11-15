@@ -2,20 +2,15 @@ package online.kheops.auth_server.resource;
 
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.annotation.AlbumAccessSecured;
-import online.kheops.auth_server.annotation.AlbumPermissionSecured;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UserAccessSecured;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.event.EventResponses;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.servlet.ServletContext;
@@ -25,7 +20,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_LIMIT;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
+import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
@@ -43,8 +40,8 @@ public class EventRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@PathParam("album") Long albumPk,
-                              @QueryParam("types") final List<String> types, @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                              @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
+                              @QueryParam("types") final List<String> types, @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                              @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -113,12 +110,10 @@ public class EventRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
-    public Response getComments(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset,
+    public Response getComments(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset,
                                 @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -155,11 +150,10 @@ public class EventRessource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postStudiesComment(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
+    public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                 @FormParam("to_user") String user, @FormParam("comment") String comment,
                                 @Context SecurityContext securityContext) {
 
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         final long callingUserPk = kheopsPrincipal.getDBID();
