@@ -61,6 +61,9 @@ public class QIDOResource {
     @Context
     ServletContext context;
 
+    @Context
+    private SecurityContext securityContext;
+
     @GET
     @Secured
     @AlbumAccessSecured
@@ -68,8 +71,7 @@ public class QIDOResource {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) Long fromAlbumPk,
                                @QueryParam(INBOX) Boolean fromInbox,
-                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
-                               @Context SecurityContext securityContext) {
+                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset) {
 
         if (fromAlbumPk != null && fromInbox != null) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -144,9 +146,7 @@ public class QIDOResource {
                               @QueryParam(ALBUM) Long fromAlbumPk,
                               @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
-                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit,
-                              @Context SecurityContext securityContext,
-                              @Context UriInfo uriInfo) {
+                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -250,7 +250,7 @@ public class QIDOResource {
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) Long fromAlbumPk,
-                                       @QueryParam(INBOX) Boolean fromInbox, @Context SecurityContext securityContext) {
+                                       @QueryParam(INBOX) Boolean fromInbox) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();

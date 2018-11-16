@@ -31,6 +31,9 @@ public class AlbumResource {
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    private SecurityContext securityContext;
+
     @POST
     @Secured
     @UserAccessSecured
@@ -40,8 +43,7 @@ public class AlbumResource {
     public Response newAlbum(@DefaultValue("Album_name") @FormParam("name") String name, @DefaultValue("") @FormParam("description") String description,
                              @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
-                             @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
-                             @Context SecurityContext securityContext) {
+                             @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -72,7 +74,7 @@ public class AlbumResource {
     @UserAccessSecured
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getAlbums(@Context SecurityContext securityContext) {
+    public Response getAlbums() {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -105,7 +107,7 @@ public class AlbumResource {
     @Path("album/{album:[1-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlbum(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
+    public Response getAlbum(@PathParam("album") Long albumPk) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -135,8 +137,7 @@ public class AlbumResource {
                               @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                               @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                               @FormParam("notificationNewSeries") Boolean notificationNewSeries,
-                              @FormParam("notificationNewComment") Boolean notificationNewComment,
-                              @Context SecurityContext securityContext) {
+                              @FormParam("notificationNewComment") Boolean notificationNewComment) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -173,7 +174,7 @@ public class AlbumResource {
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_ALBUM)
     @Path("album/{album:[1-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
+    public Response deleteAlbum(@PathParam("album") Long albumPk) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -196,7 +197,7 @@ public class AlbumResource {
     @Path("album/{album:[1-9][0-9]*}/users")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsersAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
+    public Response getUsersAlbum(@PathParam("album") Long albumPk) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -221,8 +222,8 @@ public class AlbumResource {
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_USER)
     @Path("album/{album:[1-9][0-9]*}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addUser(@PathParam("album") Long albumPk, @PathParam("user") String user,
-                            @Context SecurityContext securityContext) {
+    public Response addUser(@PathParam("album") Long albumPk,
+                            @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -246,8 +247,8 @@ public class AlbumResource {
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_ADMIN)
     @Path("album/{album:[1-9][0-9]*}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addAdmin(@PathParam("album") Long albumPk, @PathParam("user") String user,
-                             @Context SecurityContext securityContext) {
+    public Response addAdmin(@PathParam("album") Long albumPk,
+                             @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -272,8 +273,8 @@ public class AlbumResource {
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.REMOVE_ADMIN)
     @Path("album/{album:[1-9][0-9]*}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeAdmin(@PathParam("album") Long albumPk, @PathParam("user") String user,
-                                @Context SecurityContext securityContext) {
+    public Response removeAdmin(@PathParam("album") Long albumPk,
+                                @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -294,8 +295,8 @@ public class AlbumResource {
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.REMOVE_USER)
     @Path("album/{album:[1-9][0-9]*}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteUser(@PathParam("album") Long albumPk, @PathParam("user") String user,
-                               @Context SecurityContext securityContext) {
+    public Response deleteUser(@PathParam("album") Long albumPk,
+                               @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -318,7 +319,7 @@ public class AlbumResource {
     @UserAccessSecured
     @Path("album/{album:[1-9][0-9]*}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
+    public Response addFavorites(@PathParam("album") Long albumPk) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -338,7 +339,7 @@ public class AlbumResource {
     @AlbumAccessSecured
     @Path("album/{album:[1-9][0-9]*}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
+    public Response deleteFavorites(@PathParam("album") Long albumPk) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 

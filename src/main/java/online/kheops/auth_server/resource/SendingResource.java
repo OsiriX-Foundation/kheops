@@ -29,6 +29,9 @@ public class SendingResource
     @Context
     ServletContext context;
 
+    @Context
+    private SecurityContext securityContext;
+
     @PUT
     @Secured
     @UserAccessSecured
@@ -36,8 +39,7 @@ public class SendingResource
     public Response shareStudyWithUser(@PathParam("user") String username,
                                        @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) Long fromAlbumPk,
-                                       @QueryParam(INBOX) Boolean fromInbox,
-                                       @Context SecurityContext securityContext) {
+                                       @QueryParam(INBOX) Boolean fromInbox) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -76,8 +78,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                        @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
-                                        @Context SecurityContext securityContext) {
+                                        @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -104,8 +105,7 @@ public class SendingResource
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response putSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                              @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
-                              @Context SecurityContext securityContext) {
+                              @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -140,8 +140,7 @@ public class SendingResource
     //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
-    public Response deleteStudyFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                         @Context SecurityContext securityContext) {
+    public Response deleteStudyFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -151,7 +150,7 @@ public class SendingResource
 
         if (!kheopsPrincipal.hasUserAccess()) {
             try {
-                return this.deleteStudyFromAlbum(kheopsPrincipal.getAlbumID(), studyInstanceUID, securityContext);
+                return this.deleteStudyFromAlbum(kheopsPrincipal.getAlbumID(), studyInstanceUID);
                 //return Response.status(BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
@@ -173,8 +172,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteSeriesFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
-                                          @Context SecurityContext securityContext) {
+                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -188,7 +186,7 @@ public class SendingResource
 
         if (!kheopsPrincipal.hasUserAccess()) {
             try {
-                return this.deleteSeriesFromAlbum(kheopsPrincipal.getAlbumID(), studyInstanceUID, seriesInstanceUID, securityContext);
+                return this.deleteSeriesFromAlbum(kheopsPrincipal.getAlbumID(), studyInstanceUID, seriesInstanceUID);
                 //return Response.status(BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
@@ -212,8 +210,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putSeriesInAlbum(@PathParam("album") Long albumPk,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                     @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
-                                     @Context SecurityContext securityContext) {
+                                     @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -245,8 +242,7 @@ public class SendingResource
     public Response putStudyInAlbum(@PathParam("album") Long albumPk,
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) Long fromAlbumPk,
-                                    @QueryParam(INBOX) Boolean fromInbox,
-                                    @Context SecurityContext securityContext) {
+                                    @QueryParam(INBOX) Boolean fromInbox) {
 
         if ((fromAlbumPk != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -287,8 +283,7 @@ public class SendingResource
     @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteStudyFromAlbum(@PathParam("album") Long albumPk,
-                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                         @Context SecurityContext securityContext) {
+                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -309,8 +304,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteSeriesFromAlbum(@PathParam("album") Long albumPk,
                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
-                                          @Context SecurityContext securityContext) {
+                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());

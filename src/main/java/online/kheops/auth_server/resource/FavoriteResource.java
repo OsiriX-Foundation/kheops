@@ -25,6 +25,8 @@ public class FavoriteResource {
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    private SecurityContext securityContext;
 
     @PUT
     @Secured
@@ -33,8 +35,7 @@ public class FavoriteResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                         @QueryParam(ALBUM) Long fromAlbumPk,
-                                        @QueryParam(INBOX) Boolean fromInbox,
-                                        @Context SecurityContext securityContext) {
+                                        @QueryParam(INBOX) Boolean fromInbox) {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumPk, fromInbox, true, securityContext);
     }
@@ -46,8 +47,7 @@ public class FavoriteResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
                                              @QueryParam(ALBUM) Long fromAlbumPk,
-                                             @QueryParam(INBOX) Boolean fromInbox,
-                                             @Context SecurityContext securityContext) {
+                                             @QueryParam(INBOX) Boolean fromInbox) {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumPk, fromInbox, false, securityContext);
     }
@@ -93,8 +93,7 @@ public class FavoriteResource {
     public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
                                          @PathParam(SeriesInstanceUID) @UIDValidator  String seriesInstanceUID,
                                          @QueryParam(ALBUM) Long fromAlbumPk,
-                                         @QueryParam(INBOX) Boolean fromInbox,
-                                         @Context SecurityContext securityContext) {
+                                         @QueryParam(INBOX) Boolean fromInbox) {
 
         return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumPk, fromInbox, true, securityContext);
     }
@@ -107,8 +106,7 @@ public class FavoriteResource {
     public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
                                               @PathParam(SeriesInstanceUID) @UIDValidator  String seriesInstanceUID,
                                               @QueryParam(ALBUM) Long fromAlbumPk,
-                                              @QueryParam(INBOX) Boolean fromInbox,
-                                              @Context SecurityContext securityContext) {
+                                              @QueryParam(INBOX) Boolean fromInbox) {
 
         return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumPk, fromInbox, false, securityContext);
     }

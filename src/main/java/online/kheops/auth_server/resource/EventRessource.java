@@ -33,6 +33,9 @@ public class EventRessource {
     @Context
     ServletContext context;
 
+    @Context
+    private SecurityContext securityContext;
+
     @GET
     @Secured
     @AlbumAccessSecured
@@ -40,8 +43,9 @@ public class EventRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@PathParam("album") Long albumPk,
-                              @QueryParam("types") final List<String> types, @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                              @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
+                              @QueryParam("types") final List<String> types,
+                              @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                              @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -88,8 +92,8 @@ public class EventRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@PathParam("album") Long albumPk,
-                                @FormParam("to_user") String user, @FormParam("comment") String comment,
-                                @Context SecurityContext securityContext) {
+                                     @FormParam("to_user") String user,
+                                     @FormParam("comment") String comment) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -112,8 +116,7 @@ public class EventRessource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     public Response getComments(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                 @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset,
-                                @Context SecurityContext securityContext) {
+                                @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -151,8 +154,8 @@ public class EventRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                @FormParam("to_user") String user, @FormParam("comment") String comment,
-                                @Context SecurityContext securityContext) {
+                                       @FormParam("to_user") String user,
+                                       @FormParam("comment") String comment) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
