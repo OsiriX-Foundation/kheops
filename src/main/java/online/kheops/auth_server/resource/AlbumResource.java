@@ -62,7 +62,7 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info("New album pk:"+albumResponse.id+" created by user pk:"+kheopsPrincipal.getUser().getGoogleEmail());
+        LOG.info(() -> "New album pk:"+albumResponse.id+" created by user pk:"+kheopsPrincipal.getUser().getGoogleEmail());
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
@@ -184,7 +184,7 @@ public class AlbumResource {
             LOG.log(Level.INFO, "Delete album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("Delete album pk:" +albumPk+  " by user pk:"+callingUserPk+ " SUCCESS");
+        LOG.info(() -> "Delete album pk:" +albumPk+  " by user pk:"+callingUserPk+ " SUCCESS");
         return Response.status(NO_CONTENT).build();
     }
 

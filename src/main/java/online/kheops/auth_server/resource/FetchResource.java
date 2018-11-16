@@ -23,7 +23,7 @@ public class FetchResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @Context SecurityContext securityContext) {
-        LOG.log(Level.WARNING, "Fetch resource called for StudyUID:" + studyInstanceUID);
+        LOG.log(Level.WARNING,() ->  "Fetch resource called for StudyUID:" + studyInstanceUID);
         Fetcher.fetchStudy(studyInstanceUID);
         return Response.ok().build();
     }

@@ -66,7 +66,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
+        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
         return Response.status(CREATED).build();
     }
 
@@ -96,7 +96,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" with "+username);
+        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" with "+username);
         return Response.status(CREATED).build();
     }
 
@@ -163,7 +163,7 @@ public class SendingResource
         } catch(SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + kheopsPrincipal.getDBID());
+        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + kheopsPrincipal.getDBID());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -200,7 +200,7 @@ public class SendingResource
         } catch(SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + kheopsPrincipal.getDBID());
+        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + kheopsPrincipal.getDBID());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -232,7 +232,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
+        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumPK "+albumPk);
         return Response.status(CREATED).build();
 
     }
@@ -276,7 +276,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info("finished sharing StudyInstanceUID:"+studyInstanceUID+" with albumPK "+albumPk);
+        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" with albumPK "+albumPk);
         return Response.status(CREATED).build();
     }
 
@@ -298,7 +298,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" from albumPK "+albumPk);
+        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumPK "+albumPk);
         return Response.status(NO_CONTENT).build();
     }
 
@@ -321,7 +321,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info("finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from albumPK "+albumPk);
+        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from albumPK "+albumPk);
         return Response.status(NO_CONTENT).build();
     }
 }
