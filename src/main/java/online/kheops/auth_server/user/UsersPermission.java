@@ -17,9 +17,7 @@ public class UsersPermission {
         return Optional.ofNullable(addUser);
     }
 
-    public void setAddUser(Boolean addUser) {
-        this.addUser = addUser;
-    }
+    public void setAddUser(Boolean addUser) { this.addUser = addUser; }
 
     public Optional<Boolean> getDownloadSeries() {
         return Optional.ofNullable(downloadSeries);
