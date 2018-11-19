@@ -1,4 +1,4 @@
-# vikmapp-frontend
+# KheopsUI
 
 > A Vue.js project
 
