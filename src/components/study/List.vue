@@ -37,7 +37,7 @@
 <template>
 	<div class = 'container-fluid'>
 		<div class="my-3 selection-button-container">
-			<span  v-if="selectedStudiesNb > 0">
+			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
 				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
 				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>{{ $t("send") }}</button>
 				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}</button>
@@ -45,6 +45,7 @@
 				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="star"></v-icon></span><br>{{ $t("addfavorite") }}</button>
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>{{ $t("delete") }}</button>
 			</span>
+			<span style = 'margin-left: 30px;'><toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" /> Include series from albums</span>
 			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'><v-icon name = 'search' scale='2'/></button>
 
 		</div>
@@ -52,7 +53,7 @@
 	
 			<template slot="HEAD_is_selected" scope="head">
 				<b-button variant="link" size="sm"  class="mr-2" >
-					<v-icon  class="align-middle"   name="chevron-down"></v-icon>
+					<v-icon  class="align-middle"   name="chevron-down" style = 'visibility: hidden'></v-icon>
 				</b-button>
   				<b-form-checkbox @click.native.stop @change="selectAll(studies.allSelected)" v-model="studies.allSelected" name="allSelected">
   				</b-form-checkbox>
@@ -150,6 +151,10 @@ import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
 
 import seriesSummary from '@/components/study/seriesSummary'
+import ToggleButton from 'vue-js-toggle-button'
+import Vue from 'vue'
+
+Vue.use(ToggleButton)
 
 export default {
   name: 'studies',
@@ -203,6 +208,7 @@ export default {
 				AccessionNumber: '',
 				StudyDate: '',
 				ModalitiesInStudy: '',
+				inbox_and_albums: false
 			}
 		}
 	},

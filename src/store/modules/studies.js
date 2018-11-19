@@ -9,9 +9,19 @@ const state = {
 	filterParams: {
 		sortBy: 'StudyDate',
 		sortDesc: true,
-		filters: {}
+		limit: 10,
+		pageNb: 1,
+		filters: {
+			AccessionNumber: '',
+			ModalitiesInStudy: '',
+			PatientID: '',
+			PatientName: '',
+			StudyDate: '',
+			albums: '',
+			inbox: true
+		}
 	},
-	request: ''
+	request: '',
 }
 
 // getters
@@ -22,18 +32,25 @@ const getters = {
 
 // actions
 const actions = {
-// +'&sort=PatientID'
+
 	getStudies ({ commit }, params) {
 		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy == params.sortBy && state.filterParams.sortDesc == params.sortDesc && _.isEqual(state.filterParams.filters,params.filters)){
-			return;	
-		} 
-
+			return;
+		}
+		//
 		var reset = false;
 
 		let requestParams = '';
 		_.forEach(params.filters, function(value,filterName) {
-			if (value){
-				requestParams += '&'+filterName+'=*'+value+"*";
+			if (filterName == 'inbox_and_albums'){
+				if (!value){
+					requestParams += '&inbox=true';
+				}
+			}
+			else {
+				if (value){
+					requestParams += '&'+filterName+'='+value+"*";
+				}				
 			}
 		});
 		
@@ -179,7 +196,7 @@ const actions = {
 			}
 			else {
 				return HTTP.delete('/studies/'+StudyInstanceUID+'/favorites').then(res => {
-					console.log("OK "+StudyInstanceUID+" is NOT in favorites");
+					console.log("KO "+StudyInstanceUID+" is NOT in favorites");
 				});
 			}
 
@@ -227,7 +244,6 @@ const mutations = {
 
 			_.forEach(state.flags, (flag,SeriesInstanceUID) => {
 				if (d.SeriesInstanceUID == SeriesInstanceUID){
-					console.log('OK'+ "=> "+ flag.is_selected);
 					state.all[idx].series[i].is_selected = flag.is_selected;
 					state.all[idx].series[i].is_favorite = flag.is_favorite;
 					state.all[idx].series[i].comment = flag.comment;
@@ -249,7 +265,17 @@ const mutations = {
 		state.current = study;
 	},
 	SET_FILTER_PARAMS (state,params){
-		state.filterParams = params;
+		state.filterParams.sortBy = params.sortBy;
+		state.filterParams.sortDesc = params.sortDesc;
+		state.filterParams.limit = params.limit;
+		state.filterParams.pageNb = params.pageNb;
+		state.filterParams.filters.albums = params.filters.albums;
+		state.filterParams.filters.inbox = !params.filters.inbox_and_albums;
+		state.filterParams.filters.AccessionNumber = params.filters.AccessionNumber;
+		state.filterParams.filters.ModalitiesInStudy = params.filters.ModalitiesInStudy;
+		state.filterParams.filters.PatientID = params.filters.PatientID;
+		state.filterParams.filters.PatientName = params.filters.PatientName;
+		state.filterParams.filters.StudyDate = params.filters.StudyDate;
 	},
 	SET_TOTAL (state,value){
 		state.totalItems = value;

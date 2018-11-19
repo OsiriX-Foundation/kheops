@@ -97,15 +97,6 @@ export default{
 				})
 			}			
 		}
-	},
-	watch: {
-		series: {
-			handler(val){
-				console.log('changed1');				
-				console.log(val.is_selected);
-			},
-			deep: true
-		}
 	}
 }
 
