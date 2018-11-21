@@ -1,5 +1,6 @@
 package online.kheops.proxy.stow;
 
+import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.multipart.MultipartOutputStream;
 import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.part.Part;
@@ -8,20 +9,23 @@ import online.kheops.proxy.stow.authorization.AuthorizationManagerException;
 import online.kheops.proxy.stow.resource.Resource;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.mime.MultipartParser;
-import org.dcm4che3.ws.rs.MediaTypes;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_LOCATION;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 public final class Proxy {
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
+
+    private final Providers providers;
 
     private final InputStream inputStream;
     private final MediaType contentType;
@@ -29,8 +33,9 @@ public final class Proxy {
     private final MultipartOutputStream multipartOutputStream;
     private final AuthorizationManager authorizationManager;
 
-    public Proxy(final MediaType contentType, final InputStream inputStream, final MultipartOutputStream multipartOutputStream, final AuthorizationManager authorizationManager)
+    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final MultipartOutputStream multipartOutputStream, final AuthorizationManager authorizationManager)
                     throws GatewayException, RequestException {
+        this.providers = providers;
         this.contentType = contentType;
         this.inputStream = inputStream;
         this.authorizationManager = authorizationManager;
@@ -54,10 +59,9 @@ public final class Proxy {
             throws RequestException, GatewayException {
 
         String partString = "Unknown part";
-        try (Part part = Part.getInstance(multipartInputStream)) {
+        try (Part part = Part.getInstance(providers, multipartInputStream)) {
             partString = part.toString();
-            authorizationManager.getAuthorization(part);
-            writePart(partNumber, part);
+            writePart(partNumber, authorizationManager.getAuthorization(part), part);
         } catch (GatewayException e) {
             throw e;
         } catch (IOException e) {
@@ -68,11 +72,13 @@ public final class Proxy {
         }
     }
 
-    private void writePart(final int partNumber, final Part part) throws GatewayException {
-        try {
-            final InputStream fileStream = Files.newInputStream(part.getCacheFilePath());
-            multipartOutputStream.writePart(new StreamingBodyPart(fileStream, MediaTypes.APPLICATION_DICOM_TYPE));
-            fileStream.close();
+    private void writePart(final int partNumber, final Set<InstanceID> instanceIDs, final Part part) throws GatewayException {
+        try (final InputStream inputStream = part.newInputStreamForInstance(instanceIDs)) {
+            final StreamingBodyPart streamingBodyPart = new StreamingBodyPart(inputStream, part.getMediaType());
+            part.getContentLocation().ifPresent(contentLocation -> {
+                streamingBodyPart.getHeaders().putSingle(CONTENT_LOCATION, contentLocation.toString());
+            });
+            multipartOutputStream.writePart(streamingBodyPart);
         } catch (IOException e) {
             throw new GatewayException("Unable to write part " + partNumber + ": " + part, e);
         }

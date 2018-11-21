@@ -5,8 +5,10 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomInputStream;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Collections;
 
 public class DICOMPart extends DICOMMetadataPart {
     private final Attributes fileMetaInformation;
@@ -29,14 +31,14 @@ public class DICOMPart extends DICOMMetadataPart {
         }
     }
 
-    private DICOMPart(final ParsedData parsedData, final MediaType mediaType, final Path cacheFilePath) {
-        super(parsedData.getDataset(), mediaType, cacheFilePath);
+    private DICOMPart(final Providers providers, final ParsedData parsedData, final MediaType mediaType, final Path cacheFilePath) throws IOException {
+        super(providers, Collections.singleton(parsedData.getDataset()), mediaType, cacheFilePath);
 
         this.fileMetaInformation = parsedData.getFileMetaInformation();
     }
 
-    DICOMPart(InputStream inputStream, MediaType mediaType, final Path cacheFilePath) throws IOException {
-        this(parseInputStream(inputStream), mediaType, cacheFilePath);
+    DICOMPart(final Providers providers, InputStream inputStream, MediaType mediaType, final Path cacheFilePath) throws IOException {
+        this(providers, parseInputStream(inputStream), mediaType, cacheFilePath);
     }
 
     private static ParsedData parseInputStream(InputStream inputStream) throws IOException{
@@ -45,10 +47,6 @@ public class DICOMPart extends DICOMMetadataPart {
 
         return new ParsedData(dicomInputStream.readDataset(-1, -1),
                               dicomInputStream.getFileMetaInformation());
-    }
-
-    public Attributes getFileMetaInformation() {
-        return fileMetaInformation;
     }
 
     @Override

@@ -1,18 +1,21 @@
 package online.kheops.proxy.part;
 
 import online.kheops.proxy.id.ContentLocation;
+import online.kheops.proxy.id.InstanceID;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 
 public class BulkDataPart extends Part {
     private final InputStream inputStream;
     private final ContentLocation contentLocation;
 
-    BulkDataPart(final InputStream inputStream, final MediaType mediaType, final ContentLocation contentLocation, final Path cacheFilePath) {
-        super(mediaType, cacheFilePath);
+    BulkDataPart(final Providers providers, final InputStream inputStream, final MediaType mediaType, final ContentLocation contentLocation, final Path cacheFilePath) {
+        super(providers, mediaType, cacheFilePath);
 
         this.inputStream = inputStream;
         this.contentLocation = contentLocation;
@@ -23,7 +26,16 @@ public class BulkDataPart extends Part {
         return Optional.of(contentLocation);
     }
 
-    public InputStream getInputStream() {
+    @Override
+    public InputStream newInputStreamForInstance(Set<InstanceID> instanceIDs) {
+        if (instanceIDs.isEmpty()) {
+            return getInputStream();
+        } else {
+            throw new IllegalArgumentException("Asking for input stream from BulkDataPart for specific instanceIDs");
+        }
+    }
+
+    private InputStream getInputStream() {
         return inputStream;
     }
 }

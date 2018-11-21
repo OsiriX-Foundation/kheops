@@ -23,6 +23,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
+import javax.ws.rs.ext.Providers;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +57,9 @@ public final class Resource {
 
     @Context
     ServletContext context;
+
+    @Context
+    Providers providers;
 
     @HeaderParam(CONTENT_TYPE)
     MediaType contentType;
@@ -124,7 +128,7 @@ public final class Resource {
 
         MultipartStreamingOutput multipartStreamingOutput = output -> {
             try {
-                new Proxy(contentType, inputStream, output, authorizationManager);
+                new Proxy(providers, contentType, inputStream, output, authorizationManager);
             } catch (GatewayException e) {
                 LOG.log(Level.SEVERE, "Gateway Error", e);
                 throw new WebApplicationException(BAD_GATEWAY);

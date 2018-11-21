@@ -2,12 +2,12 @@ package online.kheops.proxy.part;
 
 import online.kheops.proxy.id.ContentLocation;
 import online.kheops.proxy.id.InstanceID;
-import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.stream.TeeInputStream;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.ws.rs.MediaTypes;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,15 +18,18 @@ import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 
 
 public abstract class Part implements AutoCloseable {
+    private final Providers providers;
+
     private final MediaType mediaType;
     private final Path cacheFilePath;
 
-    Part(MediaType mediaType, Path cacheFilePath) {
+    Part(final Providers providers, MediaType mediaType, Path cacheFilePath) {
+        this.providers = providers;
         this.mediaType = mediaType;
         this.cacheFilePath = cacheFilePath;
     }
 
-    public static Part getInstance(MultipartInputStream multipartInputStream) throws IOException {
+    public static Part getInstance(final Providers providers, final MultipartInputStream multipartInputStream) throws IOException {
         final Map<String, List<String>> headerParams = multipartInputStream.readHeaderParams();
         final ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, CONTENT_LOCATION));
         final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, CONTENT_TYPE));
@@ -37,18 +40,22 @@ public abstract class Part implements AutoCloseable {
             final TeeInputStream teeInputStream = new TeeInputStream(multipartInputStream, outputStream);
 
             if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
-                newPart = new DICOMPart(teeInputStream, mediaType, cacheFilePath);
+                newPart = new DICOMPart(providers, teeInputStream, mediaType, cacheFilePath);
             } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
-                newPart = new DICOMMetadataPart(teeInputStream, mediaType, cacheFilePath);
+                newPart = new DICOMMetadataPart(providers, teeInputStream, mediaType, cacheFilePath);
             } else {
-                newPart = new BulkDataPart(teeInputStream, mediaType, contentLocation, cacheFilePath);
+                newPart = new BulkDataPart(providers, multipartInputStream, mediaType, contentLocation, cacheFilePath);
             }
             outputStream.flush();
         }
         return newPart;
     }
 
-    public Set<ContentLocation> getBulkDataLocations() {
+    protected Providers getProviders() {
+        return providers;
+    }
+
+    public Set<ContentLocation> getBulkDataLocations(InstanceID instanceID) {
         return Collections.emptySet();
     }
 
@@ -56,18 +63,8 @@ public abstract class Part implements AutoCloseable {
         return Optional.empty();
     }
 
-    /**
-     * @throws MissingAttributeException Overriding classes may throw this exception
-     */
-    public Optional<SeriesID> getSeriesID() throws MissingAttributeException {
-        return Optional.empty();
-    }
-
-    /**
-     * @throws MissingAttributeException Overriding classes may throw this exception
-     */
-    public Optional<InstanceID> getInstanceID() throws MissingAttributeException {
-        return Optional.empty();
+    public Set<InstanceID> getInstanceIDs() {
+        return Collections.emptySet();
     }
 
     public MediaType getMediaType() {
@@ -83,22 +80,24 @@ public abstract class Part implements AutoCloseable {
         Files.delete(cacheFilePath);
     }
 
-    public Path getCacheFilePath() {
-        return cacheFilePath;
+    public InputStream newInputStreamForInstance(Set<InstanceID> instanceIDs) throws IOException {
+        if (instanceIDs.equals(getInstanceIDs())) {
+            return Files.newInputStream(cacheFilePath);
+        } else {
+            throw new IllegalArgumentException("Requested instanceIDs don't match this Part's instanceIDs");
+        }
     }
 
     @Override
     public String toString() {
-        try {
-            final InstanceID instanceID = getInstanceID().orElse(null);
+        final StringBuilder stringBuilder = new StringBuilder("Part InstanceIDs:");
+        for (final InstanceID instanceID : getInstanceIDs()) {
             if (instanceID == null) {
-                return "Part with unknown Instance ID";
+                stringBuilder.append("unknown,");
             } else {
-                return "Part: " + instanceID;
+                stringBuilder.append(instanceID).append(",");
             }
-
-        } catch (MissingAttributeException e) {
-            return "Part with missing attribute";
         }
+        return stringBuilder.toString();
     }
 }

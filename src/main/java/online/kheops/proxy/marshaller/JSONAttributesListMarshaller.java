@@ -9,12 +9,12 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -29,7 +29,7 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 @Provider
 @Consumes(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
 @Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
-public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
+public class JSONAttributesListMarshaller implements MessageBodyReader<List>, MessageBodyWriter<List> {
 
     @Override
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
@@ -41,7 +41,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     }
 
     @Override
-    public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) {
+    public List<Attributes> readFrom(Class<List> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException {
         List<Attributes> list = new ArrayList<>();
 
         try {
@@ -49,7 +49,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
             JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Exception e){
-            throw new WebApplicationException("Error while reading JSON datasets", e);
+            throw new IOException("Error while reading JSON datasets", e);
         }
 
         return list;
@@ -65,15 +65,19 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     }
 
     @Override
-    public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
+    public void writeTo(List attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
         JsonGenerator generator = Json.createGenerator(entityStream);
         JSONWriter jsonWriter = new JSONWriter(generator);
 
         generator.writeStartArray();
 
-        for (Attributes attributes: attributesList) {
-            jsonWriter.write(attributes);
+        for (Object object: attributesList) {
+            if (object instanceof Attributes) {
+                jsonWriter.write((Attributes) object);
+            } else {
+                throw new IllegalArgumentException("Trying to write an object that is not of class Attributes");
+            }
         }
 
         generator.writeEnd();
