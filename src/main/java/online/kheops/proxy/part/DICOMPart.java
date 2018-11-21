@@ -48,9 +48,4 @@ public class DICOMPart extends DICOMMetadataPart {
         return new ParsedData(dicomInputStream.readDataset(-1, -1),
                               dicomInputStream.getFileMetaInformation());
     }
-
-    @Override
-    public String getTransferSyntax() {
-        return fileMetaInformation.getString(Tag.TransferSyntaxUID);
-    }
 }
