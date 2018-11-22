@@ -74,22 +74,22 @@ public class WadoUriResource {
         final String studyInstanceUID = studyInstanceUIDs.get(0);
         final String seriesInstanceUID = seriesInstanceUIDs.get(0);
 
-        final AccessToken accessToken;
-        try {
-            accessToken = AccessToken.createBuilder(authorizationURI)
-                    .withCapability(authorizationToken.getToken())
-                    .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
-                    .build();
-        } catch (AccessTokenException e) {
-            throw new WebApplicationException(BAD_GATEWAY);
-        }
+//        final AccessToken accessToken;
+//        try {
+//            accessToken = AccessToken.createBuilder(authorizationURI)
+//                    .withCapability(authorizationToken.getToken())
+//                    .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
+//                    .build();
+//        } catch (AccessTokenException e) {
+//            throw new WebApplicationException(BAD_GATEWAY);
+//        }
 
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
             webTarget = webTarget.queryParam(parameter.getKey(), parameter.getValue().toArray());
         }
 
         Invocation.Builder invocationBuilder = webTarget.request();
-        invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
+//        invocationBuilder.header(AUTHORIZATION, accessToken.getHeaderValue());
         if (acceptParam != null) {
             invocationBuilder.accept(acceptParam);
         } else {

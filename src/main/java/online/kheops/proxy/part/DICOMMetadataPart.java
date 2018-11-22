@@ -126,8 +126,8 @@ public class DICOMMetadataPart extends Part {
     }
 
     private List<Attributes> getAttributesListForInstances(Set<InstanceID> requestedInstanceIDs) throws IOException {
-        Set<InstanceID> instanceIDs = getInstanceIDs();
-        if (requestedInstanceIDs.stream().anyMatch(instanceID -> !instanceIDs.contains(instanceID))) {
+        Set<InstanceID> partInstanceIDs = getInstanceIDs();
+        if (requestedInstanceIDs.stream().anyMatch(instanceID -> !partInstanceIDs.contains(instanceID))) {
             throw new IOException("Requesting instances that are not in this Part");
         }
         return getDatasets().stream()

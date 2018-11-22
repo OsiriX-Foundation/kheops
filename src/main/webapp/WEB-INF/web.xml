@@ -12,13 +12,13 @@
 
     <filter-mapping>
         <filter-name>ServletFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/*</url-pattern>paw
     </filter-mapping>
 
     <context-param>
         <description>Base URI for the pacs</description>
         <param-name>online.kheops.pacs.uri</param-name>
-        <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
+        <param-value>http://localhost:82</param-value>
     </context-param>
     <context-param>
         <description>Base URI for the authentication server</description>
