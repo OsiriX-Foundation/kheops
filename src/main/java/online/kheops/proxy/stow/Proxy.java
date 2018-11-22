@@ -73,8 +73,8 @@ public final class Proxy {
     }
 
     private void writePart(final int partNumber, final Set<InstanceID> instanceIDs, final Part part) throws GatewayException {
-        try (final InputStream inputStream = part.newInputStreamForInstance(instanceIDs)) {
-            final StreamingBodyPart streamingBodyPart = new StreamingBodyPart(inputStream, part.getMediaType());
+        try (final InputStream partInputStream = part.newInputStreamForInstance(instanceIDs)) {
+            final StreamingBodyPart streamingBodyPart = new StreamingBodyPart(partInputStream, part.getMediaType());
             part.getContentLocation().ifPresent(contentLocation -> streamingBodyPart.getHeaders().putSingle(CONTENT_LOCATION, contentLocation.toString()));
             multipartOutputStream.writePart(streamingBodyPart);
         } catch (IOException e) {
