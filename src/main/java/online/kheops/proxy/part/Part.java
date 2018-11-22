@@ -55,6 +55,9 @@ public abstract class Part implements AutoCloseable {
         return providers;
     }
 
+    /**
+     * @param instanceID Returns Bulk Data locations for in the specified instance
+     */
     public Set<ContentLocation> getBulkDataLocations(InstanceID instanceID) {
         return Collections.emptySet();
     }
