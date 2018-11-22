@@ -124,7 +124,7 @@ public final class Resource {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies").build();
         }
 
-        AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId, studyInstanceUID);
+        AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId);
 
         MultipartStreamingOutput multipartStreamingOutput = output -> {
             try {

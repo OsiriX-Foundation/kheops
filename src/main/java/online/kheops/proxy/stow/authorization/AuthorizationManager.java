@@ -46,7 +46,7 @@ public final class AuthorizationManager {
     private final UriBuilder fetchUriBuilder;
     private final AuthorizationToken bearerToken;
 
-    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
+    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId) {
         this.bearerToken = Objects.requireNonNull(authorizationToken);
         authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
         if (albumId != null) {
