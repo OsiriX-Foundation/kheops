@@ -164,8 +164,7 @@ public class DICOMMetadataPart extends Part {
 
     @Override
     public Set<ContentLocation> getBulkDataLocations(final InstanceID instanceID) {
-
-        return bulkDataLocations.get(instanceID);
+        return bulkDataLocations.getOrDefault(instanceID, Collections.emptySet());
     }
 
     public Set<Attributes> getDatasets() {
