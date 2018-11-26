@@ -70,6 +70,7 @@ dependencies {
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.26'
+    compile group: 'org.glassfish.jersey.ext', name: 'jersey-bean-validation', version: '2.26'
 
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5.jre7'
 
@@ -87,9 +88,6 @@ dependencies {
     compile group: 'org.jooq', name: 'jooq-meta', version: '3.11.2'
     // https://mvnrepository.com/artifact/org.jooq/jooq-codegen
     compile group: 'org.jooq', name: 'jooq-codegen', version: '3.11.2'
-
-    compile group: 'org.glassfish.jersey.ext', name: 'jersey-bean-validation', version: '2.27'
-
 
     compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
         exclude module: 'slf4j-log4j12'
