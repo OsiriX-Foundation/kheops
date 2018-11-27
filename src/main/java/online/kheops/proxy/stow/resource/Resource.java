@@ -179,13 +179,7 @@ public final class Resource {
 
     private String getPostBearerToken() {
         final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecretpost");
-        final Algorithm algorithmHMAC;
-        try {
-            algorithmHMAC = Algorithm.HMAC256(authSecret);
-        } catch (UnsupportedEncodingException e) {
-            LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecretpost is not a valid HMAC secret", e);
-            throw new WebApplicationException(INTERNAL_SERVER_ERROR);
-        }
+        final Algorithm algorithmHMAC = Algorithm.HMAC256(authSecret);
 
         JWTCreator.Builder jwtBuilder = JWT.create()
                 .withIssuer("auth.kheops.online")
