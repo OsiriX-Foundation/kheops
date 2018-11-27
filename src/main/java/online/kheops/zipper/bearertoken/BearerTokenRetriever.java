@@ -54,7 +54,7 @@ public final class BearerTokenRetriever {
         client = Objects.requireNonNull(builder.client, "client");
         accessToken = Objects.requireNonNull(builder.accessToken, "accessToken");
         URI authorizationURI = Objects.requireNonNull(builder.authorizationURI, "authorizationURI");
-        tokenURI = UriBuilder.fromUri(authorizationURI).path("/accesstoken").build();
+        tokenURI = UriBuilder.fromUri(authorizationURI).path("/token").build();
     }
 
     public void get(Instance instance, InvocationCallback<BearerToken> callback) {
