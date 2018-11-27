@@ -1,6 +1,7 @@
 package online.kheops.proxy.stream;
 
 import java.io.*;
+import java.time.LocalDateTime;
 
 import static java.lang.Math.min;
 
@@ -15,6 +16,12 @@ public class TeeInputStream extends FilterInputStream {
     public TeeInputStream(final InputStream inputStream, final OutputStream outputStream) {
         super(inputStream);
         this.outputStream = outputStream;
+    }
+
+    public synchronized void finish() throws IOException {
+        //noinspection StatementWithEmptyBody
+        while (skip(Long.MAX_VALUE) >= 0) {
+        }
     }
 
     @Override
