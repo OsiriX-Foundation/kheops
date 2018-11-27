@@ -1,5 +1,5 @@
 plugins {
-  id "org.sonarqube" version "2.6"
+  id "org.sonarqube" version "2.6.2"
 }
 
 apply plugin: 'java'
@@ -31,16 +31,16 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.26'
-    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.27'
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.27'
 
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
 
-    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
+    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.15.0') {
         exclude module: 'slf4j-log4j12'
     }
-    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.13.0') {
+    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.15.0') {
         exclude module: 'slf4j-log4j12'
     }
 }
@@ -50,5 +50,5 @@ gretty {
 
     httpPort = 7199
     contextPath = 'zipper'
-    servletContainer = 'tomcat8'
+    servletContainer = 'tomcat9'
 }
