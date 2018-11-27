@@ -60,16 +60,25 @@ public class TeeInputStream extends FilterInputStream {
     @Override
     public synchronized long skip(final long n) throws IOException {
         long skippedBytes = 0;
+        boolean reachedEOF = false;
 
         while (skippedBytes < n) {
-            final int bytesToRead = (int) min(BUFFER_ARRAY_LENGTH, n-skippedBytes);
-            skippedBytes += read(bufferArray, 0, bytesToRead);
-            if (bytesToRead < BUFFER_ARRAY_LENGTH) {
+            final int bytesRead = read(bufferArray, 0, (int) min(BUFFER_ARRAY_LENGTH, n-skippedBytes));
+            if (bytesRead == -1) {
+                reachedEOF = true;
+                break;
+            }
+            skippedBytes += bytesRead;
+            if (bytesRead < BUFFER_ARRAY_LENGTH) {
                 break;
             }
         }
 
-        return skippedBytes;
+        if (reachedEOF && skippedBytes == 0) {
+            return -1;
+        } else {
+            return skippedBytes;
+        }
     }
 
     @Override
