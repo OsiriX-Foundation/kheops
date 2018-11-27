@@ -9,7 +9,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.Collections;
 
-public class DICOMPart extends DICOMMetadataPart {
+class DICOMPart extends DICOMMetadataPart {
 
     DICOMPart(final Providers providers, InputStream inputStream, MediaType mediaType, final Path cacheFilePath) throws IOException {
         super(providers, Collections.singleton(parseInputStream(inputStream)), mediaType, cacheFilePath);

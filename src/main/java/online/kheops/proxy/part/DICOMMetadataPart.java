@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DICOMMetadataPart extends Part {
+class DICOMMetadataPart extends Part {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     private final Set<Attributes> datasets;
@@ -130,7 +130,7 @@ public class DICOMMetadataPart extends Part {
         if (requestedInstanceIDs.stream().anyMatch(instanceID -> !partInstanceIDs.contains(instanceID))) {
             throw new IOException("Requesting instances that are not in this Part");
         }
-        return getDatasets().stream()
+        return datasets.stream()
                 .filter(attributes -> requestedInstanceIDs.contains(InstanceID.from(attributes)))
                 .collect(Collectors.toList());
     }
@@ -165,10 +165,6 @@ public class DICOMMetadataPart extends Part {
     @Override
     public Set<ContentLocation> getBulkDataLocations(final InstanceID instanceID) {
         return bulkDataLocations.getOrDefault(instanceID, Collections.emptySet());
-    }
-
-    public Set<Attributes> getDatasets() {
-        return datasets;
     }
 
     private Set<InstanceID> readInstanceIDs() throws IOException {

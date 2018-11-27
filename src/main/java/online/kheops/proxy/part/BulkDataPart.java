@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
-public class BulkDataPart extends Part {
+class BulkDataPart extends Part {
     private final InputStream inputStream;
     private final ContentLocation contentLocation;
 
@@ -29,13 +29,9 @@ public class BulkDataPart extends Part {
     @Override
     public InputStream newInputStreamForInstance(Set<InstanceID> instanceIDs) {
         if (instanceIDs.isEmpty()) {
-            return getInputStream();
+            return inputStream;
         } else {
             throw new IllegalArgumentException("Asking for input stream from BulkDataPart for specific instanceIDs");
         }
-    }
-
-    private InputStream getInputStream() {
-        return inputStream;
     }
 }
