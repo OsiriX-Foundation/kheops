@@ -101,6 +101,8 @@ public class AlbumResponses {
         albumResponse.isAdmin = ((boolean) r.getValue("admin"));
         if(r.getValue("modalities") != null) {
             albumResponse.modalities = r.getValue("modalities").toString().split("/");
+        } else {
+            albumResponse.modalities = new String[0];
         }
 
         return albumResponse;
@@ -116,6 +118,8 @@ public class AlbumResponses {
         albumResponse.numberOfComments = (Integer) r.getValue("number_of_comments");
         if(r.getValue("modalities") != null) {
             albumResponse.modalities = r.getValue("modalities").toString().split("/");
+        } else {
+            albumResponse.modalities = new String[0];
         }
 
         return albumResponse;
