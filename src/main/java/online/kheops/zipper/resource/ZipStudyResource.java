@@ -95,18 +95,24 @@ public final class ZipStudyResource {
         List<Attributes> attributesList;
         try {
             attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + accessToken.toString()).get(new GenericType<List<Attributes>>() {});
-        } catch (ResponseProcessingException e) {
-            if (e.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
+        } catch (ResponseProcessingException | WebApplicationException e) {
+            final int status;
+            if (e instanceof ResponseProcessingException) {
+                status = ((ResponseProcessingException) e).getResponse().getStatus();
+            } else {
+                status = ((WebApplicationException) e).getResponse().getStatus();
+            }
+            if (status == UNAUTHORIZED.getStatusCode()) {
                 LOG.log(WARNING, "Unauthorized", e);
                 throw new WebApplicationException(UNAUTHORIZED);
-            } else if (e.getResponse().getStatus() == NOT_FOUND.getStatusCode()) {
+            } else if (status == NOT_FOUND.getStatusCode()) {
                 LOG.log(WARNING, "Metadata not found", e);
                 throw new WebApplicationException(NOT_FOUND);
             } else {
                 LOG.log(SEVERE, "Bad Gateway", e);
                 throw new WebApplicationException(BAD_GATEWAY);
             }
-        } catch (ProcessingException | WebApplicationException e) {
+        } catch (ProcessingException e) {
             LOG.log(SEVERE, "Processing Error", e);
             throw new WebApplicationException(BAD_GATEWAY);
         }
