@@ -13,7 +13,10 @@
 	"Modality": "Modality",
 	"StudyDate": "Study Date",
 	"AccessionNumber": "Accession #",
-	"PatientID": "Patient ID"
+	"PatientID": "Patient ID",
+	"filter": "Filter",
+	"fromDate": "From",
+	"toDate": "To"
   },
   "fr": {
 	  "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -26,7 +29,10 @@
 	"Modality": "Modalité",
 	"StudyDate": "Date de l'étude",
 	"AccessionNumber": "# accession",
-	"PatientID": "ID patient"
+	"PatientID": "ID patient",
+	"filter": "Filtrer",
+	"fromDate": "De",
+	"toDate": "A"
 	
   }
 }
@@ -59,27 +65,42 @@
   				</b-form-checkbox>
 			</template>
 			<template slot="HEAD_PatientName" slot-scope="data">
-					<div v-if='showFilters' @click.stop='' ><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientName' placeholder="filter"> <br></div>
+					<div v-if='showFilters' @click.stop='' ><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientName' :placeholder="$t('filter')"> <br></div>
 					{{$t(data.label)}}
 					
 			</template>
 		 	<template slot="HEAD_PatientID" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientID' placeholder="filter"> <br></div>
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientID' :placeholder="$t('filter')"> <br></div>
 				{{$t(data.label)}}
 
 			</template>
 		 	<template slot="HEAD_AccessionNumber" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.AccessionNumber' placeholder="filter"> <br></div>
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.AccessionNumber' :placeholder="$t('filter')"> <br></div>
 				{{$t(data.label)}}
 				
 			</template>
 		 	<template slot="HEAD_StudyDate" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDate' placeholder="filter"> <br></div>
+				<div v-if='showFilters' @click.stop='' class = 'form-row'>
+					
+						<div class = 'col form-inline'>
+							<div class = 'form-group'>
+								<datepicker v-model="filters.StudyDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+							</div>
+						</div>
+						 
+						<div class = 'col form-inline'>
+							<div class = 'form-group'>
+								<datepicker v-model="filters.StudyDateTo" :bootstrap-styling='false' :disabledDates="disabledToDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+							</div>
+						</div>					
+					<!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
+				</div>
+				<br v-if='showFilters' >
 				{{$t(data.label)}}
 				
 			</template>
 		 	<template slot="HEAD_ModalitiesInStudy" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' placeholder="filter"><br></div>
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' :placeholder="$t('filter')"><br></div>
 				{{$t(data.label)}}
 				
 			</template>
@@ -150,8 +171,9 @@
 import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
 
-import seriesSummary from '@/components/study/seriesSummary'
+import seriesSummary from '@/components/inbox/seriesSummary'
 import ToggleButton from 'vue-js-toggle-button'
+import Datepicker from 'vuejs-datepicker';
 import Vue from 'vue'
 
 Vue.use(ToggleButton)
@@ -206,13 +228,14 @@ export default {
 				PatientName: '',
 				PatientID: '',
 				AccessionNumber: '',
-				StudyDate: '',
+				StudyDateFrom: '',
+				StudyDateTo: '',
 				ModalitiesInStudy: '',
 				inbox_and_albums: false
 			}
 		}
 	},
-	components: {seriesSummary},
+	components: {seriesSummary, Datepicker},
   computed: {
 	  ...mapGetters({
 	  	  studies: 'studies'
@@ -222,10 +245,23 @@ export default {
 		},
 		selectedStudiesNb () {
 			return _.filter(this.studies,s => {return s.is_selected === true;}).length;
-		}
+		},
+  	  	disabledToDates: function(){
+  	  		  let vm = this;
+  	  		  return {
+  	  			  to: vm.filters.StudyDateFrom,
+  	  			  from: new Date()
+  	  		  }
+  	  	},
+  	  	disabledFromDates: function(){
+  	  		  let vm = this;
+  	  		  return {
+  	  			  from: new Date()
+  	  		  }
+  	  	}
   },
   methods: {
-	  scroll (person) {
+	  scroll () {
 	    window.onscroll = () => {
 	      let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
@@ -326,7 +362,8 @@ export default {
 						PatientName: '',
 						PatientID: '',
 						AccessionNumber: '',
-						StudyDate: '',
+						StudyDateFrom: '',
+						StudyDateTo: '',
 						ModalitiesInStudy: '',
 					}
 				}
@@ -382,6 +419,14 @@ select{
  
  .td_checkbox {
 	 width: 150px;
+ }
+ 
+ input.search-calendar{
+	 width: 100px !important;
+ }
+ 
+ div.calendar-wrapper{
+	 color: #333;
  }
 </style>
 

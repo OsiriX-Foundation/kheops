@@ -1,6 +1,6 @@
 import {HTTP} from '@/router/http';
 import dicom from '@/mixins/dicom';
-
+import moment from 'moment'
 // initial state
 const state = {
 	all: [],
@@ -16,7 +16,8 @@ const state = {
 			ModalitiesInStudy: '',
 			PatientID: '',
 			PatientName: '',
-			StudyDate: '',
+			StudyDateFrom: '',
+			StudyDateTo: '',
 			albums: '',
 			inbox: true
 		}
@@ -47,13 +48,22 @@ const actions = {
 					requestParams += '&inbox=true';
 				}
 			}
-			else {
+			else if (filterName.indexOf('StudyDate') == -1){
 				if (value){
 					requestParams += '&'+filterName+'='+value+"*";
 				}				
 			}
 		});
-		
+		if (params.filters.StudyDateFrom || params.filters.StudyDateTo){
+			let fromDate = '', toDate = '';
+			if (params.filters.StudyDateFrom){
+				fromDate = moment(params.filters.StudyDateFrom).format('YYYYMMDD');
+			}
+			if (params.filters.StudyDateTo){
+				toDate = moment(params.filters.StudyDateTo).format('YYYYMMDD');
+			}
+			requestParams += '&StudyDate='+fromDate+"-"+toDate;
+		}		
 		let offset = 0;
 		if (state.filterParams.sortBy != params.sortBy || state.filterParams.sortDesc != params.sortDesc || state.request != requestParams){
 			offset = 0;
@@ -89,8 +99,8 @@ const actions = {
 				})
 				if (t.StudyInstanceUID !== undefined) data.push(t);
 			})
-			commit('SET_DATASETS', {data:data,reset: reset})
-			commit('SET_FILTER_PARAMS',params);
+			commit('SET_STUDIES', {data:data,reset: reset})
+			commit('SET_STUDIES_FILTER_PARAMS',params);
 			commit('SET_REQUEST_PARAMS',requestParams);
 		});
 
@@ -212,7 +222,7 @@ const actions = {
 
 // mutations
 const mutations = {
-	SET_DATASETS (state, data) {
+	SET_STUDIES (state, data) {
 		let studies = data.data;
 		let reset = data.reset;
 		_.forEach(studies, (d,i) => {
@@ -264,7 +274,7 @@ const mutations = {
 	SELECT_STUDIES (state, study){
 		state.current = study;
 	},
-	SET_FILTER_PARAMS (state,params){
+	SET_STUDIES_FILTER_PARAMS (state,params){
 		state.filterParams.sortBy = params.sortBy;
 		state.filterParams.sortDesc = params.sortDesc;
 		state.filterParams.limit = params.limit;
@@ -275,7 +285,8 @@ const mutations = {
 		state.filterParams.filters.ModalitiesInStudy = params.filters.ModalitiesInStudy;
 		state.filterParams.filters.PatientID = params.filters.PatientID;
 		state.filterParams.filters.PatientName = params.filters.PatientName;
-		state.filterParams.filters.StudyDate = params.filters.StudyDate;
+		state.filterParams.filters.StudyDateFrom = params.filters.StudyDateFrom;
+		state.filterParams.filters.StudyDateTo = params.filters.StudyDateTo;
 	},
 	SET_TOTAL (state,value){
 		state.totalItems = value;

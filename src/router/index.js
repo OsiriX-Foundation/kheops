@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Study from '@/components/inbox/List'
-import Album from '@/components/albums/List'
+import Albums from '@/components/albums/List'
+import Album from '@/components/albums/Album'
 import store from '@/store'
 
 import PermissionDenied from '@/components/user/PermissionDenied'
@@ -25,6 +26,14 @@ const router = new Router({
 	 {
 		 path: '/albums',
 		 name: 'albums',
+		 component: Albums,
+   	    beforeEnter: requireAuth,
+   	    meta: {permissions: 'active',condition: 'any'}
+
+	 },
+	 {
+		 path: '/album/:id',
+		 name: 'album',
 		 component: Album,
    	    beforeEnter: requireAuth,
    	    meta: {permissions: 'active',condition: 'any'}
