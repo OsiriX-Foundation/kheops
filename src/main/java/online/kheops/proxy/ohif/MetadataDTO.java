@@ -30,6 +30,7 @@ class MetadataDTO {
     }
 
     private void addInstance(final Attributes attributes) {
-        studyMap.computeIfAbsent(attributes.getString(Tag.StudyInstanceUID), (studyUID) -> new StudyDTO(attributes)).addInstance(attributes);
+        studyMap.computeIfAbsent(attributes.getString(Tag.StudyInstanceUID), studyUID -> new StudyDTO(attributes))
+                .addInstance(attributes);
     }
 }

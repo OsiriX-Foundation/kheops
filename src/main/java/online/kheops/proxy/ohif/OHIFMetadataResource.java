@@ -3,10 +3,7 @@ package online.kheops.proxy.ohif;
 import online.kheops.proxy.marshaller.JSONAttributesListMarshaller;
 import online.kheops.proxy.tokens.AuthorizationToken;
 import org.dcm4che3.data.Attributes;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.moxy.internal.MoxyFilteringFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
-import org.glassfish.jersey.moxy.json.internal.FilteringMoxyJsonProvider;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -56,9 +53,7 @@ public class OHIFMetadataResource {
     }
 
     private MetadataDTO ohifMetadata(String studyInstanceUID, AuthorizationToken authorizationToken) {
-        final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
-
-        URI metadataServiceURI = UriBuilder.fromUri(authorizationURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
+        URI metadataServiceURI = UriBuilder.fromUri(getAuthorizationURI()).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
 
         try {
             return MetadataDTO.from(CLIENT.target(metadataServiceURI)
@@ -88,9 +83,9 @@ public class OHIFMetadataResource {
         }
     }
 
-    private URI getParameterURI(String parameter) {
+    private URI getAuthorizationURI() {
         try {
-            return new URI(context.getInitParameter(parameter));
+            return new URI(context.getInitParameter("online.kheops.auth_server.uri"));
         } catch (URISyntaxException e) {
             LOG.log(SEVERE, "Error with the STOWServiceURI", e);
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);

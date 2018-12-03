@@ -41,7 +41,8 @@ class StudyDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        seriesMap.computeIfAbsent(attributes.getString(Tag.SeriesInstanceUID), (seriesUID) -> new SeriesDTO(attributes)).addInstance(attributes);
+        seriesMap.computeIfAbsent(attributes.getString(Tag.SeriesInstanceUID), seriesUID -> new SeriesDTO(attributes))
+                .addInstance(attributes);
     }
 
 }
