@@ -6,6 +6,7 @@ import online.kheops.proxy.marshaller.JSONAttributesWriter;
 import online.kheops.proxy.marshaller.XMLAttributesListWriter;
 import online.kheops.proxy.marshaller.XMLAttributesWriter;
 import online.kheops.proxy.multipart.MultipartStreamingWriter;
+import online.kheops.proxy.ohif.OHIFMetadataResource;
 import online.kheops.proxy.stow.resource.Resource;
 import online.kheops.proxy.wadors.WadoRSSeries;
 import online.kheops.proxy.wadors.WadoRSStudyInstance;
@@ -36,6 +37,7 @@ public class ProxyApplication extends Application {
         set.add(WadoRsResource.class);
         set.add(WadoRSSeries.class);
         set.add(WadoRSStudyInstance.class);
+        set.add(OHIFMetadataResource.class);
         return set;
     }
 
