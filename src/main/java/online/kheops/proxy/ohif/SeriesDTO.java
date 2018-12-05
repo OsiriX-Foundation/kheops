@@ -39,6 +39,6 @@ class SeriesDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        instanceMap.computeIfAbsent(attributes.getString(Tag.SOPInstanceUID), seriesUID -> InstanceDTO.from(attributes));
+        instanceMap.computeIfAbsent(attributes.getString(Tag.SOPInstanceUID), instanceUID -> InstanceDTO.from(attributes));
     }
 }
