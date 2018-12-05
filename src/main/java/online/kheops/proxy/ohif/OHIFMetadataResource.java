@@ -56,7 +56,7 @@ public class OHIFMetadataResource {
         final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         URI rootURI = getParameterURI("online.kheops.root.uri");
         // TODO we add the authorization token to the link here, but this is not great because it could end up getting logged
-        rootURI = UriBuilder.fromUri(rootURI).path("link/{token}").resolveTemplate("token", authorizationToken).build();
+        rootURI = UriBuilder.fromUri(rootURI).scheme("dicomweb").path("link/{token}").resolveTemplate("token", authorizationToken).build();
         final URI metadataServiceURI = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
 
         try {
