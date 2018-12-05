@@ -1,6 +1,10 @@
 <Context path="capabilities" docBase="KheopsDICOMwebProxy" debug="0" reloadable="true">
     <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
                override="false"/>
+    <Parameter name="online.kheops.auth.hmacsecretpost" value="${kheops_auth_hmasecret_post}"
+               override="false"/>
     <Parameter name="online.kheops.auth_server.uri" value="${kheops_authorization_url}"
+               override="false"/>
+    <Parameter name="online.kheops.root.uri" value="${kheops_root_url}"
                override="false"/>
 </Context>
