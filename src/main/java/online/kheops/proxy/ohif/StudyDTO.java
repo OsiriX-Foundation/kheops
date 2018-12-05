@@ -20,7 +20,7 @@ class StudyDTO {
     @XmlTransient
     private final Map<String, SeriesDTO> seriesMap;
 
-    @XmlElement(name = "series")
+    @XmlElement(name = "seriesList")
     Collection<SeriesDTO> getSeries() {
         return seriesMap.values();
     }
