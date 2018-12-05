@@ -5,12 +5,16 @@ import org.dcm4che3.data.Tag;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 class SeriesDTO {
+    @XmlTransient
+    private final URI rootURI;
+
     @XmlTransient
     private final Map<String, InstanceDTO> instanceMap;
 
@@ -29,7 +33,8 @@ class SeriesDTO {
         throw new UnsupportedOperationException();
     }
 
-    SeriesDTO(final Attributes attributes) {
+    SeriesDTO(final URI rootURI, final Attributes attributes) {
+        this.rootURI = rootURI;
         instanceMap = new HashMap<>();
 
         seriesInstanceUid = attributes.getString(Tag.SeriesInstanceUID);
@@ -39,6 +44,6 @@ class SeriesDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        instanceMap.computeIfAbsent(attributes.getString(Tag.SOPInstanceUID), instanceUID -> InstanceDTO.from(attributes));
+        instanceMap.computeIfAbsent(attributes.getString(Tag.SOPInstanceUID), instanceUID -> InstanceDTO.from(rootURI, attributes));
     }
 }

@@ -53,10 +53,12 @@ public class OHIFMetadataResource {
     }
 
     private MetadataDTO ohifMetadata(String studyInstanceUID, AuthorizationToken authorizationToken) {
-        URI metadataServiceURI = UriBuilder.fromUri(getAuthorizationURI()).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
+        URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
+        URI rootURI = getParameterURI("online.kheops.root.uri");
+        URI metadataServiceURI = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
 
         try {
-            return MetadataDTO.from(CLIENT.target(metadataServiceURI)
+            return MetadataDTO.from(rootURI, CLIENT.target(metadataServiceURI)
                     .request(APPLICATION_DICOM_JSON)
                     .header(AUTHORIZATION, "Bearer " + authorizationToken)
                     .get(new GenericType<List<Attributes>>() {}));
@@ -83,14 +85,13 @@ public class OHIFMetadataResource {
         }
     }
 
-    private URI getAuthorizationURI() {
+    private URI getParameterURI(String parameter) {
         try {
-            return new URI(context.getInitParameter("online.kheops.auth_server.uri"));
+            return new URI(context.getInitParameter(parameter));
         } catch (URISyntaxException e) {
             LOG.log(SEVERE, "Error with the STOWServiceURI", e);
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }
-
 
 }

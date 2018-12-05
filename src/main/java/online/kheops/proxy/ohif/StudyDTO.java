@@ -6,6 +6,7 @@ import org.dcm4che3.data.Tag;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,9 @@ import java.util.Map;
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 @XmlRootElement
 class StudyDTO {
+    @XmlTransient
+    private final URI rootURI;
+
     @XmlTransient
     private final Map<String, SeriesDTO> seriesMap;
 
@@ -31,7 +35,8 @@ class StudyDTO {
         throw new UnsupportedOperationException();
     }
 
-    StudyDTO(final Attributes attributes) {
+    StudyDTO(final URI rootURI, final Attributes attributes) {
+        this.rootURI = rootURI;
         seriesMap = new HashMap<>();
 
         studyInstanceUID = attributes.getString(Tag.StudyInstanceUID);
@@ -41,7 +46,7 @@ class StudyDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        seriesMap.computeIfAbsent(attributes.getString(Tag.SeriesInstanceUID), seriesUID -> new SeriesDTO(attributes))
+        seriesMap.computeIfAbsent(attributes.getString(Tag.SeriesInstanceUID), seriesUID -> new SeriesDTO(rootURI, attributes))
                 .addInstance(attributes);
     }
 

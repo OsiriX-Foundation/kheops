@@ -6,6 +6,7 @@ import org.dcm4che3.data.Tag;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
+import java.net.URI;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 class InstanceDTO {
@@ -21,11 +22,11 @@ class InstanceDTO {
     @XmlElement
     private final String url;
 
-    static InstanceDTO from(Attributes attributes) {
+    static InstanceDTO from(final URI rootURI, Attributes attributes) {
         return new InstanceDTO(attributes.getString(Tag.SOPInstanceUID),
                 attributes.getInt(Tag.Columns, 0),
                 attributes.getInt(Tag.Rows, 0),
-                getURL(attributes));
+                getURL(rootURI, attributes));
     }
 
     private InstanceDTO() {
@@ -39,11 +40,13 @@ class InstanceDTO {
         this.url = url;
     }
 
-    private static String getURL(Attributes attributes) {
-        return UriBuilder.fromUri("dicomweb://test2.kheops.online/wado?studyUID={studyUID}&seriesUID={seriesUID}&objectUID={objectUID}&requestType=WADO&contentType=application/dicom")
-                .resolveTemplate("studyUID", attributes.getString(Tag.StudyInstanceUID))
-                .resolveTemplate("seriesUID", attributes.getString(Tag.SeriesInstanceUID))
-                .resolveTemplate("objectUID", attributes.getString(Tag.SOPInstanceUID))
+    private static String getURL(final URI rootURI, Attributes attributes) {
+        return UriBuilder.fromUri(rootURI).path("/wado")
+                .queryParam("studyUID", attributes.getString(Tag.StudyInstanceUID))
+                .queryParam("seriesUID", attributes.getString(Tag.SeriesInstanceUID))
+                .queryParam("objectUID", attributes.getString(Tag.SOPInstanceUID))
+                .queryParam("requestType", "WADO")
+                .queryParam("contentType", "application/dicom")
                 .build().toString();
     }
 }
