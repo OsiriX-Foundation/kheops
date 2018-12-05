@@ -41,7 +41,7 @@ class InstanceDTO {
     }
 
     private static String getURL(final URI rootURI, Attributes attributes) {
-        return UriBuilder.fromUri(rootURI).path("/wado")
+        return "wadouri:" + UriBuilder.fromUri(rootURI).path("/wado")
                 .queryParam("studyUID", attributes.getString(Tag.StudyInstanceUID))
                 .queryParam("seriesUID", attributes.getString(Tag.SeriesInstanceUID))
                 .queryParam("objectUID", attributes.getString(Tag.SOPInstanceUID))
