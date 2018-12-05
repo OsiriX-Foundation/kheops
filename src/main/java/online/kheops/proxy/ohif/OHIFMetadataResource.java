@@ -53,9 +53,11 @@ public class OHIFMetadataResource {
     }
 
     private MetadataDTO ohifMetadata(String studyInstanceUID, AuthorizationToken authorizationToken) {
-        URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
+        final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         URI rootURI = getParameterURI("online.kheops.root.uri");
-        URI metadataServiceURI = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
+        // TODO we add the authorization token to the link here, but this is not great because it could end up getting logged
+        rootURI = UriBuilder.fromUri(rootURI).path("link/{token}").resolveTemplate("token", authorizationToken).build();
+        final URI metadataServiceURI = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
 
         try {
             return MetadataDTO.from(rootURI, CLIENT.target(metadataServiceURI)
