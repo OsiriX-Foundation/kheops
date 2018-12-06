@@ -88,6 +88,9 @@ public class WadoUriResource {
                     .build();
         } catch (AccessTokenException e) {
             throw new WebApplicationException(BAD_GATEWAY);
+        } catch (Exception e) {
+            LOG.log(SEVERE, "unknown error while getting an access token", e);
+            throw new InternalServerErrorException("unknown error while getting an access token", e);
         }
 
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
@@ -113,6 +116,9 @@ public class WadoUriResource {
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
             throw new InternalServerErrorException();
+        } catch (Exception e) {
+            LOG.log(SEVERE, "unknown error while getting from upstream", e);
+            throw new InternalServerErrorException("unknown error while getting an access token", e);
         }
 
         final Object entity = upstreamResponse.getEntity();
