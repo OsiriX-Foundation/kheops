@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,9 +19,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT_CHARSET;
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
@@ -71,9 +71,14 @@ public class WadoUriResource {
         if (seriesInstanceUIDs == null || seriesInstanceUIDs.size() != 1) {
             throw new WebApplicationException(BAD_REQUEST);
         }
+        final List<String> objectUIDs = queryParameters.get("objectUID");
+        if (objectUIDs == null || objectUIDs.size() != 1) {
+            throw new WebApplicationException(BAD_REQUEST);
+        }
 
         final String studyInstanceUID = studyInstanceUIDs.get(0);
         final String seriesInstanceUID = seriesInstanceUIDs.get(0);
+        final String objectInstanceUID = objectUIDs.get(0);
 
         final AccessToken accessToken;
         try {
@@ -101,7 +106,15 @@ public class WadoUriResource {
             invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
-        final Response upstreamResponse = invocationBuilder.get();
+
+        final Response upstreamResponse;
+        try {
+            upstreamResponse = invocationBuilder.get();
+        } catch (ProcessingException e) {
+            LOG.log(SEVERE, "error processing response from upstream", e);
+            throw new InternalServerErrorException();
+        }
+
         final Object entity = upstreamResponse.getEntity();
         final InputStream inputStream;
         if (entity instanceof InputStream) {
@@ -112,18 +125,26 @@ public class WadoUriResource {
         }
 
         StreamingOutput streamingOutput = output -> {
-            byte[] buffer = new byte[4096];
-            int len = inputStream.read(buffer);
-            while (len != -1) {
-                output.write(buffer, 0, len);
-                len = inputStream.read(buffer);
+            LOG.log(WARNING, "starting to stream: " + objectInstanceUID);
+            try {
+                byte[] buffer = new byte[4096];
+                int len = inputStream.read(buffer);
+                while (len != -1) {
+                    output.write(buffer, 0, len);
+                    len = inputStream.read(buffer);
+                }
+            } catch (Exception e) {
+                LOG.log(SEVERE, "exception while streaming: " + objectInstanceUID, e);
+                throw new IOException(e);
             }
+            LOG.log(WARNING, "done streaming: objectInstanceUID" + objectInstanceUID);
         };
 
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
-        return Response.fromResponse(upstreamResponse)
-                .entity(streamingOutput)
+
+        return Response.ok(streamingOutput)
+                .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
                 .cacheControl(cacheControl)
                 .build();
     }
