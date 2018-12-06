@@ -8,8 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 @XmlRootElement
@@ -18,7 +18,7 @@ class StudyDTO {
     private final URI rootURI;
 
     @XmlTransient
-    private final Map<String, SeriesDTO> seriesMap;
+    private final SortedMap<String, SeriesDTO> seriesMap;
 
     @XmlElement(name = "seriesList")
     Collection<SeriesDTO> getSeries() {
@@ -37,7 +37,7 @@ class StudyDTO {
 
     StudyDTO(final URI rootURI, final Attributes attributes) {
         this.rootURI = rootURI;
-        seriesMap = new HashMap<>();
+        seriesMap = new TreeMap<>();
 
         studyInstanceUID = attributes.getString(Tag.StudyInstanceUID);
         patientName = attributes.getString(Tag.PatientName);

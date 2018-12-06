@@ -7,8 +7,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 class SeriesDTO {
@@ -16,7 +16,7 @@ class SeriesDTO {
     private final URI rootURI;
 
     @XmlTransient
-    private final Map<String, InstanceDTO> instanceMap;
+    private final SortedMap<String, InstanceDTO> instanceMap;
 
     @XmlElement(name = "instances")
     Collection<InstanceDTO> getInstances() {
@@ -35,7 +35,7 @@ class SeriesDTO {
 
     SeriesDTO(final URI rootURI, final Attributes attributes) {
         this.rootURI = rootURI;
-        instanceMap = new HashMap<>();
+        instanceMap = new TreeMap<>();
 
         seriesInstanceUid = attributes.getString(Tag.SeriesInstanceUID);
         seriesDescription = attributes.getString(Tag.SeriesDescription);

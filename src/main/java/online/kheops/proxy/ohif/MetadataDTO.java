@@ -16,7 +16,7 @@ class MetadataDTO {
     private final URI rootURI;
 
     @XmlTransient
-    private final Map<String, StudyDTO> studyMap;
+    private final SortedMap<String, StudyDTO> studyMap;
 
     @XmlElement(name = "studies")
     public Collection<StudyDTO> getStudies() {
@@ -32,7 +32,7 @@ class MetadataDTO {
     }
 
     private MetadataDTO(final URI rootURI, final List<Attributes> attributesList) {
-        studyMap = new HashMap<>();
+        studyMap = new TreeMap<>();
         this.rootURI = rootURI;
         attributesList.forEach(this::addInstance);
     }
