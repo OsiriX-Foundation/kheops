@@ -146,12 +146,8 @@ public class WadoUriResource {
             LOG.log(WARNING, "done streaming: objectInstanceUID" + objectInstanceUID);
         };
 
-        final CacheControl cacheControl = new CacheControl();
-        cacheControl.setNoCache(true);
-
         return Response.ok(streamingOutput)
                 .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
-                .cacheControl(cacheControl)
                 .build();
     }
 
