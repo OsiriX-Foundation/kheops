@@ -10,6 +10,9 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -100,10 +103,28 @@ public class WadoUriResource {
             invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
+        final Response upstreamResponse = invocationBuilder.get();
+        final Object entity = upstreamResponse.getEntity();
+        final InputStream inputStream;
+        if (entity instanceof InputStream) {
+            inputStream = (InputStream) entity;
+        } else {
+            throw new InternalServerErrorException();
+        }
+
+        StreamingOutput streamingOutput = output -> {
+            byte[] buffer = new byte[4096];
+            int len = inputStream.read(buffer);
+            while (len != -1) {
+                output.write(buffer, 0, len);
+                len = inputStream.read(buffer);
+            }
+        };
+
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
-
-        return Response.fromResponse(invocationBuilder.get())
+        return Response.fromResponse(upstreamResponse)
+                .entity(streamingOutput)
                 .cacheControl(cacheControl)
                 .build();
     }
