@@ -10,9 +10,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -109,6 +107,7 @@ public class WadoUriResource {
         if (entity instanceof InputStream) {
             inputStream = (InputStream) entity;
         } else {
+            LOG.log(SEVERE, "Upstream response's entity is not an InputStream");
             throw new InternalServerErrorException();
         }
 
