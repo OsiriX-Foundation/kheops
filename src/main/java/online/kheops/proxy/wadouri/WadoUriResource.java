@@ -143,7 +143,7 @@ public class WadoUriResource {
                 LOG.log(SEVERE, "exception while streaming: " + objectInstanceUID, e);
                 throw new IOException(e);
             }
-            LOG.log(WARNING, "done streaming: objectInstanceUID" + objectInstanceUID);
+            LOG.log(WARNING, "done streaming: " + objectInstanceUID);
         };
 
         return Response.ok(streamingOutput)
