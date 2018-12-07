@@ -121,18 +121,9 @@ public class WadoUriResource {
             throw new InternalServerErrorException("unknown error while getting an access token", e);
         }
 
-        final Object entity = upstreamResponse.getEntity();
-        final InputStream inputStream;
-        if (entity instanceof InputStream) {
-            inputStream = (InputStream) entity;
-        } else {
-            LOG.log(SEVERE, "Upstream response's entity is not an InputStream");
-            throw new InternalServerErrorException();
-        }
-
         StreamingOutput streamingOutput = output -> {
             LOG.log(WARNING, "starting to stream: " + objectInstanceUID);
-            try {
+            try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class)) {
                 byte[] buffer = new byte[4096];
                 int len = inputStream.read(buffer);
                 while (len != -1) {
@@ -142,6 +133,8 @@ public class WadoUriResource {
             } catch (Exception e) {
                 LOG.log(SEVERE, "exception while streaming: " + objectInstanceUID, e);
                 throw new IOException(e);
+            } finally {
+                upstreamResponse.close();
             }
             LOG.log(WARNING, "done streaming: " + objectInstanceUID);
         };
