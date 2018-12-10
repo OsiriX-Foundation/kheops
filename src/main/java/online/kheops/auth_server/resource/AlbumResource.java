@@ -165,7 +165,7 @@ public class AlbumResource {
         usersPermission.setWriteComments(writeComments);
 
         try {
-            albumResponse = Albums.editAlbum(callingUserPk, albumPk, name, description, usersPermission, notificationNewSeries, notificationNewComment);
+            albumResponse = Albums.editAlbum(callingUserPk, albumPk, name, description, usersPermission, notificationNewComment, notificationNewSeries);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Edit album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
