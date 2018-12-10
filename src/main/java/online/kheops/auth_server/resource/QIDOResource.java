@@ -185,7 +185,12 @@ public class QIDOResource {
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
         //END kheopsPrincipal
 
-        final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+        final MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
+        queryParameters.putAll(uriInfo.getQueryParameters());
+        queryParameters.remove("album");
+        queryParameters.remove("inbox");
+        queryParameters.remove("offset");
+        queryParameters.remove("limit");
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
@@ -209,9 +214,15 @@ public class QIDOResource {
                     .build();
         }
 
-        List<Attributes> allSeries = webTarget.request("application/dicom+json")
-                .header("Authorization", "Bearer "+authToken)
-                .get(new GenericType<List<Attributes>>() {});
+        final List<Attributes> allSeries;
+        try {
+            allSeries = webTarget.request("application/dicom+json")
+                    .header("Authorization", "Bearer " + authToken)
+                    .get(new GenericType<List<Attributes>>() {});
+        } catch (WebApplicationException | ProcessingException e) {
+            LOG.log(Level.SEVERE, "Error getting the list of series from the DCM server", e);
+            return Response.status(BAD_GATEWAY).build();
+        }
 
         List<Attributes> availableSeries = new ArrayList<>();
 
