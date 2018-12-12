@@ -14,6 +14,7 @@ before_script:
   - node -v
   - npm install jquery@1.9.1 --save
   - npm install
+
 script:
   - export BUILD_DIR=$TRAVIS_BUILD_DIR/dist
   - npm run build > output.txt
@@ -21,13 +22,12 @@ script:
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/tls/dist
   - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/assets
   - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/tls/assets
-  - ls $TRAVIS_BUILD_DIR
-  - cp $TRAVIS_BUILD_DIR/package-lock.json $TRAVIS_BUILD_DIR/docker/dist
-  - ls $TRAVIS_BUILD_DIR/docker/dist
+
 after_success:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x docker/deploy_no_tls.sh
   - chmod +x docker/tls/deploy_tls.sh
+
 deploy:
   skip_cleanup: true
   provider: script
