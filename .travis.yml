@@ -17,12 +17,12 @@ before_script:
 script:
   - export BUILD_DIR=$TRAVIS_BUILD_DIR/dist
   - npm run build > output.txt
-  - ls $BUILD_DIR
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/dist
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/tls/dist
   - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/assets
   - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/tls/assets
-  - cp $BUILD_DIR/package-lock.json $TRAVIS_BUILD_DIR/docker/dist
+  - ls $TRAVIS_BUILD_DIR
+  - cp $TRAVIS_BUILD_DIR/package-lock.json $TRAVIS_BUILD_DIR/docker/dist
 after_success:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x docker/deploy_no_tls.sh
