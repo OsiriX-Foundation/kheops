@@ -23,6 +23,7 @@ script:
   - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/tls/assets
   - ls $TRAVIS_BUILD_DIR
   - cp $TRAVIS_BUILD_DIR/package-lock.json $TRAVIS_BUILD_DIR/docker/dist
+  - ls $TRAVIS_BUILD_DIR/docker/dist
 after_success:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x docker/deploy_no_tls.sh
