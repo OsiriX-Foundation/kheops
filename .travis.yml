@@ -12,3 +12,5 @@ notifications:
 before_script:
   - npm -v
   - node -v
+  - npm install jquery@1.9.1 --save
+  - npm install
