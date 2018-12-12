@@ -16,7 +16,7 @@ before_script:
   - npm install
 script:
   - export BUILD_DIR=$TRAVIS_BUILD_DIR/dist
-  - npm run build
+  - npm run build > output.txt
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/dist
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/tls/dist
   - cp -r /src/assets $TRAVIS_BUILD_DIR/docker/assets
