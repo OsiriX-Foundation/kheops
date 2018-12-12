@@ -71,14 +71,9 @@ public class WadoUriResource {
         if (seriesInstanceUIDs == null || seriesInstanceUIDs.size() != 1) {
             throw new WebApplicationException(BAD_REQUEST);
         }
-        final List<String> objectUIDs = queryParameters.get("objectUID");
-        if (objectUIDs == null || objectUIDs.size() != 1) {
-            throw new WebApplicationException(BAD_REQUEST);
-        }
 
         final String studyInstanceUID = studyInstanceUIDs.get(0);
         final String seriesInstanceUID = seriesInstanceUIDs.get(0);
-        final String objectInstanceUID = objectUIDs.get(0);
 
         final AccessToken accessToken;
         try {
@@ -122,7 +117,6 @@ public class WadoUriResource {
         }
 
         StreamingOutput streamingOutput = output -> {
-            LOG.log(WARNING, "starting to stream: " + objectInstanceUID);
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class)) {
                 byte[] buffer = new byte[4096];
                 int len = inputStream.read(buffer);
@@ -131,12 +125,10 @@ public class WadoUriResource {
                     len = inputStream.read(buffer);
                 }
             } catch (Exception e) {
-                LOG.log(SEVERE, "exception while streaming: " + objectInstanceUID, e);
                 throw new IOException(e);
             } finally {
                 upstreamResponse.close();
             }
-            LOG.log(WARNING, "done streaming: " + objectInstanceUID);
         };
 
         return Response.ok(streamingOutput)
