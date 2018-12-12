@@ -17,6 +17,7 @@ before_script:
 script:
   - export BUILD_DIR=$TRAVIS_BUILD_DIR/dist
   - npm run build > output.txt
+  - cat package-lock.json
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/dist
   - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/tls/dist
   - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/assets
