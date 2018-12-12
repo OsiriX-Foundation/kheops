@@ -10,10 +10,10 @@ notifications:
   email: false
 
 before_script:
-  - npm install jquery@1.9.1 --save
-  - npm install
   - npm -v
   - node -v
+  - npm install jquery@1.9.1 --save
+  - npm install
 script:
   - export BUILD_DIR=$TRAVIS_BUILD_DIR/dist
   - npm run build
