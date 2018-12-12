@@ -14,3 +14,22 @@ before_script:
   - node -v
   - npm install jquery@1.9.1 --save
   - npm install
+script:
+  - export BUILD_DIR=$TRAVIS_BUILD_DIR/dist
+  - npm run build
+  - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/dist
+  - cp -r $BUILD_DIR $TRAVIS_BUILD_DIR/docker/tls/dist
+  - cp -r /src/assets $TRAVIS_BUILD_DIR/docker/assets
+  - cp -r /src/assets $TRAVIS_BUILD_DIR/docker/tls/assets
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - chmod +x docker/deploy_no_tls.sh
+  - chmod +x docker/tls/deploy_tls.sh
+deploy:
+  skip_cleanup: true
+  provider: script
+  script:
+    ./docker/deploy_no_tls.sh;
+    ./docker/tls/deploy_tls.sh
+  on:
+all_branches: true
