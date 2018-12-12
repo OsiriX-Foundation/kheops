@@ -2,5 +2,5 @@
 
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-docker build ./docker/tls/ -t osirixfoundation/kheopsUI:tls
-docker push osirixfoundation/kheopsUI:tls
+docker build ./docker/tls/ -t osirixfoundation/kheops-ui:tls
+docker push osirixfoundation/kheops-ui:tls
