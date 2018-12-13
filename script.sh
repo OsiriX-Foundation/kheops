@@ -2,6 +2,7 @@
 
 chmod a+w /etc/nginx/conf.d/kheops.conf
 sed -i "s|\${root_url}|$KHEOPS_ROOT_URL|" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${ohif_root_url}|$KHEOPS_OHIF_ROOT_URL|" /etc/nginx/conf.d/kheops.conf
 
 sed -i "s|\${ohif_url}|$KHEOPS_NGINX_URL_OHIF|" /etc/nginx/conf.d/kheops.conf
 sed -i "s|\${DICOMWebProxy_url}|$KHEOPS_NGINX_URL_DICOMWEB_PROXY|" /etc/nginx/conf.d/kheops.conf
