@@ -1,11 +1,8 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.JOOQTools;
 
 import javax.ws.rs.core.MultivaluedMap;
-import java.util.*;
 
 import static online.kheops.auth_server.util.Consts.*;
 
