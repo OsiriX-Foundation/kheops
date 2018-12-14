@@ -1,7 +1,7 @@
 package online.kheops.auth_server;
 
 public abstract class PACSAuthTokenBuilder {
-    static private String secret = null;
+    private static String secret = null;
 
     public static void setSecret(String secret) {
         PACSAuthTokenBuilder.secret = secret;
@@ -11,12 +11,12 @@ public abstract class PACSAuthTokenBuilder {
         return new PACSAuthTokenBuilderImpl(secret);
     }
 
-    abstract public PACSAuthTokenBuilder withStudyUID(String studyUID);
+    public abstract PACSAuthTokenBuilder withStudyUID(String studyUID);
 
-    abstract public PACSAuthTokenBuilder withSeriesUID(String seriesUID);
-    abstract public PACSAuthTokenBuilder withAllSeries();
+    public abstract PACSAuthTokenBuilder withSeriesUID(String seriesUID);
+    public abstract PACSAuthTokenBuilder withAllSeries();
 
 //    abstract public PACSAuthTokenBuilder withSubject(String sub);
 
-    abstract public String build();
+    public abstract String build();
 }

@@ -5,7 +5,6 @@ import online.kheops.auth_server.entity.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.user.UserQueries.*;
 

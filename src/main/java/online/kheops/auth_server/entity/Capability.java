@@ -180,10 +180,8 @@ public class Capability {
 
     public static class CapabilityBuilder {
 
-        private LocalDateTime issuedAtTime;
-        private LocalDateTime updatedTime;
+
         private LocalDateTime expirationTime;
-        private LocalDateTime revokedTime;
         private LocalDateTime notBeforeTime;
         private String title;
         private boolean readPermission;
@@ -198,20 +196,8 @@ public class Capability {
 
         public CapabilityBuilder () {}
 
-        public CapabilityBuilder issuedAtTime (LocalDateTime issuedAtTime) {
-            this.issuedAtTime = issuedAtTime;
-            return this;
-        }
-        public CapabilityBuilder updatedTime (LocalDateTime updatedTime) {
-            this.updatedTime = updatedTime;
-            return this;
-        }
         public CapabilityBuilder expirationTime (LocalDateTime expirationTime) {
             this.expirationTime = expirationTime;
-            return this;
-        }
-        public CapabilityBuilder revokedTime (LocalDateTime revokedTime) {
-            this.revokedTime = revokedTime;
             return this;
         }
         public CapabilityBuilder notBeforeTime (LocalDateTime notBeforeTime) {

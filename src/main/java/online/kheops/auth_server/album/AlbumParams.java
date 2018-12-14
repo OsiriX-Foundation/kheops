@@ -34,9 +34,9 @@ public final class AlbumParams {
     public AlbumParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
 
-        name = exctractName(queryParameters);
-        createdTime = exctractCreatedTime(queryParameters);
-        lastEventTime = exctractLastEventTime(queryParameters);
+        name = extractName(queryParameters);
+        createdTime = extractCreatedTime(queryParameters);
+        lastEventTime = extractLastEventTime(queryParameters);
 
         if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
             descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
@@ -49,17 +49,17 @@ public final class AlbumParams {
             orderBy = CREATED_TIME;
         }
 
-        favorite = exctractFavorite(queryParameters);
+        favorite = extractFavorite(queryParameters);
 
-        fuzzyMatching = exctractFuzzyMatching(queryParameters);
+        fuzzyMatching = extractFuzzyMatching(queryParameters);
 
-        limit = exctractLimit(queryParameters);
-        offset = exctractOffset(queryParameters);
+        limit = extractLimit(queryParameters);
+        offset = extractOffset(queryParameters);
 
         DBID = kheopsPrincipal.getDBID();
     }
 
-    private Optional<String> exctractName(MultivaluedMap<String, String> queryParameters) {
+    private Optional<String> extractName(MultivaluedMap<String, String> queryParameters) {
 
         if (queryParameters.containsKey(NAME)) {
             return Optional.ofNullable(queryParameters.get(NAME).get(0));
@@ -68,7 +68,7 @@ public final class AlbumParams {
         }
     }
 
-    private Optional<String> exctractCreatedTime(MultivaluedMap<String, String> queryParameters) {
+    private Optional<String> extractCreatedTime(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(CREATED_TIME)) {
             return Optional.ofNullable(queryParameters.get(CREATED_TIME).get(0));
         } else {
@@ -76,7 +76,7 @@ public final class AlbumParams {
         }
     }
 
-    private Optional<String> exctractLastEventTime(MultivaluedMap<String, String> queryParameters) {
+    private Optional<String> extractLastEventTime(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(LAST_EVENT_TIME)) {
             return Optional.ofNullable(queryParameters.get(LAST_EVENT_TIME).get(0));
         } else {
@@ -84,7 +84,7 @@ public final class AlbumParams {
         }
     }
 
-    private OptionalInt exctractLimit(MultivaluedMap<String, String> queryParameters)
+    private OptionalInt extractLimit(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
             return JOOQTools.getLimit(queryParameters);
@@ -93,7 +93,7 @@ public final class AlbumParams {
         }
     }
 
-    private OptionalInt exctractOffset(MultivaluedMap<String, String> queryParameters)
+    private OptionalInt extractOffset(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
             return JOOQTools.getOffset(queryParameters);
@@ -102,7 +102,7 @@ public final class AlbumParams {
         }
     }
 
-    private boolean exctractFavorite(MultivaluedMap<String, String> queryParameters) {
+    private boolean extractFavorite(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(FAVORITE)) {
             if (queryParameters.get(FAVORITE).get(0).compareTo("true") == 0) {
                 return true;
@@ -111,7 +111,7 @@ public final class AlbumParams {
         return false;
     }
 
-    private boolean exctractFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
+    private boolean extractFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
             return Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
         }
