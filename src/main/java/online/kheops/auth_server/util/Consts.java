@@ -19,7 +19,7 @@ public class Consts {
     public static final String ALBUM = "album";
     public static final String INBOX = "inbox";
 
-    //AlbumParams.java
+    //AlbumQueryParams.java
     public static final String FAVORITE = "favorite";
     public static final String NAME = "name";
     public static final String CREATED_TIME = "created_time";

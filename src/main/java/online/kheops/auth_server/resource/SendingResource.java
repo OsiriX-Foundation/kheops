@@ -14,7 +14,6 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
-import online.kheops.auth_server.user.UsersPermission;
 
 import java.util.logging.Logger;
 

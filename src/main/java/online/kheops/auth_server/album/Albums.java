@@ -34,6 +34,7 @@ public class Albums {
         try {
             tx.begin();
 
+            //TODO ??? 2x em.merge callingUser
             callingUser = em.merge(callingUser);
             final User mergedCallingUser = em.merge(callingUser);
 
@@ -110,19 +111,19 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(AlbumParams albumParams)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
-            if (!userExist(albumParams.getDBID(), em)) {
+            if (!userExist(albumQueryParams.getDBID(), em)) {
                 throw new UserNotFoundException();
             }
         } finally {
             em.close();
         }
-        return findAlbumsByUserPk(albumParams);
+        return findAlbumsByUserPk(albumQueryParams);
     }
 
     public static void deleteAlbum(long callingUserPk, long albumPk)

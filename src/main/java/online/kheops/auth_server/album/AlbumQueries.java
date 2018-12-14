@@ -57,7 +57,7 @@ public class AlbumQueries {
         }
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(AlbumParams albumParams)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -100,21 +100,21 @@ public class AlbumQueries {
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
                     .and(EVENTS.EVENT_TYPE.eq("Comment"))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumParams.getDBID()))
-                            .or(EVENTS.USER_FK.eq(albumParams.getDBID()))));
+                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getDBID()))
+                            .or(EVENTS.USER_FK.eq(albumQueryParams.getDBID()))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
 
-            applyIfPresent(albumParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumParams.isFuzzyMatching())));
-            applyIfPresent(albumParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
-            applyIfPresent(albumParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
+            applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
+            applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
+            applyIfPresent(albumQueryParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
 
-            if (albumParams.isFavorite()) {
+            if (albumQueryParams.isFavorite()) {
                 conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
             }
 
             conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
-            query.addConditions(ALBUM_USER.USER_FK.eq(albumParams.getDBID()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
+            query.addConditions(ALBUM_USER.USER_FK.eq(albumQueryParams.getDBID()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
 
             for (Condition c : conditionArrayList) {
                 if (c != null) {
@@ -122,10 +122,10 @@ public class AlbumQueries {
                 }
             }
 
-            albumParams.getLimit().ifPresent(query::addLimit);
-            albumParams.getOffset().ifPresent(query::addOffset);
+            albumQueryParams.getLimit().ifPresent(query::addLimit);
+            albumQueryParams.getOffset().ifPresent(query::addOffset);
 
-            query.addOrderBy(getOrderBy(albumParams.getOrderBy(), albumParams.isDescending(), create));
+            query.addOrderBy(getOrderBy(albumQueryParams.getOrderBy(), albumQueryParams.isDescending(), create));
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
@@ -137,7 +137,7 @@ public class AlbumQueries {
                 albumResponses.add(recordToAlbumResponse(r));
             }
 
-            final int albumTotalCount = getAlbumTotalCount(albumParams.getDBID(), conditionArrayList, connection);
+            final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getDBID(), conditionArrayList, connection);
 
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {

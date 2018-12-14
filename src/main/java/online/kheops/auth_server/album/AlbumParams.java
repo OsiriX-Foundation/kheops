@@ -1,6 +1,7 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.JOOQTools;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -12,130 +13,51 @@ import static online.kheops.auth_server.util.Consts.*;
 
 public final class AlbumParams {
 
-    private static final String[] ACCEPTED_VALUES_FOR_SORTING_ARRAY = {"created_time", "last_event_time", "name", "number_of_users", "number_of_studies", "number_of_comments"};
-    private static final Set<String> ACCEPTED_VALUES_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_VALUES_FOR_SORTING_ARRAY));
+    private final String name;
+    private final String description;
+    private final UsersPermission usersPermission;
 
-    private final boolean descending;
-    private final String orderBy;
 
-    private boolean fuzzyMatching = false;
+    public AlbumParams(MultivaluedMap<String, String> formParameters) {
 
-    private final OptionalInt limit;
-    private final OptionalInt offset;
+        name = extractName(formParameters);
+        description = extractDescription(formParameters);
+        usersPermission = extractUsersPermision(formParameters);
 
-    private final Optional<String> name;
-    private final Optional<String> createdTime;
-    private final Optional<String> lastEventTime;
+    }
 
-    private boolean favorite = false;
+    private String extractName(MultivaluedMap<String, String> formParameters) {
 
-    private long DBID;
-
-    public AlbumParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException {
-
-        name = extractName(queryParameters);
-        createdTime = extractCreatedTime(queryParameters);
-        lastEventTime = extractLastEventTime(queryParameters);
-
-        if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
-            descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
-            orderBy = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
-            if (!ACCEPTED_VALUES_FOR_SORTING.contains(orderBy)) {
-                throw new BadQueryParametersException("sort: " + orderBy);
-            }
+        if (formParameters.containsKey(NAME)) {
+            return formParameters.get(NAME).get(0);
         } else {
-            descending = true;
-            orderBy = CREATED_TIME;
+            return"Album_name";
         }
-
-        favorite = extractFavorite(queryParameters);
-
-        fuzzyMatching = extractFuzzyMatching(queryParameters);
-
-        limit = extractLimit(queryParameters);
-        offset = extractOffset(queryParameters);
-
-        DBID = kheopsPrincipal.getDBID();
     }
+    private String extractDescription(MultivaluedMap<String, String> formParameters) {
 
-    private Optional<String> extractName(MultivaluedMap<String, String> queryParameters) {
-
-        if (queryParameters.containsKey(NAME)) {
-            return Optional.ofNullable(queryParameters.get(NAME).get(0));
+        if (formParameters.containsKey("description")) {
+            return formParameters.get("description").get(0);
         } else {
-            return Optional.empty();
+            return"";
         }
     }
 
-    private Optional<String> extractCreatedTime(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(CREATED_TIME)) {
-            return Optional.ofNullable(queryParameters.get(CREATED_TIME).get(0));
-        } else {
-            return Optional.empty();
-        }
+    private UsersPermission extractUsersPermision(MultivaluedMap<String, String> formParameters) {
+        final UsersPermission usersPermission = new UsersPermission();
+        if (formParameters.containsKey("addUser")) { usersPermission.setAddUser(Boolean.valueOf(formParameters.get("addUser").get(0))); }
+        if (formParameters.containsKey("downloadSeries")) { usersPermission.setAddUser(Boolean.valueOf(formParameters.get("downloadSeries").get(0))); }
+        if (formParameters.containsKey("sendSeries")) { usersPermission.setAddUser(Boolean.valueOf(formParameters.get("sendSeries").get(0))); }
+        if (formParameters.containsKey("deleteSeries")) { usersPermission.setAddUser(Boolean.valueOf(formParameters.get("deleteSeries").get(0))); }
+        if (formParameters.containsKey("addSeries")) { usersPermission.setAddUser(Boolean.valueOf(formParameters.get("addSeries").get(0))); }
+        if (formParameters.containsKey("writeComments")) { usersPermission.setAddUser(Boolean.valueOf(formParameters.get("writeComments").get(0))); }
+
+        return usersPermission;
     }
 
-    private Optional<String> extractLastEventTime(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(LAST_EVENT_TIME)) {
-            return Optional.ofNullable(queryParameters.get(LAST_EVENT_TIME).get(0));
-        } else {
-            return Optional.empty();
-        }
-    }
+    public String getName() { return name; }
 
-    private OptionalInt extractLimit(MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException {
-        if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
-            return JOOQTools.getLimit(queryParameters);
-        } else {
-            return OptionalInt.empty();
-        }
-    }
+    public String getDescription() { return description; }
 
-    private OptionalInt extractOffset(MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException {
-        if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
-            return JOOQTools.getOffset(queryParameters);
-        } else {
-            return OptionalInt.empty();
-        }
-    }
-
-    private boolean extractFavorite(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(FAVORITE)) {
-            if (queryParameters.get(FAVORITE).get(0).compareTo("true") == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean extractFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
-            return Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
-        }
-        return false;
-    }
-
-
-    public boolean isDescending() { return descending; }
-
-    public String getOrderBy() { return orderBy; }
-
-    public boolean isFuzzyMatching() { return fuzzyMatching; }
-
-    public OptionalInt getLimit() { return limit; }
-
-    public OptionalInt getOffset() { return offset; }
-
-    public Optional<String> getName() { return name; }
-
-    public Optional<String> getCreatedTime() { return createdTime; }
-
-    public Optional<String> getLastEventTime() { return lastEventTime; }
-
-    public boolean isFavorite() { return favorite; }
-
-    public long getDBID() { return DBID; }
+    public UsersPermission getUsersPermission() { return usersPermission; }
 }

@@ -41,10 +41,12 @@ public class AlbumResource {
     @Path("album")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newAlbum(@DefaultValue("Album_name") @FormParam("name") String name, @DefaultValue("") @FormParam("description") String description,
+    public Response newAlbum(@DefaultValue("Album_name") @FormParam("name") String name,
+                             @DefaultValue("") @FormParam("description") String description,
                              @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
-                             @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments) {
+                             @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
+                             MultivaluedMap<String, String> form) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -57,10 +59,13 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
+        final AlbumParams albumParams = new AlbumParams(form);
+
         final AlbumResponses.AlbumResponse albumResponse;
 
         try {
             albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
+            //albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), albumParams);
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -83,8 +88,8 @@ public class AlbumResource {
         final PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
-            final AlbumParams albumParams = new AlbumParams(kheopsPrincipal, uriInfo.getQueryParameters());
-            pairAlbumsTotalAlbum = Albums.getAlbumList(albumParams);
+            final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
+            pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
         } catch (UserNotFoundException e) {
             LOG.log(Level.INFO, "Get albums list by user pk:"+callingUserPk+" FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -138,7 +143,8 @@ public class AlbumResource {
                               @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                               @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                               @FormParam("notificationNewSeries") Boolean notificationNewSeries,
-                              @FormParam("notificationNewComment") Boolean notificationNewComment) {
+                              @FormParam("notificationNewComment") Boolean notificationNewComment,
+                              MultivaluedMap<String, String> form) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
