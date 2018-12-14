@@ -10,6 +10,7 @@ import online.kheops.auth_server.annotation.UserAccessSecured;
 
 
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
@@ -127,7 +128,7 @@ public class AlbumResource {
     @PATCH
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.EDIT_ALBUM)
+    @AlbumPermissionSecured(UserPermissionEnum.EDIT_ALBUM)
     @Path("album/{album:[1-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -171,7 +172,7 @@ public class AlbumResource {
     @DELETE
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_ALBUM)
+    @AlbumPermissionSecured(UserPermissionEnum.DELETE_ALBUM)
     @Path("album/{album:[1-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteAlbum(@PathParam("album") Long albumPk) {
@@ -193,7 +194,7 @@ public class AlbumResource {
     @Secured
     @AlbumAccessSecured
     @UserAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.LIST_USERS)
+    @AlbumPermissionSecured(UserPermissionEnum.LIST_USERS)
     @Path("album/{album:[1-9][0-9]*}/users")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -219,7 +220,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_USER)
+    @AlbumPermissionSecured(UserPermissionEnum.ADD_USER)
     @Path("album/{album:[1-9][0-9]*}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addUser(@PathParam("album") Long albumPk,
@@ -244,7 +245,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_ADMIN)
+    @AlbumPermissionSecured(UserPermissionEnum.ADD_ADMIN)
     @Path("album/{album:[1-9][0-9]*}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addAdmin(@PathParam("album") Long albumPk,
@@ -270,7 +271,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.REMOVE_ADMIN)
+    @AlbumPermissionSecured(UserPermissionEnum.REMOVE_ADMIN)
     @Path("album/{album:[1-9][0-9]*}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeAdmin(@PathParam("album") Long albumPk,
@@ -292,7 +293,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.REMOVE_USER)
+    @AlbumPermissionSecured(UserPermissionEnum.REMOVE_USER)
     @Path("album/{album:[1-9][0-9]*}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteUser(@PathParam("album") Long albumPk,

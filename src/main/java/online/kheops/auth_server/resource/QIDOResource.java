@@ -13,8 +13,7 @@ import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
@@ -85,7 +84,7 @@ public class QIDOResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, fromAlbumPk)) {
+            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, fromAlbumPk)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {

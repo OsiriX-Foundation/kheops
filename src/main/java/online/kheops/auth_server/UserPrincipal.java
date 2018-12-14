@@ -6,6 +6,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.EntityManager;
@@ -128,7 +129,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     public boolean hasStudyWriteAccess(String study) { return true; }
 
     @Override
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, Long albumId) throws AlbumNotFoundException {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
@@ -144,37 +145,8 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             if (albumUser.isAdmin()) {
                 return true;
             }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isAddSeries()) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_USER && album.isAddUser()) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.DELETE_SERIES && album.isDeleteSeries()) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && album.isDownloadSeries()) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES && album.isSendSeries()) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.WRITE_COMMENT && album.isWriteComments()) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.REMOVE_USER) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM) {
-                return true;
-            }
-            if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_FAVORITES && album.isAddSeries()) {
-                return true;
-            }
-            return false;
+
+            return usersPermission.hasUserPermission(album);
 
         } catch (AlbumNotFoundException | UserNotMemberException e) {
             throw new AlbumNotFoundException("Album id : " + albumId + " not found");

@@ -13,6 +13,7 @@ import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.user.UsersPermission;
 
 import java.util.logging.Logger;
@@ -51,7 +52,7 @@ public class SendingResource
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
+            if(fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.SEND_SERIES, fromAlbumPk)) {
                 fromAlbumPk = null;
             }
         } catch (AlbumNotFoundException e) {
@@ -121,7 +122,7 @@ public class SendingResource
         try {
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Long albumID = kheopsPrincipal.getAlbumID();
-                if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumID)) {
+                if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                         Sending.putSeriesInAlbum(callingUserPk, albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
@@ -206,7 +207,7 @@ public class SendingResource
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.ADD_SERIES)
+    @AlbumPermissionSecured(UserPermissionEnum.ADD_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response putSeriesInAlbum(@PathParam("album") Long albumPk,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -253,11 +254,11 @@ public class SendingResource
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         try {
-            if (!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_SERIES, albumPk)) {
+            if (!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumPk)) {
                 return Response.status(FORBIDDEN).build();
             }
 
-            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.SEND_SERIES, fromAlbumPk)) {
+            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.SEND_SERIES, fromAlbumPk)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -280,7 +281,7 @@ public class SendingResource
     @DELETE
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
+    @AlbumPermissionSecured(UserPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteStudyFromAlbum(@PathParam("album") Long albumPk,
                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
@@ -300,7 +301,7 @@ public class SendingResource
     @DELETE
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.DELETE_SERIES)
+    @AlbumPermissionSecured(UserPermissionEnum.DELETE_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{album:[1-9][0-9]*}")
     public Response deleteSeriesFromAlbum(@PathParam("album") Long albumPk,
                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,

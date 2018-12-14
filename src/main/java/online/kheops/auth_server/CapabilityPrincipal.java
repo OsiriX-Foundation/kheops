@@ -6,7 +6,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -224,7 +224,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) {
+    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, Long albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
             return false;
@@ -239,22 +239,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Album album = em.merge(capability.getAlbum());
                 isMemberOfAlbum(user, album, em);
 
-                if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && capability.isReadPermission() && capability.isDownloadPermission()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES  && capability.isReadPermission() && capability.isAppropriatePermission()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.READ_SERIES  && capability.isReadPermission()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && capability.isWritePermission()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.DELETE_SERIES && capability.isReadPermission() && capability.isWritePermission()) {
-                    return true;
-                }
-                return false;
+                usersPermission.hasCapabilityPermission(capability);
 
             } else if (getScope() == ScopeType.USER) {
 
@@ -266,34 +251,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if (albumUser.isAdmin()) {
                     return true;
                 }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isAddSeries()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_USER && album.isAddUser()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.DELETE_SERIES && album.isDeleteSeries()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.DOWNLOAD_SERIES && album.isDownloadSeries()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.SEND_SERIES && album.isSendSeries()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.WRITE_COMMENT && album.isWriteComments()) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.LIST_USERS) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_ALBUM) {
-                    return true;
-                }
-                if (usersPermission == UsersPermission.UsersPermissionEnum.EDIT_FAVORITES && album.isAddSeries()) {
-                    return true;
-                }
-                return false;
+
+                usersPermission.hasUserPermission(album);
+
             }
         } catch (UserNotMemberException | AlbumNotFoundException e) {
             return false;

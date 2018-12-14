@@ -10,7 +10,7 @@ import online.kheops.auth_server.event.EventResponses;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.servlet.ServletContext;
@@ -87,7 +87,7 @@ public class EventRessource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UsersPermission.UsersPermissionEnum.WRITE_COMMENT)
+    @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
     @Path("album/{album:[1-9][0-9]*}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)

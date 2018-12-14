@@ -1,6 +1,6 @@
 package online.kheops.auth_server.annotation;
 
-import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;
@@ -14,5 +14,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 public @interface AlbumPermissionSecured {
-    UsersPermission.UsersPermissionEnum value();
+    UserPermissionEnum value();
 }

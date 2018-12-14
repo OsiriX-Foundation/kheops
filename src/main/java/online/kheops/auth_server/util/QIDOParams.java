@@ -6,7 +6,7 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
-import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import org.dcm4che3.data.Tag;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -50,7 +50,7 @@ public final class QIDOParams {
             fromInboxLocal = true;
         }
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            if (kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, albumIDLocal)) {
+            if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, albumIDLocal)) {
                 fromInboxLocal = false;
                 try {
                     albumIDLocal = kheopsPrincipal.getAlbumID();
