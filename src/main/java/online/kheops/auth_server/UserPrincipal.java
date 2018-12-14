@@ -7,7 +7,6 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
-import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;

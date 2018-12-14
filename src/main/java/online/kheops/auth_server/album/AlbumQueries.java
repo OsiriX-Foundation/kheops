@@ -9,7 +9,6 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.ws.rs.core.MultivaluedMap;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;

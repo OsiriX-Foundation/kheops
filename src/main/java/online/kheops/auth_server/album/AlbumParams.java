@@ -34,23 +34,9 @@ public final class AlbumParams {
     public AlbumParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
 
-        if (queryParameters.containsKey(NAME)) {
-            name = Optional.ofNullable(queryParameters.get(NAME).get(0));
-        } else {
-            name = Optional.empty();
-        }
-
-        if (queryParameters.containsKey(CREATED_TIME)) {
-            createdTime = Optional.ofNullable(queryParameters.get(CREATED_TIME).get(0));
-        } else {
-            createdTime = Optional.empty();
-        }
-
-        if (queryParameters.containsKey(LAST_EVENT_TIME)) {
-            lastEventTime = Optional.ofNullable(queryParameters.get(LAST_EVENT_TIME).get(0));
-        } else {
-            lastEventTime = Optional.empty();
-        }
+        name = exctractName(queryParameters);
+        createdTime = exctractCreatedTime(queryParameters);
+        lastEventTime = exctractLastEventTime(queryParameters);
 
         if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
             descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
@@ -63,29 +49,75 @@ public final class AlbumParams {
             orderBy = CREATED_TIME;
         }
 
-        if (queryParameters.containsKey(FAVORITE)) {
-            if (queryParameters.get(FAVORITE).get(0).compareTo("true") == 0) {
-                favorite = true;
-            }
-        }
+        favorite = exctractFavorite(queryParameters);
 
-        if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
-            fuzzyMatching = Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
-        }
+        fuzzyMatching = exctractFuzzyMatching(queryParameters);
 
-        if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
-            limit = JOOQTools.getLimit(queryParameters);
-        } else {
-            limit = OptionalInt.empty();
-        }
-        if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
-            offset = JOOQTools.getOffset(queryParameters);
-        } else {
-            offset = OptionalInt.empty();
-        }
+        limit = exctractLimit(queryParameters);
+        offset = exctractOffset(queryParameters);
 
         DBID = kheopsPrincipal.getDBID();
     }
+
+    private Optional<String> exctractName(MultivaluedMap<String, String> queryParameters) {
+
+        if (queryParameters.containsKey(NAME)) {
+            return Optional.ofNullable(queryParameters.get(NAME).get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> exctractCreatedTime(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(CREATED_TIME)) {
+            return Optional.ofNullable(queryParameters.get(CREATED_TIME).get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> exctractLastEventTime(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(LAST_EVENT_TIME)) {
+            return Optional.ofNullable(queryParameters.get(LAST_EVENT_TIME).get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private OptionalInt exctractLimit(MultivaluedMap<String, String> queryParameters)
+            throws BadQueryParametersException {
+        if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
+            return JOOQTools.getLimit(queryParameters);
+        } else {
+            return OptionalInt.empty();
+        }
+    }
+
+    private OptionalInt exctractOffset(MultivaluedMap<String, String> queryParameters)
+            throws BadQueryParametersException {
+        if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
+            return JOOQTools.getOffset(queryParameters);
+        } else {
+            return OptionalInt.empty();
+        }
+    }
+
+    private boolean exctractFavorite(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(FAVORITE)) {
+            if (queryParameters.get(FAVORITE).get(0).compareTo("true") == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean exctractFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
+            return Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
+        }
+        return false;
+    }
+
 
     public boolean isDescending() { return descending; }
 
