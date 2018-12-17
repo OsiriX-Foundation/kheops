@@ -18,7 +18,9 @@ public final class AlbumQueryParams {
     private final boolean descending;
     private final String orderBy;
 
-    private boolean fuzzyMatching = false;
+    private final boolean canAddSeries; //add permission or admin
+
+    private boolean fuzzyMatching;
 
     private final OptionalInt limit;
     private final OptionalInt offset;
@@ -37,6 +39,8 @@ public final class AlbumQueryParams {
         name = extractName(queryParameters);
         createdTime = extractCreatedTime(queryParameters);
         lastEventTime = extractLastEventTime(queryParameters);
+
+        canAddSeries = extractCanAddSeries(queryParameters);
 
         if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
             descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
@@ -104,9 +108,14 @@ public final class AlbumQueryParams {
 
     private boolean extractFavorite(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(FAVORITE)) {
-            if (queryParameters.get(FAVORITE).get(0).compareTo("true") == 0) {
-                return true;
-            }
+            return Boolean.valueOf(queryParameters.get(FAVORITE).get(0));
+        }
+        return false;
+    }
+
+    private boolean extractCanAddSeries(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("canAddSeries")) {
+            return Boolean.valueOf(queryParameters.get("canAddSeries").get(0));
         }
         return false;
     }
@@ -136,6 +145,8 @@ public final class AlbumQueryParams {
     public Optional<String> getLastEventTime() { return lastEventTime; }
 
     public boolean isFavorite() { return favorite; }
+
+    public boolean canAddSeries() { return canAddSeries; }
 
     public long getDBID() { return DBID; }
 }

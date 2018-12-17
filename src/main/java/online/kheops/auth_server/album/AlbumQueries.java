@@ -109,6 +109,10 @@ public class AlbumQueries {
             applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
             applyIfPresent(albumQueryParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
 
+            if(albumQueryParams.canAddSeries()) {
+                conditionArrayList.add(ALBUM_USER.ADMIN.isTrue().or(ALBUMS.ADD_SERIES_PERMISSION.isTrue()));
+            }
+
             if (albumQueryParams.isFavorite()) {
                 conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
             }
