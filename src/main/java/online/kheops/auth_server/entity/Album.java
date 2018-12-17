@@ -155,6 +155,8 @@ public class Album {
         series.removeAlbumSeries(albumSeries);
     }
 
+    public Set<AlbumSeries> getAlbumSeries() { return albumSeries; }
+
     public Set<AlbumUser> getAlbumUser() { return albumUser; }
 
     public void addAlbumUser(AlbumUser albumUser) { this.albumUser.add(albumUser); }

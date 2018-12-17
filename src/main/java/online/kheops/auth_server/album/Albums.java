@@ -154,6 +154,10 @@ public class Albums {
                 em.remove(capability);
             }
 
+            for (AlbumSeries albumSeries:album.getAlbumSeries()) {
+                em.remove(albumSeries);
+            }
+
             em.remove(album);
 
             tx.commit();
