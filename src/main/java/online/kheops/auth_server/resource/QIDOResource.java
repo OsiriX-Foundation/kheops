@@ -42,7 +42,6 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
-import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
