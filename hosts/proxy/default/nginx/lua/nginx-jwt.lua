@@ -29,10 +29,12 @@ function M.auth(claim_specs, use_post_secret)
             ngx.exit(ngx.HTTP_UNAUTHORIZED)
         end 
     end
-
-   if use_post_secret == true then
+    ngx.log(ngx.WARN, "secret(avant test):"..secret)
+    ngx.log(ngx.WARN, "post_secret:"..post_secret)
+    if use_post_secret == true then
 	secret = post_secret
-   end
+    end
+    ngx.log(ngx.WARN, "secret(apres test):"..secret)
 	
     -- require valid JWT
     local jwt_obj = jwt:verify(secret, token, 0)
