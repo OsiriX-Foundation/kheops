@@ -12,5 +12,5 @@ echo -e "${cyan}Required Dockerfile SHA1:${no_color} $dockerfile_sha1"
 
 echo -e "${cyan}Building base proxy image${no_color}"
 
-docker build --build-arg VCS_REF=`git rev-parse --short HEAD` -t="osirixfoundation/pacs-authorization-proxy" --force-rm $proxy_base_dir
+docker build --build-arg VCS_REF=`git rev-parse --short HEAD` -t="osirixfoundation/pacs-authorization-proxy:lavim" --force-rm $proxy_base_dir
 
