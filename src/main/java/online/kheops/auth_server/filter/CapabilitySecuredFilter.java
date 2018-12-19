@@ -23,6 +23,7 @@ public class CapabilitySecuredFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         if (!requestContext.getSecurityContext().isUserInRole("capability")) {
             throw new NotAuthorizedException("The bearer token not valid for access to capability resources");
+            //TODO NotAuthorized => Forbidden
         }
     }
 }

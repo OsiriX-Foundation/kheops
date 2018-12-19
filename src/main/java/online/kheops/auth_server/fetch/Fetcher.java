@@ -48,6 +48,7 @@ public abstract class Fetcher {
         final Attributes attributes;
         try {
             String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
+            LOG.log(Level.WARNING, "authToken is: " + authToken);
             List<Attributes> studyList = CLIENT.target(studyUri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
             if (studyList == null || studyList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch study returned nothing");
