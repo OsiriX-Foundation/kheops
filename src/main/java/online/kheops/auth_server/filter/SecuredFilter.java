@@ -46,7 +46,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
-        LOG.log(Level.WARNING, token);
+
         final Assertion assertion;
         try {
             assertion = AssertionVerifier.createAssertion(token);
