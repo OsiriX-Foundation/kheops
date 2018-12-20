@@ -6,7 +6,7 @@ import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
 import store from '@/store'
 
-import PermissionDenied from '@/components/user/PermissionDenied'
+import PermissionDenied from '@/components/user/permissionDenied'
 
 // import {ServerTable, ClientTable, Event} from 'vue-tables-2';
 
@@ -74,7 +74,7 @@ function requireAuth (to, from, next){
 						next({
 							path: '/permissionDenied'
 						});
-					}					
+					}
 				})
 			} else {
 				next();
@@ -84,5 +84,3 @@ function requireAuth (to, from, next){
 	});
 }
 export default router;
-
-
