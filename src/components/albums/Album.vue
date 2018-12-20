@@ -12,9 +12,7 @@
 	  "downloadSeries": "Download Studies / Series",
 	  "sendSeries": "Get Studies / Series",
 	  "deleteSeries": "Remove Studies / Series",
-	  "writeComments": "Write Comments",
-	  "create": "Create",
-	  "cancel": "Cancel"
+	  "writeComments": "Write Comments"
 
   },
   "fr": {	
@@ -27,157 +25,68 @@
 	  "downloadSeries": "Télécharger une étude / série",
 	  "sendSeries": "Récupérer une étude / série",
 	  "deleteSeries": "Supprimer une étude / série",
-	  "writeComments": "Commenter",
-	  "create": "Créer",
-	  "cancel": "Annuler"
-
+	  "writeComments": "Commenter"
   }
 }
 </i18n>
 
 <template>
-	<div class = 'container'>
+	<div class = 'container-fluid'>
+		<div class = 'container'>
+			<div class = 'row'>
+				<div class = 'col-md'>	<h3><v-icon name="book" scale="2"></v-icon>{{album.name}} <v-icon name="star-o" scale="2" v-if="view=='studies'"></v-icon></h3></div>
+				<div class = 'col-md'>	<nav class="nav nav-pills nav-fill">
+					  <a class="nav-link" :class="(view=='studies')?'active':''" @click.stop="view='studies'" >Studies</a>
+					  <a class="nav-link" :class="(view=='comments')?'active':''" @click.stop="view='comments'">Comments</a>
+					  <a class="nav-link" :class="(view=='settings')?'active':''" @click.stop="view='settings'">Settings</a>
+					</nav>
+				</div>
+				<!-- <div class = 'col-md'></div> -->
+			</div>
+		</div>
+
+		<album-studies v-if="view=='studies'"></album-studies>
+		<album-comments v-if="view=='comments'" :album_id='album.album_id'></album-comments>
+		<album-settings v-if="view=='settings'"></album-settings>
 	
-	<h3>{{displayName}}</h3>
-	<form v-on:submit.prevent="createAlbum">
-		<fieldset>
-			<div class = 'row'>
-				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('albumName')}}</dt></div>
-				<div class = 'col-xs-12 col-sm-9'>
-					<dd>
-						<input type = 'text' v-model='album.name' :placeholder="$t('albumName')" class = 'form-control' >
-					</dd>
-					
-				</div>
-			</div>
-			<div class = 'row'>
-				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('albumDescription')}}</dt></div>
-				<div class = 'col-xs-12 col-sm-9'>
-					<dd>
-						<textarea rows='5' v-model='album.description' class = 'form-control' :placeholder="$t('albumDescription')"></textarea>
-					</dd>
-					
-				</div>
-			</div>
-			<div class = 'row'>
-				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('users')}}</dt></div>
-				<div class = 'col-xs-12 col-sm-9'>
-					<dd>
-						<h5 class = 'user'><span v-for="user in album.users" class = 'badge badge-secondary'>{{user.firstname+" "+user.lastname}} <span class = 'icon pointer' @click='deleteUser(user)'><v-icon name='times'></v-icon></span></span></h5>
-						<h5 class = 'user'>
-							<div class="input-group mb-3">
-								<input type="text" class="form-control form-control-sm" placeholder="email" aria-label="Email"  v-model="newUserName">
-								<div class="input-group-append">
-									<button class="btn btn-outline-secondary btn-sm" type="button" id="button-addon2" @click='checkUser()' title = 'add user'><v-icon name="plus"></v-icon></button>
-								</div>
-							</div>
-						</h5>
-					</dd>
-					
-				</div>
-			</div>
-		</fieldset>	
-		
-		<fieldset>
-			<legend>{{$t('usersettings')}}</legend>
-			<div class = 'row form-group' v-for='(value,label) in album.userSettings' :class = '(label=="sendSeries")?"offset-1":""'>
-				<div><toggle-button v-model="album.userSettings[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')" :sync="true"/></div>
-				<label>{{$t(label)}}</label>
-			</div>
-		</fieldset>
-		<fieldset>
-			<div class = 'row'>
-				<button type = 'submit' class = 'btn btn-primary' :disabled='!album.name'>{{$t('create')}}</button>
-				<button type = 'reset' class = 'btn btn-secondary'>{{$t('cancel')}}</button>
-			</div>
-		</fieldset>
-	
-	</form>
 	
 	</div>
 </template>
 
 <script>
 import {HTTP} from '@/router/http';
-import ToggleButton from 'vue-js-toggle-button'
+import { mapGetters } from 'vuex'
+import albumStudies from '@/components/albums/albumStudies'
+import albumComments from '@/components/albums/albumComments'
+import albumSettings from '@/components/albums/albumSettings'
+
+
 export default {
 	name: 'album',
-	
+	computed: {
+  	  ...mapGetters({
+  	  	  album: 'album'
+  	    })	
+	},
+	components: { albumStudies, albumSettings, albumComments},
 	data () {
 		return {
-			album: {
-				album_id: '',
-				name: '',
-				description: '',
-				addUser: false,
-				downloadSeries: true,
-				sendSeries: true,
-				deleteSeries: false,
-				addSeries: true,
-				writeComments: true,
-				users: [{email: 'robin.liechti@sib.swiss',"firstname": "Robin", "lastname": "Liechti"}],
-				userSettings: {
-					addUser: false,
-					addSeries: true,
-					downloadSeries: true,
-					sendSeries: true,
-					deleteSeries: false,
-					writeComments: true
-				}
-			},
+			view: 'studies',
 			newUserName: ''
 		}
 	},
-	computed: {
-		displayName () {
-			return (!this.album.album_id) ? "New album" : this.album.name;
-		}
-	},
 	methods: {
-		deleteUser (user){
-			console.log("delete: ",user);
-		},
-		checkUser () {
-			let vm = this;
-			let idx = _.findIndex(vm.album.users, u => {return u.email == vm.newUserName;});
-			if (vm.newUserName && idx == -1){
-				HTTP.get('users?reference='+vm.newUserName,{headers: {'Accept': 'application/json'}}).then(res => {
-					console.log(res);
-				}).catch(res => {
-					console.log('Sorry, an error occured');
-				})
-			}
-		},
-		createAlbum () {
-			let postValues = {
-				name: this.album.name,
-				description: this.album.description,
-				addUser: this.album.userSettings.addUser,
-				downloadSeries: this.album.userSettings.downloadSeries,
-				sendSeries: this.album.userSettings.sendSeries,
-				deleteSeries: this.album.userSettings.deleteSeries,
-				addSeries: this.album.userSettings.addSeries,
-				writeComments: this.album.userSettings.writeComments
-			}
-			this.$store.dispatch("createAlbum",postValues);
-		}
+	},
+	created () {
+		this.$store.dispatch('getAlbum',{album_id: this.$route.params.album_id}).then(res => {
+			this.view = this.$route.query.view || 'studies';
+		})
 	},
 	watch: {
-		'album.userSettings.downloadSeries' () {
-			console.log(this.album.userSettings.downloadSeries);
-			if (!this.album.userSettings.downloadSeries){
-				console.log('ici');
-				this.album.userSettings.sendSeries = false;	
-				console.log(this.album);
-			} 
-		}
-	},
-	mounted () {
-		let album_id = this.$route.params.id;
-		if (album_id !== 'new'){
-		 /*
-		 	TODO ADD GET request for albums
-		 */	
+		view () {
+			let queryParams = {view: this.view};
+			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat;
+			this.$router.push({query:queryParams})
 		}
 	}
 }
@@ -187,6 +96,7 @@ export default {
 <style>
 h3 {
 	margin-bottom: 40px;
+	float: left;
 }
 
 h5.user{
@@ -202,5 +112,8 @@ h5.user{
 }
 label{
 	margin-left: 10px;
+}
+nav a{
+	cursor: pointer;
 }
 </style>

@@ -28,16 +28,16 @@
 		<div class = 'nav-container'>
 			<ul class="nav nav-pills nav-fill">
 				<li class="nav-item">
-					<a class="nav-link" :class='(activePath=="inbox")?"active":""' href="/inbox"><v-icon name='bars'/>{{ $t("inbox") }}</a>
+					<router-link to="/inbox" class="nav-link" active-class="active"><v-icon name='bars'/>{{ $t("inbox") }}</router-link>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" :class='(activePath=="albums")?"active":""' href="/albums"><v-icon name='book' />{{ $t("albums") }}</a>
+					<router-link to="/albums" class="nav-link" active-class="active"><v-icon name='book'/>{{ $t("albums") }}</router-link>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" :class='(activePath=="favorites")?"active":""' href="/favorites"><v-icon name='star' />{{ $t("favorites") }}</a>
+					<router-link to="/favorites" class="nav-link" active-class="active"><v-icon name='star'/>{{ $t("favorites") }}</router-link>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link disabled" :class='(activePath=="recents")?"active":""' href="/recents"><v-icon name='clock-o'/>{{ $t("recents") }}</a>
+					<router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock-o'/>{{ $t("recents") }}</router-link>
 				</li>
 			</ul>
 		</div>
@@ -54,8 +54,8 @@ export default {
 	},
 	watch: {
 		'$route' (to, from){
-			console.log(to.path.split("/")[1]);
 			this.activePath = to.path.split("/")[1];
+			console.log(this.activePath);
 		}
 	}
 }

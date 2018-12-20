@@ -17,7 +17,7 @@
 
 	<b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-	<b-navbar-brand href="#"><img src="../assets/sib_logo_small.gif" style="margin-right:5px"><router-link to="/">Kheops</router-link></b-navbar-brand>
+	<b-navbar-brand href="#"><img src="../assets/sib_logo_small.gif" style="margin-right:5px"><router-link to="/" style = 'font-size: 1.3rem;'>Kheops</router-link></b-navbar-brand>
 
 	<b-collapse is-nav id="nav_collapse">
 

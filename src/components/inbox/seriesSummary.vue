@@ -7,14 +7,16 @@
 		"numberimages": "Number of images",
 		"description": "Description",
 		"seriesdate": "Series date",
-		"seriestime": "Series time"
+		"seriestime": "Series time",
+		"openviewer": "Open viewer"
 	},
 	"fr": {
 		"modality": "Modalité",
 		"numberimages": "Nombre d'images",
 		"description": "Description",
 		"seriesdate": "Date de la série",
-		"seriestime": "Heure de la série"
+		"seriestime": "Heure de la série",
+		"openviewer": "Ouvrir un explorateur"
 	}
 }
 
@@ -22,7 +24,7 @@
 
 
 <template>
-	<div>
+	<div class = 'seriesSummaryContainer'>
 		<div class = 'card-title'>
 			<b-form-checkbox v-model = "isSelected" >{{series.RetrieveAETitle[0]}}</b-form-checkbox>
 		</div>
@@ -32,17 +34,18 @@
 			</div>
 			<div class = 'col description'>
 				<dl class = 'row'>
-					<dt v-if='series.Modality' class = 'col-4 text-right'>{{ $t('modality') }}</dt>
-					<dd v-if='series.Modality' class = 'col-8'>{{series.Modality[0]}}</dd>
-					<dt v-if='series.NumberOfSeriesRelatedInstances' class = 'col-4 text-right'>{{ $t("numberimages") }}</dt>
-					<dd v-if='series.NumberOfSeriesRelatedInstances' class = 'col-8'>{{series.NumberOfSeriesRelatedInstances[0]}}</dd>
-					<dt v-if='series.SeriesDescription' class = 'col-4 text-right'>{{ $t("description") }}</dt>
-					<dd v-if='series.SeriesDescription' class = 'col-8'>{{series.SeriesDescription[0]}}</dd>
-					<dt v-if='series.SeriesDate' class = 'col-4 text-right'>{{ $t("seriesdate") }}</dt>
-					<dd v-if='series.SeriesDate' class = 'col-8'>{{series.SeriesDate[0]|formatDate}}</dd>
-					<dt v-if='series.SeriesTime' class = 'col-4	text-right'>{{ $t("seriestime") }}</dt>
-					<dd v-if='series.SeriesTime' class = 'col-8'>{{series.SeriesTime[0]|formatTime}}</dd>
+					<dt v-if='series.Modality' class = 'col-md-4 col-sm-12 text-right'>{{ $t('modality') }}</dt>
+					<dd v-if='series.Modality' class = 'col-md-8 col-sm-12'>{{series.Modality[0]}}</dd>
+					<dt v-if='series.NumberOfSeriesRelatedInstances' class = 'col-md-4 col-sm-12 text-right'>{{ $t("numberimages") }}</dt>
+					<dd v-if='series.NumberOfSeriesRelatedInstances' class = 'col-md-8 col-sm-12'>{{series.NumberOfSeriesRelatedInstances[0]}}</dd>
+					<dt v-if='series.SeriesDescription' class = 'col-md-4 col-sm-12 text-right'>{{ $t("description") }}</dt>
+					<dd v-if='series.SeriesDescription' class = 'col-md-8 col-sm-12'>{{series.SeriesDescription[0]}}</dd>
+					<dt v-if='series.SeriesDate' class = 'col-md-4 col-sm-12 text-right'>{{ $t("seriesdate") }}</dt>
+					<dd v-if='series.SeriesDate' class = 'col-md-8 col-sm-12'>{{series.SeriesDate[0]|formatDate}}</dd>
+					<dt v-if='series.SeriesTime' class = 'col-md-4 col-sm-12	text-right'>{{ $t("seriestime") }}</dt>
+					<dd v-if='series.SeriesTime' class = 'col-md-8 col-sm-12'>{{series.SeriesTime[0]|formatTime}}</dd>
 				</dl>
+				<p class = 'text-center'><button type = 'button' class = 'btn btn-sm' @click='openViewer'>{{$t('openviewer')}}</button></p>
 			</div>			
 		</div>
 	</div>
@@ -59,7 +62,8 @@ export default{
 	},
     computed: {
   	  ...mapGetters({
-  	  	  studies: 'studies'
+  	  	  studies: 'studies',
+		  user: 'currentUser'
   	    }),
 		series () {
 			let studyIndex = _.findIndex(this.studies,s => {return s.StudyInstanceUID[0] == this.StudyInstanceUID});
@@ -96,6 +100,9 @@ export default{
 					return img.data;
 				})
 			}			
+		},
+		openViewer () {
+			window.open('https://ohif.kheops.online/?url=https://test.kheops.online/studies/'+this.StudyInstanceUID+'/ohifmetadata#token='+this.user.jwt,'OHIFViewer')
 		}
 	}
 }
@@ -107,6 +114,13 @@ div.preview{
 	width: 290px;
 	padding: 0 20px;
 	float: left;
+}
+div.seriesSummaryContainer{
+	font-size: 80%;
+	line-height: 1.5em;
+}
+label{
+	font-size: 130%;
 }
 
 </style>

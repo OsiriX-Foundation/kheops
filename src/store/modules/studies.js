@@ -23,12 +23,14 @@ const state = {
 		}
 	},
 	request: '',
+	studies_comments: []
 }
 
 // getters
 const getters = {
 	studies: state => state.all,
-	currentStudy: state => state.current
+	studies_comments: state => state.studies_comments
+	
 }
 
 // actions
@@ -48,12 +50,20 @@ const actions = {
 					requestParams += '&inbox=true';
 				}
 			}
+			else if (filterName == 'album_id'){
+				if (value){
+					requestParams += '&album='+value;
+				}
+			}
 			else if (filterName.indexOf('StudyDate') == -1){
 				if (value){
 					requestParams += '&'+filterName+'='+value+"*";
 				}				
 			}
 		});
+		if (requestParams.indexOf('&album=') > -1){
+			requestParams = requestParams.replace('&inbox=true','');
+		}
 		if (params.filters.StudyDateFrom || params.filters.StudyDateTo){
 			let fromDate = '', toDate = '';
 			if (params.filters.StudyDateFrom){
@@ -117,7 +127,9 @@ const actions = {
 			
 			if (study.series !== undefined && study.series.length) return study.series;
 			
-			HTTP.get('/studies/'+study.StudyInstanceUID+'/series?includefield=00080021&includefield=00080031',{headers: {'Accept': 'application/dicom+json'}}).then(res => {
+			let queryString = (params.album_id) ? "&album="+params.album_id : "&inbox=true";
+			
+			HTTP.get('/studies/'+study.StudyInstanceUID+'/series?includefield=00080021&includefield=00080031'+queryString,{headers: {'Accept': 'application/dicom+json'}}).then(res => {
 				let data = [];
 				_.forEach(res.data, (d,i) => {
 					let t = {imgSrc: ''};
@@ -178,7 +190,23 @@ const actions = {
 		
 	},
 	deleteStudy ({ commit },params) {
-		HTTP.delete('/studies/'+params.StudyInstanceUID[0]+"&inbox=true");
+		let queryParam = (params.album_id) ? "/albums/"+params.album_id : "?inbox=true";
+		let studyIdx = _.findIndex(state.all, s => {return s.StudyInstanceUID == params.StudyInstanceUID});
+		commit("TOGGLE_SELECTED_STUDY",{selected: false,type: 'study', index: studyIdx});
+		return HTTP.delete('/studies/'+params.StudyInstanceUID[0]+queryParam).then(res => {
+			commit("DELETE_STUDY",{StudyInstanceUID:params.StudyInstanceUID[0]})
+		});
+
+	},
+	deleteSeries ({ commit },params) {
+		let queryParam = (params.album_id) ? "/albums/"+params.album_id : "?inbox=true";
+		let studyIdx = _.findIndex(state.all, s => {return s.StudyInstanceUID == params.StudyInstanceUID});
+		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => {return s.SeriesInstanceUID == params.SeriesInstanceUID});
+		commit("TOGGLE_SELECTED_STUDY",{selected: false,type: 'series', index: studyIdx+":"+seriesIdx });
+		return HTTP.delete('/studies/'+params.StudyInstanceUID[0]+"/series/"+params.SeriesInstanceUID[0]+queryParam).then(res => {
+			commit("DELETE_SERIES",{StudyInstanceUID:params.StudyInstanceUID[0], SeriesInstanceUID:params.SeriesInstanceUID[0]});
+		});
+
 
 	},
 	downloadStudy ({ commit },params) {
@@ -213,8 +241,28 @@ const actions = {
 		}
 	},
 	toggleSelected ({ commit }, params){
-		commit("TOGGLE_SELECTED",params)
+		commit("TOGGLE_SELECTED_STUDY",params)
+	},
+	getStudiesComments ({ commit },params){
+		return HTTP.get('/studies/'+params.StudyInstanceUID+"/comments",{headers: {'Accept': 'application/json'}}).then(res => {
+			if (res.status == 200){
+				commit("SET_STUDIES_COMMENTS",{data: res.data,StudyInstanceUID: params.StudyInstanceUID} );
+			}
+		})
+	},
+	postStudiesComment ({commit, dispatch},params){
+		var query = "";
+		_.forEach(params, (value, key) => {
+			if (value && key != 'index') query += encodeURIComponent(key)+"="+encodeURIComponent(value)+"&";
+		})
+		let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0];
+		return HTTP.post('/studies/'+StudyInstanceUID+"/comments",query,{headers: {'Accept': 'application/json','Content-Type': 'application/x-www-form-urlencoded'}}).then(res => {
+			if (res.status == 204){
+				dispatch('getStudiesComments',{StudyInstanceUID:StudyInstanceUID});
+			}
+		})
 	}
+	
 	
 
 
@@ -229,7 +277,8 @@ const mutations = {
 			d.is_selected = false;
 			d.is_favorite = false;
 			d.comment = null;
-
+			d.view = 'series';
+			d.comments = [];
 			_.forEach(state.flags, (flag,StudyInstanceUID) => {
 				if (d.StudyInstanceUID[0] == StudyInstanceUID){
 					studies[i].is_selected = flag.is_selected;
@@ -240,8 +289,7 @@ const mutations = {
 		})
 		if (reset) 	state.all = studies;
 		else {
-			
-			state.all = _.uniqBy(state.all.concat(studies),function(d){return d.StudyInstanceUID});
+			state.all = _.uniqBy(state.all.concat(studies),function(d){return d.StudyInstanceUID[0]});
 		}
 	},
 	SET_SERIES (state,data){
@@ -271,9 +319,6 @@ const mutations = {
 		});
 		
 	},
-	SELECT_STUDIES (state, study){
-		state.current = study;
-	},
 	SET_STUDIES_FILTER_PARAMS (state,params){
 		state.filterParams.sortBy = params.sortBy;
 		state.filterParams.sortDesc = params.sortDesc;
@@ -297,7 +342,7 @@ const mutations = {
 			state.flags[state.all[params.index].StudyInstanceUID[0]].is_favorite = state.all[params.index].is_favorite;		
 		}
 	},
-	TOGGLE_SELECTED (state,params){
+	TOGGLE_SELECTED_STUDY (state,params){
 		if (params.type == 'study'){
 			state.all[params.index].is_selected = !state.all[params.index].is_selected;
 			state.flags[state.all[params.index].StudyInstanceUID[0]].is_selected = state.all[params.index].is_selected;		
@@ -316,6 +361,17 @@ const mutations = {
 			})
 			state.all[indices[0]].is_selected = studies_selected;
 		}
+		else if (params.type == 'all'){
+			_.forEach(state.flags,(flags,id) => {
+				state.flags[id].is_selected = false;
+			})
+			_.forEach(state.all, (s,idx) => {
+				s.is_selected = false;
+				_.forEach(state.all[idx].series, (series,sidx) => {
+					state.all[idx].series[sidx].is_selected = false;
+				})
+			})
+		}
 	},
 	SET_FLAG (state,flag){
 		state.flags[flag.id] = {
@@ -333,7 +389,38 @@ const mutations = {
 			let sidx = _.findIndex(state.all[idx].series, s => {return s.SeriesInstanceUID == params.SeriesInstanceUID});
 			if (sidx > -1) state.all[idx].series[sidx].imgSrc = params.img;
 		}
+	},
+	DELETE_STUDY (state,params){
+		let studyIdx = _.findIndex(state.all,s => {return s.StudyInstanceUID[0] == params.StudyInstanceUID});
+		if (studyIdx > -1) state.all.splice(studyIdx,1);
+	},
+	DELETE_SERIES (state,params){
+		let studyIdx = _.findIndex(state.all,s => {return s.StudyInstanceUID[0] == params.StudyInstanceUID});
+		if (studyIdx > -1){
+			let seriesIdx = _.findIndex(state.all[studyIdx].series, s => {return s.SeriesInstanceUID[0] == params.SeriesInstanceUID});
+			if (seriesIdx > -1){
+				state.all[studyIdx].series.splice(seriesIdx,1);
+			}
+		} 
+	},
+	SET_STUDIES_COMMENTS (state,params){
+		let data = params.data;
+		let studyIdx = _.findIndex(state.all,s => {return s.StudyInstanceUID[0] == params.StudyInstanceUID});
+		if (studyIdx > -1){
+			state.all[studyIdx].comments.splice(0);
+			_.forEach(data, d => {
+				state.all[studyIdx].comments.unshift(d);
+			})			
+		}
+	},
+	TOGGLE_STUDY_VIEW ({commit},params){
+		let idx = _.findIndex(state.all,s => {return s.StudyInstanceUID[0] == params.StudyInstanceUID;});
+		if (idx > -1){
+			state.all[idx].view = (state.all[idx].view == 'comments') ? "series" : "comments";
+		}
 	}
+	
+	
 	
 }
 

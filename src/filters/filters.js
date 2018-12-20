@@ -13,3 +13,7 @@ Vue.filter('formatTime', value => {
     // return moment(String(value)).format('hh:ii')
   }
 })
+
+Vue.filter('nl2br', value => {
+	return value.replace("\n","<br>");
+})

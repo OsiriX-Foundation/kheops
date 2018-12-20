@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Study from '@/components/inbox/List'
 import Albums from '@/components/albums/List'
+import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
 import store from '@/store'
 
@@ -32,7 +33,15 @@ const router = new Router({
 
 	 },
 	 {
-		 path: '/album/:id',
+		 path: '/albums/new',
+		 name: 'new_album',
+		 component: NewAlbum,
+   	    beforeEnter: requireAuth,
+   	    meta: {permissions: 'active',condition: 'any'}
+
+	 },
+	 {
+		 path: '/albums/:album_id',
 		 name: 'album',
 		 component: Album,
    	    beforeEnter: requireAuth,

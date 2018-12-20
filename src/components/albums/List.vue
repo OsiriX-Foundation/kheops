@@ -3,8 +3,22 @@
 <i18n>
 {
   "en": {
+	  "newalbum": "New album",
+	  "Study #": "study #",
+	  "Modalities": "modalities",
+	  "User #": "user #",
+	  "Message #": "message #",
+	  "Date": "date",
+	  "LastEvent": "last event"	  
   },
   "fr": {	
+	  "newalbum": "Nouvel album",
+	  "Study #": "# Etudes",
+	  "Modalities": "modalités",
+	  "User #": "# utilisateurs",
+	  "Message #": "# messages",
+	  "Date": "date",
+	  "LastEvent": "dern. evnt"
   }
 }
 </i18n>
@@ -13,12 +27,13 @@
 
 <template>
 	<div class = 'container-fluid'>
-		<div class="my-3 selection-button-container">
-			<h3 style = 'display: inline'><a href='album/new'><v-icon name = 'plus'></v-icon>New album</a></h3>
-			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'><v-icon name = 'search' scale='2'/></button>
-
+		<div class="my-3 selection-button-container" style = ' position: relative;'>
+			<h3 >
+				<router-link to="albums/new" class="nav-link" active-class="active" style = 'display: inline'><v-icon name = 'plus'></v-icon>{{$t('newalbum')}}</router-link>
+				<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters' style='position: absolute; right: 20px;top: 0'><v-icon name = 'search' scale='2'/></button>
+			</h3>
 		</div>
-		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
+		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true"  @row-clicked='selectAlbum'>
 	
 			<template slot="HEAD_is_selected" scope="head">
 				<b-button variant="link" size="sm"  class="mr-2" >
@@ -36,7 +51,7 @@
 				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbStudies' :placeholder="$t('filter')"> <br></div>
 				{{$t(data.label)}}
 			</template>
-		 	<template slot="HEAD_modalities_in_study" slot-scope="data">
+		 	<template slot="HEAD_modalities" slot-scope="data">
 				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' :placeholder="$t('filter')"> <br></div>
 				{{$t(data.label)}}
 			</template>
@@ -100,12 +115,14 @@
 				</b-form-group>
 			</template>
 		 	<template slot = 'name' slot-scope='data'>
-				{{data.item.name}}
-				<div class = 'nameIcons'>
-					<span @click = "toggleFavorite(data.index,'album')" :class="data.item.is_favorite?'selected':''">
-						<v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-						<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
-					</span>
+				<div class = 'nameContainer'>
+					{{data.item.name}}
+					<div class = 'nameIcons'>
+						<span @click = "toggleFavorite(data.index,'album')" :class="data.item.is_favorite?'selected':''">
+							<v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
+							<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
+						</span>
+					</div>
 				</div>
 			</template>
 
@@ -127,6 +144,7 @@
 
 import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
+import Datepicker from 'vuejs-datepicker';
 
 export default {
   name: 'albums',
@@ -153,7 +171,7 @@ export default {
 					sortable: true
 				},
 				{
-					key: 'modalities_in_study',
+					key: 'modalities',
 					label: 'Modalities',
 					sortable: true
 				},
@@ -187,7 +205,7 @@ export default {
 			filters: {
 				name: '',
 				number_of_studies: '',
-				modalities_in_study: '',
+				modalities: '',
 				number_of_users: '',
 				number_of_comments: '',
 				CreateDateFrom: '',
@@ -198,7 +216,7 @@ export default {
 			
 		}
 	},
-	components: {},
+	components: {Datepicker},
   computed: {
 	  ...mapGetters({
 	  	  albums: 'albums'
@@ -229,7 +247,7 @@ export default {
   	  			  from: new Date()
   	  		  }
   	  	},
-  	  	disabledFromCreateDates: function(){
+  	  	disabledFromEventDates: function(){
   	  		  let vm = this;
   	  		  return {
   	  			  from: new Date()
@@ -304,6 +322,11 @@ export default {
 	  },
 	  searchOnline(filters){
 		  this.$store.dispatch('getAlbums',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+	  },
+	  selectAlbum (item){
+		  if (item.album_id){
+			  this.$router.push("/albums/"+item.album_id);
+		  }
 	  }
 
   },
@@ -338,6 +361,9 @@ watch : {
 </script>
 
 <style>
+table th{
+	text-transform: capitalize;
+}
 select{
 	display: inline !important;
 	width: auto;
@@ -370,6 +396,33 @@ select{
  div.calendar-wrapper{
 	 color: #333;
  }
+ 
+ .nameContainer{
+ 	position: relative;
+ 	white-space: nowrap;
+	cursor: pointer;
+ }
+
+ .nameIcons{
+ 	margin-left: 10px;
+ 	visibility: hidden;
+ 	display: inline;
+ 	cursor: pointer;
+ }
+
+ .name:hover .nameIcons {
+ 	 visibility:visible; 
+  }
+ 
+  .nameIcons > span.selected{
+ 	 visibility:visible !important;  	
+  }
+ 
+  .nameIcons span{
+ 	 margin: 0 3px;
+  }
+ 
+ 
 </style>
 
 /* eslint-disable */

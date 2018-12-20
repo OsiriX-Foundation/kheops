@@ -8,6 +8,7 @@ import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import '@/css/bootstrap_dark.css'
+import '@/css/main.css'
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import 'vue-snotify/styles/material.css'
 import Access from '@/directives/access'
@@ -20,7 +21,7 @@ import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import {HTTP} from '@/router/http';
 import '@/filters/filters.js';
 import VueI18n from 'vue-i18n'
-
+import messages from '@/lang/messages'
 
 
 Vue.config.productionTip = false
@@ -64,7 +65,8 @@ function tokenInterceptor () {
 
 // Create VueI18n instance with options
 const i18n = new VueI18n({
-  locale: 'en'
+  locale: 'en',
+  messages
 })
 
 

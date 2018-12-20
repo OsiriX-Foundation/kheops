@@ -1,41 +1,40 @@
 /* eslint-disable */
 
 <i18n>
-{
-  "en": {
-	  "selectednbstudies": "{count} study is selected | {count} studies are selected",
-	  "send": "Send",
-	  "addalbum": "Add to an album",
-	  "download": "Download",
-	  "addfavorite": "Add to favorite",
-	  "delete": "Delete",
-    "PatientName": "Patient Name",
-	"Modality": "Modality",
-	"StudyDate": "Study Date",
-	"AccessionNumber": "Accession #",
-	"PatientID": "Patient ID",
-	"filter": "Filter",
-	"fromDate": "From",
-	"toDate": "To"
-  },
-  "fr": {
-	  "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
-	  "send": "Envoyer",
-	  "addalbum": "Ajouter à un album",
-	  "download": "Télécharger",
-	  "addfavorite": "Ajouter aux favoris",
-	  "delete": "Supprimer",
-    "PatientName": "Nom du patient",
-	"Modality": "Modalité",
-	"StudyDate": "Date de l'étude",
-	"AccessionNumber": "# accession",
-	"PatientID": "ID patient",
-	"filter": "Filtrer",
-	"fromDate": "De",
-	"toDate": "A"
-	
-  }
-}
+	{
+		"en": {
+			"selectednbstudies": "{count} study is selected | {count} studies are selected",
+			"addalbum": "Add to an album",
+			"download": "Download",
+			"addfavorite": "Add to favorite",
+			"PatientName": "Patient Name",
+			"Modality": "Modality",
+			"StudyDate": "Study Date",
+			"AccessionNumber": "Accession #",
+			"PatientID": "Patient ID",
+			"filter": "Filter",
+			"fromDate": "From",
+			"toDate": "To",
+			"studyputtoalbum": "Studies put successfully to an album",
+			"includeseriesfromalbum": "include series from albums"
+		},
+		"fr": {
+			"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
+			"addalbum": "Ajouter à un album",
+			"download": "Télécharger",
+			"addfavorite": "Ajouter aux favoris",
+			"PatientName": "Nom du patient",
+			"Modality": "Modalité",
+			"StudyDate": "Date de l'étude",
+			"AccessionNumber": "# accession",
+			"PatientID": "ID patient",
+			"filter": "Filtrer",
+			"fromDate": "De",
+			"toDate": "A",
+			"studyputtoalbum": "L'étude a été enregistrée dans l'album avec succès",
+			"includeseriesfromalbum": "inclure des séries présentes dans les albums"	
+		}
+	}
 </i18n>
 
 
@@ -45,13 +44,21 @@
 		<div class="my-3 selection-button-container">
 			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
 				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
-				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>{{ $t("send") }}</button>
-				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>{{ $t("send") }}</button>
+				<!-- <button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}</button> -->
+			    <b-dropdown variant="link" size="sm" no-caret>
+			       <template slot="button-content">
+					   <span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}
+			       </template>
+			       <b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in albums'>{{album.name}}</b-dropdown-item>
+			     </b-dropdown>
+				
+				
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()"><span><v-icon class="align-middle" name="download"></v-icon></span><br>{{ $t("download") }}</button>
-				<button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="star"></v-icon></span><br>{{ $t("addfavorite") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'><span><v-icon class="align-middle" name="star"></v-icon></span><br>{{ $t("addfavorite") }}</button>
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>{{ $t("delete") }}</button>
 			</span>
-			<span style = 'margin-left: 30px;'><toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" /> Include series from albums</span>
+			<span style = 'margin-left: 30px;' v-if='!filters.album_id'><toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" /><label class = 'ml-3'>{{$t('includeseriesfromalbum')}}</label></span>
 			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'><v-icon name = 'search' scale='2'/></button>
 
 		</div>
@@ -125,39 +132,46 @@
 
 			</template>
 			<template slot="row-details" slot-scope="row">
-				<b-card>
-					<!-- <p>{{row.item.series.length}} serie{{row.item.series.length>1?"s":""}}</p> -->
+				<b-card>				
 					<div class = 'row'>
-						<div class = 'col-sm-12 col-md-6' v-for='serie in row.item.series'>
-							<series-summary
-							      :SeriesInstanceUID="serie.SeriesInstanceUID[0]"
-								  :selected="serie.is_selected"
-								  :StudyInstanceUID="row.item.StudyInstanceUID[0]"
-							      :key="serie.SeriesInstanceUID[0]">
-							</series-summary>
+						<div class = 'col-sm-2' >
+							<nav class="nav nav-pills nav-justified flex-column">
+							  <a class="nav-link" :class="(row.item.view=='series')?'active':''" @click="row.item.view='series'">{{$t('series')}}</a>
+							  <a class="nav-link" :class="(row.item.view=='comments')?'active':''" @click="loadStudiesComments(row.item)">{{$t('comments')}}</a>
+							</nav>
 						</div>
+						<div class = 'col-sm-10' v-if='row.item.view=="series"'>
+							<div class = 'row'>
+								<div class = 'col-sm-12 col-md-6 mb-5'  v-for='serie in row.item.series'>
+									<series-summary
+									      :SeriesInstanceUID="serie.SeriesInstanceUID[0]"
+										  :selected="serie.is_selected"
+										  :StudyInstanceUID="row.item.StudyInstanceUID[0]"
+									      :key="serie.SeriesInstanceUID[0]">
+									</series-summary>
+								</div>
+							
+							</div>
+						</div>												
 						
+						<div v-if='row.item.view=="comments"'  class = 'col-md-10'>
+							<comments-and-notifications scope='studies' :id='row.item.StudyInstanceUID[0]'></comments-and-notifications>
+						</div>
 					</div>
-
-					<!-- <b-row class="mb-2">
-						<b-col sm="3" class="text-sm-right"><b>Age:</b></b-col>
-						<b-col>{{ row.item.age }}</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
-						<b-col>{{ row.item.isActive }}</b-col>
-					</b-row> -->
 				</b-card>
 			</template>
 		 	<template slot = 'PatientName' slot-scope='data'>
+				<div class = 'patientNameContainer'>
 				{{data.item.PatientName}}
-				<div class = 'patientNameIcons'>
-					<span @click = "toggleFavorite(data.index,'study')" :class="data.item.is_favorite?'selected':''"><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-					<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
-					</span>
-						<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+					<div class = 'patientNameIcons'>
+						<span @click = "toggleFavorite(data.index,'study')" :class="data.item.is_favorite?'selected':''"><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
+						<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
 						</span>
-					<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+							<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+							</span>
+						<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+data.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
+						<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+					</div>
 				</div>
 			</template>
 
@@ -170,11 +184,12 @@
 
 import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
-
+import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 import seriesSummary from '@/components/inbox/seriesSummary'
 import ToggleButton from 'vue-js-toggle-button'
 import Datepicker from 'vuejs-datepicker';
 import Vue from 'vue'
+
 
 Vue.use(ToggleButton)
 
@@ -231,14 +246,17 @@ export default {
 				StudyDateFrom: '',
 				StudyDateTo: '',
 				ModalitiesInStudy: '',
-				inbox_and_albums: false
+				inbox_and_albums: false,
+				album_id: ''
 			}
 		}
 	},
-	components: {seriesSummary, Datepicker},
+	components: {seriesSummary, Datepicker, commentsAndNotifications},
   computed: {
 	  ...mapGetters({
-	  	  studies: 'studies'
+	  	  studies: 'studies',
+		  albums: 'albums',
+		  user: 'currentUser'
 	    }),
 		totalRows () {
 			return this.studies.length;
@@ -283,8 +301,9 @@ export default {
 
 	    },
 		showSeries (row) {
+			
 			if (!row.detailsShowing){
-				this.$store.dispatch('getSeries',{StudyInstanceUID: row.item.StudyInstanceUID[0]})
+				this.$store.dispatch('getSeries',{StudyInstanceUID: row.item.StudyInstanceUID[0],album_id: this.filters.album_id})
 			}
 			row.toggleDetails();
 		},
@@ -313,19 +332,30 @@ export default {
 	  },
 	  deleteSelectedStudies(){
 		 var vm = this;
-		 var i;
+		 var i,j;
 		 for (i = this.studies.length-1; i > -1; i--) {
-			 if(this.studies[i].is_selected){
- 			 	vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.studies[i].StudyInstanceUID})
- 				vm.$delete(vm.studies, i);
+			 if (this.studies[i].is_selected){
+				 let selectedSeries = _.filter(this.studies[i].series,s => {return s.is_selected;});
+				 if (this.studies[i].series.length == 0 || this.studies[i].series.length == selectedSeries.length){
+					 vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.studies[i].StudyInstanceUID,album_id:this.filters.album_id});
+	  				// vm.$delete(vm.studies, i);
+
+				 }
+				 else {
+					 for (j = selectedSeries.length-1; j > -1; j--){
+						 let s = selectedSeries[j];
+						 vm.$store.dispatch('deleteSeries',{StudyInstanceUID:this.studies[i].StudyInstanceUID,SeriesInstanceUID: s.SeriesInstanceUID, album_id:this.filters.album_id});
+						 // vm.$delete(vm.studies[i].series,j);
+						 
+					 }
+				 }
  			 }
 		 }
-
 	  },
 	  downloadSelectedStudies(){
 		   var vm = this;
 		   _.forEach(this.studies, function(study,index) {
-			   if( study.is_selected){
+			   if ( study.is_selected){
 				   vm.$store.dispatch('downloadStudy',{StudyInstanceUID:study.StudyInstanceUID})
 			   }
 		   });
@@ -333,13 +363,49 @@ export default {
 	  },
 	  searchOnline(filters){
 		  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+	  },
+	  addToAlbum (album_id) {
+		 let studies = _.filter(this.studies, s => {return s.is_selected});
+		 let data = [];
+		 
+		 _.forEach(studies, s => {
+			 let series = _.filter(s.series, one_series => {return one_series.is_selected});
+			 if (series.length == s.series.length){
+				 data.push({study_id: s.StudyInstanceUID[0],series_id: null, album_id: album_id});
+			 } 
+			 else {
+			 	_.forEach(series, one_series => {
+					 data.push({study_id: s.StudyInstanceUID[0],series_id: one_series.SeriesInstanceUID[0], album_id: album_id});
+				})
+			 }
+		 });
+		 
+		 if (data.length){
+			 this.$store.dispatch('putStudiesInAlbum',{data: data}).then(res => {
+				 this.$snotify.success(this.$t('studyputtoalbum'));
+			 });
+		 }	 
+	  },
+	  toggleStudyView (item){
+	  		this.$store.commit('TOGGLE_STUDY_VIEW',{StudyInstanceUID: item.StudyInstanceUID[0]})
+	  },
+	  loadStudiesComments (item) {
+		  this.studyView = 'comments';
+		  // this.$store.dispatch('getStudiesComments',{StudyInstanceUID: item.StudyInstanceUID[0]})
 	  }
+	  
 
 
   },
   created () {
+	  if (this.$route.params.album_id){
+	  	this.filters.album_id = this.$route.params.album_id;
+	  } 
+	  else{
+		  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+		  this.$store.dispatch('getAlbums',{pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true});	  	
+	  }
 
-	  this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
 
   },
   mounted () {
@@ -365,6 +431,9 @@ export default {
 						StudyDateFrom: '',
 						StudyDateTo: '',
 						ModalitiesInStudy: '',
+						inbox_and_albums: this.filters.inbox_and_albums,
+						album_id: this.filters.album_id
+						
 					}
 				}
 			}
@@ -392,6 +461,11 @@ select{
   text-decoration: underline;
   background-color: transparent;
   border-color: transparent;
+}
+
+.patientNameContainer{
+	position: relative;
+	white-space: nowrap;
 }
 
 .patientNameIcons{
@@ -428,6 +502,12 @@ select{
  div.calendar-wrapper{
 	 color: #333;
  }
+ a.download{
+	 color: #FFF;
+ }
+  a.download:hover{
+	  color: #fd7e14;
+  }
 </style>
 
 /* eslint-disable */
