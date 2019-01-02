@@ -16,6 +16,8 @@ public class AlbumResponses {
     }
 
     public static class AlbumResponse {
+        @XmlElement(name = "album_pk")//TODO remove (debug)
+        public String pk;             //TODO remove (debug)
         @XmlElement(name = "album_id")
         public String id;
         @XmlElement(name = "name")
@@ -80,7 +82,8 @@ public class AlbumResponses {
     public static AlbumResponse recordToAlbumResponse(Record r) {
         final AlbumResponse albumResponse = new AlbumResponse();
 
-        albumResponse.id = r.getValue("album_pk").toString();
+        albumResponse.id = r.getValue("album_id").toString();
+        albumResponse.pk = r.getValue("album_pk").toString();
         albumResponse.name = r.getValue("album_name").toString();
         albumResponse.description = r.getValue("album_description").toString();
         albumResponse.createdTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_created_time")).getTime()), TimeZone.getDefault().toZoneId());
@@ -111,7 +114,8 @@ public class AlbumResponses {
     public static AlbumResponse recordToAlbumResponseForCapabilityToken(Record r) {
         final AlbumResponse albumResponse = new AlbumResponse();
 
-        albumResponse.id = r.getValue("album_pk").toString();
+        albumResponse.id = r.getValue("album_id").toString();
+        albumResponse.pk = r.getValue("album_pk").toString();
         albumResponse.name = r.getValue("album_name").toString();
         albumResponse.description = r.getValue("album_description").toString();
         albumResponse.numberOfStudies = (Integer) r.getValue("number_of_studies");

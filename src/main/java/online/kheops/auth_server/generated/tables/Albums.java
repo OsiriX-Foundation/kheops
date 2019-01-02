@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Albums extends TableImpl<AlbumsRecord> {
 
-    private static final long serialVersionUID = -1843401841;
+    private static final long serialVersionUID = 313199869;
 
     /**
      * The reference instance of <code>public.albums</code>
@@ -61,6 +61,11 @@ public class Albums extends TableImpl<AlbumsRecord> {
      * The column <code>public.albums.pk</code>.
      */
     public final TableField<AlbumsRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('album_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>public.albums.id</code>.
+     */
+    public final TableField<AlbumsRecord, String> ID = createField("id", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.albums.name</code>.
@@ -158,7 +163,7 @@ public class Albums extends TableImpl<AlbumsRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ALBUM_PK);
+        return Arrays.<Index>asList(Indexes.ALBUM_PK, Indexes.ALBUMS_ID_UNIQUE);
     }
 
     /**
@@ -182,7 +187,7 @@ public class Albums extends TableImpl<AlbumsRecord> {
      */
     @Override
     public List<UniqueKey<AlbumsRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlbumsRecord>>asList(Keys.ALBUM_PK);
+        return Arrays.<UniqueKey<AlbumsRecord>>asList(Keys.ALBUM_PK, Keys.ALBUMS_ID_UNIQUE);
     }
 
     /**

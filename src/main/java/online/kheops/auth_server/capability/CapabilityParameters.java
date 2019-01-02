@@ -9,7 +9,7 @@ public class CapabilityParameters {
     private final LocalDateTime expirationTime;
     private final LocalDateTime notBeforeTime;
     private final ScopeType scopeType;
-    private Long albumPk;
+    private String albumId;
     private String seriesInstanceUID;
     private String studyInstanceUID;
     private final boolean readPermission;
@@ -18,13 +18,13 @@ public class CapabilityParameters {
     private final boolean downloadPermission;
 
     protected CapabilityParameters(Long callingUserPk, String title, LocalDateTime expirationTime, LocalDateTime notBeforeTime,
-                                   ScopeType scopeType, Long albumPk, String studyInstanceUID, String seriesInstanceUID,
+                                   ScopeType scopeType, String albumId, String studyInstanceUID, String seriesInstanceUID,
                                    boolean readPermission, boolean writePermission, boolean appropriatePermission, boolean downloadPermission) {
         this.callingUserPk = callingUserPk;
         this.title = title;
         this.expirationTime = expirationTime;
         this.notBeforeTime = notBeforeTime;
-        this.albumPk = albumPk;
+        this.albumId = albumId;
         this.seriesInstanceUID = seriesInstanceUID;
         this.studyInstanceUID = studyInstanceUID;
         this.readPermission = readPermission;
@@ -39,7 +39,7 @@ public class CapabilityParameters {
     public LocalDateTime getExpirationTime() { return expirationTime; }
     public LocalDateTime getNotBeforeTime() { return notBeforeTime; }
     public ScopeType getScopeType() { return scopeType; }
-    public Long getAlbumPk() { return albumPk; }
+    public String getAlbumId() { return albumId; }
     public String getSeriesInstanceUID() { return seriesInstanceUID; }
     public String getStudyInstanceUID() { return studyInstanceUID; }
     public boolean isReadPermission() {  return readPermission; }

@@ -42,6 +42,7 @@ public class Indexes {
     public static final Index ALBUM_USER_PK = Indexes0.ALBUM_USER_PK;
     public static final Index ALBUM_USER_UNIQUE = Indexes0.ALBUM_USER_UNIQUE;
     public static final Index ALBUM_PK = Indexes0.ALBUM_PK;
+    public static final Index ALBUMS_ID_UNIQUE = Indexes0.ALBUMS_ID_UNIQUE;
     public static final Index CAPABILITIES_PK = Indexes0.CAPABILITIES_PK;
     public static final Index CAPABILITIES_SECRET_INDEX = Indexes0.CAPABILITIES_SECRET_INDEX;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
@@ -77,6 +78,7 @@ public class Indexes {
         public static Index ALBUM_USER_PK = Internal.createIndex("album_user_pk", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.PK }, true);
         public static Index ALBUM_USER_UNIQUE = Internal.createIndex("album_user_unique", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.ALBUM_FK, AlbumUser.ALBUM_USER.USER_FK }, true);
         public static Index ALBUM_PK = Internal.createIndex("album_pk", Albums.ALBUMS, new OrderField[] { Albums.ALBUMS.PK }, true);
+        public static Index ALBUMS_ID_UNIQUE = Internal.createIndex("albums_id_unique", Albums.ALBUMS, new OrderField[] { Albums.ALBUMS.ID }, true);
         public static Index CAPABILITIES_PK = Internal.createIndex("capabilities_pk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.PK }, true);
         public static Index CAPABILITIES_SECRET_INDEX = Internal.createIndex("capabilities_secret_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, false);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("capabilities_secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);

@@ -46,9 +46,9 @@ public class CapabilityParametersBuilder {
         return new CapabilityScopeBuilder(this);
     }
 
-    public CapabilityParametersBuilder scope(String scopeType, Long albumPk)
+    public CapabilityParametersBuilder scope(String scopeType, String albumId)
     throws CapabilityBadRequestException {
-        ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumPk);
+        ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumId);
         return this;
     }
 
@@ -98,7 +98,7 @@ public class CapabilityParametersBuilder {
         }
 
         return new CapabilityParameters(callingUserPk, title, expirationTime, notBeforeTime,
-                capabilityScopeBuilder.getScopeType(), capabilityScopeBuilder.getAlbumPk(), capabilityScopeBuilder.getStudyInstanceUID(), capabilityScopeBuilder.getSeriesInstanceUID(),
+                capabilityScopeBuilder.getScopeType(), capabilityScopeBuilder.getAlbumId(), capabilityScopeBuilder.getStudyInstanceUID(), capabilityScopeBuilder.getSeriesInstanceUID(),
                 readPermission, writePermission, appropriatePermission, downloadPermission);
     }
 

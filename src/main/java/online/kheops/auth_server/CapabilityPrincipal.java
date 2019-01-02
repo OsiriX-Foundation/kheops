@@ -224,7 +224,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) {
+    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
             return false;
@@ -307,14 +307,14 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumAccess(Long albumId) {
+    public boolean hasAlbumAccess(String albumId) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         if (getScope() == ScopeType.ALBUM) {
             if (albumId  == null) {
-                albumId = capability.getAlbum().getPk();
+                albumId = capability.getAlbum().getId();
             }
-            if (albumId != capability.getAlbum().getPk()) {
+            if (albumId.compareTo(capability.getAlbum().getId()) == 0) {
                 return false;
             }
             try {
@@ -366,9 +366,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public long getAlbumID() throws NotAlbumScopeTypeException {
+    public String getAlbumID() throws NotAlbumScopeTypeException {
         if(getScope() == ScopeType.ALBUM) {
-            return capability.getAlbum().getPk();
+            return capability.getAlbum().getId();
         } else {
             throw new NotAlbumScopeTypeException("");
         }

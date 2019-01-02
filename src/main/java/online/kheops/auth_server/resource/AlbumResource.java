@@ -101,16 +101,17 @@ public class AlbumResource {
 
     @GET
     @Secured
-    @Path("album/{album:[1-9][0-9]*}")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlbum(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
+    public Response getAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                             @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumAccess(albumPk)){
+            if(!kheopsPrincipal.hasAlbumAccess(albumId)){
                 return Response.status(NOT_FOUND).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -120,7 +121,7 @@ public class AlbumResource {
         final AlbumResponses.AlbumResponse albumResponse;
 
         try {
-            albumResponse = Albums.getAlbum(callingUserPk, albumPk, kheopsPrincipal.hasUserAccess());
+            albumResponse = Albums.getAlbum(callingUserPk, albumId, kheopsPrincipal.hasUserAccess());
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -131,10 +132,10 @@ public class AlbumResource {
 
     @PATCH
     @Secured
-    @Path("album/{album:[1-9][0-9]*}")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editAlbum(@PathParam("album") Long albumPk,
+    public Response editAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
                               @FormParam("name") String name, @FormParam("description") String description,
                               @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                               @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
@@ -147,7 +148,7 @@ public class AlbumResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_ALBUM, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_ALBUM, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -165,12 +166,12 @@ public class AlbumResource {
         usersPermission.setWriteComments(writeComments);
 
         try {
-            albumResponse = Albums.editAlbum(callingUserPk, albumPk, name, description, usersPermission, notificationNewComment, notificationNewSeries);
+            albumResponse = Albums.editAlbum(callingUserPk, albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Edit album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Edit album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Edit album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Edit album pk:" +albumId+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
@@ -182,15 +183,16 @@ public class AlbumResource {
 
     @DELETE
     @Secured
-    @Path("album/{album:[1-9][0-9]*}")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
+    public Response deleteAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                                @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_ALBUM, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.DELETE_ALBUM, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -198,27 +200,28 @@ public class AlbumResource {
         }
 
         try {
-            Albums.deleteAlbum(callingUserPk, albumPk);
+            Albums.deleteAlbum(callingUserPk, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Delete album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Delete album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info("Delete album pk:" +albumPk+  " by user pk:"+callingUserPk+ " SUCCESS");
+        LOG.info("Delete album pk:" +albumId+  " by user pk:"+callingUserPk+ " SUCCESS");
         return Response.status(NO_CONTENT).build();
     }
 
     @GET
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/users")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/users")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsersAlbum(@PathParam("album") Long albumPk,@Context SecurityContext securityContext) {
+    public Response getUsersAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                                  @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.LIST_USERS, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.LIST_USERS, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -228,9 +231,9 @@ public class AlbumResource {
         final List<AlbumResponses.UserAlbumResponse> usersAlbumResponse;
 
         try {
-            usersAlbumResponse = Albums.getUsers(callingUserPk, albumPk);
+            usersAlbumResponse = Albums.getUsers(callingUserPk, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Get users list for album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Get users list for album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -240,16 +243,17 @@ public class AlbumResource {
 
     @PUT
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/users/{user}")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addUser(@PathParam("album") Long albumPk, @PathParam("user") String user,
+    public Response addUser(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                            @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user,
                             @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_USER, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_USER, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -257,12 +261,12 @@ public class AlbumResource {
         }
 
         try {
-            Albums.addUser(callingUserPk, user, albumPk, false);
+            Albums.addUser(callingUserPk, user, albumId, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -271,16 +275,17 @@ public class AlbumResource {
 
     @PUT
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/users/{user}/admin")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addAdmin(@PathParam("album") Long albumPk, @PathParam("user") String user,
+    public Response addAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                             @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user,
                              @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_ADMIN, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.ADD_ADMIN, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -288,12 +293,12 @@ public class AlbumResource {
         }
 
         try {
-            Albums.addUser(callingUserPk, user, albumPk, true);
+            Albums.addUser(callingUserPk, user, albumId, true);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -302,16 +307,17 @@ public class AlbumResource {
 
     @DELETE
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/users/{user}/admin")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeAdmin(@PathParam("album") Long albumPk, @PathParam("user") String user,
+    public Response removeAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                                @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user,
                                 @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.REMOVE_ADMIN, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.REMOVE_ADMIN, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -319,9 +325,9 @@ public class AlbumResource {
         }
 
         try {
-            Albums.removeAdmin(callingUserPk, user, albumPk);
+            Albums.removeAdmin(callingUserPk, user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -330,16 +336,17 @@ public class AlbumResource {
 
     @DELETE
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/users/{user}")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteUser(@PathParam("album") Long albumPk, @PathParam("user") String user,
+    public Response deleteUser(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                               @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user,
                                @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.REMOVE_USER, albumPk)){
+            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.REMOVE_USER, albumId)){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -347,12 +354,12 @@ public class AlbumResource {
         }
 
         try {
-            Albums.deleteUser(callingUserPk, user, albumPk);
+            Albums.deleteUser(callingUserPk, user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumPk+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumId+  " by user pk:"+callingUserPk+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -361,15 +368,15 @@ public class AlbumResource {
 
     @PUT
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/favorites")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
+    public Response addFavorites(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId, @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!(kheopsPrincipal.hasUserAccess() && kheopsPrincipal.hasAlbumAccess(albumPk))){
+            if(!(kheopsPrincipal.hasUserAccess() && kheopsPrincipal.hasAlbumAccess(albumId))){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -377,9 +384,9 @@ public class AlbumResource {
         }
 
         try {
-            Albums.setFavorites(callingUserPk, albumPk, true);
+            Albums.setFavorites(callingUserPk, albumId, true);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO,"Add an album pk:" +albumPk+ " to favorites by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO,"Add an album pk:" +albumId+ " to favorites by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -388,15 +395,15 @@ public class AlbumResource {
 
     @DELETE
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/favorites")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deleteFavorites(@PathParam("album") Long albumPk, @Context SecurityContext securityContext) {
+    public Response deleteFavorites(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId, @Context SecurityContext securityContext) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(!(kheopsPrincipal.hasUserAccess() && kheopsPrincipal.hasAlbumAccess(albumPk))){
+            if(!(kheopsPrincipal.hasUserAccess() && kheopsPrincipal.hasAlbumAccess(albumId))){
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -404,9 +411,9 @@ public class AlbumResource {
         }
 
         try {
-            Albums.setFavorites(callingUserPk, albumPk, false);
+            Albums.setFavorites(callingUserPk, albumId, false);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an album pk:" +albumPk+ " from favorites by user pk:"+callingUserPk+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove an album pk:" +albumId+ " from favorites by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

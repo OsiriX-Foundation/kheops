@@ -4,6 +4,7 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.capability.ScopeType;
@@ -35,10 +36,10 @@ public class EventRessource {
 
     @GET
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/events")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEvents(@PathParam("album") Long albumPk,
+    public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumPk,
                               @QueryParam("types") final List<String> types, @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
 
@@ -83,12 +84,12 @@ public class EventRessource {
 
     @POST
     @Secured
-    @Path("album/{album:[1-9][0-9]*}/comments")
+    @Path("album/{album:"+Albums.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postAlbumComment(@PathParam("album") Long albumPk,
-                                @FormParam("to_user") String user, @FormParam("comment") String comment,
-                                @Context SecurityContext securityContext) {
+    public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumPk,
+                                     @FormParam("to_user") String user, @FormParam("comment") String comment,
+                                     @Context SecurityContext securityContext) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 

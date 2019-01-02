@@ -32,7 +32,7 @@ public class Events {
 
     public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES, EDIT_ALBUM, ADD_FAV, REMOVE_FAV}
 
-    public static void albumPostComment(long callingUserPk,long albumPk,String commentContent, String user)
+    public static void albumPostComment(long callingUserPk,String albumId,String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
 
         EntityManager em = EntityManagerListener.createEntityManager();
@@ -44,7 +44,7 @@ public class Events {
             final boolean isPrivateComment = user != null;
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album album = getAlbum(albumPk, em);
+            final Album album = getAlbum(albumId, em);
 
             final Comment comment = new Comment(commentContent, callingUser, album);
 
@@ -56,7 +56,7 @@ public class Events {
                 }
 
                 if (!isMemberOfAlbum(targetUser, album, em)) {
-                    throw new UserNotFoundException("Target user is not a member of the album : " + albumPk);
+                    throw new UserNotFoundException("Target user is not a member of the album : " + albumId);
                 }
 
                 comment.setPrivateTargetUser(targetUser);
@@ -92,7 +92,7 @@ public class Events {
         return new Mutation(callingUser, album, mutationType, study);
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getEventsAlbum(long callingUserPk, long albumPk, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponses.EventResponse> getEventsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
             throws UserNotFoundException, AlbumNotFoundException {
 
         final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
@@ -106,7 +106,7 @@ public class Events {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album album = getAlbum(albumPk, em);
+            final Album album = getAlbum(albumId, em);
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
                 if (e instanceof Comment) {
@@ -129,7 +129,7 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(long callingUserPk, long albumPk, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
             throws AlbumNotFoundException {
 
         final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
@@ -142,7 +142,7 @@ public class Events {
         try {
             tx.begin();
 
-            final Album album = getAlbum(albumPk, em);
+            final Album album = getAlbum(albumId, em);
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
                     eventResponses.add(EventResponses.mutationToEventResponse(m));
@@ -161,7 +161,7 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getCommentsAlbum(long callingUserPk,long albumPk, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponses.EventResponse> getCommentsAlbum(long callingUserPk,String albumId, Integer offset, Integer limit)
             throws UserNotFoundException, AlbumNotFoundException {
 
         final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
@@ -175,7 +175,7 @@ public class Events {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album album = getAlbum(albumPk, em);
+            final Album album = getAlbum(albumId, em);
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
                 eventResponses.add(EventResponses.commentToEventResponse(c));

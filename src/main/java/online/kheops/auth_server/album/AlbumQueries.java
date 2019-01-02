@@ -45,6 +45,12 @@ public class AlbumQueries {
                 .getSingleResult();
     }
 
+    public static Album findAlbumById(String albumId, EntityManager em) throws NoResultException{
+        return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
+                .setParameter("albumId", albumId)
+                .getSingleResult();
+    }
+
     public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em ) throws NoResultException {
         return em.createQuery("SELECT a from AlbumUser a where :targetUser = a.user and :targetAlbum = a.album", AlbumUser.class)
                 .setParameter("targetUser", user)
@@ -67,6 +73,7 @@ public class AlbumQueries {
                     .asField();
 
             query.addSelect(ALBUMS.PK.as("album_pk"),
+                    ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
                     ALBUMS.CREATED_TIME.as("album_created_time"),
@@ -142,7 +149,7 @@ public class AlbumQueries {
         }
     }
 
-    public static AlbumResponses.AlbumResponse findAlbumByUserPkAndAlbumPk(long albumPk, long userPK)
+    public static AlbumResponses.AlbumResponse findAlbumByUserPkAndAlbumId(String albumId, long userPK)
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -151,10 +158,11 @@ public class AlbumQueries {
 
             Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
                     .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(albumPk))
+                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
             query.addSelect(ALBUMS.PK.as("album_pk"),
+                    ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
                     ALBUMS.CREATED_TIME.as("album_created_time"),
@@ -185,7 +193,7 @@ public class AlbumQueries {
                             .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(userPK))
                             .or(EVENTS.USER_FK.eq(userPK))));
 
-            query.addConditions(ALBUMS.PK.eq(albumPk));
+            query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
             query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
 
@@ -199,7 +207,7 @@ public class AlbumQueries {
         }
     }
 
-    public static AlbumResponses.AlbumResponse findAlbumByAlbumPk(long albumPk)
+    public static AlbumResponses.AlbumResponse findAlbumByAlbumId(String albumId)
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -207,6 +215,7 @@ public class AlbumQueries {
             final SelectQuery<Record> query = create.selectQuery();
 
             query.addSelect(isnull(ALBUMS.PK,"NULL").as("album_pk"),
+                    isnull(ALBUMS.ID,"NULL").as("album_id"),
                     isnull(ALBUMS.NAME,"NULL").as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
                     isnull(countDistinct(EVENTS.PK),"NULL").as("number_of_comments"),
@@ -222,7 +231,7 @@ public class AlbumQueries {
                     .and(EVENTS.EVENT_TYPE.eq("Comment"))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
 
-            query.addConditions(ALBUMS.PK.eq(albumPk));
+            query.addConditions(ALBUMS.ID.eq(albumId));
 
             query.addGroupBy(ALBUMS.PK);
             Record result = query.fetchOne();

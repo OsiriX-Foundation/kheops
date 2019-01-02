@@ -82,7 +82,7 @@ public class Series {
     }
 
 
-    public static void editFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID, Long fromAlbumPk, boolean favorite)
+    public static void editFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, boolean favorite)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -92,10 +92,10 @@ public class Series {
 
             final User callingUser = getUser(callingUserPk, em);
             final Album album;
-            if (fromAlbumPk == null) {
+            if (fromAlbumId == null) {
                 album = callingUser.getInbox();
             } else {
-                album = getAlbum(fromAlbumPk, em);
+                album = getAlbum(fromAlbumId, em);
             }
             final online.kheops.auth_server.entity.Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             editSeriesFavorites(series, album, favorite, em);

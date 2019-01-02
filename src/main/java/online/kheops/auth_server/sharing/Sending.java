@@ -84,7 +84,7 @@ public class Sending {
         }
     }
 
-    public static void deleteStudyFromAlbum(long callingUserPk, long albumPk, String studyInstanceUID)
+    public static void deleteStudyFromAlbum(long callingUserPk, String albumId, String studyInstanceUID)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -93,7 +93,7 @@ public class Sending {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album callingAlbum = getAlbum(albumPk, em);
+            final Album callingAlbum = getAlbum(albumId, em);
 
             final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
 
@@ -119,7 +119,7 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromAlbum(long callingUserPk, long albumPk, String studyInstanceUID, String seriesInstanceUID)
+    public static void deleteSeriesFromAlbum(long callingUserPk, String albumId, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -128,7 +128,7 @@ public class Sending {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album callingAlbum = getAlbum(albumPk, em);
+            final Album callingAlbum = getAlbum(albumId, em);
 
             Series availableSeries;
             try {
@@ -151,7 +151,7 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(long callingUserPk, long albumPk, String studyInstanceUID, String seriesInstanceUID)
+    public static void putSeriesInAlbum(long callingUserPk, String albumId, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, AlbumNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -160,7 +160,7 @@ public class Sending {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album targetAlbum = getAlbum(albumPk, em);
+            final Album targetAlbum = getAlbum(albumId, em);
 
             Series availableSeries;
             try {
@@ -206,7 +206,7 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(long callingUserPk, long albumPk, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox)
+    public static void putStudyInAlbum(long callingUserPk, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -215,9 +215,9 @@ public class Sending {
             tx.begin();
 
             final User callingUser = getUser(callingUserPk, em);
-            final Album targetAlbum = getAlbum(albumPk, em);
+            final Album targetAlbum = getAlbum(albumId, em);
 
-            final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumPk, fromInbox, em);
+            final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
 
             Boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
@@ -247,7 +247,7 @@ public class Sending {
         }
     }
 
-    public static void shareStudyWithUser(long callingUserPk, String targetUsername, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox)
+    public static void shareStudyWithUser(long callingUserPk, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -263,7 +263,7 @@ public class Sending {
                 return;
             }
 
-            final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumPk, fromInbox, em);
+            final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
 
             final Album inbox = targetUser.getInbox();
             for (Series series : availableSeries) {
@@ -394,7 +394,7 @@ public class Sending {
         }
     }
 
-    public static Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox)
+    public static Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws UserNotFoundException, AlbumNotFoundException , StudyNotFoundException {
         Set<String> availableSeriesUIDs;
 
@@ -406,8 +406,8 @@ public class Sending {
 
             final User callingUser = getUser(userPk, em);
 
-            if (fromAlbumPk != null) {
-                final Album album = getAlbum(fromAlbumPk, em);
+            if (fromAlbumId != null) {
+                final Album album = getAlbum(fromAlbumId, em);
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromAlbum(callingUser, album, studyInstanceUID, em);
             } else if (fromInbox) {
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromInbox(callingUser, studyInstanceUID, em);
@@ -428,12 +428,12 @@ public class Sending {
         return availableSeriesUIDs;
     }
 
-    public static  List<Series> getSeriesList(User callingUser, String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox, EntityManager em)
+    public static  List<Series> getSeriesList(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, EntityManager em)
             throws AlbumNotFoundException , SeriesNotFoundException{
         List<Series> availableSeries;
 
-        if (fromAlbumPk != null) {
-            final Album callingAlbum = getAlbum(fromAlbumPk, em);
+        if (fromAlbumId != null) {
+            final Album callingAlbum = getAlbum(fromAlbumId, em);
 
             availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
         } else if (fromInbox) {

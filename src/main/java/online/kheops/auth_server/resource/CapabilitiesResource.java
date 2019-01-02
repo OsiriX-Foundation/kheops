@@ -37,7 +37,7 @@ public class CapabilitiesResource {
                                         @FormParam("expiration_time") String expirationTime,
                                         @FormParam("not_before_time") String notBeforeTime,
                                         @NotNull @FormParam("scope_type") String scopeType,
-                                        @FormParam("album") Long albumPk,
+                                        @FormParam("album") String albumId,
                                         @NotNull @FormParam("read_permission") boolean readPermission,
                                         @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
                                         @NotNull @FormParam("download_permission") boolean downloadPermission,
@@ -74,7 +74,7 @@ public class CapabilitiesResource {
         }
 
         try {
-            capabilityParametersBuilder.scope(scopeType, albumPk);
+            capabilityParametersBuilder.scope(scopeType, albumId);
         } catch (CapabilityBadRequestException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {

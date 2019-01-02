@@ -69,7 +69,7 @@ public class Studies {
         if (qidoParams.isFromInbox()) {
             conditionArrayList.add(ALBUMS.PK.eq(USERS.INBOX_FK));
         }
-        qidoParams.getAlbumID().ifPresent(albumId -> conditionArrayList.add(ALBUMS.PK.eq(albumId)));
+        qidoParams.getAlbumID().ifPresent(albumId -> conditionArrayList.add(ALBUMS.ID.eq(albumId)));
 
         final Condition fromCondition;
         if (conditionArrayList.isEmpty()) {
@@ -380,7 +380,7 @@ public class Studies {
         }
     }
 
-    public static void editFavorites(Long callingUserPk, String studyInstanceUID, Long fromAlbumPk, boolean favorite) throws UserNotFoundException, AlbumNotFoundException, StudyNotFoundException {
+    public static void editFavorites(Long callingUserPk, String studyInstanceUID, String fromAlbumId, boolean favorite) throws UserNotFoundException, AlbumNotFoundException, StudyNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -390,11 +390,11 @@ public class Studies {
             final User callingUser = getUser(callingUserPk, em);
             List<Series> seriesList;
             final Album album;
-            if (fromAlbumPk == null) {
+            if (fromAlbumId == null) {
                 seriesList = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
                 album = callingUser.getInbox();
             } else {
-                album = getAlbum(fromAlbumPk, em);
+                album = getAlbum(fromAlbumId, em);
                 seriesList = findSeriesListByStudyUIDFromAlbum(callingUser,album, studyInstanceUID, em);
             }
 

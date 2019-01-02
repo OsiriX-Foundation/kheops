@@ -30,11 +30,11 @@ public class FavoriteResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                        @QueryParam("album") Long fromAlbumPk,
+                                        @QueryParam("album") String fromAlbumId,
                                         @QueryParam("inbox") Boolean fromInbox,
                                         @Context SecurityContext securityContext) {
 
-        return editStudyFavorites(studyInstanceUID, fromAlbumPk, fromInbox, true, securityContext);
+        return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, true, securityContext);
     }
 
     @DELETE
@@ -42,18 +42,18 @@ public class FavoriteResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                             @QueryParam("album") Long fromAlbumPk,
+                                             @QueryParam("album") String fromAlbumId,
                                              @QueryParam("inbox") Boolean fromInbox,
                                              @Context SecurityContext securityContext) {
 
-        return editStudyFavorites(studyInstanceUID, fromAlbumPk, fromInbox, false, securityContext);
+        return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, false, securityContext);
 
     }
 
-    private Response editStudyFavorites(String studyInstanceUID, Long fromAlbumPk, Boolean fromInbox,
+    private Response editStudyFavorites(String studyInstanceUID, String fromAlbumId, Boolean fromInbox,
                                         boolean favorite, SecurityContext securityContext) {
 
-        if ((fromInbox == null && fromAlbumPk == null) || (fromInbox != null && fromAlbumPk != null)) {
+        if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
@@ -67,7 +67,7 @@ public class FavoriteResource {
         }
 
         try {
-            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
+            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -82,7 +82,7 @@ public class FavoriteResource {
             return Response.status(NOT_FOUND).build();
         }
         try {
-            Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumPk, favorite);
+            Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumId, favorite);
         } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -95,11 +95,11 @@ public class FavoriteResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addSeriesToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                          @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
-                                         @QueryParam("album") Long fromAlbumPk,
+                                         @QueryParam("album") String fromAlbumId,
                                          @QueryParam("inbox") Boolean fromInbox,
                                          @Context SecurityContext securityContext) {
 
-        return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumPk, fromInbox, true, securityContext);
+        return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumId, fromInbox, true, securityContext);
     }
 
     @DELETE
@@ -108,16 +108,16 @@ public class FavoriteResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeSeriesFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
                                               @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
-                                              @QueryParam("album") Long fromAlbumPk,
+                                              @QueryParam("album") String fromAlbumId,
                                               @QueryParam("inbox") Boolean fromInbox,
                                               @Context SecurityContext securityContext) {
 
-        return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumPk, fromInbox, false, securityContext);
+        return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumId, fromInbox, false, securityContext);
     }
 
-    private Response editSeriesFavorites(String studyInstanceUID, String seriesInstanceUID, Long fromAlbumPk, Boolean fromInbox,
+    private Response editSeriesFavorites(String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, Boolean fromInbox,
                                         boolean favorite, SecurityContext securityContext) {
-        if ((fromInbox == null && fromAlbumPk == null) || (fromInbox != null && fromAlbumPk != null)) {
+        if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
@@ -132,7 +132,7 @@ public class FavoriteResource {
         }
 
         try {
-            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
+            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -148,7 +148,7 @@ public class FavoriteResource {
         }
 
         try {
-            Series.editFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID, fromAlbumPk, favorite);
+            Series.editFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite);
         } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }

@@ -21,7 +21,7 @@ public enum ScopeType {
         }
 
         @Override
-        public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk) {
+        public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId) {
             return capabilityParametersBuilder.scope().userScope();
         }
 
@@ -45,12 +45,12 @@ public enum ScopeType {
         }
 
         @Override
-        public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk)
+        public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
                 throws CapabilityBadRequestException {
-            if( albumPk == null) {
+            if( albumId == null) {
                 throw new CapabilityBadRequestException("The {album} query parameter must be set");
             }
-            return capabilityParametersBuilder.scope().albumScope(albumPk);
+            return capabilityParametersBuilder.scope().albumScope(albumId);
         }
         @Override
         public CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability) {
@@ -77,7 +77,7 @@ public enum ScopeType {
     public abstract CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
-    public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, Long albumPk)
+    public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
             throws CapabilityBadRequestException;
 
     public abstract CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability);

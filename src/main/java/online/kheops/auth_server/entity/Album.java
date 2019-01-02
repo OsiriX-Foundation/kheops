@@ -8,6 +8,8 @@ import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.album.Albums.newAlbumID;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
 @Table(name = "albums")
@@ -20,6 +22,10 @@ public class Album {
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
+
+    @Basic(optional = false)
+    @Column(name = "id")
+    private String id;
 
     @Column(name = "description")
     private String description;
@@ -80,6 +86,7 @@ public class Album {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         lastEventTime = now;
+        id = newAlbumID();
     }
 
     public Album() {}
@@ -91,6 +98,8 @@ public class Album {
     }
 
     public long getPk() { return pk; }
+
+    public String getId() { return id; }
 
     public String getName() { return name; }
 

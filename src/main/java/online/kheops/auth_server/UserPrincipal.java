@@ -128,7 +128,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     public boolean hasStudyWriteAccess(String study) { return true; }
 
     @Override
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, Long albumId) throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, String albumId) throws AlbumNotFoundException {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
@@ -187,7 +187,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumAccess(Long albumId) throws AlbumNotFoundException{
+    public boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException{
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
@@ -220,5 +220,5 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     public ScopeType getScope() { return ScopeType.USER; }
 
     @Override
-    public long getAlbumID() throws NotAlbumScopeTypeException { throw new NotAlbumScopeTypeException(""); }
+    public String getAlbumID() throws NotAlbumScopeTypeException { throw new NotAlbumScopeTypeException(""); }
 }

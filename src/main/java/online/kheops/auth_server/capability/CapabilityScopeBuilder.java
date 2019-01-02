@@ -3,7 +3,7 @@ package online.kheops.auth_server.capability;
 public class CapabilityScopeBuilder{
     private final CapabilityParametersBuilder capabilityParametersBuilder;
 
-    private Long albumPk;
+    private String albumId;
     private String seriesInstanceUID;
     private String studyInstanceUID;
     private ScopeType scopeType;
@@ -12,8 +12,8 @@ public class CapabilityScopeBuilder{
         this.capabilityParametersBuilder = capabilityParametersBuilder;
     }
 
-    public CapabilityParametersBuilder albumScope(Long albumPK) {
-        this.albumPk = albumPK;
+    public CapabilityParametersBuilder albumScope(String albumId) {
+        this.albumId = albumId;
         scopeType = ScopeType.ALBUM;
         return capabilityParametersBuilder.scope(this);
     }
@@ -22,7 +22,7 @@ public class CapabilityScopeBuilder{
         return capabilityParametersBuilder.scope(this);
     }
 
-    public Long getAlbumPk() { return albumPk; }
+    public String getAlbumId() { return albumId; }
     public String getSeriesInstanceUID() { return seriesInstanceUID; }
     public String getStudyInstanceUID() { return studyInstanceUID; }
     public ScopeType getScopeType() { return scopeType; }

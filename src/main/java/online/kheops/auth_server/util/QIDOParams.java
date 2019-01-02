@@ -22,7 +22,7 @@ public final class QIDOParams {
     private static final String ALBUM = "album";
     private static final String INBOX = "inbox";
 
-    private final OptionalLong albumID;
+    private final Optional<String> albumID;
     private final boolean fromInbox;
 
     private final boolean descending;
@@ -44,10 +44,10 @@ public final class QIDOParams {
     private final Optional<String> studyIDFilter;
 
     public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException{
-        Long albumIDLocal = null;
+        String albumIDLocal = null;
         boolean fromInboxLocal = false;
         if (queryParameters.containsKey(ALBUM)) {
-            albumIDLocal = Long.parseLong(queryParameters.get(ALBUM).get(0));
+            albumIDLocal = queryParameters.get(ALBUM).get(0);
         }
         if (queryParameters.containsKey(INBOX)) {
             fromInboxLocal = true;
@@ -62,7 +62,7 @@ public final class QIDOParams {
                 throw new AlbumForbiddenException("Token doesn't have read access");
             }
         }
-        albumID = Optional.ofNullable(albumIDLocal).map(OptionalLong::of).orElseGet(OptionalLong::empty);
+        albumID = Optional.ofNullable(albumIDLocal);
         fromInbox = fromInboxLocal;
         if (queryParameters.containsKey(SORT)) {
             descending = queryParameters.get(SORT).get(0).startsWith("-");
@@ -96,7 +96,7 @@ public final class QIDOParams {
         }
     }
 
-    public OptionalLong getAlbumID() {
+    public Optional<String> getAlbumID() {
         return albumID;
     }
 

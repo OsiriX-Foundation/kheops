@@ -65,6 +65,7 @@ public class Keys {
     public static final UniqueKey<AlbumUserRecord> ALBUM_USER_PK = UniqueKeys0.ALBUM_USER_PK;
     public static final UniqueKey<AlbumUserRecord> ALBUM_USER_UNIQUE = UniqueKeys0.ALBUM_USER_UNIQUE;
     public static final UniqueKey<AlbumsRecord> ALBUM_PK = UniqueKeys0.ALBUM_PK;
+    public static final UniqueKey<AlbumsRecord> ALBUMS_ID_UNIQUE = UniqueKeys0.ALBUMS_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = UniqueKeys0.CAPABILITIES_PK;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = UniqueKeys0.CAPABILITIES_SECRET_UNIQUE;
     public static final UniqueKey<EventsRecord> EVENT_PK = UniqueKeys0.EVENT_PK;
@@ -116,6 +117,7 @@ public class Keys {
         public static final UniqueKey<AlbumUserRecord> ALBUM_USER_PK = Internal.createUniqueKey(AlbumUser.ALBUM_USER, "album_user_pk", AlbumUser.ALBUM_USER.PK);
         public static final UniqueKey<AlbumUserRecord> ALBUM_USER_UNIQUE = Internal.createUniqueKey(AlbumUser.ALBUM_USER, "album_user_unique", AlbumUser.ALBUM_USER.ALBUM_FK, AlbumUser.ALBUM_USER.USER_FK);
         public static final UniqueKey<AlbumsRecord> ALBUM_PK = Internal.createUniqueKey(Albums.ALBUMS, "album_pk", Albums.ALBUMS.PK);
+        public static final UniqueKey<AlbumsRecord> ALBUMS_ID_UNIQUE = Internal.createUniqueKey(Albums.ALBUMS, "albums_id_unique", Albums.ALBUMS.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_pk", Capabilities.CAPABILITIES.PK);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_secret_unique", Capabilities.CAPABILITIES.SECRET);
         public static final UniqueKey<EventsRecord> EVENT_PK = Internal.createUniqueKey(Events.EVENTS, "event_pk", Events.EVENTS.PK);
