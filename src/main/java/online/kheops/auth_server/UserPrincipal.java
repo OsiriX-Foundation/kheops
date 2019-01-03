@@ -144,6 +144,9 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             if (albumUser.isAdmin()) {
                 return true;
             }
+            if (usersPermission == UsersPermission.UsersPermissionEnum.READ_SERIES) {
+                return true;
+            }
             if (usersPermission == UsersPermission.UsersPermissionEnum.ADD_SERIES && album.isAddSeries()) {
                 return true;
             }
