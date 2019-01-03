@@ -3,19 +3,20 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UIDValidator;
+import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
+import static online.kheops.auth_server.util.Consts.*;
 
 
 @Path("/")
@@ -24,30 +25,31 @@ public class FavoriteResource {
     @Context
     private UriInfo uriInfo;
 
+    @Context
+    private SecurityContext securityContext;
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addStudyToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                        @QueryParam("album") String fromAlbumId,
-                                        @QueryParam("inbox") Boolean fromInbox,
-                                        @Context SecurityContext securityContext) {
+    public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                        @QueryParam(ALBUM) Long fromAlbumPk,
+                                        @QueryParam(INBOX) Boolean fromInbox) {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, true, securityContext);
     }
 
     @DELETE
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeStudyFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                             @QueryParam("album") String fromAlbumId,
-                                             @QueryParam("inbox") Boolean fromInbox,
-                                             @Context SecurityContext securityContext) {
+    public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
+                                             @QueryParam(ALBUM) String fromAlbumId,
+                                             @QueryParam(INBOX) Boolean fromInbox) {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, false, securityContext);
-
     }
 
     private Response editStudyFavorites(String studyInstanceUID, String fromAlbumId, Boolean fromInbox,
@@ -57,17 +59,11 @@ public class FavoriteResource {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
-
         try {
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
+            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -91,26 +87,26 @@ public class FavoriteResource {
 
     @PUT
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addSeriesToFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                         @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
-                                         @QueryParam("album") String fromAlbumId,
-                                         @QueryParam("inbox") Boolean fromInbox,
-                                         @Context SecurityContext securityContext) {
+    public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
+                                         @PathParam(SeriesInstanceUID) @UIDValidator  String seriesInstanceUID,
+                                         @QueryParam(ALBUM) String fromAlbumId,
+                                         @QueryParam(INBOX) Boolean fromInbox) {
 
         return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumId, fromInbox, true, securityContext);
     }
 
     @DELETE
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeSeriesFromFavorites(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                              @PathParam(Consts.SeriesInstanceUID) String seriesInstanceUID,
-                                              @QueryParam("album") String fromAlbumId,
-                                              @QueryParam("inbox") Boolean fromInbox,
-                                              @Context SecurityContext securityContext) {
+    public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
+                                              @PathParam(SeriesInstanceUID) @UIDValidator  String seriesInstanceUID,
+                                              @QueryParam(ALBUM) String fromAlbumId,
+                                              @QueryParam(INBOX) Boolean fromInbox) {
 
         return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumId, fromInbox, false, securityContext);
     }
@@ -121,18 +117,11 @@ public class FavoriteResource {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
-        checkValidUID(seriesInstanceUID, Consts.SeriesInstanceUID);
-
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        if (!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
-
         try {
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
+            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {

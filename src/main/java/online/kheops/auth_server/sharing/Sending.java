@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.*;
+import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 
@@ -27,15 +28,16 @@ public class Sending {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void deleteStudyFromInbox(long callingUserPk, String studyInstanceUID)
-            throws UserNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+    public static void deleteStudyFromInbox(User callingUser, String studyInstanceUID)
+            throws SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
 
             final List<Series> seriesList = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
 
@@ -43,7 +45,7 @@ public class Sending {
                 throw new SeriesNotFoundException("No access to any series with the given studyInstanceUID");
             }
 
-            for (Series series: seriesList) {
+            for (final Series series: seriesList) {
                 callingUser.getInbox().removeSeries(series, em);
             }
 
@@ -56,17 +58,18 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromInbox(long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+    public static void deleteSeriesFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID)
+            throws SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
 
-            Series series;
+            final Series series;
             try {
                 series = findSeriesByStudyUIDandSeriesUIDFromInbox(callingUser, studyInstanceUID, seriesInstanceUID, em);
             } catch (NoResultException e) {
@@ -84,15 +87,16 @@ public class Sending {
         }
     }
 
-    public static void deleteStudyFromAlbum(long callingUserPk, String albumId, String studyInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+    public static void deleteStudyFromAlbum(User callingUser, String albumId, String studyInstanceUID)
+            throws AlbumNotFoundException, SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album callingAlbum = getAlbum(albumId, em);
 
             final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
@@ -119,18 +123,19 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromAlbum(long callingUserPk, String albumId, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+    public static void deleteSeriesFromAlbum(User callingUser, String albumId, String studyInstanceUID, String seriesInstanceUID)
+            throws AlbumNotFoundException, SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album callingAlbum = getAlbum(albumId, em);
 
-            Series availableSeries;
+            final Series availableSeries;
             try {
                 availableSeries = findSeriesByStudyUIDandSeriesUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, seriesInstanceUID, em);
             } catch (NoResultException e) {
@@ -153,8 +158,9 @@ public class Sending {
 
     public static void putSeriesInAlbum(long callingUserPk, String albumId, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, AlbumNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -170,15 +176,7 @@ public class Sending {
             } catch (NoResultException e2) {
                 // from here the series does not exists
                 // find if the study already exists
-                Study study;
-                try {
-                    study = getStudy(studyInstanceUID, em);
-                } catch (StudyNotFoundException ignored) {
-                    // the study doesn't exist, we need to create it
-                    study = new Study();
-                    study.setStudyInstanceUID(studyInstanceUID);
-                    em.persist(study);
-                }
+                final Study study = getOrCreateStudy(studyInstanceUID, em);
 
                 availableSeries = new Series(seriesInstanceUID);
                 study.getSeries().add(availableSeries);
@@ -190,7 +188,7 @@ public class Sending {
                 return;
             }
 
-            final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries, false );
+            final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries);
             availableSeries.addAlbumSeries(albumSeries);
             targetAlbum.addSeries(albumSeries);
             em.persist(albumSeries);
@@ -222,7 +220,7 @@ public class Sending {
             Boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
                 if (!targetAlbum.containsSeries(series, em)) {
-                    final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, series, false );
+                    final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, series);
                     series.addAlbumSeries(albumSeries);
                     targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
@@ -268,7 +266,7 @@ public class Sending {
             final Album inbox = targetUser.getInbox();
             for (Series series : availableSeries) {
                 if (!inbox.containsSeries(series, em)) {
-                    final AlbumSeries albumSeries = new AlbumSeries(inbox, series, false );
+                    final AlbumSeries albumSeries = new AlbumSeries(inbox, series);
                     series.addAlbumSeries(albumSeries);
                     inbox.addSeries(albumSeries);
                     em.persist(albumSeries);
@@ -286,8 +284,9 @@ public class Sending {
 
     public static void shareSeriesWithUser(long callingUserPk, String targetUsername, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -308,11 +307,11 @@ public class Sending {
 
             final Album inbox = targetUser.getInbox();
             if(inbox.containsSeries(series, em)) {
-                //return Response.status(Response.Status.OK).build();
+                //target user has already access to the series
                 return;
             }
 
-            final AlbumSeries albumSeries = new AlbumSeries(inbox, series, false );
+            final AlbumSeries albumSeries = new AlbumSeries(inbox, series);
             series.addAlbumSeries(albumSeries);
             inbox.addSeries(albumSeries);
             em.persist(albumSeries);
@@ -328,8 +327,9 @@ public class Sending {
 
     public static void appropriateSeries(long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, SeriesForbiddenException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -339,53 +339,57 @@ public class Sending {
             try {
                 final Series storedSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
 
-                if(!isOrphan(storedSeries, em)) {
+                if(isOrphan(storedSeries, em)) {
+                    //here the series exists but she is orphan
+                    final Album inbox = callingUser.getInbox();
+                    final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
+                    storedSeries.addAlbumSeries(inboxSeries);
+                    inbox.addSeries(inboxSeries);
+                    em.persist(inboxSeries);
+                    tx.commit();
+                    LOG.info(() -> "Claim accepted because the series is inside an album where the calling user (" + callingUser.getGoogleId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
+                    return; //appropriate OK
+                } else {
                     try {
+                        //here the series is not orphan
                         findSeriesBySeriesAndUserInbox(callingUser, storedSeries, em);
-                        return;
+                        return; //the series is already in the inbox
                     } catch (NoResultException e) {
-                        throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                        try {
+                            final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
+                            final Album inbox = callingUser.getInbox();
+                            final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
+                            series.addAlbumSeries(inboxSeries);
+                            inbox.addSeries(inboxSeries);
+
+                            em.persist(inboxSeries);
+                            tx.commit();
+                            return;
+                        } catch (NoResultException e2) {
+                            throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                        }
                     }
-
                 }
-
-                // here the series exists but she is orphan or the calling can send the series from an album
-                final Album inbox = callingUser.getInbox();
-                final AlbumSeries albumSeries = new AlbumSeries(inbox, storedSeries, false );
-                storedSeries.addAlbumSeries(albumSeries);
-                inbox.addSeries(albumSeries);
-                em.persist(albumSeries);
-                tx.commit();
-                LOG.info("Claim accepted because the series is inside an album where the calling user (" + callingUser.getGoogleId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
-                return;
 
             } catch (NoResultException ignored) {/*empty*/}
 
             // from here the series does not exists
             // find if the study already exists
-            Study study;
-            try {
-                study = getStudy(studyInstanceUID, em);
-            } catch (StudyNotFoundException ignored) {
-                // the study doesn't exist, we need to create it
-                study = new Study();
-                study.setStudyInstanceUID(studyInstanceUID);
-                em.persist(study);
-            }
+            final Study study = getOrCreateStudy(studyInstanceUID, em);
 
             final Series series = new Series(seriesInstanceUID);
             study.getSeries().add(series);
-            Album inbox = callingUser.getInbox();
-            final AlbumSeries albumSeries = new AlbumSeries(inbox, series, false );
-            series.addAlbumSeries(albumSeries);
-            inbox.addSeries(albumSeries);
+            final Album inbox = callingUser.getInbox();
+            final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
+            series.addAlbumSeries(inboxSeries);
+            inbox.addSeries(inboxSeries);
 
             em.persist(series);
-            em.persist(albumSeries);
-            LOG.info("finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
+            em.persist(inboxSeries);
+            LOG.info(() -> "finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
 
             tx.commit();
-            LOG.info("sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
+            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getGoogleId());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

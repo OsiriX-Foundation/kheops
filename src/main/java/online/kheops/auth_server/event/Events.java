@@ -1,10 +1,10 @@
 package online.kheops.auth_server.event;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -19,8 +19,6 @@ import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
-import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 
@@ -129,7 +127,7 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(String albumId, Integer offset, Integer limit)
             throws AlbumNotFoundException {
 
         final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
@@ -244,6 +242,10 @@ public class Events {
 
                 if (targetUser == callingUser) {
                     throw new BadQueryParametersException("Self comment forbidden");
+                }
+
+                if (!Studies.canAccessStudy(targetUser, study, em)) {
+                    throw new UserNotFoundException("Target user can't access to this study : " + studyInstanceUID);
                 }
 
                 comment.setPrivateTargetUser(targetUser);

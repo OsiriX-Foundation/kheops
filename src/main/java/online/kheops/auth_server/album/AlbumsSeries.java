@@ -5,7 +5,6 @@ import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.Series;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 
 public class AlbumsSeries {
 

@@ -5,7 +5,6 @@ import online.kheops.auth_server.entity.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.user.UserQueries.*;
 
@@ -14,11 +13,12 @@ public class Users {
         throw new IllegalStateException("Utility class");
     }
 
-    public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException{
-        try {
-            return findUserByPk(callingUserPk, entityManager);
-        } catch (NoResultException e) {
-            throw new UserNotFoundException(e);
+    public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
+        final User user = findUserByPk(callingUserPk, entityManager);
+        if (user != null) {
+            return user;
+        } else {
+            throw new UserNotFoundException("User :" +callingUserPk +"does not exist.");
         }
     }
 
@@ -46,11 +46,6 @@ public class Users {
     }
 
     public static boolean userExist(long callingUserPk, EntityManager entityManager){
-        try {
-            findUserByPk(callingUserPk, entityManager);
-        } catch (UserNotFoundException e) {
-            return false;
-        }
-        return true;
+        return findUserByPk(callingUserPk, entityManager) != null;
     }
 }

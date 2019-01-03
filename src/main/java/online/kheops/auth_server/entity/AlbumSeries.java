@@ -26,10 +26,10 @@ public class AlbumSeries {
 
     public AlbumSeries() {}
 
-    public AlbumSeries(Album album, Series series, Boolean isFavorite) {
+    public AlbumSeries(Album album, Series series) {
         this.album = album;
         this.series = series;
-        favorite = isFavorite;
+        favorite = false;
     }
 
     public void setFavorite(boolean favorite) { this.favorite = favorite; }

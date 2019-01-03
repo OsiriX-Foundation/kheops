@@ -16,42 +16,10 @@ apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScr
 def debugArgs = []
 if (gradle.startParameter.initScripts) {
 
-    //def line = file(gradle.startParameter.initScripts[0]).readLines().findAll({ x -> x ==~ /.*-agentlib:jdwp=.*/ })[0]
-    //if (line) {
+    def line = file(gradle.startParameter.initScripts[0]).readLines().findAll({ x -> x ==~ /.*-agentlib:jdwp=.*/ })[0]
+    if (line) {
         //noinspection GroovyAssignabilityCheck
-    //    debugArgs = ((line =~ /.*'(.*)'.*/)[0][1] as String).split(' ')
-    //}
-    
-    def all_lines = file(gradle.startParameter.initScripts[0]).text
-
-    def firstPattern = "setupDebugger(task.path, "
-    def firstIndex = all_lines.indexOf(firstPattern)
-    def debugPort = ""
-    if (firstIndex > 0) {
-        def secondIndex = all_lines.indexOf(")", firstIndex)
-        if (secondIndex > 0) {
-            debugPort = all_lines.substring(firstIndex + firstPattern.length(), secondIndex)
-        }
-    }
-
-    if (!debugPort.empty) {
-
-        def socket = null
-        def stream = null
-        try {
-            socket = new Socket("127.0.0.1", Integer.parseInt(debugPort))
-            stream = new DataOutputStream(socket.getOutputStream())
-            stream.writeInt(10700)
-            stream.writeUTF(":jettyStart")
-            socket.getInputStream().read();
-        }
-        catch(Exception e) {}
-        finally {
-            if (socket != null) socket.close()
-            if (stream != null) stream.close()
-        }
-
-        debugArgs = ["-agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=10700"]
+        debugArgs = ((line =~ /.*'(.*)'.*/)[0][1] as String).split(' ')
     }
 }
 

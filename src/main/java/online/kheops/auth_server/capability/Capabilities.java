@@ -6,7 +6,6 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
-import org.dcm4che3.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;

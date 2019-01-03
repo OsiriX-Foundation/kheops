@@ -11,15 +11,10 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.VR;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.Oid;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
@@ -31,14 +26,6 @@ public class Series {
 
     private Series() {
         throw new IllegalStateException("Utility class");
-    }
-
-    public static void checkValidUID(String uid, String name) {
-        try {
-            new Oid(uid);
-        } catch (GSSException exception) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(name + " is not a valid UID").build());
-        }
     }
 
     public static void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {

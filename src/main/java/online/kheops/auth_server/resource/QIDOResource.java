@@ -7,12 +7,13 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
@@ -40,9 +41,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
+import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
@@ -59,14 +60,17 @@ public class QIDOResource {
     @Context
     ServletContext context;
 
+    @Context
+    private SecurityContext securityContext;
+
     @GET
     @Secured
+    @AlbumAccessSecured
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response getStudies(@QueryParam("album") String fromAlbumId,
-                               @QueryParam("inbox") Boolean fromInbox,
-                               @QueryParam("offset") Integer offset,
-                               @Context SecurityContext securityContext) {
+    public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
+                               @QueryParam(INBOX) Boolean fromInbox,
+                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset) {
 
         if (fromAlbumId != null && fromInbox != null) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -80,7 +84,7 @@ public class QIDOResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if(fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.READ_SERIES, fromAlbumId)) {
+            if(fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, fromAlbumId)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {
@@ -137,13 +141,11 @@ public class QIDOResource {
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response getSeries(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                              @QueryParam("album") String fromAlbumId,
-                              @QueryParam("inbox") Boolean fromInbox,
-                              @QueryParam("offset") Integer offset,
-                              @QueryParam("limit") Integer limit,
-                              @Context SecurityContext securityContext,
-                              @Context UriInfo uriInfo) {
+    public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                              @QueryParam(ALBUM) String fromAlbumId,
+                              @QueryParam(INBOX) Boolean fromInbox,
+                              @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
+                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit) {
 
         if ((fromAlbumId != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -156,8 +158,6 @@ public class QIDOResource {
         if (limit == null) {
             limit = Integer.MAX_VALUE;
         }
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -258,17 +258,15 @@ public class QIDOResource {
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
-    public Response getStudiesMetadata(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                       @QueryParam("album") String fromAlbumId,
-                                       @QueryParam("inbox") Boolean fromInbox, @Context SecurityContext securityContext) {
+    public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                       @QueryParam(ALBUM) String fromAlbumId,
+                                       @QueryParam(INBOX) Boolean fromInbox) {
 
         if ((fromAlbumId != null && fromInbox != null)) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
         fromInbox = fromInbox != null;
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();

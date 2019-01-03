@@ -18,6 +18,7 @@ import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.util.Consts.ALBUM;
 
 
 @Path("/")
@@ -25,6 +26,9 @@ public class CapabilitiesResource {
 
     @Context
     private UriInfo uriInfo;
+
+    @Context
+    private SecurityContext securityContext;
 
     @POST
     @Secured
@@ -41,8 +45,7 @@ public class CapabilitiesResource {
                                         @NotNull @FormParam("read_permission") boolean readPermission,
                                         @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
                                         @NotNull @FormParam("download_permission") boolean downloadPermission,
-                                        @NotNull @FormParam("write_permission") boolean writePermission,
-                                        @Context SecurityContext securityContext) {
+                                        @NotNull @FormParam("write_permission") boolean writePermission) {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         final CapabilitiesResponses.CapabilityResponse capabilityResponse;
@@ -102,8 +105,7 @@ public class CapabilitiesResource {
     @Path("capabilities/{capability_id:[1-9][0-9]*}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response revokeCapability(@PathParam("capability_id") long capabilityId,
-                                     @Context SecurityContext securityContext) {
+    public Response revokeCapability(@PathParam("capability_id") long capabilityId) {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         CapabilityResponse capabilityResponse;
@@ -123,8 +125,7 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCapabilities(@Context SecurityContext securityContext,
-                                    @QueryParam("show_revoked") boolean showRevoke ) {
+    public Response getCapabilities(@QueryParam("show_revoked") boolean showRevoke ) {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<CapabilityResponse> capabilityResponses;
@@ -142,8 +143,7 @@ public class CapabilitiesResource {
     @Path("capabilities/{capability_token:"+Capabilities.TOKEN_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken,
-                                      @Context SecurityContext securityContext) {
+    public Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
 
         CapabilityResponse capabilityResponses;
 

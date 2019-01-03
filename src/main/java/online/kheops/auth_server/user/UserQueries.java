@@ -26,13 +26,7 @@ public class UserQueries {
         }
     }
 
-    public static User findUserByPk(long userPk, EntityManager em) throws UserNotFoundException {
-        try {
-            TypedQuery<User> query = em.createQuery("SELECT u from User u where u.pk = :pk", User.class);
-            query.setParameter("pk", userPk);
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            throw new UserNotFoundException();
-        }
+    public static User findUserByPk(long userPk, EntityManager em)  {
+        return em.find(User.class, userPk);
     }
 }

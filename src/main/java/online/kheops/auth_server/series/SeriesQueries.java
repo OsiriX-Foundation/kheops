@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import javax.ws.rs.NotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,14 +26,6 @@ public class SeriesQueries {
         return query.getResultList();
     }
 
-    public static Series findSeriesByStudyUIDandSeriesUIDFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
-        query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
-        query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-        query.setParameter("callingUser", callingUser);
-        return query.getSingleResult();
-    }
-
     public static List<Series> findSeriesListByStudyUIDFromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a <> u.inbox and :album = a and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID,studyInstanceUID);
@@ -50,6 +41,14 @@ public class SeriesQueries {
         query.setParameter("callingUser",callingUser);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         return query.getResultList();
+    }
+
+    public static Series findSeriesByStudyUIDandSeriesUIDFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+        query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
+        query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+        query.setParameter("callingUser", callingUser);
+        return query.getSingleResult();
     }
 
     public static Series findSeriesByStudyUIDandSeriesUIDFromAlbum(User callingUser, Album album, String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws NoResultException {

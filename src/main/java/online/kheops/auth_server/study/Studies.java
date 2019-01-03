@@ -63,7 +63,6 @@ public class Studies {
     public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, QIDOParams qidoParams, Connection connection)
             throws BadQueryParametersException {
 
-        //queryParameters = ConvertDICOMKeyWordToDICOMTag(queryParameters);
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
 
         if (qidoParams.isFromInbox()) {
@@ -360,6 +359,19 @@ public class Studies {
         } catch (NoResultException e) {
             throw new StudyNotFoundException("StudyInstanceUID : "+studyInstanceUID+" not found");
         }
+    }
+
+    public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
+        Study study;
+        try {
+            study = getStudy(studyInstanceUID, em);
+        } catch (StudyNotFoundException ignored) {
+            // the study doesn't exist, we need to create it
+            study = new Study();
+            study.setStudyInstanceUID(studyInstanceUID);
+            em.persist(study);
+        }
+        return study;
     }
 
     public static boolean canAccessStudy(User user, Study study, EntityManager em) {

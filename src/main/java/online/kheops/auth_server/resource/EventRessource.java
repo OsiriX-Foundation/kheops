@@ -2,18 +2,16 @@ package online.kheops.auth_server.resource;
 
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
-import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.annotation.Secured;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.event.EventResponses;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.servlet.ServletContext;
@@ -23,7 +21,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.series.Series.checkValidUID;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_LIMIT;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
+import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
@@ -34,23 +34,25 @@ public class EventRessource {
     @Context
     ServletContext context;
 
+    @Context
+    private SecurityContext securityContext;
+
     @GET
     @Secured
+    @AlbumAccessSecured
     @Path("album/{album:"+Albums.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumPk,
-                              @QueryParam("types") final List<String> types, @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                              @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset, @Context SecurityContext securityContext) {
+                              @QueryParam("types") final List<String> types,
+                              @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                              @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        try {
-            if(!kheopsPrincipal.hasAlbumAccess(albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+
+        //TODO check if permission read comments
+        //TODO if album token : only comments not mutations
+
         if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
             return Response.status(FORBIDDEN).build();
         }
@@ -68,7 +70,7 @@ public class EventRessource {
             } else if (types.contains("comments")) {
                 pair = Events.getCommentsAlbum(callingUserPk, albumPk, offset, limit);
             } else if (types.contains("mutations")) {
-                pair = Events.getMutationsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getMutationsAlbum(albumPk, offset, limit);
             } else {
                 pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
             }
@@ -84,23 +86,17 @@ public class EventRessource {
 
     @POST
     @Secured
+    @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
     @Path("album/{album:"+Albums.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumPk,
-                                     @FormParam("to_user") String user, @FormParam("comment") String comment,
-                                     @Context SecurityContext securityContext) {
+                                     @FormParam("to_user") String user,
+                                     @FormParam("comment") String comment) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-
-        try {
-            if(!kheopsPrincipal.hasAlbumPermission(UsersPermission.UsersPermissionEnum.WRITE_COMMENT, albumPk)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -119,12 +115,9 @@ public class EventRessource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
-    public Response getComments(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                @QueryParam(Consts.QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                @QueryParam(Consts.QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset,
-                                @Context SecurityContext securityContext) {
-
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
+    public Response getComments(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -157,19 +150,15 @@ public class EventRessource {
 
     @POST
     @Secured
+    @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postStudiesComment(@PathParam(Consts.StudyInstanceUID) String studyInstanceUID,
-                                @FormParam("to_user") String user, @FormParam("comment") String comment,
-                                @Context SecurityContext securityContext) {
+    public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                       @FormParam("to_user") String user,
+                                       @FormParam("comment") String comment) {
 
-        checkValidUID(studyInstanceUID, Consts.StudyInstanceUID);
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-
-        if(!kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
-        }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
 

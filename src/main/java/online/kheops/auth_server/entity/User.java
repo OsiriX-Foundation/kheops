@@ -1,7 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.util.Consts;
-
 import javax.persistence.*;
 
 import javax.persistence.Table;

@@ -92,41 +92,6 @@ public class Capability {
 
     private Capability() {}
 
-    /*private Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, boolean readPermission, boolean writePermission) {
-        this.secret = Capabilities.newCapabilityToken();
-        this.expiration = expirationDate;
-        this.startTime = startDate;
-        this.title  = title;
-        this.user = user;
-        this.scopeType = "user";
-        this.readPermission = readPermission;
-        this.writePermission = writePermission;
-        user.getCapabilities().add(this);
-    }
-
-    private Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, Series series, boolean readPermission, boolean writePermission) {
-        this(user, expirationDate, startDate, title, readPermission, writePermission);
-        this.scopeType = "series";
-        this.series = series;
-        this.study = series.getStudy();
-        series.addCapability(this);
-        study.addCapability(this);
-    }
-
-    private Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, Album album, boolean readPermission, boolean writePermission) {
-        this(user, expirationDate, startDate, title, readPermission, writePermission);
-        this.scopeType = "album";
-        this.album = album;
-        album.addCapability(this);
-    }
-
-    private Capability(User user, LocalDateTime expirationDate, LocalDateTime startDate, String title, Study study, boolean readPermission, boolean writePermission) {
-        this(user, expirationDate, startDate, title, readPermission, writePermission);
-        this.scopeType = "study";
-        this.study = study;
-        study.addCapability(this);
-    }*/
-
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
         this.secret = Capabilities.newCapabilityToken();
         this.expirationTime = builder.expirationTime;
@@ -215,10 +180,8 @@ public class Capability {
 
     public static class CapabilityBuilder {
 
-        private LocalDateTime issuedAtTime;
-        private LocalDateTime updatedTime;
+
         private LocalDateTime expirationTime;
-        private LocalDateTime revokedTime;
         private LocalDateTime notBeforeTime;
         private String title;
         private boolean readPermission;
@@ -233,20 +196,8 @@ public class Capability {
 
         public CapabilityBuilder () {}
 
-        public CapabilityBuilder issuedAtTime (LocalDateTime issuedAtTime) {
-            this.issuedAtTime = issuedAtTime;
-            return this;
-        }
-        public CapabilityBuilder updatedTime (LocalDateTime updatedTime) {
-            this.updatedTime = updatedTime;
-            return this;
-        }
         public CapabilityBuilder expirationTime (LocalDateTime expirationTime) {
             this.expirationTime = expirationTime;
-            return this;
-        }
-        public CapabilityBuilder revokedTime (LocalDateTime revokedTime) {
-            this.revokedTime = revokedTime;
             return this;
         }
         public CapabilityBuilder notBeforeTime (LocalDateTime notBeforeTime) {

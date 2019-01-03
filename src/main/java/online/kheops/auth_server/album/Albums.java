@@ -10,8 +10,6 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
-import javax.ws.rs.core.MultivaluedMap;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,6 +56,8 @@ public class Albums {
         try {
             tx.begin();
 
+            //TODO ??? 2x em.merge callingUser
+            callingUser = em.merge(callingUser);
             final User mergedCallingUser = em.merge(callingUser);
 
             final Album newAlbum = new Album(name, description, usersPermission);
@@ -133,19 +133,19 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(long callingUserPk, MultivaluedMap<String, String> queryParameters)
+    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
-            if (!userExist(callingUserPk, em)) {
+            if (!userExist(albumQueryParams.getDBID(), em)) {
                 throw new UserNotFoundException();
             }
         } finally {
             em.close();
         }
-        return findAlbumsByUserPk(callingUserPk, queryParameters);
+        return findAlbumsByUserPk(albumQueryParams);
     }
 
     public static void deleteAlbum(long callingUserPk, String albumId)
@@ -223,7 +223,7 @@ public class Albums {
         return usersAlbumResponses;
     }
 
-    public static void addUser(long callingUserPk, String userName, String albumId, boolean isAdmin)
+    public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -232,7 +232,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User targetUser = getUser(userName, em);
 
             if (targetUser.getPk() == callingUser.getPk()) {
@@ -282,7 +282,7 @@ public class Albums {
         }
     }
 
-    public static void deleteUser(long callingUserPk, String userName, String albumId)
+    public static void deleteUser(User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException, AlbumForbiddenException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -291,7 +291,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User removedUser = getUser(userName, em);
             final Album album = getAlbum(albumId, em);
             final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
@@ -322,7 +322,7 @@ public class Albums {
 
             //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
-                deleteAlbum(callingUserPk, albumId);
+                deleteAlbum(callingUser.getPk(), albumId);
             }
 
             tx.commit();
@@ -334,7 +334,7 @@ public class Albums {
         }
     }
 
-    public static void removeAdmin(long callingUserPk, String userName, String albumId)
+    public static void removeAdmin(User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -343,7 +343,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User removedUser = getUser(userName, em);
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
@@ -368,8 +368,8 @@ public class Albums {
         }
     }
 
-    public static void setFavorites(long callingUserPk, String albumId, Boolean favorite)
-            throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
+    public static void setFavorites(User callingUser,  String albumId, Boolean favorite)
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -377,7 +377,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(album, callingUser, em);
 
@@ -398,7 +398,7 @@ public class Albums {
         try {
             return findAlbumById(albumId, em);
         } catch (NoResultException e) {
-            throw new AlbumNotFoundException(e);
+            throw new AlbumNotFoundException("Album : " + albumId + " does not exist.");
         }
     }
 
@@ -406,7 +406,7 @@ public class Albums {
             throws UserNotMemberException {
 
         try {
-        return findAlbumUserByUserAndAlbum(user, album, em);
+            return findAlbumUserByUserAndAlbum(user, album, em);
         } catch (NoResultException e) {
             throw new UserNotMemberException(e);
         }
