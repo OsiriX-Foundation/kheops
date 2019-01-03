@@ -38,10 +38,13 @@ public class Albums {
     public static String newAlbumID() {
         StringBuilder idBuilder = new StringBuilder();
 
-        while (idBuilder.length() < ID_LENGTH) {
-            int index = rdm.nextInt(DICT.length());
-            idBuilder.append(DICT.charAt(index));
-        }
+        do {
+            idBuilder.setLength(0);
+            while (idBuilder.length() < ID_LENGTH) {
+                int index = rdm.nextInt(DICT.length());
+                idBuilder.append(DICT.charAt(index));
+            }
+        } while (albumExist(idBuilder.toString()));
         return idBuilder.toString();
     }
 
@@ -414,6 +417,18 @@ public class Albums {
             findAlbumById(albumId, em);
         } catch (NoResultException e) {
             return false;
+        }
+        return true;
+    }
+
+    public static boolean albumExist(String albumId) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            findAlbumById(albumId, em);
+        } catch (NoResultException e) {
+            return false;
+        } finally {
+            em.close();
         }
         return true;
     }
