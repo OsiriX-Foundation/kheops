@@ -41,7 +41,7 @@ public final class QIDOParams {
     private final Optional<String> studyIDFilter;
 
     public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
-        Long albumIDLocal = null;
+        String albumIDLocal = null;
         boolean fromInboxLocal = false;
         if (queryParameters.containsKey(ALBUM)) {
             albumIDLocal = queryParameters.get(ALBUM).get(0);

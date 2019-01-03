@@ -45,20 +45,20 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
 
                 final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
                 if(pathParam.containsKey(ALBUM)) {
-                    final Long albumID = Long.valueOf(pathParam.get(ALBUM).get(0));
+                    final String albumID = pathParam.get(ALBUM).get(0);
                     tryPermission(kheopsPrincipal, albumID, requestContext);
                 }
 
                 final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
                 //TODO album or albums ??
                 if(queryParam.containsKey(ALBUM)) {
-                    final Long albumID = Long.valueOf(queryParam.get(ALBUM).get(0));
+                    final String albumID = queryParam.get(ALBUM).get(0);
                     tryPermission(kheopsPrincipal, albumID, requestContext);
                 }
             }
         }
 
-        private void tryPermission(KheopsPrincipalInterface kheopsPrincipal, Long albumID, ContainerRequestContext requestContext) {
+        private void tryPermission(KheopsPrincipalInterface kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
             try {
                 if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
                     requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : " + albumID + " Forbidden").build());

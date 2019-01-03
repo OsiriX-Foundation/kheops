@@ -1,6 +1,7 @@
 package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 
 import javax.annotation.Priority;
@@ -29,7 +30,7 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
 
         final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
         if(pathParam.containsKey(ALBUM)) {
-            final Long albumID = Long.valueOf(pathParam.get(ALBUM).get(0));
+            final String albumID = pathParam.get(ALBUM).get(0);
             tryAccess(kheopsPrincipal, albumID, requestContext);
         }
 
@@ -38,13 +39,17 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
         final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
         //TODO album or albums ??
         if(queryParam.containsKey(ALBUM)) {
-            final Long albumID = Long.valueOf(queryParam.get(ALBUM).get(0));
+            final String albumID = queryParam.get(ALBUM).get(0);
             tryAccess(kheopsPrincipal, albumID, requestContext);
         }
     }
 
-    private void tryAccess(KheopsPrincipalInterface kheopsPrincipal, Long albumID, ContainerRequestContext requestContext) {
-        if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
+    private void tryAccess(KheopsPrincipalInterface kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
+        try {
+            if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
+                requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
+            }
+        } catch (AlbumNotFoundException e) {
             requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
         }
     }

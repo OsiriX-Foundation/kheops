@@ -70,7 +70,7 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "New album pk:"+albumResponse.id+" created by user pk:"+kheopsPrincipal.getUser().getGoogleEmail());
+        LOG.info(() -> "New album pk:"+albumResponse.id+" created by user:"+kheopsPrincipal.getUser().getGoogleEmail());
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
@@ -187,7 +187,7 @@ public class AlbumResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.deleteAlbum(callingUserPk, albumPk);
+            Albums.deleteAlbum(callingUserPk, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Delete album pk:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -308,7 +308,7 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         try {
-            Albums.deleteUser(kheopsPrincipal.getUser(), user, albumPk);
+            Albums.deleteUser(kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album pk:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();

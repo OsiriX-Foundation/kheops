@@ -34,7 +34,7 @@ public class FavoriteResource {
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                        @QueryParam(ALBUM) Long fromAlbumPk,
+                                        @QueryParam(ALBUM) String fromAlbumId,
                                         @QueryParam(INBOX) Boolean fromInbox) {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, true, securityContext);
@@ -63,7 +63,7 @@ public class FavoriteResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            if (fromAlbumPk != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.EDIT_FAVORITES, fromAlbumPk)) {
+            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
                 return Response.status(FORBIDDEN).build();
             }
         } catch (AlbumNotFoundException e) {

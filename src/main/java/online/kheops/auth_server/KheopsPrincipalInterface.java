@@ -8,6 +8,7 @@ import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
 
+
 public interface KheopsPrincipalInterface extends java.security.Principal{
 
     //for old version
@@ -21,7 +22,7 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;
     boolean hasStudyWriteAccess(String study);
 
-    boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, String albumId)throws AlbumNotFoundException;
+    boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)throws AlbumNotFoundException;
 
     boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException;
 

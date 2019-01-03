@@ -224,7 +224,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumPermission(UsersPermission.UsersPermissionEnum usersPermission, String albumId) {
+    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
             return false;

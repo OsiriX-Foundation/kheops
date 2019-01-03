@@ -158,7 +158,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumAccess(Long albumId){
+    public boolean hasAlbumAccess(String albumId){
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {

@@ -43,7 +43,7 @@ public class EventRessource {
     @Path("album/{album:"+Albums.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumPk,
+    public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
                               @QueryParam("types") final List<String> types,
                               @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
@@ -66,13 +66,13 @@ public class EventRessource {
 
         try {
             if (types.contains("comments") && types.contains("mutations")) {
-                pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getEventsAlbum(callingUserPk, albumId, offset, limit);
             } else if (types.contains("comments")) {
-                pair = Events.getCommentsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getCommentsAlbum(callingUserPk, albumId, offset, limit);
             } else if (types.contains("mutations")) {
-                pair = Events.getMutationsAlbum(albumPk, offset, limit);
+                pair = Events.getMutationsAlbum(albumId, offset, limit);
             } else {
-                pair = Events.getEventsAlbum(callingUserPk, albumPk, offset, limit);
+                pair = Events.getEventsAlbum(callingUserPk, albumId, offset, limit);
             }
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -92,7 +92,7 @@ public class EventRessource {
     @Path("album/{album:"+Albums.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumPk,
+    public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
                                      @FormParam("to_user") String user,
                                      @FormParam("comment") String comment) {
 
@@ -100,7 +100,7 @@ public class EventRessource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Events.albumPostComment(callingUserPk, albumPk, comment, user);
+            Events.albumPostComment(callingUserPk, albumId, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
