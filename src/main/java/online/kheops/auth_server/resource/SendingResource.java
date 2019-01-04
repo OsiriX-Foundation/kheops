@@ -135,6 +135,7 @@ public class SendingResource
                 Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
             }
         } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
+            LOG.info(() -> "DEBUG:error:"+e.getMessage());
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(CREATED).build();
