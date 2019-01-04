@@ -150,12 +150,18 @@ public class SendingResource
             return Response.status(FORBIDDEN).build();
         }
 
-        if (!kheopsPrincipal.hasUserAccess()) {
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
-                return this.deleteStudyFromAlbum(kheopsPrincipal.getAlbumID(), studyInstanceUID);
-                //return Response.status(BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
+                String albumId = kheopsPrincipal.getAlbumID();
+                if(kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.DELETE_SERIES,albumId)) {
+                    Sending.deleteStudyFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID);
+                }
+                LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
+                return Response.status(NO_CONTENT).build();
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
+            } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
             }
         }
 
