@@ -119,7 +119,7 @@ public class Albums {
                 usersPermission.getWriteComments().ifPresent(editAlbum::setWriteComments);
 
             } else if (name != null || description != null || usersPermission.areSet()) {
-                throw new AlbumForbiddenException("Not admin: The user must be an admin for editing name, description or permission");
+                throw new AlbumForbiddenException("Not admin: The user must be an admin for editing name, description or permissions");
             }
 
             tx.commit();

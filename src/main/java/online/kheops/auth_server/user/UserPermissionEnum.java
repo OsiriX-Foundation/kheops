@@ -117,7 +117,7 @@ public enum UserPermissionEnum {
     EDIT_ALBUM {
         @Override
         public boolean hasUserPermission(Album album) {
-            return false;
+            return true;
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
