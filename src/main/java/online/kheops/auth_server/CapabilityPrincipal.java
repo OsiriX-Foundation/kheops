@@ -229,6 +229,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
+            LOG.info(() -> "DEBUG:album access => NO Grrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
             return false;
         }
         LOG.info(() -> "DEBUG:album access => OK");
@@ -278,7 +279,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             if (albumId  == null) {
                 albumId = capability.getAlbum().getId();
             }
-            if (albumId.compareTo(capability.getAlbum().getId()) == 0) {
+            if (albumId.compareTo(capability.getAlbum().getId()) != 0) {
                 return false;
             }
             try {
