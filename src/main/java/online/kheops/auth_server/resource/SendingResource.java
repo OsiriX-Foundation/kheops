@@ -111,7 +111,7 @@ public class SendingResource
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-        LOG.info(() -> "DEBUG: try put series in album 1");
+        LOG.info(() -> "DEBUG: try put series in album");
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                 LOG.info(() -> "formbidden ...");
@@ -125,18 +125,12 @@ public class SendingResource
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 LOG.info(() -> "DEBUG :"+albumID);
-                LOG.info(() -> {
-                    try {
-                        return "DEBUG :"+kheopsPrincipal.getAlbumID();
-                    } catch (NotAlbumScopeTypeException e) {
-                        return e.getMessage();
-                    }
-                });
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                     LOG.info(() -> "DEBUG before put: try put series in album:"+albumID);
                     Sending.putSeriesInAlbum(callingUserPk, albumID, studyInstanceUID, seriesInstanceUID);
                     LOG.info(() -> "DEBUG after put: try put series in album:"+albumID);
                 } else {
+                    LOG.info(() -> "DEBUG FORBIDDEM no album permission...");
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
             } else {
