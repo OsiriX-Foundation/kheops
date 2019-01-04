@@ -15,7 +15,7 @@ public class CapabilityParametersBuilder {
     private boolean appropriatePermission;
     private CapabilityScopeBuilder capabilityScopeBuilder;
 
-    public CapabilityParametersBuilder() { }
+    public CapabilityParametersBuilder() { /*empty*/ }
 
     public CapabilityParametersBuilder callingUserPk(Long callingUserPk) {
         this.callingUserPk = callingUserPk;

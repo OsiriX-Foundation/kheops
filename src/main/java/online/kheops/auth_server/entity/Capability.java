@@ -194,7 +194,7 @@ public class Capability {
         private Series series;
         private Study study;
 
-        public CapabilityBuilder () {}
+        public CapabilityBuilder () { /*empty*/ }
 
         public CapabilityBuilder expirationTime (LocalDateTime expirationTime) {
             this.expirationTime = expirationTime;

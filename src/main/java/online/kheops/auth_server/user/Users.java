@@ -27,8 +27,8 @@ public class Users {
     }
 
     public static User getUser(String username) throws UserNotFoundException{
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
         User user;
 
         try {
