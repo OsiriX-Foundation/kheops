@@ -12,6 +12,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 
+import java.util.logging.Logger;
+
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
@@ -22,7 +24,7 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 
 
 public class CapabilityPrincipal implements KheopsPrincipalInterface {
-
+    private static final Logger LOG = Logger.getLogger(CapabilityPrincipal.class.getName());
     private final Capability capability;
     private final User user;
 
@@ -328,6 +330,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     @Override
     public String getAlbumID() throws NotAlbumScopeTypeException {
         if(getScope() == ScopeType.ALBUM) {
+            LOG.info(() -> "DEBUG:return id:"+capability.getAlbum().getId());
             return capability.getAlbum().getId();
         } else {
             throw new NotAlbumScopeTypeException("");

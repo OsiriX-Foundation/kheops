@@ -125,8 +125,9 @@ public class SendingResource
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
-                    LOG.info(() -> "DEBUG: try put series in album:"+albumID);
+                    LOG.info(() -> "DEBUG before put: try put series in album:"+albumID);
                     Sending.putSeriesInAlbum(callingUserPk, albumID, studyInstanceUID, seriesInstanceUID);
+                    LOG.info(() -> "DEBUG after put: try put series in album:"+albumID);
                 } else {
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
