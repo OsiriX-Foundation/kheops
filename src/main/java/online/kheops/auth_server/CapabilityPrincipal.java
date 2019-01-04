@@ -231,17 +231,19 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (!this.hasAlbumAccess(albumId)) {
             return false;
         }
+        LOG.info(() -> "DEBUG:album access => OK");
 
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
             tx.begin();
             if(getScope() == ScopeType.ALBUM){
+                LOG.info(() -> "DEBUG:scope = album => OK");
 
                 final Album album = em.merge(capability.getAlbum());
                 isMemberOfAlbum(user, album, em);
 
-                usersPermission.hasCapabilityPermission(capability);
+                return usersPermission.hasCapabilityPermission(capability);
 
             } else if (getScope() == ScopeType.USER) {
 
@@ -254,7 +256,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                     return true;
                 }
 
-                usersPermission.hasUserPermission(album);
+                return usersPermission.hasUserPermission(album);
 
             }
         } catch (UserNotMemberException | AlbumNotFoundException e) {
