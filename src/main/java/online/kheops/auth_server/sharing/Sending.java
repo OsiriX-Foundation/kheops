@@ -159,7 +159,6 @@ public class Sending {
     public static void putSeriesInAlbum(long callingUserPk, String albumId, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, AlbumNotFoundException {
 
-        LOG.info(() -> "DEBUG:inside put series in album id:"+albumId);
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 

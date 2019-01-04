@@ -111,10 +111,9 @@ public class SendingResource
 
         KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-        LOG.info(() -> "DEBUG: try put series in album");
+
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                LOG.info(() -> "formbidden ...");
                 return Response.status(FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
@@ -124,22 +123,15 @@ public class SendingResource
         try {
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
-                LOG.info(() -> "DEBUG :"+albumID);
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
-                    LOG.info(() -> "DEBUG before put: try put series in album:"+albumID);
                     Sending.putSeriesInAlbum(callingUserPk, albumID, studyInstanceUID, seriesInstanceUID);
-                    LOG.info(() -> "DEBUG after put: try put series in album:"+albumID);
                 } else {
-                    LOG.info(() -> "DEBUG FORBIDDEM no album permission...");
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
             } else {
-                LOG.info(() -> "DEBUG: try appropriate the series");
                 Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
             }
         } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
-            LOG.info(() -> "DEBUG:error:");
-            LOG.info(() -> "DEBUG:error:"+e.getMessage());
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(CREATED).build();
@@ -194,13 +186,21 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        if (!kheopsPrincipal.hasUserAccess()) {
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
-                return this.deleteSeriesFromAlbum(kheopsPrincipal.getAlbumID(), studyInstanceUID, seriesInstanceUID);
-                //return Response.status(BAD_REQUEST).entity("Use DELETE /studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/album/"+kheopsPrincipal.getAlbumID()).build();
+                String albumId = kheopsPrincipal.getAlbumID();
+                if(kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.DELETE_SERIES,albumId)) {
+                    Sending.deleteSeriesFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, seriesInstanceUID);
+                    LOG.info(() -> "finished removing StudyInstanceUID:" + studyInstanceUID + " SeriesInstanceUID:" + seriesInstanceUID + " from albumId " + albumId);
+                    return Response.status(NO_CONTENT).build();
+                } else {
+                    return Response.status(FORBIDDEN).build();
+                }
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
-            }
+            } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
         }
 
         try {
