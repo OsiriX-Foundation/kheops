@@ -43,7 +43,7 @@ public class CapabilitiesResponses {
         @XmlElement(name = "scope_type")
         String scopeType;
         @XmlElement(name = "scope_album")
-        Long albumId;
+        String albumId;
         @XmlElement(name = "scope_series")
         String series;
         @XmlElement(name = "scope_study")
@@ -54,7 +54,7 @@ public class CapabilitiesResponses {
 
         CapabilityResponse capabilityResponse = new CapabilityResponse();
 
-        capabilityResponse.id = capability.getPk();
+        capabilityResponse.id = capability.getPk();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         capabilityResponse.secret = capability.getSecret();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         capabilityResponse.title = capability.getTitle();

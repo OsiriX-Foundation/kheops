@@ -54,7 +54,7 @@ public enum ScopeType {
         }
         @Override
         public CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability) {
-            capabilityResponse.albumId = capability.getAlbum().getPk();
+            capabilityResponse.albumId = capability.getAlbum().getId();
             capabilityResponse.scopeType = this.name().toLowerCase();
             capabilityResponse.appropriatePermission = capability.isAppropriatePermission();
             capabilityResponse.downloadPermission = capability.isDownloadPermission();
