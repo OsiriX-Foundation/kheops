@@ -34,7 +34,7 @@ public class UIDValidatorFactory implements DynamicFeature {
                     for (Annotation annotation2 : annotations) {
                         if (annotation2 instanceof PathParam) {
                             featureContext.register(new CheckUID(((PathParam)annotation2).value()));
-                            break;
+                            //break;
                         }
                     }
 
