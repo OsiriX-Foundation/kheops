@@ -155,9 +155,11 @@ public class SendingResource
                 String albumId = kheopsPrincipal.getAlbumID();
                 if(kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.DELETE_SERIES,albumId)) {
                     Sending.deleteStudyFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID);
+                    LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
+                    return Response.status(NO_CONTENT).build();
+                } else {
+                    return Response.status(FORBIDDEN).build();
                 }
-                LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
-                return Response.status(NO_CONTENT).build();
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
             } catch(AlbumNotFoundException | SeriesNotFoundException e) {
