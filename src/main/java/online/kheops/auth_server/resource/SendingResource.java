@@ -124,6 +124,14 @@ public class SendingResource
         try {
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
+                LOG.info(() -> "DEBUG :"+albumID);
+                LOG.info(() -> {
+                    try {
+                        return "DEBUG :"+kheopsPrincipal.getAlbumID();
+                    } catch (NotAlbumScopeTypeException e) {
+                        return e.getMessage();
+                    }
+                });
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                     LOG.info(() -> "DEBUG before put: try put series in album:"+albumID);
                     Sending.putSeriesInAlbum(callingUserPk, albumID, studyInstanceUID, seriesInstanceUID);
