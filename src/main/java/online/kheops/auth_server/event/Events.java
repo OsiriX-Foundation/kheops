@@ -33,8 +33,8 @@ public class Events {
     public static void albumPostComment(long callingUserPk,String albumId,String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -97,8 +97,8 @@ public class Events {
         final PairListXTotalCount<EventResponses.EventResponse> pair;
         final long XTotalCount;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -134,8 +134,8 @@ public class Events {
         final PairListXTotalCount<EventResponses.EventResponse> pair;
         final long XTotalCount;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -166,8 +166,8 @@ public class Events {
         final PairListXTotalCount<EventResponses.EventResponse> pair;
         final long XTotalCount;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -197,8 +197,8 @@ public class Events {
         final PairListXTotalCount<EventResponses.EventResponse> pair;
         final long XTotalCount;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -224,8 +224,9 @@ public class Events {
 
     public static void studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String user)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
