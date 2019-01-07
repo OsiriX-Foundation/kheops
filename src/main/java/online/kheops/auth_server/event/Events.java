@@ -90,6 +90,10 @@ public class Events {
         return new Mutation(callingUser, album, mutationType, study);
     }
 
+    public static Mutation albumPostEditMutation(User callingUser, Album album) {
+        return new Mutation(callingUser, album, MutationType.EDIT_ALBUM);
+    }
+
     public static PairListXTotalCount<EventResponses.EventResponse> getEventsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
             throws UserNotFoundException, AlbumNotFoundException {
 
@@ -224,7 +228,7 @@ public class Events {
 
     public static void studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String user)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
-        
+
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 

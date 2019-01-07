@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.entity.User;

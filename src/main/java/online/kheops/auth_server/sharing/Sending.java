@@ -217,7 +217,7 @@ public class Sending {
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
 
-            Boolean allSeriesAlreadyExist = true;
+            boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
                 if (!targetAlbum.containsSeries(series, em)) {
                     final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, series);

@@ -45,7 +45,7 @@ public class AlbumQueries {
     }
 
     public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em ) throws NoResultException {
-        return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album", AlbumUser.class)
+        return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
                 .setParameter("targetUser", user)
                 .setParameter("targetAlbum", album)
                 .getSingleResult();

@@ -197,26 +197,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-
-            if (!capability.isWritePermission()) {
-                return false;
-            }
-            try {
-                tx.begin();
-                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
-                if (albumUser.isAdmin()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (UserNotMemberException e) {
-                return false;
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
+            return capability.isWritePermission();
         } else {
             return false;
         }
@@ -233,10 +214,13 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         this.tx = em.getTransaction();
         try {
             tx.begin();
-            if(getScope() == ScopeType.ALBUM){
+            if(getScope() == ScopeType.ALBUM) {
 
                 final Album album = em.merge(capability.getAlbum());
-                isMemberOfAlbum(user, album, em);
+
+                if (albumId.compareTo(album.getId()) != 0) {
+                    return false;
+                }
 
                 return usersPermission.hasCapabilityPermission(capability);
 
@@ -252,7 +236,6 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
 
                 return usersPermission.hasUserPermission(album);
-
             }
         } catch (UserNotMemberException | AlbumNotFoundException e) {
             return false;
@@ -272,8 +255,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (getScope() == ScopeType.ALBUM) {
             if (albumId  == null) {
                 albumId = capability.getAlbum().getId();
-            }
-            if (albumId.compareTo(capability.getAlbum().getId()) != 0) {
+            } else  if (albumId.compareTo(capability.getAlbum().getId()) != 0) {
                 return false;
             }
             try {
@@ -299,9 +281,8 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             try {
                 tx.begin();
                 final Album album = getAlbum(albumId, em);
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
-                return user.getInbox() != album;
-            } catch (UserNotMemberException  | AlbumNotFoundException e) {
+                return isMemberOfAlbum(user, album, em);
+            } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {

@@ -118,6 +118,9 @@ public class Albums {
                 usersPermission.getAddSeries().ifPresent(editAlbum::setAddSeries);
                 usersPermission.getWriteComments().ifPresent(editAlbum::setWriteComments);
 
+                Mutation mutation = Events.albumPostEditMutation(callingUser, editAlbum);
+                em.persist(mutation);
+
             } else if (name != null || description != null || usersPermission.areSet()) {
                 throw new AlbumForbiddenException("Not admin: The user must be an admin for editing name, description or permissions");
             }

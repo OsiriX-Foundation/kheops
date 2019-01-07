@@ -48,20 +48,23 @@ public class EventRessource {
                               @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         //TODO check if permission read comments
-        //TODO if album token : only comments not mutations
 
-        if (kheopsPrincipal.getScope() != ScopeType.USER && types.contains("mutation")) {
-            return Response.status(FORBIDDEN).build();
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutation")) {
+            types.remove("mutation");
+            types.add("comments");
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
-        if( offset < 0 || limit < 0 ) {
-            return Response.status(BAD_REQUEST).build();
+        if( offset < 0 ) {
+            return Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
+        }
+        if( limit < 0 ) {
+            return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
         }
 
         try {
@@ -96,7 +99,7 @@ public class EventRessource {
                                      @FormParam("to_user") String user,
                                      @FormParam("comment") String comment) {
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -119,7 +122,7 @@ public class EventRessource {
                                 @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                 @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         try {
             if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
@@ -132,8 +135,11 @@ public class EventRessource {
         final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponses.EventResponse> pair;
 
-        if( offset < 0 || limit < 0 ) {
-            return Response.status(BAD_REQUEST).build();
+        if( offset < 0 ) {
+            return Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
+        }
+        if( limit < 0 ) {
+            return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
         }
 
         try {
@@ -158,7 +164,7 @@ public class EventRessource {
                                        @FormParam("to_user") String user,
                                        @FormParam("comment") String comment) {
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         final long callingUserPk = kheopsPrincipal.getDBID();
 
