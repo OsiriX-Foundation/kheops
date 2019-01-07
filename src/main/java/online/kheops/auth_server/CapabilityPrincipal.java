@@ -258,22 +258,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             } else  if (albumId.compareTo(capability.getAlbum().getId()) != 0) {
                 return false;
             }
-            try {
-                tx.begin();
-                final Album album = getAlbum(albumId, em);
-                final AlbumUser albumUser = getAlbumUser(album, user, em);
-                if (!albumUser.isAdmin()) {
-                    return false;
-                }
-                return user.getInbox() != album;
-            } catch (UserNotMemberException | AlbumNotFoundException e) {
-                return false;
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
+            return true;
         } else if (getScope() == ScopeType.USER) {
             if (albumId == null) {
                 return false;
