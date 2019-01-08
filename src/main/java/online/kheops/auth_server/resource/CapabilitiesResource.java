@@ -102,10 +102,10 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
-    @Path("capabilities/{capability_id:[1-9][0-9]*}/revoke")
+    @Path("capabilities/{capability_id:"+Capabilities.ID_PATTERN+"}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response revokeCapability(@PathParam("capability_id") long capabilityId) {
+    public Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         CapabilityResponse capabilityResponse;

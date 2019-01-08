@@ -67,6 +67,7 @@ public class Keys {
     public static final UniqueKey<AlbumsRecord> ALBUM_PK = UniqueKeys0.ALBUM_PK;
     public static final UniqueKey<AlbumsRecord> ALBUMS_ID_UNIQUE = UniqueKeys0.ALBUMS_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = UniqueKeys0.CAPABILITIES_PK;
+    public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = UniqueKeys0.CAPABILITIES_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = UniqueKeys0.CAPABILITIES_SECRET_UNIQUE;
     public static final UniqueKey<EventsRecord> EVENT_PK = UniqueKeys0.EVENT_PK;
     public static final UniqueKey<SeriesRecord> SERIES_PK = UniqueKeys0.SERIES_PK;
@@ -119,6 +120,7 @@ public class Keys {
         public static final UniqueKey<AlbumsRecord> ALBUM_PK = Internal.createUniqueKey(Albums.ALBUMS, "album_pk", Albums.ALBUMS.PK);
         public static final UniqueKey<AlbumsRecord> ALBUMS_ID_UNIQUE = Internal.createUniqueKey(Albums.ALBUMS, "albums_id_unique", Albums.ALBUMS.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_pk", Capabilities.CAPABILITIES.PK);
+        public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_id_unique", Capabilities.CAPABILITIES.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_secret_unique", Capabilities.CAPABILITIES.SECRET);
         public static final UniqueKey<EventsRecord> EVENT_PK = Internal.createUniqueKey(Events.EVENTS, "event_pk", Events.EVENTS.PK);
         public static final UniqueKey<SeriesRecord> SERIES_PK = Internal.createUniqueKey(Series.SERIES, "series_pk", Series.SERIES.PK);

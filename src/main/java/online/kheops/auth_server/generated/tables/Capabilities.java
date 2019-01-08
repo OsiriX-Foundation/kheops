@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
-    private static final long serialVersionUID = 1777657534;
+    private static final long serialVersionUID = 1155374022;
 
     /**
      * The reference instance of <code>public.capabilities</code>
@@ -61,6 +61,11 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      * The column <code>public.capabilities.pk</code>.
      */
     public final TableField<CapabilitiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('capabilities_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>public.capabilities.id</code>.
+     */
+    public final TableField<CapabilitiesRecord, String> ID = createField("id", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.issued_at_time</code>.
@@ -178,7 +183,7 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.CAPABILITIES_PK, Indexes.CAPABILITIES_SECRET_INDEX, Indexes.CAPABILITIES_SECRET_UNIQUE, Indexes.CAPABILITIES_USER_FK_INDEX);
+        return Arrays.<Index>asList(Indexes.CAPABILITIES_ID_UNIQUE, Indexes.CAPABILITIES_PK, Indexes.CAPABILITIES_SECRET_INDEX, Indexes.CAPABILITIES_SECRET_UNIQUE, Indexes.CAPABILITIES_USER_FK_INDEX);
     }
 
     /**
@@ -202,7 +207,7 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      */
     @Override
     public List<UniqueKey<CapabilitiesRecord>> getKeys() {
-        return Arrays.<UniqueKey<CapabilitiesRecord>>asList(Keys.CAPABILITIES_PK, Keys.CAPABILITIES_SECRET_UNIQUE);
+        return Arrays.<UniqueKey<CapabilitiesRecord>>asList(Keys.CAPABILITIES_PK, Keys.CAPABILITIES_ID_UNIQUE, Keys.CAPABILITIES_SECRET_UNIQUE);
     }
 
     /**

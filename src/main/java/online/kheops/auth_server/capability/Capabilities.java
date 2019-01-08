@@ -23,11 +23,19 @@ import static online.kheops.auth_server.capability.CapabilitiesResponses.capabil
 import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponsesInfo;
 
 public class Capabilities {
-    private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+    private static final String TOKEN_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int TOKEN_LENGTH = 22;
     public static final String TOKEN_PATTERN = "[A-Za-z0-9]{" + TOKEN_LENGTH + "}";
     private static final String TOKEN_PATTERN_STRICT = "^" + TOKEN_PATTERN + "$";
-    private static final Pattern pattern = Pattern.compile(TOKEN_PATTERN_STRICT);
+    private static final Pattern tokenPattern = Pattern.compile(TOKEN_PATTERN_STRICT);
+
+    private static final String ID_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    private static final int ID_LENGTH = 10;
+    public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
+    private static final String ID_PATTERN_STRICT = "^" + ID_PATTERN + "$";
+    private static final Pattern idPattern = Pattern.compile(ID_PATTERN_STRICT);
+
     private static final Random rdm = new SecureRandom();
 
     private Capabilities() {
@@ -38,14 +46,28 @@ public class Capabilities {
         StringBuilder secretBuilder = new StringBuilder();
 
         while (secretBuilder.length() < TOKEN_LENGTH) {
-            int index = rdm.nextInt(DICT.length());
-            secretBuilder.append(DICT.charAt(index));
+            int index = rdm.nextInt(TOKEN_DICT.length());
+            secretBuilder.append(TOKEN_DICT.charAt(index));
         }
         return secretBuilder.toString();
     }
 
+    public static String newCapabilityID() {
+        StringBuilder idBuilder = new StringBuilder();
+
+        do {
+            idBuilder.setLength(0);
+            while (idBuilder.length() < ID_LENGTH) {
+                int index = rdm.nextInt(ID_DICT.length());
+                idBuilder.append(ID_DICT.charAt(index));
+            }
+        } while (capabilityExist(idBuilder.toString()));
+        return idBuilder.toString();
+    }
+
+
     public static Boolean isValidFormat(String token) {
-        return pattern.matcher(token).matches();
+        return tokenPattern.matcher(token).matches();
     }
 
     public static CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
@@ -133,7 +155,7 @@ public class Capabilities {
         return capabilityResponse;
     }
     
-    public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, long capabilityId)
+    public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, String capabilityId)
     throws UserNotFoundException, CapabilityNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -210,7 +232,22 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static Capability getCapability(User user, long capabilityId, EntityManager em) throws CapabilityNotFoundException {
+    public static boolean capabilityExist(String capabilityId) {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            findCapabilityByCapabilityID(capabilityId, em);
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+
+    }
+
+    public static Capability getCapability(User user, String capabilityId, EntityManager em) throws CapabilityNotFoundException {
         try {
             return findCapabilityByCapabilityTokenandUser(user, capabilityId, em);
         } catch (NoResultException e) {

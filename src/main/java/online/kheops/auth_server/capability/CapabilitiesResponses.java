@@ -12,7 +12,7 @@ public class CapabilitiesResponses {
 
     public static class CapabilityResponse {
         @XmlElement(name = "id")
-        Long id;
+        String id;
 
         @XmlElement(name = "secret")
         String secret;
@@ -54,7 +54,7 @@ public class CapabilitiesResponses {
 
         CapabilityResponse capabilityResponse = new CapabilityResponse();
 
-        capabilityResponse.id = capability.getPk();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        capabilityResponse.id = capability.getId();
 
         capabilityResponse.secret = capability.getSecret();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         capabilityResponse.title = capability.getTitle();

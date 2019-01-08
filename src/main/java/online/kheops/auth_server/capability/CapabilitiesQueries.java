@@ -21,13 +21,21 @@ public class CapabilitiesQueries {
         return query.getSingleResult();
     }
 
-    public static Capability findCapabilityByCapabilityTokenandUser(User user, long capabilityId, EntityManager em)
+    public static Capability findCapabilityByCapabilityTokenandUser(User user, String capabilityId, EntityManager em)
             throws NoResultException {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user AND :capabilityId = c.pk", Capability.class);
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user AND :capabilityId = c.id", Capability.class);
         query.setParameter("user", user);
         query.setParameter("capabilityId", capabilityId);
         return query.getSingleResult();
     }
+
+    public static Capability findCapabilityByCapabilityID(String capabilityId, EntityManager em)
+            throws NoResultException {
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :capabilityId = c.id", Capability.class);
+        query.setParameter("capabilityId", capabilityId);
+        return query.getSingleResult();
+    }
+
 
     public static  List<Capability> findCapabilitiesByUserWithRevoke(User user, EntityManager em) {
         TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user order by c.issuedAtTime desc", Capability.class);

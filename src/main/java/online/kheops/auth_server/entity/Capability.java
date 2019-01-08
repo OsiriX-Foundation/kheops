@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import static online.kheops.auth_server.capability.Capabilities.newCapabilityID;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
 @SuppressWarnings("unused")
@@ -21,6 +22,10 @@ public class Capability {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")
     private long pk;
+
+    @Basic(optional = false)
+    @Column(name = "id")
+    private String id;
 
     @Basic(optional = false)
     @Column(name = "issued_at_time", updatable = false)
@@ -80,6 +85,7 @@ public class Capability {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         issuedAtTime = now;
         updatedTime = now;
+        id = newCapabilityID();
         if(notBeforeTime == null) {
             notBeforeTime = now;
         }
@@ -130,6 +136,8 @@ public class Capability {
     }
 
     public String getTitle() { return title; }
+
+    public String getId() { return id; }
 
     public void setTitle(String description) { this.title = description; }
 
