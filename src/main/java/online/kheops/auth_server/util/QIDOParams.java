@@ -50,12 +50,14 @@ public final class QIDOParams {
             fromInboxLocal = true;
         }
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, albumIDLocal)) {
-                fromInboxLocal = false;
-                try {
-                    albumIDLocal = kheopsPrincipal.getAlbumID();
-                } catch (NotAlbumScopeTypeException notUsed) { /*empty*/ }
-            } else {
+            if(fromInboxLocal) {
+                throw new BadQueryParametersException("from inbox forbidden with a capability token with an album scope");//todo good message
+            }
+            try {
+                albumIDLocal = kheopsPrincipal.getAlbumID();
+            } catch (NotAlbumScopeTypeException notUsed) { /*empty*/ }
+
+            if (!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, albumIDLocal)) {
                 throw new AlbumForbiddenException("Token doesn't have read access");
             }
         }
