@@ -31,5 +31,6 @@ public class Consts {
     public static final int ALBUM_ACCESS_PRIORITY = Priorities.USER + 2;
     public static final int ALBUM_PERMISSION_ACCESS_PRIORITY = Priorities.USER + 3;
     public static final int UID_VALIDATOR_PRIORITY = Priorities.USER - 1;
+    public static final int MIN_VALIDATOR_PRIORITY = Priorities.USER - 2;
 
 }

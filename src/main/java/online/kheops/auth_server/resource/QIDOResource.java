@@ -80,7 +80,7 @@ public class QIDOResource {
             offset = 0;
         }
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -159,14 +159,10 @@ public class QIDOResource {
             limit = Integer.MAX_VALUE;
         }
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        try {
-            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                return Response.status(NOT_FOUND).build();
-            }
-        } catch (StudyNotFoundException e) {
+        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
         }
 
@@ -268,14 +264,10 @@ public class QIDOResource {
 
         fromInbox = fromInbox != null;
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        try {
-            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                return Response.status(NOT_FOUND).build();
-            }
-        } catch (StudyNotFoundException e) {
+        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
         }
 

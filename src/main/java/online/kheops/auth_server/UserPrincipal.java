@@ -64,17 +64,15 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) throws StudyNotFoundException {
+    public boolean hasStudyReadAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
             tx.begin();
             final Study study = getStudy(studyInstanceUID, em);
-            if (canAccessStudy(user, study, em)) {
-                return true;
-            } else {
-                throw new StudyNotFoundException("studyInstanceUID : " + studyInstanceUID + " not found");
-            }
+            return canAccessStudy(user, study, em);
+        } catch (StudyNotFoundException e) {
+            return false;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

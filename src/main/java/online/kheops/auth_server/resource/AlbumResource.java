@@ -259,7 +259,6 @@ public class AlbumResource {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
-
         try {
             Albums.addUser(kheopsPrincipal.getUser(), user, albumId, true);
         } catch (UserNotFoundException | AlbumNotFoundException e) {

@@ -70,13 +70,11 @@ public class FavoriteResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        try {
-            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).build();
+
+        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+            return Response.status(FORBIDDEN).build();
         }
+
         try {
             Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumId, favorite);
         } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {

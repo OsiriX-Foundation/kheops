@@ -44,24 +44,24 @@ public class SendingResource
                                        @QueryParam(INBOX) Boolean fromInbox) {
 
         if ((fromAlbumId != null && fromInbox != null)) {
-            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} or {"+INBOX+"} not both").build();
         }
 
         fromInbox = fromInbox == null && fromAlbumId == null;
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
             if(fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.SEND_SERIES, fromAlbumId)) {
-                fromAlbumId = null;
+                return Response.status(UNAUTHORIZED).entity("You can't send series from the album: "+fromAlbumId).build();
             }
         } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        if(fromInbox == true && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
-            fromInbox = false;
+        if(fromInbox && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            return Response.status(UNAUTHORIZED).entity("You can't send study:"+studyInstanceUID+" from inbox").build();
         }
 
         try {
@@ -82,7 +82,7 @@ public class SendingResource
                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                         @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -109,7 +109,7 @@ public class SendingResource
     public Response putSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                               @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -268,7 +268,7 @@ public class SendingResource
 
         fromInbox = fromInbox != null;
 
-        KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         try {
             if (!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumId)) {

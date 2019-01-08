@@ -16,7 +16,7 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     String getAlbumID() throws NotAlbumScopeTypeException;
 
     boolean hasSeriesReadAccess(String study, String series) throws SeriesNotFoundException;
-    boolean hasStudyReadAccess(String study)  throws StudyNotFoundException;
+    boolean hasStudyReadAccess(String study);
     boolean hasUserAccess();
 
     boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;

@@ -15,6 +15,7 @@ import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.servlet.ServletContext;
+import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
@@ -124,12 +125,8 @@ public class EventRessource {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
-        try {
-            if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+            return Response.status(FORBIDDEN).build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
