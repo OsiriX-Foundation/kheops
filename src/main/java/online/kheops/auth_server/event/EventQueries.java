@@ -54,7 +54,7 @@ public class EventQueries {
     }
 
     public static List<Comment> getCommentsByStudy(User user, String studyUID, Integer offset, Integer limit, EntityManager em) {
-        TypedQuery<Comment> query = em.createQuery("SELECT c from Comment c where c.study =  :studyUID and (c.privateTargetUser = null or c.privateTargetUser = :user or c.user = :user) order by c.eventTime desc", Comment.class);
+        TypedQuery<Comment> query = em.createQuery("SELECT c from Comment c where c.study.studyInstanceUID =  :studyUID and (c.privateTargetUser = null or c.privateTargetUser = :user or c.user = :user) order by c.eventTime desc", Comment.class);
         query.setParameter("user", user);
         query.setParameter("studyUID", studyUID);
         query.setFirstResult(offset).setMaxResults(limit);
@@ -62,7 +62,7 @@ public class EventQueries {
     }
 
     public static long getTotalCommentsByStudy(User user, String studyUID, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where c.study = :studyUID and (c.privateTargetUser = null or c.privateTargetUser = :user or c.user = :user)", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where c.study.studyInstanceUID = :studyUID and (c.privateTargetUser = null or c.privateTargetUser = :user or c.user = :user)", Long.class);
         query.setParameter("user", user);
         query.setParameter("studyUID", studyUID);
         return query.getSingleResult();
