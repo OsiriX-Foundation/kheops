@@ -126,7 +126,7 @@ public class EventRessource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+            return Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -164,6 +164,10 @@ public class EventRessource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         final long callingUserPk = kheopsPrincipal.getDBID();
+
+        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+            return Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
+        }
 
         try {
             Events.studyPostComment(callingUserPk, studyInstanceUID, comment, user);

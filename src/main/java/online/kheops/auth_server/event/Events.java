@@ -232,6 +232,10 @@ public class Events {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
+        if (commentContent.isEmpty()) {
+            throw new BadQueryParametersException("Comment is empty");
+        }
+
         try {
             tx.begin();
 
