@@ -226,7 +226,7 @@ public class Events {
     }
 
 
-    public static void studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String user)
+    public static void studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String targetUserPk)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -239,7 +239,7 @@ public class Events {
         try {
             tx.begin();
 
-            final boolean isPrivateComment = user != null;
+            final boolean isPrivateComment = targetUserPk != null;
 
             final User callingUser = getUser(callingUserPk, em);
             final Study study = getStudy(studyInstanceUID, em);
@@ -247,7 +247,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, study);
 
             if(isPrivateComment) {
-                User targetUser = getUser(user, em);
+                User targetUser = getUser(targetUserPk, em);
 
                 if (targetUser == callingUser) {
                     throw new BadQueryParametersException("Self comment forbidden");

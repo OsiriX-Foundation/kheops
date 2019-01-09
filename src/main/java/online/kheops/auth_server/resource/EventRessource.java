@@ -13,6 +13,7 @@ import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
@@ -157,10 +158,9 @@ public class EventRessource {
     @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @FormParam("to_user") String user,
-                                       @FormParam("comment") @NotNull String comment) {
+                                       @FormParam("comment") @NotNull @NotEmpty String comment) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
