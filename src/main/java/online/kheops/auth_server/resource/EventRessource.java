@@ -16,6 +16,7 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
@@ -159,7 +160,7 @@ public class EventRessource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @FormParam("to_user") String user,
-                                       @FormParam("comment") String comment) {
+                                       @FormParam("comment") @NotNull String comment) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
