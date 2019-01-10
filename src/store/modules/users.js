@@ -73,6 +73,14 @@ const actions = {
 		localStorage.removeItem('currentUser');
 		HTTP.defaults.auth = {};
 		commit('LOGOUT');
+	},
+	checkUser({commit},user){
+		return HTTP.get('users?reference='+user,{headers: {'Accept': 'application/json'}}).then(res => {
+			if (res.status == 200) return res.data.sub;
+			return false;
+		}).catch(res => {
+			return false;
+		})
 	}
 
 

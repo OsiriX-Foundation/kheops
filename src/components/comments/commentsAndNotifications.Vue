@@ -40,7 +40,7 @@
 		<p class = 'col-sm-12 col-md-10 offset-md-1 text-right' v-if='scope=="album"'><label>{{$t('includenotifications')}} </label> <toggle-button v-model="includeNotifications" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='getComments'/></p>
 		<div class = 'row'>
 
-			<div class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3" style = 'max-height: 600px; overflow-y: scroll;' id = 'album_comment_container'>
+			<div class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3" style = 'max-height: 600px; overflow-y: scroll;' :id = 'container_id'>
 				<div v-for="comment in comments">
 					
 					<!-- Comments -->
@@ -128,23 +128,49 @@ export default {
 			album: 'album',
 			studies: 'studies',
 			album_comments: 'album_comments',
-			studies_comments: 'studies_comments',
 			users: 'users'
 		}),
 		comments () {
-			return (this.scope == 'album') ? this.album_comments : this.studies_comments;
+			if (this.scope == 'album') return this.album_comments;
+			
+			let studyIdx = _.findIndex(this.studies,s => {return s.StudyInstanceUID[0] == this.id});
+			if (studyIdx > -1){
+				return this.studies[studyIdx].comments
+			}
+			 
+		},
+		container_id () {
+			return (this.scope == 'album') ? "album_comment_container" : "study_"+this.id.replace(/\./g,"_")+"_comment_container";
 		}
   	},
 	methods: {
 		addComment () {
 			if (this.newComment.comment.length > 2){
 				if (this.newComment.comment.indexOf('@')>-1){
-					_.forEach(this.users, user => {
-						if (this.newComment.comment.indexOf(user.user_name) > -1){
-							this.newComment.to_user = user.user_name;
-							this.newComment.comment = this.newComment.comment.replace("@"+user.user_name,"").trim();
-						}
-					})
+					if (this.users.length){ // album
+						_.forEach(this.users, user => {
+							if (this.newComment.comment.indexOf(user.user_name) > -1){
+								this.newComment.to_user = user.user_name;
+								this.newComment.comment = this.newComment.comment.replace("@"+user.user_name,"").trim();
+							}
+						})						
+					}
+					else{
+						let at_idx = this.newComment.comment.indexOf('@');
+						let end =  this.newComment.comment.substr(at_idx).length;
+						let match = this.newComment.comment.substr(at_idx).match(/\s/);
+						if (match) end = match.index;
+						this.newComment.to_user = this.newComment.comment.substr(at_idx+1,end-1);
+						this.$store.dispatch('checkUser',this.newComment.to_user).then(res => {
+							if (res){
+								this.newComment.comment = this.newComment.comment.replace("@"+this.newComment.to_user,"").trim();								
+								this.newComment.to_user = res;
+							}
+							else {
+								this.newComment.to_user = '';
+							}
+						})
+					}
 				}
 				if (this.scope == 'album'){
 					this.$store.dispatch('postAlbumComment',this.newComment).then(res => {
@@ -152,10 +178,21 @@ export default {
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror'))
+						this.$snotify.error(this.$t('sorryerror')+": "+res)
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 
+					})
+				}
+				else if (this.scope == 'studies'){
+					this.$store.dispatch('postStudiesComment',{StudyInstanceUID: this.id,comment: this.newComment}).then(res => {
+						this.$snotify.success('commentpostsuccess');
+						this.newComment.comment = ''
+						this.newComment.to_user = ''
+					}).catch(res => {
+						this.$snotify.error(this.$t('sorryerror')+": "+res)
+						this.newComment.comment = ''
+						this.newComment.to_user = ''
 					})
 				}
 			}
@@ -168,6 +205,12 @@ export default {
 					container.scrollTop = container.scrollHeight;
 				});
 			}
+			else if (this.scope == 'studies'){
+				this.$store.dispatch('getStudiesComments',{StudyInstanceUID: this.id, type: type}).then(res => {
+					let container = this.$el.querySelector("#study_"+this.id.replace(/\./g,"_")+"_comment_container");
+					container.scrollTop = container.scrollHeight;
+				});
+			}
 		}
 	},
 	watch: {
@@ -176,8 +219,9 @@ export default {
 		}
 	},
 	created () {
+		console.log(this.users);
 		this.getComments();
-		this.$store.dispatch('getUsers');
+		if (this.album.album_id) this.$store.dispatch('getUsers');
 	}
 }
 </script>

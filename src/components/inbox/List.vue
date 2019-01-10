@@ -160,16 +160,16 @@
 					</div>
 				</b-card>
 			</template>
-		 	<template slot = 'PatientName' slot-scope='data'>
+		 	<template slot = 'PatientName' slot-scope='row'>
 				<div class = 'patientNameContainer'>
-				{{data.item.PatientName}}
+				{{row.item.PatientName}}
 					<div class = 'patientNameIcons'>
-						<span @click = "toggleFavorite(data.index,'study')" :class="data.item.is_favorite?'selected':''"><v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
+						<span @click = "toggleFavorite(row.index,'study')" :class="row.item.is_favorite?'selected':''"><v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
 						<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
 						</span>
-							<span @click="handleComments(data.index,'comment')"><v-icon v-if="data.item.comment" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''"><v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
 							</span>
-						<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+data.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
+						<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+row.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
 						<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
 					</div>
 				</div>
@@ -322,8 +322,9 @@ export default {
 		  })
 
 	  },
-	  handleComments(index,entity){
-		  this.studies[index][entity]= !this.studies[index][entity];
+	  handleComments(row){
+		  this.showSeries(row);
+		  row.item.view = 'comments'
 
 	  },
 	  selectAll(is_selected){
@@ -390,7 +391,7 @@ export default {
 	  		this.$store.commit('TOGGLE_STUDY_VIEW',{StudyInstanceUID: item.StudyInstanceUID[0]})
 	  },
 	  loadStudiesComments (item) {
-		  this.studyView = 'comments';
+		  item.view = 'comments';
 		  // this.$store.dispatch('getStudiesComments',{StudyInstanceUID: item.StudyInstanceUID[0]})
 	  }
 	  
@@ -501,6 +502,9 @@ select{
  
  div.calendar-wrapper{
 	 color: #333;
+ }
+ a{
+	 cursor: pointer;
  }
  a.download{
 	 color: #FFF;

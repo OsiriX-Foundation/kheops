@@ -22,21 +22,19 @@ const state = {
 			inbox: true
 		}
 	},
-	request: '',
-	studies_comments: []
+	request: ''
 }
 
 // getters
 const getters = {
-	studies: state => state.all,
-	studies_comments: state => state.studies_comments
+	studies: state => state.all
 	
 }
 
 // actions
 const actions = {
 
-	getStudies ({ commit }, params) {
+	getStudies ({ commit, dispatch }, params) {
 		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy == params.sortBy && state.filterParams.sortDesc == params.sortDesc && _.isEqual(state.filterParams.filters,params.filters)){
 			return;
 		}
@@ -87,7 +85,7 @@ const actions = {
 			commit("SET_TOTAL",res.headers["x-total-count"]);
 			let data = [];
 			_.forEach(res.data, d => {
-				let t = {series: []};
+				let t = {series: [],comments: []};
 				_.forEach(d, (v,k) => {
 					if (dicom.dicom2name[k] !== undefined){
 						if (dicom.dicom2name[k] == 'PatientName' || dicom.dicom2name[k] == 'ReferringPhysicianName') v.Value = v.Value[0].Alphabetic;
@@ -108,6 +106,7 @@ const actions = {
 
 				})
 				if (t.StudyInstanceUID !== undefined) data.push(t);
+				dispatch('getStudiesComments',{StudyInstanceUID: t.StudyInstanceUID});
 			})
 			commit('SET_STUDIES', {data:data,reset: reset})
 			commit('SET_STUDIES_FILTER_PARAMS',params);
@@ -252,14 +251,16 @@ const actions = {
 	},
 	postStudiesComment ({commit, dispatch},params){
 		var query = "";
-		_.forEach(params, (value, key) => {
-			if (value && key != 'index') query += encodeURIComponent(key)+"="+encodeURIComponent(value)+"&";
+		_.forEach(params.comment, (value, key) => {
+			if (value) query += encodeURIComponent(key)+"="+encodeURIComponent(value)+"&";
 		})
-		let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0];
+		let StudyInstanceUID = params.StudyInstanceUID;
+				
 		return HTTP.post('/studies/'+StudyInstanceUID+"/comments",query,{headers: {'Accept': 'application/json','Content-Type': 'application/x-www-form-urlencoded'}}).then(res => {
 			if (res.status == 204){
 				dispatch('getStudiesComments',{StudyInstanceUID:StudyInstanceUID});
 			}
+			else return res;
 		})
 	}
 	

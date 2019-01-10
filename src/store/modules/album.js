@@ -114,6 +114,7 @@ const actions = {
 			if (res.status == 204){
 				dispatch('getAlbumComments');
 			}
+			else return res;
 		})
 	}
 		
