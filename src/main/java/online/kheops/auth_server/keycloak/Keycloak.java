@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 
 public class Keycloak {
 
-    private final static String basePath = "/auth/admin/realms";
-    private final static String usersPath = "/users";
+    private static final String basePath = "/auth/admin/realms";
+    private static final String usersPath = "/users";
 
     private static boolean isInitialised = false;
 

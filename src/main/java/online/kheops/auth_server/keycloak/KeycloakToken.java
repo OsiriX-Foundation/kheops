@@ -13,10 +13,10 @@ import java.net.URI;
 
 public class KeycloakToken {
 
-    private final static String basePath1 = "/auth/realms";
-    private final static String basePath2 = "/protocol/openid-connect";
-    private final static String tokenPath = "/token";
-    private final static String introspectPath = "/token/introspect";
+    private static final String basePath1 = "/auth/realms";
+    private static final String basePath2 = "/protocol/openid-connect";
+    private static final String tokenPath = "/token";
+    private static final String introspectPath = "/token/introspect";
 
     private static URI tokenUri;
     private static URI introspectUri;
