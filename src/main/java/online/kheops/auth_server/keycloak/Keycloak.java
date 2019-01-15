@@ -3,9 +3,7 @@ package online.kheops.auth_server.keycloak;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponses;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonReader;
+import javax.json.*;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -59,11 +57,12 @@ public class Keycloak {
 
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
+                output = "["+output+"]";
                 JsonReader jsonReader = Json.createReader(new StringReader(output));
                 JsonArray reply = jsonReader.readArray();
                 final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                 if(keycloakUser.size() == 1) {
-                    return UserResponses.newUserResponse("","");
+                    return UserResponses.newUserResponse(keycloakUser.getEmail(0),keycloakUser.getId(0));
                 } else {
                     throw new UserNotFoundException();
                 }
