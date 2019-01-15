@@ -9,8 +9,6 @@ import javax.persistence.*;
 
 import javax.persistence.Table;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
