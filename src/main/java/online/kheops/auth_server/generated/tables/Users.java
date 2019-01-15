@@ -4,7 +4,6 @@
 package online.kheops.auth_server.generated.tables;
 
 
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = 93427184;
+    private static final long serialVersionUID = -1492604409;
 
     /**
      * The reference instance of <code>public.users</code>
@@ -63,24 +62,9 @@ public class Users extends TableImpl<UsersRecord> {
     public final TableField<UsersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('users_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>public.users.created_time</code>.
+     * The column <code>public.users.keycloak_id</code>.
      */
-    public final TableField<UsersRecord, Timestamp> CREATED_TIME = createField("created_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
-
-    /**
-     * The column <code>public.users.updated_time</code>.
-     */
-    public final TableField<UsersRecord, Timestamp> UPDATED_TIME = createField("updated_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
-
-    /**
-     * The column <code>public.users.google_id</code>.
-     */
-    public final TableField<UsersRecord, String> GOOGLE_ID = createField("google_id", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
-
-    /**
-     * The column <code>public.users.google_email</code>.
-     */
-    public final TableField<UsersRecord, String> GOOGLE_EMAIL = createField("google_email", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<UsersRecord, String> KEYCLOAK_ID = createField("keycloak_id", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.users.inbox_fk</code>.
@@ -133,7 +117,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.GOOGLE_EMAIL_INDEX, Indexes.GOOGLE_EMAIL_UNIQUE, Indexes.GOOGLE_ID_INDEX, Indexes.GOOGLE_ID_UNIQUE, Indexes.USERS_PK);
+        return Arrays.<Index>asList(Indexes.KEYCLOAK_ID_UNIQUE, Indexes.USERS_PK);
     }
 
     /**
@@ -157,7 +141,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<UniqueKey<UsersRecord>> getKeys() {
-        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.GOOGLE_ID_UNIQUE, Keys.GOOGLE_EMAIL_UNIQUE);
+        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.KEYCLOAK_ID_UNIQUE);
     }
 
     /**

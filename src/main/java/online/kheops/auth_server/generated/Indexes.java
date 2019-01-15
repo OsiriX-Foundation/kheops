@@ -63,10 +63,7 @@ public class Indexes {
     public static final Index STUDY_TIME_INDEX = Indexes0.STUDY_TIME_INDEX;
     public static final Index STUDY_UID_INDEX = Indexes0.STUDY_UID_INDEX;
     public static final Index STUDY_UID_UNIQUE = Indexes0.STUDY_UID_UNIQUE;
-    public static final Index GOOGLE_EMAIL_INDEX = Indexes0.GOOGLE_EMAIL_INDEX;
-    public static final Index GOOGLE_EMAIL_UNIQUE = Indexes0.GOOGLE_EMAIL_UNIQUE;
-    public static final Index GOOGLE_ID_INDEX = Indexes0.GOOGLE_ID_INDEX;
-    public static final Index GOOGLE_ID_UNIQUE = Indexes0.GOOGLE_ID_UNIQUE;
+    public static final Index KEYCLOAK_ID_UNIQUE = Indexes0.KEYCLOAK_ID_UNIQUE;
     public static final Index USERS_PK = Indexes0.USERS_PK;
 
     // -------------------------------------------------------------------------
@@ -100,10 +97,7 @@ public class Indexes {
         public static Index STUDY_TIME_INDEX = Internal.createIndex("study_time_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_TIME }, false);
         public static Index STUDY_UID_INDEX = Internal.createIndex("study_uid_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_UID }, false);
         public static Index STUDY_UID_UNIQUE = Internal.createIndex("study_uid_unique", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_UID }, true);
-        public static Index GOOGLE_EMAIL_INDEX = Internal.createIndex("google_email_index", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_EMAIL }, false);
-        public static Index GOOGLE_EMAIL_UNIQUE = Internal.createIndex("google_email_unique", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_EMAIL }, true);
-        public static Index GOOGLE_ID_INDEX = Internal.createIndex("google_id_index", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_ID }, false);
-        public static Index GOOGLE_ID_UNIQUE = Internal.createIndex("google_id_unique", Users.USERS, new OrderField[] { Users.USERS.GOOGLE_ID }, true);
+        public static Index KEYCLOAK_ID_UNIQUE = Internal.createIndex("keycloak_id_unique", Users.USERS, new OrderField[] { Users.USERS.KEYCLOAK_ID }, true);
         public static Index USERS_PK = Internal.createIndex("users_pk", Users.USERS, new OrderField[] { Users.USERS.PK }, true);
     }
 }

@@ -1,19 +1,18 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
-import online.kheops.auth_server.entity.User;
+
 import online.kheops.auth_server.keycloak.Keycloak;
+import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponses;
-import online.kheops.auth_server.user.Users;
 
-import javax.json.JsonArray;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.UserResponses.userToUserResponse;
 
 @Path("/")
 public class UserResource {
@@ -34,17 +33,14 @@ public class UserResource {
 
         final UserResponses.UserResponse userResponse;
 
-        //Keycloak keycloak = new Keycloak();
-        //JsonArray j = keycloak.getUser("").getUsers();
-
-
         try {
-            final User user = Users.getUser(reference);
-            userResponse = userToUserResponse(user);
+            final Keycloak keycloak = new Keycloak();
+            userResponse = keycloak.getUser(reference);
+            return Response.status(OK).entity(userResponse).build();
         } catch (UserNotFoundException e) {
             return Response.status(NO_CONTENT).build();
+        } catch (KeycloakException e) {
+            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-
-        return Response.status(OK).entity(userResponse).build();
     }
 }

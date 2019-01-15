@@ -13,55 +13,73 @@ import java.net.URI;
 
 public class KeycloakToken {
 
-    private final static URI tokenUri = UriBuilder.fromUri("https://keycloak.kheops.online").path("/auth/realms/StaticLoginConnect/protocol/openid-connect/token").build();
-    private final static URI introspectUri = UriBuilder.fromUri("https://keycloak.kheops.online").path("/auth/realms/StaticLoginConnect/protocol/openid-connect/token/introspect").build();
+    private final static String basePath1 = "/auth/realms";
+    private final static String basePath2 = "/protocol/openid-connect";
+    private final static String tokenPath = "/token";
+    private final static String introspectPath = "/token/introspect";
 
-    private static final String USERNAME = "XXX";
-    private static final String PASSWORD = "XXX";
-    private static final String CLIENT_ID = "XXX";
-    private static final String CLIENT_SECRET = "XXX";
+    private static URI tokenUri;
+    private static URI introspectUri;
 
+    private static String USERNAME;
+    private static String PASSWORD;
+    private static String CLIENT_ID;
+    private static String CLIENT_SECRET;
+
+    private static final Form form = new Form();
+
+    private static boolean isInitialised = false;
 
     private static JsonObject token;
 
-    public KeycloakToken() { }
+    public KeycloakToken() {
 
-    private boolean newToken() {
-        final Form form = new Form();
-        form.param("grant_type", "password");
-        form.param("username", USERNAME);
-        form.param("password", PASSWORD);
-        form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET);
+        if(!isInitialised) {
+
+            tokenUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakUri()).path(basePath1+"/"+KeycloakContextListener.getKeycloakRealms()+basePath2+tokenPath).build();
+            introspectUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakUri()).path(basePath1+"/"+KeycloakContextListener.getKeycloakRealms()+basePath2+introspectPath).build();
+
+            USERNAME = KeycloakContextListener.getKeycloakUser();
+            PASSWORD = KeycloakContextListener.getKeycloakPassword();
+            CLIENT_ID = KeycloakContextListener.getKeycloakClientId();
+            CLIENT_SECRET = KeycloakContextListener.getKeycloakClientSecret();
+
+            form.param("grant_type", "password");
+            form.param("username", USERNAME);
+            form.param("password", PASSWORD);
+            form.param("client_id", CLIENT_ID);
+            form.param("client_secret", CLIENT_SECRET);
+            isInitialised = true;
+        }
+    }
+
+    private void newToken() throws KeycloakException{
+
         Response response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
             JsonReader jsonReader = Json.createReader(new StringReader(output));
             token = jsonReader.readObject();
-            return true;
+            return;
         }
-        return false;
+        throw new KeycloakException("Error during request a new token");
     }
 
-    private boolean refreshToken() {
-        final Form form = new Form();
-        form.param("grant_type", "refresh_token");
-        form.param("refresh_token", getRefreshToken());
-        form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET);
+    private void refreshToken() throws KeycloakException{
+
         Response response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
             JsonReader jsonReader = Json.createReader(new StringReader(output));
             token = jsonReader.readObject();
-            return true;
         }
-        return false;
+        throw new KeycloakException("Error during request a refresh token");
+
     }
 
-    public String getToken() {
+    public String getToken() throws KeycloakException {
 
         if (token != null) {
 
@@ -70,9 +88,9 @@ public class KeycloakToken {
                 return getAccessToken();
             } else {
                 if(introspect(getRefreshToken())) {
-
                     refreshToken();
                     return getAccessToken();
+
                 } else {
                     newToken();
                     return getAccessToken();
@@ -87,9 +105,7 @@ public class KeycloakToken {
     private String getRefreshToken() {
         return token.getString("refresh_token");
     }
-    private String getAccessToken() {
-        return token.getString("access_token");
-    }
+    private String getAccessToken() { return token.getString("access_token"); }
 
     private boolean introspect(String token) {
         final Form form = new Form();

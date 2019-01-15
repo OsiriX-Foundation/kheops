@@ -14,6 +14,11 @@
         </init-param>
     </servlet>
 
+    <listener>
+        <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
+    </listener>
+
+
     <context-param>
         <description>All JWT Assertions signed by issuer superuser.kheops.online are considered valid</description>
         <param-name>online.kheops.superuser.hmacsecret</param-name>
@@ -42,6 +47,36 @@
     <context-param>
         <description>Password for the PostgreSQL databse</description>
         <param-name>online.kheops.jdbc.password</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>Password for the keycloak API</description>
+        <param-name>online.kheops.keycloak.password</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>User for the keycloak API</description>
+        <param-name>online.kheops.keycloak.user</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>Client ID for the keycloak API</description>
+        <param-name>online.kheops.keycloak.clientid</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>Client secret for the keycloak API</description>
+        <param-name>online.kheops.keycloak.clientsecret</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>Uri for the keycloak API</description>
+        <param-name>online.kheops.keycloak.uri</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>Realms for the keycloak API</description>
+        <param-name>online.kheops.keycloak.realms</param-name>
         <param-value>mypwd</param-value>
     </context-param>
 </web-app>

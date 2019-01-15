@@ -31,8 +31,8 @@ final class CapabilityAssertion implements Assertion {
 
                 capability.isValid();
 
-                final String username = capability.getUser().getGoogleId();
-                final String email = capability.getUser().getGoogleEmail();
+                final String username = capability.getUser().getKeycloakId();
+                final String email = capability.getUser().getEmail();
 
                 tx.commit();
 

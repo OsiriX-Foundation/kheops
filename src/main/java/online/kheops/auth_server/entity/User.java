@@ -1,5 +1,10 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.keycloak.Keycloak;
+import online.kheops.auth_server.keycloak.KeycloakException;
+import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserResponses;
+
 import javax.persistence.*;
 
 import javax.persistence.Table;
@@ -21,20 +26,8 @@ public class User {
     private long pk;
 
     @Basic(optional = false)
-    @Column(name = "created_time", updatable = false)
-    private LocalDateTime createdTime;
-
-    @Basic(optional = false)
-    @Column(name = "updated_time")
-    private LocalDateTime updatedTime;
-
-    @Basic(optional = false)
-    @Column(name = "google_id")
-    private String googleId;
-
-    @Basic(optional = false)
-    @Column(name = "google_email")
-    private String googleEmail;
+    @Column(name = "keycloak_id")
+    private String keycloakId;
 
     @OneToMany
     @JoinColumn (name = "user_fk", nullable=false)
@@ -60,43 +53,28 @@ public class User {
     @JoinColumn(name = "inbox_fk", unique = true, nullable = false, updatable = false)
     private Album inbox;
 
-    @PrePersist
-    public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        createdTime = now;
-        updatedTime = now;
-    }
-
-    @PreUpdate
-    public void onPreUpdate() {
-        updatedTime = LocalDateTime.now(ZoneOffset.UTC);
-    }
-
     public User() {}
 
-    public User(String googleId, String googleEmail) {
-        this.googleId = googleId;
-        this.googleEmail = googleEmail;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
+    public User(String keycloakId) {
+        this.keycloakId = keycloakId;
     }
 
     public long getPk() {
         return pk;
     }
 
-    public String getGoogleId() {
-        return googleId;
+    public String getKeycloakId() {
+        return keycloakId;
     }
 
-    public String getGoogleEmail() {
-        return googleEmail;
+    public String getEmail() {
+        try {
+            final Keycloak keycloak = new Keycloak();
+            final UserResponses.UserResponse userResponse = keycloak.getUser(keycloakId);
+            return userResponse.email;
+        } catch (UserNotFoundException | KeycloakException e) {
+            return "UNKNOWN";//TODO
+        }
     }
 
     public Set<Capability> getCapabilities() {

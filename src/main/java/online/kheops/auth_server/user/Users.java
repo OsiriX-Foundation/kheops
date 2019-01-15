@@ -2,10 +2,14 @@ package online.kheops.auth_server.user;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.keycloak.Keycloak;
+import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.core.Response;
 
+import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.UserQueries.*;
 
 public class Users {
@@ -22,18 +26,29 @@ public class Users {
         }
     }
 
-    public static User getUser(String userName, EntityManager entityManager) throws UserNotFoundException {
-        return findUserByUsername(userName, entityManager);
+    public static User getUser(String userReference, EntityManager entityManager)
+            throws UserNotFoundException {
+
+        if(userReference.contains("@")) {
+            try {
+                final Keycloak keycloak = new Keycloak();
+                userReference= keycloak.getUser(userReference).sub;
+            } catch (UserNotFoundException | KeycloakException e2) {
+                throw new UserNotFoundException();
+            }
+        }
+
+        return findUserByUserId(userReference, entityManager);
     }
 
-    public static User getUser(String username) throws UserNotFoundException{
+    public static User getUser(String userReference) throws UserNotFoundException{
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         User user;
 
         try {
             tx.begin();
-            user = getUser(username, em);
+            user = getUser(userReference, em);
             tx.commit();
         } finally {
             if (tx.isActive()) {

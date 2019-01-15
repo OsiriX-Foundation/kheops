@@ -10,17 +10,13 @@ public class UserQueries {
         throw new IllegalStateException("Utility class");
     }
 
-    public static User findUserByUsername(String username, EntityManager em) throws UserNotFoundException{
+    public static User findUserByUserId(String userId, EntityManager em) throws UserNotFoundException{
         try {
-            if (username.contains("@")) {
-                TypedQuery<User> googleEmailQuery = em.createQuery("SELECT u from User u where u.googleEmail = :googleEmail", User.class);
-                googleEmailQuery.setParameter("googleEmail", username);
-                return googleEmailQuery.getSingleResult();
-            } else {
-                TypedQuery<User> googleIdQuery = em.createQuery("SELECT u from User u where u.googleId = :googleId", User.class);
-                googleIdQuery.setParameter("googleId", username);
-                return googleIdQuery.getSingleResult();
-            }
+
+            TypedQuery<User> googleIdQuery = em.createQuery("SELECT u from User u where u.keycloakId = :userId", User.class);
+            googleIdQuery.setParameter("userId", userId);
+            return googleIdQuery.getSingleResult();
+
         } catch (NoResultException e) {
             throw new UserNotFoundException();
         }

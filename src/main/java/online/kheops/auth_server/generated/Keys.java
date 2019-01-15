@@ -75,8 +75,7 @@ public class Keys {
     public static final UniqueKey<StudiesRecord> STUDIES_PK = UniqueKeys0.STUDIES_PK;
     public static final UniqueKey<StudiesRecord> STUDY_UID_UNIQUE = UniqueKeys0.STUDY_UID_UNIQUE;
     public static final UniqueKey<UsersRecord> USERS_PK = UniqueKeys0.USERS_PK;
-    public static final UniqueKey<UsersRecord> GOOGLE_ID_UNIQUE = UniqueKeys0.GOOGLE_ID_UNIQUE;
-    public static final UniqueKey<UsersRecord> GOOGLE_EMAIL_UNIQUE = UniqueKeys0.GOOGLE_EMAIL_UNIQUE;
+    public static final UniqueKey<UsersRecord> KEYCLOAK_ID_UNIQUE = UniqueKeys0.KEYCLOAK_ID_UNIQUE;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -128,8 +127,7 @@ public class Keys {
         public static final UniqueKey<StudiesRecord> STUDIES_PK = Internal.createUniqueKey(Studies.STUDIES, "studies_pk", Studies.STUDIES.PK);
         public static final UniqueKey<StudiesRecord> STUDY_UID_UNIQUE = Internal.createUniqueKey(Studies.STUDIES, "study_uid_unique", Studies.STUDIES.STUDY_UID);
         public static final UniqueKey<UsersRecord> USERS_PK = Internal.createUniqueKey(Users.USERS, "users_pk", Users.USERS.PK);
-        public static final UniqueKey<UsersRecord> GOOGLE_ID_UNIQUE = Internal.createUniqueKey(Users.USERS, "google_id_unique", Users.USERS.GOOGLE_ID);
-        public static final UniqueKey<UsersRecord> GOOGLE_EMAIL_UNIQUE = Internal.createUniqueKey(Users.USERS, "google_email_unique", Users.USERS.GOOGLE_EMAIL);
+        public static final UniqueKey<UsersRecord> KEYCLOAK_ID_UNIQUE = Internal.createUniqueKey(Users.USERS, "keycloak_id_unique", Users.USERS.KEYCLOAK_ID);
     }
 
     private static class ForeignKeys0 {

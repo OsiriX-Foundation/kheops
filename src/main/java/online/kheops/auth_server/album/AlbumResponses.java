@@ -73,7 +73,7 @@ public class AlbumResponses {
     public static UserAlbumResponse albumUserToUserAlbumResponce(AlbumUser albumUser) {
         final UserAlbumResponse userAlbumResponse = new UserAlbumResponse();
 
-        userAlbumResponse.userName = albumUser.getUser().getGoogleEmail();
+        userAlbumResponse.userName = albumUser.getUser().getEmail();
         userAlbumResponse.isAdmin = albumUser.isAdmin();
 
         return userAlbumResponse;

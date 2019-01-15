@@ -153,7 +153,7 @@ public class TokenResource
             try {
                 tx.begin();
                 LOG.info("User not found, creating a new User");
-                final User user = new User(assertion.getUsername(), assertion.getEmail());
+                final User user = new User(assertion.getUsername());
                 final Album inbox = new Album();
                 inbox.setName("inbox");
                 user.setInbox(inbox);

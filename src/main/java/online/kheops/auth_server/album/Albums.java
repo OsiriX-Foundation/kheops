@@ -252,7 +252,7 @@ public class Albums {
                         return; // the target is already a member of the album with the same profile (admin / non-admin)
                     }
                     if (targetAlbumUser.isAdmin() && !isAdmin) {
-                        throw new AlbumForbiddenException("The user: " + targetUser.getGoogleEmail() + "is an admin. Use : DELETE /albums/" + albumId + "/users/" + callingUser.getGoogleId() + "/admin");
+                        throw new AlbumForbiddenException("The user: " + targetUser.getEmail() + "is an admin. Use : DELETE /albums/" + albumId + "/users/" + callingUser.getKeycloakId() + "/admin");
                     }
                     //From here, the targetUser is an normal member and he will be promot admin
                     targetAlbumUser.setAdmin(isAdmin);

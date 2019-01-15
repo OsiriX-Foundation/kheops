@@ -42,7 +42,7 @@ final class AuthorizationJWTAssertion implements Assertion {
                 if (capabilityClaim != null) {
                     capabilityBoolean = capabilityClaim;
                 }
-                return new AuthorizationJWTAssertion(jwt.getSubject(), user.getGoogleEmail(), capabilityBoolean);
+                return new AuthorizationJWTAssertion(jwt.getSubject(), user.getEmail(), capabilityBoolean);
 
             } catch (JWTVerificationException | UnsupportedEncodingException e) {
                 throw new BadAssertionException("Verification of the access token failed", e);

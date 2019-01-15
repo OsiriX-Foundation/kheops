@@ -37,12 +37,12 @@ public class EventResponses {
         final EventResponse eventResponse = new EventResponse();
 
         eventResponse.eventType = "Comment";
-        eventResponse.originName = comment.getUser().getGoogleEmail();
+        eventResponse.originName = comment.getUser().getEmail();
         eventResponse.comment = comment.getComment();
         eventResponse.postDate = comment.getEventTime();
         if(comment.getPrivateTargetUser() != null) {
             eventResponse.privateComment = true;
-            eventResponse.targetName = comment.getPrivateTargetUser().getGoogleEmail();
+            eventResponse.targetName = comment.getPrivateTargetUser().getEmail();
         } else {
             eventResponse.privateComment = false;
         }
@@ -55,7 +55,7 @@ public class EventResponses {
 
         eventResponse.eventType = "Mutation";
 
-        eventResponse.originName = mutation.getUser().getGoogleEmail();
+        eventResponse.originName = mutation.getUser().getEmail();
         eventResponse.postDate = mutation.getEventTime();
         eventResponse.mutationType = mutation.getMutationType();
         if (mutation.getMutationType().compareTo(Events.MutationType.PROMOTE_ADMIN.toString()) == 0 ||
@@ -63,7 +63,7 @@ public class EventResponses {
                 mutation.getMutationType().compareTo(Events.MutationType.ADD_USER.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.ADD_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_USER.toString()) == 0 ) {
-            eventResponse.targetName = mutation.getToUser().getGoogleEmail();
+            eventResponse.targetName = mutation.getToUser().getEmail();
         }
         if (mutation.getMutationType().compareTo(Events.MutationType.IMPORT_SERIES.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_SERIES.toString()) == 0 ) {

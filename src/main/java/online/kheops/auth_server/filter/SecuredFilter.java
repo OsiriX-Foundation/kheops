@@ -76,7 +76,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             try {
                 tx.begin();
                 LOG.info("User not found, creating a new User");
-                final User newUser = new User(assertion.getUsername(), assertion.getEmail());
+                final User newUser = new User(assertion.getUsername());
                 final Album inbox = new Album();
                 inbox.setName("inbox");
                 newUser.setInbox(inbox);

@@ -70,7 +70,7 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "New album id:"+albumResponse.id+" created by user:"+kheopsPrincipal.getUser().getGoogleEmail());
+        LOG.info(() -> "New album id:"+albumResponse.id+" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
