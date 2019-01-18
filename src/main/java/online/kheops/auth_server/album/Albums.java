@@ -196,10 +196,15 @@ public class Albums {
         }
     }
 
-    public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess)
+    public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess, boolean withUsersList)
            throws JOOQException {
+        AlbumResponses.AlbumResponse albumResponse;
         if (withUserAccess) {
-            return findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
+            albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
+            if(withUsersList) {
+                albumResponse = AlbumResponses.addUsersList(callingUserPk, albumResponse);
+            }
+            return albumResponse;
         } else {
             return findAlbumByAlbumId(albumId);
         }

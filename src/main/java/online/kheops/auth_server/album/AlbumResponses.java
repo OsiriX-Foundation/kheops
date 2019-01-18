@@ -1,13 +1,17 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.user.UserNotFoundException;
 import org.jooq.Record;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.TimeZone;
+
+import static online.kheops.auth_server.album.Albums.getUsers;
 
 public class AlbumResponses {
 
@@ -16,8 +20,6 @@ public class AlbumResponses {
     }
 
     public static class AlbumResponse {
-        @XmlElement(name = "album_pk")//TODO remove (debug)
-        public String pk;             //TODO remove (debug)
         @XmlElement(name = "album_id")
         public String id;
         @XmlElement(name = "name")
@@ -32,6 +34,8 @@ public class AlbumResponses {
         public LocalDateTime lastEventTime;
         @XmlElement(name = "number_of_users")
         public Integer numberOfUsers;
+        @XmlElement(name = "users")
+        public List<UserAlbumResponse> users;
         @XmlElement(name = "number_of_comments")
         public long numberOfComments;
         @XmlElement(name = "number_of_studies")
@@ -61,6 +65,8 @@ public class AlbumResponses {
     public static class UserAlbumResponse  implements Comparable<UserAlbumResponse> {
         @XmlElement(name = "user_name")
         public String userName;
+        @XmlElement(name = "user_id")
+        public String userId;
         @XmlElement(name = "is_admin")
         public Boolean isAdmin;
 
@@ -70,10 +76,20 @@ public class AlbumResponses {
         }
     }
 
+    public static AlbumResponse addUsersList(long callingUserPk, AlbumResponse albumResponse) {
+        try {
+            albumResponse.users = getUsers(callingUserPk,albumResponse.id);
+        } catch (AlbumNotFoundException | UserNotFoundException e) {
+            return albumResponse;
+        }
+        return albumResponse;
+    }
+
     public static UserAlbumResponse albumUserToUserAlbumResponce(AlbumUser albumUser) {
         final UserAlbumResponse userAlbumResponse = new UserAlbumResponse();
 
         userAlbumResponse.userName = albumUser.getUser().getEmail();
+        userAlbumResponse.userId = albumUser.getUser().getKeycloakId();
         userAlbumResponse.isAdmin = albumUser.isAdmin();
 
         return userAlbumResponse;
@@ -83,7 +99,6 @@ public class AlbumResponses {
         final AlbumResponse albumResponse = new AlbumResponse();
 
         albumResponse.id = r.getValue("album_id").toString();
-        albumResponse.pk = r.getValue("album_pk").toString();
         albumResponse.name = r.getValue("album_name").toString();
         albumResponse.description = r.getValue("album_description").toString();
         albumResponse.createdTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_created_time")).getTime()), TimeZone.getDefault().toZoneId());
@@ -115,7 +130,6 @@ public class AlbumResponses {
         final AlbumResponse albumResponse = new AlbumResponse();
 
         albumResponse.id = r.getValue("album_id").toString();
-        albumResponse.pk = r.getValue("album_pk").toString();
         albumResponse.name = r.getValue("album_name").toString();
         albumResponse.description = r.getValue("album_description").toString();
         albumResponse.numberOfStudies = (Integer) r.getValue("number_of_studies");

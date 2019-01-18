@@ -113,7 +113,8 @@ public class AlbumResource {
     @Path("album/{album:"+Albums.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId) {
+    public Response getAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+                             @QueryParam("includeUsers") @DefaultValue("false") boolean includeUsers) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -121,11 +122,19 @@ public class AlbumResource {
         final AlbumResponses.AlbumResponse albumResponse;
 
         try {
-            albumResponse = Albums.getAlbum(callingUserPk, albumId, kheopsPrincipal.hasUserAccess());
+            if(!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.LIST_USERS, albumId) && includeUsers) {
+                return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
+            }
+        } catch (AlbumNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
+        try {
+            albumResponse = Albums.getAlbum(callingUserPk, albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
+
 
         return Response.status(OK).entity(albumResponse).build();
     }
