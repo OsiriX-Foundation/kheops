@@ -1,6 +1,5 @@
 package online.kheops.auth_server.keycloak;
 
-import online.kheops.auth_server.resource.TokenResource;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponses;
 
@@ -11,12 +10,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
 
 public class Keycloak {
 
-    private static final String basePath = "/auth/admin/realms";
     private static final String usersPath = "/users";
 
     private static boolean isInitialised = false;
@@ -27,10 +25,9 @@ public class Keycloak {
 
     private static final Logger LOG = Logger.getLogger(Keycloak.class.getName());
 
-    public Keycloak() {
+    public Keycloak() throws KeycloakException{
         if(!isInitialised) {
-            LOG.log(Level.WARNING, basePath + "/" + KeycloakContextListener.getKeycloakRealms() + usersPath);
-            usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakUri()).path(basePath + "/" + KeycloakContextListener.getKeycloakRealms() + usersPath).build();
+            usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
             isInitialised = true;
         }
         token = new KeycloakToken();

@@ -13,7 +13,7 @@ import java.util.Objects;
 
 final class AuthorizationJWTAssertion implements Assertion {
 
-    private final String username;
+    private final String sub;
     private final String email;
     private final boolean capabilityAccess;
 
@@ -50,8 +50,8 @@ final class AuthorizationJWTAssertion implements Assertion {
         }
     }
 
-    private AuthorizationJWTAssertion(String username, String email, boolean capabilityAccess) {
-        this.username = username;
+    private AuthorizationJWTAssertion(String sub, String email, boolean capabilityAccess) {
+        this.sub = sub;
         this.email = email;
         this.capabilityAccess = capabilityAccess;
     }
@@ -61,8 +61,8 @@ final class AuthorizationJWTAssertion implements Assertion {
     }
 
     @Override
-    public String getUsername() {
-        return username;
+    public String getSub() {
+        return sub;
     }
 
     @Override

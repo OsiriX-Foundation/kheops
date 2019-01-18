@@ -8,6 +8,8 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.keycloak.Keycloak;
+import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 import online.kheops.auth_server.user.UsersPermission;
@@ -25,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 @Secured
 @Provider
@@ -56,58 +60,12 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        User user;
+        final User user;
         try {
-            user = Users.getUser(assertion.getUsername());
+            user = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
-            try {
-                user = Users.getUser(assertion.getEmail());
-            } catch (UserNotFoundException ex) {
-                user = null;
-            }
-        }
-        // if the user can't be found, try to build a new one;
-        if (user == null) {
-            // try to build a new user, building a new user might fail if there is a unique constraint violation
-            // due to a race condition. Catch the violation and do nothing in that case.
-            EntityManager em = EntityManagerListener.createEntityManager();
-            EntityTransaction tx = em.getTransaction();
-
-            try {
-                tx.begin();
-                LOG.info("User not found, creating a new User");
-                final User newUser = new User(assertion.getUsername());
-                final Album inbox = new Album();
-                inbox.setName("inbox");
-                newUser.setInbox(inbox);
-                final UsersPermission usersPermission = new UsersPermission();
-                usersPermission.setInboxPermission();
-                inbox.setPermission(usersPermission);
-
-                final AlbumUser albumUser = new AlbumUser(inbox, newUser, false);
-                albumUser.setNewCommentNotifications(false);
-                albumUser.setNewSeriesNotifications(false);
-
-                em.persist(inbox);
-                em.persist(newUser);
-                em.persist(albumUser);
-                tx.commit();
-            } catch (Exception e) {
-                LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-
-            // At this point there should definitely be a user in the database for the calling user.
-            try {
-                user = Users.getUser(assertion.getUsername());
-            } catch (UserNotFoundException e) {
-                throw new IllegalStateException("Unable to find user");//TODO
-            }
-
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
         }
 
         final boolean capabilityAccess = assertion.hasCapabilityAccess();

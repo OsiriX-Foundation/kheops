@@ -2,15 +2,15 @@ package online.kheops.auth_server.assertion;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import online.kheops.auth_server.keycloak.KeycloakContextListener;
 
 final class JWTAssertionBuilder implements AssertionBuilder {
     private static final String KHEOPS_ISSUER = "auth.kheops.online";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
     private static final String GOOGLE_ISSUER = "accounts.google.com";
-    private static final String KEYCLOAK_ISSUER = "https://keycloak.kheops.online/auth/realms/StaticLoginConnect";
+    private static final String KEYCLOAK_ISSUER = "https://keycloak.kheops.online/auth/realms/travis";
 
     private static final String GOOGLE_CONFIGURATION_URL = "https://accounts.google.com/.well-known/openid-configuration";
-    private static final String KEYCLOAK_CONFIGURATION_URL = "http://keycloak.kheops.online/auth/realms/StaticLoginConnect/.well-known/openid-configuration";
 
     private final String superuserSecret;
     private final String authorizationSecret;
@@ -42,7 +42,7 @@ final class JWTAssertionBuilder implements AssertionBuilder {
             case GOOGLE_ISSUER:
                 return JWTAssertion.getBuilder(GOOGLE_CONFIGURATION_URL).build(assertionToken);
             case KEYCLOAK_ISSUER:
-                return JWTAssertion.getBuilder(KEYCLOAK_CONFIGURATION_URL).build(assertionToken);
+                return JWTAssertion.getBuilder(KeycloakContextListener.getKeycloakWellKnownString()).build(assertionToken);
             default:
                 throw new BadAssertionException("Unknown JWT issuer");
         }

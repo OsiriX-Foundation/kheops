@@ -26,8 +26,8 @@ final class JWTAssertion implements Assertion {
         String jwksURI;
     }
 
-    private final String username;
     private final String email;
+    private final String sub;
 
 
     static final class Builder {
@@ -92,14 +92,9 @@ final class JWTAssertion implements Assertion {
         return new Builder(configurationUrl);
     }
 
-    private JWTAssertion(String username, String email) {
-        this.username = username;
+    private JWTAssertion(String sub, String email) {
+        this.sub = sub;
         this.email = email;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -110,5 +105,10 @@ final class JWTAssertion implements Assertion {
     @Override
     public boolean hasCapabilityAccess() {
         return true;
+    }
+
+    @Override
+    public String getSub() {
+        return sub;
     }
 }

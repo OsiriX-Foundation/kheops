@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
 final class SuperuserJWTAssertion implements Assertion {
-    private final String username;
+    private final String sub;
     private final String email;
 
     static class Builder {
@@ -56,14 +56,14 @@ final class SuperuserJWTAssertion implements Assertion {
         return new Builder(superuserSecret);
     }
 
-    private SuperuserJWTAssertion(String username, String email) {
-        this.username = Objects.requireNonNull(username);
+    private SuperuserJWTAssertion(String sub, String email) {
+        this.sub = Objects.requireNonNull(sub);
         this.email = Objects.requireNonNull(email);
     }
 
     @Override
-    public String getUsername() {
-        return username;
+    public String getSub() {
+        return sub;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package online.kheops.auth_server.user;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
@@ -8,6 +10,8 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.ws.rs.core.Response;
+
+import java.util.logging.Level;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.UserQueries.*;
@@ -62,5 +66,54 @@ public class Users {
 
     public static boolean userExist(long callingUserPk, EntityManager entityManager){
         return findUserByPk(callingUserPk, entityManager) != null;
+    }
+
+    public static User getOrCreateUser(String keycloakId) throws UserNotFoundException {
+
+        //try to find the user in kheops db
+        try {
+            return getUser(keycloakId);
+        } catch (UserNotFoundException e) {/*empty*/ }
+
+        //the user is not in kheops db
+        //try to find the user in keycloak
+        try {
+            final Keycloak keycloak = new Keycloak();
+            keycloakId = keycloak.getUser(keycloakId).sub;
+        } catch (KeycloakException e) {
+            throw new InternalError("Error during request to keycloak", e);
+        }
+
+        //the user is in keycloak but not in kheops => add the user in kheops
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+            final User newUser = new User(keycloakId);
+            final Album inbox = new Album();
+            inbox.setName("inbox");
+            newUser.setInbox(inbox);
+            final UsersPermission usersPermission = new UsersPermission();
+            usersPermission.setInboxPermission();
+            inbox.setPermission(usersPermission);
+
+            final AlbumUser albumUser = new AlbumUser(inbox, newUser, false);
+            albumUser.setNewCommentNotifications(false);
+            albumUser.setNewSeriesNotifications(false);
+
+            em.persist(inbox);
+            em.persist(newUser);
+            em.persist(albumUser);
+            tx.commit();
+            return newUser;
+        } catch (Exception e) {
+            throw new InternalError("Error during adding a new user in kehops db",e);
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
     }
 }

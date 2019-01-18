@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 @Path("/")
 public class TokenResource
@@ -131,60 +132,12 @@ public class TokenResource
         EntityManager em;
         EntityTransaction tx;
 
-        // try to find the user in the database;
-        User callingUser;
+        final User callingUser;
         try {
-            callingUser = Users.getUser(assertion.getUsername());
+            callingUser = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
-            try {
-                callingUser = Users.getUser(assertion.getEmail());
-            } catch (UserNotFoundException ex) {
-                callingUser = null;
-            }
-        }
-
-        // if the user can't be found, try to build a new one;
-        if (callingUser == null) {
-            // try to build a new user, building a new user might fail if there is a unique constraint violation
-            // due to a race condition. Catch the violation and do nothing in that case.
-            em = EntityManagerListener.createEntityManager();
-            tx = em.getTransaction();
-
-            try {
-                tx.begin();
-                LOG.info("User not found, creating a new User");
-                final User user = new User(assertion.getUsername());
-                final Album inbox = new Album();
-                inbox.setName("inbox");
-                user.setInbox(inbox);
-                final UsersPermission usersPermission = new UsersPermission();
-                usersPermission.setInboxPermission();
-                inbox.setPermission(usersPermission);
-
-                final AlbumUser albumUser = new AlbumUser(inbox, user, false);
-                albumUser.setNewCommentNotifications(false);
-                albumUser.setNewSeriesNotifications(false);
-
-                em.persist(inbox);
-                em.persist(user);
-                em.persist(albumUser);
-                tx.commit();
-                responseStatus = CREATED;
-            } catch (PersistenceException e) {
-                LOG.log(Level.WARNING, "Caught exception while creating a new user", e);
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-
-            // At this point there should definitely be a user in the database for the calling user.
-            try {
-                callingUser = Users.getUser(assertion.getUsername());
-            } catch (UserNotFoundException e) {
-                callingUser = null;
-            }
+            errorResponse.errorDescription = "Unknown user";
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
         }
 
         em = EntityManagerListener.createEntityManager();
@@ -227,7 +180,7 @@ public class TokenResource
 
         JWTCreator.Builder jwtBuilder = JWT.create()
                 .withIssuer("auth.kheops.online")
-                .withSubject(assertion.getUsername())
+                .withSubject(assertion.getSub())
                 .withAudience("dicom.kheops.online")
                 .withClaim("capability", assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
@@ -245,11 +198,12 @@ public class TokenResource
         tokenResponse.tokenType = "Bearer";
         tokenResponse.expiresIn = 3600L;
         if (returnUser != null && returnUser.equalsIgnoreCase("true")) {
-            tokenResponse.user = assertion.getUsername();
+            tokenResponse.user = assertion.getSub();
         }
-        LOG.info("Returning token for user: " + assertion.getUsername());
+        LOG.info("Returning token for user: " + assertion.getSub());
         return Response.status(responseStatus).entity(tokenResponse).build();
     }
+
 
     private UIDPair getUIDPairFromScope(String scope) {
         String seriesUID = null;

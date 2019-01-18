@@ -13,11 +13,6 @@ import java.net.URI;
 
 public class KeycloakToken {
 
-    private static final String basePath1 = "/auth/realms";
-    private static final String basePath2 = "/protocol/openid-connect";
-    private static final String tokenPath = "/token";
-    private static final String introspectPath = "/token/introspect";
-
     private static URI tokenUri;
     private static URI introspectUri;
 
@@ -32,12 +27,22 @@ public class KeycloakToken {
 
     private static JsonObject token;
 
-    public KeycloakToken() {
+    public KeycloakToken() throws KeycloakException{
 
         if(!isInitialised) {
 
-            tokenUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakUri()).path(basePath1+"/"+KeycloakContextListener.getKeycloakRealms()+basePath2+tokenPath).build();
-            introspectUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakUri()).path(basePath1+"/"+KeycloakContextListener.getKeycloakRealms()+basePath2+introspectPath).build();
+            Response response = ClientBuilder.newClient().target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
+
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                String output = response.readEntity(String.class);
+                JsonReader jsonReader = Json.createReader(new StringReader(output));
+                JsonObject wellKnownResponse = jsonReader.readObject();
+                tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
+                introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
+            } else {
+                throw new KeycloakException("Error during request OpenID Connect well-known");
+            }
+
 
             USERNAME = KeycloakContextListener.getKeycloakUser();
             PASSWORD = KeycloakContextListener.getKeycloakPassword();
