@@ -5,19 +5,19 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class UserResponse {
 
-    private Response response;
-
-    private static class Response {
+    public static class Response {
         @XmlElement(name = "email")
-        public String email;
+        private String email;
         @XmlElement(name = "sub")
-        public String sub;
+        private String sub;
     }
 
-    public UserResponse(String email, String id) {
+    private Response response;
+
+    protected UserResponse(UserResponseBuilder userResponseBuilder) {
         response = new Response();
-        response.email = email;
-        response.sub = id;
+        response.email = userResponseBuilder.getEmail();
+        response.sub = userResponseBuilder.getSub();
     }
 
     public String getEmail() { return response.email; }
@@ -26,3 +26,5 @@ public class UserResponse {
 
     public Response getResponse() { return response; }
 }
+
+
