@@ -1,7 +1,7 @@
 package online.kheops.auth_server.keycloak;
 
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponses;
+import online.kheops.auth_server.user.UserResponse;
 
 import javax.json.*;
 import javax.ws.rs.client.ClientBuilder;
@@ -33,7 +33,7 @@ public class Keycloak {
         token = new KeycloakToken();
     }
 
-    public UserResponses.UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{
+    public UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{
 
         if(user.contains("@")) {
 
@@ -46,7 +46,7 @@ public class Keycloak {
                 final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
                 if(keycloakUsers.size() > 0) {
                     final int index = keycloakUsers.verifyEmail(user);
-                    return UserResponses.newUserResponse(keycloakUsers.getEmail(index),keycloakUsers.getId(0));
+                    return new UserResponse(keycloakUsers.getEmail(index),keycloakUsers.getId(0));
                 } else {
                     throw new UserNotFoundException();
                 }
@@ -63,7 +63,7 @@ public class Keycloak {
                 JsonArray reply = jsonReader.readArray();
                 final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                 if(keycloakUser.size() == 1) {
-                    return UserResponses.newUserResponse(keycloakUser.getEmail(0),keycloakUser.getId(0));
+                    return new UserResponse(keycloakUser.getEmail(0),keycloakUser.getId(0));
                 } else {
                     throw new UserNotFoundException();
                 }
