@@ -15,7 +15,7 @@ import static online.kheops.auth_server.capability.Capabilities.*;
 public enum ScopeType {
     USER {
         @Override
-        public CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
+        public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
                 throws UserNotFoundException, DateTimeParseException, CapabilityBadRequestException {
             return createUserCapability(capabilityParameters);
         }
@@ -26,7 +26,7 @@ public enum ScopeType {
         }
 
         @Override
-        public CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability) {
+        public CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability) {
             capabilityResponse.scopeType = this.name().toLowerCase();
             return capabilityResponse;
         }
@@ -39,7 +39,7 @@ public enum ScopeType {
     },
     ALBUM {
         @Override
-        public CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
+        public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
                 throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
             return createAlbumCapability(capabilityParameters);
         }
@@ -53,7 +53,7 @@ public enum ScopeType {
             return capabilityParametersBuilder.scope().albumScope(albumId);
         }
         @Override
-        public CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability) {
+        public CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability) {
             capabilityResponse.albumId = capability.getAlbum().getId();
             capabilityResponse.scopeType = this.name().toLowerCase();
             capabilityResponse.appropriatePermission = capability.isAppropriatePermission();
@@ -74,13 +74,13 @@ public enum ScopeType {
         }
     };
 
-    public abstract CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
+    public abstract CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
             throws CapabilityBadRequestException;
 
-    public abstract CapabilitiesResponses.CapabilityResponse setCapabilityResponse(CapabilitiesResponses.CapabilityResponse capabilityResponse, Capability capability);
+    public abstract CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability);
 
     public abstract void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException;
 

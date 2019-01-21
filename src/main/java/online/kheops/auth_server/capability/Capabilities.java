@@ -19,8 +19,6 @@ import java.util.regex.Pattern;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
-import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponses;
-import static online.kheops.auth_server.capability.CapabilitiesResponses.capabilityToCapabilitiesResponsesInfo;
 
 public class Capabilities {
 
@@ -70,15 +68,15 @@ public class Capabilities {
         return tokenPattern.matcher(token).matches();
     }
 
-    public static CapabilitiesResponses.CapabilityResponse generateCapability(CapabilityParameters capabilityParameters)
+    public static CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException, UserNotMemberException {
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createUserCapability(CapabilityParameters capabilityParameters)
+    public static CapabilitiesResponse.Response createUserCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, CapabilityBadRequestException {
 
-        CapabilitiesResponses.CapabilityResponse capabilityResponse;
+        CapabilitiesResponse.Response capabilityResponse;
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -98,7 +96,7 @@ public class Capabilities {
                     .build();
             em.persist(capability);
 
-            capabilityResponse = capabilityToCapabilitiesResponses(capability);
+            capabilityResponse = new CapabilitiesResponse(capability, false).getResponse();
 
             tx.commit();
         } finally {
@@ -110,10 +108,10 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse createAlbumCapability(CapabilityParameters capabilityParameters)
+    public static CapabilitiesResponse.Response createAlbumCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
 
-        CapabilitiesResponses.CapabilityResponse capabilityResponse;
+        CapabilitiesResponse.Response capabilityResponse;
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -143,7 +141,7 @@ public class Capabilities {
 
             em.persist(capability);
 
-            capabilityResponse = capabilityToCapabilitiesResponses(capability);
+            capabilityResponse = new CapabilitiesResponse(capability, false).getResponse();
 
             tx.commit();
         } finally {
@@ -155,12 +153,12 @@ public class Capabilities {
         return capabilityResponse;
     }
     
-    public static CapabilitiesResponses.CapabilityResponse revokeCapability(Long callingUserPk, String capabilityId)
+    public static CapabilitiesResponse.Response revokeCapability(Long callingUserPk, String capabilityId)
     throws UserNotFoundException, CapabilityNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
-        CapabilitiesResponses.CapabilityResponse capabilityResponse;
+        CapabilitiesResponse.Response capabilityResponse;
 
         try {
             tx.begin();
@@ -171,7 +169,7 @@ public class Capabilities {
             capability.setRevoked(true);
             em.persist(capability);
 
-            capabilityResponse = capabilityToCapabilitiesResponses(capability);
+            capabilityResponse = new CapabilitiesResponse(capability, false).getResponse();
 
             tx.commit();
         } finally {
@@ -183,9 +181,9 @@ public class Capabilities {
         return  capabilityResponse;
     }
 
-    public static List<CapabilitiesResponses.CapabilityResponse> getCapabilities(Long callingUserPk, boolean showRevoked)
+    public static List<CapabilitiesResponse.Response> getCapabilities(Long callingUserPk, boolean showRevoked)
             throws UserNotFoundException {
-        List<CapabilitiesResponses.CapabilityResponse> capabilityResponses = new ArrayList<>();
+        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -203,8 +201,7 @@ public class Capabilities {
             }
 
             for (Capability capability: capabilities) {
-                CapabilitiesResponses.CapabilityResponse capabilityResponse = capabilityToCapabilitiesResponses(capability);
-                capabilityResponses.add(capabilityResponse);
+                capabilityResponses.add(new CapabilitiesResponse(capability, false).getResponse());
             }
 
             tx.commit();
@@ -217,15 +214,15 @@ public class Capabilities {
         return capabilityResponses;
     }
 
-    public static CapabilitiesResponses.CapabilityResponse getCapabilityInfo(String capabilityToken)
+    public static CapabilitiesResponse.Response getCapabilityInfo(String capabilityToken)
             throws CapabilityNotFoundException {
-        CapabilitiesResponses.CapabilityResponse capabilityResponse;
+        CapabilitiesResponse.Response capabilityResponse;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
             Capability capability = getCapability(capabilityToken, em);
-            capabilityResponse = capabilityToCapabilitiesResponsesInfo(capability);
+            capabilityResponse = new CapabilitiesResponse(capability, true).getResponse();
         } finally {
             em.close();
         }
