@@ -94,11 +94,11 @@ public class Events {
         return new Mutation(callingUser, album, MutationType.EDIT_ALBUM);
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getEventsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponse.Response> getEventsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
             throws UserNotFoundException, AlbumNotFoundException {
 
-        final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
-        final PairListXTotalCount<EventResponses.EventResponse> pair;
+        final List<EventResponse.Response> eventResponses = new ArrayList<>();
+        final PairListXTotalCount<EventResponse.Response> pair;
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -112,9 +112,9 @@ public class Events {
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
                 if (e instanceof Comment) {
-                    eventResponses.add(EventResponses.commentToEventResponse((Comment) e));
+                    eventResponses.add(new EventResponse((Comment)e).getResponse());
                 } else if (e instanceof Mutation) {
-                    eventResponses.add(EventResponses.mutationToEventResponse((Mutation) e));
+                    eventResponses.add(new EventResponse((Mutation) e).getResponse());
                 }
             }
 
@@ -131,11 +131,11 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getMutationsAlbum(String albumId, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponse.Response> getMutationsAlbum(String albumId, Integer offset, Integer limit)
             throws AlbumNotFoundException {
 
-        final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
-        final PairListXTotalCount<EventResponses.EventResponse> pair;
+        final List<EventResponse.Response> eventResponses = new ArrayList<>();
+        final PairListXTotalCount<EventResponse.Response> pair;
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -147,7 +147,7 @@ public class Events {
             final Album album = getAlbum(albumId, em);
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                    eventResponses.add(EventResponses.mutationToEventResponse(m));
+                    eventResponses.add(new EventResponse(m).getResponse());
             }
 
             XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
@@ -163,11 +163,11 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getCommentsAlbum(long callingUserPk,String albumId, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponse.Response> getCommentsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
             throws UserNotFoundException, AlbumNotFoundException {
 
-        final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
-        final PairListXTotalCount<EventResponses.EventResponse> pair;
+        final List<EventResponse.Response> eventResponses = new ArrayList<>();
+        final PairListXTotalCount<EventResponse.Response> pair;
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -180,7 +180,7 @@ public class Events {
             final Album album = getAlbum(albumId, em);
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
-                eventResponses.add(EventResponses.commentToEventResponse(c));
+                eventResponses.add(new EventResponse(c).getResponse());
             }
             XTotalCount = EventQueries.getTotalCommentsByAlbum(callingUser, album, em);
             tx.commit();
@@ -194,11 +194,11 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponses.EventResponse> getCommentsByStudyUID(long callingUserPk, String studyInstanceUID, Integer offset, Integer limit)
+    public static PairListXTotalCount<EventResponse.Response> getCommentsByStudyUID(long callingUserPk, String studyInstanceUID, Integer offset, Integer limit)
             throws UserNotFoundException {
 
-        final List<EventResponses.EventResponse> eventResponses = new ArrayList<>();
-        final PairListXTotalCount<EventResponses.EventResponse> pair;
+        final List<EventResponse.Response> eventResponses = new ArrayList<>();
+        final PairListXTotalCount<EventResponse.Response> pair;
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -210,7 +210,7 @@ public class Events {
             final User callingUser = getUser(callingUserPk, em);
 
             for (Comment c : EventQueries.getCommentsByStudy(callingUser, studyInstanceUID, offset, limit, em)) {
-                eventResponses.add(EventResponses.commentToEventResponse(c));
+                eventResponses.add(new EventResponse(c).getResponse());
             }
             XTotalCount = EventQueries.getTotalCommentsByStudy(callingUser, studyInstanceUID, em);
 

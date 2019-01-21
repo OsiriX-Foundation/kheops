@@ -6,11 +6,11 @@ import online.kheops.auth_server.entity.Mutation;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 
-public class EventResponses {
+public class EventResponse {
 
-    private EventResponses() { throw new IllegalStateException("Utility class"); }
+    private Response response;
 
-    public static class EventResponse {
+    public static class Response {
         @XmlElement(name = "event_type")
         public String eventType;
 
@@ -33,48 +33,48 @@ public class EventResponses {
         public String study;
     }
 
-    public static EventResponses.EventResponse commentToEventResponse(Comment comment) {
-        final EventResponse eventResponse = new EventResponse();
+    public EventResponse(Comment comment) {
+        response = new Response();
 
-        eventResponse.eventType = "Comment";
-        eventResponse.originName = comment.getUser().getEmail();
-        eventResponse.comment = comment.getComment();
-        eventResponse.postDate = comment.getEventTime();
+        response.eventType = "Comment";
+        response.originName = comment.getUser().getEmail();
+        response.comment = comment.getComment();
+        response.postDate = comment.getEventTime();
         if(comment.getPrivateTargetUser() != null) {
-            eventResponse.privateComment = true;
-            eventResponse.targetName = comment.getPrivateTargetUser().getEmail();
+            response.privateComment = true;
+            response.targetName = comment.getPrivateTargetUser().getEmail();
         } else {
-            eventResponse.privateComment = false;
+            response.privateComment = false;
         }
-
-        return eventResponse;
     }
 
-    public static EventResponses.EventResponse mutationToEventResponse(Mutation mutation) {
-        final EventResponse eventResponse = new EventResponse();
+    public EventResponse(Mutation mutation) {
+        response = new Response();
 
-        eventResponse.eventType = "Mutation";
+        response.eventType = "Mutation";
 
-        eventResponse.originName = mutation.getUser().getEmail();
-        eventResponse.postDate = mutation.getEventTime();
-        eventResponse.mutationType = mutation.getMutationType();
+        response.originName = mutation.getUser().getEmail();
+        response.postDate = mutation.getEventTime();
+        response.mutationType = mutation.getMutationType();
         if (mutation.getMutationType().compareTo(Events.MutationType.PROMOTE_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.DEMOTE_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.ADD_USER.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.ADD_ADMIN.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_USER.toString()) == 0 ) {
-            eventResponse.targetName = mutation.getToUser().getEmail();
+            response.targetName = mutation.getToUser().getEmail();
         }
         if (mutation.getMutationType().compareTo(Events.MutationType.IMPORT_SERIES.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_SERIES.toString()) == 0 ) {
-            eventResponse.series = mutation.getSeries().getSeriesInstanceUID();
-            eventResponse.study = mutation.getSeries().getStudy().getStudyInstanceUID();
+            response.series = mutation.getSeries().getSeriesInstanceUID();
+            response.study = mutation.getSeries().getStudy().getStudyInstanceUID();
         }
         if (mutation.getMutationType().compareTo(Events.MutationType.IMPORT_STUDY.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_STUDY.toString()) == 0 ) {
-            eventResponse.study = mutation.getStudy().getStudyInstanceUID();
+            response.study = mutation.getStudy().getStudyInstanceUID();
         }
+    }
 
-        return eventResponse;
+    public Response getResponse() {
+        return response;
     }
 }
