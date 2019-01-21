@@ -9,11 +9,7 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.ws.rs.core.Response;
 
-import java.util.logging.Level;
-
-import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.UserQueries.*;
 
 public class Users {

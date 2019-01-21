@@ -21,14 +21,9 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.assertion.DownloadKeyException;
 import online.kheops.auth_server.assertion.UnknownGrantTypeException;
 
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumUser;
-
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesQueries;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.Users;
-import online.kheops.auth_server.user.UsersPermission;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 

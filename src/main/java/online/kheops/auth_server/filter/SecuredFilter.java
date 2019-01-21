@@ -5,18 +5,11 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.keycloak.Keycloak;
-import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.Users;
-import online.kheops.auth_server.user.UsersPermission;
+
 
 import javax.annotation.Priority;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;

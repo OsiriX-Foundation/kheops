@@ -1,18 +1,9 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.entity.AlbumUser;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponse;
-import org.jooq.Record;
-
 import javax.xml.bind.annotation.XmlElement;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimeZone;
 
 import static online.kheops.auth_server.album.Albums.getUsers;
 
@@ -71,7 +62,7 @@ public class AlbumResponse {
         @XmlElement(name = "is_admin")
         public Boolean isAdmin;
 
-
+        @Override
         public int compareTo(UserAlbumResponse userAlbumResponse) {
             return userName.compareTo(userAlbumResponse.userName);
         }
