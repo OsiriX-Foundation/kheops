@@ -47,12 +47,12 @@ public class Albums {
         return idBuilder.toString();
     }
 
-    public static AlbumResponses.AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
+    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
             throws JOOQException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
-        final AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponse albumResponse;
 
         try {
             tx.begin();
@@ -81,13 +81,13 @@ public class Albums {
         return albumResponse;
     }
 
-    public static AlbumResponses.AlbumResponse editAlbum(long callingUserPk, String albumId, String name, String description, UsersPermission usersPermission,
-                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
+    public static AlbumResponse editAlbum(long callingUserPk, String albumId, String name, String description, UsersPermission usersPermission,
+                                                        Boolean notificationNewComment , Boolean notificationNewSeries)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
-        final AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponse albumResponse;
 
         try {
             tx.begin();
@@ -137,7 +137,7 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
+    public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -196,13 +196,13 @@ public class Albums {
         }
     }
 
-    public static AlbumResponses.AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess, boolean withUsersList)
+    public static AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess, boolean withUsersList)
            throws JOOQException {
-        AlbumResponses.AlbumResponse albumResponse;
+        AlbumResponse albumResponse;
         if (withUserAccess) {
             albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
             if(withUsersList) {
-                albumResponse = AlbumResponses.addUsersList(callingUserPk, albumResponse);
+                albumResponse.addUsersList();
             }
             return albumResponse;
         } else {
@@ -210,26 +210,21 @@ public class Albums {
         }
     }
 
-    public static List<AlbumResponses.UserAlbumResponse> getUsers(long callingUserPk, String albumId)
-            throws AlbumNotFoundException, UserNotFoundException {
+    public static AlbumResponse getUsers(String albumId)
+            throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final List<AlbumResponses.UserAlbumResponse> usersAlbumResponses = new ArrayList<>();
-
+        final AlbumResponseBuilder albumResponseBuilder = new AlbumResponseBuilder();
         try {
-            if (!userExist(callingUserPk, em)) {
-                throw new UserNotFoundException();
-            }
             final Album album = getAlbum(albumId, em);
 
             for (AlbumUser albumUser : album.getAlbumUser()) {
-                usersAlbumResponses.add(AlbumResponses.albumUserToUserAlbumResponce(albumUser));
+                albumResponseBuilder.addUser(albumUser);
             }
-            Collections.sort(usersAlbumResponses);
         } finally {
             em.close();
         }
-        return usersAlbumResponses;
+        return albumResponseBuilder.build();
     }
 
     public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)

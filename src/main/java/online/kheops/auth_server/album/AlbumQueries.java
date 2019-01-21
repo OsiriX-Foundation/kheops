@@ -16,10 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponseForCapabilityToken;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.JOOQTools.*;
-import static online.kheops.auth_server.album.AlbumResponses.recordToAlbumResponse;
 import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
@@ -63,7 +61,7 @@ public class AlbumQueries {
         }
     }
 
-    public static PairListXTotalCount<AlbumResponses.AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
+    public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -142,10 +140,10 @@ public class AlbumQueries {
 
             final Result<? extends Record> result = query.fetch();
 
-            final List<AlbumResponses.AlbumResponse> albumResponses = new ArrayList<>();
+            final List<AlbumResponse> albumResponses = new ArrayList<>();
 
             for(Record r : result) {
-                albumResponses.add(recordToAlbumResponse(r));
+                albumResponses.add(new AlbumResponseBuilder().setAlbumFromUser(r).build());
             }
 
             final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getDBID(), conditionArrayList, connection);
@@ -158,7 +156,7 @@ public class AlbumQueries {
         }
     }
 
-    public static AlbumResponses.AlbumResponse findAlbumByUserPkAndAlbumId(String albumId, long userPK)
+    public static AlbumResponse findAlbumByUserPkAndAlbumId(String albumId, long userPK)
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -210,13 +208,13 @@ public class AlbumQueries {
 
             Record result = query.fetchOne();
 
-            return recordToAlbumResponse(result);
+            return new AlbumResponseBuilder().setAlbumFromUser(result).build();
         } catch (SQLException e) {
             throw new JOOQException("Error during request", e);
         }
     }
 
-    public static AlbumResponses.AlbumResponse findAlbumByAlbumId(String albumId)
+    public static AlbumResponse findAlbumByAlbumId(String albumId)
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -245,7 +243,7 @@ public class AlbumQueries {
             query.addGroupBy(ALBUMS.PK);
             Record result = query.fetchOne();
 
-            return recordToAlbumResponseForCapabilityToken(result);
+            return new AlbumResponseBuilder().setAlbumFromCapabilityToken(result).build();
         } catch (Exception e) {
             throw new JOOQException("Error during request");
         }

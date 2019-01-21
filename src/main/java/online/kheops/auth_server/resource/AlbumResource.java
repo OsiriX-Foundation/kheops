@@ -61,7 +61,7 @@ public class AlbumResource {
 
         final AlbumParams albumParams = new AlbumParams(form);
 
-        final AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponse albumResponse;
 
         try {
             albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
@@ -70,8 +70,8 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "New album id:"+albumResponse.id+" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
-        return Response.status(CREATED).entity(albumResponse).build();
+       // LOG.info(() -> "New album id:"+albumResponse.id+" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
+        return Response.status(CREATED).entity(albumResponse.getResponse()).build();
     }
 
     @GET
@@ -85,7 +85,7 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final PairListXTotalCount<AlbumResponses.AlbumResponse> pairAlbumsTotalAlbum;
+        final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
             final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
@@ -101,7 +101,7 @@ public class AlbumResource {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<AlbumResponses.AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponses.AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
+        final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
         return Response.ok(genericAlbumResponsesList)
                 .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
                 .build();
@@ -119,7 +119,7 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponse albumResponse;
 
         try {
             if(!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.LIST_USERS, albumId) && includeUsers) {
@@ -136,7 +136,7 @@ public class AlbumResource {
         }
 
 
-        return Response.status(OK).entity(albumResponse).build();
+        return Response.status(OK).entity(albumResponse.getResponse()).build();
     }
 
     @PATCH
@@ -158,7 +158,7 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final AlbumResponses.AlbumResponse albumResponse;
+        final AlbumResponse albumResponse;
         final UsersPermission usersPermission = new UsersPermission();
 
         usersPermission.setAddUser(addUser);
@@ -181,7 +181,7 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        return Response.status(OK).entity(albumResponse).build();
+        return Response.status(OK).entity(albumResponse.getResponse()).build();
     }
 
     @DELETE
@@ -218,16 +218,16 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final List<AlbumResponses.UserAlbumResponse> usersAlbumResponse;
+        final AlbumResponse albumResponse;
 
         try {
-            usersAlbumResponse = Albums.getUsers(callingUserPk, albumId);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+            albumResponse = Albums.getUsers(albumId);
+        } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Get users list for album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<AlbumResponses.UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<AlbumResponses.UserAlbumResponse>>(usersAlbumResponse) {};
+        final GenericEntity<List<AlbumResponse.UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<AlbumResponse.UserAlbumResponse>>(albumResponse.getUsersResponse()) {};
         return Response.status(OK).entity(genericUsersAlbumResponsesList).build();
     }
 
