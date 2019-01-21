@@ -59,18 +59,15 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
-        final AlbumParams albumParams = new AlbumParams(form);
-
         final AlbumResponse albumResponse;
 
         try {
             albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
-            //albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), albumParams);
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-       // LOG.info(() -> "New album id:"+albumResponse.id+" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
+        LOG.info(() -> "New album id:"+albumResponse.getResponse().id+" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
         return Response.status(CREATED).entity(albumResponse.getResponse()).build();
     }
 
