@@ -1,13 +1,13 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponses;
+import online.kheops.auth_server.user.UserResponse;
+
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -31,12 +31,12 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getAlbums(@QueryParam("reference") String reference ) {
 
-        final UserResponses.UserResponse userResponse;
+        final UserResponse userResponse;
 
         try {
             final Keycloak keycloak = new Keycloak();
             userResponse = keycloak.getUser(reference);
-            return Response.status(OK).entity(userResponse).build();
+            return Response.status(OK).entity(userResponse.getResponse()).build();
         } catch (UserNotFoundException e) {
             return Response.status(NO_CONTENT).build();
         } catch (KeycloakException e) {

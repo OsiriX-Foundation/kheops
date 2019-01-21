@@ -36,7 +36,7 @@ public class Users {
         if(userReference.contains("@")) {
             try {
                 final Keycloak keycloak = new Keycloak();
-                userReference= keycloak.getUser(userReference).sub;
+                userReference= keycloak.getUser(userReference).getSub();
             } catch (UserNotFoundException | KeycloakException e2) {
                 throw new UserNotFoundException();
             }
@@ -79,7 +79,7 @@ public class Users {
         //try to find the user in keycloak
         try {
             final Keycloak keycloak = new Keycloak();
-            keycloakId = keycloak.getUser(keycloakId).sub;
+            keycloakId = keycloak.getUser(keycloakId).getSub();
         } catch (KeycloakException e) {
             throw new InternalError("Error during request to keycloak", e);
         }
