@@ -134,7 +134,7 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
+    public static PairListXTotalCount<AlbumResponse.Response> getAlbumList(AlbumQueryParams albumQueryParams)
             throws UserNotFoundException, JOOQException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();

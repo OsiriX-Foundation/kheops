@@ -85,7 +85,7 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
+        final PairListXTotalCount<AlbumResponse.Response> pairAlbumsTotalAlbum;
 
         try {
             final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
@@ -101,7 +101,7 @@ public class AlbumResource {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
+        final GenericEntity<List<AlbumResponse.Response>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse.Response>>(pairAlbumsTotalAlbum.getAttributesList()) {};
         return Response.ok(genericAlbumResponsesList)
                 .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
                 .build();
