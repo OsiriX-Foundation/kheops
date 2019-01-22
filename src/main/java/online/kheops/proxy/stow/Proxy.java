@@ -14,8 +14,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
@@ -30,18 +31,28 @@ public final class Proxy {
     private final InputStream inputStream;
     private final MediaType contentType;
 
-    private final MultipartOutputStream multipartOutputStream;
     private final AuthorizationManager authorizationManager;
 
-    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final MultipartOutputStream multipartOutputStream, final AuthorizationManager authorizationManager)
-                    throws GatewayException, RequestException {
-        this.providers = providers;
-        this.contentType = contentType;
-        this.inputStream = inputStream;
-        this.authorizationManager = authorizationManager;
-        this.multipartOutputStream = multipartOutputStream;
+    private final Set<String> sentStudies = new HashSet<>();
 
+    private MultipartOutputStream multipartOutputStream;
+
+    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final AuthorizationManager authorizationManager)
+                     {
+        this.providers = Objects.requireNonNull(providers);
+        this.contentType = Objects.requireNonNull(contentType);
+        this.inputStream = Objects.requireNonNull(inputStream);
+        this.authorizationManager = Objects.requireNonNull(authorizationManager);
+    }
+
+    public void processStream(final MultipartOutputStream multipartOutputStream) throws GatewayException, RequestException
+    {
+        this.multipartOutputStream = Objects.requireNonNull(multipartOutputStream);
         processMultipart();
+    }
+
+    public Set<String> getSentStudies() {
+        return Collections.unmodifiableSet(sentStudies);
     }
 
     private void processMultipart() throws RequestException, GatewayException {
@@ -62,10 +73,14 @@ public final class Proxy {
         try (Part part = Part.getInstance(providers, multipartInputStream)) {
             partString = part.toString();
             writePart(partNumber, authorizationManager.getAuthorization(part), part);
+            sentStudies.addAll(part.getInstanceIDs()
+                    .stream()
+                    .map((instanceID -> instanceID.getSeriesID().getStudyUID()))
+                    .collect(Collectors.toSet()));
         } catch (GatewayException e) {
             throw e;
         } catch (IOException e) {
-            throw new RequestException("Unable to parse for part:\n" + partNumber);
+            throw new RequestException("Unable to parse for part:\n" + partNumber, e);
         } catch (AuthorizationManagerException e) {
             LOG.log(WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString);
             LOG.log(FINE, "Authorization failure exception:\n" , e);
