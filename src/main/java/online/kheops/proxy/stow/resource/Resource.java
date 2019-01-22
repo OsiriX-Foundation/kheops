@@ -145,8 +145,6 @@ public final class Resource {
             }
         };
 
-        FetchRequester.newFetchRequester(authorizationURI, authorizationToken).fetchStudies(proxy.getSentStudies());
-
         final Response gatewayResponse;
         try {
             gatewayResponse = CLIENT.target(stowServiceURI)
@@ -163,6 +161,8 @@ public final class Resource {
                 throw new WebApplicationException(INTERNAL_SERVER_ERROR);
             }
         }
+
+        FetchRequester.newFetchRequester(authorizationURI, authorizationToken).fetchStudies(proxy.getSentStudies());
 
         if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
             LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
