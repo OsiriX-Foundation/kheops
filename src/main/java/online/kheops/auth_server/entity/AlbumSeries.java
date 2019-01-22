@@ -33,4 +33,6 @@ public class AlbumSeries {
     }
 
     public void setFavorite(boolean favorite) { this.favorite = favorite; }
+
+    public boolean isFavorite() { return favorite; }
 }

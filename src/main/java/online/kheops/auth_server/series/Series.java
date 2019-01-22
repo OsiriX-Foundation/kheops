@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 
+import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByPk;
@@ -109,5 +110,33 @@ public class Series {
         final AlbumSeries albumSeries = getAlbumSeries(album, series, em);
         albumSeries.setFavorite(favorite);
     }
+
+    public static boolean isFavorite(String seriesUID, User callingUser) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        final boolean isFavorite;
+
+        try {
+            callingUser = em.merge(callingUser);
+            isFavorite = isFavorite(seriesUID, callingUser.getInbox().getId());
+        } finally {
+            em.close();
+        }
+        return isFavorite;
+    }
+
+    public static boolean isFavorite(String seriesUID, String albumID) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        final AlbumSeries albumSeries;
+        try {
+            albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
+        } finally {
+            em.close();
+        }
+        return albumSeries.isFavorite();
+    }
+
+
 
 }

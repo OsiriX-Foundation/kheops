@@ -1,6 +1,7 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -31,11 +32,6 @@ public class AlbumQueries {
         throw new IllegalStateException("Utility class");
     }
 
-
-    public static Album findAlbumByPk(long albumPk, EntityManager em) {
-        return em.find(Album.class, albumPk);
-    }
-
     public static Album findAlbumById(String albumId, EntityManager em) throws NoResultException{
         return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
                 .setParameter("albumId", albumId)
@@ -46,6 +42,13 @@ public class AlbumQueries {
         return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
                 .setParameter("targetUser", user)
                 .setParameter("targetAlbum", album)
+                .getSingleResult();
+    }
+
+    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String albumID, String seriesUID, EntityManager em) throws NoResultException {
+        return em.createQuery("SELECT aSeries from AlbumSeries aSeries join aSeries.series s join aSeries.album a where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
+                .setParameter("seriesUID", seriesUID)
+                .setParameter("albumID", albumID)
                 .getSingleResult();
     }
 

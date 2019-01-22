@@ -11,6 +11,7 @@ import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
+import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
@@ -18,6 +19,7 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
+import org.dcm4che3.data.VR;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
 
@@ -144,14 +146,31 @@ public class QIDOResource {
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                               @QueryParam(ALBUM) String fromAlbumId,
                               @QueryParam(INBOX) Boolean fromInbox,
+                              @QueryParam("favorite") Boolean favoriteFilter,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
                               @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit) {
 
-        if ((fromAlbumId != null && fromInbox != null)) {
+        if (fromAlbumId != null && fromInbox != null) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
+        final boolean includeFieldFavorite;
+        if(uriInfo.getQueryParameters().containsKey("includefield") && uriInfo.getQueryParameters().get("includefield").contains("12345")) {
+            includeFieldFavorite = true;
+        } else {
+            includeFieldFavorite = false;
+        }
+
+        if(includeFieldFavorite && fromAlbumId == null && fromInbox == null) {
+            return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify inbox=true OR albumID=XX as query param").build();
+        }
+
+        if(favoriteFilter && fromAlbumId == null && fromInbox == null) {
+            return Response.status(BAD_REQUEST).entity("If favorite=true, you must specify inbox=true OR albumID=XX as query param").build();
+        }
+
         fromInbox = fromInbox != null;
+
         if (offset == null) {
             offset = 0;
         }
@@ -223,13 +242,28 @@ public class QIDOResource {
 
         int skipped = 0;
         int totalAvailableSeries = 0;
+        boolean favoriteValue = false;
         for (Attributes series: allSeries) {
             String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
             if (availableSeriesUIDs.contains(seriesInstanceUID)) {
                 totalAvailableSeries++;
+                if(favoriteFilter != null || includeFieldFavorite) {
+                    if(fromInbox) {
+                        favoriteValue = Series.isFavorite(seriesInstanceUID, kheopsPrincipal.getUser());
+                    } else {
+                        favoriteValue = Series.isFavorite(seriesInstanceUID, fromAlbumId);
+                    }
+                }
+
                 if (skipped >= offset) {
-                    if (availableSeries.size() < limit) {
-                        availableSeries.add(series);
+                    if(!(favoriteFilter != null && favoriteValue != favoriteFilter)) {
+                        if (availableSeries.size() < limit) {
+                            if (includeFieldFavorite) {
+
+                                series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
+                            }
+                            availableSeries.add(series);
+                        }
                     }
                 } else {
                     skipped++;
