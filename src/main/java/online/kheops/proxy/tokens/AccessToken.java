@@ -2,6 +2,7 @@ package online.kheops.proxy.tokens;
 
 import online.kheops.proxy.id.SeriesID;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -68,7 +69,7 @@ public class AccessToken {
             final TokenResponse tokenResponse;
             try {
                 tokenResponse = CLIENT.target(uri).request(APPLICATION_JSON_TYPE).post(Entity.form(form), TokenResponse.class);
-            } catch (ResponseProcessingException | WebApplicationException e) {
+            } catch (ProcessingException | WebApplicationException e) {
                 throw new AccessTokenException("Unable to get a request token for the capability URL", e);
             }
 
