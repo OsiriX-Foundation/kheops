@@ -19,6 +19,8 @@ public final class QIDOParams {
     private static final Integer[] ACCEPTED_TAGS_FOR_SORTING_ARRAY = {Tag.StudyDate, Tag.StudyTime, Tag.AccessionNumber, Tag.ReferringPhysicianName, Tag.PatientName, Tag.PatientID, Tag.StudyInstanceUID, Tag.StudyID};
     private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_TAGS_FOR_SORTING_ARRAY));
 
+    private static final String INCLUDE_FIELD = "includefield";
+
     private final Optional<String> albumID;
     private final boolean fromInbox;
 
@@ -39,6 +41,8 @@ public final class QIDOParams {
     private final Optional<String> patientIDFilter;
     private final Optional<String> studyInstanceUIDFilter;
     private final Optional<String> studyIDFilter;
+    private final Optional<Boolean> favoriteFilter;
+    private final boolean favoriteField;
 
     public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
         String albumIDLocal = null;
@@ -97,6 +101,8 @@ public final class QIDOParams {
         patientIDFilter = getFilter(Tag.PatientID, queryParameters);
         studyInstanceUIDFilter = getFilter(Tag.StudyInstanceUID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
+        favoriteField = getFavoriteField(queryParameters);
+        favoriteFilter = getFavoriteFilter(queryParameters);
 
         if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
             fuzzyMatching = Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
@@ -104,6 +110,7 @@ public final class QIDOParams {
             fuzzyMatching = false;
         }
     }
+
 
     public Optional<String> getAlbumID() {
         return albumID;
@@ -165,15 +172,35 @@ public final class QIDOParams {
         return studyIDFilter;
     }
 
+    public Optional<Boolean> getFavoriteFilter() { return favoriteFilter; }
+
     public boolean isFuzzyMatching() {
         return fuzzyMatching;
     }
+
+    public boolean includeFavoriteField() { return favoriteField; }
 
     private static Optional<String> getFilter(int tag, MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
             return Optional.ofNullable(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0));
         } else if (queryParameters.containsKey(String.format("%08X", tag))) {
             return Optional.ofNullable(queryParameters.get(String.format("%08X", tag)).get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static boolean getFavoriteField(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(INCLUDE_FIELD)) {
+            return queryParameters.get(INCLUDE_FIELD).contains("12345");
+        } else {
+            return false;
+        }
+    }
+
+    private Optional<Boolean> getFavoriteFilter(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("favorite")) {
+            return Optional.of(Boolean.valueOf(queryParameters.get("favorite").get(0)));
         } else {
             return Optional.empty();
         }

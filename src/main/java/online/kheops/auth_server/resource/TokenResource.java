@@ -88,7 +88,7 @@ public class TokenResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken,
                           @FormParam("scope") String scope,
-                          @FormParam("return_user") String returnUser) {
+                          @FormParam("return_user") @DefaultValue("false") boolean returnUser) {
         UIDPair uidPair = getUIDPairFromScope(scope);
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
@@ -192,7 +192,7 @@ public class TokenResource
         tokenResponse.accessToken = token;
         tokenResponse.tokenType = "Bearer";
         tokenResponse.expiresIn = 3600L;
-        if (returnUser != null && returnUser.equalsIgnoreCase("true")) {
+        if (returnUser) {
             tokenResponse.user = assertion.getSub();
         }
         LOG.info("Returning token for user: " + assertion.getSub());

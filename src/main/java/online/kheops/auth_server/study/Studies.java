@@ -87,11 +87,9 @@ public class Studies {
         applyIfPresent(qidoParams::getPatientIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getStudyInstanceUIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_UID, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getStudyIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_ID, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getFavoriteFilter, filter -> conditionArrayList.add(ALBUM_SERIES.FAVORITE.eq(filter)));
 
         qidoParams.getModalityFilter().ifPresent(filter -> conditionArrayList.add(createConditionModality(filter)));
-
-        //TODO add fav condition
-
 
         final SelectQuery<Record> countQuery = create.selectQuery();
         countQuery.addSelect(countDistinct(STUDIES.PK));
@@ -195,7 +193,9 @@ public class Studies {
             safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer) r.getValue("count:" + SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal) r.getValue("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
-            //TODO add sum_fav
+            if(qidoParams.includeFavoriteField()) {
+                attributes.setInt(0x00012345, VR.IS, ((Integer)r.getValue("sum_fav")));
+            }
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 

@@ -20,7 +20,7 @@ public class Keycloak {
 
     private static URI usersUri;
 
-    private KeycloakToken token;
+    private static KeycloakToken token;
 
     private static final Logger LOG = Logger.getLogger(Keycloak.class.getName());
 
@@ -77,7 +77,6 @@ public class Keycloak {
             }
         }
         throw new KeycloakException("ERROR:");
-
     }
 
 }
