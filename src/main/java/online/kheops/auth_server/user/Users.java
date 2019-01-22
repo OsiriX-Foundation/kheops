@@ -31,7 +31,7 @@ public class Users {
 
         if(userReference.contains("@")) {
             try {
-                final Keycloak keycloak = new Keycloak();
+                final Keycloak keycloak = Keycloak.getInstance();
                 userReference= keycloak.getUser(userReference).getSub();
             } catch (UserNotFoundException | KeycloakException e2) {
                 throw new UserNotFoundException();
@@ -74,7 +74,7 @@ public class Users {
         //the user is not in kheops db
         //try to find the user in keycloak
         try {
-            final Keycloak keycloak = new Keycloak();
+            final Keycloak keycloak = Keycloak.getInstance();
             keycloakId = keycloak.getUser(keycloakId).getSub();
         } catch (KeycloakException e) {
             throw new InternalError("Error during request to keycloak", e);

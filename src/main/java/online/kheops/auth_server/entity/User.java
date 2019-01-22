@@ -67,7 +67,7 @@ public class User {
 
     public String getEmail() {
         try {
-            final Keycloak keycloak = new Keycloak();
+            final Keycloak keycloak = Keycloak.getInstance();
             final UserResponse userResponse = keycloak.getUser(keycloakId);
             return userResponse.getEmail();
         } catch (UserNotFoundException | KeycloakException e) {

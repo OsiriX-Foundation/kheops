@@ -18,24 +18,24 @@ public class Keycloak {
 
     private static final String usersPath = "/users";
 
-    private static boolean isInitialised = false;
-
     private static URI usersUri;
 
     private KeycloakToken token;
 
     private static final Logger LOG = Logger.getLogger(Keycloak.class.getName());
 
-    public Keycloak() throws KeycloakException{
-        if(!isInitialised) {
-            initKeycloak();
-        }
-        token = new KeycloakToken();
+    private static Keycloak instance = null;
+
+    private Keycloak() throws KeycloakException{
+        usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
+        token = KeycloakToken.getInstance();
     }
 
-    private void initKeycloak() {
-        usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
-        isInitialised = true;
+    public static Keycloak getInstance() throws KeycloakException{
+        if(instance == null) {
+            instance = new Keycloak();
+        }
+        return instance;
     }
 
     public UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{

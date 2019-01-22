@@ -34,7 +34,7 @@ public class UserResource {
         final UserResponse userResponse;
 
         try {
-            final Keycloak keycloak = new Keycloak();
+            final Keycloak keycloak = Keycloak.getInstance();
             userResponse = keycloak.getUser(reference);
             return Response.status(OK).entity(userResponse.getResponse()).build();
         } catch (UserNotFoundException e) {

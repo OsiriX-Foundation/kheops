@@ -23,40 +23,42 @@ public class KeycloakToken {
 
     private static final Form form = new Form();
 
-    private static boolean isInitialised = false;
-
     private static JsonObject token;
 
-    public KeycloakToken() throws KeycloakException{
+    private static KeycloakToken instance = null;
 
-        if(!isInitialised) {
+    private KeycloakToken() throws KeycloakException{
 
-            Response response = ClientBuilder.newClient().target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
+        Response response = ClientBuilder.newClient().target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
 
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                String output = response.readEntity(String.class);
-                JsonReader jsonReader = Json.createReader(new StringReader(output));
-                JsonObject wellKnownResponse = jsonReader.readObject();
-                tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
-                introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
-            } else {
-                throw new KeycloakException("Error during request OpenID Connect well-known");
-            }
-
-
-            USERNAME = KeycloakContextListener.getKeycloakUser();
-            PASSWORD = KeycloakContextListener.getKeycloakPassword();
-            CLIENT_ID = KeycloakContextListener.getKeycloakClientId();
-            CLIENT_SECRET = KeycloakContextListener.getKeycloakClientSecret();
-
-            form.param("grant_type", "password");
-            form.param("username", USERNAME);
-            form.param("password", PASSWORD);
-            form.param("client_id", CLIENT_ID);
-            form.param("client_secret", CLIENT_SECRET);
-
-            isInitialised = true;
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            String output = response.readEntity(String.class);
+            JsonReader jsonReader = Json.createReader(new StringReader(output));
+            JsonObject wellKnownResponse = jsonReader.readObject();
+            tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
+            introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
+        } else {
+            throw new KeycloakException("Error during request OpenID Connect well-known");
         }
+
+
+        USERNAME = KeycloakContextListener.getKeycloakUser();
+        PASSWORD = KeycloakContextListener.getKeycloakPassword();
+        CLIENT_ID = KeycloakContextListener.getKeycloakClientId();
+        CLIENT_SECRET = KeycloakContextListener.getKeycloakClientSecret();
+
+        form.param("grant_type", "password");
+        form.param("username", USERNAME);
+        form.param("password", PASSWORD);
+        form.param("client_id", CLIENT_ID);
+        form.param("client_secret", CLIENT_SECRET);
+    }
+
+    public static KeycloakToken getInstance() throws KeycloakException{
+        if (instance == null) {
+            instance = new KeycloakToken();
+        }
+        return instance;
     }
 
     private void newToken() throws KeycloakException{
@@ -113,7 +115,7 @@ public class KeycloakToken {
     }
     private String getAccessToken() { return token.getString("access_token"); }
 
-    private boolean introspect(String token) {
+    private boolean introspect(String token) throws KeycloakException{
         final Form introspectForm = new Form();
         introspectForm.param("token", token);
         introspectForm.param("client_id", CLIENT_ID);
@@ -124,10 +126,9 @@ public class KeycloakToken {
             String output = response.readEntity(String.class);
             JsonReader jsonReader = Json.createReader(new StringReader(output));
             JsonObject result = jsonReader.readObject();
-            boolean active = result.getBoolean("active");
-            return active;
+            return result.getBoolean("active");
         }
-        return false;
+        throw new KeycloakException("Error during introspect token");
     }
 
 }
