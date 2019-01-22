@@ -54,6 +54,7 @@ public class KeycloakToken {
             form.param("password", PASSWORD);
             form.param("client_id", CLIENT_ID);
             form.param("client_secret", CLIENT_SECRET);
+
             isInitialised = true;
         }
     }
@@ -113,11 +114,11 @@ public class KeycloakToken {
     private String getAccessToken() { return token.getString("access_token"); }
 
     private boolean introspect(String token) {
-        final Form form = new Form();
-        form.param("token", token);
-        form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET);
-        Response response = ClientBuilder.newClient().target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
+        final Form introspectForm = new Form();
+        introspectForm.param("token", token);
+        introspectForm.param("client_id", CLIENT_ID);
+        introspectForm.param("client_secret", CLIENT_SECRET);
+        Response response = ClientBuilder.newClient().target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(introspectForm));
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);

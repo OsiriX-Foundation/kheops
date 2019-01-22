@@ -78,7 +78,7 @@ public class Albums {
         return albumResponse;
     }
 
-    public static AlbumResponse editAlbum(long callingUserPk, String albumId, String name, String description, UsersPermission usersPermission,
+    public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException, UserNotMemberException {
 
@@ -89,7 +89,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album editAlbum = getAlbum(albumId, em);
             final AlbumUser callingAlbumUser = getAlbumUser(editAlbum, callingUser, em);
 
@@ -124,7 +124,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(editAlbum.getId(), callingUserPk);
+            albumResponse = findAlbumByUserPkAndAlbumId(editAlbum.getId(), callingUser.getPk());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -149,7 +149,7 @@ public class Albums {
         return findAlbumsByUserPk(albumQueryParams);
     }
 
-    public static void deleteAlbum(long callingUserPk, String albumId)
+    public static void deleteAlbum(User callingUser, String albumId)
             throws AlbumNotFoundException, UserNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -158,7 +158,7 @@ public class Albums {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
             if (album.getPk() == callingUser.getInbox().getPk()) {
@@ -323,7 +323,7 @@ public class Albums {
 
             //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
-                deleteAlbum(callingUser.getPk(), albumId);
+                deleteAlbum(callingUser, albumId);
             }
 
             tx.commit();

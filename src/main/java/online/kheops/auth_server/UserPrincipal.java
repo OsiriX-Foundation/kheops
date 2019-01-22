@@ -29,20 +29,19 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     private final User user;
 
     //old version
-    Long dbid;
+    private final Long dbid;
     public UserPrincipal(User user) {
-        this.dbid=user.getPk();
+        this.dbid = user.getPk();
         this.user = user;
     }
     @Override
     public long getDBID() {
         return dbid;
     }
-    @Override
-    public String getName() {
-        return Long.toString(dbid);
-    }
     //end old version
+
+    @Override
+    public String getName() { return Long.toString(dbid); }
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{

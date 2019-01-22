@@ -35,7 +35,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }*/
 
     //old version
-    Long dbid;
+    private final Long dbid;
     public CapabilityPrincipal(Capability capability, User user) {
         this.capability = capability;
         this.dbid=user.getPk();
@@ -46,11 +46,12 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     public long getDBID() {
         return dbid;
     }
+    //end old version
+
     @Override
     public String getName() {
         return Long.toString(dbid);
     }
-    //end old version
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException {

@@ -166,7 +166,7 @@ public class AlbumResource {
         usersPermission.setWriteComments(writeComments);
 
         try {
-            albumResponse = Albums.editAlbum(callingUserPk, albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
+            albumResponse = Albums.editAlbum(kheopsPrincipal.getUser(), albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Edit album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -193,7 +193,7 @@ public class AlbumResource {
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
-            Albums.deleteAlbum(callingUserPk, albumId);
+            Albums.deleteAlbum(kheopsPrincipal.getUser(), albumId);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
