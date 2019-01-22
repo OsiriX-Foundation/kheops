@@ -12,6 +12,8 @@ import java.util.concurrent.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static java.util.zip.Deflater.NO_COMPRESSION;
+
 public final class InstanceZipper {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     private final InstanceRetrievalService instanceRetrievalService;
@@ -41,6 +43,7 @@ public final class InstanceZipper {
 
         private void privateWrite(OutputStream output, DicomDirGenerator dicomDirGenerator) throws IOException, InterruptedException, ExecutionException {
             try (final ZipOutputStream zipStream = new ZipOutputStream(output)) {
+                zipStream.setLevel(NO_COMPRESSION);
                 if (alreadyWritten) {
                     throw new IllegalStateException("Already written out");
                 }
