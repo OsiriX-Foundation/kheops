@@ -109,6 +109,7 @@ public final class Resource {
                     .withCapability(authorizationToken.getToken())
                     .build();
         } catch (AccessTokenException e) {
+            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
             throw new WebApplicationException(UNAUTHORIZED);
         }
 
