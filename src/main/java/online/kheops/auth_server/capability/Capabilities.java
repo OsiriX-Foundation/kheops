@@ -96,7 +96,7 @@ public class Capabilities {
                     .build();
             em.persist(capability);
 
-            capabilityResponse = new CapabilitiesResponse(capability, false).getResponse();
+            capabilityResponse = new CapabilitiesResponse(capability, true, false).getResponse();
 
             tx.commit();
         } finally {
@@ -141,7 +141,7 @@ public class Capabilities {
 
             em.persist(capability);
 
-            capabilityResponse = new CapabilitiesResponse(capability, false).getResponse();
+            capabilityResponse = new CapabilitiesResponse(capability, true, false).getResponse();
 
             tx.commit();
         } finally {
@@ -169,7 +169,7 @@ public class Capabilities {
             capability.setRevoked(true);
             em.persist(capability);
 
-            capabilityResponse = new CapabilitiesResponse(capability, false).getResponse();
+            capabilityResponse = new CapabilitiesResponse(capability, false, false).getResponse();
 
             tx.commit();
         } finally {
@@ -201,7 +201,7 @@ public class Capabilities {
             }
 
             for (Capability capability: capabilities) {
-                capabilityResponses.add(new CapabilitiesResponse(capability, false).getResponse());
+                capabilityResponses.add(new CapabilitiesResponse(capability, false, false).getResponse());
             }
 
             tx.commit();
@@ -222,7 +222,7 @@ public class Capabilities {
 
         try {
             Capability capability = getCapability(capabilityToken, em);
-            capabilityResponse = new CapabilitiesResponse(capability, true).getResponse();
+            capabilityResponse = new CapabilitiesResponse(capability, false, true).getResponse();
         } finally {
             em.close();
         }

@@ -50,11 +50,13 @@ public class CapabilitiesResponse {
         String study;
     }
 
-    public CapabilitiesResponse(Capability capability, boolean isIntrospect) {
+    public CapabilitiesResponse(Capability capability, boolean showSecret, boolean isIntrospect) {
 
         if(!isIntrospect) {
             response.id = capability.getId();
-            response.secret = capability.getSecret();//TODO MUST BE REMOVE USE FOR DEBUG ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(showSecret) {
+                response.secret = capability.getSecret();
+            }
             response.title = capability.getTitle();
             response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
 

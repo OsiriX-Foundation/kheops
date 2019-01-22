@@ -28,10 +28,14 @@ public class Keycloak {
 
     public Keycloak() throws KeycloakException{
         if(!isInitialised) {
-            usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
-            isInitialised = true;
+            initKeycloak();
         }
         token = new KeycloakToken();
+    }
+
+    private void initKeycloak() {
+        usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
+        isInitialised = true;
     }
 
     public UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{

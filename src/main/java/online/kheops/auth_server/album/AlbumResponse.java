@@ -66,6 +66,20 @@ public class AlbumResponse {
         public int compareTo(UserAlbumResponse userAlbumResponse) {
             return userName.compareTo(userAlbumResponse.userName);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj instanceof UserAlbumResponse) {
+                final UserAlbumResponse userAlbumResponse = (UserAlbumResponse) obj;
+                return  userAlbumResponse.userId.compareTo(userId) == 0 &&
+                        userAlbumResponse.isAdmin == isAdmin &&
+                        userAlbumResponse.userName.compareTo(userName) == 0;
+            }
+            return false;
+        }
     }
 
     protected AlbumResponse(AlbumResponseBuilder albumResponseBuilder) {
@@ -100,9 +114,7 @@ public class AlbumResponse {
     public void addUsersList(){
         try {
             response.users = getUsers(response.id).response.users;
-        } catch (AlbumNotFoundException e) {
-
-        }
+        } catch (AlbumNotFoundException e) { /*empty*/ }
     }
 
     public Response getResponse() {
