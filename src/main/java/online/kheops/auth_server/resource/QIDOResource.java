@@ -78,10 +78,6 @@ public class QIDOResource {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
-        if (offset == null) {
-            offset = 0;
-        }
-
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
@@ -98,9 +94,9 @@ public class QIDOResource {
         }
 
         final PairListXTotalCount<Attributes> pair;
-
+        final QIDOParams qidoParams;
         try (Connection connection = getDataSource().getConnection()) {
-            QIDOParams qidoParams = new QIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
+            qidoParams = new QIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
             LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
@@ -125,7 +121,7 @@ public class QIDOResource {
         Response.ResponseBuilder response = Response.ok(genericAttributesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount());
 
-        final long remaining = pair.getXTotalCount() - (offset + pair.getAttributesList().size());
+        final long remaining = pair.getXTotalCount() - (qidoParams.getOffset().orElse(0) + pair.getAttributesList().size());
         if ( remaining > 0) {
             // TODO fix {+service}
             response.header("Warning","Warning: 299 {+service}: There are "+ remaining +" additional results that can be requested");
@@ -146,7 +142,7 @@ public class QIDOResource {
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                               @QueryParam(ALBUM) String fromAlbumId,
                               @QueryParam(INBOX) Boolean fromInbox,
-                              @QueryParam("favorite") Boolean favoriteFilter,
+                              @QueryParam(FAVORITE) Boolean favoriteFilter,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
                               @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit) {
 
@@ -161,13 +157,15 @@ public class QIDOResource {
             includeFieldFavorite = false;
         }
 
-        if(includeFieldFavorite && fromAlbumId == null && fromInbox == null) {
-            return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify inbox=true OR albumID=XX as query param").build();
+        if(fromAlbumId == null && fromInbox == null) {
+            if(includeFieldFavorite) {
+                return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param").build();
+            }
+            if(favoriteFilter != null) {
+                return Response.status(BAD_REQUEST).entity("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param").build();
+            }
         }
 
-        if(favoriteFilter && fromAlbumId == null && fromInbox == null) {
-            return Response.status(BAD_REQUEST).entity("If favorite=true, you must specify inbox=true OR albumID=XX as query param").build();
-        }
 
         fromInbox = fromInbox != null;
 
@@ -201,10 +199,11 @@ public class QIDOResource {
 
         final MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
         queryParameters.putAll(uriInfo.getQueryParameters());
-        queryParameters.remove("album");
-        queryParameters.remove("inbox");
-        queryParameters.remove("offset");
-        queryParameters.remove("limit");
+        queryParameters.remove(ALBUM);
+        queryParameters.remove(INBOX);
+        queryParameters.remove(QUERY_PARAMETER_OFFSET);
+        queryParameters.remove(QUERY_PARAMETER_LIMIT);
+        queryParameters.remove(FAVORITE);
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
@@ -259,7 +258,6 @@ public class QIDOResource {
                     if(!(favoriteFilter != null && favoriteValue != favoriteFilter)) {
                         if (availableSeries.size() < limit) {
                             if (includeFieldFavorite) {
-
                                 series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
                             }
                             availableSeries.add(series);

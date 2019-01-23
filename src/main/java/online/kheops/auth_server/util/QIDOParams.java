@@ -43,16 +43,21 @@ public final class QIDOParams {
     private final Optional<String> studyIDFilter;
     private final Optional<Boolean> favoriteFilter;
     private final boolean favoriteField;
+    private final boolean commentField;
 
     public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
+
         String albumIDLocal = null;
         boolean fromInboxLocal = false;
+
         if (queryParameters.containsKey(ALBUM)) {
             albumIDLocal = queryParameters.get(ALBUM).get(0);
         }
+
         if (queryParameters.containsKey(INBOX)) {
             fromInboxLocal = true;
         }
+
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             if(fromInboxLocal) {
                 throw new BadQueryParametersException("from inbox forbidden with a capability token with an album scope");//todo good message
@@ -65,6 +70,7 @@ public final class QIDOParams {
                 throw new AlbumForbiddenException("Token doesn't have read access");
             }
         }
+
         albumID = Optional.ofNullable(albumIDLocal);
         fromInbox = fromInboxLocal;
         if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
@@ -85,6 +91,7 @@ public final class QIDOParams {
         } else {
             limit = OptionalInt.empty();
         }
+
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
             offset = JOOQTools.getOffset(queryParameters);
         } else {
@@ -102,7 +109,17 @@ public final class QIDOParams {
         studyInstanceUIDFilter = getFilter(Tag.StudyInstanceUID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
         favoriteField = getFavoriteField(queryParameters);
+        commentField = getCommentField(queryParameters);
         favoriteFilter = getFavoriteFilter(queryParameters);
+
+        if(!albumID.isPresent() && !fromInbox) {
+            if(favoriteField) {
+                throw new BadQueryParametersException("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param");
+            }
+            if(favoriteFilter.isPresent()) {
+                throw new BadQueryParametersException("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param");
+            }
+        }
 
         if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
             fuzzyMatching = Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
@@ -180,6 +197,8 @@ public final class QIDOParams {
 
     public boolean includeFavoriteField() { return favoriteField; }
 
+    public boolean includeCommentField() { return commentField; }
+
     private static Optional<String> getFilter(int tag, MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
             return Optional.ofNullable(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0));
@@ -198,11 +217,22 @@ public final class QIDOParams {
         }
     }
 
-    private Optional<Boolean> getFavoriteFilter(MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey("favorite")) {
-            return Optional.of(Boolean.valueOf(queryParameters.get("favorite").get(0)));
+    private Optional<Boolean> getFavoriteFilter(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
+        if (queryParameters.containsKey(FAVORITE)) {
+            if(!Boolean.valueOf(queryParameters.get(FAVORITE).get(0))) {
+                throw new BadQueryParametersException("Favorite filter can only be true");
+            }
+            return Optional.of(true);
         } else {
             return Optional.empty();
+        }
+    }
+
+    private static boolean getCommentField(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(INCLUDE_FIELD)) {
+            return queryParameters.get(INCLUDE_FIELD).contains("12346");
+        } else {
+            return false;
         }
     }
 }

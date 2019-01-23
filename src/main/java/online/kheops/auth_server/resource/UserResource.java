@@ -40,7 +40,7 @@ public class UserResource {
         } catch (UserNotFoundException e) {
             return Response.status(NO_CONTENT).build();
         } catch (KeycloakException e) {
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
         }
     }
 }

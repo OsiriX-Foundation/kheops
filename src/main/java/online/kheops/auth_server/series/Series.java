@@ -131,6 +131,8 @@ public class Series {
         final AlbumSeries albumSeries;
         try {
             albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
+        } catch (NoResultException e) {
+            throw new IllegalStateException("SeriesUID: "+seriesUID+"Not found inside the albumID: "+albumID);
         } finally {
             em.close();
         }

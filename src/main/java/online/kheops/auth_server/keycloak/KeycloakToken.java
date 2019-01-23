@@ -3,6 +3,7 @@ package online.kheops.auth_server.keycloak;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
@@ -29,7 +30,12 @@ public class KeycloakToken {
 
     private KeycloakToken() throws KeycloakException{
 
-        Response response = ClientBuilder.newClient().target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
+        final Response response;
+        try {
+            response = ClientBuilder.newClient().target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
+        } catch (ProcessingException e) {
+            throw new KeycloakException("Error during request OpenID Connect well-known", e);
+        }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
@@ -63,7 +69,12 @@ public class KeycloakToken {
 
     private void newToken() throws KeycloakException{
 
-        Response response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
+        final Response response;
+        try {
+            response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
+        } catch (ProcessingException e) {
+            throw new KeycloakException("Error during request a new token", e);
+        }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
@@ -76,7 +87,17 @@ public class KeycloakToken {
 
     private void refreshToken() throws KeycloakException{
 
-        Response response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
+        final Form refreshTokenForm = new Form();
+        refreshTokenForm.param("grant_type", "refresh_token");
+        refreshTokenForm.param("refresh_token", getRefreshToken());
+        refreshTokenForm.param("client_id", CLIENT_ID);
+        refreshTokenForm.param("client_secret", CLIENT_SECRET);
+        final Response response;
+        try {
+            response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(refreshTokenForm));
+        } catch (ProcessingException e) {
+            throw new KeycloakException("Error during request a refresh token", e);
+        }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
@@ -110,9 +131,7 @@ public class KeycloakToken {
         }
     }
 
-    private String getRefreshToken() {
-        return token.getString("refresh_token");
-    }
+    private String getRefreshToken() { return token.getString("refresh_token"); }
     private String getAccessToken() { return token.getString("access_token"); }
 
     private boolean introspect(String token) throws KeycloakException{
@@ -120,7 +139,12 @@ public class KeycloakToken {
         introspectForm.param("token", token);
         introspectForm.param("client_id", CLIENT_ID);
         introspectForm.param("client_secret", CLIENT_SECRET);
-        Response response = ClientBuilder.newClient().target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(introspectForm));
+        final Response response;
+        try {
+            response = ClientBuilder.newClient().target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(introspectForm));
+        } catch (ProcessingException e) {
+            throw new KeycloakException("Error during introspect token", e);
+        }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);

@@ -10,6 +10,7 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,8 +46,8 @@ public class AlbumQueries {
                 .getSingleResult();
     }
 
-    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String albumID, String seriesUID, EntityManager em) throws NoResultException {
-        return em.createQuery("SELECT aSeries from AlbumSeries aSeries join aSeries.series s join aSeries.album a where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
+    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em) throws NoResultException {
+        return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
                 .setParameter("seriesUID", seriesUID)
                 .setParameter("albumID", albumID)
                 .getSingleResult();

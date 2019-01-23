@@ -5,7 +5,9 @@ import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.json.*;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -41,8 +43,12 @@ public class Keycloak {
     public UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{
 
         if(user.contains("@")) {
-
-            Response response = ClientBuilder.newClient().target(usersUri).queryParam("email", user).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+            final Response response;
+            try {
+                response = ClientBuilder.newClient().target(usersUri).queryParam("email", user).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+            } catch (ProcessingException e) {
+                throw new KeycloakException("Error during introspect token", e);
+            }
 
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
@@ -59,8 +65,12 @@ public class Keycloak {
 
         } else {
             final URI userUri = UriBuilder.fromUri(usersUri).path("/"+user).build();
-            Response response =  ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
-
+            final Response response;
+            try {
+                response =  ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+            } catch (ProcessingException e) {
+                throw new KeycloakException("Error during introspect token", e);
+            }
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
                 output = "["+output+"]";

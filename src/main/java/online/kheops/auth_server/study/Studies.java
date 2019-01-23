@@ -29,12 +29,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.generated.Tables.*;
 import static online.kheops.auth_server.series.Series.editSeriesFavorites;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.user.Users.getUser;
-import static online.kheops.auth_server.generated.Tables.ALBUMS;
-import static online.kheops.auth_server.generated.Tables.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
@@ -125,10 +124,11 @@ public class Studies {
                 isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
                 isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
                 isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
-                count(SERIES.PK).as("count:" + SERIES.PK.getName()),
-                sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                countDistinct(SERIES.PK).as("count:" + SERIES.PK.getName()),
+                sumDistinct(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
-                count(when(ALBUM_SERIES.FAVORITE.eq(true), 1)).as("sum_fav"));
+                countDistinct(when(ALBUM_SERIES.FAVORITE.eq(true), ALBUM_SERIES.PK)).as("sum_fav"),
+                countDistinct(EVENTS).as("sum_comments"));
 
         selectQuery.addFrom(USERS);
         selectQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
@@ -136,6 +136,7 @@ public class Studies {
         selectQuery.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
         selectQuery.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
         selectQuery.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+        selectQuery.addJoin(EVENTS, EVENTS.EVENT_TYPE.eq("Comment").and(EVENTS.STUDY_FK.eq(STUDIES.PK)).and(EVENTS.PRIVATE_TARGET_USER_FK.isNull().or(EVENTS.USER_FK.eq(USERS.PK)).or(EVENTS.PRIVATE_TARGET_USER_FK.eq(USERS.PK))));
 
         for (Condition c : conditionArrayList) {
             if (c != null) {
@@ -193,8 +194,12 @@ public class Studies {
             safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer) r.getValue("count:" + SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal) r.getValue("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
+
             if(qidoParams.includeFavoriteField()) {
                 attributes.setInt(0x00012345, VR.IS, ((Integer)r.getValue("sum_fav")));
+            }
+            if(qidoParams.includeCommentField()) {
+                attributes.setInt(0x00012346, VR.IS, ((Integer)r.getValue("sum_comments")));
             }
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
