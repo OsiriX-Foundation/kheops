@@ -11,6 +11,7 @@ public class TeeInputStream extends FilterInputStream {
 
     private static final int BUFFER_ARRAY_LENGTH = 4096;
     private final byte[] bufferArray = new byte[BUFFER_ARRAY_LENGTH];
+    private final byte[] finishBufferArray = new byte[BUFFER_ARRAY_LENGTH];
 
     public TeeInputStream(final InputStream inputStream, final OutputStream outputStream) {
         super(inputStream);
@@ -19,7 +20,7 @@ public class TeeInputStream extends FilterInputStream {
 
     public synchronized void finish() throws IOException {
         while (true) {
-            if (read(bufferArray, 0 , BUFFER_ARRAY_LENGTH) == -1) {
+            if (read(finishBufferArray, 0 , BUFFER_ARRAY_LENGTH) == -1) {
                 break;
             }
         }
