@@ -18,9 +18,10 @@ public class TeeInputStream extends FilterInputStream {
     }
 
     public synchronized void finish() throws IOException {
-        long skippedBytes = 0;
-        while (skippedBytes >= 0) {
-            skippedBytes = skip(Long.MAX_VALUE);
+        while (true) {
+            if (read(bufferArray, 0 , BUFFER_ARRAY_LENGTH) == -1) {
+                break;
+            }
         }
     }
 
@@ -67,25 +68,20 @@ public class TeeInputStream extends FilterInputStream {
     @Override
     public synchronized long skip(final long n) throws IOException {
         long skippedBytes = 0;
-        boolean reachedEOF = false;
 
         while (skippedBytes < n) {
-            final int bytesRead = read(bufferArray, 0, (int) min(BUFFER_ARRAY_LENGTH, n-skippedBytes));
+            final int bytesToRead = (int) min(BUFFER_ARRAY_LENGTH, n-skippedBytes);
+            final int bytesRead = read(bufferArray, 0, bytesToRead);
             if (bytesRead == -1) {
-                reachedEOF = true;
                 break;
             }
             skippedBytes += bytesRead;
-            if (bytesRead < BUFFER_ARRAY_LENGTH) {
+            if (bytesRead < bytesToRead) {
                 break;
             }
         }
 
-        if (reachedEOF && skippedBytes == 0) {
-            return -1;
-        } else {
-            return skippedBytes;
-        }
+        return skippedBytes;
     }
 
     @Override
@@ -96,7 +92,7 @@ public class TeeInputStream extends FilterInputStream {
 
     @Override
     public synchronized void reset() throws IOException {
-        bytesRewound = bytesSinceMark;
+        bytesRewound += bytesSinceMark;
         bytesSinceMark = 0;
         super.reset();
     }
