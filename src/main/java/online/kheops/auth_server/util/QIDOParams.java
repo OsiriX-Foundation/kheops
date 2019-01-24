@@ -211,7 +211,7 @@ public final class QIDOParams {
 
     private static boolean getFavoriteField(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(INCLUDE_FIELD)) {
-            return queryParameters.get(INCLUDE_FIELD).contains("12345");
+            return queryParameters.get(INCLUDE_FIELD).contains(CUSTOM_DICOM_TAG_FAVORITE) || queryParameters.get(INCLUDE_FIELD).contains(FAVORITE);
         } else {
             return false;
         }
@@ -230,7 +230,7 @@ public final class QIDOParams {
 
     private static boolean getCommentField(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(INCLUDE_FIELD)) {
-            return queryParameters.get(INCLUDE_FIELD).contains("12346");
+            return queryParameters.get(INCLUDE_FIELD).contains(CUSTOM_DICOM_TAG_COMMENTS) || queryParameters.get(INCLUDE_FIELD).contains(COMMENTS);
         } else {
             return false;
         }

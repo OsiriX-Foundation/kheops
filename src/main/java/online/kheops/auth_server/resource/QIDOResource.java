@@ -151,7 +151,7 @@ public class QIDOResource {
         }
 
         final boolean includeFieldFavorite;
-        if(uriInfo.getQueryParameters().containsKey("includefield") && uriInfo.getQueryParameters().get("includefield").contains("12345")) {
+        if(uriInfo.getQueryParameters().containsKey("includefield") && (uriInfo.getQueryParameters().get("includefield").contains(CUSTOM_DICOM_TAG_FAVORITE)||uriInfo.getQueryParameters().get("includefield").contains(FAVORITE))) {
             includeFieldFavorite = true;
         } else {
             includeFieldFavorite = false;
