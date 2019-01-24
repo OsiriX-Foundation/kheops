@@ -414,6 +414,9 @@ public class Studies {
                 album = getAlbum(fromAlbumId, em);
                 seriesList = findSeriesListByStudyUIDFromAlbum(callingUser,album, studyInstanceUID, em);
             }
+            if(seriesList.isEmpty()) {
+                throw new StudyNotFoundException("Study not found");
+            }
 
             for(Series s: seriesList) {
                 editSeriesFavorites(s, album, favorite, em);
