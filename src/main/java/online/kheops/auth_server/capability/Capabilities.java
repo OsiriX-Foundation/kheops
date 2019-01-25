@@ -86,7 +86,6 @@ public class Capabilities {
         */
     }
 
-
     private static String bytesToHex(byte[] hash) {
         StringBuffer hexString = new StringBuffer();
         for (int i = 0; i < hash.length; i++) {
@@ -96,7 +95,6 @@ public class Capabilities {
         }
         return hexString.toString();
     }
-
 
     public static Boolean isValidFormat(String token) {
         return tokenPattern.matcher(token).matches();
