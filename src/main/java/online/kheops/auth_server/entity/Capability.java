@@ -274,9 +274,6 @@ public class Capability {
             if (title == null) {
                 throw new IllegalStateException("Missing title");
             }
-
-
-
             return new Capability(this);
         }
     }

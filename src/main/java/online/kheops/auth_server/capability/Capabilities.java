@@ -76,6 +76,14 @@ public class Capabilities {
         }
         byte[] encodedhash = digest.digest(capability.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(encodedhash);
+        /*Maby use :
+        https://en.wikipedia.org/wiki/Argon2
+        https://en.wikipedia.org/wiki/Bcrypt
+        https://en.wikipedia.org/wiki/Scrypt
+        https://en.wikipedia.org/wiki/PBKDF2
+        or another sha-512 is just for test
+        https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
+        */
     }
 
 
