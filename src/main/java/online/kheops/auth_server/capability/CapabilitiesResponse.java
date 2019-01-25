@@ -55,7 +55,7 @@ public class CapabilitiesResponse {
         if(!isIntrospect) {
             response.id = capability.getId();
             if(showSecret) {
-                response.secret = capability.getSecret();
+                response.secret = capability.getSecretBeforeHash();
             }
             response.title = capability.getTitle();
             response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();

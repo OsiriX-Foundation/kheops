@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import static online.kheops.auth_server.capability.Capabilities.HashCapability;
 import static online.kheops.auth_server.capability.Capabilities.newCapabilityID;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
@@ -18,6 +19,10 @@ import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 @Table(name = "capabilities")
 
 public class Capability {
+
+    @Transient
+    private String secretBeforeHash;
+
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")
@@ -99,7 +104,8 @@ public class Capability {
     private Capability() {}
 
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
-        this.secret = Capabilities.newCapabilityToken();
+        secretBeforeHash = Capabilities.newCapabilityToken();
+        this.secret = HashCapability(secretBeforeHash);
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
         this.title  = builder.title;
@@ -186,6 +192,8 @@ public class Capability {
 
     public void setAlbum(Album album) { this.album = album; }
 
+    public String getSecretBeforeHash() { return secretBeforeHash; }
+
     public static class CapabilityBuilder {
 
 
@@ -266,6 +274,9 @@ public class Capability {
             if (title == null) {
                 throw new IllegalStateException("Missing title");
             }
+
+
+
             return new Capability(this);
         }
     }

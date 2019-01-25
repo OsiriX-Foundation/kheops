@@ -21,6 +21,7 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.assertion.DownloadKeyException;
 import online.kheops.auth_server.assertion.UnknownGrantTypeException;
 
+import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesQueries;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -35,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.capability.Capabilities.HashCapability;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 @Path("/")

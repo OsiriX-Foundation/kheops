@@ -10,6 +10,9 @@ import online.kheops.auth_server.user.Users;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +45,12 @@ public class Capabilities {
 
     public static String newCapabilityToken() {
         StringBuilder secretBuilder = new StringBuilder();
-
-        while (secretBuilder.length() < TOKEN_LENGTH) {
-            int index = rdm.nextInt(TOKEN_DICT.length());
-            secretBuilder.append(TOKEN_DICT.charAt(index));
-        }
+        do {
+            while (secretBuilder.length() < TOKEN_LENGTH) {
+                int index = rdm.nextInt(TOKEN_DICT.length());
+                secretBuilder.append(TOKEN_DICT.charAt(index));
+            }
+        } while (capabilitySecretExist(secretBuilder.toString()));
         return secretBuilder.toString();
     }
 
@@ -59,8 +63,30 @@ public class Capabilities {
                 int index = rdm.nextInt(ID_DICT.length());
                 idBuilder.append(ID_DICT.charAt(index));
             }
-        } while (capabilityExist(idBuilder.toString()));
+        } while (capabilityIDExist(idBuilder.toString()));
         return idBuilder.toString();
+    }
+
+    public static String HashCapability(String capability) {
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-512");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException();
+        }
+        byte[] encodedhash = digest.digest(capability.getBytes(StandardCharsets.UTF_8));
+        return bytesToHex(encodedhash);
+    }
+
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
 
@@ -84,7 +110,6 @@ public class Capabilities {
         try {
             tx.begin();
             final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
-            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
@@ -125,7 +150,6 @@ public class Capabilities {
             if (!albumUser.isAdmin()) {
                 throw new NewCapabilityForbidden("Only an admin can generate a capability token for an album");
             }
-            //final Capability capability = new Capability(user, capabilityParameters.getExpirationDate(), capabilityParameters.getStartDate(), capabilityParameters.getTitle(), album, capabilityParameters.isReadPermission(), capabilityParameters.isWritePermission());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
@@ -229,7 +253,7 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static boolean capabilityExist(String capabilityId) {
+    public static boolean capabilityIDExist(String capabilityId) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
@@ -241,7 +265,20 @@ public class Capabilities {
         } finally {
             em.close();
         }
+    }
 
+    public static boolean capabilitySecretExist(String capabilitySecret) {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            getCapability(capabilitySecret, em);
+            return true;
+        } catch (CapabilityNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
     }
 
     public static Capability getCapability(User user, String capabilityId, EntityManager em) throws CapabilityNotFoundException {
@@ -254,6 +291,7 @@ public class Capabilities {
 
     public static Capability getCapability(String secret, EntityManager em) throws CapabilityNotFoundException {
         try {
+            secret = HashCapability(secret);
             return findCapabilityByCapabilityToken(secret, em);
         } catch (NoResultException e) {
             throw new CapabilityNotFoundException("Capabability token not found");
