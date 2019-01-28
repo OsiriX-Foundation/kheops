@@ -104,7 +104,7 @@ public class Users {
             tx.commit();
             return newUser;
         } catch (Exception e) {
-            throw new InternalError("Error during adding a new user in kehops db",e);
+            throw new InternalError("Error while adding a new user to the kheops db", e);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
