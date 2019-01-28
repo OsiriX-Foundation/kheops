@@ -4,6 +4,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
@@ -12,19 +13,20 @@ import javax.ws.rs.core.UriBuilder;
 import java.io.StringReader;
 import java.net.URI;
 
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
+
 public class KeycloakToken {
+    private static Client CLIENT = ClientBuilder.newClient();
 
-    private static URI tokenUri;
-    private static URI introspectUri;
+    private URI tokenUri;
+    private URI introspectUri;
 
-    private static String USERNAME;
-    private static String PASSWORD;
-    private static String CLIENT_ID;
-    private static String CLIENT_SECRET;
+    private String clientId;
+    private String clientSecret;
 
-    private static final Form form = new Form();
+    private final Form form;
 
-    private static JsonObject token;
+    private JsonObject token;
 
     private static KeycloakToken instance = null;
 
@@ -32,7 +34,7 @@ public class KeycloakToken {
 
         final Response response;
         try {
-            response = ClientBuilder.newClient().target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
+            response = CLIENT.target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
         } catch (ProcessingException e) {
             throw new KeycloakException("Error during request OpenID Connect well-known", e);
         }
@@ -48,19 +50,20 @@ public class KeycloakToken {
         }
 
 
-        USERNAME = KeycloakContextListener.getKeycloakUser();
-        PASSWORD = KeycloakContextListener.getKeycloakPassword();
-        CLIENT_ID = KeycloakContextListener.getKeycloakClientId();
-        CLIENT_SECRET = KeycloakContextListener.getKeycloakClientSecret();
+        String username = KeycloakContextListener.getKeycloakUser();
+        String password = KeycloakContextListener.getKeycloakPassword();
+        clientId = KeycloakContextListener.getKeycloakClientId();
+        clientSecret = KeycloakContextListener.getKeycloakClientSecret();
 
+        form = new Form();
         form.param("grant_type", "password");
-        form.param("username", USERNAME);
-        form.param("password", PASSWORD);
-        form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET);
+        form.param("username", username);
+        form.param("password", password);
+        form.param("client_id", clientId);
+        form.param("client_secret", clientSecret);
     }
 
-    public static KeycloakToken getInstance() throws KeycloakException{
+    public static synchronized KeycloakToken getInstance() throws KeycloakException{
         if (instance == null) {
             instance = new KeycloakToken();
         }
@@ -71,7 +74,7 @@ public class KeycloakToken {
 
         final Response response;
         try {
-            response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
+            response = CLIENT.target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
         } catch (ProcessingException e) {
             throw new KeycloakException("Error while requesting a new token", e);
         }
@@ -90,22 +93,26 @@ public class KeycloakToken {
         final Form refreshTokenForm = new Form();
         refreshTokenForm.param("grant_type", "refresh_token");
         refreshTokenForm.param("refresh_token", getRefreshToken());
-        refreshTokenForm.param("client_id", CLIENT_ID);
-        refreshTokenForm.param("client_secret", CLIENT_SECRET);
+        refreshTokenForm.param("client_id", clientId);
+        refreshTokenForm.param("client_secret", clientSecret);
         final Response response;
         try {
-            response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(refreshTokenForm));
+            response = CLIENT.target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(refreshTokenForm));
         } catch (ProcessingException e) {
             throw new KeycloakException("Error while requesting a refresh token", e);
         }
 
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+        if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
+            throw new KeycloakException("Status of:" + response.getStatus() + " while getting a refresh token");
+        }
+
+        try {
             String output = response.readEntity(String.class);
             JsonReader jsonReader = Json.createReader(new StringReader(output));
             token = jsonReader.readObject();
+        } catch (Exception e) {
+            throw new KeycloakException("Error while parsing the refresh token response", e);
         }
-        throw new KeycloakException("Error during request a refresh token");
-
     }
 
     public String getToken() throws KeycloakException {
@@ -137,11 +144,11 @@ public class KeycloakToken {
     private boolean introspect(String token) throws KeycloakException{
         final Form introspectForm = new Form();
         introspectForm.param("token", token);
-        introspectForm.param("client_id", CLIENT_ID);
-        introspectForm.param("client_secret", CLIENT_SECRET);
+        introspectForm.param("client_id", clientId);
+        introspectForm.param("client_secret", clientSecret);
         final Response response;
         try {
-            response = ClientBuilder.newClient().target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(introspectForm));
+            response = CLIENT.target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(introspectForm));
         } catch (ProcessingException e) {
             throw new KeycloakException("Error during token introspect", e);
         }

@@ -20,17 +20,41 @@ public class KeycloakContextListener implements ServletContextListener {
         servletContext = null;
     }
 
-    private static String getKeycloakUri(){ return servletContext.getInitParameter("online.kheops.keycloak.uri"); }
+    private static void verifyState() {
+        if (servletContext == null) {
+            throw new IllegalStateException("Getting parameters before the context is initialized");
+        }
+    }
 
-    public static String getKeycloakUser(){ return servletContext.getInitParameter("online.kheops.keycloak.user"); }
+    private static String getKeycloakUri() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.keycloak.uri");
+    }
 
-    public static String getKeycloakPassword(){ return servletContext.getInitParameter("online.kheops.keycloak.password"); }
+    public static String getKeycloakUser() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.keycloak.user");
+    }
 
-    public static String getKeycloakClientId(){ return servletContext.getInitParameter("online.kheops.keycloak.clientid"); }
+    public static String getKeycloakPassword() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.keycloak.password");
+    }
 
-    public static String getKeycloakClientSecret(){ return servletContext.getInitParameter("online.kheops.keycloak.clientsecret"); }
+    public static String getKeycloakClientId() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.keycloak.clientid");
+    }
 
-    private static String getKeycloakRealms(){ return servletContext.getInitParameter("online.kheops.keycloak.realms"); }
+    public static String getKeycloakClientSecret() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.keycloak.clientsecret");
+    }
+
+    private static String getKeycloakRealms() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.keycloak.realms");
+    }
 
     public static URI getKeycloakWellKnownURI(){ return UriBuilder.fromUri(getKeycloakUri() + "/auth/realms/" + getKeycloakRealms() + "/.well-known/openid-configuration").build(); }
 
