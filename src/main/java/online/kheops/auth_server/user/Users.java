@@ -33,8 +33,8 @@ public class Users {
             try {
                 final Keycloak keycloak = Keycloak.getInstance();
                 userReference= keycloak.getUser(userReference).getSub();
-            } catch (UserNotFoundException | KeycloakException e2) {
-                throw new UserNotFoundException();
+            } catch (KeycloakException e) {
+                throw new UserNotFoundException("Error during request to keycloak", e);
             }
         }
 
@@ -77,7 +77,7 @@ public class Users {
             final Keycloak keycloak = Keycloak.getInstance();
             keycloakId = keycloak.getUser(keycloakId).getSub();
         } catch (KeycloakException e) {
-            throw new InternalError("Error during request to keycloak", e);
+            throw new UserNotFoundException("Error during request to keycloak", e);
         }
 
         //the user is in keycloak but not in kheops => add the user in kheops
@@ -104,7 +104,7 @@ public class Users {
             tx.commit();
             return newUser;
         } catch (Exception e) {
-            throw new InternalError("Error while adding a new user to the kheops db", e);
+            throw new UserNotFoundException("Error while adding a new user to the kheops db", e);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

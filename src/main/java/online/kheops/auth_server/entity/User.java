@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @SuppressWarnings("unused")
@@ -18,6 +20,8 @@ import java.util.Set;
 @Table(name = "users")
 
 public class User {
+    private static final Logger LOG = Logger.getLogger(User.class.getName());
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "pk")
@@ -71,6 +75,7 @@ public class User {
             final UserResponse userResponse = keycloak.getUser(keycloakId);
             return userResponse.getEmail();
         } catch (UserNotFoundException | KeycloakException e) {
+            LOG.log(Level.SEVERE, "Error getting email", e);
             return "UNKNOWN";//TODO
         }
     }

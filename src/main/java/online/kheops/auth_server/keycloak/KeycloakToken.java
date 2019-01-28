@@ -73,7 +73,7 @@ public class KeycloakToken {
         try {
             response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(form));
         } catch (ProcessingException e) {
-            throw new KeycloakException("Error during request a new token", e);
+            throw new KeycloakException("Error while requesting a new token", e);
         }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -82,7 +82,7 @@ public class KeycloakToken {
             token = jsonReader.readObject();
             return;
         }
-        throw new KeycloakException("Error during request a new token");
+        throw new KeycloakException("Error while requesting a new token");
     }
 
     private void refreshToken() throws KeycloakException{
@@ -96,7 +96,7 @@ public class KeycloakToken {
         try {
             response = ClientBuilder.newClient().target(tokenUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(refreshTokenForm));
         } catch (ProcessingException e) {
-            throw new KeycloakException("Error during request a refresh token", e);
+            throw new KeycloakException("Error while requesting a refresh token", e);
         }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -143,7 +143,7 @@ public class KeycloakToken {
         try {
             response = ClientBuilder.newClient().target(introspectUri).request().header("Content-Type", "application/x-www-form-urlencoded").post(Entity.form(introspectForm));
         } catch (ProcessingException e) {
-            throw new KeycloakException("Error during introspect token", e);
+            throw new KeycloakException("Error during token introspect", e);
         }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -152,7 +152,7 @@ public class KeycloakToken {
             JsonObject result = jsonReader.readObject();
             return result.getBoolean("active");
         }
-        throw new KeycloakException("Error during introspect token");
+        throw new KeycloakException("Error during token introspect");
     }
 
 }
