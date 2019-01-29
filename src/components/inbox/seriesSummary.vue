@@ -1,4 +1,3 @@
-/* eslint-disable */
 <i18n>
 
 {
@@ -8,7 +7,8 @@
 		"description": "Description",
 		"seriesdate": "Series date",
 		"seriestime": "Series time",
-		"openviewer": "Open viewer"
+		"openviewer": "Open viewer",
+		"applicationentity": "Application entity"
 	},
 	"fr": {
 		"modality": "Modalité",
@@ -16,7 +16,8 @@
 		"description": "Description",
 		"seriesdate": "Date de la série",
 		"seriestime": "Heure de la série",
-		"openviewer": "Ouvrir un explorateur"
+		"openviewer": "Ouvrir une visionneuse",
+		"applicationentity": "Application entity"
 	}
 }
 
@@ -26,26 +27,48 @@
 <template>
 	<div class = 'seriesSummaryContainer'>
 		<div class = 'card-title'>
-			<b-form-checkbox v-model = "isSelected" >{{series.RetrieveAETitle[0]}}</b-form-checkbox>
+			<b-form-checkbox v-model = "isSelected" v-if='series.SeriesDescription'>{{series.SeriesDescription[0]}}</b-form-checkbox>
+			<b-form-checkbox v-model = "isSelected" v-else>No description</b-form-checkbox>
 		</div>
 		<div class = 'row'>
 			<div class = 'preview'>
 				<img :src='previewImg()' width= '250' height = '250'>
 			</div>
 			<div class = 'col description'>
-				<dl class = 'row'>
-					<dt v-if='series.Modality' class = 'col-md-4 col-sm-12 text-right'>{{ $t('modality') }}</dt>
-					<dd v-if='series.Modality' class = 'col-md-8 col-sm-12'>{{series.Modality[0]}}</dd>
-					<dt v-if='series.NumberOfSeriesRelatedInstances' class = 'col-md-4 col-sm-12 text-right'>{{ $t("numberimages") }}</dt>
-					<dd v-if='series.NumberOfSeriesRelatedInstances' class = 'col-md-8 col-sm-12'>{{series.NumberOfSeriesRelatedInstances[0]}}</dd>
-					<dt v-if='series.SeriesDescription' class = 'col-md-4 col-sm-12 text-right'>{{ $t("description") }}</dt>
-					<dd v-if='series.SeriesDescription' class = 'col-md-8 col-sm-12'>{{series.SeriesDescription[0]}}</dd>
-					<dt v-if='series.SeriesDate' class = 'col-md-4 col-sm-12 text-right'>{{ $t("seriesdate") }}</dt>
-					<dd v-if='series.SeriesDate' class = 'col-md-8 col-sm-12'>{{series.SeriesDate[0]|formatDate}}</dd>
-					<dt v-if='series.SeriesTime' class = 'col-md-4 col-sm-12	text-right'>{{ $t("seriestime") }}</dt>
-					<dd v-if='series.SeriesTime' class = 'col-md-8 col-sm-12'>{{series.SeriesTime[0]|formatTime}}</dd>
+				
+				<table class="table table-striped col-md-8">
+					<tbody>
+						<tr v-if="series.Modality">
+							<th>{{ $t('modality') }}</th>
+							<td>{{ series.Modality[0] }}</td>
+						</tr>
+						<tr v-if="series.RetrieveAETitle">
+							<th>{{ $t('applicationentity') }}</th>
+							<td>{{ series.RetrieveAETitle[0] }}</td>
+						</tr>
+						<tr v-if="series.NumberOfSeriesRelatedInstances">
+							<th>{{ $t('numberimages') }}</th>
+							<td>{{ series.NumberOfSeriesRelatedInstances[0] }}</td>
+						</tr>
+						<tr v-if="series.SeriesDescription">
+							<th>{{ $t('description') }}</th>
+							<td>{{ series.SeriesDescription[0] }}</td>
+						</tr>
+						<tr v-if="series.SeriesDate">
+							<th>{{ $t('seriesdate') }}</th>
+							<td>{{ series.SeriesDate[0]|formatDate }}</td>
+						</tr>
+						<tr v-if="series.SeriesTime">
+							<th>{{ $t('seriestime') }}</th>
+							<td>{{ series.SeriesTime[0]|formatTime }}</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<dl class = 'row' v-if='series.Modality'>
+					<dt class = 'col-md-4 col-sm-12 text-right'></dt>
+					<dd class = 'col-md-8 col-sm-12'><button type = 'button' class = 'btn-primary btn-sm' @click='openViewer'>{{$t('openviewer')}}</button></dd>
 				</dl>
-				<p class = 'text-center'><button type = 'button' class = 'btn btn-sm' @click='openViewer'>{{$t('openviewer')}}</button></p>
 			</div>			
 		</div>
 	</div>
