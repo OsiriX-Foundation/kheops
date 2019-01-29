@@ -35,6 +35,6 @@ deploy:
     ./docker/deploy_no_tls.sh;
     ./docker/tls/deploy_tls.sh
   on:
-all_branches: true
+    all_branches: true
 
 
