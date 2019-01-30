@@ -73,9 +73,10 @@ public final class AuthorizationManager {
         }
     }
 
-    public Response getResponse(final Attributes attributes, final int status) {
+    public Response getResponse(Attributes attributes, final int status) {
         if (attributes == null) {
-            return Response.status(Response.Status.BAD_GATEWAY).build();
+            attributes = new Attributes(2);
+            attributes.setString(Tag.RetrieveURL, VR.UR, "");
         }
 
         Sequence failedSOPs = attributes.getSequence(Tag.FailedSOPSequence);
