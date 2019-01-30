@@ -43,9 +43,9 @@ const options = {
 }
 
 const keycloakconfig = {
-  authRealm: 'StaticLoginConnect',
-  authUrl: 'https://keycloak.kheops.online/auth',
-  authClientId: 'loginConnect'
+  authRealm: process.env.REALM_KEYCLOAK,
+  authUrl: process.env.ADDR_KEYCLOAK+'/auth',
+  authClientId: process.env.CLIENTID
   // logoutRedirectUri: 'http://logout'
 }
 
