@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.proxy.multipart.MultipartStreamingOutput;
 import online.kheops.proxy.multipart.MultipartStreamingWriter;
+import online.kheops.proxy.stow.FetchRequester;
 import online.kheops.proxy.stow.GatewayException;
 import online.kheops.proxy.stow.Proxy;
 import online.kheops.proxy.stow.RequestException;
@@ -39,6 +40,7 @@ import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static org.glassfish.jersey.client.ClientProperties.REQUEST_ENTITY_PROCESSING;
 import static org.glassfish.jersey.client.RequestEntityProcessing.CHUNKED;
 
@@ -107,6 +109,7 @@ public final class Resource {
                     .withCapability(authorizationToken.getToken())
                     .build();
         } catch (AccessTokenException e) {
+            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
             throw new WebApplicationException(UNAUTHORIZED);
         }
 
@@ -125,9 +128,10 @@ public final class Resource {
 
         AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId);
 
+        final Proxy proxy = new Proxy(providers, contentType, inputStream, authorizationManager);
         MultipartStreamingOutput multipartStreamingOutput = output -> {
             try {
-                new Proxy(providers, contentType, inputStream, output, authorizationManager);
+                proxy.processStream(output);
             } catch (GatewayException e) {
                 LOG.log(Level.SEVERE, "Gateway Error", e);
                 throw new WebApplicationException(BAD_GATEWAY);
@@ -150,7 +154,19 @@ public final class Resource {
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, contentType));
         } catch (ProcessingException e) {
-            LOG.log(Level.SEVERE, "Error interpreting the gateway's response", e);
+            LOG.log(Level.SEVERE, "Processing Error", e);
+            if (e.getCause() instanceof WebApplicationException) {
+                WebApplicationException cause = (WebApplicationException)e.getCause();
+                throw new WebApplicationException(cause.getResponse().getStatus());
+            } else {
+                throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        FetchRequester.newFetchRequester(authorizationURI, authorizationToken).fetchStudies(proxy.getSentStudies());
+
+        if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
+            LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
             throw new WebApplicationException(BAD_GATEWAY);
         }
 

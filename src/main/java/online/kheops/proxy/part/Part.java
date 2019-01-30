@@ -33,20 +33,21 @@ public abstract class Part implements AutoCloseable {
         final Map<String, List<String>> headerParams = multipartInputStream.readHeaderParams();
         final ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, CONTENT_LOCATION));
         final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, CONTENT_TYPE));
+        final BufferedInputStream bufferedInputStream = new BufferedInputStream(multipartInputStream);
 
         final Path cacheFilePath = Files.createTempFile("PartCache", null);
         final Part newPart;
         try (final OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(cacheFilePath))) {
             if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
-                final TeeInputStream teeInputStream = new TeeInputStream(multipartInputStream, outputStream);
+                final TeeInputStream teeInputStream = new TeeInputStream(bufferedInputStream, outputStream);
                 newPart = new DICOMPart(providers, teeInputStream, mediaType, cacheFilePath);
                 teeInputStream.finish();
             } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
-                final TeeInputStream teeInputStream = new TeeInputStream(multipartInputStream, outputStream);
+                final TeeInputStream teeInputStream = new TeeInputStream(bufferedInputStream, outputStream);
                 newPart = new DICOMMetadataPart(providers, teeInputStream, mediaType, cacheFilePath);
                 teeInputStream.finish();
             } else {
-                newPart = new BulkDataPart(providers, multipartInputStream, mediaType, contentLocation, cacheFilePath);
+                newPart = new BulkDataPart(providers, bufferedInputStream, mediaType, contentLocation, cacheFilePath);
             }
             outputStream.flush();
         }

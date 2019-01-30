@@ -5,7 +5,6 @@ import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.part.Part;
 import online.kheops.proxy.stow.GatewayException;
-import online.kheops.proxy.stow.resource.Resource;
 import online.kheops.proxy.tokens.AuthorizationToken;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Sequence;
@@ -22,10 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import static java.util.logging.Level.SEVERE;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.ACCEPTED;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
@@ -35,7 +31,6 @@ import static online.kheops.proxy.stow.authorization.AuthorizationManagerExcepti
 import static online.kheops.proxy.stow.authorization.AuthorizationManagerException.Reason.UNKNOWN_CONTENT_LOCATION;
 
 public final class AuthorizationManager {
-    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient();
 
     private final Set<SeriesID> authorizedSeriesIDs = new HashSet<>();
@@ -43,7 +38,6 @@ public final class AuthorizationManager {
     private final Set<InstanceID> forbiddenInstanceIDs = new HashSet<>();
     private final Set<ContentLocation> authorizedContentLocations = new HashSet<>();
     private final UriBuilder authorizationUriBuilder;
-    private final UriBuilder fetchUriBuilder;
     private final AuthorizationToken bearerToken;
 
     public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId) {
@@ -52,7 +46,6 @@ public final class AuthorizationManager {
         if (albumId != null) {
             authorizationUriBuilder.path("/albums/" + albumId);
         }
-        fetchUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/fetch");
     }
 
     // This method blocks while a connection is made to the authorization server
@@ -80,9 +73,10 @@ public final class AuthorizationManager {
         }
     }
 
-    public Response getResponse(final Attributes attributes, final int status) {
+    public Response getResponse(Attributes attributes, final int status) {
         if (attributes == null) {
-            return Response.status(Response.Status.CONFLICT).build();
+            attributes = new Attributes(2);
+            attributes.setString(Tag.RetrieveURL, VR.UR, "");
         }
 
         Sequence failedSOPs = attributes.getSequence(Tag.FailedSOPSequence);
@@ -98,11 +92,6 @@ public final class AuthorizationManager {
 
             failedSOPs.add(failedAttributes);
         }
-
-        authorizedSeriesIDs.stream()
-                .map(SeriesID::getStudyUID)
-                .collect(Collectors.toSet())
-                .forEach(this::triggerFetch);
 
         Response.Status responseStatus;
         switch (status) {
@@ -172,19 +161,4 @@ public final class AuthorizationManager {
         authorizedContentLocations.addAll(contentLocations);
     }
 
-    private void triggerFetch(String studyInstanceUID) {
-        URI uri = fetchUriBuilder.build(studyInstanceUID);
-
-        try {
-            Response response = CLIENT.target(uri)
-                    .request()
-                    .header(AUTHORIZATION, bearerToken.getHeaderValue())
-                    .post(Entity.text(""));
-            if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
-                LOG.log(SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
-            }
-        } catch (ProcessingException | WebApplicationException e) {
-            LOG.log(SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID, e);
-        }
-    }
 }

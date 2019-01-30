@@ -6,12 +6,12 @@ import org.dcm4che3.data.Tag;
 import java.util.Objects;
 
 public final class InstanceID {
-    private final SeriesID studyID;
+    private final SeriesID seriesID;
     private final String sopInstanceUID;
     private final String sopClassUID;
 
-    public InstanceID(SeriesID studyID, String sopInstanceUID, String sopClassUID) {
-        this.studyID = Objects.requireNonNull(studyID);
+    public InstanceID(SeriesID seriesID, String sopInstanceUID, String sopClassUID) {
+        this.seriesID = Objects.requireNonNull(seriesID);
         this.sopInstanceUID = Objects.requireNonNull(sopInstanceUID);
         this.sopClassUID = Objects.requireNonNull(sopClassUID);
     }
@@ -30,7 +30,7 @@ public final class InstanceID {
     }
 
     public SeriesID getSeriesID() {
-        return studyID;
+        return seriesID;
     }
 
     public String getSOPInstanceUID() {
@@ -44,18 +44,18 @@ public final class InstanceID {
     @Override
     public boolean equals(Object o) {
         return o instanceof InstanceID &&
-                studyID.equals(((InstanceID) o).getSeriesID()) &&
+                seriesID.equals(((InstanceID) o).getSeriesID()) &&
                 sopInstanceUID.equals(((InstanceID) o).getSOPInstanceUID()) &&
                 sopClassUID.equals(((InstanceID) o).getSOPClassUID());
     }
 
     @Override
     public int hashCode() {
-        return studyID.hashCode() | sopInstanceUID.hashCode() | sopClassUID.hashCode();
+        return seriesID.hashCode() | sopInstanceUID.hashCode() | sopClassUID.hashCode();
     }
 
     @Override
     public String toString() {
-        return studyID.toString() + " SOPInstanceUID:" + sopInstanceUID + " SOPClassUID:" + sopClassUID;
+        return seriesID.toString() + " SOPInstanceUID:" + sopInstanceUID + " SOPClassUID:" + sopClassUID;
     }
 }
