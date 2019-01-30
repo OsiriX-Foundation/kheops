@@ -21,9 +21,8 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.*;
-import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 @Path("/")
 public class WadoUriResource {
@@ -82,10 +81,11 @@ public class WadoUriResource {
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
         } catch (AccessTokenException e) {
-            throw new WebApplicationException(BAD_GATEWAY);
+            LOG.log(WARNING, "Unable to get an access token", e);
+            throw new WebApplicationException(UNAUTHORIZED);
         } catch (Exception e) {
             LOG.log(SEVERE, "unknown error while getting an access token", e);
-            throw new InternalServerErrorException("unknown error while getting an access token", e);
+            throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
@@ -110,10 +110,10 @@ public class WadoUriResource {
             upstreamResponse = invocationBuilder.get();
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
-            throw new InternalServerErrorException();
+            throw new WebApplicationException(BAD_GATEWAY);
         } catch (Exception e) {
             LOG.log(SEVERE, "unknown error while getting from upstream", e);
-            throw new InternalServerErrorException("unknown error while getting an access token", e);
+            throw new InternalServerErrorException("unknown error while getting from upstream");
         }
 
         StreamingOutput streamingOutput = output -> {
@@ -131,7 +131,7 @@ public class WadoUriResource {
             }
         };
 
-        return Response.ok(streamingOutput)
+        return Response.status(upstreamResponse.getStatus()).entity(streamingOutput)
                 .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
                 .build();
     }

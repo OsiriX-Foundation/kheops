@@ -80,9 +80,13 @@ public final class WadoRsResource {
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);
             throw new WebApplicationException(UNAUTHORIZED);
+        } catch (Exception e) {
+            LOG.log(SEVERE, "unknown error while getting an access token", e);
+            throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
-        Pattern p = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)");
+
+    Pattern p = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)");
         Matcher m = p.matcher(uriInfo.getPath());
 
         final String resource;

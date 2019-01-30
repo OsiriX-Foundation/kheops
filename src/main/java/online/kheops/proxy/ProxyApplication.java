@@ -57,7 +57,6 @@ public class ProxyApplication extends Application {
     public Map<String, Object> getProperties() {
         Map<String, Object> props = new HashMap<>();
         props.put(ServerProperties.PROVIDER_CLASSNAMES, "org.glassfish.jersey.media.multipart.MultiPartFeature");
-//        props.put(ServerProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, 0);
 
         return props;
     }
