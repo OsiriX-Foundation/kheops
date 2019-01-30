@@ -165,7 +165,7 @@ public final class Resource {
 
         FetchRequester.newFetchRequester(authorizationURI, authorizationToken).fetchStudies(proxy.getSentStudies());
 
-        if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
+        if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
             LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
             throw new WebApplicationException(BAD_GATEWAY);
         }

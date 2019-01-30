@@ -75,7 +75,7 @@ public final class AuthorizationManager {
 
     public Response getResponse(final Attributes attributes, final int status) {
         if (attributes == null) {
-            return Response.status(Response.Status.CONFLICT).build();
+            return Response.status(Response.Status.BAD_GATEWAY).build();
         }
 
         Sequence failedSOPs = attributes.getSequence(Tag.FailedSOPSequence);
