@@ -3,9 +3,11 @@ package online.kheops.proxy.ohif;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.Comparator;
 import java.util.Objects;
 
+@XmlTransient
 final class UIDKey implements Comparable<UIDKey> {
 
     private final String uid;
@@ -25,7 +27,7 @@ final class UIDKey implements Comparable<UIDKey> {
     }
 
     static UIDKey fromStudy(final Attributes attributes) {
-        return new UIDKey(Objects.requireNonNull(attributes.getString(Tag.StudyInstanceUID)), attributes.getInt(Tag.AccessionNumber, 0));
+        return new UIDKey(Objects.requireNonNull(attributes.getString(Tag.StudyInstanceUID)), 0);
     }
 
     static Comparator<UIDKey> getFirstUIDComparator(final String firstUID) {
