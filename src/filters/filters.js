@@ -9,15 +9,15 @@ Vue.filter('formatDate', value => {
 
 Vue.filter('formatTime', value => {
   if (value) {
-	  return value;
+    return value
     // return moment(String(value)).format('hh:ii')
   }
 })
 
 Vue.filter('nl2br', value => {
-	return value.replace("\n","<br>");
+  return value.replace('\n', '<br>')
 })
 
 Vue.filter('formatModality', value => {
-  return value.split(",").join("/")
+  return value.split(',').join('/')
 })
