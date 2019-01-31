@@ -16,7 +16,7 @@ class SeriesDTO {
     private final URI rootURI;
 
     @XmlTransient
-    private final SortedMap<Integer, InstanceDTO> instanceMap;
+    private final SortedMap<UIDKey, InstanceDTO> instanceMap;
 
     @XmlElement(name = "instances")
     Collection<InstanceDTO> getInstances() {
@@ -44,6 +44,6 @@ class SeriesDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        instanceMap.computeIfAbsent(attributes.getInt(Tag.InstanceNumber, 0), instanceNumber -> InstanceDTO.from(rootURI, attributes));
+        instanceMap.computeIfAbsent(UIDKey.fromInstance(attributes), instanceNumber -> InstanceDTO.from(rootURI, attributes));
     }
 }

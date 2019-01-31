@@ -16,29 +16,33 @@ class MetadataDTO {
     private final URI rootURI;
 
     @XmlTransient
-    private final SortedMap<String, StudyDTO> studyMap;
+    private final String firstSeriesInstanceUID;
+
+    @XmlTransient
+    private final SortedMap<UIDKey, StudyDTO> studyMap;
 
     @XmlElement(name = "studies")
     public Collection<StudyDTO> getStudies() {
         return studyMap.values();
     }
 
-    public static MetadataDTO from(final URI rootURI, final List<Attributes> attributesList) {
-        return new MetadataDTO(rootURI, attributesList);
+    public static MetadataDTO from(final URI rootURI, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
+        return new MetadataDTO(rootURI, firstSeriesInstanceUID, attributesList);
     }
 
     private MetadataDTO() {
         throw new UnsupportedOperationException();
     }
 
-    private MetadataDTO(final URI rootURI, final List<Attributes> attributesList) {
+    private MetadataDTO(final URI rootURI, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
         studyMap = new TreeMap<>();
         this.rootURI = rootURI;
+        this.firstSeriesInstanceUID = firstSeriesInstanceUID;
         attributesList.forEach(this::addInstance);
     }
 
     private void addInstance(final Attributes attributes) {
-        studyMap.computeIfAbsent(attributes.getString(Tag.StudyInstanceUID), studyUID -> new StudyDTO(rootURI, attributes))
+        studyMap.computeIfAbsent(UIDKey.fromStudy(attributes), studyUID -> new StudyDTO(rootURI, firstSeriesInstanceUID, attributes))
                 .addInstance(attributes);
     }
 }

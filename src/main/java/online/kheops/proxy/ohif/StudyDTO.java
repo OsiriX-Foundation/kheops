@@ -7,9 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
-import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 @XmlRootElement
@@ -18,7 +16,7 @@ class StudyDTO {
     private final URI rootURI;
 
     @XmlTransient
-    private final SortedMap<String, SeriesDTO> seriesMap;
+    private final SortedMap<UIDKey, SeriesDTO> seriesMap;
 
     @XmlElement(name = "seriesList")
     Collection<SeriesDTO> getSeries() {
@@ -35,9 +33,15 @@ class StudyDTO {
         throw new UnsupportedOperationException();
     }
 
-    StudyDTO(final URI rootURI, final Attributes attributes) {
-        this.rootURI = rootURI;
-        seriesMap = new TreeMap<>();
+    StudyDTO(final URI rootURI, final String firstSeriesInstanceUID, final Attributes attributes) {
+        this.rootURI = Objects.requireNonNull(rootURI);
+        Objects.requireNonNull(attributes);
+
+        if (firstSeriesInstanceUID == null) {
+            seriesMap = new TreeMap<>();
+        } else {
+            seriesMap = new TreeMap<>(UIDKey.getFirstUIDComparator(firstSeriesInstanceUID));
+        }
 
         studyInstanceUID = attributes.getString(Tag.StudyInstanceUID);
         patientName = attributes.getString(Tag.PatientName);
@@ -46,7 +50,7 @@ class StudyDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        seriesMap.computeIfAbsent(attributes.getString(Tag.SeriesInstanceUID), seriesUID -> new SeriesDTO(rootURI, attributes))
+        seriesMap.computeIfAbsent(UIDKey.fromSeries(attributes), seriesUID -> new SeriesDTO(rootURI, attributes))
                 .addInstance(attributes);
     }
 

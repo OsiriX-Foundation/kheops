@@ -40,28 +40,31 @@ public class OHIFMetadataResource {
     @Produces(APPLICATION_JSON)
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata")
     public MetadataDTO wado(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-                         @PathParam("studyInstanceUID") String studyInstanceUID) {
-        return ohifMetadata(studyInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+                            @PathParam("studyInstanceUID") String studyInstanceUID,
+                            @QueryParam("firstseries") String firstSeriesInstanceUID) {
+        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
 
     @GET
     @Produces(APPLICATION_JSON)
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata")
     public MetadataDTO wadoWithCapability(@PathParam("capability") String capabilityToken,
-                                       @PathParam("studyInstanceUID") String studyInstanceUID) {
-        return ohifMetadata(studyInstanceUID, AuthorizationToken.from(capabilityToken));
+                                          @PathParam("studyInstanceUID") String studyInstanceUID,
+                                          @QueryParam("firstseries") String firstSeriesInstanceUID) {
+        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.from(capabilityToken));
     }
 
-    private MetadataDTO ohifMetadata(String studyInstanceUID, AuthorizationToken authorizationToken) {
+    private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
         final URI metadataServiceURI = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
 
         try {
-            return MetadataDTO.from(rootURI, CLIENT.target(metadataServiceURI)
-                    .request(APPLICATION_DICOM_JSON)
-                    .header(AUTHORIZATION, "Bearer " + authorizationToken)
-                    .get(new GenericType<List<Attributes>>() {}));
+            return MetadataDTO.from(rootURI, firstSeriesInstanceUID,
+                    CLIENT.target(metadataServiceURI)
+                            .request(APPLICATION_DICOM_JSON)
+                            .header(AUTHORIZATION, "Bearer " + authorizationToken)
+                            .get(new GenericType<List<Attributes>>() {}));
         } catch (ResponseProcessingException | WebApplicationException e) {
             final int status;
             if (e instanceof ResponseProcessingException) {
@@ -93,5 +96,4 @@ public class OHIFMetadataResource {
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }
-
 }
