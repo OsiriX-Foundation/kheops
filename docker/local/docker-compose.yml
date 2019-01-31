@@ -4,5 +4,5 @@ services:
     container_name: kheops-ui
     image: kheops/ui:latest
     ports:
-      - "8888:8080"
+      - "80:8080"
     restart: on-failure
