@@ -28,9 +28,11 @@ final class UIDKey implements Comparable<UIDKey> {
         return new UIDKey(Objects.requireNonNull(attributes.getString(Tag.StudyInstanceUID)), attributes.getInt(Tag.AccessionNumber, 0));
     }
 
-    static Comparator<UIDKey> getFirstUIDComparator(String firstUID) {
+    static Comparator<UIDKey> getFirstUIDComparator(final String firstUID) {
         return (uidKey1, uidKey2) -> {
-            if (uidKey1.uid.equals(firstUID)) {
+            if (uidKey1.uid.equals(firstUID) && uidKey2.uid.equals(firstUID)) {
+                return uidKey1.compareTo(uidKey2);
+            } else if (uidKey1.uid.equals(firstUID)) {
                 return -1;
             } else if (uidKey2.uid.equals(firstUID)) {
                 return 1;
@@ -55,7 +57,7 @@ final class UIDKey implements Comparable<UIDKey> {
     }
 
     @Override
-    public int compareTo(UIDKey uidKey) {
+    public int compareTo(final UIDKey uidKey) {
         final int comparison = Integer.compare(number, uidKey.number);
         if (comparison != 0) {
             return comparison;
