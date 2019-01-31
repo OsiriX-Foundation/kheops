@@ -51,10 +51,17 @@
 
 <template>
 	<div class = 'container-fluid'>
+		
+		<!--
+			button Study selected
+		-->
 		<div class="my-3 selection-button-container">
 			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
 				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'><span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>{{ $t("send") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'>
+					<span><v-icon class="align-middle" name="paper-plane" color="white"></v-icon></span><br>
+					{{ $t("send") }}
+				</button>
 				<!-- <button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}</button> -->
 			    <b-dropdown variant="link" size="sm" no-caret>
 			       <template slot="button-content">
@@ -63,9 +70,18 @@
 			       <b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in albums' v-bind:key="album.id">{{album.name}}</b-dropdown-item>
 			     </b-dropdown>
 				
-				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()"><span><v-icon class="align-middle" name="download"></v-icon></span><br>{{ $t("download") }}</button>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'><span><v-icon class="align-middle" name="star"></v-icon></span><br>{{ $t("addfavorite") }}</button>
-				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()"><span><v-icon class="align-middle" name="trash"></v-icon></span><br>{{ $t("delete") }}</button>
+				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()">
+					<span><v-icon class="align-middle" name="download"></v-icon></span><br>
+					{{ $t("download") }}
+				</button>
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'>
+					<span><v-icon class="align-middle" name="star"></v-icon></span><br>
+					{{ $t("addfavorite") }}
+				</button>
+				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()">
+					<span><v-icon class="align-middle" name="trash"></v-icon></span><br>
+					{{ $t("delete") }}
+				</button>
 			</span>
 
 			<span style = 'margin-left: 30px;' v-if='!filters.album_id'>
@@ -158,16 +174,17 @@
 			<template slot="row-details" slot-scope="row">
 				<b-card>				
 					<div class = 'row'>
-						<div class = 'col-sm-2 mb-3' >
+						<div class = 'col-xl-auto mb-4' >
 							<nav class="nav nav-pills nav-justified flex-column">
-							  	<a class="nav-link" :class="(row.item.view=='series')?'active':''" @click="row.item.view='series'">{{$t('series')}}</a>
-							  	<a class="nav-link" :class="(row.item.view=='comments')?'active':''" @click="loadStudiesComments(row.item)">{{$t('comments')}}</a>
-								<a class="nav-link" :class="(row.item.view=='study')?'active':''" @click="loadStudiesMetadata(row.item)">{{$t('study')}}</a>
+							  		<a class="nav-link" :class="(row.item.view=='series')?'active':''" @click="row.item.view='series'">{{$t('series')}}</a>						
+									<a class="nav-link" :class="(row.item.view=='comments')?'active':''" @click="loadStudiesComments(row.item)">{{$t('comments')}}</a>				
+									<a class="nav-link" :class="(row.item.view=='study')?'active':''" @click="loadStudiesMetadata(row.item)">{{$t('study')}}</a>		
 							</nav>
 						</div>
-						<div class = 'col-sm-10' v-if='row.item.view=="series"'>
+						<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-10' v-if='row.item.view=="series"'>
 							<div class = 'row'>
-								<div class = 'col-sm-12 col-md-6 mb-5'  v-for='serie in row.item.series' v-bind:key="serie.id">
+								
+								<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5'  v-for='serie in row.item.series' v-bind:key="serie.id">
 									<series-summary
 									      :SeriesInstanceUID="serie.SeriesInstanceUID[0]"
 										  :selected="serie.is_selected"
@@ -183,7 +200,7 @@
 							<comments-and-notifications scope='studies' :id='row.item.StudyInstanceUID[0]'></comments-and-notifications>
 						</div>
 
-						<div v-if='row.item.view=="study"'  class = 'col-sm-10'>
+						<div v-if='row.item.view=="study"'  class = 'col-sm-12 col-md-12 col-lg-12 col-xl-10'>
 							<study-metadata scope='studies' :id='row.item.StudyInstanceUID[0]'></study-metadata>
 						</div>
 					</div>
@@ -194,15 +211,22 @@
 			-->
 		 	<template slot = 'PatientName' slot-scope='row'>
 				<div class = 'patientNameContainer'>
-					{{row.item.PatientName}}
-					<div class = 'patientNameIcons'>
-						<span @click = "toggleFavorite(row.index,'study')" :class="row.item.is_favorite?'selected':''"><v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-						<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
-						</span>
-							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''"><v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon><v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+					<div class="row">
+						<div class="patientName col-md-auto">
+							{{row.item.PatientName}}
+						</div>
+						<div class = 'patientNameIcons col-md-auto'>
+							<span @click = "toggleFavorite(row.index,'study')" :class="row.item.is_favorite?'selected':''">
+								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
+								<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
 							</span>
-						<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+row.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
-						<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''">
+								<v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon>
+								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+							</span>
+							<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+row.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
+							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+						</div>
 					</div>
 				</div>
 			</template>
@@ -238,11 +262,13 @@ export default {
 					label: '',
 					sortable: false,
 					class: 'td_checkbox',
+					thClass: "d-none d-sm-table-cell",
 					margin: 'auto'
 				},
 				{
 					key: "PatientName",
 					label: "PatientName",
+					thClass: "d-none d-sm-table-cell",
 					tdClass: 'patientName',
 					sortable: true
 				},
@@ -263,10 +289,14 @@ export default {
 				{
 					key: 'StudyDate',
 					label: "StudyDate",
+					thClass: "d-none d-sm-table-cell",
+					tdClass: "d-none d-sm-table-cell",
 					sortable: true
 				},
 				{
 					key: 'ModalitiesInStudy',
+					thClass: "d-none d-sm-table-cell",
+					tdClass: "d-none d-sm-table-cell",
 					label: 'Modality',
 					sortable: true
 				}
@@ -560,13 +590,18 @@ export default {
 		display: inline;
 		cursor: pointer;
 	}
-
+	@media (max-width:1024px) {
+		.patientNameIcons {
+			visibility: visible;
+			display: inline-block;
+		}
+	}
 	.patientName:hover .patientNameIcons {
 		visibility:visible; 
 	}
 
 	.patientNameIcons > span.selected{
-		visibility:visibility !important;  	
+		visibility:visible !important;  	
 	}
 	
 	.patientNameIcons span{

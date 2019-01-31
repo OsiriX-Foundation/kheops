@@ -1,5 +1,4 @@
 <i18n>
-
 {
 	"en": {
         "patientname": "Patient name",
@@ -28,15 +27,14 @@
         "studyinfo": "Information de l'étude"
 	}
 }
-
 </i18n>
 
 
 <template>
     <div class="studyMetadataContainer">
         <div class="row">
-            
-            <div class="col-sm-12 col-md-6 mb-3">
+            <div class="col-xl-1"></div>
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
             <h5>{{ $t('patientinfo') }}</h5>
             <table class="table table-striped">
                 <tbody>
@@ -60,7 +58,7 @@
             </table>
             </div>
 
-            <div class="col-sm-12 col-md-6 mb-3">
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
             <h5>{{ $t('studyinfo') }}</h5>
             <table class="table table-striped">
                 <tbody>

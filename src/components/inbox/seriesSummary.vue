@@ -26,17 +26,28 @@
 
 <template>
 	<div class = 'seriesSummaryContainer'>
-		<div class = 'card-title'>
-			<b-form-checkbox v-model = "isSelected" v-if='series.SeriesDescription'>{{series.SeriesDescription[0]}}</b-form-checkbox>
-			<b-form-checkbox v-model = "isSelected" v-else>No description</b-form-checkbox>
+
+		<div class = 'card-title' style="width: 55%; margin: 0 auto;">
+			<b-form-checkbox v-model="isSelected" v-if='series.SeriesDescription'>
+				{{series.SeriesDescription[0]}}
+			</b-form-checkbox>
+
+			<b-form-checkbox v-model="isSelected" v-else>
+				No description
+			</b-form-checkbox>
 		</div>
-		<div class = 'row'>
+
+		<div class = 'row justify-content-center'>
 			<div class = 'preview'>
-				<img :src='previewImg()' width= '250' height = '250'>
+				<img class="cursor-img" @click="openViewer" :src='previewImg()' width= '250' height = '250' v-if='series.Modality != "SR"'>
+				<img :src='previewImg()' width= '250' height = '250' v-else>
 			</div>
-			<div class = 'col description'>
-				
-				<table class="table table-striped col-md-8">
+			<!--
+				div - col col-mb-2 col-md-auto description
+				table - table table-striped col-md-auto
+			-->
+			<div class = 'col col-mb-2 col-sm-10 col-md-8 col-lg-6 description'>
+				<table class="table table-striped">
 					<tbody>
 						<tr v-if="series.Modality">
 							<th>{{ $t('modality') }}</th>
@@ -65,9 +76,10 @@
 					</tbody>
 				</table>
 
-				<dl class = 'row' v-if='series.Modality'>
-					<dt class = 'col-md-4 col-sm-12 text-right'></dt>
-					<dd class = 'col-md-8 col-sm-12'><button type = 'button' class = 'btn-primary btn-sm' @click='openViewer'>{{$t('openviewer')}}</button></dd>
+				<dl class = 'row justify-content-center' v-if='series.Modality != "SR"'>
+					<dd>
+						<button type = 'button' class = 'btn-primary btn-sm' @click='openViewer'>{{$t('openviewer')}}</button>
+					</dd>
 				</dl>
 			</div>			
 		</div>
@@ -80,8 +92,7 @@ export default{
 	name: "seriesSummary",
 	props: ['SeriesInstanceUID','StudyInstanceUID','selected'],
 	data () {
-		return {
-		}
+		return {}
 	},
     computed: {
   	  ...mapGetters({
@@ -112,11 +123,15 @@ export default{
 			   }
 		   }
 	         
-	   }
+	   	}
    	},
 	methods: {
+		toggleChecked () {
+			this.isSelected = !this.isSelected
+		},
+
 		previewImg () {
-			let imgSrcData = '';
+			if (this.series.Modality == 'SR') this.series.imgSrc = 'static/img/SR_2.png';
 			if (this.series.imgSrc !== undefined) return this.series.imgSrc;
 			else {
 				this.$store.dispatch('getImage',{SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID}).then(img => {
@@ -125,7 +140,7 @@ export default{
 			}			
 		},
 		openViewer () {
-			window.open('https://ohif.kheops.online/?url=https://test.kheops.online/studies/'+this.StudyInstanceUID+'/ohifmetadata#token='+this.user.jwt,'OHIFViewer')
+			window.open(`https://ohif.kheops.online/?url=https://test.kheops.online/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}#token=${this.user.jwt}`,'OHIFViewer')
 		}
 	}
 }
@@ -139,11 +154,14 @@ div.preview{
 	float: left;
 }
 div.seriesSummaryContainer{
-	font-size: 80%;
+	font-size: 90%;
 	line-height: 1.5em;
 }
 label{
 	font-size: 130%;
+}
+.cursor-img{
+	cursor: pointer;
 }
 
 </style>
