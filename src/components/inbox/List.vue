@@ -59,7 +59,7 @@
 			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
 				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
 				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'>
-					<span><v-icon class="align-middle" name="paper-plane" color="white"></v-icon></span><br>
+					<span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br>
 					{{ $t("send") }}
 				</button>
 				<!-- <button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br>{{ $t("addalbum") }}</button> -->
@@ -349,8 +349,7 @@ export default {
 	methods: {
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
-
+				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++;
 					this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
