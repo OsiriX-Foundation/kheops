@@ -20,7 +20,7 @@ public class StreamingBodyPart {
     public StreamingBodyPart(final Object entity, final MediaType mediaType, final MultivaluedMap<String, String> headers) {
         this.entity = entity;
         this.mediaType = mediaType;
-        this.headers = headers;
+        this.headers.putAll(headers);
     }
 
     public Object getEntity() {
