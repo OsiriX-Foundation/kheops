@@ -1,7 +1,6 @@
 package online.kheops.proxy.ohif;
 
 import org.dcm4che3.data.Attributes;
-import org.dcm4che3.data.Tag;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
