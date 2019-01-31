@@ -16,26 +16,21 @@ import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
-public class MultipartOutputStream extends FilterOutputStream {
+public class MultipartOutputStream {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
+    private final OutputStream outputStream;
     private final Providers providers;
     private final MediaType mediaType;
     private final Writer writer;
 
     private boolean firstPartWritten = false;
 
-    MultipartOutputStream(final OutputStream out, final MediaType mediaType, final Providers providers) {
-        super(out);
+    MultipartOutputStream(final OutputStream outputStream, final MediaType mediaType, final Providers providers) {
+        this.outputStream = outputStream;
         this.mediaType = mediaType;
         this.providers = providers;
-        writer = new BufferedWriter(new OutputStreamWriter(out, MessageUtils.getCharset(mediaType)));
-
-    }
-
-    @Override
-    public void write(final byte[] b, final int off, final int len) throws IOException {
-        out.write(b, off, len);
+        writer = new BufferedWriter(new OutputStreamWriter(outputStream, MessageUtils.getCharset(mediaType)));
     }
 
     public void writePart(final StreamingBodyPart bodyPart) throws IOException {
@@ -87,9 +82,9 @@ public class MultipartOutputStream extends FilterOutputStream {
                 EMPTY_ANNOTATIONS,
                 bodyMediaType,
                 bodyHeaders,
-                this
+                outputStream
         );
-        flush();
+        outputStream.flush();
     }
 
     private String getBoundary() {
