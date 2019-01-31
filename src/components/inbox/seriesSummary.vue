@@ -26,17 +26,17 @@
 
 <template>
 	<div class = 'seriesSummaryContainer'>
+		<div class='row justify-content-center'>
+			<div class='mb-2'>
+				<b-form-checkbox v-model="isSelected" v-if='series.SeriesDescription'>
+					{{series.SeriesDescription[0]}}
+				</b-form-checkbox>
 
-		<div class = 'card-title' style="width: 55%; margin: 0 auto;">
-			<b-form-checkbox v-model="isSelected" v-if='series.SeriesDescription'>
-				{{series.SeriesDescription[0]}}
-			</b-form-checkbox>
-
-			<b-form-checkbox v-model="isSelected" v-else>
-				No description
-			</b-form-checkbox>
+				<b-form-checkbox v-model="isSelected" v-else>
+					No description
+				</b-form-checkbox>
+			</div>
 		</div>
-
 		<div class = 'row justify-content-center'>
 			<div class = 'preview'>
 				<img class="cursor-img" @click="openViewer" :src='previewImg()' width= '250' height = '250' v-if='series.Modality != "SR"'>
