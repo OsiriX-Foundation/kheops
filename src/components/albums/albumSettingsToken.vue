@@ -30,17 +30,16 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
-	},
+		})	
+  	},
 	created () {
 	},
 	watch: {
 	}
 }
-
 </script>
+
 
 <style>
 
 </style>
-

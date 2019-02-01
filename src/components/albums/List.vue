@@ -2,26 +2,28 @@
 
 <i18n>
 {
-	"en": {
-		"newalbum": "New album",
-		"Study #": "study #",
-		"Modalities": "modalities",
-		"User #": "user #",
-		"Message #": "message #",
-		"Date": "date",
-		"LastEvent": "last event"
-	},
-	"fr": {
-		"newalbum": "Nouvel album",
-		"Study #": "# Etudes",
-		"Modalities": "modalités",
-		"User #": "# utilisateurs",
-		"Message #": "# messages",
-		"Date": "date",
-		"LastEvent": "dern. evnt"
-	}
+  "en": {
+	  "newalbum": "New album",
+	  "Study #": "study #",
+	  "Modalities": "modalities",
+	  "User #": "user #",
+	  "Message #": "message #",
+	  "Date": "date",
+	  "LastEvent": "last event"	  
+  },
+  "fr": {	
+	  "newalbum": "Nouvel album",
+	  "Study #": "# Etudes",
+	  "Modalities": "modalités",
+	  "User #": "# utilisateurs",
+	  "Message #": "# messages",
+	  "Date": "date",
+	  "LastEvent": "dern. evnt"
+  }
 }
 </i18n>
+
+
 
 <template>
 	<div class = 'container-fluid'>
@@ -32,74 +34,74 @@
 			</h3>
 		</div>
 		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true"  @row-clicked='selectAlbum'>
-
-			<template slot="HEAD_is_selected">
+	
+			<template slot="HEAD_is_selected" scope="head">
 				<b-button variant="link" size="sm"  class="mr-2" >
 					<v-icon  class="align-middle"   name="chevron-down" style = 'visibility: hidden'></v-icon>
 				</b-button>
-				<b-form-checkbox @click.native.stop @change="selectAll(albums.allSelected)" v-model="albums.allSelected" name="allSelected">
-				</b-form-checkbox>
+  				<b-form-checkbox @click.native.stop @change="selectAll(albums.allSelected)" v-model="albums.allSelected" name="allSelected">
+  				</b-form-checkbox>
 			</template>
 			<template slot="HEAD_name" slot-scope="data">
-				<div v-if='showFilters' @click.stop='' ><input type = 'search' class = 'form-control form-control-sm' v-model='filters.name' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-
+					<div v-if='showFilters' @click.stop='' ><input type = 'search' class = 'form-control form-control-sm' v-model='filters.name' :placeholder="$t('filter')"> <br></div>
+					{{$t(data.label)}}
+					
 			</template>
-			<template slot="HEAD_number_of_studies" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbStudies' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-			</template>
-			<template slot="HEAD_modalities" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' :placeholder="$t('filter')"> <br/></div>
+		 	<template slot="HEAD_number_of_studies" slot-scope="data">
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbStudies' :placeholder="$t('filter')"> <br></div>
 				{{$t(data.label)}}
 			</template>
-			<template slot="HEAD_number_of_users" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbUsers' :placeholder="$t('filter')"> <br/></div>
+		 	<template slot="HEAD_modalities" slot-scope="data">
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' :placeholder="$t('filter')"> <br></div>
 				{{$t(data.label)}}
 			</template>
-			<template slot="HEAD_number_of_comments" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbMessages' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
+		 	<template slot="HEAD_number_of_users" slot-scope="data">
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbUsers' :placeholder="$t('filter')"> <br></div>
+				{{$t(data.label)}}				
 			</template>
-			<template slot="HEAD_created_time" slot-scope="data">
+		 	<template slot="HEAD_number_of_comments" slot-scope="data">
+				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbMessages' :placeholder="$t('filter')"> <br></div>
+				{{$t(data.label)}}				
+			</template>
+		 	<template slot="HEAD_created_time" slot-scope="data">
 				<div v-if='showFilters' @click.stop='' class = 'form-row'>
-
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.CreateDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromCreateDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+					
+						<div class = 'col form-inline'>
+							<div class = 'form-group'>
+								<datepicker v-model="filters.CreateDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromCreateDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+							</div>
 						</div>
-					</div>
-
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.CreateDateTo" :bootstrap-styling='false' :disabledDates="disabledToCreateDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
+						 
+						<div class = 'col form-inline'>
+							<div class = 'form-group'>
+								<datepicker v-model="filters.CreateDateTo" :bootstrap-styling='false' :disabledDates="disabledToCreateDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+							</div>
+						</div>					
 					<!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
 				</div>
-				<br v-if='showFilters' />
+				<br v-if='showFilters' >
 				{{$t(data.label)}}
-
+				
 			</template>
-			<template slot="HEAD_last_event_time" slot-scope="data">
+		 	<template slot="HEAD_last_event_time" slot-scope="data">
 				<div v-if='showFilters' @click.stop='' class = 'form-row'>
-
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.EventDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromEventDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+					
+						<div class = 'col form-inline'>
+							<div class = 'form-group'>
+								<datepicker v-model="filters.EventDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromEventDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+							</div>
 						</div>
-					</div>
-
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.EventDateTo" :bootstrap-styling='false' :disabledDates="disabledToEventDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
+						 
+						<div class = 'col form-inline'>
+							<div class = 'form-group'>
+								<datepicker v-model="filters.EventDateTo" :bootstrap-styling='false' :disabledDates="disabledToEventDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
+							</div>
+						</div>					
 					<!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
 				</div>
-				<br v-if='showFilters' />
+				<br v-if='showFilters' >
 				{{$t(data.label)}}
-
+				
 			</template>
 			<template slot="is_selected" slot-scope="row">
 				<b-form-group>
@@ -109,10 +111,10 @@
 					</b-button>
 					<b-form-checkbox v-model = "row.item.is_selected" @click.native.stop @change="toggleSelected(row.item,'album',!row.item.is_selected)" >
 					</b-form-checkbox>
-
+					
 				</b-form-group>
 			</template>
-			<template slot = 'name' slot-scope='data'>
+		 	<template slot = 'name' slot-scope='data'>
 				<div class = 'nameContainer'>
 					{{data.item.name}}
 					<div class = 'nameIcons'>
@@ -124,25 +126,28 @@
 				</div>
 			</template>
 
-			<template slot = 'created_time' slot-scope='data'>{{data.item.created_time | formatDate}}</template>
-			<template slot = 'last_event_time' slot-scope='data'>{{data.item.last_event_time | formatDate}}</template>
-
+	 	 	<template slot = 'created_time' slot-scope='data'>{{data.item.created_time | formatDate}}</template>
+	 	 	<template slot = 'last_event_time' slot-scope='data'>{{data.item.last_event_time | formatDate}}</template>
+			
 			<template slot="row-details" slot-scope="row">
 				<b-card>
 					<dl><dt>Description</dt><dd>{{row.item.description}}</dd></dl>
 				</b-card>
 			</template>
-
+		
+			
+			
 		</b-table>
 	</div>
 </template>
 <script>
 
+import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
-import Datepicker from 'vuejs-datepicker'
+import Datepicker from 'vuejs-datepicker';
 
 export default {
-	name: 'albums',
+  name: 'albums',
 	data () {
 		return {
 			pageNb: 1,
@@ -155,14 +160,14 @@ export default {
 					class: 'td_checkbox'
 				},
 				{
-					key: 'name',
-					label: 'name',
+					key: "name",
+					label: "name",
 					tdClass: 'name',
 					sortable: true
 				},
 				{
-					key: 'number_of_studies',
-					label: 'Study #',
+					key: "number_of_studies",
+					label: "Study #",
 					sortable: true
 				},
 				{
@@ -171,13 +176,13 @@ export default {
 					sortable: true
 				},
 				{
-					key: 'number_of_users',
-					label: 'User #',
+					key: "number_of_users",
+					label: "User #",
 					sortable: true
 				},
 				{
 					key: 'number_of_comments',
-					label: 'Messages #',
+					label: "Messages #",
 					sortable: true
 				},
 				{
@@ -194,7 +199,7 @@ export default {
 			sortBy: 'created_time',
 			sortDesc: true,
 			limit: 8,
-			optionsNbPages: [5, 10, 25, 50, 100],
+			optionsNbPages: [5,10,25,50,100],
 			showFilters: false,
 			filterTimeout: null,
 			filters: {
@@ -208,141 +213,149 @@ export default {
 				EventDateFrom: '',
 				EventDateTo: ''
 			}
-
+			
 		}
 	},
-	components: { Datepicker },
-	computed: {
-		...mapGetters({
-			albums: 'albums'
-		}),
+	components: {Datepicker},
+  computed: {
+	  ...mapGetters({
+	  	  albums: 'albums'
+	    }),
 		totalRows () {
-			return this.albums.length
+			return this.albums.length;
 		},
 		selectedAlbumsNb () {
-			return _.filter(this.albums, s => { return s.is_selected === true }).length
+			return _.filter(this.albums,s => {return s.is_selected === true;}).length;
 		},
-		disabledToCreateDates: function () {
-			let vm = this
-			return {
-				to: vm.filters.CreateDateFrom,
-				from: new Date()
-			}
-		},
-		disabledFromCreateDates: function () {
-			return {
-				from: new Date()
-			}
-		},
-		disabledToEventDates: function () {
-			let vm = this
-			return {
-				to: vm.filters.EventDateFrom,
-				from: new Date()
-			}
-		},
-		disabledFromEventDates: function () {
-			return {
-				from: new Date()
-			}
-		}
+  	  	disabledToCreateDates: function(){
+  	  		  let vm = this;
+  	  		  return {
+  	  			  to: vm.filters.CreateDateFrom,
+  	  			  from: new Date()
+  	  		  }
+  	  	},
+  	  	disabledFromCreateDates: function(){
+  	  		  let vm = this;
+  	  		  return {
+  	  			  from: new Date()
+  	  		  }
+  	  	},
+  	  	disabledToEventDates: function(){
+  	  		  let vm = this;
+  	  		  return {
+  	  			  to: vm.filters.EventDateFrom,
+  	  			  from: new Date()
+  	  		  }
+  	  	},
+  	  	disabledFromEventDates: function(){
+  	  		  let vm = this;
+  	  		  return {
+  	  			  from: new Date()
+  	  		  }
+  	  	}
+		
+  },
+  methods: {
+	  scroll () {
+	    window.onscroll = () => {
+	      let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
+	      if (bottomOfWindow) {
+			  this.pageNb++;
+			  this.$store.dispatch('getAlbums',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+	      }
+	    };
+	  },
+	  sortingChanged (ctx) {
+	      // ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
+	      // ctx.sortDesc ==> true if sorting descending, false otherwise
+
+		  this.pageNb = ctx.currentPage;
+		  this.sortBy = ctx.sortBy;
+		  this.sortDesc = ctx.sortDesc;
+		  this.limit = this.albums.length;
+		  this.$store.dispatch('getAlbums',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+
+	    },
+	  toggleSelected(item,type,is_selected) {
+		  let index = _.findIndex(this.albums,s => {return s.album_id == item.album_id})
+		  var vm = this;
+		  this.$store.dispatch('toggleSelectedAlbum',{type: type, index: index,is_selected: is_selected}).then(res => {
+		  })
+	  },
+
+	  toggleFavorite(index,type){
+		  var vm = this;
+		  this.$store.dispatch('toggleFavoriteAlbum',{type: type, index: index}).then(res => {
+			  if (res) vm.$snotify.success(type+ 'is now in favorites');
+			  else vm.$snotify.error('Sorry, an error occured');		  	
+		  })
+
+	  },
+	  handleComments(index,entity){
+		  this.albums[index][entity]= !this.albums[index][entity];
+
+	  },
+	  selectAll(is_selected){
+		this.$store.commit("SELECT_ALL_ALBUMS",!is_selected);
+		this.albums.allSelected = ! this.albums.allSelected;
+	  },
+	  deleteSelectedAlbums(){
+		 var vm = this;
+		 var i;
+		 for (i = this.albums.length-1; i > -1; i--) {
+			 if(this.albums[i].is_selected){
+ 			 	vm.$store.dispatch('deleteAlbum',{album_id:this.albums[i].album_id})
+ 				vm.$delete(vm.albums, i);
+ 			 }
+		 }
+
+	  },
+	  downloadSelectedAlbums(){
+		   var vm = this;
+		   _.forEach(this.albums, function(album,index) {
+			   if ( album.is_selected){
+				   vm.$store.dispatch('downloadAlbum',{album_id:album.album_id})
+			   }
+		   });
+
+	  },
+	  searchOnline(filters){
+		  this.$store.dispatch('getAlbums',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+	  },
+	  selectAlbum (item){
+		  if (item.album_id){
+			  this.$router.push("/albums/"+item.album_id);
+		  }
+	  }
+
+  },
+  created () {
+	  this.$store.dispatch('getAlbums',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+  },
+  mounted () {
+	  this.scroll();
+  },
+watch : {
+	filters: {
+		handler: function(filters) {
+			if (this.filterTimeout) {
+			    clearTimeout(this.filterTimeout);
+			}
+			this.filterTimeout = setTimeout( () => this.searchOnline(filters), 300);
+		},
+		deep: true
 	},
-	methods: {
-		scroll () {
-			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
-
-				if (bottomOfWindow) {
-					this.pageNb++
-					this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-				}
-			}
-		},
-		sortingChanged (ctx) {
-			// ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
-			// ctx.sortDesc ==> true if sorting descending, false otherwise
-
-			this.pageNb = ctx.currentPage
-			this.sortBy = ctx.sortBy
-			this.sortDesc = ctx.sortDesc
-			this.limit = this.albums.length
-			this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-		},
-		toggleSelected (item, type, isSelected) {
-			let index = _.findIndex(this.albums, s => { return s.album_id === item.album_id })
-			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then(res => {
-			})
-		},
-
-		toggleFavorite (index, type) {
-			var vm = this
-			this.$store.dispatch('toggleFavoriteAlbum', { type: type, index: index }).then(res => {
-				if (res) vm.$snotify.success(type + 'is now in favorites')
-				else vm.$snotify.error('Sorry, an error occured')
-			})
-		},
-		handleComments (index, entity) {
-			this.albums[index][entity] = !this.albums[index][entity]
-		},
-		selectAll (isSelected) {
-			this.$store.commit('SELECT_ALL_ALBUMS', !isSelected)
-			this.albums.allSelected = !this.albums.allSelected
-		},
-		deleteSelectedAlbums () {
-			var vm = this
-			var i
-			for (i = this.albums.length - 1; i > -1; i--) {
-				if (this.albums[i].is_selected) {
-					vm.$store.dispatch('deleteAlbum', { album_id: this.albums[i].album_id })
-					vm.$delete(vm.albums, i)
-				}
-			}
-		},
-		downloadSelectedAlbums () {
-			var vm = this
-			_.forEach(this.albums, function (album, index) {
-				if (album.is_selected) {
-					vm.$store.dispatch('downloadAlbum', { album_id: album.album_id })
-				}
-			})
-		},
-		searchOnline (filters) {
-			this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-		},
-		selectAlbum (item) {
-			if (item.album_id) {
-				this.$router.push('/albums/' + item.album_id)
-			}
-		}
-
-	},
-	created () {
-		this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-	},
-	mounted () {
-		this.scroll()
-	},
-	watch: {
-		filters: {
-			handler: function (filters) {
-				if (this.filterTimeout) {
-					clearTimeout(this.filterTimeout)
-				}
-				this.filterTimeout = setTimeout(() => this.searchOnline(filters), 300)
-			},
-			deep: true
-		},
-		showFilters: {
-			handler: function (showFilters) {
-				if (!showFilters) {
-					this.filters = {
-					}
+	showFilters: {
+		handler: function(showFilters){
+			if (!showFilters){
+				this.filters = {
 				}
 			}
 		}
 	}
-
+}
+  
 }
 
 </script>
@@ -356,57 +369,60 @@ select{
 	width: auto;
 }
 .btn-link {
-	font-weight: 400;
-	color: white;
-	background-color: transparent;
+  font-weight: 400;
+  color: white;
+  background-color: transparent;
 }
 
 .btn-link:hover {
-	color: #c7d1db;
-	text-decoration: underline;
-	background-color: transparent;
-	border-color: transparent;
+  color: #c7d1db;
+  text-decoration: underline;
+  background-color: transparent;
+  border-color: transparent;
 }
-
-.selection-button-container{
-	height: 60px;
-}
-
-.td_checkbox {
-	width: 150px;
-}
-
-input.search-calendar{
-	width: 100px !important;
-}
-
-div.calendar-wrapper{
-	color: #333;
-}
-
-.nameContainer{
-	position: relative;
-	white-space: nowrap;
+ 
+ .selection-button-container{
+	 height: 60px;
+ }
+ 
+ .td_checkbox {
+	 width: 150px;
+ }
+ 
+ input.search-calendar{
+	 width: 100px !important;
+ }
+ 
+ div.calendar-wrapper{
+	 color: #333;
+ }
+ 
+ .nameContainer{
+ 	position: relative;
+ 	white-space: nowrap;
 	cursor: pointer;
-}
+ }
 
-.nameIcons{
-	margin-left: 10px;
-	visibility: hidden;
-	display: inline;
-	cursor: pointer;
-}
+ .nameIcons{
+ 	margin-left: 10px;
+ 	visibility: hidden;
+ 	display: inline;
+ 	cursor: pointer;
+ }
 
-.name:hover .nameIcons {
-	visibility:visible;
-}
-
-.nameIcons > span.selected{
-	visibility:visible !important;
-}
-
-.nameIcons span{
-	margin: 0 3px;
-}
-
+ .name:hover .nameIcons {
+ 	 visibility:visible; 
+  }
+ 
+  .nameIcons > span.selected{
+ 	 visibility:visible !important;  	
+  }
+ 
+  .nameIcons span{
+ 	 margin: 0 3px;
+  }
+ 
+ 
 </style>
+
+/* eslint-disable */

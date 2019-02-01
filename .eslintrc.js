@@ -8,9 +8,6 @@ module.exports = {
   env: {
     browser: true,
   },
-  globals: {
-    "_": true
-  },
   extends: [
     // https://github.com/vuejs/eslint-plugin-vue#priority-a-essential-error-prevention
     // consider switching to `plugin:vue/strongly-recommended` or `plugin:vue/recommended` for stricter rules.
@@ -27,9 +24,6 @@ module.exports = {
     // allow async-await
     'generator-star-spacing': 'off',
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-multiple-empty-lines': [2,{"max": 2, "maxEOF": 10000, "maxBOF": 10000}],
-    "indent": [2, "tab"],
-    "no-tabs": 0
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   }
 }

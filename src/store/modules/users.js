@@ -1,4 +1,5 @@
-import { HTTP } from '@/router/http'
+import {HTTP} from '@/router/http';
+import Base64 from '@/mixins/base64';
 // initial state
 const state = {
 	all: [],
@@ -11,6 +12,7 @@ const state = {
 		permissions: [],
 		jwt: null
 	}
+
 }
 
 // getters
@@ -22,61 +24,66 @@ const getters = {
 const actions = {
 	login ({ commit }, userData) {
 		return new Promise((resolve, reject) => {
-			var loggedUser = {
-				username: userData.login,
-				jwt: userData.jwt,
-				fullname: userData.fullname,
-				firstname: userData.firstname,
-				lastname: userData.lastname,
-				email: userData.email,
-				permissions: userData.permissions
-			}
-			HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
-			localStorage.setItem('currentUser', JSON.stringify(loggedUser))
-			commit('LOGIN', loggedUser)
-			resolve(userData)
+			
+				var loggedUser = {
+					username: userData.login,
+					jwt: userData.jwt,
+					fullname: userData.fullname,
+					firstname: userData.firstname,
+					lastname: userData.lastname,
+					email: userData.email,
+					permissions: userData.permissions
+				};
+				HTTP.defaults.headers.common['authorization'] = 'Bearer '+userData.jwt;
+				localStorage.setItem('currentUser',JSON.stringify(loggedUser));
+				commit('LOGIN',loggedUser);
+				resolve(userData);
 		})
 	},
 
-	getCredentials ({ commit }) {
-		if (state.current.user_id) {
+	getCredentials({ commit }){
+		if (state.current.user_id){
 			return state.current
-		} else {
-			let user = localStorage.getItem('currentUser')
-			if (user) {
-				user = JSON.parse(user)
-				if (user.jwt) {
-					HTTP.defaults.headers.common['authorization'] = 'Bearer ' + user.jwt
+		}
+		else {
+			let user = localStorage.getItem('currentUser');
+			if (user){
+				user = JSON.parse(user);
+				if (user.jwt){
+					HTTP.defaults.headers.common['authorization'] = 'Bearer '+user.jwt;
 				}
-				commit('LOGIN', user)
-				return true
-			} else {
-				return false
+				commit('LOGIN',user);
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
 	},
-	checkPermissions ({ commit }, params) {
+	checkPermissions({ commit },params){
 		let permissionsToCheck = params.permissions
 		let condition = params.condition
-		if (condition !== 'all') condition = 'any'
-		if (!state.current.permissions) return false
-		if (condition === 'any') return state.current.permissions.some(v => permissionsToCheck.includes(v))
-		else if (condition === 'all') return _.difference(permissionsToCheck, state.current.permissions).length === 0
-		return false
+		if (condition != 'all') condition = 'any';
+		if (!state.current.permissions) return false;
+		if (condition == 'any') return state.current.permissions.some(v => permissionsToCheck.includes(v));
+		else if (condition == 'all') return _.difference(permissionsToCheck, state.current.permissions).length === 0;
+		return false;
 	},
-	logout ({ commit }) {
-		localStorage.removeItem('currentUser')
-		HTTP.defaults.auth = {}
-		commit('LOGOUT')
+	logout ({ commit }){
+		localStorage.removeItem('currentUser');
+		HTTP.defaults.auth = {};
+		commit('LOGOUT');
 	},
-	checkUser ({ commit }, user) {
-		return HTTP.get('users?reference=' + user, { headers: { 'Accept': 'application/json' } }).then(res => {
-			if (res.status === 200) return res.data.sub
-			return false
+	checkUser({commit},user){
+		return HTTP.get('users?reference='+user,{headers: {'Accept': 'application/json'}}).then(res => {
+			if (res.status == 200) return res.data.sub;
+			return false;
 		}).catch(res => {
-			return false
+			return false;
 		})
 	}
+
+
 }
 
 // mutations
@@ -84,10 +91,10 @@ const mutations = {
 	SET_USERS (state, users) {
 		state.all = users
 	},
-	LOGIN (state, user) {
-		state.current = user
+	LOGIN (state, user){
+		state.current = user;
 	},
-	LOGOUT (state) {
+	LOGOUT (state){
 		state.current = {
 			user_id: null,
 			username: null,
@@ -98,6 +105,7 @@ const mutations = {
 			jwt: null,
 			permissions: null
 		}
+
 	}
 }
 

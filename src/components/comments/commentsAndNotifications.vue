@@ -37,80 +37,82 @@
 
 <template>
 	<div class = 'container'>
-		<div class = 'row justify-content-center'>
-			<p class = 'col-sm-12 col-md-10 offset-md-1 text-right' v-if='scope=="album"'><label>{{$t('includenotifications')}} </label> <toggle-button v-model="includeNotifications" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='getComments'/></p>
+		<p class = 'col-sm-12 col-md-10 offset-md-1 text-right' v-if='scope=="album"'><label>{{$t('includenotifications')}} </label> <toggle-button v-model="includeNotifications" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='getComments'/></p>
+		<div class = 'row'>
 
 			<div class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3" style = 'max-height: 600px; overflow-y: scroll;' :id = 'container_id'>
-
-				<div v-for="comment in comments" v-bind:key="comment.id">
-
+				<div v-for="comment in comments">
+					
 					<!-- Comments -->
-
+					
 					<div class="card mt-3 ml-5 mr-5" :class="(comment.is_private)?'bg-primary':'bg-secondary'"  v-if='comment.event_type=="Comment"'>
 						<div class = 'card-header'><v-icon name = 'user'></v-icon> {{comment.origin_name}}<span class = 'float-right'>{{comment.post_date|formatDate}}</span></div>
 						<div class = 'card-body' v-html="$options.filters.nl2br(comment.comment)">
 						</div>
 					</div>
-
+					
 					<!-- Notifications -->
-
+					
 					<div class = 'card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-5 mr-5' v-if='comment.event_type=="Mutation"'>
+						
 
 						<div class="d-flex">
-
-							<!-- IMPORT_STUDY, REMOVE_STUDY : -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_STUDY"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('thestudy')}} {{comment.study}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_STUDY"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('thestudy')}} {{comment.study}}</div>
-
-							<!-- IMPORT_SERIES, REMOVE_SERIES -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_SERIES"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_SERIES"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
-
-							<!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_USER"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theuser')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theadmin')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_USER"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theuser')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="PROMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasgranted')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="DEMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasremoved')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
-
-							<!-- LEAVE_ALBUM -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="LEAVE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasleft')}} </div>
-
-							<!-- CREATE_ALBUM -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="CREATE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hascreated')}} {{$t('thealbum')}} </div>
-
-							<!-- EDIT_ALBUM -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="EDIT_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasedited')}} {{$t('thealbum')}} </div>
-
-							<div class="bd-highlight"><small style = 'white-space: nowrap'>{{comment.post_date|formatDate}}</small></div>
+							
+						<!-- IMPORT_STUDY, REMOVE_STUDY : -->
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_STUDY"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('thestudy')}} {{comment.study}}</div>
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_STUDY"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('thestudy')}} {{comment.study}}</div>
+						  
+						  <!-- IMPORT_SERIES, REMOVE_SERIES -->
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_SERIES"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_SERIES"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
+						  
+						  <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_USER"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theuser')}} {{comment.target_name}}</div>
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theadmin')}} {{comment.target_name}}</div>
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_USER"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theuser')}} {{comment.target_name}}</div>						  
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="PROMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasgranted')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>						  
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="DEMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasremoved')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
+						  
+						  <!-- LEAVE_ALBUM -->
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="LEAVE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasleft')}} </div>
+						  
+						  <!-- CREATE_ALBUM -->
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="CREATE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hascreated')}} {{$t('thealbum')}} </div>
+						  
+						  <!-- EDIT_ALBUM -->
+						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="EDIT_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasedited')}} {{$t('thealbum')}} </div>
+						  						  
+						  <div class="bd-highlight"><small style = 'white-space: nowrap'>{{comment.post_date|formatDate}}</small></div>
 						</div>
-
+						
+						
 					</div>
-
+					
 				</div>
 			</div>
 		</div>
-		<div class = 'row mt-4 justify-content-center'>
+		<div class = 'row mt-4'>
 			<div class = 'col-sm-12 col-md-10 offset-md-1'>
 				<form @submit.prevent='addComment'>
-					<div class = 'row justify-content-center'>
-						<div class = 'col-9 mb-2'>
+					<div class = 'row'>
+						<div class = 'col-10'>
 							<textarea class = 'form-control' rows=6 v-model='newComment.comment' placeholder="Use @... for a specific user"></textarea>
 						</div>
-						<div class = 'col-auto'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='send'></v-icon>{{$t('send')}}</button></div>
+						<div class = 'col-2'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='send'></v-icon>{{$t('send')}}</button></div>
 					</div>
-				</form>
-			</div>
+				</form>		
+			</div>		
 		</div>
 	</div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import ToggleButton from 'vue-js-toggle-button'
 
 export default {
 	name: 'commentsAndNotifications',
-	props: ['scope', 'id'],
+	props: ['scope','id'],
 	data () {
 		return {
 			newComment: {
@@ -119,6 +121,7 @@ export default {
 			},
 			includeNotifications: false
 		}
+		
 	},
 	computed: {
 		...mapGetters({
@@ -128,62 +131,66 @@ export default {
 			users: 'users'
 		}),
 		comments () {
-			if (this.scope === 'album') return this.album_comments
-
-			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
-			if (studyIdx > -1) {
+			if (this.scope == 'album') return this.album_comments;
+			
+			let studyIdx = _.findIndex(this.studies,s => {return s.StudyInstanceUID[0] == this.id});
+			if (studyIdx > -1){
 				return this.studies[studyIdx].comments
 			}
-			return []
+			 
 		},
 		container_id () {
-			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
+			return (this.scope == 'album') ? "album_comment_container" : "study_"+this.id.replace(/\./g,"_")+"_comment_container";
 		}
-	},
+  	},
 	methods: {
 		addComment () {
-			if (this.newComment.comment.length > 2) {
-				if (this.newComment.comment.indexOf('@') > -1) {
-					if (this.users.length) { // album
+			if (this.newComment.comment.length > 2){
+				if (this.newComment.comment.indexOf('@')>-1){
+					if (this.users.length){ // album
 						_.forEach(this.users, user => {
-							if (this.newComment.comment.indexOf(user.user_name) > -1) {
-								this.newComment.to_user = user.user_name
-								this.newComment.comment = this.newComment.comment.replace('@' + user.user_name, '').trim()
+							if (this.newComment.comment.indexOf(user.user_name) > -1){
+								this.newComment.to_user = user.user_name;
+								this.newComment.comment = this.newComment.comment.replace("@"+user.user_name,"").trim();
 							}
-						})
-					} else {
-						let atIdx = this.newComment.comment.indexOf('@')
-						let end = this.newComment.comment.substr(atIdx).length
-						let match = this.newComment.comment.substr(atIdx).match(/\s/)
-						if (match) end = match.index
-						this.newComment.to_user = this.newComment.comment.substr(atIdx + 1, end - 1)
-						this.$store.dispatch('checkUser', this.newComment.to_user).then(res => {
-							if (res) {
-								this.newComment.comment = this.newComment.comment.replace('@' + this.newComment.to_user, '').trim()
-								this.newComment.to_user = res
-							} else {
-								this.newComment.to_user = ''
+						})						
+					}
+					else{
+						let at_idx = this.newComment.comment.indexOf('@');
+						let end =  this.newComment.comment.substr(at_idx).length;
+						let match = this.newComment.comment.substr(at_idx).match(/\s/);
+						if (match) end = match.index;
+						this.newComment.to_user = this.newComment.comment.substr(at_idx+1,end-1);
+						this.$store.dispatch('checkUser',this.newComment.to_user).then(res => {
+							if (res){
+								this.newComment.comment = this.newComment.comment.replace("@"+this.newComment.to_user,"").trim();								
+								this.newComment.to_user = res;
+							}
+							else {
+								this.newComment.to_user = '';
 							}
 						})
 					}
 				}
-				if (this.scope === 'album') {
-					this.$store.dispatch('postAlbumComment', this.newComment).then(res => {
-						this.$snotify.success('commentpostsuccess')
+				if (this.scope == 'album'){
+					this.$store.dispatch('postAlbumComment',this.newComment).then(res => {
+						this.$snotify.success('commentpostsuccess');
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+						this.$snotify.error(this.$t('sorryerror')+": "+res)
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
+
 					})
-				} else if (this.scope === 'studies') {
-					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(res => {
-						this.$snotify.success('commentpostsuccess')
+				}
+				else if (this.scope == 'studies'){
+					this.$store.dispatch('postStudiesComment',{StudyInstanceUID: this.id,comment: this.newComment}).then(res => {
+						this.$snotify.success('commentpostsuccess');
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+						this.$snotify.error(this.$t('sorryerror')+": "+res)
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					})
@@ -191,35 +198,35 @@ export default {
 			}
 		},
 		getComments () {
-			let type = (this.includeNotifications) ? '' : 'comments'
-			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumComments', { type: type }).then(res => {
-					let container = this.$el.querySelector('#album_comment_container')
-					container.scrollTop = container.scrollHeight
-				})
-			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then(res => {
-					let container = this.$el.querySelector('#study_' + this.id.replace(/\./g, '_') + '_comment_container')
-					container.scrollTop = container.scrollHeight
-				})
+			let type = (this.includeNotifications) ? "" : "comments";
+			if (this.scope == 'album'){
+				this.$store.dispatch('getAlbumComments',{type: type}).then(res => {
+					let container = this.$el.querySelector("#album_comment_container");
+					container.scrollTop = container.scrollHeight;
+				});
+			}
+			else if (this.scope == 'studies'){
+				this.$store.dispatch('getStudiesComments',{StudyInstanceUID: this.id, type: type}).then(res => {
+					let container = this.$el.querySelector("#study_"+this.id.replace(/\./g,"_")+"_comment_container");
+					container.scrollTop = container.scrollHeight;
+				});
 			}
 		}
 	},
 	watch: {
-		'id' (to, from) {
-			console.log(this.id + 'changed')
+		'id' (to, from){
+			console.log(this.id+ "changed");
 		}
 	},
 	created () {
-		console.log(this.users)
-		this.getComments()
-		if (this.album.album_id) this.$store.dispatch('getUsers')
+		console.log(this.users);
+		this.getComments();
+		if (this.album.album_id) this.$store.dispatch('getUsers');
 	}
 }
-
 </script>
+
 
 <style>
 
 </style>
-

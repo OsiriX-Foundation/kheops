@@ -1,3 +1,4 @@
+/* eslint-disable */
 <i18n>
 {
 	"en": {
@@ -7,67 +8,77 @@
 		"welcome": "Bienvenue"
 	}
 }
+
 </i18n>
 
 <template>
 	<!-- Navbar -->
 	<b-navbar toggleable="md" type="light" variant="light" fixed='top'>
 
-		<b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+	<b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-		<b-navbar-brand href="#"><img src="../assets/sib_logo_small.gif" style="margin-right:5px"><router-link to="/" style = 'font-size: 1.3rem;'>Kheops</router-link></b-navbar-brand>
+	<b-navbar-brand href="#"><img src="../assets/sib_logo_small.gif" style="margin-right:5px"><router-link to="/" style = 'font-size: 1.3rem;'>Kheops</router-link></b-navbar-brand>
 
-		<b-collapse is-nav id="nav_collapse">
+	<b-collapse is-nav id="nav_collapse">
 
-			<!-- Right aligned nav items -->
-			<b-navbar-nav class="ml-auto">
 
-				<b-navbar-nav right>
-					<b-nav-item v-access = '"admin"'><router-link to="/admin">Admin</router-link></b-nav-item>
-					<b-nav-item v-access = '"active"'>{{$t('welcome')}} {{user.fullname}}</b-nav-item>
-					<b-nav-item v-access = '"active"'><a class = 'pointer' @click='logout()'><v-icon name = 'sign-out'></v-icon></a></b-nav-item>
-					<b-nav-item-dropdown :text="'Lang: '+lang" right>
-						<b-dropdown-item @click="changeLang('en')">EN</b-dropdown-item>
-						<b-dropdown-item @click="changeLang('fr')">FR</b-dropdown-item>
-					</b-nav-item-dropdown>
-				</b-navbar-nav>
+<!-- Right aligned nav items -->
+<b-navbar-nav class="ml-auto">
 
-			</b-navbar-nav>
+<b-navbar-nav right>
+	<b-nav-item v-access = '"admin"'><router-link to="/admin">Admin</router-link></b-nav-item>
+	<b-nav-item v-access = '"active"'>{{$t('welcome')}} {{user.fullname}}</b-nav-item>
+	<b-nav-item v-access = '"active"'><a class = 'pointer' @click='logout()'><v-icon name = 'sign-out'></v-icon></a></b-nav-item>
+	<b-nav-item-dropdown :text="'Lang: '+lang" right>
+		<b-dropdown-item @click="changeLang('en')">EN</b-dropdown-item>
+		<b-dropdown-item @click="changeLang('fr')">FR</b-dropdown-item>
+	</b-nav-item-dropdown>
+</b-navbar-nav>
 
-		</b-collapse>
-	</b-navbar>
+
+
+</b-navbar-nav>
+
+</b-collapse>
+</b-navbar>
+
+
 
 </template>
 
 <script>
+
+import {Bus} from '@/bus';
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import Vue from 'vue'
 
 export default {
-	name: 'navHeader',
+  name: 'navHeader',
 	data () {
 		return {
 		}
 	},
-	computed: {
-		...mapGetters({
-			user: 'currentUser'
-		}),
+  computed: {
+	  ...mapGetters({
+	  	  user: 'currentUser'
+	    }),
 		lang () {
 			return this.$i18n.locale
 		}
-	},
-	methods: {
-		logout () {
-			store.dispatch('logout').then(data => {
-				Vue.prototype.$keycloak.logoutFn()
-			})
-		},
-		changeLang (value) {
-			this.$root.$i18n.locale = value
-		}
-	}
+  },
+  methods: {
+	  logout () {
+	  	store.dispatch('logout').then(data => {
+		`${Vue.prototype.$keycloak.logoutFn()}`
+	  	})
+	  },
+	  changeLang (value){
+		  this.$root.$i18n.locale = value;
+	  }
+  }
 }
 
 </script>
+
+/* eslint-disable */

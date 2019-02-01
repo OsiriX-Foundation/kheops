@@ -1,7 +1,0 @@
-**/node_modules
-**/docker
-**/.gitignore
-**/.git
-**/Dockerfile
-**/.travis.yml
-**/.dockerignore

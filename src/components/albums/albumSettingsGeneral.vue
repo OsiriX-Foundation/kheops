@@ -1,19 +1,19 @@
 /* eslint-disable */
 <i18n>
-{
-	"en":{
-		"albumname": "Album name",
-		"albumdescription": "Album description",
-		"notification": "Notifications",
-		"albumdeletesuccess": "Album deleted successfully"
-	},
-	"fr": {
-		"albumname": "Nom de l'album",
-		"albumdescription": "Description de l'album",
-		"notification": "Notifications",
-		"albumdeletesuccess": "Album supprimé avec succès"
+	{
+		"en":{
+			"albumname": "Album name",
+			"albumdescription": "Album description",
+			"notification": "Notifications",
+			"albumdeletesuccess": "Album deleted successfully"
+		},
+		"fr": {
+			"albumname": "Nom de l'album",
+			"albumdescription": "Description de l'album",
+			"notification": "Notifications",
+			"albumdeletesuccess": "Album supprimé avec succès"
+		}
 	}
-}
 </i18n>
 
 <template>
@@ -27,17 +27,18 @@
 				<div v-if='edit.name!="-1"'>
 					<form @submit.prevent='updateAlbum'>
 						<div class="input-group mb-2">
-							<div>
-								<input type="text" class = 'form-control' v-model='edit.name'>
-							</div>
-							<div class="input-group-append">
-                <button class="btn btn-primary" type="submit">{{$t('update')}}</button>
-                <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.name="-1"' @click='edit.name="-1"' tabindex="0">{{$t('cancel')}}</button>
-							</div>
+						  <div>
+						    <input type="text" class = 'form-control' v-model='edit.name'>
+						  </div>
+						  <div class="input-group-append">
+						    <button class="btn btn-primary" type="submit">{{$t('update')}}</button>
+							 <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.name="-1"' @click='edit.name="-1"' tabindex="0">{{$t('cancel')}}</button>
+						  </div>
+						  
 						</div>
 					</form>
 				</div>
-
+				
 			</dd>
 			<dt>{{$t('albumdescription')}}<span class = 'icon-edit float-right' @click="edit.description=album.description" v-if='album.is_admin && edit.description=="-1"'><v-icon name='pencil'></v-icon></span></dt>
 			<dd class = 'album_description'>
@@ -45,19 +46,20 @@
 				<div v-if='edit.description!="-1"'>
 					<form @submit.prevent='updateAlbum'>
 						<div class="">
-							<div>
-								<textarea v-model='edit.description' rows='6' class = 'form-control'></textarea>
-							</div>
-							<div>
-								<button class="btn btn-primary" type="submit">{{$t('update')}}</button>
-                <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.description="-1"' @click='edit.description="-1"' tabindex="0">{{$t('cancel')}}</button>
-							</div>
+						  <div>
+						    <textarea v-model='edit.description' rows='6' class = 'form-control'></textarea>
+						  </div>
+						  <div>
+						    <button class="btn btn-primary" type="submit">{{$t('update')}}</button>
+							 <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.description="-1"' @click='edit.description="-1"' tabindex="0">{{$t('cancel')}}</button>
+						  </div>
+						  
 						</div>
 					</form>
 				</div>
 			</dd>
 		</dl>
-
+		
 		<dl>
 			<dt>{{$t('notification')}}</dt>
 			<dd style = 'margin-top: 10px'>
@@ -77,6 +79,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import ToggleButton from 'vue-js-toggle-button'
 
 export default {
 	name: 'album_settings_general',
@@ -97,35 +100,35 @@ export default {
 	methods: {
 		updateAlbum () {
 			if (!this.album.is_admin) {
-				this.$snotify.error(this.$t('permissiondenied'))
-				return
+				this.$snotify.error(this.$t('permissiondenied'));
+				return;
 			}
-			let params = {}
-			_.forEach(this.edit, (v, k) => {
-				if (v === -1) return
-				if (this.album[k] !== v) {
-					params[k] = v
+			let params = {};
+			_.forEach(this.edit,(v,k) => {
+				if (v == -1) return;
+				if (this.album[k] !== v){
+					params[k] = v;
 				}
-			})
-			params.notificationNewComment = this.album.notification_new_comment
-			params.notificationNewSeries = this.album.notification_new_series
-
-			this.$store.dispatch('patchAlbum', params).then(res => {
-				this.$snotify.success(this.$t('albumupdatesuccess'))
-				this.edit.name = '-1'
-				this.edit.description = '-1'
+			});
+			params.notificationNewComment = this.album.notification_new_comment;
+			params.notificationNewSeries = this.album.notification_new_series;
+			
+			this.$store.dispatch("patchAlbum",params).then(res => {
+				this.$snotify.success(this.$t('albumupdatesuccess'));
+				this.edit.name = "-1";
+				this.edit.description = "-1";
 			}).catch(res => {
-				this.$snotify.error(this.$t('sorryerror'))
-			})
+				this.$snotify.error(this.$t('sorryerror'));				
+			});
 		},
 		deleteAlbum () {
-			if (!this.confirmDeletion) this.confirmDeletion = true
+			if (!this.confirmDeletion) this.confirmDeletion = true;
 			else {
-				this.$store.dispatch('deleteAlbum').then(res => {
-					this.$snotify.success(this.$t('albumdeletesuccess'))
-					this.$router.push('/albums')
+				this.$store.dispatch("deleteAlbum").then(res => {
+					this.$snotify.success(this.$t('albumdeletesuccess'));
+					this.$router.push("/albums");
 				}).catch(res => {
-					this.$snotify.error(this.$t('sorryerror'))
+					this.$snotify.error(this.$t('sorryerror'));				
 				})
 			}
 		}
@@ -155,4 +158,3 @@ dd.album_description{
 }
 
 </style>
-

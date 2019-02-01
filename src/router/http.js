@@ -1,10 +1,13 @@
-import axios from 'axios'
-import { serverURL } from '@/app_config'
+import Vue from 'vue';
+import axios from 'axios';
+import Base64 from '@/mixins/base64';
+import {serverURL} from '@/app_config';
 
-export var HTTP = axios.create({ baseURL: serverURL })
+
+export var HTTP = axios.create({ baseURL: serverURL });
 
 HTTP.interceptors.response.use(function (response) {
 	return response
-}, function (error, status) {
-	return Promise.reject(error.response.data)
+}, function(error,status){
+	return Promise.reject(error.response.data);
 })
