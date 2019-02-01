@@ -15,23 +15,20 @@
 	</div>
 </template>
 
-
 <script>
-
 import navHeader from '@/components/navheader'
 import navBar from '@/components/navbar'
 
 export default {
-  components: { navHeader,navBar },
+  components: { navHeader, navBar },
   name: 'App',
-	computed:{
-		year () {
-			return new Date().getFullYear();
-		}
-	}
+  computed: {
+    year () {
+      return new Date().getFullYear()
+    }
+  }
 }
 </script>
-
 
 <style>
 
@@ -45,7 +42,6 @@ export default {
 .uppercase{
 	text-transform:uppercase;
 }
-
 
 a.navbar-brand {
 	color: #CCC;

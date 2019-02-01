@@ -140,12 +140,8 @@ export default{
 			}			
 		},
 		openViewer () {
-<<<<<<< HEAD
-			let url = 'https://test.kheops.online/studies/'+this.StudyInstanceUID+'/ohifmetadata#token='+this.user.jwt;
+			let url = `https://ohif.kheops.online/?url=https://test.kheops.online/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}#token=${this.user.jwt}`;
 			window.open('https://ohif.kheops.online/?url='+encodeURI(url),'OHIFViewer')
-=======
-			window.open(`https://ohif.kheops.online/?url=https://test.kheops.online/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}#token=${this.user.jwt}`,'OHIFViewer')
->>>>>>> 1f24342757e9cd5aa1021364813a061ee84b2148
 		}
 	}
 }
