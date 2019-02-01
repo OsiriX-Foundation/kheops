@@ -18,14 +18,20 @@ import Icon from 'vue-awesome/components/Icon'
 import VeeValidate from 'vee-validate'
 import store from './store'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
-import { HTTP } from '@/router/http'
 import '@/filters/filters.js'
 import VueI18n from 'vue-i18n'
 import messages from '@/lang/messages'
 
 Vue.config.productionTip = false
 
-Vue.use(Snotify, options)
+// globally (in your main .js file)
+const snotifyOptions = {
+  toast: {
+    position: SnotifyPosition.rightTop
+  }
+}
+
+Vue.use(Snotify, snotifyOptions)
 Vue.use(BootstrapVue)
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' })
 Vue.use(VueI18n)
@@ -33,13 +39,6 @@ Vue.use(VueI18n)
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon)
 Vue.directive('access', Access)
-
-// globally (in your main .js file)
-const options = {
-  toast: {
-    position: SnotifyPosition.rightTop
-  }
-}
 
 const keycloakconfig = {
   authRealm: process.env.REALM_KEYCLOAK,
