@@ -1,4 +1,3 @@
-/* eslint-disable */
 <i18n>
 {
 	"en": {
@@ -80,5 +79,3 @@ export default {
 }
 
 </script>
-
-/* eslint-disable */
