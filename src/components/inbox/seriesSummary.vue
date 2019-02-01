@@ -140,8 +140,8 @@ export default{
 			}			
 		},
 		openViewer () {
-			let url = 'https://test.kheops.online/studies/'+this.StudyInstanceUID+'/ohifmetadata#token='+this.user.jwt;
-			window.open('https://ohif.kheops.online/?url='+encodeURIComponent(url),'OHIFViewer')
+			let url = `https://test.kheops.online/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}`;
+			window.open(`https://ohif.kheops.online/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`,'OHIFViewer')
 		}
 	}
 }
