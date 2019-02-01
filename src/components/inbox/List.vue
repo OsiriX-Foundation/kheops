@@ -237,327 +237,265 @@
 </template>
 
 <script>
-
-import {Bus} from '@/bus'
 import { mapGetters } from 'vuex'
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 import seriesSummary from '@/components/inbox/seriesSummary'
 import studyMetadata from '@/components/study/studyMetadata.vue'
 import ToggleButton from 'vue-js-toggle-button'
-import Datepicker from 'vuejs-datepicker';
+import Datepicker from 'vuejs-datepicker'
 import Vue from 'vue'
 
 
 Vue.use(ToggleButton)
 
 export default {
-  	name: 'studies',
-	data () {
-		return {
-			pageNb: 1,
-			active: false,
-			fields: [
-				{
-					key: 'is_selected',
-					label: '',
-					sortable: false,
-					class: 'td_checkbox',
-					thClass: "d-none d-sm-table-cell",
-					margin: 'auto'
-				},
-				{
-					key: "PatientName",
-					label: "PatientName",
-					thClass: "d-none d-sm-table-cell",
-					tdClass: 'patientName',
-					sortable: true
-				},
-				{
-					key: "PatientID",
-					label: "MRN",
-					sortable: true,
-					thClass: "d-none d-md-table-cell",
-					tdClass: "d-none d-md-table-cell"
-				},
-				{
-					key: "AccessionNumber",
-					label: "AccessionNumber",
-					sortable: true,
-					thClass: "d-none d-lg-table-cell",
-					tdClass: "d-none d-lg-table-cell"
-				},
-				{
-					key: 'StudyDate',
-					label: "StudyDate",
-					thClass: "d-none d-sm-table-cell",
-					tdClass: "d-none d-sm-table-cell",
-					sortable: true
-				},
-				{
-					key: 'ModalitiesInStudy',
-					thClass: "d-none d-sm-table-cell",
-					tdClass: "d-none d-sm-table-cell",
-					label: 'Modality',
-					sortable: true
-				}
-			],
-			sortBy: 'StudyDate',
-			sortDesc: true,
-			limit: 8,
-			optionsNbPages: [5,10,25,50,100],
-			showFilters: false,
-			filterTimeout: null,
-			filters: {
-				PatientName: '',
-				PatientID: '',
-				AccessionNumber: '',
-				StudyDateFrom: '',
-				StudyDateTo: '',
-				ModalitiesInStudy: '',
-				inbox_and_albums: false,
-				album_id: ''
-			}
-		}
-	},
-	components: {seriesSummary, Datepicker, commentsAndNotifications, studyMetadata},
-	computed: {
-		...mapGetters({
-			studies: 'studies',
-			albums: 'albums',
-			user: 'currentUser'
-			}),
-			totalRows () {
-				return this.studies.length;
-			},
-			selectedStudiesNb () {
-				return _.filter(this.studies,s => {return s.is_selected === true;}).length;
-			},
-			disabledToDates: function(){
-				let vm = this;
-				return {
-					to: vm.filters.StudyDateFrom,
-					from: new Date()
-				}
-			},
-			disabledFromDates: function(){
-				let vm = this;
-				return {
-					from: new Date()
-				}
-			}
-	},
-	methods: {
-		scroll () {
-			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
-				if (bottomOfWindow) {
-					this.pageNb++;
-					this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
-				}
-			};
-		},
-		sortingChanged (ctx) {
-			// ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
-			// ctx.sortDesc ==> true if sorting descending, false otherwise
+  name: 'studies',
+  data () {
+    return {
+      pageNb: 1,
+      active: false,
+      fields: [
+        {
+          key: 'is_selected',
+          label: '',
+          sortable: false,
+          class: 'td_checkbox',
+          thClass: 'd-none d-sm-table-cell',
+          margin: 'auto'
+        },
+        {
+          key: 'PatientName',
+          label: 'PatientName',
+          thClass: 'd-none d-sm-table-cell',
+          tdClass: 'patientName',
+          sortable: true
+        },
+        {
+          key: 'PatientID',
+          label: 'MRN',
+          sortable: true,
+          thClass: 'd-none d-md-table-cell',
+          tdClass: 'd-none d-md-table-cell'
+        },
+        {
+          key: 'AccessionNumber',
+          label: 'AccessionNumber',
+          sortable: true,
+          thClass: 'd-none d-lg-table-cell',
+          tdClass: 'd-none d-lg-table-cell'
+        },
+        {
+          key: 'StudyDate',
+          label: 'StudyDate',
+          thClass: 'd-none d-sm-table-cell',
+          tdClass: 'd-none d-sm-table-cell',
+          sortable: true
+        },
+        {
+          key: 'ModalitiesInStudy',
+          thClass: 'd-none d-sm-table-cell',
+          tdClass: 'd-none d-sm-table-cell',
+          label: 'Modality',
+          sortable: true
+        }
+      ],
+      sortBy: 'StudyDate',
+      sortDesc: true,
+      limit: 8,
+      optionsNbPages: [5, 10, 25, 50, 100],
+      showFilters: false,
+      filterTimeout: null,
+      filters: {
+        PatientName: '',
+        PatientID: '',
+        AccessionNumber: '',
+        StudyDateFrom: '',
+        StudyDateTo: '',
+        ModalitiesInStudy: '',
+        inbox_and_albums: false,
+        album_id: ''
+      }
+    }
+  },
+  components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata },
+  computed: {
+    ...mapGetters({
+      studies: 'studies',
+      albums: 'albums',
+      user: 'currentUser'
+    }),
+    totalRows () {
+      return this.studies.length
+    },
+    selectedStudiesNb () {
+      return _.filter(this.studies, s => { return s.is_selected === true }).length
+    },
+    disabledToDates: function () {
+      let vm = this
+      return {
+        to: vm.filters.StudyDateFrom,
+        from: new Date()
+      }
+    },
+    disabledFromDates: function () {
+      return {
+        from: new Date()
+      }
+    }
+  },
+  methods: {
+    scroll () {
+      window.onscroll = () => {
+        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+        if (bottomOfWindow) {
+          this.pageNb++
+          this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+        }
+      }
+    },
+    sortingChanged (ctx) {
+      // ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
+      // ctx.sortDesc ==> true if sorting descending, false otherwise
 
-			this.pageNb = ctx.currentPage;
-			this.sortBy = ctx.sortBy;
-			this.sortDesc = ctx.sortDesc;
-			this.limit = this.studies.length;
-			this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
+      this.pageNb = ctx.currentPage
+      this.sortBy = ctx.sortBy
+      this.sortDesc = ctx.sortDesc
+      this.limit = this.studies.length
+      this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+    },
+    showSeries (row) {
+      if (!row.detailsShowing) {
+        this.$store.dispatch('getSeries', { StudyInstanceUID: row.item.StudyInstanceUID[0], album_id: this.filters.album_id })
+      }
+      row.toggleDetails()
+    },
 
-		},
-		showSeries (row) {
-			
-			if (!row.detailsShowing){
-				this.$store.dispatch('getSeries',{StudyInstanceUID: row.item.StudyInstanceUID[0],album_id: this.filters.album_id})
-			}
-			row.toggleDetails();
-		},
-		toggleSelected(item,type,is_selected) {
-			let index = _.findIndex(this.studies,s => {return s.StudyInstanceUID[0] == item.StudyInstanceUID[0]})
-			var vm = this;
-			this.$store.dispatch('toggleSelected',{type: type, index: index,is_selected: is_selected}).then(res => {
-			})
-		},
+    toggleFavorite (index, type) {
+      var vm = this
+      this.$store.dispatch('toggleFavorite', { type: type, index: index }).then(res => {
+        if (res) vm.$snotify.success(type + 'is now in favorites')
+        else vm.$snotify.error('Sorry, an error occured')
+      })
+    },
+    handleComments (row) {
+      this.showSeries(row)
+      row.item.view = 'comments'
+    },
+    selectAll (isSelected) {
+      this.$store.commit('SELECT_ALL_STUDIES', !isSelected)
+      this.studies.allSelected = !this.studies.allSelected
+    },
+    deleteSelectedStudies () {
+      var vm = this
+      var i, j
+      for (i = this.studies.length - 1; i > -1; i--) {
+        if (this.studies[i].is_selected) {
+          let selectedSeries = _.filter(this.studies[i].series, s => { return s.is_selected })
+          if (this.studies[i].series.length === 0 || this.studies[i].series.length === selectedSeries.length) {
+            vm.$store.dispatch('deleteStudy', { StudyInstanceUID: this.studies[i].StudyInstanceUID, album_id: this.filters.album_id })
+            // vm.$delete(vm.studies, i);
+          } else {
+            for (j = selectedSeries.length - 1; j > -1; j--) {
+              let s = selectedSeries[j]
+              vm.$store.dispatch('deleteSeries', { StudyInstanceUID: this.studies[i].StudyInstanceUID, SeriesInstanceUID: s.SeriesInstanceUID, album_id: this.filters.album_id })
+              // vm.$delete(vm.studies[i].series,j);
+            }
+          }
+        }
+      }
+    },
+    toggleSelected (item, type, isSelected) {
+      let index = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === item.StudyInstanceUID[0] })
+      this.$store.dispatch('toggleSelected', { type: type, index: index, is_selected: isSelected }).then(res => {
+      })
+    },
+    downloadSelectedStudies () {
+      var vm = this
+      _.forEach(this.studies, function (study, index) {
+        if (study.is_selected) {
+          vm.$store.dispatch('downloadStudy', { StudyInstanceUID: study.StudyInstanceUID })
+        }
+      })
+    },
+    searchOnline (filters) {
+      this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+    },
+    addToAlbum (albumId) {
+      let studies = _.filter(this.studies, s => { return s.is_selected })
+      let data = []
 
-		toggleFavorite(index,type){
-			var vm = this;
-			this.$store.dispatch('toggleFavorite',{type: type, index: index}).then(res => {
-				if (res) vm.$snotify.success(type+ 'is now in favorites');
-				else vm.$snotify.error('Sorry, an error occured');		  	
-			})
+      _.forEach(studies, s => {
+        let series = _.filter(s.series, oneSeries => { return oneSeries.is_selected })
+        if (series.length === s.series.length) {
+          data.push({ study_id: s.StudyInstanceUID[0], series_id: null, album_id: albumId })
+        } else {
+          _.forEach(series, oneSeries => {
+            data.push({ study_id: s.StudyInstanceUID[0], series_id: oneSeries.SeriesInstanceUID[0], album_id: albumId })
+          })
+        }
+      })
 
-		},
-		handleComments(row){
-			this.showSeries(row);
-			row.item.view = 'comments'
+      if (data.length) {
+        this.$store.dispatch('putStudiesInAlbum', { data: data }).then(res => {
+          this.$snotify.success(this.$t('studyputtoalbum'))
+        })
+      }
+    },
+    toggleStudyView (item) {
+      this.$store.commit('TOGGLE_STUDY_VIEW', { StudyInstanceUID: item.StudyInstanceUID[0] })
+    },
+    loadStudiesComments (item) {
+      item.view = 'comments'
+      // this.$store.dispatch('getStudiesComments',{StudyInstanceUID: item.StudyInstanceUID[0]})
+    },
+    loadStudiesMetadata (item) {
+      item.view = 'study'
+    }
+  },
 
-		},
-		selectAll(is_selected){
-		this.$store.commit("SELECT_ALL_STUDIES",!is_selected);
-		this.studies.allSelected = ! this.studies.allSelected;
-		},
-		deleteSelectedStudies(){
-			var vm = this;
-			var i,j;
-			for (i = this.studies.length-1; i > -1; i--) {
-				if (this.studies[i].is_selected){
-					let selectedSeries = _.filter(this.studies[i].series,s => {return s.is_selected;});
-					if (this.studies[i].series.length == 0 || this.studies[i].series.length == selectedSeries.length){
-						vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.studies[i].StudyInstanceUID,album_id:this.filters.album_id});
-					// vm.$delete(vm.studies, i);
+  created () {
+    if (this.$route.params.album_id) {
+      this.filters.album_id = this.$route.params.album_id
+    } else {
+      this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+      this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
+    }
+  },
 
-					}
-					else {
-						for (j = selectedSeries.length-1; j > -1; j--){
-							let s = selectedSeries[j];
-							vm.$store.dispatch('deleteSeries',{StudyInstanceUID:this.studies[i].StudyInstanceUID,SeriesInstanceUID: s.SeriesInstanceUID, album_id:this.filters.album_id});
-							// vm.$delete(vm.studies[i].series,j);
-							
-						}
-					}
-				}
-			}
-		},
-		toggleSelected(item,type,is_selected) {
-			let index = _.findIndex(this.studies,s => {return s.StudyInstanceUID[0] == item.StudyInstanceUID[0]})
-			var vm = this;
-			this.$store.dispatch('toggleSelected',{type: type, index: index,is_selected: is_selected}).then(res => {
-			})
-		},
+  mounted () {
+    this.scroll()
+  },
 
-		toggleFavorite(index,type){
-			var vm = this;
-			this.$store.dispatch('toggleFavorite',{type: type, index: index}).then(res => {
-				if (res) vm.$snotify.success(type+ 'is now in favorites');
-				else vm.$snotify.error('Sorry, an error occured');		  	
-			})
+  watch: {
+    filters: {
+      handler: function (filters) {
+        if (this.filterTimeout) {
+          clearTimeout(this.filterTimeout)
+        }
+        this.filterTimeout = setTimeout(() => this.searchOnline(filters), 300)
+      },
+      deep: true
+    },
+    showFilters: {
+      handler: function (showFilters) {
+        if (!showFilters) {
+          this.filters = {
+            PatientName: '',
+            PatientID: '',
+            AccessionNumber: '',
+            StudyDateFrom: '',
+            StudyDateTo: '',
+            ModalitiesInStudy: '',
+            inbox_and_albums: this.filters.inbox_and_albums,
+            album_id: this.filters.album_id
 
-		},
-		handleComments(row){
-			this.showSeries(row);
-			row.item.view = 'comments'
-
-		},
-		selectAll(is_selected){
-		this.$store.commit("SELECT_ALL_STUDIES",!is_selected);
-		this.studies.allSelected = ! this.studies.allSelected;
-		},
-		deleteSelectedStudies(){
-			var vm = this;
-			var i,j;
-			for (i = this.studies.length-1; i > -1; i--) {
-				if (this.studies[i].is_selected){
-					let selectedSeries = _.filter(this.studies[i].series,s => {return s.is_selected;});
-					if (this.studies[i].series.length == 0 || this.studies[i].series.length == selectedSeries.length){
-						vm.$store.dispatch('deleteStudy',{StudyInstanceUID:this.studies[i].StudyInstanceUID,album_id:this.filters.album_id});
-					// vm.$delete(vm.studies, i);
-
-					}
-					else {
-						for (j = selectedSeries.length-1; j > -1; j--){
-							let s = selectedSeries[j];
-							vm.$store.dispatch('deleteSeries',{StudyInstanceUID:this.studies[i].StudyInstanceUID,SeriesInstanceUID: s.SeriesInstanceUID, album_id:this.filters.album_id});
-							// vm.$delete(vm.studies[i].series,j);
-							
-						}
-					}
-				}
-			}
-		},
-		downloadSelectedStudies(){
-			var vm = this;
-			_.forEach(this.studies, function(study,index) {
-				if ( study.is_selected){
-					vm.$store.dispatch('downloadStudy',{StudyInstanceUID:study.StudyInstanceUID})
-				}
-			});
-
-		},
-		searchOnline(filters){
-			this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
-		},
-		addToAlbum (album_id) {
-			let studies = _.filter(this.studies, s => {return s.is_selected});
-			let data = [];
-			
-			_.forEach(studies, s => {
-				let series = _.filter(s.series, one_series => {return one_series.is_selected});
-				if (series.length == s.series.length){
-					data.push({study_id: s.StudyInstanceUID[0],series_id: null, album_id: album_id});
-				} 
-				else {
-				_.forEach(series, one_series => {
-						data.push({study_id: s.StudyInstanceUID[0],series_id: one_series.SeriesInstanceUID[0], album_id: album_id});
-				})
-				}
-			});
-			
-			if (data.length){
-				this.$store.dispatch('putStudiesInAlbum',{data: data}).then(res => {
-					this.$snotify.success(this.$t('studyputtoalbum'));
-				});
-			}	 
-		},
-		toggleStudyView (item){
-			this.$store.commit('TOGGLE_STUDY_VIEW',{StudyInstanceUID: item.StudyInstanceUID[0]})
-		},
-		loadStudiesComments (item) {
-			item.view = 'comments';
-			// this.$store.dispatch('getStudiesComments',{StudyInstanceUID: item.StudyInstanceUID[0]})
-		},
-		loadStudiesMetadata (item) {
-			item.view ='study'
-		}
-	},
-
-	created () {
-		if (this.$route.params.album_id){
-			this.filters.album_id = this.$route.params.album_id;
-		} 
-		else{
-			this.$store.dispatch('getStudies',{pageNb: this.pageNb,filters: this.filters,sortBy: this.sortBy, sortDesc: this.sortDesc,limit: this.limit})
-			this.$store.dispatch('getAlbums',{pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true});	  	
-		}
+          }
+        }
+      }
+    }
 
 
-	},
-
-	mounted () {
-		this.scroll();
-	},
-
-	watch : {
-		filters: {
-			handler: function(filters) {
-				if (this.filterTimeout) {
-					clearTimeout(this.filterTimeout);
-				}
-				this.filterTimeout = setTimeout( () => this.searchOnline(filters), 300);
-			},
-			deep: true
-		},
-		showFilters: {
-			handler: function(showFilters){
-				if (!showFilters){
-					this.filters = {
-						PatientName: '',
-						PatientID: '',
-						AccessionNumber: '',
-						StudyDateFrom: '',
-						StudyDateTo: '',
-						ModalitiesInStudy: '',
-						inbox_and_albums: this.filters.inbox_and_albums,
-						album_id: this.filters.album_id
-						
-					}
-				}
-			}
-		}
-
-
-	}
+  }
 }
 
 </script>

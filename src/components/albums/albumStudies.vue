@@ -23,19 +23,20 @@ import { mapGetters } from 'vuex'
 import Studies from '@/components/inbox/List.vue'
 
 export default {
-	name: 'album_studies',
-	components: {Studies},
-	data () {
-		return {
-			
-		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album'
-		})	
-  	}
+  name: 'album_studies',
+  components: { Studies },
+  data () {
+    return {
+
+    }
+  },
+  computed: {
+    ...mapGetters({
+      album: 'album'
+    })
+  }
 }
+
 </script>
 
 

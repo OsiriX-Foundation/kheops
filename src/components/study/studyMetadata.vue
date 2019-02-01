@@ -96,42 +96,43 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 export default {
-  name: "studyMetadata",
-  props: ["id"],
-  data() {
-    return {};
+  name: 'studyMetadata',
+  props: ['id'],
+  data () {
+    return {}
   },
   computed: {
     ...mapGetters({
-      studies: "studies",
-      user: "currentUser"
+      studies: 'studies',
+      user: 'currentUser'
     }),
-    metadata() {
+    metadata () {
       let studyIdx = _.findIndex(this.studies, s => {
-        return s.StudyInstanceUID[0] == this.id;
-      });
+        return s.StudyInstanceUID[0] === this.id
+      })
       if (studyIdx > -1) {
-        return this.studies[studyIdx];
+        return this.studies[studyIdx]
       }
     }
   },
   methods: {
-    getDate(date) {
-      var year = date.substr(0, 4);
-      var month = date.substr(4, 2);
-      var day = date.substr(6, 2);
-      return day + "/" + month + "/" + year;
+    getDate (date) {
+      var year = date.substr(0, 4)
+      var month = date.substr(4, 2)
+      var day = date.substr(6, 2)
+      return day + '/' + month + '/' + year
     },
-    matchSex(sex) {
-      return /m|M|o|O|f|F/.test(sex);
+    matchSex (sex) {
+      return /m|M|o|O|f|F/.test(sex)
     },
-    matchNumbers(number) {
-      return /^[0-9]*([,.][0-9]*)?$/.test(number);
+    matchNumbers (number) {
+      return /^[0-9]*([,.][0-9]*)?$/.test(number)
     }
   }
-};
+}
+
 </script>
 
 <style>

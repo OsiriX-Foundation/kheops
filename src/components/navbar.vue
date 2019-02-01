@@ -46,17 +46,17 @@
 <script>
 export default {
   name: 'navBar',
-	data () {
-		return {
-			activePath: 'inbox'
-		}
-	},
-	watch: {
-		'$route' (to, from){
-			this.activePath = to.path.split("/")[1];
-			console.log(this.activePath);
-		}
-	}
+  data () {
+    return {
+      activePath: 'inbox'
+    }
+  },
+  watch: {
+    '$route' (to, from){
+      this.activePath = to.path.split("/")[1];
+      console.log(this.activePath);
+    }
+  }
 }
 
 </script>

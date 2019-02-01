@@ -98,81 +98,80 @@
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'album_settings_user',
-	data () {
-		return {
-			confirm_delete: '',
-			form_add_user: false,
-			new_user_name: '',
-			userSettings: [
-				"add_user",
-				"add_series",
-				"download_series",
-				"send_series",
-				"delete_series",
-				"write_comments"
-			]
-		}
-	},
-	methods: {
-		addUser () {
-			if (!this.form_add_user) this.form_add_user = true;
-			else {
-				if (this.new_user_name && this.validEmail(this.new_user_name)){
-					this.$store.dispatch('add_user_to_album',{user_name: this.new_user_name}).then(res => {
-						this.$snotify.success(this.$t('albumuseraddsuccess'))
-					}).catch(res => {
-						this.$snotify.error(this.$t(res))
-					})
-				}
-			}
-			
-		},
-		toggleAdmin (user) {
-			user.is_admin = !user.is_admin;
-			this.$store.dispatch('toggleAlbumUserAdmin',user).then(res => {
-				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin');
-				this.$snotify.success(message)
-			}).catch(err => {
-				console.error(err);
-				this.$snotify.error(this.$t('sorryerror'));
-			})
-		},
-		deleteUser (user){
-			if (this.confirm_delete != user.user_name) this.confirm_delete = user.user_name;
-			else {
-				this.$store.dispatch('remove_user_from_album',{user_name: user.user_name}).then(res => {
-					this.$snotify.success(this.$t('albumuserdeletesuccess'))
-				})
-			}
-		},
-		validEmail (email) {
-		      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		      return re.test(email);
-		},
-		patchAlbum (field){
-			let params = {field: this.album[field]};
-			this.$store.dispatch("patchAlbum",params).then(res => {
-				this.$snotify.success(this.$t('albumupdatesuccess'));
-			}).catch(err => {
-				console.error(err);
-				this.$snotify.error(this.$t('sorryerror'));				
-			});
-			
-		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album',
-			users: 'users'
-		})	
-  	},
-	created () {
-		this.$store.dispatch('getUsers');
-	},
-	watch: {
-	}
+  name: 'album_settings_user',
+  data () {
+    return {
+      confirm_delete: '',
+      form_add_user: false,
+      new_user_name: '',
+      userSettings: [
+        'add_user',
+        'add_series',
+        'download_series',
+        'send_series',
+        'delete_series',
+        'write_comments'
+      ]
+    }
+  },
+  methods: {
+    addUser () {
+      if (!this.form_add_user) this.form_add_user = true
+      else {
+        if (this.new_user_name && this.validEmail(this.new_user_name)) {
+          this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then(res => {
+            this.$snotify.success(this.$t('albumuseraddsuccess'))
+          }).catch(res => {
+            this.$snotify.error(this.$t(res))
+          })
+        }
+      }
+    },
+    toggleAdmin (user) {
+      user.is_admin = !user.is_admin
+      this.$store.dispatch('toggleAlbumUserAdmin', user).then(res => {
+        let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
+        this.$snotify.success(message)
+      }).catch(err => {
+        console.error(err)
+        this.$snotify.error(this.$t('sorryerror'))
+      })
+    },
+    deleteUser (user) {
+      if (this.confirm_delete !== user.user_name) this.confirm_delete = user.user_name
+      else {
+        this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(res => {
+          this.$snotify.success(this.$t('albumuserdeletesuccess'))
+        })
+      }
+    },
+    validEmail (email) {
+      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      return re.test(email)
+    },
+    patchAlbum (field) {
+      let params = { field: this.album[field] }
+      this.$store.dispatch('patchAlbum', params).then(res => {
+        this.$snotify.success(this.$t('albumupdatesuccess'))
+      }).catch(err => {
+        console.error(err)
+        this.$snotify.error(this.$t('sorryerror'))
+      })
+    }
+  },
+  computed: {
+    ...mapGetters({
+      album: 'album',
+      users: 'users'
+    })
+  },
+  created () {
+    this.$store.dispatch('getUsers')
+  },
+  watch: {
+  }
 }
+
 </script>
 
 

@@ -54,7 +54,6 @@
 </template>
 
 <script>
-import {HTTP} from '@/router/http';
 import { mapGetters } from 'vuex'
 import albumStudies from '@/components/albums/albumStudies'
 import albumComments from '@/components/albums/albumComments'
@@ -62,35 +61,34 @@ import albumSettings from '@/components/albums/albumSettings'
 
 
 export default {
-	name: 'album',
-	computed: {
-  	  ...mapGetters({
-  	  	  album: 'album'
-  	    })	
-	},
-	components: { albumStudies, albumSettings, albumComments},
-	data () {
-		return {
-			view: 'studies',
-			newUserName: ''
-		}
-	},
-	methods: {
-	},
-	created () {
-		this.$store.dispatch('getAlbum',{album_id: this.$route.params.album_id}).then(res => {
-			this.view = this.$route.query.view || 'studies';
-		})
-	},
-	watch: {
-		view () {
-			let queryParams = {view: this.view};
-			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat;
-			this.$router.push({query:queryParams})
-		}
-	}
+  name: 'album',
+  computed: {
+    ...mapGetters({
+      album: 'album'
+    })
+  },
+  components: { albumStudies, albumSettings, albumComments },
+  data () {
+    return {
+      view: 'studies',
+      newUserName: ''
+    }
+  },
+  methods: {
+  },
+  created () {
+    this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(res => {
+      this.view = this.$route.query.view || 'studies'
+    })
+  },
+  watch: {
+    view () {
+      let queryParams = { view: this.view }
+      if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
+      this.$router.push({ query: queryParams })
+    }
+  }
 }
-
 </script>
 
 <style>

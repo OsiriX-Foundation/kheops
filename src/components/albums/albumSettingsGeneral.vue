@@ -79,60 +79,59 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import ToggleButton from 'vue-js-toggle-button'
 
 export default {
-	name: 'album_settings_general',
-	data () {
-		return {
-			edit: {
-				name: '-1',
-				description: '-1'
-			},
-			confirmDeletion: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album'
-		})
-	},
-	methods: {
-		updateAlbum () {
-			if (!this.album.is_admin) {
-				this.$snotify.error(this.$t('permissiondenied'));
-				return;
-			}
-			let params = {};
-			_.forEach(this.edit,(v,k) => {
-				if (v == -1) return;
-				if (this.album[k] !== v){
-					params[k] = v;
-				}
-			});
-			params.notificationNewComment = this.album.notification_new_comment;
-			params.notificationNewSeries = this.album.notification_new_series;
-			
-			this.$store.dispatch("patchAlbum",params).then(res => {
-				this.$snotify.success(this.$t('albumupdatesuccess'));
-				this.edit.name = "-1";
-				this.edit.description = "-1";
-			}).catch(res => {
-				this.$snotify.error(this.$t('sorryerror'));				
-			});
-		},
-		deleteAlbum () {
-			if (!this.confirmDeletion) this.confirmDeletion = true;
-			else {
-				this.$store.dispatch("deleteAlbum").then(res => {
-					this.$snotify.success(this.$t('albumdeletesuccess'));
-					this.$router.push("/albums");
-				}).catch(res => {
-					this.$snotify.error(this.$t('sorryerror'));				
-				})
-			}
-		}
-	}
+  name: 'album_settings_general',
+  data () {
+    return {
+      edit: {
+        name: '-1',
+        description: '-1'
+      },
+      confirmDeletion: false
+    }
+  },
+  computed: {
+    ...mapGetters({
+      album: 'album'
+    })
+  },
+  methods: {
+    updateAlbum () {
+      if (!this.album.is_admin) {
+        this.$snotify.error(this.$t('permissiondenied'))
+        return
+      }
+      let params = {}
+      _.forEach(this.edit, (v, k) => {
+        if (v === -1) return
+        if (this.album[k] !== v) {
+          params[k] = v
+        }
+      })
+      params.notificationNewComment = this.album.notification_new_comment
+      params.notificationNewSeries = this.album.notification_new_series
+
+      this.$store.dispatch('patchAlbum', params).then(res => {
+        this.$snotify.success(this.$t('albumupdatesuccess'))
+        this.edit.name = '-1'
+        this.edit.description = '-1'
+      }).catch(res => {
+        this.$snotify.error(this.$t('sorryerror'))
+      })
+    },
+    deleteAlbum () {
+      if (!this.confirmDeletion) this.confirmDeletion = true
+      else {
+        this.$store.dispatch('deleteAlbum').then(res => {
+          this.$snotify.success(this.$t('albumdeletesuccess'))
+          this.$router.push('/albums')
+        }).catch(res => {
+          this.$snotify.error(this.$t('sorryerror'))
+        })
+      }
+    }
+  }
 }
 
 </script>

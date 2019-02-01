@@ -44,14 +44,13 @@
 <script>
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 export default {
-	name: 'album_comments',
-	props: ['album_id'],
-	data () {
-		return {
-		}
-		
-	},
-	components: {commentsAndNotifications}
+  name: 'album_comments',
+  props: ['album_id'],
+  data () {
+    return {
+    }
+  },
+  components: { commentsAndNotifications }
 }
 </script>
 

@@ -41,30 +41,29 @@ import albumSettingsUser from '@/components/albums/albumSettingsUser'
 import albumSettingsToken from '@/components/albums/albumSettingsToken'
 
 export default {
-	name: 'album_settings',
-	components: {albumSettingsGeneral,albumSettingsUser,albumSettingsToken},
-	data () {
-		return {
-			view: 'general',
-			categories: ['general', 'user', 'token']
-		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album'
-		})	
-  	},
-	created () {
-		if (this.categories.indexOf(this.$route.query.cat) > -1){
-			this.view = this.$route.query.cat;			
-		}
-
-	},
-	watch: {
-		view () {
-			this.$router.push({query:{view: 'settings',cat: this.view}})
-		}
-	}
+  name: 'album_settings',
+  components: { albumSettingsGeneral, albumSettingsUser, albumSettingsToken },
+  data () {
+    return {
+      view: 'general',
+      categories: ['general', 'user', 'token']
+    }
+  },
+  computed: {
+    ...mapGetters({
+      album: 'album'
+    })
+  },
+  created () {
+    if (this.categories.indexOf(this.$route.query.cat) > -1) {
+      this.view = this.$route.query.cat
+    }
+  },
+  watch: {
+    view () {
+      this.$router.push({ query: { view: 'settings', cat: this.view } })
+    }
+  }
 }
 </script>
 

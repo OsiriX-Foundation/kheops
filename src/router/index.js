@@ -6,7 +6,7 @@ import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
 import store from '@/store'
 
-import PermissionDenied from '@/components/user/permissionDenied'
+// import PermissionDenied from '@/components/user/permissionDenied'
 
 // import {ServerTable, ClientTable, Event} from 'vue-tables-2';
 
@@ -20,21 +20,21 @@ const router = new Router({
     name: 'studies',
     component: Study,
     beforeEnter: requireAuth,
-    meta: {permissions: 'active', condition: 'any'}
+    meta: { permissions: 'active', condition: 'any' }
   },
   {
     path: '/albums',
     name: 'albums',
     component: Albums,
     beforeEnter: requireAuth,
-    meta: {permissions: 'active', condition: 'any'}
+    meta: { permissions: 'active', condition: 'any' }
   },
   {
     path: '/albums/new',
     name: 'new_album',
     component: NewAlbum,
     beforeEnter: requireAuth,
-    meta: {permissions: 'active', condition: 'any'}
+    meta: { permissions: 'active', condition: 'any' }
 
   },
   {
@@ -42,7 +42,7 @@ const router = new Router({
     name: 'album',
     component: Album,
     beforeEnter: requireAuth,
-    meta: {permissions: 'active', condition: 'any'}
+    meta: { permissions: 'active', condition: 'any' }
 
   },
   {
@@ -50,7 +50,7 @@ const router = new Router({
     name: 'inbox',
     component: Study,
     beforeEnter: requireAuth,
-    meta: {permissions: 'active', condition: 'any'}
+    meta: { permissions: 'active', condition: 'any' }
   }
   ]
 })
@@ -60,11 +60,11 @@ function requireAuth (to, from, next) {
     if (!test) {
       next({
         path: '/',
-        query: {redirect: to.fullPath}
+        query: { redirect: to.fullPath }
       })
     } else {
       if (to.matched.some(record => record.meta.permissions.length > 0)) {
-        store.dispatch('checkPermissions', {permissions: to.meta.permissions, condition: to.meta.condition}).then(res => {
+        store.dispatch('checkPermissions', { permissions: to.meta.permissions, condition: to.meta.condition }).then(res => {
           if (res) {
             next()
           } else {

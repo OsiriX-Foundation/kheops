@@ -1,5 +1,4 @@
 import { HTTP } from '@/router/http'
-import Base64 from '@/mixins/base64'
 // initial state
 const state = {
   all: [],

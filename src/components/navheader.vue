@@ -46,35 +46,33 @@
 </template>
 
 <script>
-
-import {Bus} from '@/bus';
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import Vue from 'vue'
 
 export default {
   name: 'navHeader',
-	data () {
-		return {
-		}
-	},
+  data () {
+    return {
+    }
+  },
   computed: {
-	  ...mapGetters({
-	  	  user: 'currentUser'
-	    }),
-		lang () {
-			return this.$i18n.locale
-		}
+    ...mapGetters({
+      user: 'currentUser'
+    }),
+    lang () {
+      return this.$i18n.locale
+    }
   },
   methods: {
-	  logout () {
-	  	store.dispatch('logout').then(data => {
-		`${Vue.prototype.$keycloak.logoutFn()}`
-	  	})
-	  },
-	  changeLang (value){
-		  this.$root.$i18n.locale = value;
-	  }
+    logout () {
+      store.dispatch('logout').then(data => {
+        `${Vue.prototype.$keycloak.logoutFn()}`
+      })
+    },
+    changeLang (value) {
+      this.$root.$i18n.locale = value
+    }
   }
 }
 

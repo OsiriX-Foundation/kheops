@@ -110,19 +110,20 @@ const actions = {
   },
   toggleFavorite ({ commit }, params) {
     if (params.type === 'album') {
-      let is_favorite = !state.all[params.index].is_favorite
-      let album_id = state.all[params.index].album_id
-      if (is_favorite) {
-        return HTTP.put('/albums/' + album_id + '/favorites').then(res => {
-          console.log('OK ' + album_id + ' is in favorites')
+      let isFavorite = !state.all[params.index].is_favorite
+      let albumId = state.all[params.index].album_id
+      if (isFavorite) {
+        return HTTP.put('/albums/' + albumId + '/favorites').then(res => {
+          console.log('OK ' + albumId + ' is in favorites')
           commit('TOGGLE_FAVORITE', params)
           return true
         }).catch(err => {
+          console.error(err)
           return false
         })
       } else {
-        return HTTP.delete('/albums/' + album_id + '/favorites').then(res => {
-          console.log('KO ' + album_id + ' is NOT in favorites')
+        return HTTP.delete('/albums/' + albumId + '/favorites').then(res => {
+          console.log('KO ' + albumId + ' is NOT in favorites')
         })
       }
     }
@@ -173,8 +174,8 @@ const mutations = {
       d.is_favorite = false
       d.comment = null
 
-      _.forEach(state.flags, (flag, album_id) => {
-        if (d.album_id === album_id) {
+      _.forEach(state.flags, (flag, albumId) => {
+        if (d.album_id === albumId) {
           albums[i].is_selected = flag.is_selected
           albums[i].is_favorite = flag.is_favorite
           albums[i].comment = flag.comment
@@ -183,13 +184,12 @@ const mutations = {
     })
     if (reset) state.all = albums
     else {
-
       state.all = _.uniqBy(state.all.concat(albums), function (d) { return d.album_id })
     }
   },
-  SELECT_ALL_ALBUMS (state, is_selected) {
+  SELECT_ALL_ALBUMS (state, isSelected) {
     _.forEach(state.all, function (album, index) {
-      album.is_selected = is_selected
+      album.is_selected = isSelected
     })
   },
   SELECT_ALBUM (state, album) {

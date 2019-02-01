@@ -16,6 +16,7 @@
 </template>
 
 <script>
+
 import navHeader from '@/components/navheader'
 import navBar from '@/components/navbar'
 
