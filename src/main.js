@@ -26,61 +26,61 @@ Vue.config.productionTip = false
 
 // globally (in your main .js file)
 const snotifyOptions = {
-  toast: {
-    position: SnotifyPosition.rightTop
-  }
+	toast: {
+		position: SnotifyPosition.rightTop
+	}
 }
 
 Vue.use(Snotify, snotifyOptions)
 Vue.use(BootstrapVue)
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' })
 Vue.use(VueI18n)
-
+Vue.use(lodash)
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon)
 Vue.directive('access', Access)
 
 const keycloakconfig = {
-  authRealm: process.env.REALM_KEYCLOAK,
-  authUrl: process.env.ADDR_KEYCLOAK + '/auth',
-  authClientId: process.env.CLIENTID
-  // logoutRedirectUri: 'http://logout'
+	authRealm: process.env.REALM_KEYCLOAK,
+	authUrl: process.env.ADDR_KEYCLOAK + '/auth',
+	authClientId: process.env.CLIENTID
+	// logoutRedirectUri: 'http://logout'
 }
 
 function tokenInterceptor () {
-  let user = {
-    login: `${Vue.prototype.$keycloak.userName}`,
-    jwt: `${Vue.prototype.$keycloak.token}`,
-    fullname: `${Vue.prototype.$keycloak.fullName}`,
-    lastname: `${Vue.prototype.$keycloak.lastName}`,
-    firstname: `${Vue.prototype.$keycloak.firstName}`,
-    email: `${Vue.prototype.$keycloak.email}`,
-    permissions: ['active']
-  }
-  store.dispatch('login', user).then(user => { })
+	let user = {
+		login: `${Vue.prototype.$keycloak.userName}`,
+		jwt: `${Vue.prototype.$keycloak.token}`,
+		fullname: `${Vue.prototype.$keycloak.fullName}`,
+		lastname: `${Vue.prototype.$keycloak.lastName}`,
+		firstname: `${Vue.prototype.$keycloak.firstName}`,
+		email: `${Vue.prototype.$keycloak.email}`,
+		permissions: ['active']
+	}
+	store.dispatch('login', user).then(user => { })
 }
 
 // Create VueI18n instance with options
 const i18n = new VueI18n({
-  locale: 'en',
-  messages
+	locale: 'en',
+	messages
 })
 
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
-  config: keycloakconfig,
-  onReady: (keycloak) => {
-    tokenInterceptor()
-    /* eslint-disable no-new */
-    new Vue({
-      el: '#app',
-      router,
-      store,
-      i18n,
-      components: { App },
-      template: '<App/>'
-    })
-  }
+	config: keycloakconfig,
+	onReady: (keycloak) => {
+		tokenInterceptor()
+		/* eslint-disable no-new */
+		new Vue({
+			el: '#app',
+			router,
+			store,
+			i18n,
+			components: { App },
+			template: '<App/>'
+		})
+	}
 })
 
 // if we don't need authentication...

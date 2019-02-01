@@ -22,25 +22,25 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'album_settings_token',
-  data () {
-    return {
-    }
-  },
-  computed: {
-    ...mapGetters({
-      album: 'album'
-    })
-  },
-  created () {
-  },
-  watch: {
-  }
+	name: 'album_settings_token',
+	data () {
+		return {
+		}
+	},
+	computed: {
+		...mapGetters({
+			album: 'album'
+		})
+	},
+	created () {
+	},
+	watch: {
+	}
 }
 
 </script>
 
-
 <style>
 
 </style>
+
