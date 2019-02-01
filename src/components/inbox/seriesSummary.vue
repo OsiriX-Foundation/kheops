@@ -102,7 +102,8 @@ export default{
 			}			
 		},
 		openViewer () {
-			window.open('https://ohif.kheops.online/?url=https://test.kheops.online/studies/'+this.StudyInstanceUID+'/ohifmetadata#token='+this.user.jwt,'OHIFViewer')
+			let url = 'https://test.kheops.online/studies/'+this.StudyInstanceUID+'/ohifmetadata#token='+this.user.jwt;
+			window.open('https://ohif.kheops.online/?url='+encodeURI(url),'OHIFViewer')
 		}
 	}
 }
