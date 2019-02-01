@@ -111,7 +111,7 @@ public class QIDOResource {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
-        if(pair.getXTotalCount() == 0) {
+        if(pair.getAttributesList().isEmpty()) {
             return Response.status(NO_CONTENT)
                     .header(X_TOTAL_COUNT, pair.getXTotalCount())
                     .build();
