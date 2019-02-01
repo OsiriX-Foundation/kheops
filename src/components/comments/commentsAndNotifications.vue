@@ -37,11 +37,12 @@
 
 <template>
 	<div class = 'container'>
-		<p class = 'col-sm-12 col-md-10 offset-md-1 text-right' v-if='scope=="album"'><label>{{$t('includenotifications')}} </label> <toggle-button v-model="includeNotifications" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='getComments'/></p>
-		<div class = 'row'>
+		<div class = 'row justify-content-center'>
+			<p class = 'col-sm-12 col-md-10 offset-md-1 text-right' v-if='scope=="album"'><label>{{$t('includenotifications')}} </label> <toggle-button v-model="includeNotifications" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='getComments'/></p>
 
 			<div class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3" style = 'max-height: 600px; overflow-y: scroll;' :id = 'container_id'>
-				<div v-for="comment in comments">
+				
+				<div v-for="comment in comments" v-bind:key="comment.id">
 					
 					<!-- Comments -->
 					
@@ -58,31 +59,31 @@
 
 						<div class="d-flex">
 							
-						<!-- IMPORT_STUDY, REMOVE_STUDY : -->
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_STUDY"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('thestudy')}} {{comment.study}}</div>
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_STUDY"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('thestudy')}} {{comment.study}}</div>
-						  
-						  <!-- IMPORT_SERIES, REMOVE_SERIES -->
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_SERIES"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_SERIES"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
-						  
-						  <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_USER"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theuser')}} {{comment.target_name}}</div>
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theadmin')}} {{comment.target_name}}</div>
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_USER"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theuser')}} {{comment.target_name}}</div>						  
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="PROMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasgranted')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>						  
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="DEMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasremoved')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
-						  
-						  <!-- LEAVE_ALBUM -->
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="LEAVE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasleft')}} </div>
-						  
-						  <!-- CREATE_ALBUM -->
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="CREATE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hascreated')}} {{$t('thealbum')}} </div>
-						  
-						  <!-- EDIT_ALBUM -->
-						  <div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="EDIT_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasedited')}} {{$t('thealbum')}} </div>
-						  						  
-						  <div class="bd-highlight"><small style = 'white-space: nowrap'>{{comment.post_date|formatDate}}</small></div>
+							<!-- IMPORT_STUDY, REMOVE_STUDY : -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_STUDY"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('thestudy')}} {{comment.study}}</div>
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_STUDY"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('thestudy')}} {{comment.study}}</div>
+							
+							<!-- IMPORT_SERIES, REMOVE_SERIES -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_SERIES"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_SERIES"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
+							
+							<!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_USER"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theuser')}} {{comment.target_name}}</div>
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theadmin')}} {{comment.target_name}}</div>
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_USER"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theuser')}} {{comment.target_name}}</div>						  
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="PROMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasgranted')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>						  
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="DEMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasremoved')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
+							
+							<!-- LEAVE_ALBUM -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="LEAVE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasleft')}} </div>
+							
+							<!-- CREATE_ALBUM -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="CREATE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hascreated')}} {{$t('thealbum')}} </div>
+							
+							<!-- EDIT_ALBUM -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="EDIT_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasedited')}} {{$t('thealbum')}} </div>
+													
+							<div class="bd-highlight"><small style = 'white-space: nowrap'>{{comment.post_date|formatDate}}</small></div>
 						</div>
 						
 						
@@ -91,14 +92,14 @@
 				</div>
 			</div>
 		</div>
-		<div class = 'row mt-4'>
+		<div class = 'row mt-4 justify-content-center'>
 			<div class = 'col-sm-12 col-md-10 offset-md-1'>
 				<form @submit.prevent='addComment'>
-					<div class = 'row'>
-						<div class = 'col-10'>
+					<div class = 'row justify-content-center'>
+						<div class = 'col-9 mb-2'>
 							<textarea class = 'form-control' rows=6 v-model='newComment.comment' placeholder="Use @... for a specific user"></textarea>
 						</div>
-						<div class = 'col-2'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='send'></v-icon>{{$t('send')}}</button></div>
+						<div class = 'col-auto'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='send'></v-icon>{{$t('send')}}</button></div>
 					</div>
 				</form>		
 			</div>		

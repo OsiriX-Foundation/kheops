@@ -18,22 +18,21 @@ import Icon from 'vue-awesome/components/Icon'
 import VeeValidate from 'vee-validate'
 import store from './store'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
-import {HTTP} from '@/router/http';
-import '@/filters/filters.js';
+import { HTTP } from '@/router/http'
+import '@/filters/filters.js'
 import VueI18n from 'vue-i18n'
 import messages from '@/lang/messages'
-
 
 Vue.config.productionTip = false
 
 Vue.use(Snotify, options)
 Vue.use(BootstrapVue)
-Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
+Vue.use(VeeValidate, { fieldsBagName: 'formFields' })
 Vue.use(VueI18n)
 
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon)
-Vue.directive('access',Access);
+Vue.directive('access', Access)
 
 // globally (in your main .js file)
 const options = {
@@ -43,25 +42,24 @@ const options = {
 }
 
 const keycloakconfig = {
-  authRealm: 'StaticLoginConnect',
-  authUrl: 'https://keycloak.kheops.online/auth',
-  authClientId: 'loginConnect'
+  authRealm: process.env.REALM_KEYCLOAK,
+  authUrl: process.env.ADDR_KEYCLOAK + '/auth',
+  authClientId: process.env.CLIENTID
   // logoutRedirectUri: 'http://logout'
 }
 
 function tokenInterceptor () {
-	let user = {
-		login: `${Vue.prototype.$keycloak.userName}`,
-		jwt: `${Vue.prototype.$keycloak.token}`,
-		fullname: `${Vue.prototype.$keycloak.fullName}`,
-		lastname: `${Vue.prototype.$keycloak.lastName}`,
-		firstname: `${Vue.prototype.$keycloak.firstName}`,
-		email: `${Vue.prototype.$keycloak.email}`,
-		permissions: ['active']
-	}
-	store.dispatch('login',user).then(user => {})
+  let user = {
+    login: `${Vue.prototype.$keycloak.userName}`,
+    jwt: `${Vue.prototype.$keycloak.token}`,
+    fullname: `${Vue.prototype.$keycloak.fullName}`,
+    lastname: `${Vue.prototype.$keycloak.lastName}`,
+    firstname: `${Vue.prototype.$keycloak.firstName}`,
+    email: `${Vue.prototype.$keycloak.email}`,
+    permissions: ['active']
+  }
+  store.dispatch('login', user).then(user => { })
 }
-
 
 // Create VueI18n instance with options
 const i18n = new VueI18n({
@@ -69,32 +67,29 @@ const i18n = new VueI18n({
   messages
 })
 
-
-
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
-	config: keycloakconfig,
-    onReady: (keycloak) => {
-	   tokenInterceptor()
+  config: keycloakconfig,
+  onReady: (keycloak) => {
+    tokenInterceptor()
     /* eslint-disable no-new */
-	new Vue({
-	    el: '#app',
-	    router,
-	    store,
-  	    i18n,
-	    components: { App },
-	    template: '<App/>'
-	  })
+    new Vue({
+      el: '#app',
+      router,
+      store,
+      i18n,
+      components: { App },
+      template: '<App/>'
+    })
   }
 })
 
-
 // if we don't need authentication...
 
-	  // new Vue({
-	  //   el: '#app',
-	  //   router,
-	  //   store,
-	  //   components: { App },
-	  //   template: '<App/>'
-	  // })
+// new Vue({
+//   el: '#app',
+//   router,
+//   store,
+//   components: { App },
+//   template: '<App/>'
+// })

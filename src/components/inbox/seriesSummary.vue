@@ -1,4 +1,3 @@
-/* eslint-disable */
 <i18n>
 
 {
@@ -8,7 +7,8 @@
 		"description": "Description",
 		"seriesdate": "Series date",
 		"seriestime": "Series time",
-		"openviewer": "Open viewer"
+		"openviewer": "Open viewer",
+		"applicationentity": "Application entity"
 	},
 	"fr": {
 		"modality": "Modalité",
@@ -16,7 +16,8 @@
 		"description": "Description",
 		"seriesdate": "Date de la série",
 		"seriestime": "Heure de la série",
-		"openviewer": "Ouvrir un explorateur"
+		"openviewer": "Ouvrir une visionneuse",
+		"applicationentity": "Application entity"
 	}
 }
 
@@ -25,27 +26,61 @@
 
 <template>
 	<div class = 'seriesSummaryContainer'>
-		<div class = 'card-title'>
-			<b-form-checkbox v-model = "isSelected" >{{series.RetrieveAETitle[0]}}</b-form-checkbox>
-		</div>
-		<div class = 'row'>
-			<div class = 'preview'>
-				<img :src='previewImg()' width= '250' height = '250'>
+		<div class='row justify-content-center'>
+			<div class='mb-2'>
+				<b-form-checkbox v-model="isSelected" v-if='series.SeriesDescription'>
+					{{series.SeriesDescription[0]}}
+				</b-form-checkbox>
+
+				<b-form-checkbox v-model="isSelected" v-else>
+					No description
+				</b-form-checkbox>
 			</div>
-			<div class = 'col description'>
-				<dl class = 'row'>
-					<dt v-if='series.Modality' class = 'col-md-4 col-sm-12 text-right'>{{ $t('modality') }}</dt>
-					<dd v-if='series.Modality' class = 'col-md-8 col-sm-12'>{{series.Modality[0]}}</dd>
-					<dt v-if='series.NumberOfSeriesRelatedInstances' class = 'col-md-4 col-sm-12 text-right'>{{ $t("numberimages") }}</dt>
-					<dd v-if='series.NumberOfSeriesRelatedInstances' class = 'col-md-8 col-sm-12'>{{series.NumberOfSeriesRelatedInstances[0]}}</dd>
-					<dt v-if='series.SeriesDescription' class = 'col-md-4 col-sm-12 text-right'>{{ $t("description") }}</dt>
-					<dd v-if='series.SeriesDescription' class = 'col-md-8 col-sm-12'>{{series.SeriesDescription[0]}}</dd>
-					<dt v-if='series.SeriesDate' class = 'col-md-4 col-sm-12 text-right'>{{ $t("seriesdate") }}</dt>
-					<dd v-if='series.SeriesDate' class = 'col-md-8 col-sm-12'>{{series.SeriesDate[0]|formatDate}}</dd>
-					<dt v-if='series.SeriesTime' class = 'col-md-4 col-sm-12	text-right'>{{ $t("seriestime") }}</dt>
-					<dd v-if='series.SeriesTime' class = 'col-md-8 col-sm-12'>{{series.SeriesTime[0]|formatTime}}</dd>
+		</div>
+		<div class = 'row justify-content-center'>
+			<div class = 'preview'>
+				<img class="cursor-img" @click="openViewer" :src='previewImg()' width= '250' height = '250' v-if='series.Modality != "SR"'>
+				<img :src='previewImg()' width= '250' height = '250' v-else>
+			</div>
+			<!--
+				div - col col-mb-2 col-md-auto description
+				table - table table-striped col-md-auto
+			-->
+			<div class = 'col col-mb-2 col-sm-10 col-md-8 col-lg-6 description'>
+				<table class="table table-striped">
+					<tbody>
+						<tr v-if="series.Modality">
+							<th>{{ $t('modality') }}</th>
+							<td>{{ series.Modality[0] }}</td>
+						</tr>
+						<tr v-if="series.RetrieveAETitle">
+							<th>{{ $t('applicationentity') }}</th>
+							<td>{{ series.RetrieveAETitle[0] }}</td>
+						</tr>
+						<tr v-if="series.NumberOfSeriesRelatedInstances">
+							<th>{{ $t('numberimages') }}</th>
+							<td>{{ series.NumberOfSeriesRelatedInstances[0] }}</td>
+						</tr>
+						<tr v-if="series.SeriesDescription">
+							<th>{{ $t('description') }}</th>
+							<td>{{ series.SeriesDescription[0] }}</td>
+						</tr>
+						<tr v-if="series.SeriesDate">
+							<th>{{ $t('seriesdate') }}</th>
+							<td>{{ series.SeriesDate[0]|formatDate }}</td>
+						</tr>
+						<tr v-if="series.SeriesTime">
+							<th>{{ $t('seriestime') }}</th>
+							<td>{{ series.SeriesTime[0]|formatTime }}</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<dl class = 'row justify-content-center' v-if='series.Modality != "SR"'>
+					<dd>
+						<button type = 'button' class = 'btn-primary btn-sm' @click='openViewer'>{{$t('openviewer')}}</button>
+					</dd>
 				</dl>
-				<p class = 'text-center'><button type = 'button' class = 'btn btn-sm' @click='openViewer'>{{$t('openviewer')}}</button></p>
 			</div>			
 		</div>
 	</div>
@@ -57,8 +92,7 @@ export default{
 	name: "seriesSummary",
 	props: ['SeriesInstanceUID','StudyInstanceUID','selected'],
 	data () {
-		return {
-		}
+		return {}
 	},
     computed: {
   	  ...mapGetters({
@@ -89,11 +123,15 @@ export default{
 			   }
 		   }
 	         
-	   }
+	   	}
    	},
 	methods: {
+		toggleChecked () {
+			this.isSelected = !this.isSelected
+		},
+
 		previewImg () {
-			let imgSrcData = '';
+			if (this.series.Modality == 'SR') this.series.imgSrc = 'static/img/SR_2.png';
 			if (this.series.imgSrc !== undefined) return this.series.imgSrc;
 			else {
 				this.$store.dispatch('getImage',{SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID}).then(img => {
@@ -117,11 +155,14 @@ div.preview{
 	float: left;
 }
 div.seriesSummaryContainer{
-	font-size: 80%;
+	font-size: 90%;
 	line-height: 1.5em;
 }
 label{
 	font-size: 130%;
+}
+.cursor-img{
+	cursor: pointer;
 }
 
 </style>
