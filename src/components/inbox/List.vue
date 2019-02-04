@@ -54,7 +54,7 @@
 		<div class="my-3 selection-button-container">
 			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
 				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'>
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id' @click.stop='form_send_study=!form_send_study'>
 					<span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br/>
 					{{ $t("send") }}
 				</button>
@@ -89,6 +89,9 @@
 				<v-icon name = 'search' scale='2'/>
 			</button>
 		</div>
+		
+		<form-get-user @get-user='getUser' v-if='form_send_study'></form-get-user>
+		
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
 
@@ -231,6 +234,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
+import formGetUser from '@/components/user/getUser'
 import seriesSummary from '@/components/inbox/seriesSummary'
 import studyMetadata from '@/components/study/studyMetadata.vue'
 import ToggleButton from 'vue-js-toggle-button'
@@ -245,6 +249,7 @@ export default {
 		return {
 			pageNb: 1,
 			active: false,
+			form_send_study: false,
 			fields: [
 				{
 					key: 'is_selected',
@@ -308,7 +313,7 @@ export default {
 			}
 		}
 	},
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser },
 	computed: {
 		...mapGetters({
 			studies: 'studies',
@@ -440,6 +445,9 @@ export default {
 		},
 		loadStudiesMetadata (item) {
 			item.view = 'study'
+		},
+		getUser (user_sub) {
+			console.log(user_sub)
 		}
 	},
 
