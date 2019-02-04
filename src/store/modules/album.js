@@ -43,7 +43,7 @@ const actions = {
 			commit('SET_ALBUM', res.data)
 		})
 	},
-	toggleFavorite ({ commit }, params) {
+	toggleFavorite () {
 	},
 	patchAlbum ({ commit }, params) {
 		var query = ''
@@ -56,7 +56,7 @@ const actions = {
 			}
 		})
 	},
-	getUsers ({ commit }, params) {
+	getUsers ({ commit }) {
 		return HTTP.get('/album/' + state.album.album_id + '/users', { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) {
 				commit('SET_USERS', res.data)
@@ -102,7 +102,7 @@ const actions = {
 			}
 		})
 	},
-	postAlbumComment ({ commit, dispatch }, params) {
+	postAlbumComment ({ dispatch }, params) {
 		var query = ''
 		_.forEach(params, (value, key) => {
 			if (value) query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'

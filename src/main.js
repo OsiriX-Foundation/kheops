@@ -39,11 +39,10 @@ Vue.use(lodash)
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon)
 Vue.directive('access', Access)
-
 const keycloakconfig = {
-	authRealm: process.env.REALM_KEYCLOAK,
-	authUrl: process.env.ADDR_KEYCLOAK + '/auth',
-	authClientId: process.env.CLIENTID
+	authRealm: process.env.VUE_APP_REALM_KEYCLOAK,
+	authUrl: process.env.VUE_APP_ADDR_KEYCLOAK + '/auth',
+	authClientId: process.env.VUE_APP_CLIENTID
 	// logoutRedirectUri: 'http://logout'
 }
 
@@ -52,12 +51,9 @@ function tokenInterceptor () {
 		login: `${Vue.prototype.$keycloak.userName}`,
 		jwt: `${Vue.prototype.$keycloak.token}`,
 		fullname: `${Vue.prototype.$keycloak.fullName}`,
-		lastname: `${Vue.prototype.$keycloak.lastName}`,
-		firstname: `${Vue.prototype.$keycloak.firstName}`,
-		email: `${Vue.prototype.$keycloak.email}`,
 		permissions: ['active']
 	}
-	store.dispatch('login', user).then(user => { })
+	store.dispatch('login', user)
 }
 
 // Create VueI18n instance with options
@@ -69,7 +65,7 @@ const i18n = new VueI18n({
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
 	config: keycloakconfig,
-	onReady: (keycloak) => {
+	onReady: () => {
 		tokenInterceptor()
 		/* eslint-disable no-new */
 		new Vue({

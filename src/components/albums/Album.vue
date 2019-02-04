@@ -34,7 +34,7 @@
 	<div class = 'container-fluid'>
 		<div class = 'container'>
 			<div class = 'row'>
-				<div class = 'col-md'>	<h3><v-icon name="book" scale="2"></v-icon>{{album.name}} <v-icon name="star-o" scale="2" v-if="view=='studies'"></v-icon></h3></div>
+				<div class = 'col-md'>	<h3><v-icon name="book" scale="2"></v-icon><span class = 'p-2'>{{album.name}}</span> <v-icon name="star" scale="2" v-if="view=='studies'"></v-icon></h3></div>
 				<div class = 'col-md'>	<nav class="nav nav-pills nav-fill">
 						<a class="nav-link" :class="(view=='studies')?'active':''" @click.stop="view='studies'" >Studies</a>
 						<a class="nav-link" :class="(view=='comments')?'active':''" @click.stop="view='comments'">Comments</a>
@@ -75,7 +75,7 @@ export default {
 	methods: {
 	},
 	created () {
-		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(res => {
+		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
 			this.view = this.$route.query.view || 'studies'
 		})
 	},

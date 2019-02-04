@@ -33,7 +33,7 @@
 					<router-link to="/favorites" class="nav-link" active-class="active"><v-icon name='star'/>{{ $t("favorites") }}</router-link>
 				</li>
 				<li class="nav-item">
-					<router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock-o'/>{{ $t("recents") }}</router-link>
+					<router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock'/>{{ $t("recents") }}</router-link>
 				</li>
 			</ul>
 		</div>
@@ -49,9 +49,8 @@ export default {
 		}
 	},
 	watch: {
-		'$route' (to, from) {
+		'$route' (to) {
 			this.activePath = to.path.split('/')[1]
-			console.log(this.activePath)
 		}
 	}
 }

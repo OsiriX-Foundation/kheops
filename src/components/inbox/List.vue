@@ -210,11 +210,11 @@
 						<div class = 'patientNameIcons col-md-auto'>
 							<span @click = "toggleFavorite(row.index,'study')" :class="row.item.is_favorite?'selected':''">
 								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-								<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
+								<v-icon v-else class="align-middle" style="margin-right:0" name="star"></v-icon>
 							</span>
 							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''">
 								<v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon>
-								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment-o"></v-icon>
+								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment"></v-icon>
 							</span>
 							<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+row.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
@@ -397,18 +397,17 @@ export default {
 		},
 		toggleSelected (item, type, isSelected) {
 			let index = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === item.StudyInstanceUID[0] })
-			this.$store.dispatch('toggleSelected', { type: type, index: index, is_selected: isSelected }).then(res => {
-			})
+			this.$store.dispatch('toggleSelected', { type: type, index: index, is_selected: isSelected })
 		},
 		downloadSelectedStudies () {
 			var vm = this
-			_.forEach(this.studies, function (study, index) {
+			_.forEach(this.studies, function (study) {
 				if (study.is_selected) {
 					vm.$store.dispatch('downloadStudy', { StudyInstanceUID: study.StudyInstanceUID })
 				}
 			})
 		},
-		searchOnline (filters) {
+		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
 		},
 		addToAlbum (albumId) {
@@ -427,7 +426,7 @@ export default {
 			})
 
 			if (data.length) {
-				this.$store.dispatch('putStudiesInAlbum', { data: data }).then(res => {
+				this.$store.dispatch('putStudiesInAlbum', { data: data }).then( () => {
 					this.$snotify.success(this.$t('studyputtoalbum'))
 				})
 			}

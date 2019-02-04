@@ -4,10 +4,7 @@ const state = {
 	all: [],
 	current: {
 		username: null,
-		firstname: null,
-		lastname: null,
 		fullname: null,
-		email: null,
 		permissions: [],
 		jwt: null
 	}
@@ -21,14 +18,11 @@ const getters = {
 // actions
 const actions = {
 	login ({ commit }, userData) {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			var loggedUser = {
 				username: userData.login,
 				jwt: userData.jwt,
 				fullname: userData.fullname,
-				firstname: userData.firstname,
-				lastname: userData.lastname,
-				email: userData.email,
 				permissions: userData.permissions
 			}
 			HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
@@ -55,7 +49,7 @@ const actions = {
 			}
 		}
 	},
-	checkPermissions ({ commit }, params) {
+	checkPermissions (context, params) {
 		let permissionsToCheck = params.permissions
 		let condition = params.condition
 		if (condition !== 'all') condition = 'any'
@@ -69,11 +63,11 @@ const actions = {
 		HTTP.defaults.auth = {}
 		commit('LOGOUT')
 	},
-	checkUser ({ commit }, user) {
+	checkUser (context, user) {
 		return HTTP.get('users?reference=' + user, { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) return res.data.sub
 			return false
-		}).catch(res => {
+		}).catch( () => {
 			return false
 		})
 	}

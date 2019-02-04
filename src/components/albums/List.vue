@@ -118,7 +118,7 @@
 					<div class = 'nameIcons'>
 						<span @click = "toggleFavorite(data.index,'album')" :class="data.item.is_favorite?'selected':''">
 							<v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-							<v-icon v-else class="align-middle" style="margin-right:0" name="star-o"></v-icon>
+							<v-icon v-else class="align-middle" style="margin-right:0" name="star" :invert="true"></v-icon>
 						</span>
 					</div>
 				</div>
@@ -271,7 +271,7 @@ export default {
 		},
 		toggleSelected (item, type, isSelected) {
 			let index = _.findIndex(this.albums, s => { return s.album_id === item.album_id })
-			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then(res => {
+			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then( () => {
 			})
 		},
 
@@ -301,13 +301,13 @@ export default {
 		},
 		downloadSelectedAlbums () {
 			var vm = this
-			_.forEach(this.albums, function (album, index) {
+			_.forEach(this.albums, function (album) {
 				if (album.is_selected) {
 					vm.$store.dispatch('downloadAlbum', { album_id: album.album_id })
 				}
 			})
 		},
-		searchOnline (filters) {
+		searchOnline () {
 			this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
 		},
 		selectAlbum (item) {

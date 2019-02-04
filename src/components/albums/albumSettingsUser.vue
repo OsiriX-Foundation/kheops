@@ -5,8 +5,9 @@
 	"en": {
 		"username": "User name",
 		"user": "user",
+		"userlist": "List of users",
 		"changerole": "change role to",
-		"add_user": "Add User",
+		"add_user": "Add a user",
 		"add_series": "Add Studies / Series",
 		"download_series": "Download Studies / Series",
 		"send_series": "Get Studies / Series",
@@ -21,6 +22,7 @@
 	"fr": {
 		"username": "Utilisateur",
 		"user": "Utilisateur",
+		"userlist": "Liste d'utilisateurs",
 		"changerole": "changer le rôle pour",
 		"add_user": "Ajouter un utilisateur",
 		"add_series": "Ajouter une étude / série",
@@ -39,7 +41,7 @@
 
 <template>
 	<div class = 'container'>
-		<h3 class = 'pointer' v-if = '!form_add_user'><span @click='addUser()'><v-icon name='user-plus' scale='2'></v-icon>{{$t('add_user')}}</span></h3>
+		<h3 class = 'pointer' v-if = '!form_add_user' style='width: 100%'>{{$t('userlist')}}<button @click='addUser()' class = 'btn btn-secondary float-right'><v-icon name='user-plus' scale='1'></v-icon>{{$t('add_user')}}</button></h3>
 		<div class = 'card' v-if='form_add_user'>
 			<div class = 'card-body'>
 				<form @submit.prevent='addUser'>
@@ -115,8 +117,11 @@ export default {
 			if (!this.form_add_user) this.form_add_user = true
 			else {
 				if (this.new_user_name && this.validEmail(this.new_user_name)) {
-					this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then(res => {
-						this.$snotify.success(this.$t('albumuseraddsuccess'))
+					this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then( () => {
+						this.$snotify.success(this.$t('albumuseraddsuccess')),
+						this.new_user_name = ''
+						this.form_add_user = false
+						this.confirm_delete = ''
 					}).catch(res => {
 						this.$snotify.error(this.$t(res))
 					})
@@ -125,7 +130,7 @@ export default {
 		},
 		toggleAdmin (user) {
 			user.is_admin = !user.is_admin
-			this.$store.dispatch('toggleAlbumUserAdmin', user).then(res => {
+			this.$store.dispatch('toggleAlbumUserAdmin', user).then( () => {
 				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
 				this.$snotify.success(message)
 			}).catch(err => {
@@ -136,8 +141,9 @@ export default {
 		deleteUser (user) {
 			if (this.confirm_delete !== user.user_name) this.confirm_delete = user.user_name
 			else {
-				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(res => {
+				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then( () => {
 					this.$snotify.success(this.$t('albumuserdeletesuccess'))
+					this.confirm_delete = ''
 				})
 			}
 		},
@@ -147,7 +153,7 @@ export default {
 		},
 		patchAlbum (field) {
 			let params = { field: this.album[field] }
-			this.$store.dispatch('patchAlbum', params).then(res => {
+			this.$store.dispatch('patchAlbum', params).then( () => {
 				this.$snotify.success(this.$t('albumupdatesuccess'))
 			}).catch(err => {
 				console.error(err)

@@ -128,10 +128,11 @@ export default {
 
 		previewImg () {
 			if (this.series.Modality === 'SR') this.series.imgSrc = 'static/img/SR_2.png'
-			if (this.series.imgSrc !== undefined) return this.series.imgSrc
+			if (this.series.imgSrc !== undefined && this.series.imgSrc != '') return this.series.imgSrc
 			else {
-				this.$store.dispatch('getImage', { SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID }).then(img => {
-					return img.data
+				return this.$store.dispatch('getImage', { SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID }).then(img => {
+					this.series.imgSrc = img;
+					return img;
 				})
 			}
 		},

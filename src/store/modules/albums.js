@@ -113,7 +113,7 @@ const actions = {
 			let isFavorite = !state.all[params.index].is_favorite
 			let albumId = state.all[params.index].album_id
 			if (isFavorite) {
-				return HTTP.put('/albums/' + albumId + '/favorites').then(res => {
+				return HTTP.put('/albums/' + albumId + '/favorites').then( () => {
 					console.log('OK ' + albumId + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
@@ -122,7 +122,7 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/albums/' + albumId + '/favorites').then(res => {
+				return HTTP.delete('/albums/' + albumId + '/favorites').then( () => {
 					console.log('KO ' + albumId + ' is NOT in favorites')
 				})
 			}
@@ -140,7 +140,7 @@ const actions = {
 
 		return HTTP.post('album', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			commit('CREATE_ALBUM', res.data)
-		}).catch(res => {
+		}).catch( () => {
 		})
 	},
 
@@ -188,7 +188,7 @@ const mutations = {
 		}
 	},
 	SELECT_ALL_ALBUMS (state, isSelected) {
-		_.forEach(state.all, function (album, index) {
+		_.forEach(state.all, function (album) {
 			album.is_selected = isSelected
 		})
 	},

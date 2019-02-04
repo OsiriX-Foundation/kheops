@@ -97,7 +97,7 @@
 						<div class = 'col-9 mb-2'>
 							<textarea class = 'form-control' rows=6 v-model='newComment.comment' placeholder="Use @... for a specific user"></textarea>
 						</div>
-						<div class = 'col-auto'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='send'></v-icon>{{$t('send')}}</button></div>
+						<div class = 'col-auto'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='paper-plane'></v-icon>{{$t('send')}}</button></div>
 					</div>
 				</form>
 			</div>
@@ -168,7 +168,7 @@ export default {
 					}
 				}
 				if (this.scope === 'album') {
-					this.$store.dispatch('postAlbumComment', this.newComment).then(res => {
+					this.$store.dispatch('postAlbumComment', this.newComment).then( () => {
 						this.$snotify.success('commentpostsuccess')
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
@@ -178,7 +178,7 @@ export default {
 						this.newComment.to_user = ''
 					})
 				} else if (this.scope === 'studies') {
-					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(res => {
+					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then( () => {
 						this.$snotify.success('commentpostsuccess')
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
@@ -193,25 +193,19 @@ export default {
 		getComments () {
 			let type = (this.includeNotifications) ? '' : 'comments'
 			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumComments', { type: type }).then(res => {
+				this.$store.dispatch('getAlbumComments', { type: type }).then( () => {
 					let container = this.$el.querySelector('#album_comment_container')
 					container.scrollTop = container.scrollHeight
 				})
 			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then(res => {
+				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then( () => {
 					let container = this.$el.querySelector('#study_' + this.id.replace(/\./g, '_') + '_comment_container')
 					container.scrollTop = container.scrollHeight
 				})
 			}
 		}
 	},
-	watch: {
-		'id' (to, from) {
-			console.log(this.id + 'changed')
-		}
-	},
 	created () {
-		console.log(this.users)
 		this.getComments()
 		if (this.album.album_id) this.$store.dispatch('getUsers')
 	}

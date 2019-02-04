@@ -5,6 +5,6 @@ export var HTTP = axios.create({ baseURL: serverURL })
 
 HTTP.interceptors.response.use(function (response) {
 	return response
-}, function (error, status) {
+}, function (error) {
 	return Promise.reject(error.response.data)
 })

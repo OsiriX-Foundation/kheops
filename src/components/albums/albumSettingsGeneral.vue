@@ -22,7 +22,7 @@
 			<dt>{{$t('albumname')}}</dt>
 			<dd>
 				<div v-if='edit.name=="-1"'>
-					{{album.name}} <span class = 'icon-edit' @click="edit.name=album.name" v-if='album.is_admin && edit.name=="-1"'><v-icon name='pencil'></v-icon></span>
+					{{album.name}} <span class = 'icon-edit' @click="edit.name=album.name" v-if='album.is_admin && edit.name=="-1"'><v-icon name='pencil-alt'></v-icon></span>
 				</div>
 				<div v-if='edit.name!="-1"'>
 					<form @submit.prevent='updateAlbum'>
@@ -39,7 +39,7 @@
 				</div>
 
 			</dd>
-			<dt>{{$t('albumdescription')}}<span class = 'icon-edit float-right' @click="edit.description=album.description" v-if='album.is_admin && edit.description=="-1"'><v-icon name='pencil'></v-icon></span></dt>
+			<dt>{{$t('albumdescription')}}<span class = 'icon-edit float-right' @click="edit.description=album.description" v-if='album.is_admin && edit.description=="-1"'><v-icon name='pencil-alt'></v-icon></span></dt>
 			<dd class = 'album_description'>
 				<div v-if='edit.description=="-1"' v-html='$options.filters.nl2br(album.description)'></div>
 				<div v-if='edit.description!="-1"'>
@@ -110,21 +110,21 @@ export default {
 			params.notificationNewComment = this.album.notification_new_comment
 			params.notificationNewSeries = this.album.notification_new_series
 
-			this.$store.dispatch('patchAlbum', params).then(res => {
+			this.$store.dispatch('patchAlbum', params).then( () => {
 				this.$snotify.success(this.$t('albumupdatesuccess'))
 				this.edit.name = '-1'
 				this.edit.description = '-1'
-			}).catch(res => {
+			}).catch( () => {
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
 		deleteAlbum () {
 			if (!this.confirmDeletion) this.confirmDeletion = true
 			else {
-				this.$store.dispatch('deleteAlbum').then(res => {
+				this.$store.dispatch('deleteAlbum').then( () => {
 					this.$snotify.success(this.$t('albumdeletesuccess'))
 					this.$router.push('/albums')
-				}).catch(res => {
+				}).catch( () => {
 					this.$snotify.error(this.$t('sorryerror'))
 				})
 			}

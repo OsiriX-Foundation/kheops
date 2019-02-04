@@ -3,8 +3,8 @@ import store from '@/store'
 
 // Initialize the annoying-background directive.
 export default {
-	bind: function (el, binding, vnode) {
-		Bus.$on('user.updated', v => {
+	bind: function (el, binding) {
+		Bus.$on('user.updated', () => {
 			store.dispatch('checkPermissions', { permissions: binding.value, condition: 'any' }).then(check => {
 				el.style.display = (check) ? '' : 'none'
 			})

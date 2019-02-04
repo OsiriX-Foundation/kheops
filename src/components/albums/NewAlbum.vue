@@ -137,8 +137,8 @@ export default {
 			let idx = _.findIndex(vm.album.users, u => { return u.email === vm.newUserName })
 			if (vm.newUserName && idx === -1) {
 				HTTP.get('users?reference=' + vm.newUserName, { headers: { 'Accept': 'application/json' } }).then(res => {
-					console.log(res)
-				}).catch(res => {
+					console.log(res.data)
+				}).catch( () => {
 					console.log('Sorry, an error occured')
 				})
 			}
@@ -154,7 +154,7 @@ export default {
 				addSeries: this.album.userSettings.addSeries,
 				writeComments: this.album.userSettings.writeComments
 			}
-			this.$store.dispatch('createAlbum', postValues).then(album => {
+			this.$store.dispatch('createAlbum', postValues).then( () => {
 				this.$router.push('/albums')
 			})
 		}

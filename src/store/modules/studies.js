@@ -112,7 +112,7 @@ const actions = {
 	getSeries ({ commit, dispatch }, params) {
 		if (params.StudyInstanceUID) {
 			let study = null
-			let studies = _.filter(state.all, s => { return s.StudyInstanceUID === params.StudyInstanceUID })
+			let studies = _.filter(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 			if (studies.length) {
 				study = studies[0]
 			}
@@ -124,7 +124,7 @@ const actions = {
 
 			HTTP.get('/studies/' + study.StudyInstanceUID + '/series?includefield=00080021&includefield=00080031' + queryString, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 				let data = []
-				_.forEach(res.data, (d, i) => {
+				_.forEach(res.data, (d) => {
 					let t = { imgSrc: '' }
 					_.forEach(d, (v, k) => {
 						if (dicom.dicom2name[k] !== undefined) {
@@ -152,8 +152,7 @@ const actions = {
 								}
 								commit('SET_FLAG', flag)
 							}
-
-							dispatch('getImage', { StudyInstanceUID: study.StudyInstanceUID, SeriesInstanceUID: t.SeriesInstanceUID[0] })
+							dispatch('getImage', { StudyInstanceUID: study.StudyInstanceUID[0], SeriesInstanceUID: t.SeriesInstanceUID[0] })
 						}
 					})
 					if (t.SeriesInstanceUID !== undefined) data.push(t)
@@ -174,29 +173,28 @@ const actions = {
 				var mimeType = resp.headers['content-type'].toLowerCase()
 				img = 'data:' + mimeType + ';base64,' + b64
 			}
-
 			commit('SET_IMAGE', { StudyInstanceUID: StudyInstanceUID, SeriesInstanceUID: SeriesInstanceUID, img: img })
 			return img
 		})
 	},
 	deleteStudy ({ commit }, params) {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
-		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID === params.StudyInstanceUID })
+		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'study', index: studyIdx })
-		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + queryParam).then(res => {
+		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + queryParam).then( () => {
 			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID[0] })
 		})
 	},
 	deleteSeries ({ commit }, params) {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
-		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID === params.StudyInstanceUID })
+		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID === params.SeriesInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'series', index: studyIdx + ':' + seriesIdx })
-		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + '/series/' + params.SeriesInstanceUID[0] + queryParam).then(res => {
+		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + '/series/' + params.SeriesInstanceUID[0] + queryParam).then( () => {
 			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID[0], SeriesInstanceUID: params.SeriesInstanceUID[0] })
 		})
 	},
-	downloadStudy ({ commit }, params) {
+	downloadStudy () {
 
 		// var request = "/zipper/studies/"+params.StudyInstanceUID[0]+"/stream";
 		// var request = '/zipper/studies?limit='+limit+"&offset="+offset+params.filterParams;
@@ -211,7 +209,7 @@ const actions = {
 			let isFavorite = !state.all[params.index].is_favorite
 			let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0]
 			if (isFavorite) {
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites').then(res => {
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites').then( () => {
 					console.log('OK ' + StudyInstanceUID + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
@@ -220,7 +218,7 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites').then(res => {
+				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites').then( () => {
 					console.log('KO ' + StudyInstanceUID + ' is NOT in favorites')
 				})
 			}
@@ -236,7 +234,7 @@ const actions = {
 			}
 		})
 	},
-	postStudiesComment ({ commit, dispatch }, params) {
+	postStudiesComment ({ dispatch }, params) {
 		var query = ''
 		_.forEach(params.comment, (value, key) => {
 			if (value) query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
@@ -277,7 +275,7 @@ const mutations = {
 		}
 	},
 	SET_SERIES (state, data) {
-		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID === data.StudyInstanceUID })
+		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === data.StudyInstanceUID })
 		if (idx > -1) state.all[idx].series = data.series
 		_.forEach(state.all[idx].series, (d, i) => {
 			state.all[idx].series[i].is_selected = state.all[idx].is_selected
@@ -294,9 +292,9 @@ const mutations = {
 		})
 	},
 	SELECT_ALL_STUDIES (state, isSelected) {
-		_.forEach(state.all, function (study, index) {
+		_.forEach(state.all, function (study) {
 			study.is_selected = isSelected
-			_.forEach(study.series, (serie, serieIdx) => {
+			_.forEach(study.series, (serie) => {
 				serie.is_selected = study.is_selected
 			})
 		})
@@ -328,7 +326,7 @@ const mutations = {
 		if (params.type === 'study') {
 			state.all[params.index].is_selected = !state.all[params.index].is_selected
 			state.flags[state.all[params.index].StudyInstanceUID[0]].is_selected = state.all[params.index].is_selected
-			_.forEach(state.all[params.index].series, (serie, serieIdx) => {
+			_.forEach(state.all[params.index].series, (serie) => {
 				serie.is_selected = state.all[params.index].is_selected
 			})
 		} else if (params.type === 'series') {
@@ -393,7 +391,7 @@ const mutations = {
 			})
 		}
 	},
-	TOGGLE_STUDY_VIEW ({ commit }, params) {
+	TOGGLE_STUDY_VIEW (params) {
 		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		if (idx > -1) {
 			state.all[idx].view = (state.all[idx].view === 'comments') ? 'series' : 'comments'
