@@ -1,4 +1,4 @@
-# kheops2-vue
+# kheops-vue
 
 ## Project setup
 ```
