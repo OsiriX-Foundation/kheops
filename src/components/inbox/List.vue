@@ -500,7 +500,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 	select{
 		display: inline !important;
 	}

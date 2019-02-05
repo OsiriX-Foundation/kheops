@@ -228,7 +228,7 @@ const actions = {
 		commit('TOGGLE_SELECTED_STUDY', params)
 	},
 	getStudiesComments ({ commit }, params) {
-		return HTTP.get('/studies/' + params.StudyInstanceUID + '/comments', { headers: { 'Accept': 'application/json' } }).then(res => {
+		return HTTP.get('/studies/' + params.StudyInstanceUID[0] + '/comments', { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) {
 				commit('SET_STUDIES_COMMENTS', { data: res.data, StudyInstanceUID: params.StudyInstanceUID })
 			}
@@ -383,7 +383,7 @@ const mutations = {
 	},
 	SET_STUDIES_COMMENTS (state, params) {
 		let data = params.data
-		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
+		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID[0] })
 		if (studyIdx > -1) {
 			state.all[studyIdx].comments.splice(0)
 			_.forEach(data, d => {

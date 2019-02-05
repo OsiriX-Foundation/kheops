@@ -14,12 +14,12 @@
 	"yes": "yes",
 	"no": "no",
 	"name": "name",
-	 "delete": "Delete",
-	 "confirmdeletion": "Confirm deletion",
-		"send": "Send",
-		"in": "in",
-		"theuser": "the user",
-		"theadmin": "the admin",
-		"to": "to",
-		"thealbum": "the album"
+	"delete": "Delete",
+	"confirmdeletion": "Confirm deletion",
+	"send": "Send",
+	"in": "in",
+	"theuser": "the user",
+	"theadmin": "the admin",
+	"to": "to",
+	"thealbum": "the album"
 }
