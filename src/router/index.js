@@ -4,6 +4,7 @@ import Study from '@/components/inbox/List'
 import Albums from '@/components/albums/List'
 import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
+import Favorites from '@/components/favorites/Favorites'
 import store from '@/store'
 
 // import PermissionDenied from '@/components/user/permissionDenied'
@@ -16,6 +17,13 @@ Vue.use(Router)
 const router = new Router({
 	mode: 'history',
 	routes: [{
+		path: '/favorites',
+		name: 'favorites',
+		component: Favorites,
+		beforeEnter: requireAuth,
+		meta: { permissions: 'active', condition: 'any' }
+	},
+	{
 		path: '/inbox',
 		name: 'studies',
 		component: Study,
