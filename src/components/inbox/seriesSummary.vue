@@ -137,8 +137,8 @@ export default {
 			}
 		},
 		openViewer () {
-			let url = `${process.env.VUE_APP_URL_API}/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}#token=${this.user.jwt}`
-			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURI(url)}`, 'OHIFViewer')
+			let url = `${process.env.VUE_APP_URL_API}/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}`;
+			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`, 'OHIFViewer');
 		}
 	}
 }
