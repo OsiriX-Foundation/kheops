@@ -1,7 +1,9 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',  
-  ADDR_KEYCLOAK: '"https://keycloak.kheops.online"',
+  URL_KEYCLOAK: '"https://keycloak.kheops.online"',
   REALM_KEYCLOAK: '"StaticLoginConnect"',
-  CLIENTID: '"loginConnect"'
+  CLIENTID: '"loginConnect"',
+  URL_API: '"https://test.kheops.online"',
+  URL_VIEWER: '"https://ohif.kheops.online"'
 }

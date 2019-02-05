@@ -1,4 +1,4 @@
-export const serverURL = 'https://test.kheops.online/'
+export const serverURL = process.env.VUE_APP_URL_API
 
 export const siteTitle = 'Kheops'
 

@@ -219,7 +219,7 @@
 								<v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon>
 								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment"></v-icon>
 							</span>
-							<a :href="'https://test.kheops.online/link/'+user.jwt+'/studies/'+row.item.StudyInstanceUID+'?accept=application%2Fzip'" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
+							<a :href="getURLDownload(row.item.StudyInstanceUID)" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
 						</div>
 					</div>
@@ -340,6 +340,9 @@ export default {
 		}
 	},
 	methods: {
+		getURLDownload (StudyInstanceUID) {
+			return `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application%2Fzip`
+		},
 		scroll () {
 			window.onscroll = () => {
 				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight

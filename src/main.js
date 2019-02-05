@@ -41,7 +41,7 @@ Vue.component('v-icon', Icon)
 Vue.directive('access', Access)
 const keycloakconfig = {
 	authRealm: process.env.VUE_APP_REALM_KEYCLOAK,
-	authUrl: process.env.VUE_APP_ADDR_KEYCLOAK + '/auth',
+	authUrl: process.env.VUE_APP_URL_KEYCLOAK + '/auth',
 	authClientId: process.env.VUE_APP_CLIENTID
 	// logoutRedirectUri: 'http://logout'
 }

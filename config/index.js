@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
     	'/api':{
-    		target: 'https://test.kheops.online/',
+    		target: process.env.VUE_APP_URL_API,
 			changeOrigin: true,
 			pathRewrite: {
 				'^/api': ''
