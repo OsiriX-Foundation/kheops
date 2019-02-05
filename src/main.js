@@ -18,18 +18,24 @@ import Icon from 'vue-awesome/components/Icon'
 import VeeValidate from 'vee-validate'
 import store from './store'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
-import { HTTP } from '@/router/http'
 import '@/filters/filters.js'
 import VueI18n from 'vue-i18n'
 import messages from '@/lang/messages'
 
 Vue.config.productionTip = false
 
-Vue.use(Snotify, options)
+// globally (in your main .js file)
+const snotifyOptions = {
+	toast: {
+		position: SnotifyPosition.rightTop
+	}
+}
+
+Vue.use(Snotify, snotifyOptions)
 Vue.use(BootstrapVue)
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' })
 Vue.use(VueI18n)
-
+Vue.use(lodash)
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon)
 Vue.directive('access', Access)
@@ -52,8 +58,8 @@ function tokenInterceptor () {
 
 // Create VueI18n instance with options
 const i18n = new VueI18n({
-  locale: 'en',
-  messages
+	locale: 'en',
+	messages
 })
 
 /* eslint-disable no-new */
@@ -72,3 +78,13 @@ Vue.use(VueKeyCloak, {
 		})
 	}
 })
+
+// if we don't need authentication...
+
+// new Vue({
+//   el: '#app',
+//   router,
+//   store,
+//   components: { App },
+//   template: '<App/>'
+// })

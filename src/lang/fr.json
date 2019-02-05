@@ -7,7 +7,7 @@
 	"permissiondenied": "Permission refusée",
 	"sorryerror": "Désolé, une erreur est survenue",
 	"add": "Ajouter",
-    "usersettings": "Réglages des utilisateurs",
+		"usersettings": "Réglages des utilisateurs",
 	"albumupdatesuccess": "Album modifié avec succès",
 	"Yes": "Oui",
 	"No": "Non",
@@ -17,11 +17,10 @@
  "delete": "Supprimer",
  "confirmdeletion": "Confirmer la suppression",
  	  "send": "Envoyer",
-	  "in": "dans",
-	  "theuser": "l'utilisateur",
-	  "theadmin": "l'admin",
-	  "to": "à",
-	  "thealbum": "l'ablum"
-	
-	
+		"in": "dans",
+		"theuser": "l'utilisateur",
+		"theadmin": "l'admin",
+		"to": "à",
+		"thealbum": "l'ablum"
+
 }

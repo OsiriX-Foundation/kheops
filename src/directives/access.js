@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import {Bus} from '@/bus'
+import { Bus } from '@/bus'
 import store from '@/store'
 
 // Initialize the annoying-background directive.

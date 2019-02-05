@@ -90,7 +90,7 @@
 			</button>
 		</div>
 		
-		<form-get-user @get-user='getUser' v-if='form_send_study'></form-get-user>
+		<form-get-user @get-user='getUser' @cancel-user='form_send_study=false' v-if='form_send_study'></form-get-user>
 		
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
@@ -570,3 +570,4 @@ export default {
 		color: #fd7e14;
 	}
 </style>
+

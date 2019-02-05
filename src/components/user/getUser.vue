@@ -21,7 +21,7 @@
 						</div>
 						<div class="input-group-append">
               <button class="btn btn-primary" type="submit" :disabled='!validEmail(new_user_name)'>{{$t('add')}}</button>
-              <button class="btn btn-secondary" type="reset"  @keyup.esc='new_user_name=""' @click='new_user_name="";form_add_user=!form_add_user' tabindex="0">{{$t('cancel')}}</button>
+              <button class="btn btn-secondary" type="reset"  @keyup.esc='new_user_name=""' @click='cancel' tabindex="0">{{$t('cancel')}}</button>
 						</div>
 					</div>
 				</form>
@@ -50,6 +50,10 @@ export default {
 					this.new_user_name = ''
 				} 
 			})
+		},
+		cancel () {
+			this.new_user_name=""
+			this.$emit('cancel-user')
 		}
 	}
 	

@@ -12,7 +12,7 @@
 				<div class = 'card-body'>
 					<p><strong>Album description:</strong> <span v-html='$options.filters.nl2br(album.description)'></span></p>
 				</div>
-			</div>		
+			</div>
 		</div>
 		<studies></studies>
 	</div>
@@ -24,20 +24,20 @@ import Studies from '@/components/inbox/List.vue'
 
 export default {
 	name: 'album_studies',
-	components: {Studies},
+	components: { Studies },
 	data () {
 		return {
-			
+
 		}
 	},
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})	
-  	}
+		})
+	}
 }
-</script>
 
+</script>
 
 <style>
 
