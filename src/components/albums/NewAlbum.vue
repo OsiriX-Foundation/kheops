@@ -2,38 +2,40 @@
 
 <i18n>
 {
-	"en": {
-		"albumName": "Album Name",
-		"albumDescription": "Album Description",
-		"users": "Users",
-		"addUser": "Add User",
-		"addSeries": "Add Studies / Series",
-		"downloadSeries": "Download Studies / Series",
-		"sendSeries": "Get Studies / Series",
-		"deleteSeries": "Remove Studies / Series",
-		"writeComments": "Write Comments",
-		"create": "Create",
-		"cancel": "Cancel"
-	},
-	"fr": {
-		"albumName": "Nom de l'album",
-		"albumDescription": "Description de l'album",
-		"users": "Utilisateurs",
-		"addUser": "Ajouter un utilisateur",
-		"addSeries": "Ajouter une étude / série",
-		"downloadSeries": "Télécharger une étude / série",
-		"sendSeries": "Récupérer une étude / série",
-		"deleteSeries": "Supprimer une étude / série",
-		"writeComments": "Commenter",
-		"create": "Créer",
-		"cancel": "Annuler"
-	}
+  "en": {
+	  "albumName": "Album Name",
+	  "albumDescription": "Album Description",
+	  "users": "Users",
+	  "addUser": "Add User",
+	  "addSeries": "Add Studies / Series",
+	  "downloadSeries": "Download Studies / Series",
+	  "sendSeries": "Get Studies / Series",
+	  "deleteSeries": "Remove Studies / Series",
+	  "writeComments": "Write Comments",
+	  "create": "Create",
+	  "cancel": "Cancel"
+
+  },
+  "fr": {	
+	  "albumName": "Nom de l'album",
+	  "albumDescription": "Description de l'album",
+	  "users": "Utilisateurs",
+	  "addUser": "Ajouter un utilisateur",
+	  "addSeries": "Ajouter une étude / série",
+	  "downloadSeries": "Télécharger une étude / série",
+	  "sendSeries": "Récupérer une étude / série",
+	  "deleteSeries": "Supprimer une étude / série",
+	  "writeComments": "Commenter",
+	  "create": "Créer",
+	  "cancel": "Annuler"
+
+  }
 }
 </i18n>
 
 <template>
 	<div class = 'container'>
-
+	
 	<h3>{{displayName}}</h3>
 	<form v-on:submit.prevent="createAlbum">
 		<fieldset>
@@ -43,7 +45,7 @@
 					<dd>
 						<input type = 'text' v-model='album.name' :placeholder="$t('albumName')" class = 'form-control' >
 					</dd>
-
+					
 				</div>
 			</div>
 			<div class = 'row'>
@@ -52,14 +54,14 @@
 					<dd>
 						<textarea rows='5' v-model='album.description' class = 'form-control' :placeholder="$t('albumDescription')"></textarea>
 					</dd>
-
+					
 				</div>
 			</div>
 			<div class = 'row'>
 				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('users')}}</dt></div>
 				<div class = 'col-xs-12 col-sm-9'>
 					<dd>
-						<h5 class = 'user'><span v-for="user in album.users" :key="user.user_name" class = 'badge badge-secondary'>{{user.firstname+" "+user.lastname}} <span class = 'icon pointer' @click='deleteUser(user)'><v-icon name='times'></v-icon></span></span></h5>
+						<h5 class = 'user'><span v-for="user in album.users" class = 'badge badge-secondary'>{{user.firstname+" "+user.lastname}} <span class = 'icon pointer' @click='deleteUser(user)'><v-icon name='times'></v-icon></span></span></h5>
 						<h5 class = 'user'>
 							<div class="input-group mb-3">
 								<input type="text" class="form-control form-control-sm" placeholder="email" aria-label="Email"  v-model="newUserName">
@@ -69,14 +71,14 @@
 							</div>
 						</h5>
 					</dd>
-
+					
 				</div>
 			</div>
-		</fieldset>
-
+		</fieldset>	
+		
 		<fieldset class='user_settings'>
 			<legend>{{$t('usersettings')}}</legend>
-			<div class = 'row form-group' v-for='(value,label) in album.userSettings' :key="label" :class = '(label=="sendSeries")?"offset-1":""'>
+			<div class = 'row form-group' v-for='(value,label) in album.userSettings' :class = '(label=="sendSeries")?"offset-1":""'>
 				<div><toggle-button v-model="album.userSettings[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')" :sync="true"/></div>
 				<label>{{$t(label)}}</label>
 			</div>
@@ -87,17 +89,18 @@
 				<router-link to="/albums" class = 'btn btn-secondary'>{{$t('cancel')}}</router-link>
 			</div>
 		</fieldset>
-
+	
 	</form>
-
+	
 	</div>
 </template>
 
 <script>
-import { HTTP } from '@/router/http'
+import {HTTP} from '@/router/http';
+import ToggleButton from 'vue-js-toggle-button'
 export default {
 	name: 'new_album',
-
+	
 	data () {
 		return {
 			album: {
@@ -110,7 +113,7 @@ export default {
 				deleteSeries: false,
 				addSeries: true,
 				writeComments: true,
-				users: [{ email: 'robin.liechti@sib.swiss', 'firstname': 'Robin', 'lastname': 'Liechti' }],
+				users: [{email: 'robin.liechti@sib.swiss',"firstname": "Robin", "lastname": "Liechti"}],
 				userSettings: {
 					addUser: false,
 					addSeries: true,
@@ -125,12 +128,12 @@ export default {
 	},
 	computed: {
 		displayName () {
-			return (!this.album.album_id) ? 'New album' : this.album.name
+			return (!this.album.album_id) ? "New album" : this.album.name;
 		}
 	},
 	methods: {
-		deleteUser (user) {
-			console.log('delete: ', user)
+		deleteUser (user){
+			console.log("delete: ",user);
 		},
 		checkUser () {
 			let vm = this
@@ -161,12 +164,12 @@ export default {
 	},
 	watch: {
 		'album.userSettings.downloadSeries' () {
-			console.log(this.album.userSettings.downloadSeries)
-			if (!this.album.userSettings.downloadSeries) {
-				console.log('ici')
-				this.album.userSettings.sendSeries = false
-				console.log(this.album)
-			}
+			console.log(this.album.userSettings.downloadSeries);
+			if (!this.album.userSettings.downloadSeries){
+				console.log('ici');
+				this.album.userSettings.sendSeries = false;	
+				console.log(this.album);
+			} 
 		}
 	}
 }

@@ -1,4 +1,5 @@
 <i18n>
+
 {
 	"en" : {
 		"inbox": "Inbox",
@@ -11,8 +12,10 @@
 		"albums": "Albums",
 		"favorites": "Favoris",
 		"recents": "Récents"
+
 	}
 }
+
 </i18n>
 
 <template>
@@ -20,7 +23,7 @@
 		<div class = 'buttons-container'>
 			<p></p>
 		</div>
-
+	
 		<div class = 'nav-container'>
 			<ul class="nav nav-pills nav-fill">
 				<li class="nav-item">
@@ -42,7 +45,7 @@
 
 <script>
 export default {
-	name: 'navBar',
+  name: 'navBar',
 	data () {
 		return {
 			activePath: 'inbox'

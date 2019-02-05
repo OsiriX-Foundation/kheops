@@ -17,17 +17,17 @@
 
 <template>
 	<b-jumbotron bg-variant="info" text-variant="white" border-variant="dark">
-		<template slot="header">
-			{{ $t("permissiondenied") }}
-		</template>
-		<template slot="lead">
-			{{ $t("sorrynotauthorized") }}
-		</template>
-		<hr class="my-4">
-		<p>
-			<b-button size = 'lg' @click='changeLocation("home")'>{{ $t("gotohome") }}</b-button>
-			<b-button size = 'lg' @click='changeLocation("login")'>{{ $t("gotologin") }}</b-button>
-		</p>
+	  <template slot="header">
+		  {{ $t("permissiondenied") }}
+	  </template>
+	  <template slot="lead">
+		  {{ $t("sorrynotauthorized") }}
+	  </template>
+	  <hr class="my-4">
+	  <p>
+		  <b-button size = 'lg' @click='changeLocation("home")'>{{ $t("gotohome") }}</b-button>
+		  <b-button size = 'lg' @click='changeLocation("login")'>{{ $t("gotologin") }}</b-button>
+	  </p>
 	</b-jumbotron>
 </template>
 
@@ -38,11 +38,12 @@ export default {
 		return {
 		}
 	},
-	methods: {
+	methods:{
 		changeLocation (path) {
-			var vm = this
-			vm.$router.push('/' + path)
+			var vm = this;
+			vm.$router.push("/"+path);
 		}
 	}
 }
+
 </script>

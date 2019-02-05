@@ -1,43 +1,43 @@
 import { HTTP } from '@/router/http'
+import axios from 'axios'
 // initial state
 const state = {
-	album: {
-		album_id: '',
-		name: '',
-		description: '',
-		modalities: [],
-		created_time: '',
-		last_event_time: '',
-		number_of_users: '',
-		number_of_comments: 0,
-		number_of_studies: 0,
-		add_user: false,
-		download_series: true,
-		send_series: true,
-		delete_series: false,
-		add_series: true,
-		write_comments: true,
-		is_favorite: false,
-		notification_new_series: true,
-		notification_new_comment: true,
-		is_admin: true,
-		users: []
-	},
-	users: [],
-	comments: []
+  album: {
+    album_id: '',
+    name: '',
+    description: '',
+    modalities: [],
+    created_time: '',
+    last_event_time: '',
+    number_of_users: '',
+    number_of_comments: 0,
+    number_of_studies: 0,
+    add_user: false,
+    download_series: true,
+    send_series: true,
+    delete_series: false,
+    add_series: true,
+    write_comments: true,
+    is_favorite: false,
+    notification_new_series: true,
+    notification_new_comment: true,
+    is_admin: true,
+    users: []
+  },
+  users: [],
+  comments: []
 
 }
 
 // getters
 const getters = {
-	album: state => state.album,
-	users: state => state.users,
-	album_comments: state => state.comments
+  album: state => state.album,
+  users: state => state.users,
+  album_comments: state => state.comments
 }
 
 // actions
 const actions = {
-
 	getAlbum ({ commit }, params) {
 		return HTTP.get('album/' + params.album_id, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_ALBUM', res.data)
@@ -113,80 +113,79 @@ const actions = {
 			} else return res
 		})
 	}
-
 }
 
 // mutations
 const mutations = {
-	SET_ALBUM (state, data) {
-		state.album = data
-	},
-	PATCH_ALBUM (state, params) {
-		_.forEach(params, (v, k) => {
-			state.album[k] = v
-		})
-	},
-	SET_USERS (state, users) {
-		state.users.splice(0)
-		_.forEach(users, u => {
-			state.users.push(u)
-		})
-	},
-	ADD_USER (state, user) {
-		state.users.push(user)
-	},
-	DELETE_USER (state, params) {
-		let idx = _.findIndex(state.users, function (u) {
-			return u.user_name === params.user_name
-		})
-		if (idx > -1) {
-			state.users.splice(idx, 1)
-		}
-	},
-	TOGGLE_USER_ADMIN (state, user) {
-		let idx = _.findIndex(state.users, function (u) {
-			return u.user_name === user.user_name
-		})
-		if (idx > -1) {
-			state.users.splice(idx, 1, user)
-		}
-	},
-	DELETE_ALBUM (state) {
-		state.album.album_id = ''
-		state.album.name = ''
-		state.album.description = ''
-		state.album.modalities = []
-		state.album.created_time = ''
-		state.album.last_event_time = ''
-		state.album.number_of_users = ''
-		state.album.number_of_comments = 0
-		state.album.number_of_studies = 0
-		state.album.add_user = false
-		state.album.download_series = true
-		state.album.send_series = true
-		state.album.delete_series = false
-		state.album.add_series = true
-		state.album.write_comments = true
-		state.album.is_favorite = false
-		state.album.notification_new_series = true
-		state.album.notification_new_comment = true
-		state.album.is_admin = true
-		state.users = []
-		state.comments = []
-		state.mutations = []
-	},
-	SET_COMMENTS (state, data) {
-		state.comments.splice(0)
-		_.forEach(data, d => {
-			state.comments.unshift(d)
-		})
-	}
+  SET_ALBUM (state, data) {
+    state.album = data
+  },
+  PATCH_ALBUM (state, params) {
+    _.forEach(params, (v, k) => {
+      state.album[k] = v
+    })
+  },
+  SET_USERS (state, users) {
+    state.users.splice(0)
+    _.forEach(users, u => {
+      state.users.push(u)
+    })
+  },
+  ADD_USER (state, user) {
+    state.users.push(user)
+  },
+  DELETE_USER (state, params) {
+    let idx = _.findIndex(state.users, function (u) {
+      return u.user_name === params.user_name
+    })
+    if (idx > -1) {
+      state.users.splice(idx, 1)
+    }
+  },
+  TOGGLE_USER_ADMIN (state, user) {
+    let idx = _.findIndex(state.users, function (u) {
+      return u.user_name === user.user_name
+    })
+    if (idx > -1) {
+      state.users.splice(idx, 1, user)
+    }
+  },
+  DELETE_ALBUM (state) {
+    state.album.album_id = ''
+    state.album.name = ''
+    state.album.description = ''
+    state.album.modalities = []
+    state.album.created_time = ''
+    state.album.last_event_time = ''
+    state.album.number_of_users = ''
+    state.album.number_of_comments = 0
+    state.album.number_of_studies = 0
+    state.album.add_user = false
+    state.album.download_series = true
+    state.album.send_series = true
+    state.album.delete_series = false
+    state.album.add_series = true
+    state.album.write_comments = true
+    state.album.is_favorite = false
+    state.album.notification_new_series = true
+    state.album.notification_new_comment = true
+    state.album.is_admin = true
+    state.users = []
+    state.comments = []
+    state.mutations = []
+  },
+  SET_COMMENTS (state, data) {
+    state.comments.splice(0)
+    _.forEach(data, d => {
+      state.comments.unshift(d)
+    })
+  }
 
 }
 
 export default {
-	state,
-	getters,
-	actions,
-	mutations
+  state,
+  getters,
+  actions,
+  mutations
 }

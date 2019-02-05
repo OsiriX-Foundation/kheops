@@ -5,15 +5,16 @@
 		<nav-bar></nav-bar>
 
 		<!-- content -->
-		<router-view style="margin: 90px auto"/>
+	  <router-view style="margin: 90px auto"/>
 
-		<!-- footer -->
+		 <!-- footer -->
 		<b-navbar toggleable="md" type="info" navbar-dark bg-primary>
-			<b-navbar-brand href="#"  tag='h4'>© KHEOPS, inc {{year}}</b-navbar-brand>
+		  <b-navbar-brand href="#"  tag='h4'>© KHEOPS, inc {{year}}</b-navbar-brand>
 		</b-navbar>
 
 	</div>
 </template>
+
 
 <script>
 
@@ -21,15 +22,16 @@ import navHeader from '@/components/navheader'
 import navBar from '@/components/navbar'
 
 export default {
-	components: { navHeader, navBar },
-	name: 'App',
-	computed: {
+  components: { navHeader,navBar },
+  name: 'App',
+	computed:{
 		year () {
-			return new Date().getFullYear()
+			return new Date().getFullYear();
 		}
 	}
 }
 </script>
+
 
 <style>
 
@@ -44,9 +46,9 @@ export default {
 	text-transform:uppercase;
 }
 
+
 a.navbar-brand {
 	color: #CCC;
 	font-size: 11pt;
 }
 </style>
-

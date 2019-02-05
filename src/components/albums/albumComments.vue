@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 <i18n>
 {
 	"en": {
@@ -47,12 +49,13 @@ export default {
 	data () {
 		return {
 		}
+		
 	},
-	components: { commentsAndNotifications }
+	components: {commentsAndNotifications}
 }
 </script>
+
 
 <style>
 
 </style>
-
