@@ -156,7 +156,7 @@ const actions = {
 		})
 		axios.all(promises).then(results => {
 			_.forEach(results, res => {
-				if (res.status === '201') {
+				if (res.status === 201) {
 					commit('TOGGLE_SELECTED_STUDY', { type: 'all' })
 				}
 			})

@@ -20,7 +20,9 @@
 		"delete": "Delete",
 		"comments": "comments",
 		"series": "series",
-		"study": "study"
+		"study": "study",
+		"studiessharedsuccess": "studies shared successfully",
+		"studiessharederror": "studies could not be shared"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -42,7 +44,9 @@
 		"delete": "Supprimer",
 		"comments": "commentaire",
 		"series": "séries",
-		"study": "étude"
+		"study": "étude",
+		"studiessharedsuccess": "études ont été partagées avec succès",
+		"studiessharederror": "études n'ont pas pu être partagée"
 	}
 }
 </i18n>
@@ -90,7 +94,7 @@
 			</button>
 		</div>
 		
-		<form-get-user @get-user='getUser' @cancel-user='form_send_study=false' v-if='form_send_study'></form-get-user>
+		<form-get-user @get-user='sendToUser' @cancel-user='form_send_study=false' v-if='form_send_study'></form-get-user>
 		
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
@@ -181,7 +185,7 @@
 						<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-10' v-if='row.item.view=="series"'>
 							<div class = 'row'>
 
-								<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5'  v-for='serie in row.item.series' v-bind:key="serie.id">
+								<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5'  v-for='serie in row.item.series' :key="serie.id">
 									<series-summary
 										:SeriesInstanceUID="serie.SeriesInstanceUID[0]"
 										:selected="serie.is_selected"
@@ -449,8 +453,26 @@ export default {
 		loadStudiesMetadata (item) {
 			item.view = 'study'
 		},
-		getUser (user_sub) {
-			console.log(user_sub)
+		sendToUser (user_sub) {
+			let studies = _.filter(this.studies, s => {return s.is_selected})
+			let studyIds = [], seriesIds = []
+			_.forEach(studies, s => {
+				let selectedSeries = _.filter(s.series, oneSeries => {return oneSeries.is_selected});
+				if (selectedSeries.length == s.series.length) studyIds.push(s.StudyInstanceUID[0]);
+				else {
+					_.forEach(selectedSeries, oneSeries => {
+						seriesIds.push({
+							StudyInstanceUID: s.StudyInstanceUID[0],
+							SeriesInstanceUID: oneSeries.SeriesInstanceUID[0]
+						})
+					})
+				}
+			})
+			
+			if (studyIds.length || seriesIds.length) this.$store.dispatch('sendStudies',{StudyInstanceUIDs: studyIds,SeriesInstanceUIDs: seriesIds, user: user_sub}).then( res => {
+				this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}` )
+				if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}` )
+			})
 		}
 	},
 

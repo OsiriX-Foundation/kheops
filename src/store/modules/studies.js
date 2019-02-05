@@ -1,6 +1,7 @@
 import { HTTP } from '@/router/http'
 import dicom from '@/mixins/dicom'
 import moment from 'moment'
+import axios from 'axios'
 // initial state
 const state = {
 	all: [],
@@ -225,6 +226,7 @@ const actions = {
 		}
 	},
 	toggleSelected ({ commit }, params) {
+		console.log(params)
 		commit('TOGGLE_SELECTED_STUDY', params)
 	},
 	getStudiesComments ({ commit }, params) {
@@ -245,6 +247,27 @@ const actions = {
 			if (res.status === 204) {
 				dispatch('getStudiesComments', { StudyInstanceUID: StudyInstanceUID })
 			} else return res
+		})
+	},
+	sendStudies (ctx, params){
+		let promises = []
+
+		_.forEach(params.StudyInstanceUIDs, StudyInstanceUID => {
+			promises.push(HTTP.put(`studies/${StudyInstanceUID}/users/${params.user}`))
+		})
+		_.forEach(params.SeriesInstanceUIDs, s => {
+			promises.push(HTTP.put(`studies/${s.StudyInstanceUID}/series/${s.SeriesInstanceUID}/users/${params.user}`))
+		})
+
+		return axios.all(promises).then(results => {
+			let summary = {success: 0, error: 0}
+			_.forEach(results, res => {
+				if (res.status === 201 || res.status === 204) {
+					summary.success++
+				}
+				else summary.error++
+			})
+			return summary
 		})
 	}
 
@@ -332,8 +355,8 @@ const mutations = {
 		} else if (params.type === 'series') {
 			let studiesSelected = false
 			let indices = params.index.split(':')
-			_.forEach(state.all[indices[0]].series, (serie, serieIdx) => {
-				if (serieIdx === indices[1]) {
+			_.forEach(state.all[+indices[0]].series, (serie, serieIdx) => {
+				if (serieIdx === +indices[1]) {
 					state.all[indices[0]].series[serieIdx].is_selected = params.selected
 				}
 				if (serie.is_selected) studiesSelected = true
