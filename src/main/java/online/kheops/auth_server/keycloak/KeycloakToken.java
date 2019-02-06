@@ -34,7 +34,7 @@ public class KeycloakToken {
 
         final Response response;
         try {
-            response = CLIENT.target(KeycloakContextListener.getKeycloakWellKnownURI()).request().get();
+            response = CLIENT.target(KeycloakContextListener.getKeycloakOIDCConfigurationURI()).request().get();
         } catch (ProcessingException e) {
             throw new KeycloakException("Error during request OpenID Connect well-known", e);
         }
