@@ -8,7 +8,6 @@ final class JWTAssertionBuilder implements AssertionBuilder {
     private static final String KHEOPS_ISSUER = "auth.kheops.online";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
     private static final String GOOGLE_ISSUER = "accounts.google.com";
-    private static final String KEYCLOAK_ISSUER = "https://keycloak.kheops.online/auth/realms/travis";
 
     private static final String GOOGLE_CONFIGURATION_URL = "https://accounts.google.com/.well-known/openid-configuration";
 
@@ -41,10 +40,12 @@ final class JWTAssertionBuilder implements AssertionBuilder {
                 return SuperuserJWTAssertion.getBuilder(superuserSecret).build(assertionToken);
             case GOOGLE_ISSUER:
                 return JWTAssertion.getBuilder(GOOGLE_CONFIGURATION_URL).build(assertionToken);
-            case KEYCLOAK_ISSUER:
-                return JWTAssertion.getBuilder(KeycloakContextListener.getKeycloakWellKnownString()).build(assertionToken);
             default:
-                throw new BadAssertionException("Unknown JWT issuer");
+                if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
+                    return JWTAssertion.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
+                } else {
+                    throw new BadAssertionException("Unknown JWT Issuer:" + issuer);
+                }
         }
     }
 }

@@ -1,5 +1,7 @@
 package online.kheops.auth_server.assertion;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class AssertionVerifier {
@@ -36,14 +38,25 @@ public abstract class AssertionVerifier {
         UNKNOWN_BEARER(UNKNOWN_BEARER_URN) {
             AssertionBuilder getAssertionBuilder() {
                 return assertionToken -> {
+                    List<BadAssertionException> exceptionList = new ArrayList<>(2);
                     try {
                         return JWT_BEARER.getAssertionBuilder().build(assertionToken);
-                    } catch (BadAssertionException e) { /* empty */ }
+                    } catch (BadAssertionException e) {
+                        exceptionList.add(e);
+                    }
                     try {
                         return CAPABILITY.getAssertionBuilder().build(assertionToken);
-                    } catch (BadAssertionException e) { /* empty */ }
+                    } catch (BadAssertionException e) {
+                        exceptionList.add(e);
+                    }
 
-                    throw new BadAssertionException("Bad bearer token");
+                    final StringBuilder messageBuilder = new StringBuilder("Unable to verify assertion because");
+                    exceptionList.forEach(e -> messageBuilder.append(", ").append(e.getMessage()));
+
+                    final BadAssertionException badAssertionException = new BadAssertionException(messageBuilder.toString());
+                    exceptionList.forEach(badAssertionException::addSuppressed);
+
+                    throw badAssertionException;
                 };
             }
         };
