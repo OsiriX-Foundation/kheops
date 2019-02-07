@@ -173,7 +173,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 h3 {
 	margin-bottom: 40px;
 }
@@ -201,5 +201,8 @@ fieldset.user_settings {
 fieldset.user_settings legend{
 	padding: 0 20px;
 	width: auto;
+}
+dt{
+	text-align: right;
 }
 </style>

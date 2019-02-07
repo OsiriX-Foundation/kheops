@@ -71,7 +71,7 @@
 				</div>
 			</dd>
 		</dl>
-		<p class = 'float-right'><button type = 'button' class = 'btn btn-danger' @click='deleteAlbum'>{{confirmDeletion?$t('confirmdeletion'):$t('delete')}}</button> <button type = 'button' class = 'btn btn-secondary' @click='confirmDeletion=!confirmDeletion' v-if='confirmDeletion'>{{$t('cancel')}}</button></p>
+		<p class = 'float-right' v-if='album.is_admin'><button type = 'button' class = 'btn btn-danger' @click='deleteAlbum'>{{confirmDeletion?$t('confirmdeletion'):$t('delete')}}</button> <button type = 'button' class = 'btn btn-secondary' @click='confirmDeletion=!confirmDeletion' v-if='confirmDeletion'>{{$t('cancel')}}</button></p>
 	</div>
 </template>
 

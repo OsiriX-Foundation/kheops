@@ -67,7 +67,7 @@
 					<template slot="button-content">
 						<span><v-icon class="align-middle" name="book"></v-icon></span><br/>{{ $t("addalbum") }}
 					</template>
-					<b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in albums' v-bind:key="album.id">{{album.name}}</b-dropdown-item>
+					<b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in allowedAlbums' :key="album.id">{{album.name}}</b-dropdown-item>
 				</b-dropdown>
 
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()">
@@ -341,6 +341,9 @@ export default {
 			return {
 				from: new Date()
 			}
+		},
+		allowedAlbums () {
+			return _.filter(this.albums, a => { return a.add_series })
 		}
 	},
 	methods: {
@@ -375,7 +378,7 @@ export default {
 
 		toggleFavorite (index, type) {
 			var vm = this
-			this.$store.dispatch('toggleFavorite', { type: type, index: index }).then(res => {
+			this.$store.dispatch('toggleFavorite', { type: type, index: index, inbox: true, album: null }).then(res => {
 				if (res) vm.$snotify.success(type + 'is now in favorites')
 				else vm.$snotify.error('Sorry, an error occured')
 			})

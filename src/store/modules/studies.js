@@ -210,7 +210,8 @@ const actions = {
 			let isFavorite = !state.all[params.index].is_favorite
 			let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0]
 			if (isFavorite) {
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites').then( () => {
+				let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites',urlParameters).then( () => {
 					console.log('OK ' + StudyInstanceUID + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true

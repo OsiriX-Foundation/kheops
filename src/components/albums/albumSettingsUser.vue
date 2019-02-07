@@ -41,7 +41,7 @@
 
 <template>
 	<div class = 'container'>
-		<h3 class = 'pointer' v-if = '!form_add_user' style='width: 100%'>{{$t('userlist')}}<button @click='addUser()' class = 'btn btn-secondary float-right'><v-icon name='user-plus' scale='1'></v-icon>{{$t('add_user')}}</button></h3>
+		<h3 class = 'pointer' v-if = '!form_add_user' style='width: 100%'>{{$t('userlist')}}<button @click='addUser()' class = 'btn btn-secondary float-right' v-if='album.add_user||album.is_admin'><v-icon name='user-plus' scale='1'></v-icon>{{$t('add_user')}}</button></h3>
 		<div class = 'card' v-if='form_add_user'>
 			<div class = 'card-body'>
 				<form @submit.prevent='addUser'>
@@ -62,13 +62,13 @@
 				<thead>
 					<tr>
 						<th>{{$t('username')}}</th>
-						<th></th>
+						<th v-if='album.is_admin'></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr v-for='user in users' :key="user.user_name">
 						<td>{{user.user_name}} <span v-if='user.is_admin'>(Admin)</span></td>
-						<td class = 'showOnTrHover text-right'>
+						<td class = 'showOnTrHover text-right'  v-if='album.is_admin'>
 							<div v-if='confirm_delete!=user.user_name' class = 'user_actions'>
 								<a @click.stop='toggleAdmin(user)'>{{$t('changerole')}} {{(user.is_admin)?$t('user'):"admin"}}</a> <a @click.stop='deleteUser(user)' v-if='album.is_admin' class='text-danger' style='margin-left: 20px'><v-icon name = 'trash'></v-icon></a>
 							</div>
@@ -81,10 +81,14 @@
 			</table>
 		</div>
 
-		<fieldset v-if='album.is_admin' class = 'user_settings'>
+		<fieldset class = 'user_settings'>
 			<legend>{{$t('usersettings')}}</legend>
 			<div class = 'row form-group' v-for='(label,idx) in userSettings' :key="idx" :class = '(label=="send_series")?"offset-1":""'>
-				<div><toggle-button v-model="album[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.download_series && label=='send_series')" :sync="true" @change='patchAlbum(label)'/></div>
+				<div>
+					<toggle-button v-model="album[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.download_series && label=='send_series')" :sync="true" @change='patchAlbum(label)' v-if="album.is_admin"/>
+					<v-icon name="ban" class="text-danger" v-if='!album.is_admin && !album[label]'></v-icon>
+					<v-icon name="check-circle" class="text-success" v-if='!album.is_admin && album[label]'></v-icon>
+				</div>
 				<label>{{$t(label)}}</label>
 			</div>
 		</fieldset>
@@ -199,10 +203,13 @@ fieldset.user_settings {
 	border: 1px solid #333;
 	padding: 20px;
 	background-color: #303030 ;
+	font-size: 0.75rem;
+	line-height: 0.75rem;
 }
 
 fieldset.user_settings legend{
 	padding: 0 20px;
 	width: auto;
+
 }
 </style>
