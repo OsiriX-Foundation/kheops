@@ -4,5 +4,6 @@ services:
     container_name: kheops-ui
     image: kheops/ui:latest
     ports:
-      - "80:8080"
+      - "80:3000"
+    env_file: docker-compose.env
     restart: on-failure
