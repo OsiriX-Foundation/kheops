@@ -14,6 +14,8 @@ COPY --from=build-stage /app/script/ui.conf /etc/nginx/conf.d/ui.conf
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY --from=build-stage /app/script/docker-entrypoint-nginx.sh /docker-entrypoint.sh
 
+ENV SERVER_NAME=localhost
+
 RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 3000
