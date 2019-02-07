@@ -12,6 +12,7 @@ RUN npm run build
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/script/ui.conf /etc/nginx/conf.d/ui.conf
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY --from=build-stage /app/src/assets /usr/share/nginx/html/assets
 COPY --from=build-stage /app/script/docker-entrypoint-nginx.sh /docker-entrypoint.sh
 
 ENV SERVER_NAME=localhost
