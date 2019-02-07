@@ -10,6 +10,8 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
+import online.kheops.auth_server.annotation.ViewerTokenAccess;
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
@@ -137,6 +139,7 @@ public class QIDOResource {
 
     @GET
     @Secured
+    @ViewerTokenAccess
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -159,10 +162,10 @@ public class QIDOResource {
 
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {
-                return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param").build();
+                return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param").build();
             }
             if(favoriteFilter != null) {
-                return Response.status(BAD_REQUEST).entity("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param").build();
+                return Response.status(BAD_REQUEST).entity("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={album_ID} as query param").build();
             }
         }
 
@@ -195,6 +198,13 @@ public class QIDOResource {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
             }
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
+          catch (AlbumNotFoundException e) {
+              return Response.status(FORBIDDEN).build();
+          }
+
+        if(securityContext.isUserInRole("tokenViewer")) {
+            fromInbox = kheopsPrincipal.hasInboxAccess();
+        }
         //END kheopsPrincipal
 
         final MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
@@ -284,6 +294,7 @@ public class QIDOResource {
 
     @GET
     @Secured
+    @ViewerTokenAccess
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -315,6 +326,13 @@ public class QIDOResource {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
             }
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
+        catch (AlbumNotFoundException e) {
+            return Response.status(FORBIDDEN).build();
+        }
+
+        if(securityContext.isUserInRole(USER_IN_ROLE.VIEWER_TOKEN)) {
+            fromInbox = kheopsPrincipal.hasInboxAccess();
+        }
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);

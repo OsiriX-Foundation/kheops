@@ -82,6 +82,8 @@ dependencies {
     compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
     compile group: 'com.auth0', name: 'jwks-rsa', version: '0.3.0'
 
+    compile 'org.bitbucket.b_c:jose4j:0.6.5'
+    
     // https://mvnrepository.com/artifact/org.jooq/jooq
     compile group: 'org.jooq', name: 'jooq', version: '3.11.2'
     // https://mvnrepository.com/artifact/org.jooq/jooq-meta

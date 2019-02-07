@@ -282,6 +282,11 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
+    public boolean hasInboxAccess() {
+        return getScope() == ScopeType.USER;
+    }
+
+    @Override
     public User getUser() {
         return user;
     }

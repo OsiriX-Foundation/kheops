@@ -13,11 +13,12 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     //for old version
     long getDBID();
-    String getAlbumID() throws NotAlbumScopeTypeException;
+    String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
     boolean hasSeriesReadAccess(String study, String series) throws SeriesNotFoundException;
     boolean hasStudyReadAccess(String study);
     boolean hasUserAccess();
+    boolean hasInboxAccess();
 
     boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;
     boolean hasStudyWriteAccess(String study);

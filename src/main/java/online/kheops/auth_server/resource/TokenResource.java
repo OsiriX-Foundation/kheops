@@ -4,16 +4,20 @@ package online.kheops.auth_server.resource;
 import javax.persistence.*;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
+import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.*;
+import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
+import online.kheops.auth_server.annotation.ViewerTokenAccess;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 
@@ -21,14 +25,29 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.assertion.DownloadKeyException;
 import online.kheops.auth_server.assertion.UnknownGrantTypeException;
 
-import online.kheops.auth_server.capability.Capabilities;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesQueries;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.Consts;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
+import org.jose4j.json.internal.json_simple.JSONObject;
+import org.jose4j.jwa.AlgorithmConstraints;
+import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
+import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
+import org.jose4j.keys.AesKey;
+import org.jose4j.lang.ByteUtil;
+import org.jose4j.lang.JoseException;
 
 import java.io.UnsupportedEncodingException;
+
+import java.security.Key;
+import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -36,35 +55,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.capability.Capabilities.HashCapability;
+import static online.kheops.auth_server.study.Studies.canAccessStudyInbox;
+import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.util.Consts.INBOX;
 
 @Path("/")
 public class TokenResource
 {
-    private static class UIDPair {
-        private String studyInstanceUID;
-        private String seriesInstanceUID;
-
-        @SuppressWarnings("WeakerAccess")
-        public UIDPair(String studyInstanceUID, String seriesInstanceUID) {
-            this.studyInstanceUID = studyInstanceUID;
-            this.seriesInstanceUID = seriesInstanceUID;
-        }
-
-        String getStudyInstanceUID() {
-            return studyInstanceUID;
-        }
-
-        String getSeriesInstanceUID() {
-            return seriesInstanceUID;
-        }
-    }
 
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @Context
     ServletContext context;
+
+    @Context
+    ResourceContext resourceContext;
 
     static class TokenResponse {
         @XmlElement(name = "access_token")
@@ -85,13 +92,19 @@ public class TokenResource
 
     @POST
     @FormURLEncodedContentType
+    @ViewerTokenAccess
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response token(@FormParam("grant_type") String grantType, @FormParam("assertion") String assertionToken,
+    public Response token(@FormParam("grant_type") String grantType,
+                          @FormParam("assertion") String assertionToken,
                           @FormParam("scope") String scope,
+                          @FormParam("studyInstanceUID") String studyInstanceUID,
+                          @FormParam("seriesInstanceUID") String seriesInstanceUID,
+                          @FormParam("sourceType") String sourceType,
+                          @FormParam("sourceId") String sourceId,
                           @FormParam("return_user") @DefaultValue("false") boolean returnUser) {
-        UIDPair uidPair = getUIDPairFromScope(scope);
+
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
 
@@ -124,10 +137,52 @@ public class TokenResource
             return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
+        boolean pepScope = false;
+        boolean viewerScope = false;
+
+        if(scope != null && !scope.isEmpty()) {
+            if(scope.compareTo("pep") == 0) {
+                if(studyInstanceUID == null || seriesInstanceUID == null) {
+                    errorResponse.errorDescription = "With the scope: 'pep', 'studyInstanceUID' and 'seriesInstanceUID' must be set";
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                if (!checkValidUID(studyInstanceUID)) {
+                    errorResponse.errorDescription = "'studyInstanceUID' is not a valid UID";
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                if (!checkValidUID(seriesInstanceUID)) {
+                    errorResponse.errorDescription = "'seriesInstanceUID' is not a valid UID";
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                pepScope = true;
+            } else if(scope.compareTo("viewer") == 0) {
+                if(studyInstanceUID == null || sourceType == null) {
+                    errorResponse.errorDescription = "With the scope: 'viewer', 'studyInstanceUID' and 'sourceType' must be set";
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                if (!checkValidUID(studyInstanceUID)) {
+                    errorResponse.errorDescription = "'studyInstanceUID' is not a valid UID";
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                if (sourceType.compareTo(ALBUM)!=0 && sourceType.compareTo(INBOX) != 0 ) {
+                    errorResponse.errorDescription = "'sourceType' can be only '"+ALBUM+"' or '"+INBOX+"'";
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                if (sourceType.compareTo(ALBUM) == 0 && (sourceId.isEmpty() || sourceId == null) ) {
+                    errorResponse.errorDescription = "'sourceId' must be set when 'sourceType'="+ALBUM;
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                }
+                viewerScope = true;
+            } else {
+                errorResponse.errorDescription = "Scope: can be only 'pep', 'viewer', null or Empty";
+                throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+            }
+        }
+
         Response.Status responseStatus = OK;
 
-        EntityManager em;
-        EntityTransaction tx;
+        final EntityManager em;
+        final EntityTransaction tx;
 
         final User callingUser;
         try {
@@ -142,15 +197,93 @@ public class TokenResource
         try {
             tx.begin();
 
-            if (uidPair != null && callingUser != null) {
+            if (pepScope) {
                 try {
-                    SeriesQueries.findSeriesByStudyUIDandSeriesUID(callingUser, uidPair.getStudyInstanceUID(), uidPair.getSeriesInstanceUID(), em);
+                    SeriesQueries.findSeriesByStudyUIDandSeriesUID(callingUser, studyInstanceUID, seriesInstanceUID, em);
                 } catch (NoResultException e) {
                     LOG.info("The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair");
                     errorResponse.errorDescription = "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-            }
+
+            }/* else if (viewerScope) {
+
+                QIDOResource qidoResource = resourceContext.getResource(QIDOResource.class);
+
+                final boolean capabilityAccess = assertion.hasCapabilityAccess();
+                final User finalUser = callingUser;
+                SecurityContext securityContext = new SecurityContext() {
+                    @Override
+                    public KheopsPrincipalInterface getUserPrincipal() {
+                        if (assertion.getCapability().isPresent()) {
+                            return new CapabilityPrincipal(assertion.getCapability().get(), finalUser);
+                        } else {
+                            return new UserPrincipal(finalUser);
+                        }
+                    }
+
+                    @Override
+                    public boolean isUserInRole(String role) {
+                        if (role.equals("capability")) {
+                            return capabilityAccess;
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean isSecure() {
+                        return true;
+                    }
+
+                    @Override
+                    public String getAuthenticationScheme() { return "BEARER"; }
+                };
+
+                if(sourceType.compareTo(INBOX) == 0) {
+                    qidoResource.getStudiesMetadata(studyInstanceUID, null, true);
+                }
+                if(sourceType.compareTo(ALBUM) == 0) {
+                    qidoResource.getStudiesMetadata(studyInstanceUID, sourceId, false);
+                }
+
+                final Capability capability;
+
+                if(sourceType.compareTo(INBOX) == 0) {
+                    if(assertion.getCapability().isPresent()) {
+                        capability = assertion.getCapability().get();
+                        if (capability.getScopeType().compareTo("user") != 0) {
+                            errorResponse.errorDescription = "The access to the inbox is forbidden";
+                            return Response.status(FORBIDDEN).entity(errorResponse).build();
+                        }
+                    }
+                    try {
+                        final Study study = getStudy(studyInstanceUID, em);
+                        if (!canAccessStudyInbox(callingUser, study, em)) {
+                            throw new StudyNotFoundException("");
+                        }
+                    } catch (StudyNotFoundException e) {
+                        errorResponse.errorDescription = "The access to the study : " + studyInstanceUID + " is forbidden";
+                        return Response.status(FORBIDDEN).entity(errorResponse).build();
+                    }
+                }
+
+                else if(sourceType.compareTo(ALBUM) == 0) {
+                    if(assertion.getCapability().isPresent()) {
+                        capability = assertion.getCapability().get();
+                        if (capability.getScopeType().compareTo("album") == 0) {
+
+                        }
+                    }
+
+                    if (!Albums.albumExist(sourceId, em)) {
+                        errorResponse.errorDescription = "The access to the album : " + sourceId + " is forbidden";
+                        return Response.status(FORBIDDEN).entity(errorResponse).build();
+                    } else if (!Albums.isMemberOfAlbum(callingUser, Albums.getAlbum(sourceId, em), em)) {
+                        errorResponse.errorDescription = "The access to the album : " + sourceId + " is forbidden";
+                        return Response.status(FORBIDDEN).entity(errorResponse).build();
+                    }
+                }
+            }*/
 
             tx.commit();
         } catch (Exception e) {
@@ -165,35 +298,71 @@ public class TokenResource
             em.close();
         }
 
-        // Generate a new token
-        final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-        final Algorithm algorithmHMAC;
-        try {
-            algorithmHMAC = Algorithm.HMAC256(authSecret);
-        } catch (UnsupportedEncodingException e) {
-            LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
-            return Response.status(INTERNAL_SERVER_ERROR).build();
+        final String token;
+        final long expiresIn;
+
+        if (viewerScope) {
+            // Generate a new Viewer token (JWE)
+
+            try {
+                Key key = new AesKey(context.getInitParameter("online.kheops.auth.hmacsecret").substring(0, 16).getBytes());
+                JsonWebEncryption jwe = new JsonWebEncryption();
+
+                JSONObject data = new JSONObject();
+                data.put("token", assertionToken);
+                data.put("sourceId", sourceId);
+                data.put("isInbox", sourceType.compareTo(INBOX) == 0);
+                data.put("studyInstanceUID", studyInstanceUID);
+                data.put("exp", Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
+
+                jwe.setPayload(data.toJSONString());
+                jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
+                jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+                jwe.setKey(key);
+                String serializedJwe = jwe.getCompactSerialization();
+
+                System.out.println("key format: " + key.toString());
+                System.out.println("Serialized Encrypted JWE: " + serializedJwe);
+
+                token = serializedJwe;
+                expiresIn = 43200L;
+            } catch (JoseException e) {
+                e.printStackTrace();
+                return Response.status(INTERNAL_SERVER_ERROR).build();//TODO
+            }
+        } else {
+
+            // Generate a new token
+            final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
+            final Algorithm algorithmHMAC;
+            try {
+                algorithmHMAC = Algorithm.HMAC256(authSecret);
+            } catch (UnsupportedEncodingException e) {
+                LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
+                return Response.status(INTERNAL_SERVER_ERROR).build();
+            }
+
+            JWTCreator.Builder jwtBuilder = JWT.create()
+                    .withIssuer("auth.kheops.online")
+                    .withSubject(assertion.getSub())
+                    .withAudience("dicom.kheops.online")
+                    .withClaim("capability", assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
+                    .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                    .withNotBefore(new Date());
+
+            if (pepScope) {
+                jwtBuilder = jwtBuilder.withClaim("study_uid", studyInstanceUID)
+                        .withClaim("series_uid", seriesInstanceUID);
+            }
+
+            token = jwtBuilder.sign(algorithmHMAC);
+            expiresIn = 3600L;
         }
-
-        JWTCreator.Builder jwtBuilder = JWT.create()
-                .withIssuer("auth.kheops.online")
-                .withSubject(assertion.getSub())
-                .withAudience("dicom.kheops.online")
-                .withClaim("capability", assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
-                .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-                .withNotBefore(new Date());
-
-        if (uidPair != null) {
-            jwtBuilder = jwtBuilder.withClaim("study_uid", uidPair.getStudyInstanceUID())
-                .withClaim("series_uid", uidPair.getSeriesInstanceUID());
-        }
-
-        String token = jwtBuilder.sign(algorithmHMAC);
 
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.accessToken = token;
         tokenResponse.tokenType = "Bearer";
-        tokenResponse.expiresIn = 3600L;
+        tokenResponse.expiresIn = expiresIn;
         if (returnUser) {
             tokenResponse.user = assertion.getSub();
         }
@@ -201,56 +370,13 @@ public class TokenResource
         return Response.status(responseStatus).entity(tokenResponse).build();
     }
 
-
-    private UIDPair getUIDPairFromScope(String scope) {
-        String seriesUID = null;
-        String studyUID = null;
-        final ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.error = "invalid_grant";
-
-        if (scope == null) {
-            return null;
+    private boolean checkValidUID(String uid) {
+        try {
+            new Oid(uid);
+            return true;
+        } catch (GSSException exception) {
+            return false;
         }
-
-       String[] scopes = scope.split(" ");
-       for (String item: scopes) {
-           if (item.startsWith("StudyInstanceUID=")) {
-               studyUID = item.substring(17);
-               try {
-                   new Oid(studyUID);
-               } catch (GSSException exception) {
-                   LOG.info("scope StudyInstanceUID is not a valid UID");
-                   errorResponse.errorDescription = "scope StudyInstanceUID is not a valid UID";
-                   throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
-               }
-           } else if (item.startsWith("SeriesInstanceUID=")) {
-               seriesUID = item.substring(18);
-               try {
-                   new Oid(seriesUID);
-               } catch (GSSException exception) {
-                   LOG.info("scope SeriesInstanceUID is not a valid UID");
-                   errorResponse.errorDescription = "scope SeriesInstanceUID is not a valid UID";
-                   throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
-               }
-           } else {
-               LOG.info("Unknown scope requested: " +item);
-           }
-       }
-
-       if (studyUID == null && seriesUID == null) {
-           return null;
-       } else if (studyUID == null) {
-           LOG.info("no StudyInstanceUID provided in the scope");
-           errorResponse.errorDescription = "no StudyInstanceUID provided in the scope";
-           throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
-       } else if (seriesUID == null) {
-           errorResponse.errorDescription = "no StudyInstanceUID provided in the scope";
-           LOG.info("no SeriesInstanceUID provided in the scope");
-           errorResponse.errorDescription = "no SeriesInstanceUID provided in the scope";
-           throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
-       } else {
-           return new UIDPair(studyUID, seriesUID);
-       }
     }
 }
 

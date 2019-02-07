@@ -8,9 +8,7 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
 
-
 import javax.annotation.Priority;
-import javax.servlet.ServletContext;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -22,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.Consts.*;
 
 @Secured
 @Provider
@@ -29,9 +28,6 @@ import static online.kheops.auth_server.user.Users.getOrCreateUser;
 public class SecuredFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
-
-    @Context
-    ServletContext context;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -62,6 +58,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         }
 
         final boolean capabilityAccess = assertion.hasCapabilityAccess();
+        final boolean viewerTokenAccess = assertion.getViewer().isPresent();
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final User finalUser = user;
         requestContext.setSecurityContext(new SecurityContext() {
@@ -69,6 +66,8 @@ public class SecuredFilter implements ContainerRequestFilter {
             public KheopsPrincipalInterface getUserPrincipal() {
                 if(assertion.getCapability().isPresent()) {
                     return new CapabilityPrincipal(assertion.getCapability().get(), finalUser);
+                } else if(assertion.getViewer().isPresent()) {
+                    return new ViewerPrincipal(assertion.getViewer().get());
                 } else {
                     return new UserPrincipal(finalUser);
                 }
@@ -76,8 +75,10 @@ public class SecuredFilter implements ContainerRequestFilter {
 
             @Override
             public boolean isUserInRole(String role) {
-                if (role.equals("capability")) {
+                if (role.equals(USER_IN_ROLE.CAPABILITY)) {
                     return capabilityAccess;
+                } if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
+                    return viewerTokenAccess;
                 }
                 return false;
             }

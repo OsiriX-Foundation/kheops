@@ -388,6 +388,15 @@ public class Studies {
         }
     }
 
+    public static boolean canAccessStudyInbox(User user, Study study, EntityManager em) {
+        try {
+            StudyQueries.findStudyByStudyandUserInbox(study, user, em);
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        }
+    }
+
     public static boolean canAccessStudy(Album album, Study study, EntityManager em) {
         try {
             StudyQueries.findStudyByStudyandAlbum(study, album, em);

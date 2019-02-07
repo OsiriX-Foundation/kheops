@@ -14,6 +14,7 @@ public abstract class AssertionVerifier {
 
     private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:grant-type:jwt-bearer";
     private static final String CAPABILITY_URN = "urn:x-kheops:params:oauth:grant-type:capability";
+    private static final String VIEWER_URN = "urn:x-kheops:params:oauth:grant-type:viewer";
     private static final String UNKNOWN_BEARER_URN = "urn:x-kheops:params:oauth:grant-type:unknown-bearer";
 
     private enum GrantType {
@@ -33,6 +34,14 @@ public abstract class AssertionVerifier {
                 return new CapabilityAssertionBuilder();
             }
         },
+        VIEWER(VIEWER_URN) {
+            AssertionBuilder getAssertionBuilder() {
+                if (authorizationSecret == null) {
+                    throw new IllegalStateException("authorization secret was never set");
+                }
+                return new ViewerAssertionBuilder(authorizationSecret);
+            }
+        },
         UNKNOWN_BEARER(UNKNOWN_BEARER_URN) {
             AssertionBuilder getAssertionBuilder() {
                 return assertionToken -> {
@@ -41,6 +50,9 @@ public abstract class AssertionVerifier {
                     } catch (BadAssertionException e) { /* empty */ }
                     try {
                         return CAPABILITY.getAssertionBuilder().build(assertionToken);
+                    } catch (BadAssertionException e) { /* empty */ }
+                    try {
+                        return VIEWER.getAssertionBuilder().build(assertionToken);
                     } catch (BadAssertionException e) { /* empty */ }
 
                     throw new BadAssertionException("Bad bearer token");
