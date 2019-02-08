@@ -1,5 +1,6 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.principal;
 
+import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.User;

@@ -1,18 +1,20 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.*;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.CapabilityPrincipal;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.UserPrincipal;
+import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
 import java.nio.charset.StandardCharsets;

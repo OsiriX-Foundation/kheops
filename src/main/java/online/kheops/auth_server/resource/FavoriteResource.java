@@ -1,6 +1,6 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.series.Series;
@@ -22,6 +22,7 @@ public class FavoriteResource {
 
     @Context
     private SecurityContext securityContext;
+
 
     @PUT
     @Secured
