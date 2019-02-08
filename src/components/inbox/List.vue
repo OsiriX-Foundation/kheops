@@ -477,14 +477,10 @@ export default {
 				if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}` )
 			})
 		},
-		// TODO : Improve this.
 		addSelectedStudiesFavorite(){
 			let studies = _.filter(this.studies, s => { return s.is_selected })
-			var vm = this
 			_.forEach(studies, study => {
-				this.$store.dispatch('toggleFavorite', { type: 'study', StudyInstanceUID: study.StudyInstanceUID[0], inbox: true }).then(res => {
-					if (!res) vm.$snotify.error('Sorry, an error occured')
-				})
+				this.toggleFavorite(study, 'study')
 			})
 		}
 	},
