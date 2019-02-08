@@ -94,7 +94,7 @@ const actions = {
 							let flag = {
 								id: album.album_id,
 								is_selected: false,
-								is_favorite: false,
+								is_favorite: d.is_favorite,
 								comment: false
 							}
 							commit('SET_FLAG', flag)
@@ -109,11 +109,12 @@ const actions = {
 		})
 	},
 	toggleFavorite ({ commit }, params) {
+		console.log("TOGGLE !")
 		if (params.type === 'album') {
 			let isFavorite = !state.all[params.index].is_favorite
 			let albumId = state.all[params.index].album_id
 			if (isFavorite) {
-				return HTTP.put('/albums/' + albumId + '/favorites').then( () => {
+				return HTTP.put('/album/' + albumId + '/favorites').then( () => {
 					console.log('OK ' + albumId + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
@@ -122,8 +123,9 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/albums/' + albumId + '/favorites').then( () => {
+				return HTTP.delete('/album/' + albumId + '/favorites').then( () => {
 					console.log('KO ' + albumId + ' is NOT in favorites')
+					commit('TOGGLE_FAVORITE', params)
 				})
 			}
 		}

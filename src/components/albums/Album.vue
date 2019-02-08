@@ -34,7 +34,13 @@
 	<div class = 'container-fluid'>
 		<div class = 'container'>
 			<div class = 'row'>
-				<div class = 'col-md'>	<h3><v-icon name="book" scale="2"></v-icon><span class = 'p-2'>{{album.name}}</span> <v-icon name="star" scale="2" v-if="view=='studies'"></v-icon></h3></div>
+				<div class = 'col-md'>	
+					<h3>
+						<v-icon name="book" scale="2"></v-icon>
+						<span class = 'p-2'>{{album.name}}</span> 
+						<v-icon name="star" scale="2" v-if="view=='studies'"></v-icon>
+					</h3>
+				</div>
 				<div class = 'col-md'>	<nav class="nav nav-pills nav-fill">
 						<a class="nav-link" :class="(view=='studies')?'active':''" @click.stop="view='studies'" >Studies</a>
 						<a class="nav-link" :class="(view=='comments')?'active':''" @click.stop="view='comments'">Comments</a>

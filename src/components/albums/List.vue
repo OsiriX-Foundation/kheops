@@ -31,7 +31,7 @@
 				<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters' style='position: absolute; right: 20px;top: 0'><v-icon name = 'search' scale='2'/></button>
 			</h3>
 		</div>
-		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true"  @row-clicked='selectAlbum'>
+		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true" @row-clicked='selectAlbum' >
 
 			<template slot="HEAD_is_selected" slot-scope="data">
 				{{$t(data.label)}}
@@ -278,7 +278,7 @@ export default {
 
 		toggleFavorite (index, type) {
 			var vm = this
-			this.$store.dispatch('toggleFavoriteAlbum', { type: type, index: index }).then(res => {
+			this.$store.dispatch('toggleFavorite', { type: type, index: index }).then(res => {
 				if (res) vm.$snotify.success(type + 'is now in favorites')
 				else vm.$snotify.error('Sorry, an error occured')
 			})
@@ -354,7 +354,6 @@ table th{
 }
 select{
 	display: inline !important;
-	width: auto;
 }
 .btn-link {
 	font-weight: 400;
