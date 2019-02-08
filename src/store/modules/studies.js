@@ -218,8 +218,9 @@ const actions = {
 			let isFavorite = !state.all[index].is_favorite
 			let StudyInstanceUID = params.StudyInstanceUID
 			if (isFavorite) {
-				let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites',urlParameters).then( () => {
+				//let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
+				//return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' , urlParameters).then( () => {
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites'+( params.inbox !== undefined ? '?inbox='+params.inbox : '')).then( () => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
