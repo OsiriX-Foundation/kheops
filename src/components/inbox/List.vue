@@ -74,7 +74,7 @@
 					<span><v-icon class="align-middle" name="download"></v-icon></span><br/>
 					{{ $t("download") }}
 				</button>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'>
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id' @click = "addSelectedStudiesFavorite()">
 					<span><v-icon class="align-middle" name="star"></v-icon></span><br/>
 					{{ $t("addfavorite") }}
 				</button>
@@ -99,7 +99,7 @@
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
 
-			<template slot="HEAD_is_selected" >
+			<template slot="HEAD_is_selected">
 				<b-button variant="link" size="sm" class="mr-2" >
 					<v-icon  class="align-middle" name="chevron-down" style = 'visibility: hidden'></v-icon>
 				</b-button>
@@ -215,7 +215,7 @@
 							{{row.item.PatientName}}
 						</div>
 						<div class = 'patientNameIcons col-md-auto'>
-							<span @click = "toggleFavorite(row.index,'study')" :class="row.item.is_favorite?'selected':''">
+							<span @click="toggleFavorite(row.item, 'study')" :class="row.item.is_favorite?'selected':''">
 								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
 								<v-icon v-else class="align-middle" style="margin-right:0" name="star"></v-icon>
 							</span>
@@ -296,7 +296,7 @@ export default {
 					thClass: 'd-none d-sm-table-cell',
 					tdClass: 'd-none d-sm-table-cell',
 					label: 'Modality',
-					sortable: true
+					sortable: false
 				}
 			],
 			sortBy: 'StudyDate',
@@ -352,7 +352,7 @@ export default {
 				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
-					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
 				}
 			}
 		},
@@ -364,7 +364,7 @@ export default {
 			this.sortBy = ctx.sortBy
 			this.sortDesc = ctx.sortDesc
 			this.limit = this.studies.length
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
 		},
 		showSeries (row) {
 			if (!row.detailsShowing) {
@@ -373,11 +373,10 @@ export default {
 			row.toggleDetails()
 		},
 
-		toggleFavorite (index, type) {
+		toggleFavorite (study, type) {
 			var vm = this
-			this.$store.dispatch('toggleFavorite', { type: type, index: index }).then(res => {
-				if (res) vm.$snotify.success(type + 'is now in favorites')
-				else vm.$snotify.error('Sorry, an error occured')
+			this.$store.dispatch('toggleFavorite', { type: type, StudyInstanceUID: study.StudyInstanceUID[0], inbox: true }).then(res => {
+				if (!res) vm.$snotify.error('Sorry, an error occured')
 			})
 		},
 		handleComments (row) {
@@ -420,7 +419,7 @@ export default {
 			})
 		},
 		searchOnline () {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
@@ -473,6 +472,16 @@ export default {
 				this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}` )
 				if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}` )
 			})
+		},
+		// TODO : Improve this.
+		addSelectedStudiesFavorite(){
+			let studies = _.filter(this.studies, s => { return s.is_selected })
+			var vm = this
+			_.forEach(studies, study => {
+				this.$store.dispatch('toggleFavorite', { type: 'study', StudyInstanceUID: study.StudyInstanceUID[0], inbox: true }).then(res => {
+					if (!res) vm.$snotify.error('Sorry, an error occured')
+				})
+			})
 		}
 	},
 
@@ -480,7 +489,7 @@ export default {
 		if (this.$route.params.album_id) {
 			this.filters.album_id = this.$route.params.album_id
 		} else {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
 	},
