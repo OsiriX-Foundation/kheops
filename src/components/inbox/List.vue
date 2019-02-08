@@ -53,7 +53,6 @@
 
 <template>
 	<div class = 'container-fluid'>
-
 		<!--button Study selected -->
 		<div class="my-3 selection-button-container">
 			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
@@ -398,12 +397,12 @@ export default {
 				if (this.studies[i].is_selected) {
 					let selectedSeries = _.filter(this.studies[i].series, s => { return s.is_selected })
 					if (this.studies[i].series.length === 0 || this.studies[i].series.length === selectedSeries.length) {
-						vm.$store.dispatch('deleteStudy', { StudyInstanceUID: this.studies[i].StudyInstanceUID, album_id: this.filters.album_id })
+						vm.$store.dispatch('deleteStudy', { StudyInstanceUID: this.studies[i].StudyInstanceUID[0], album_id: this.filters.album_id })
 						// vm.$delete(vm.studies, i);
 					} else {
 						for (j = selectedSeries.length - 1; j > -1; j--) {
 							let s = selectedSeries[j]
-							vm.$store.dispatch('deleteSeries', { StudyInstanceUID: this.studies[i].StudyInstanceUID, SeriesInstanceUID: s.SeriesInstanceUID, album_id: this.filters.album_id })
+							vm.$store.dispatch('deleteSeries', { StudyInstanceUID: this.studies[i].StudyInstanceUID[0], SeriesInstanceUID: s.SeriesInstanceUID[0], album_id: this.filters.album_id })
 							// vm.$delete(vm.studies[i].series,j);
 						}
 					}
@@ -585,7 +584,7 @@ export default {
 	div.calendar-wrapper{
 		color: #333;
 	}
-
+		
 	a{
 		cursor: pointer;
 	}

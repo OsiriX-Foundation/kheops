@@ -182,17 +182,17 @@ const actions = {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'study', index: studyIdx })
-		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + queryParam).then( () => {
-			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID[0] })
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}${queryParam}`).then( () => {
+			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
 		})
 	},
 	deleteSeries ({ commit }, params) {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
-		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID === params.SeriesInstanceUID })
+		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID[0] === params.SeriesInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'series', index: studyIdx + ':' + seriesIdx })
-		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + '/series/' + params.SeriesInstanceUID[0] + queryParam).then( () => {
-			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID[0], SeriesInstanceUID: params.SeriesInstanceUID[0] })
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}${queryParam}`).then( () => {
+			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 		})
 	},
 	downloadStudy () {
@@ -212,11 +212,9 @@ const actions = {
 			if (isFavorite) {
 				let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
 				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites',urlParameters).then( () => {
-					console.log('OK ' + StudyInstanceUID + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
-					console.error(err)
 					return false
 				})
 			} else {
@@ -227,7 +225,6 @@ const actions = {
 		}
 	},
 	toggleSelected ({ commit }, params) {
-		console.log(params)
 		commit('TOGGLE_SELECTED_STUDY', params)
 	},
 	getStudiesComments ({ commit }, params) {
