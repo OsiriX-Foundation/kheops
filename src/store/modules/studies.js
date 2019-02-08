@@ -1,5 +1,6 @@
 import { HTTP } from '@/router/http'
 import dicom from '@/mixins/dicom'
+import customdicom from '@/mixins/customdicom'
 import moment from 'moment'
 import axios from 'axios'
 // initial state
@@ -58,6 +59,9 @@ const actions = {
 				}
 			}
 		})
+		_.forEach(params.includefield, function(value) {
+			requestParams += `&includefield=${value}`
+		})
 		if (requestParams.indexOf('&album=') > -1) {
 			requestParams = requestParams.replace('&inbox=true', '')
 		}
@@ -88,14 +92,16 @@ const actions = {
 					if (dicom.dicom2name[k] !== undefined) {
 						if (dicom.dicom2name[k] === 'PatientName' || dicom.dicom2name[k] === 'ReferringPhysicianName') v.Value = v.Value[0].Alphabetic
 						t[dicom.dicom2name[k]] = v.Value
+					} else if (customdicom.customdicom2name[k] !== undefined) {
+						t[customdicom.customdicom2name[k]] = v.Value
 					} else t[k] = v
 					if (t.StudyInstanceUID !== undefined) {
 						if (state.flags[t.StudyInstanceUID[0]] === undefined) {
 							let flag = {
 								id: t.StudyInstanceUID[0],
 								is_selected: false,
-								is_favorite: false,
-								comment: false
+								is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
+								comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
 							}
 							commit('SET_FLAG', flag)
 						}
@@ -207,11 +213,12 @@ const actions = {
 
 	toggleFavorite ({ commit }, params) {
 		if (params.type === 'study') {
-			let isFavorite = !state.all[params.index].is_favorite
-			let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0]
+			let index = state.all.findIndex( function (item) { return item.StudyInstanceUID[0] === params.StudyInstanceUID })
+			params.index = index
+			let isFavorite = !state.all[index].is_favorite
+			let StudyInstanceUID = params.StudyInstanceUID
 			if (isFavorite) {
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites').then( () => {
-					console.log('OK ' + StudyInstanceUID + ' is in favorites')
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites'+( params.inbox !== undefined ? '?inbox='+params.inbox : '')).then( () => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
@@ -219,8 +226,9 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites').then( () => {
-					console.log('KO ' + StudyInstanceUID + ' is NOT in favorites')
+				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites'+( params.inbox !== undefined ? '?inbox='+params.inbox : '')).then( () => {
+					commit('TOGGLE_FAVORITE', params)
+					return true
 				})
 			}
 		}
@@ -230,7 +238,7 @@ const actions = {
 		commit('TOGGLE_SELECTED_STUDY', params)
 	},
 	getStudiesComments ({ commit }, params) {
-		return HTTP.get('/studies/' + params.StudyInstanceUID[0] + '/comments', { headers: { 'Accept': 'application/json' } }).then(res => {
+		return HTTP.get('/studies/' + params.StudyInstanceUID + '/comments', { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) {
 				commit('SET_STUDIES_COMMENTS', { data: res.data, StudyInstanceUID: params.StudyInstanceUID })
 			}
