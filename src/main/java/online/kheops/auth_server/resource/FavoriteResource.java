@@ -54,7 +54,7 @@ public class FavoriteResource {
     private Response editStudyFavorites(String studyInstanceUID, String fromAlbumId, Boolean fromInbox,
                                         boolean favorite, SecurityContext securityContext) {
 
-        if (fromInbox == null ^ fromAlbumId == null) {
+        if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
@@ -106,7 +106,7 @@ public class FavoriteResource {
     private Response editSeriesFavorites(String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, Boolean fromInbox,
                                         boolean favorite, SecurityContext securityContext) {
 
-        if (fromInbox == null ^ fromAlbumId == null) {
+        if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
