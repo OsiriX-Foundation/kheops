@@ -63,6 +63,11 @@ const router = new Router({
 	]
 })
 
+router.beforeEach((to, from, next) => {
+	document.title = "Kheops"
+	next()
+})
+
 function requireAuth (to, from, next) {
 	store.dispatch('getCredentials').then(test => {
 		if (!test) {
