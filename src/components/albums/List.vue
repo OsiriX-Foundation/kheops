@@ -119,7 +119,7 @@
 					<div class = 'nameIcons'>
 						<span @click = "toggleFavorite(data.index,'album')" :class="data.item.is_favorite?'selected':''">
 							<v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-							<v-icon v-else class="align-middle" style="margin-right:0" name="star" :invert="true"></v-icon>
+							<v-icon v-else class="align-middle" style="margin-right:0" name="star" color="grey" :invert="true"></v-icon>
 						</span>
 					</div>
 				</div>

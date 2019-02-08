@@ -218,11 +218,11 @@
 						<div class = 'patientNameIcons col-md-auto'>
 							<span @click="toggleFavorite(row.item, 'study')" :class="row.item.is_favorite?'selected':''">
 								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-								<v-icon v-else class="align-middle" style="margin-right:0" name="star"></v-icon>
+								<v-icon v-else class="align-middle" style="margin-right:0" name="star" color="grey"></v-icon>
 							</span>
 							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''">
 								<v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon>
-								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment"></v-icon>
+								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment" color="grey"></v-icon>
 							</span>
 							<a :href="getURLDownload(row.item.StudyInstanceUID)" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
