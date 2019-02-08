@@ -98,10 +98,12 @@
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
 
-			<template slot="HEAD_is_selected" >
+			<template slot="HEAD_is_selected" slot-scope="data">
+				{{$t(data.label)}}
 				<b-button variant="link" size="sm" class="mr-2" >
 					<v-icon  class="align-middle" name="chevron-down" style = 'visibility: hidden'></v-icon>
 				</b-button>
+
 				<b-form-checkbox @click.native.stop @change="selectAll(studies.allSelected)" v-model="studies.allSelected" name="allSelected">
 				</b-form-checkbox>
 			</template>
@@ -260,7 +262,7 @@ export default {
 					sortable: false,
 					class: 'td_checkbox',
 					thClass: 'd-none d-sm-table-cell',
-					margin: 'auto'
+					// margin: 'auto'
 				},
 				{
 					key: 'PatientName',

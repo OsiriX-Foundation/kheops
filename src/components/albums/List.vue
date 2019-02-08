@@ -33,7 +33,8 @@
 		</div>
 		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true"  @row-clicked='selectAlbum'>
 
-			<template slot="HEAD_is_selected">
+			<template slot="HEAD_is_selected" slot-scope="data">
+				{{$t(data.label)}}
 				<b-button variant="link" size="sm"  class="mr-2" >
 					<v-icon  class="align-middle"   name="chevron-down" style = 'visibility: hidden'></v-icon>
 				</b-button>

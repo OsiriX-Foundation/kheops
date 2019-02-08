@@ -215,6 +215,7 @@ const actions = {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
+					console.error(err)
 					return false
 				})
 			} else {
