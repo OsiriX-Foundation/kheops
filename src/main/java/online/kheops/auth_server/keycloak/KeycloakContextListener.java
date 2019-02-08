@@ -51,17 +51,17 @@ public class KeycloakContextListener implements ServletContextListener {
         return servletContext.getInitParameter("online.kheops.keycloak.clientsecret");
     }
 
-    private static String getKeycloakRealms() {
+    private static String getKeycloakRealm() {
         verifyState();
         return servletContext.getInitParameter("online.kheops.keycloak.realms");
     }
 
-    public static URI getKeycloakWellKnownURI(){ return UriBuilder.fromUri(getKeycloakUri() + "/auth/realms/" + getKeycloakRealms() + "/.well-known/openid-configuration").build(); }
+    public static URI getKeycloakOIDCConfigurationURI(){ return UriBuilder.fromUri(getKeycloakUri() + "/auth/realms/" + getKeycloakRealm() + "/.well-known/openid-configuration").build(); }
 
-    public static String getKeycloakWellKnownString(){ return getKeycloakUri() + "/auth/realms/" + getKeycloakRealms() + "/.well-known/openid-configuration"; }
+    public static String getKeycloakOIDCConfigurationString(){ return getKeycloakUri() + "/auth/realms/" + getKeycloakRealm() + "/.well-known/openid-configuration"; }
 
-    public static URI getKeycloakAdminURI(){ return UriBuilder.fromUri(getKeycloakUri() + "/auth/admin/realms/" + getKeycloakRealms()).build(); }
+    public static URI getKeycloakAdminURI(){ return UriBuilder.fromUri(getKeycloakUri() + "/auth/admin/realms/" + getKeycloakRealm()).build(); }
 
-    public static String getKeycloakIssuer() { return getKeycloakUri() + "/auth/realms/" + getKeycloakRealms();}
+    public static String getKeycloakIssuer() { return getKeycloakUri() + "/auth/realms/" + getKeycloakRealm();}
 
 }
