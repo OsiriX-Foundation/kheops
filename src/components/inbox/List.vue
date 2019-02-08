@@ -98,8 +98,12 @@
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
 
+<<<<<<< HEAD
 			<template slot="HEAD_is_selected" slot-scope="data">
 				{{$t(data.label)}}
+=======
+			<template slot="HEAD_is_selected">
+>>>>>>> 46751122beda7db94d19d1a08602de90e6831068
 				<b-button variant="link" size="sm" class="mr-2" >
 					<v-icon  class="align-middle" name="chevron-down" style = 'visibility: hidden'></v-icon>
 				</b-button>
@@ -379,7 +383,11 @@ export default {
 
 		toggleFavorite (study, type) {
 			var vm = this
+<<<<<<< HEAD
 			this.$store.dispatch('toggleFavorite', { type: type, StudyInstanceUID: study.StudyInstanceUID[0], inbox: true, album: null }).then(res => {
+=======
+			this.$store.dispatch('toggleFavorite', { type: type, StudyInstanceUID: study.StudyInstanceUID[0], inbox: true }).then(res => {
+>>>>>>> 46751122beda7db94d19d1a08602de90e6831068
 				if (!res) vm.$snotify.error('Sorry, an error occured')
 			})
 		},
