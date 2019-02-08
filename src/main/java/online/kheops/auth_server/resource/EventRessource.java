@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_LIMIT;
-import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
-import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
+import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
@@ -42,10 +40,10 @@ public class EventRessource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @Path("album/{album:"+Albums.ID_PATTERN+"}/events")
+    @Path("album/{"+ALBUM+":"+Albums.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+    public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                               @QueryParam("types") final List<String> types,
                               @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
@@ -94,10 +92,10 @@ public class EventRessource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
-    @Path("album/{album:"+Albums.ID_PATTERN+"}/comments")
+    @Path("album/{"+ALBUM+":"+Albums.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam("album") String albumId,
+    public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @FormParam("to_user") String user,
                                      @FormParam("comment") String comment) {
 

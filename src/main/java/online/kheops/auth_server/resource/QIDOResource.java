@@ -7,11 +7,7 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.annotation.AlbumAccessSecured;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UIDValidator;
-import online.kheops.auth_server.annotation.ViewerTokenAccess;
-import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
@@ -25,6 +21,8 @@ import org.dcm4che3.data.VR;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
 
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.RolesAllowed;
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
@@ -70,6 +68,7 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
@@ -83,15 +82,7 @@ public class QIDOResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        try {
-            if(fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, fromAlbumId)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-
-        if(fromInbox != null && !kheopsPrincipal.hasUserAccess()) {
+        if(fromInbox != null && fromInbox && !kheopsPrincipal.hasUserAccess()) {
             return Response.status(FORBIDDEN).build();
         }
 
@@ -140,6 +131,8 @@ public class QIDOResource {
     @GET
     @Secured
     @ViewerTokenAccess
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -295,6 +288,8 @@ public class QIDOResource {
     @GET
     @Secured
     @ViewerTokenAccess
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -315,12 +310,12 @@ public class QIDOResource {
         }
 
         //BEGIN kheopsPrincipal
-        if (fromInbox && !kheopsPrincipal.hasUserAccess()) {
+        if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
             return Response.status(FORBIDDEN).build();
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId != kheopsPrincipal.getAlbumID()) {
+            if (fromAlbumId != null && fromAlbumId.compareTo(kheopsPrincipal.getAlbumID()) != 0) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
@@ -328,10 +323,6 @@ public class QIDOResource {
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
         catch (AlbumNotFoundException e) {
             return Response.status(FORBIDDEN).build();
-        }
-
-        if(securityContext.isUserInRole(USER_IN_ROLE.VIEWER_TOKEN)) {
-            fromInbox = kheopsPrincipal.hasInboxAccess();
         }
         //END kheopsPrincipal
 

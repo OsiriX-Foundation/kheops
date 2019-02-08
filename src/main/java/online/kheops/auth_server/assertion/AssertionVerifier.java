@@ -47,7 +47,7 @@ public abstract class AssertionVerifier {
         UNKNOWN_BEARER(UNKNOWN_BEARER_URN) {
             AssertionBuilder getAssertionBuilder() {
                 return assertionToken -> {
-                    List<BadAssertionException> exceptionList = new ArrayList<>(2);
+                    List<BadAssertionException> exceptionList = new ArrayList<>(3);
                     try {
                         return JWT_BEARER.getAssertionBuilder().build(assertionToken);
                     } catch (BadAssertionException e) {
@@ -55,6 +55,11 @@ public abstract class AssertionVerifier {
                     }
                     try {
                         return CAPABILITY.getAssertionBuilder().build(assertionToken);
+                    } catch (BadAssertionException e) {
+                        exceptionList.add(e);
+                    }
+                    try {
+                        return VIEWER.getAssertionBuilder().build(assertionToken);
                     } catch (BadAssertionException e) {
                         exceptionList.add(e);
                     }

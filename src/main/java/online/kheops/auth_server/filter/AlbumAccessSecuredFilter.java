@@ -35,7 +35,6 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
         }
 
         final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
-        //TODO album or albums ??
         if(queryParam.containsKey(ALBUM)) {
             final String albumID = queryParam.get(ALBUM).get(0);
             tryAccess(kheopsPrincipal, albumID, requestContext);

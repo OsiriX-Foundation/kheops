@@ -50,7 +50,6 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
                 }
 
                 final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
-                //TODO album or albums ??
                 if(queryParam.containsKey(ALBUM)) {
                     final String albumID = queryParam.get(ALBUM).get(0);
                     tryPermission(kheopsPrincipal, albumID, requestContext);

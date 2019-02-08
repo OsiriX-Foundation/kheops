@@ -175,9 +175,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasInboxAccess() {
-        return true;
-    }
+    public boolean hasInboxAccess() { return true; }
 
     @Override
     public User getUser() { return user; }

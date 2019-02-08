@@ -179,7 +179,14 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     public User getUser() { return kheopsPrincipal.getUser(); }
 
     @Override
-    public ScopeType getScope() { return kheopsPrincipal.getScope(); }
+    public ScopeType getScope() {
+        if(!jwe.getBoolean("isInbox") || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            return ScopeType.ALBUM;
+        } else {
+            return ScopeType.USER;
+        }
+
+    }
 
     @Override
     public String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException {

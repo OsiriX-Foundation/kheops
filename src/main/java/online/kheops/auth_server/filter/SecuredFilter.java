@@ -12,6 +12,7 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +29,8 @@ import static online.kheops.auth_server.util.Consts.*;
 public class SecuredFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
+    public ContainerRequestContext requestContext;
+
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -75,9 +78,9 @@ public class SecuredFilter implements ContainerRequestFilter {
 
             @Override
             public boolean isUserInRole(String role) {
-                if (role.equals(USER_IN_ROLE.CAPABILITY)) {
+                if (role.compareTo(USER_IN_ROLE.CAPABILITY) == 0) {
                     return capabilityAccess;
-                } if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
+                } if (role.compareTo(USER_IN_ROLE.VIEWER_TOKEN) == 0) {
                     return viewerTokenAccess;
                 }
                 return false;
@@ -93,7 +96,7 @@ public class SecuredFilter implements ContainerRequestFilter {
                 return "BEARER";
             }
         });
-
+        this.requestContext = requestContext;
     }
 
     private static String getToken(String authorizationHeader) {
