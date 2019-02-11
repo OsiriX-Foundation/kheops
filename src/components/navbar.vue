@@ -29,12 +29,14 @@
 				<li class="nav-item">
 					<router-link to="/albums" class="nav-link" active-class="active"><v-icon name='book'/>{{ $t("albums") }}</router-link>
 				</li>
+				<!--
 				<li class="nav-item">
 					<router-link to="/favorites" class="nav-link" active-class="active"><v-icon name='star'/>{{ $t("favorites") }}</router-link>
 				</li>
 				<li class="nav-item">
 					<router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock'/>{{ $t("recents") }}</router-link>
 				</li>
+				-->
 			</ul>
 		</div>
 	</div>
@@ -59,7 +61,7 @@ export default {
 
 <style>
 #navbar_container{
-	margin-top: 150px;
+	margin-top: 125px;
 }
 svg.fa-icon{
 	margin-right: 10px;

@@ -5,7 +5,7 @@
 		<nav-bar></nav-bar>
 
 		<!-- content -->
-		<router-view style="margin: 90px auto"/>
+		<router-view style="margin: auto"/>
 
 		<!-- footer -->
 		<b-navbar toggleable="md" type="info" navbar-dark bg-primary>
