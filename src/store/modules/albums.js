@@ -109,7 +109,6 @@ const actions = {
 		})
 	},
 	toggleFavorite ({ commit }, params) {
-		console.log("TOGGLE !")
 		if (params.type === 'album') {
 			let isFavorite = !state.all[params.index].is_favorite
 			let albumId = state.all[params.index].album_id

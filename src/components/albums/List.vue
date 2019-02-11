@@ -278,7 +278,7 @@ export default {
 
 		toggleFavorite (index, type) {
 			var vm = this
-			this.$store.dispatch('toggleFavorite', { type: type, index: index }).then(res => {
+			this.$store.dispatch('toggleFavorite', { type: this.$route.name, index: index }).then(res => {
 				if (res) vm.$snotify.success(type + 'is now in favorites')
 				else vm.$snotify.error('Sorry, an error occured')
 			})

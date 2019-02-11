@@ -83,11 +83,13 @@
 				</button>
 			</span>
 
+			<!--
 			<span style = 'margin-left: 30px;' v-if='!filters.album_id'>
 				<toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" />
 				<label class = 'ml-3'>{{$t('includeseriesfromalbum')}}</label>
 			</span>
-
+			-->
+			
 			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'>
 				<v-icon name = 'search' scale='2'/>
 			</button>
@@ -216,7 +218,7 @@
 							{{row.item.PatientName}}
 						</div>
 						<div class = 'patientNameIcons col-md-auto'>
-							<span @click="toggleFavorite(row.item, 'study')" :class="row.item.is_favorite?'selected':''">
+							<span @click="toggleFavorite(row.item)" :class="row.item.is_favorite?'selected':''">
 								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
 								<v-icon v-else class="align-middle" style="margin-right:0" name="star" color="grey"></v-icon>
 							</span>
@@ -377,9 +379,10 @@ export default {
 			row.toggleDetails()
 		},
 
-		toggleFavorite (study, type) {
+		toggleFavorite (study) {
 			var vm = this
-			this.$store.dispatch('toggleFavorite', { type: type, StudyInstanceUID: study.StudyInstanceUID[0], inbox: true, album: null }).then(res => {
+			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
+			this.$store.dispatch('toggleFavorite', { type: "study", StudyInstanceUID: study.StudyInstanceUID[0], queryparams: params }).then(res => {
 				if (!res) vm.$snotify.error('Sorry, an error occured')
 			})
 		},

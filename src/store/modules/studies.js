@@ -95,19 +95,17 @@ const actions = {
 					} else if (customdicom.customdicom2name[k] !== undefined) {
 						t[customdicom.customdicom2name[k]] = v.Value
 					} else t[k] = v
-					if (t.StudyInstanceUID !== undefined) {
-						if (state.flags[t.StudyInstanceUID[0]] === undefined) {
-							let flag = {
-								id: t.StudyInstanceUID[0],
-								is_selected: false,
-								is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
-								comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
-							}
-							commit('SET_FLAG', flag)
-						}
-					}
 				})
-				if (t.StudyInstanceUID !== undefined) data.push(t)
+				if (t.StudyInstanceUID !== undefined) {
+					let flag = {
+						id: t.StudyInstanceUID[0],
+						is_selected: false,
+						is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
+						comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
+					}
+					commit('SET_FLAG', flag)
+					data.push(t)
+				} 
 				dispatch('getStudiesComments', { StudyInstanceUID: t.StudyInstanceUID })
 			})
 			commit('SET_STUDIES', { data: data, reset: reset })
@@ -211,16 +209,21 @@ const actions = {
 		// HTTP.GET('/studies/'+params.StudyInstanceUID[0]+"&inbox=true");
 	},
 
+	//TODO: Improve if condition.
 	toggleFavorite ({ commit }, params) {
-		if (params.type === 'study') {
+		if (params.type === 'study' || params.type === 'album') {
 			let index = state.all.findIndex( function (item) { return item.StudyInstanceUID[0] === params.StudyInstanceUID })
 			params.index = index
 			let isFavorite = !state.all[index].is_favorite
 			let StudyInstanceUID = params.StudyInstanceUID
+			let urlParameters = '?'
+			_.forEach(params.queryparams, (value, key) => {
+				urlParameters += (urlParameters === '?' ? '' : '&') + key+'='+value
+			})
 			if (isFavorite) {
 				//let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
 				//return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' , urlParameters).then( () => {
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites'+( params.inbox !== undefined ? '?inbox='+params.inbox : '')).then( () => {
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites'+urlParameters).then( () => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
@@ -228,7 +231,7 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites'+( params.inbox !== undefined ? '?inbox='+params.inbox : '')).then( () => {
+				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites'+urlParameters).then( () => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				})
@@ -348,8 +351,9 @@ const mutations = {
 	SET_TOTAL (state, value) {
 		state.totalItems = value
 	},
+	//TODO: Improve if condition.
 	TOGGLE_FAVORITE (state, params) {
-		if (params.type === 'study') {
+		if (params.type === 'study' || params.type === 'album') {
 			state.all[params.index].is_favorite = !state.all[params.index].is_favorite
 			state.flags[state.all[params.index].StudyInstanceUID[0]].is_favorite = state.all[params.index].is_favorite
 		}
