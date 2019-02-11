@@ -74,6 +74,7 @@ public class TokenResource
     }
 
     static class ErrorResponse {
+        @XmlElement(name = "error")
         String error;
         @XmlElement(name = "error_description")
         String errorDescription;
