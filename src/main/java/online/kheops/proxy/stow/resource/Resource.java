@@ -110,7 +110,7 @@ public final class Resource {
                     .build();
         } catch (AccessTokenException e) {
             LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
-            throw new WebApplicationException(UNAUTHORIZED);
+            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
         }
 
         final InputStream inputStream;
