@@ -79,6 +79,8 @@ public final class BearerTokenRetriever {
     }
 
     private Form getInstanceForm(Instance instance) {
-        return getForm().param("scope", STUDY_INSTANCE_UID +"=" + instance.getStudyInstanceUID() + " " + SERIES_INSTANCE_UID + "=" + instance.getSeriesInstanceUID());
+        return getForm().param("scope", "pep")
+                .param("study_instance_uid", instance.getStudyInstanceUID())
+                .param("series_instance_uid", instance.getSeriesInstanceUID());
     }
 }
