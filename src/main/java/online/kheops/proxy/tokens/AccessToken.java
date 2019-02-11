@@ -61,7 +61,9 @@ public class AccessToken {
                     .param("assertion", capability)
                     .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer");
             if (seriesID != null) {
-                form.param("scope", "StudyInstanceUID=" + seriesID.getStudyUID() + " SeriesInstanceUID=" + seriesID.getSeriesUID());
+                form.param("scope", "pep")
+                        .param("study_instance_uid", seriesID.getStudyUID())
+                        .param("series_instance_uid", seriesID.getSeriesUID());
             }
             URI uri = UriBuilder.fromUri(authorizationServerRoot).path("token").build();
 
