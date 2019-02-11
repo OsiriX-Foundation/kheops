@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
+import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 
 public class Capabilities {
 
@@ -253,6 +254,21 @@ public class Capabilities {
         try {
             Capability capability = getCapability(capabilityToken, em);
             capabilityResponse = new CapabilitiesResponse(capability, false, true).getResponse();
+        } finally {
+            em.close();
+        }
+        return capabilityResponse;
+    }
+
+    public static CapabilitiesResponse.Response getCapability(String capabilityTokenID, long callingUserPk)
+            throws CapabilityNotFoundException {
+        CapabilitiesResponse.Response capabilityResponse;
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final User user = findUserByPk(callingUserPk, em);
+        try {
+            Capability capability = getCapability(user, capabilityTokenID, em);
+            capabilityResponse = new CapabilitiesResponse(capability, false, false).getResponse();
         } finally {
             em.close();
         }

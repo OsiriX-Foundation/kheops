@@ -129,43 +129,43 @@ public class TokenResource
 
         boolean pepScope = false;
         boolean viewerScope = false;
-
+        errorResponse.error = "Bad Request";
         if(scope != null && !scope.isEmpty()) {
             if(scope.compareTo("pep") == 0) {
                 if(studyInstanceUID == null || seriesInstanceUID == null) {
                     errorResponse.errorDescription = "With the scope: 'pep', 'study_instance_uid' and 'series_instance_uid' must be set";
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 if (!checkValidUID(studyInstanceUID)) {
                     errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 if (!checkValidUID(seriesInstanceUID)) {
                     errorResponse.errorDescription = "'series_instance_uid' is not a valid UID";
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 pepScope = true;
             } else if(scope.compareTo("viewer") == 0) {
                 if(studyInstanceUID == null || sourceType == null) {
                     errorResponse.errorDescription = "With the scope: 'viewer', 'study_instance_uid' and 'source_type' must be set";
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 if (!checkValidUID(studyInstanceUID)) {
                     errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 if (sourceType.compareTo(ALBUM)!=0 && sourceType.compareTo(INBOX) != 0 ) {
                     errorResponse.errorDescription = "'source_type' can be only '"+ALBUM+"' or '"+INBOX+"'";
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 if (sourceType.compareTo(ALBUM) == 0 && (sourceId.isEmpty() || sourceId == null) ) {
                     errorResponse.errorDescription = "'source_id' must be set when 'source_type'="+ALBUM;
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 viewerScope = true;
             } else {
                 errorResponse.errorDescription = "Scope: can be only 'pep', 'viewer', null or Empty";
-                throw new WebApplicationException(Response.status(BAD_REQUEST).entity(errorResponse).build());
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 

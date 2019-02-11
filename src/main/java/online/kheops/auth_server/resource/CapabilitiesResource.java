@@ -1,5 +1,6 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
@@ -148,6 +149,26 @@ public class CapabilitiesResource {
 
         try {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
+        } catch (CapabilityNotFoundException e) {
+            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
+        return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();
+    }
+
+    @GET
+    @Secured
+    @UserAccessSecured
+    @Path("capabilities/{capability_token_id:"+ ID_PATTERN+"}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
+
+        Response capabilityResponses;
+
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+
+        try {
+            capabilityResponses = Capabilities.getCapability(capabilityTokenID, callingUserPk);
         } catch (CapabilityNotFoundException e) {
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
