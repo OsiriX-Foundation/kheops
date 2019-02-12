@@ -21,6 +21,7 @@ import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.assertion.DownloadKeyException;
 import online.kheops.auth_server.assertion.UnknownGrantTypeException;
 
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
@@ -80,6 +81,17 @@ public class TokenResource
         @XmlElement(name = "error_description")
         String errorDescription;
     }
+
+    static class IntreospectResponse {
+    @XmlElement(name = "active")
+    boolean active;
+    @XmlElement(name = "scope")
+    String scope;
+    @XmlElement(name = "error")
+    ErrorResponse error;
+}
+
+
 
     @POST
     @FormURLEncodedContentType
@@ -292,6 +304,7 @@ public class TokenResource
 
         final ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.error = "invalid_grant";
+        final IntreospectResponse intreospectResponse = new IntreospectResponse();
 
         final Assertion assertion;
         try {
@@ -303,7 +316,9 @@ public class TokenResource
         } catch (BadAssertionException e) {
             errorResponse.errorDescription = e.getMessage();
             LOG.log(Level.WARNING, "Error validating a token", e);
-            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+            intreospectResponse.error = errorResponse;
+            intreospectResponse.active = false;
+            return Response.status(OK).entity(intreospectResponse).build();
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
             errorResponse.error = "server_error";
@@ -323,14 +338,26 @@ public class TokenResource
 
         final KheopsPrincipalInterface principal;
         if(assertion.getCapability().isPresent()) {
+            if (assertion.getCapability().get().getScopeType().compareToIgnoreCase(ScopeType.ALBUM.name()) == 0) {
+                intreospectResponse.scope = (assertion.getCapability().get().isWritePermission()?"write ":"") +
+                        (assertion.getCapability().get().isReadPermission()?"read ":"") +
+                        (assertion.getCapability().get().isDownloadPermission()?"download ":"") +
+                        (assertion.getCapability().get().isAppropriatePermission()?"appropriate ":"");
+                intreospectResponse.scope = intreospectResponse.scope.substring(0, intreospectResponse.scope.length()-1);
+            } else {
+                intreospectResponse.scope = "read write";
+            }
             principal = new CapabilityPrincipal(assertion.getCapability().get(), callingUser);
         } else if(assertion.getViewer().isPresent()) {
+            intreospectResponse.scope = "read";
             principal = new ViewerPrincipal(assertion.getViewer().get());
         } else {
+            intreospectResponse.scope = "read write";
             principal = new UserPrincipal(callingUser);
         }
 
-        return Response.status(OK).build();
+        intreospectResponse.active = true;
+        return Response.status(OK).entity(intreospectResponse).build();
     }
 
     private boolean checkValidUID(String uid) {

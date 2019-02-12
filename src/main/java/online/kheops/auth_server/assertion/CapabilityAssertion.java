@@ -19,7 +19,7 @@ final class CapabilityAssertion implements Assertion {
     static final class Builder {
         CapabilityAssertion build(String capabilityToken) throws BadAssertionException {
             if (!Capabilities.isValidFormat(capabilityToken)) {
-                throw new BadAssertionException("Bad capability format");
+                throw new BadAssertionException("Bad capability token format");
             }
 
             final EntityManager em = EntityManagerListener.createEntityManager();
