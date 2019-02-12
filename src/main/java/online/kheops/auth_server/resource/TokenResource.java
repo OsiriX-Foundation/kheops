@@ -127,6 +127,12 @@ public class TokenResource
             return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
+        try {
+            getOrCreateUser(assertion.getSub());
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
         boolean pepScope = false;
         boolean viewerScope = false;
         errorResponse.error = "Bad Request";
