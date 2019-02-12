@@ -1,11 +1,8 @@
 package online.kheops.auth_server.assertion;
 
-import online.kheops.auth_server.resource.TokenResource;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class AssertionVerifier {
@@ -109,7 +106,6 @@ public abstract class AssertionVerifier {
     private AssertionVerifier() {}
 
     public static Assertion createAssertion(String assertionToken, String grantType) throws UnknownGrantTypeException, BadAssertionException {
-        LOG.log(Level.WARNING, "TOKEN: "+assertionToken);
         return GrantType.valueOfUrn(grantType).getAssertionBuilder().build(assertionToken);
     }
 

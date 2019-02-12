@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 
@@ -278,6 +279,58 @@ public class TokenResource
             LOG.info("Returning access token for user: " + assertion.getSub());
         }
         return Response.status(responseStatus).entity(tokenResponse).build();
+    }
+
+    @POST
+    @FormURLEncodedContentType
+    @ViewerTokenAccess
+    @Path("/token/introspect")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response introspect(@FormParam("grant_type") String grantType,
+                               @FormParam("assertion") String assertionToken) {
+
+        final ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.error = "invalid_grant";
+
+        final Assertion assertion;
+        try {
+            assertion = AssertionVerifier.createAssertion(assertionToken, grantType);
+        } catch (UnknownGrantTypeException e) {
+            errorResponse.errorDescription = e.getMessage();
+            LOG.log(Level.WARNING, "Unknown grant type", e);
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        } catch (BadAssertionException e) {
+            errorResponse.errorDescription = e.getMessage();
+            LOG.log(Level.WARNING, "Error validating a token", e);
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+        } catch (DownloadKeyException e) {
+            LOG.log(Level.SEVERE, "Error downloading the public key", e);
+            errorResponse.error = "server_error";
+            errorResponse.errorDescription = "error";
+            return Response.status(BAD_GATEWAY).entity(errorResponse).build();
+        }
+
+
+        final User callingUser;
+        try {
+            callingUser = getUser(assertion.getSub());
+        } catch (UserNotFoundException e) {
+            errorResponse.error = "unknown_user";
+            errorResponse.errorDescription = "The user was not found in the DB";
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+        }
+
+        final KheopsPrincipalInterface principal;
+        if(assertion.getCapability().isPresent()) {
+            principal = new CapabilityPrincipal(assertion.getCapability().get(), callingUser);
+        } else if(assertion.getViewer().isPresent()) {
+            principal = new ViewerPrincipal(assertion.getViewer().get());
+        } else {
+            principal = new UserPrincipal(callingUser);
+        }
+
+        return Response.status(OK).build();
     }
 
     private boolean checkValidUID(String uid) {
