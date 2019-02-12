@@ -64,11 +64,16 @@ public class EventResponse {
             response.targetName = mutation.getToUser().getEmail();
         }
         if (mutation.getMutationType().compareTo(Events.MutationType.IMPORT_SERIES.toString()) == 0 ||
-                mutation.getMutationType().compareTo(Events.MutationType.REMOVE_SERIES.toString()) == 0 ||
-                mutation.getMutationType().compareTo(Events.MutationType.ADD_FAV.toString()) == 0 ||
-                mutation.getMutationType().compareTo(Events.MutationType.REMOVE_FAV.toString()) == 0) {
+                mutation.getMutationType().compareTo(Events.MutationType.REMOVE_SERIES.toString()) == 0 ) {
             response.series = mutation.getSeries().getSeriesInstanceUID();
             response.study = mutation.getSeries().getStudy().getStudyInstanceUID();
+        }
+        if (mutation.getMutationType().compareTo(Events.MutationType.ADD_FAV.toString()) == 0 ||
+                mutation.getMutationType().compareTo(Events.MutationType.REMOVE_FAV.toString()) == 0) {
+            if(mutation.getSeries() != null) {
+                response.series = mutation.getSeries().getSeriesInstanceUID();
+            }
+            response.study = mutation.getStudy().getStudyInstanceUID();
         }
         if (mutation.getMutationType().compareTo(Events.MutationType.IMPORT_STUDY.toString()) == 0 ||
                 mutation.getMutationType().compareTo(Events.MutationType.REMOVE_STUDY.toString()) == 0 ) {
