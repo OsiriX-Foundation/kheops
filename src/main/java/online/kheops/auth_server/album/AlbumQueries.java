@@ -122,6 +122,10 @@ public class AlbumQueries {
                 conditionArrayList.add(ALBUM_USER.ADMIN.isTrue().or(ALBUMS.ADD_SERIES_PERMISSION.isTrue()));
             }
 
+            if(albumQueryParams.canCreateCapabilityToken()) {
+                conditionArrayList.add(ALBUM_USER.ADMIN.isTrue());
+            }
+
             if (albumQueryParams.isFavorite()) {
                 conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
             }
