@@ -55,11 +55,11 @@ const actions = {
 				}
 			} else if (filterName.indexOf('StudyDate') === -1) {
 				if (value) {
-					requestParams += '&' + filterName + '=' + value + '*'
+					requestParams += '&' + filterName + '=' + value + (filterName !== 'ModalitiesInStudy' ? '*' : '')
 				}
 			}
 		})
-		_.forEach(params.includefield, function(value) {
+		params.includefield.forEach(function(value) {
 			requestParams += `&includefield=${value}`
 		})
 		if (requestParams.indexOf('&album=') > -1) {
