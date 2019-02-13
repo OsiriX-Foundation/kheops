@@ -15,7 +15,9 @@
 		"hasleft": "has left",
 		"hascreated": "has created",
 		"hasedited": "has edited",
-		"includenotifications": "include notifications"
+		"includenotifications": "include notifications",
+		"addalbum": "add as favorite",
+		"removealbum": "remove as favorite"
 	},
 	"fr" : {
 		"commentpostsuccess": "le commentaire a été posté avec succès",
@@ -30,7 +32,9 @@
 		"hasleft": "a quitté",
 		"hascreated": "a créé",
 		"hasedited": "a édité",
-		"includenotifications": "inclure les notifications"
+		"includenotifications": "inclure les notifications",
+		"addalbum": "a mis en favori",
+		"removealbum": "a enlevé des favories"
 	}
 }
 </i18n>
@@ -81,6 +85,12 @@
 
 							<!-- EDIT_ALBUM -->
 							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="EDIT_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasedited')}} {{$t('thealbum')}} </div>
+
+							<!-- ADD STUDY IN FAVORITES -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_FAV" && comment.study'><i>{{comment.origin_name}}</i> {{$t('addalbum')}} {{$t('thestudy')}} {{comment.study}} </div>
+
+							<!-- ADD STUDY IN FAVORITES -->
+							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_FAV" && comment.study'><i>{{comment.origin_name}}</i> {{$t('removealbum')}} {{$t('thestudy')}} {{comment.study}} </div>
 
 							<div class="bd-highlight"><small style = 'white-space: nowrap'>{{comment.post_date|formatDate}}</small></div>
 						</div>
