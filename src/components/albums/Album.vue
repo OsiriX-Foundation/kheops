@@ -38,7 +38,7 @@
 					<h3>
 						<v-icon name="book" scale="2"></v-icon>
 						<span class = 'p-2'>{{album.name}}</span> 
-						<v-icon name="star" scale="2" v-if="view=='studies'"></v-icon>
+						<v-icon name="star" scale="2" v-if="view=='studies' && album.is_favorite"></v-icon>
 					</h3>
 				</div>
 				<div class = 'col-md'>	<nav class="nav nav-pills nav-fill">

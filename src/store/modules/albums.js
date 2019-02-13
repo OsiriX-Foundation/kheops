@@ -109,7 +109,7 @@ const actions = {
 		})
 	},
 	toggleFavorite ({ commit }, params) {
-		if (params.type === 'album') {
+		if (params.type === 'albums') {
 			let isFavorite = !state.all[params.index].is_favorite
 			let albumId = state.all[params.index].album_id
 			if (isFavorite) {
@@ -125,6 +125,7 @@ const actions = {
 				return HTTP.delete('/album/' + albumId + '/favorites').then( () => {
 					console.log('KO ' + albumId + ' is NOT in favorites')
 					commit('TOGGLE_FAVORITE', params)
+					return true
 				})
 			}
 		}
@@ -213,7 +214,7 @@ const mutations = {
 		state.totalItems = value
 	},
 	TOGGLE_FAVORITE (state, params) {
-		if (params.type === 'album') {
+		if (params.type === 'albums') {
 			state.all[params.index].is_favorite = !state.all[params.index].is_favorite
 			state.flags[state.all[params.index].album_id].is_favorite = state.all[params.index].is_favorite
 		}

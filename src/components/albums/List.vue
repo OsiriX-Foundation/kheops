@@ -117,7 +117,7 @@
 				<div class = 'nameContainer'>
 					{{data.item.name}}
 					<div class = 'nameIcons'>
-						<span @click = "toggleFavorite(data.index,'album')" :class="data.item.is_favorite?'selected':''">
+						<span @click.stop = "toggleFavorite(data.index)" :class="data.item.is_favorite?'selected':''">
 							<v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
 							<v-icon v-else class="align-middle" style="margin-right:0" name="star" color="grey" :invert="true"></v-icon>
 						</span>
@@ -276,11 +276,10 @@ export default {
 			})
 		},
 
-		toggleFavorite (index, type) {
+		toggleFavorite (index) {
 			var vm = this
 			this.$store.dispatch('toggleFavorite', { type: this.$route.name, index: index }).then(res => {
-				if (res) vm.$snotify.success(type + 'is now in favorites')
-				else vm.$snotify.error('Sorry, an error occured')
+				if (res[1] === false) vm.$snotify.error('Sorry, an error occured')
 			})
 		},
 		handleComments (index, entity) {
