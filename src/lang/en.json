@@ -21,5 +21,8 @@
 	"theuser": "the user",
 	"theadmin": "the admin",
 	"to": "to",
-	"thealbum": "the album"
+	"thealbum": "the album",
+	"back": "back",
+	"none": "none",
+	"user": "user"
 }

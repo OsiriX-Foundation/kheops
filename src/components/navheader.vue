@@ -24,7 +24,7 @@
 
 				<b-navbar-nav right>
 					<b-nav-item v-access = '"admin"'><router-link to="/admin">Admin</router-link></b-nav-item>
-					<b-nav-item v-access = '"active"'>{{$t('welcome')}} {{user.fullname}}</b-nav-item>
+					<b-nav-item v-access = '"active"'>{{$t('welcome')}} <router-link to="/user"> {{user.fullname}}</router-link></b-nav-item>
 					<b-nav-item v-access = '"active"'><a class = 'pointer' @click='logout()'><v-icon name = 'sign-out-alt'></v-icon></a></b-nav-item>
 					<b-nav-item-dropdown :text="'Lang: '+lang" right>
 						<b-dropdown-item @click="changeLang('en')">EN</b-dropdown-item>

@@ -57,7 +57,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 #navbar_container{
 	margin-top: 150px;
 }

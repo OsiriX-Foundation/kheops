@@ -21,6 +21,9 @@
 	"theuser": "l'utilisateur",
 	"theadmin": "l'admin",
 	"to": "à",
-	"thealbum": "l'ablum"
-
+	"thealbum": "l'ablum",
+	"back": "retour",
+	"none": "aucune",
+	"user": "utilisateur"
+	
 }

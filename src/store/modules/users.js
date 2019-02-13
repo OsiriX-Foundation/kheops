@@ -6,7 +6,8 @@ const state = {
 		username: null,
 		fullname: null,
 		permissions: [],
-		jwt: null
+		jwt: null,
+		tokens: []
 	}
 }
 
@@ -23,7 +24,8 @@ const actions = {
 				username: userData.login,
 				jwt: userData.jwt,
 				fullname: userData.fullname,
-				permissions: userData.permissions
+				permissions: userData.permissions,
+				tokens: []
 			}
 			HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
 			localStorage.setItem('currentUser', JSON.stringify(loggedUser))
@@ -70,6 +72,36 @@ const actions = {
 		}).catch( () => {
 			return false
 		})
+	},
+	getUserTokens ({ commit }, params){
+		return HTTP.get(`/capabilities?show_revoked=${params.showRevoked}`).then( res => {
+			if (res.status == 200) {
+				commit('SET_TOKENS',res.data)
+			}
+			return res.data;
+		}).catch( () => {
+			return false
+		})
+	},
+	createToken ({ commit }, params){
+		var query = ''
+		_.forEach(params.token, (value, key) => {
+			query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
+		})
+		return HTTP.post('/capabilities', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+			if (res.status === 201) {
+				commit('SET_TOKEN', res.data)
+			}
+		})
+	},
+	revokeToken ({ commit }, params){
+		if (params.token_id === undefined) return;
+		return HTTP.post(`/capabilities/${params.token_id}/revoke`).then(res => {
+			if (res.status === 200){
+				commit('REVOKE_TOKEN', res.data)
+			}
+			return res
+		})
 	}
 }
 
@@ -90,7 +122,20 @@ const mutations = {
 			lastname: null,
 			email: null,
 			jwt: null,
-			permissions: null
+			permissions: null,
+			tokens: []
+		}
+	},
+	SET_TOKENS (state, tokens){
+		state.current.tokens = tokens
+	},
+	SET_TOKEN (state, token){
+		state.current.tokens.push(token)
+	},
+	REVOKE_TOKEN (state, token){
+		let idx = _.findIndex(state.current.tokens, t => {return t.id === token.id});
+		if (idx > -1){
+			state.current.tokens[idx] = token
 		}
 	}
 }

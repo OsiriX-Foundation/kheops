@@ -67,7 +67,7 @@
 						</tr>
 						<tr v-if="series.SeriesTime">
 							<th>{{ $t('seriestime') }}</th>
-							<td>{{ series.SeriesTime[0]|formatTime }}</td>
+							<td>{{ series.SeriesTime[0] }}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -145,7 +145,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 div.preview{
 	width: 290px;
 	padding: 0 20px;

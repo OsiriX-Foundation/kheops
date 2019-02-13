@@ -134,7 +134,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 dd span.icon-edit, dt span.icon-edit {
 	margin: 0 10px;
 	cursor: pointer;
