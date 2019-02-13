@@ -5,6 +5,7 @@
 		"addalbum": "Add to an album",
 		"download": "Download",
 		"addfavorite": "Add to favorite",
+		"removefavorite": "Remove to favorite",
 		"PatientName": "Patient Name",
 		"Modality": "Modality",
 		"StudyDate": "Study Date",
@@ -29,6 +30,7 @@
 		"addalbum": "Ajouter à un album",
 		"download": "Télécharger",
 		"addfavorite": "Ajouter aux favoris",
+		"removefavorite": "Supprimer des favoris",
 		"PatientName": "Nom du patient",
 		"Modality": "Modalité",
 		"StudyDate": "Date de l'étude",
@@ -54,8 +56,8 @@
 <template>
 	<div class = 'container-fluid'>
 		<!--button Study selected -->
-		<div class="my-3 selection-button-container">
-			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
+		<div class="container-fluid my-3 selection-button-container">
+			<span class="float-left" v-if="selectedStudiesNb">
 				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
 				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id' @click.stop='form_send_study=!form_send_study'>
 					<span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br/>
@@ -68,14 +70,15 @@
 					</template>
 					<b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in allowedAlbums' :key="album.id">{{album.name}}</b-dropdown-item>
 				</b-dropdown>
-
+				<!--
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()">
 					<span><v-icon class="align-middle" name="download"></v-icon></span><br/>
 					{{ $t("download") }}
 				</button>
+				-->
 				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id' @click = "addSelectedStudiesFavorite()">
 					<span><v-icon class="align-middle" name="star"></v-icon></span><br/>
-					{{ $t("addfavorite") }}
+					{{ $t(infoFavorites) }}
 				</button>
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()">
 					<span><v-icon class="align-middle" name="trash"></v-icon></span><br/>
@@ -90,12 +93,12 @@
 			</span>
 			-->
 			
-			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'>
+			<button type = 'button' class = "d-none d-sm-block btn btn-link btn-lg float-right" @click='showFilters=!showFilters'>
 				<v-icon name = 'search' scale='2'/>
 			</button>
 		</div>
 
-		<form-get-user @get-user='sendToUser' @cancel-user='form_send_study=false' v-if='form_send_study'></form-get-user>
+		<form-get-user @get-user='sendToUser' @cancel-user='form_send_study=false' v-if='form_send_study && selectedStudiesNb'></form-get-user>
 
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
@@ -179,7 +182,7 @@
 				<b-card>
 					<div class = 'row'>
 						<div class = 'col-xl-auto mb-4' >
-							<nav class="nav nav-pills nav-justified flex-column">
+							<nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
 								<a class="nav-link" :class="(row.item.view=='series')?'active':''" @click="row.item.view='series'">{{$t('series')}}</a>
 								<a class="nav-link" :class="(row.item.view=='comments')?'active':''" @click="loadStudiesComments(row.item)">{{$t('comments')}}</a>
 								<a class="nav-link" :class="(row.item.view=='study')?'active':''" @click="loadStudiesMetadata(row.item)">{{$t('study')}}</a>
@@ -217,6 +220,9 @@
 						<div class="patientName col-md-auto">
 							{{row.item.PatientName}}
 						</div>
+						<div class="patientName_ct col-md-auto d-block d-sm-none">
+							{{row.item.ModalitiesInStudy [0] | formatModality }}
+						</div>
 						<div class = 'patientNameIcons col-md-auto'>
 							<span @click="toggleFavorite(row.item)" :class="row.item.is_favorite?'selected':''">
 								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
@@ -227,7 +233,9 @@
 								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment" color="grey"></v-icon>
 							</span>
 							<a :href="getURLDownload(row.item.StudyInstanceUID)" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
+							<!--
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+							-->
 						</div>
 					</div>
 				</div>
@@ -332,6 +340,13 @@ export default {
 		},
 		selectedStudiesNb () {
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
+		},
+		infoFavorites (){
+			if (this.studies.filter(s => { return s.is_selected}).every(s => { return s.is_favorite === true })) {
+				return "removefavorite"
+			} else {
+				return "addfavorite"
+			}
 		},
 		disabledToDates: function () {
 			let vm = this
@@ -481,9 +496,12 @@ export default {
 			})
 		},
 		addSelectedStudiesFavorite(){
-			let studies = _.filter(this.studies, s => { return s.is_selected })
-			_.forEach(studies, study => {
-				this.toggleFavorite(study, 'study')
+			let studies = this.studies.filter(s => { return s.is_selected})
+			let favorites = studies.every(s => { return s.is_favorite === true }) || 
+				studies.every(s => { return s.is_favorite === false })
+			studies.forEach(study => {
+				if (favorites) this.toggleFavorite(study, 'study')
+				else if (study.is_favorite === false) this.toggleFavorite(study, 'study')
 			})
 		}
 	},
