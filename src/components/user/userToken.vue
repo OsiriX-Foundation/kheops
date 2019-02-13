@@ -60,7 +60,7 @@
 				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('album')}}</dt></div>
 				<div class = 'col-xs-12 col-sm-9'>
 					<dd>
-						<router-link :to="`/album/${token.album.id}`">{{token.album.name}}</router-link>
+						<router-link :to="`/albums/${token.album.id}`">{{token.album.name}}</router-link>
 					</dd>
 				</div>
 			</div>
