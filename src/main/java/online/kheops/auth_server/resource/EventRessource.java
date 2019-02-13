@@ -40,7 +40,7 @@ public class EventRessource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @Path("album/{"+ALBUM+":"+Albums.ID_PATTERN+"}/events")
+    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -92,7 +92,7 @@ public class EventRessource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
-    @Path("album/{"+ALBUM+":"+Albums.ID_PATTERN+"}/comments")
+    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,

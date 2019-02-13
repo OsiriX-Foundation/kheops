@@ -11,6 +11,7 @@ public class CapabilitiesResponse {
 
     private Response response = new Response();
 
+    //TODO include directly an AlbumResponse
     public static class AlbumScope {
         @XmlElement(name = "id")
         String id;
