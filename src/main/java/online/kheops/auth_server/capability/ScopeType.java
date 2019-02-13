@@ -1,6 +1,8 @@
 package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.AlbumResponse;
+import online.kheops.auth_server.album.AlbumResponseBuilder;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
@@ -54,7 +56,10 @@ public enum ScopeType {
         }
         @Override
         public CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability) {
-            capabilityResponse.albumId = capability.getAlbum().getId();
+            CapabilitiesResponse.AlbumScope albumScope =  new CapabilitiesResponse.AlbumScope();
+            albumScope.id = capability.getAlbum().getId();
+            albumScope.name = capability.getAlbum().getName();
+            capabilityResponse.albumScope =  albumScope;
             capabilityResponse.scopeType = this.name().toLowerCase();
             capabilityResponse.appropriatePermission = capability.isAppropriatePermission();
             capabilityResponse.downloadPermission = capability.isDownloadPermission();

@@ -1,5 +1,6 @@
 package online.kheops.auth_server.capability;
 
+import online.kheops.auth_server.album.AlbumResponse;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,6 +10,13 @@ import java.time.ZonedDateTime;
 public class CapabilitiesResponse {
 
     private Response response = new Response();
+
+    public static class AlbumScope {
+        @XmlElement(name = "id")
+        String id;
+        @XmlElement(name = "name")
+        String name;
+    }
 
     public static class Response {
         @XmlElement(name = "id")
@@ -42,8 +50,8 @@ public class CapabilitiesResponse {
 
         @XmlElement(name = "scope_type")
         String scopeType;
-        @XmlElement(name = "scope_album")
-        String albumId;
+        @XmlElement(name = "album")
+        AlbumScope albumScope;
         @XmlElement(name = "scope_series")
         String series;
         @XmlElement(name = "scope_study")
