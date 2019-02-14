@@ -43,19 +43,19 @@ export default {
 			return re.test(email)
 		},
 		getUser () {
-			this.$store.dispatch('checkUser',this.new_user_name).then(sub => {
-				if (!sub) this.$snotify.error('Sorry, unknown user');
+			this.$store.dispatch('checkUser', this.new_user_name).then(sub => {
+				if (!sub) this.$snotify.error('Sorry, unknown user')
 				else {
-					this.$emit('get-user',sub)
+					this.$emit('get-user', sub)
 					this.new_user_name = ''
-				} 
+				}
 			})
 		},
 		cancel () {
-			this.new_user_name=""
+			this.new_user_name = ''
 			this.$emit('cancel-user')
 		}
 	}
-	
+
 }
 </script>

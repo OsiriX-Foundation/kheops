@@ -128,17 +128,17 @@ export default {
 
 		previewImg () {
 			if (this.series.Modality === 'SR') this.series.imgSrc = 'static/img/SR_2.png'
-			if (this.series.imgSrc !== undefined && this.series.imgSrc != '') return this.series.imgSrc
+			if (this.series.imgSrc !== undefined && this.series.imgSrc !== '') return this.series.imgSrc
 			else {
 				return this.$store.dispatch('getImage', { SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID }).then(img => {
-					this.series.imgSrc = img;
-					return img;
+					this.series.imgSrc = img
+					return img
 				})
 			}
 		},
 		openViewer () {
-			let url = `${process.env.VUE_APP_URL_API}/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}`;
-			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`, 'OHIFViewer');
+			let url = `${process.env.VUE_APP_URL_API}/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}`
+			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`, 'OHIFViewer')
 		}
 	}
 }

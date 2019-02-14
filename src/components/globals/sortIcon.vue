@@ -9,7 +9,7 @@
 
 export default {
 	name: 'SortIcon',
-	props: ['sorter','ccas']
+	props: ['sorter', 'ccas']
 	// data () {
 	//   return {
 	//     msg: 'Welcome to Your Vue.js App - Home page'

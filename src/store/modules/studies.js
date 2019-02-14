@@ -182,7 +182,7 @@ const actions = {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'study', index: studyIdx })
-		return HTTP.delete(`/studies/${params.StudyInstanceUID}${queryParam}`).then( () => {
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}${queryParam}`).then(() => {
 			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
 		})
 	},
@@ -191,7 +191,7 @@ const actions = {
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID[0] === params.SeriesInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'series', index: studyIdx + ':' + seriesIdx })
-		return HTTP.delete(`/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}${queryParam}`).then( () => {
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}${queryParam}`).then(() => {
 			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 		})
 	},
@@ -210,8 +210,8 @@ const actions = {
 			let isFavorite = !state.all[params.index].is_favorite
 			let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0]
 			if (isFavorite) {
-				let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites',urlParameters).then( () => {
+				let urlParameters = (params.inbox) ? { inbox: true } : { album: params.album }
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites', urlParameters).then(() => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
@@ -219,7 +219,7 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites').then( () => {
+				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites').then(() => {
 					console.log('KO ' + StudyInstanceUID + ' is NOT in favorites')
 				})
 			}
@@ -248,7 +248,7 @@ const actions = {
 			} else return res
 		})
 	},
-	sendStudies (ctx, params){
+	sendStudies (ctx, params) {
 		let promises = []
 
 		_.forEach(params.StudyInstanceUIDs, StudyInstanceUID => {
@@ -259,12 +259,11 @@ const actions = {
 		})
 
 		return axios.all(promises).then(results => {
-			let summary = {success: 0, error: 0}
+			let summary = { success: 0, error: 0 }
 			_.forEach(results, res => {
 				if (res.status === 201 || res.status === 204) {
 					summary.success++
-				}
-				else summary.error++
+				} else summary.error++
 			})
 			return summary
 		})

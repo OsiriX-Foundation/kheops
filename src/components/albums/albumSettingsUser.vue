@@ -121,8 +121,8 @@ export default {
 			if (!this.form_add_user) this.form_add_user = true
 			else {
 				if (this.new_user_name && this.validEmail(this.new_user_name)) {
-					this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then( () => {
-						this.$snotify.success(this.$t('albumuseraddsuccess')),
+					this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then(() => {
+						this.$snotify.success(this.$t('albumuseraddsuccess'))
 						this.new_user_name = ''
 						this.form_add_user = false
 						this.confirm_delete = ''
@@ -134,7 +134,7 @@ export default {
 		},
 		toggleAdmin (user) {
 			user.is_admin = !user.is_admin
-			this.$store.dispatch('toggleAlbumUserAdmin', user).then( () => {
+			this.$store.dispatch('toggleAlbumUserAdmin', user).then(() => {
 				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
 				this.$snotify.success(message)
 			}).catch(err => {
@@ -145,7 +145,7 @@ export default {
 		deleteUser (user) {
 			if (this.confirm_delete !== user.user_name) this.confirm_delete = user.user_name
 			else {
-				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then( () => {
+				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(() => {
 					this.$snotify.success(this.$t('albumuserdeletesuccess'))
 					this.confirm_delete = ''
 				})
@@ -157,7 +157,7 @@ export default {
 		},
 		patchAlbum (field) {
 			let params = { field: this.album[field] }
-			this.$store.dispatch('patchAlbum', params).then( () => {
+			this.$store.dispatch('patchAlbum', params).then(() => {
 				this.$snotify.success(this.$t('albumupdatesuccess'))
 			}).catch(err => {
 				console.error(err)

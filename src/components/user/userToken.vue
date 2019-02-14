@@ -122,18 +122,18 @@ export default {
 	},
 	computed: {
 		permissions () {
-			let perms = [];
-			_.forEach(this.token, (value,key) => {
-				if (key.indexOf('permission') > -1 && value){
-					perms.push(key.replace("_permission",""))
+			let perms = []
+			_.forEach(this.token, (value, key) => {
+				if (key.indexOf('permission') > -1 && value) {
+					perms.push(key.replace('_permission', ''))
 				}
 			})
-			return perms.length ? perms.join(", ") : "-"
+			return perms.length ? perms.join(', ') : '-'
 		}
 	},
 	methods: {
 		revoke () {
-			this.$store.dispatch('revokeToken',{token_id: this.token.id}).then( (res) => {
+			this.$store.dispatch('revokeToken', { token_id: this.token.id }).then((res) => {
 				this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`)
 				this.cancel()
 			}).catch((err) => {
@@ -143,7 +143,7 @@ export default {
 			})
 		},
 		cancel () {
-			this.$emit('done');
+			this.$emit('done')
 		}
 	}
 }

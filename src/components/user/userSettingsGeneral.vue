@@ -26,21 +26,21 @@
 </template>
 
 <script>
-export default{
+export default {
 	name: 'userSettingsGeneral',
 	data () {
 		return {
 		}
 	},
 	computed: {
-		lang:  {
+		lang: {
 			get () {
-				return this.$i18n.locale				
+				return this.$i18n.locale
 			},
 			set (value) {
-				this.$root.$i18n.locale = value	
+				this.$root.$i18n.locale = value
 			}
-		}		
+		}
 	}
 }
 </script>
