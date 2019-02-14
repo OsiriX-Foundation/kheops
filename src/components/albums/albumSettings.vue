@@ -17,7 +17,7 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
+	<div class = 'container' id="albumSettings">
 		<div class = 'row'>
 			<div class = 'col-2' >
 				<nav class="nav nav-pills nav-justified flex-column">
@@ -67,6 +67,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

@@ -180,7 +180,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 div.user-table-container{
 	min-height: 200px;
 	padding: 50px 0;

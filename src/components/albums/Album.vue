@@ -95,7 +95,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 h3 {
 	margin-bottom: 40px;
 	float: left;

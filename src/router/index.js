@@ -4,7 +4,7 @@ import Study from '@/components/inbox/List'
 import Albums from '@/components/albums/List'
 import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
-//import Favorites from '@/components/favorites/Favorites'
+import User from '@/components/user/user'
 import store from '@/store'
 
 // import PermissionDenied from '@/components/user/permissionDenied'
@@ -45,6 +45,13 @@ const router = new Router({
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
 
+	},
+	{
+		path: '/user',
+		name: 'user',
+		component: User,
+		beforeEnter: requireAuth,
+		meta: { permissions: 'active', condition: 'any' }
 	},
 	{
 		path: '*',

@@ -77,7 +77,7 @@
 						</tr>
 						<tr v-if="matchNumbers(metadata.StudyTime)">
 							<th>{{ $t('studytime') }}</th>
-							<td>{{ metadata.StudyTime[0]|formatTime }}</td>
+							<td>{{ metadata.StudyTime[0] }}</td>
 						</tr>
 						<tr v-if="matchNumbers(metadata.NumberOfStudyRelatedSeries)">
 							<th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
@@ -135,7 +135,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 div.description {
 	width: 290px;
 	padding: 0 20px;
