@@ -32,6 +32,8 @@ public class CapabilitiesResponse {
         String issuedAt;
         @XmlElement(name = "not_before_time")
         String notBeforeTime;
+        @XmlElement(name = "last_use")
+        String lastUse;
         @XmlElement(name = "expiration_time")
         String expirationTime;
         @XmlElement(name = "revoke_time")
@@ -68,11 +70,14 @@ public class CapabilitiesResponse {
             }
             response.title = capability.getTitle();
             response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
-
+            if(capability.getLastUse() != null) {
+                response.lastUse = ZonedDateTime.of(capability.getLastUse(), ZoneOffset.UTC).toString();
+            }
         }
 
         response.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
         response.revoked = capability.isRevoked();
+
         if (capability.isActive()) {
             response.notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
         }
