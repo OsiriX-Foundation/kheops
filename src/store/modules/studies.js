@@ -127,6 +127,9 @@ const actions = {
 
 			let queryString = (params.album_id) ? '&album=' + params.album_id : '&inbox=true'
 
+			_.forEach(params.includefield, function(value) {
+				queryString += `&includefield=${value}`
+			})
 			HTTP.get('/studies/' + study.StudyInstanceUID + '/series?includefield=00080021&includefield=00080031' + queryString, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 				let data = []
 				_.forEach(res.data, (d) => {

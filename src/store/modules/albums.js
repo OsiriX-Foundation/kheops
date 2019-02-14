@@ -81,7 +81,7 @@ const actions = {
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
-		var request = 'album?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+		var request = 'albums?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
 		HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
 			let data = []
@@ -113,7 +113,7 @@ const actions = {
 			let isFavorite = !state.all[params.index].is_favorite
 			let albumId = state.all[params.index].album_id
 			if (isFavorite) {
-				return HTTP.put('/album/' + albumId + '/favorites').then( () => {
+				return HTTP.put('/albums/' + albumId + '/favorites').then( () => {
 					console.log('OK ' + albumId + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
@@ -122,7 +122,7 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/album/' + albumId + '/favorites').then( () => {
+				return HTTP.delete('/albums/' + albumId + '/favorites').then( () => {
 					console.log('KO ' + albumId + ' is NOT in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
@@ -140,7 +140,7 @@ const actions = {
 			query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
 		})
 
-		return HTTP.post('album', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+		return HTTP.post('albums', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			commit('CREATE_ALBUM', res.data)
 		}).catch( () => {
 		})

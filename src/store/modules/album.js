@@ -39,7 +39,7 @@ const getters = {
 const actions = {
 
 	getAlbum ({ commit }, params) {
-		return HTTP.get('album/' + params.album_id, { headers: { 'Accept': 'application/json' } }).then(res => {
+		return HTTP.get('albums/' + params.album_id, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_ALBUM', res.data)
 		})
 	},
@@ -50,28 +50,28 @@ const actions = {
 		_.forEach(params, (value, key) => {
 			query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
 		})
-		return HTTP.patch('/album/' + state.album.album_id, query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+		return HTTP.patch('/albums/' + state.album.album_id, query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			if (res.status === 200) {
 				commit('PATCH_ALBUM', params)
 			}
 		})
 	},
 	getUsers ({ commit }) {
-		return HTTP.get('/album/' + state.album.album_id + '/users', { headers: { 'Accept': 'application/json' } }).then(res => {
+		return HTTP.get('/albums/' + state.album.album_id + '/users', { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) {
 				commit('SET_USERS', res.data)
 			}
 		})
 	},
 	add_user_to_album ({ commit }, params) {
-		return HTTP.put('/album/' + state.album.album_id + '/users/' + params.user_name).then(res => {
+		return HTTP.put('/albums/' + state.album.album_id + '/users/' + params.user_name).then(res => {
 			if (res.status === 201) {
 				commit('ADD_USER', { user_name: params.user_name, is_admin: false })
 			}
 		})
 	},
 	remove_user_from_album ({ commit }, params) {
-		return HTTP.delete('/album/' + state.album.album_id + '/users/' + params.user_name).then(res => {
+		return HTTP.delete('/albums/' + state.album.album_id + '/users/' + params.user_name).then(res => {
 			if (res.status === 204) {
 				commit('DELETE_USER', { user_name: params.user_name })
 			} else console.log(res.status)
@@ -79,14 +79,14 @@ const actions = {
 	},
 	toggleAlbumUserAdmin ({ commit }, user) {
 		let method = (user.is_admin) ? 'put' : 'delete'
-		return HTTP[method]('/album/' + state.album.album_id + '/users/' + user.user_name + '/admin').then(res => {
+		return HTTP[method]('/albums/' + state.album.album_id + '/users/' + user.user_name + '/admin').then(res => {
 			if (res.status === 204) {
 				commit('TOGGLE_USER_ADMIN', user)
 			}
 		})
 	},
 	deleteAlbum ({ commit }) {
-		return HTTP.delete('/album/' + state.album.album_id).then(res => {
+		return HTTP.delete('/albums/' + state.album.album_id).then(res => {
 			if (res.status === 204) {
 				commit('DELETE_ALBUM')
 			}
@@ -96,7 +96,7 @@ const actions = {
 		let query = ''
 		if (params.type) query = '?types=' + params.type
 
-		return HTTP.get('/album/' + state.album.album_id + '/events' + query).then(res => {
+		return HTTP.get('/albums/' + state.album.album_id + '/events' + query).then(res => {
 			if (res.status === 200) {
 				commit('SET_COMMENTS', res.data)
 			}
@@ -107,7 +107,7 @@ const actions = {
 		_.forEach(params, (value, key) => {
 			if (value) query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
 		})
-		return HTTP.post('/album/' + state.album.album_id + '/comments', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+		return HTTP.post('/albums/' + state.album.album_id + '/comments', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			if (res.status === 204) {
 				dispatch('getAlbumComments')
 			} else return res
@@ -120,6 +120,7 @@ const actions = {
 const mutations = {
 	SET_ALBUM (state, data) {
 		state.album = data
+		console.log(state.album)
 	},
 	PATCH_ALBUM (state, params) {
 		_.forEach(params, (v, k) => {
