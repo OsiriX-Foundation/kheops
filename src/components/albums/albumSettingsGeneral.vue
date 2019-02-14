@@ -57,7 +57,7 @@
 				</div>
 			</dd>
 		</dl>
-
+		<!--
 		<dl>
 			<dt>{{$t('notification')}}</dt>
 			<dd style = 'margin-top: 10px'>
@@ -71,6 +71,7 @@
 				</div>
 			</dd>
 		</dl>
+		-->
 		<p class = 'float-right' v-if='album.is_admin'><button type = 'button' class = 'btn btn-danger' @click='deleteAlbum'>{{confirmDeletion?$t('confirmdeletion'):$t('delete')}}</button> <button type = 'button' class = 'btn btn-secondary' @click='confirmDeletion=!confirmDeletion' v-if='confirmDeletion'>{{$t('cancel')}}</button></p>
 	</div>
 </template>

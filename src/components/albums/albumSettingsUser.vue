@@ -7,10 +7,10 @@
 		"user": "user",
 		"userlist": "List of users",
 		"changerole": "change role to",
-		"add_user": "Add a user",
+		"add_user": "Invite a user",
 		"add_series": "Add Studies / Series",
 		"download_series": "Download Studies / Series",
-		"send_series": "Get Studies / Series",
+		"send_series": "Add to album / inbox",
 		"delete_series": "Remove Studies / Series",
 		"write_comments": "Write Comments",
 		"albumuseraddsuccess": "User added successfully to the album",
@@ -24,10 +24,10 @@
 		"user": "Utilisateur",
 		"userlist": "Liste d'utilisateurs",
 		"changerole": "changer le rôle pour",
-		"add_user": "Ajouter un utilisateur",
+		"add_user": "Inviter un utilisateur",
 		"add_series": "Ajouter une étude / série",
 		"download_series": "Télécharger une étude / série",
-		"send_series": "Récupérer une étude / série",
+		"send_series": "Ajouter à album / inbox",
 		"delete_series": "Supprimer une étude / série",
 		"write_comments": "Commenter",
 		"albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
@@ -109,9 +109,9 @@ export default {
 			userSettings: [
 				'add_user',
 				'add_series',
+				'delete_series',
 				'download_series',
 				'send_series',
-				'delete_series',
 				'write_comments'
 			]
 		}

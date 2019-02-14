@@ -31,12 +31,17 @@
 				<b-form-checkbox v-model="isSelected" v-else>
 					No description
 				</b-form-checkbox>
+				<!--
+				<span>
+					<v-icon class="align-middle" name="star"></v-icon>
+				</span>
+				-->
 			</div>
 		</div>
 		<div class = 'row justify-content-center'>
 			<div class = 'preview'>
 				<img class="cursor-img" @click="openViewer" :src='previewImg()' width= '250' height = '250' v-if='series.Modality != "SR"'>
-				<img :src='previewImg()' width= '250' height = '250' v-else>
+				<img src="../../assets/SR.png" width= '250' height = '250' v-else>
 			</div>
 			<!--
 				div - col col-mb-2 col-md-auto description
@@ -127,7 +132,6 @@ export default {
 		},
 
 		previewImg () {
-			if (this.series.Modality === 'SR') this.series.imgSrc = 'static/img/SR_2.png'
 			if (this.series.imgSrc !== undefined && this.series.imgSrc != '') return this.series.imgSrc
 			else {
 				return this.$store.dispatch('getImage', { SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID }).then(img => {
