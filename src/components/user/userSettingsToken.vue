@@ -20,10 +20,10 @@
 				<span class = 'link' @click="view='new'"><v-icon name = 'plus' scale='1' class='mr-3'></v-icon>{{$t('newtoken')}}</span>
 			</h4>
 		</div>
-		
+
 		<new-user-token v-if="view=='new'" @done="view='list'"></new-user-token>
 		<user-token v-if="view=='token'" :token="token" @done='showList'></user-token>
-		
+
 		<div class = 'tokens' v-if="view=='list'">
 			<h4>
 				Tokens
@@ -54,7 +54,7 @@
 				<template slot="actions" slot-scope="data">
 					<v-icon name="times" v-if="data.item.revoked" class="text-danger" title="revoked"></v-icon>
 				</template>
-				
+
 			</b-table>
 	</div>
   <b-modal id="tokenModal" ref="tokenModal" centered no-fade hide-header hide-footer size="lg">
@@ -64,23 +64,23 @@
 			<div class="col-xs-2 col-sm-1 pointer"><button type="button" class="btn btn-secondary btn-sm" v-clipboard:copy="token.secret" v-clipboard:success="onCopy" v-clipboard:error="onCopyError"><v-icon name="paste" scale="1"></v-icon></button></div>
 		</dl>
   </b-modal>
-	
-		
+
+
 </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
-
-VueClipboard.config.autoSetContainer = true // add this line
-Vue.use(VueClipboard)
 import { mapGetters } from 'vuex'
 import newUserToken from '@/components/user/newUserToken'
 import userToken from '@/components/user/userToken'
-export default{
+
+VueClipboard.config.autoSetContainer = true // add this line
+Vue.use(VueClipboard)
+export default {
 	name: 'userSettingsToken',
-	components: {newUserToken,userToken},
+	components: { newUserToken, userToken },
 	data () {
 		return {
 			showRevoked: false,
@@ -105,7 +105,7 @@ export default{
 				{
 					key: 'title',
 					label: 'description',
-					sortable: true,
+					sortable: true
 				},
 				{
 					key: 'scope_type',
@@ -169,10 +169,10 @@ export default{
 				title: '',
 				write_permission: false
 			}
-			this.view='list'
+			this.view = 'list'
 		},
 		getTokens () {
-			this.$store.dispatch('getUserTokens',{showRevoked: this.showRevoked})
+			this.$store.dispatch('getUserTokens', { showRevoked: this.showRevoked })
 		},
 		onCopy () {
 			this.$snotify.success(this.$t('tokencopysuccess'))

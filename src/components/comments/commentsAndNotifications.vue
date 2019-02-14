@@ -178,7 +178,7 @@ export default {
 					}
 				}
 				if (this.scope === 'album') {
-					this.$store.dispatch('postAlbumComment', this.newComment).then( () => {
+					this.$store.dispatch('postAlbumComment', this.newComment).then(() => {
 						this.$snotify.success('commentpostsuccess')
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
@@ -188,7 +188,7 @@ export default {
 						this.newComment.to_user = ''
 					})
 				} else if (this.scope === 'studies') {
-					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then( () => {
+					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(() => {
 						this.$snotify.success('commentpostsuccess')
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
@@ -203,12 +203,12 @@ export default {
 		getComments () {
 			let type = (this.includeNotifications) ? '' : 'comments'
 			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumComments', { type: type }).then( () => {
+				this.$store.dispatch('getAlbumComments', { type: type }).then(() => {
 					let container = this.$el.querySelector('#album_comment_container')
 					container.scrollTop = container.scrollHeight
 				})
 			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then( () => {
+				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then(() => {
 					let container = this.$el.querySelector('#study_' + this.id.replace(/\./g, '_') + '_comment_container')
 					container.scrollTop = container.scrollHeight
 				})

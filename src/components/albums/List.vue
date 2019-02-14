@@ -272,7 +272,7 @@ export default {
 		},
 		toggleSelected (item, type, isSelected) {
 			let index = _.findIndex(this.albums, s => { return s.album_id === item.album_id })
-			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then( () => {
+			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then(() => {
 			})
 		},
 

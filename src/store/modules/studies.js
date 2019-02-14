@@ -59,7 +59,7 @@ const actions = {
 				}
 			}
 		})
-		params.includefield.forEach(function(value) {
+		params.includefield.forEach(function (value) {
 			requestParams += `&includefield=${value}`
 		})
 		if (requestParams.indexOf('&album=') > -1) {
@@ -105,7 +105,7 @@ const actions = {
 					}
 					commit('SET_FLAG', flag)
 					data.push(t)
-				} 
+				}
 				dispatch('getStudiesComments', { StudyInstanceUID: t.StudyInstanceUID })
 			})
 			commit('SET_STUDIES', { data: data, reset: reset })
@@ -127,7 +127,7 @@ const actions = {
 
 			let queryString = (params.album_id) ? '&album=' + params.album_id : '&inbox=true'
 
-			_.forEach(params.includefield, function(value) {
+			_.forEach(params.includefield, function (value) {
 				queryString += `&includefield=${value}`
 			})
 			HTTP.get('/studies/' + study.StudyInstanceUID + '/series?includefield=00080021&includefield=00080031' + queryString, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
@@ -189,7 +189,7 @@ const actions = {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'study', index: studyIdx })
-		return HTTP.delete(`/studies/${params.StudyInstanceUID}${queryParam}`).then( () => {
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}${queryParam}`).then(() => {
 			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
 		})
 	},
@@ -198,7 +198,7 @@ const actions = {
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID[0] === params.SeriesInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'series', index: studyIdx + ':' + seriesIdx })
-		return HTTP.delete(`/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}${queryParam}`).then( () => {
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}${queryParam}`).then(() => {
 			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 		})
 	},
@@ -212,21 +212,21 @@ const actions = {
 		// HTTP.GET('/studies/'+params.StudyInstanceUID[0]+"&inbox=true");
 	},
 
-	//TODO: Improve if condition.
+	// TODO: Improve if condition.
 	toggleFavorite ({ commit }, params) {
 		if (params.type === 'study' || params.type === 'album') {
-			let index = state.all.findIndex( function (item) { return item.StudyInstanceUID[0] === params.StudyInstanceUID })
+			let index = state.all.findIndex(function (item) { return item.StudyInstanceUID[0] === params.StudyInstanceUID })
 			params.index = index
 			let isFavorite = !state.all[index].is_favorite
 			let StudyInstanceUID = params.StudyInstanceUID
 			let urlParameters = '?'
 			_.forEach(params.queryparams, (value, key) => {
-				urlParameters += (urlParameters === '?' ? '' : '&') + key+'='+value
+				urlParameters += (urlParameters === '?' ? '' : '&') + key + '=' + value
 			})
 			if (isFavorite) {
-				//let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
-				//return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' , urlParameters).then( () => {
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites'+urlParameters).then( () => {
+				// let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
+				// return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' , urlParameters).then( () => {
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' + urlParameters).then(() => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
@@ -234,7 +234,7 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites'+urlParameters).then( () => {
+				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites' + urlParameters).then(() => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				})
@@ -264,7 +264,7 @@ const actions = {
 			} else return res
 		})
 	},
-	sendStudies (ctx, params){
+	sendStudies (ctx, params) {
 		let promises = []
 
 		_.forEach(params.StudyInstanceUIDs, StudyInstanceUID => {
@@ -275,12 +275,11 @@ const actions = {
 		})
 
 		return axios.all(promises).then(results => {
-			let summary = {success: 0, error: 0}
+			let summary = { success: 0, error: 0 }
 			_.forEach(results, res => {
 				if (res.status === 201 || res.status === 204) {
 					summary.success++
-				}
-				else summary.error++
+				} else summary.error++
 			})
 			return summary
 		})
@@ -354,7 +353,7 @@ const mutations = {
 	SET_TOTAL (state, value) {
 		state.totalItems = value
 	},
-	//TODO: Improve if condition.
+	// TODO: Improve if condition.
 	TOGGLE_FAVORITE (state, params) {
 		if (params.type === 'study' || params.type === 'album') {
 			state.all[params.index].is_favorite = !state.all[params.index].is_favorite

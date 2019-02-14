@@ -34,10 +34,10 @@
 	<div class = 'container-fluid'>
 		<div class = 'container'>
 			<div class = 'row'>
-				<div class = 'col-md'>	
+				<div class = 'col-md'>
 					<h3>
 						<v-icon name="book" scale="2"></v-icon>
-						<span class = 'p-2'>{{album.name}}</span> 
+						<span class = 'p-2'>{{album.name}}</span>
 						<v-icon name="star" scale="2" v-if="view=='studies' && album.is_favorite"></v-icon>
 					</h3>
 				</div>

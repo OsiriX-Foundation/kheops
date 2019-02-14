@@ -59,19 +59,19 @@ const router = new Router({
 		component: Study,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
-	},
-	/*{
+	}
+	/* {
 		path: '/favorites',
 		name: 'favorites',
 		component: Favorites,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
-	}*/
+	} */
 	]
 })
 
 router.beforeEach((to, from, next) => {
-	document.title = "Kheops"
+	document.title = 'Kheops'
 	next()
 })
 

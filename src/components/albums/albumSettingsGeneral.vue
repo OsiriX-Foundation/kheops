@@ -111,21 +111,21 @@ export default {
 			params.notificationNewComment = this.album.notification_new_comment
 			params.notificationNewSeries = this.album.notification_new_series
 
-			this.$store.dispatch('patchAlbum', params).then( () => {
+			this.$store.dispatch('patchAlbum', params).then(() => {
 				this.$snotify.success(this.$t('albumupdatesuccess'))
 				this.edit.name = '-1'
 				this.edit.description = '-1'
-			}).catch( () => {
+			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
 		deleteAlbum () {
 			if (!this.confirmDeletion) this.confirmDeletion = true
 			else {
-				this.$store.dispatch('deleteAlbum').then( () => {
+				this.$store.dispatch('deleteAlbum').then(() => {
 					this.$snotify.success(this.$t('albumdeletesuccess'))
 					this.$router.push('/albums')
-				}).catch( () => {
+				}).catch(() => {
 					this.$snotify.error(this.$t('sorryerror'))
 				})
 			}
