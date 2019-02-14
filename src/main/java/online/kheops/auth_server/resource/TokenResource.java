@@ -47,8 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
-import static online.kheops.auth_server.user.Users.getUser;
+import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 
@@ -336,7 +335,6 @@ public class TokenResource
             return Response.status(UNAUTHORIZED).entity(errorResponse).build();
         }
 
-        final KheopsPrincipalInterface principal;
         if(assertion.getCapability().isPresent()) {
             if (assertion.getCapability().get().getScopeType().compareToIgnoreCase(ScopeType.ALBUM.name()) == 0) {
                 intreospectResponse.scope = (assertion.getCapability().get().isWritePermission()?"write ":"") +
@@ -347,13 +345,10 @@ public class TokenResource
             } else {
                 intreospectResponse.scope = "read write";
             }
-            principal = new CapabilityPrincipal(assertion.getCapability().get(), callingUser);
         } else if(assertion.getViewer().isPresent()) {
             intreospectResponse.scope = "read";
-            principal = new ViewerPrincipal(assertion.getViewer().get());
         } else {
             intreospectResponse.scope = "read write";
-            principal = new UserPrincipal(callingUser);
         }
 
         intreospectResponse.active = true;
