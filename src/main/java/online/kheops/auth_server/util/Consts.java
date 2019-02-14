@@ -1,6 +1,7 @@
 package online.kheops.auth_server.util;
 
 import javax.ws.rs.Priorities;
+import java.time.Duration;
 
 public class Consts {
 
@@ -41,6 +42,12 @@ public class Consts {
     public static final int ALBUM_PERMISSION_ACCESS_PRIORITY = Priorities.USER + 3;
     public static final int UID_VALIDATOR_PRIORITY = Priorities.USER - 1;
     public static final int VIEWER_TOKEN_ACCESS_PRIORITY = Priorities.USER - 2;
+
+    //Cache
+    public static class CACHE_USER {
+        public static final Duration DURATION = Duration.ofMinutes(20);
+        public static final int SIZE = 100;
+    }
 
 
 }

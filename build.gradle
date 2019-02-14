@@ -91,6 +91,10 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jooq/jooq-codegen
     compile group: 'org.jooq', name: 'jooq-codegen', version: '3.11.2'
 
+    // https://mvnrepository.com/artifact/org.ehcache/ehcache
+    compile group: 'org.ehcache', name: 'ehcache', version: '3.6.3'
+
+    
     compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.13.0') {
         exclude module: 'slf4j-log4j12'
     }

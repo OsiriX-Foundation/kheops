@@ -1,5 +1,6 @@
 package online.kheops.auth_server.keycloak;
 
+import online.kheops.auth_server.user.CacheUserName;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
@@ -27,9 +28,12 @@ public class Keycloak {
 
     private static Keycloak instance = null;
 
+    private static CacheUserName cacheUserName;
+
     private Keycloak() throws KeycloakException{
         usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
         token = KeycloakToken.getInstance();
+        cacheUserName = CacheUserName.getInstance();
     }
 
     public static Keycloak getInstance() throws KeycloakException{
@@ -63,6 +67,12 @@ public class Keycloak {
             }
 
         } else {
+
+            String userEmail = cacheUserName.getCachedValue(user);
+            if(userEmail != null) {
+                 return new UserResponseBuilder().setEmail(userEmail).setSub(user).build();
+            }
+
             final URI userUri = UriBuilder.fromUri(usersUri).path("/"+user).build();
             final Response response;
             try {
@@ -77,6 +87,7 @@ public class Keycloak {
                 JsonArray reply = jsonReader.readArray();
                 final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                 if(keycloakUser.size() == 1) {
+                    cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
                     return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0)).build();
                 } else {
                     throw new UserNotFoundException();
