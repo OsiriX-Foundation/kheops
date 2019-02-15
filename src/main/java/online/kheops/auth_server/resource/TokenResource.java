@@ -121,6 +121,57 @@ public class TokenResource
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
+        boolean pepScope = false;
+        boolean viewerScope = false;
+        errorResponse.error = "Bad Request";
+
+        if(scope != null) {
+            if (scope.compareTo("pep") == 0) {
+                if (studyInstanceUID == null || seriesInstanceUID == null) {
+                    errorResponse.errorDescription = "With the scope: 'pep', 'study_instance_uid' and 'series_instance_uid' must be set";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                if (!checkValidUID(studyInstanceUID)) {
+                    errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                if (!checkValidUID(seriesInstanceUID)) {
+                    errorResponse.errorDescription = "'series_instance_uid' is not a valid UID";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                pepScope = true;
+            } else if (scope.compareTo("viewer") == 0) {
+                if (studyInstanceUID == null || sourceType == null) {
+                    errorResponse.errorDescription = "With the scope: 'viewer', 'study_instance_uid' and 'source_type' must be set";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                if (!checkValidUID(studyInstanceUID)) {
+                    errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                if (sourceType.compareTo(ALBUM) != 0 && sourceType.compareTo(INBOX) != 0) {
+                    errorResponse.errorDescription = "'source_type' can be only '" + ALBUM + "' or '" + INBOX + "'";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                if (sourceType.compareTo(ALBUM) == 0 && (sourceId.isEmpty() || sourceId == null)) {
+                    errorResponse.errorDescription = "'source_id' must be set when 'source_type'=" + ALBUM;
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                viewerScope = true;
+            } else {
+                errorResponse.errorDescription = "scope: must be 'pep' or 'viewer' not " + scope;
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
+            }
+        } else {
+            errorResponse.errorDescription = "scope: must be 'pep' or 'viewer' not " + scope;
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
+
+
+        Response.Status responseStatus = OK;
+        final String token;
+        final long expiresIn;
+
         final Assertion assertion;
         try {
             assertion = AssertionVerifier.createAssertion(assertionToken, grantType);
@@ -145,53 +196,13 @@ public class TokenResource
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        boolean pepScope = false;
-        boolean viewerScope = false;
-        errorResponse.error = "Bad Request";
-        if(scope != null && !scope.isEmpty()) {
-            if(scope.compareTo("pep") == 0) {
-                if(studyInstanceUID == null || seriesInstanceUID == null) {
-                    errorResponse.errorDescription = "With the scope: 'pep', 'study_instance_uid' and 'series_instance_uid' must be set";
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                if (!checkValidUID(studyInstanceUID)) {
-                    errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                if (!checkValidUID(seriesInstanceUID)) {
-                    errorResponse.errorDescription = "'series_instance_uid' is not a valid UID";
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                pepScope = true;
-            } else if(scope.compareTo("viewer") == 0) {
-                if(studyInstanceUID == null || sourceType == null) {
-                    errorResponse.errorDescription = "With the scope: 'viewer', 'study_instance_uid' and 'source_type' must be set";
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                if (!checkValidUID(studyInstanceUID)) {
-                    errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                if (sourceType.compareTo(ALBUM)!=0 && sourceType.compareTo(INBOX) != 0 ) {
-                    errorResponse.errorDescription = "'source_type' can be only '"+ALBUM+"' or '"+INBOX+"'";
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                if (sourceType.compareTo(ALBUM) == 0 && (sourceId.isEmpty() || sourceId == null) ) {
-                    errorResponse.errorDescription = "'source_id' must be set when 'source_type'="+ALBUM;
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
-                viewerScope = true;
-            } else {
-                errorResponse.errorDescription = "Scope: can be only 'pep', 'viewer', null or Empty";
-                return Response.status(BAD_REQUEST).entity(errorResponse).build();
-            }
-        }
-
-        Response.Status responseStatus = OK;
-        final String token;
-        final long expiresIn;
-
         if (pepScope) {
+
+            if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ) {
+                errorResponse.error = "Unauthorized";
+                errorResponse.errorDescription = "Request a pep token is unauthorized with a viewer token";
+                return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+            }
 
             final User callingUser;
             try {
@@ -218,10 +229,38 @@ public class TokenResource
                 errorResponse.errorDescription = "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair";
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
-        }
+            // Generate a pep token
+            final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
+            final Algorithm algorithmHMAC;
+            try {
+                algorithmHMAC = Algorithm.HMAC256(authSecret);
+            } catch (UnsupportedEncodingException e) {
+                LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
+                return Response.status(INTERNAL_SERVER_ERROR).build();
+            }
 
-        if (viewerScope) {
+            JWTCreator.Builder jwtBuilder = JWT.create()
+                    .withIssuer("auth.kheops.online")
+                    .withSubject(assertion.getSub())
+                    .withAudience("dicom.kheops.online")
+                    .withClaim("capability", false) // don't give capability access
+                    .withClaim("study_uid", studyInstanceUID)
+                    .withClaim("series_uid", seriesInstanceUID)
+                    .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                    .withNotBefore(new Date());
+
+            token = jwtBuilder.sign(algorithmHMAC);
+            expiresIn = 3600L;
+
+        } else if (viewerScope) {
             // Generate a new Viewer token (JWE)
+
+            if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ||
+                    assertion.getTokenType() == Assertion.TokenType.PEP_TOKEN ) {
+                errorResponse.error = "Unauthorized";
+                errorResponse.errorDescription = "Request a viewer token is unauthorized with a pep token or a viewer token";
+                return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+            }
 
             try {
                 final JsonWebEncryption jwe = new JsonWebEncryption();
@@ -245,34 +284,8 @@ public class TokenResource
                 e.printStackTrace();
                 return Response.status(INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();//TODO
             }
-
         } else {
-
-            // Generate a new token (access token or pep token)
-            final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-            final Algorithm algorithmHMAC;
-            try {
-                algorithmHMAC = Algorithm.HMAC256(authSecret);
-            } catch (UnsupportedEncodingException e) {
-                LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
-                return Response.status(INTERNAL_SERVER_ERROR).build();
-            }
-
-            JWTCreator.Builder jwtBuilder = JWT.create()
-                    .withIssuer("auth.kheops.online")
-                    .withSubject(assertion.getSub())
-                    .withAudience("dicom.kheops.online")
-                    .withClaim("capability", assertion.hasCapabilityAccess()) // don't give capability access for capability assertions
-                    .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-                    .withNotBefore(new Date());
-
-            if (pepScope) {
-                jwtBuilder = jwtBuilder.withClaim("study_uid", studyInstanceUID)
-                        .withClaim("series_uid", seriesInstanceUID);
-            }
-
-            token = jwtBuilder.sign(algorithmHMAC);
-            expiresIn = 3600L;
+            return Response.status(BAD_REQUEST).build();
         }
 
         TokenResponse tokenResponse = new TokenResponse();

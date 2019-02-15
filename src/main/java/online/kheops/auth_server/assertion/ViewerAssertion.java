@@ -72,4 +72,7 @@ final class ViewerAssertion implements Assertion {
     public String getSub() {
         return sub;
     }
+
+    @Override
+    public TokenType getTokenType() { return TokenType.VIEWER_TOKEN; }
 }

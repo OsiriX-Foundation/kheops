@@ -75,4 +75,8 @@ final class AuthorizationJWTAssertion implements Assertion {
         return capabilityAccess;
     }
 
+    @Override
+    public TokenType getTokenType() {
+        return TokenType.PEP_TOKEN;
+    }
 }

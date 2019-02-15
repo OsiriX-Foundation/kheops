@@ -81,4 +81,7 @@ final class CapabilityAssertion implements Assertion {
     public Optional<Capability> getCapability() {
         return Optional.of(capability);
     }
+
+    @Override
+    public TokenType getTokenType() { return TokenType.CAPABILITY_TOKEN; }
 }

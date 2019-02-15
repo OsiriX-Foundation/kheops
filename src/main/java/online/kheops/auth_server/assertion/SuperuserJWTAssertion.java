@@ -71,9 +71,11 @@ final class SuperuserJWTAssertion implements Assertion {
         return email;
     }
 
-
     @Override
     public boolean hasCapabilityAccess() {
         return true;
     }
+
+    @Override
+    public TokenType getTokenType() { return TokenType.SUPER_USER_TOKEN; }
 }

@@ -111,4 +111,9 @@ final class JWTAssertion implements Assertion {
     public String getSub() {
         return sub;
     }
+
+    @Override
+    public TokenType getTokenType() {
+        return TokenType.KEYCLOAK_TOKEN;
+    }
 }
