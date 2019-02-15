@@ -57,4 +57,7 @@ export default{
 </script>
 
 <style scoped>
+a.nav-link{
+	cursor: pointer;
+}
 </style>
