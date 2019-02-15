@@ -52,6 +52,15 @@ export default {
 		...mapGetters({
 			user: 'currentUser'
 		})
+	},
+	mounted () {
+		this.view = this.$route.query.view || 'general'
+	},
+	watch: {
+		view () {
+			let queryParams = { view: this.view }
+			this.$router.push({ query: queryParams })
+		}
 	}
 }
 </script>

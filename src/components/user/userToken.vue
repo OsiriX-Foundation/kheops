@@ -15,7 +15,6 @@
 		"creationdate": "creation date",
 		"revokeddate": "revoke date",
 		"revoke": "revoke",
-		"revokedsuccess": "revoked successfully",
 		"thistokenrevoked": "this token is revoked"
 	},
 	"fr": {
@@ -33,7 +32,6 @@
 		"creationdate": "date de création",
 		"revokeddate": "date de révoquation",
 		"revoke": "révoquer",
-		"revokedsuccess": "révoqué avec succès",
 		"thistokenrevoked": "ce token a été revoqué"
 	}
 }
@@ -133,14 +131,8 @@ export default {
 	},
 	methods: {
 		revoke () {
-			this.$store.dispatch('revokeToken', { token_id: this.token.id }).then((res) => {
-				this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`)
-				this.cancel()
-			}).catch((err) => {
-				console.log(err)
-				this.$snotify.error(this.$t('sorryerror'))
-				this.cancel()
-			})
+			this.$emit('revoke', this.token.id)
+			this.cancel()
 		},
 		cancel () {
 			this.$emit('done')
