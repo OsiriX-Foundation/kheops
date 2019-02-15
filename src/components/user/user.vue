@@ -39,13 +39,13 @@ import { mapGetters } from 'vuex'
 import userSettingsGeneral from '@/components/user/userSettingsGeneral'
 import userSettingsToken from '@/components/user/userSettingsToken'
 import userSettingsProvider from '@/components/user/userSettingsProvider'
-export default{
+export default {
 	name: 'user',
-	components: { userSettingsGeneral, userSettingsToken, userSettingsProvider},
+	components: { userSettingsGeneral, userSettingsToken, userSettingsProvider },
 	data () {
 		return {
-			categories: ['general','token','provider'],
-			view: 'general'			
+			categories: ['general', 'token', 'provider'],
+			view: 'general'
 		}
 	},
 	computed: {

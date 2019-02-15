@@ -60,7 +60,7 @@ export default {
 	},
 	methods: {
 		logout () {
-			store.dispatch('logout').then( () => {
+			store.dispatch('logout').then(() => {
 				Vue.prototype.$keycloak.logoutFn()
 			})
 		},

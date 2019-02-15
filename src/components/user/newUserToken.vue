@@ -50,7 +50,7 @@
 						<dd>
 							<select class = 'form-control' v-model='token.scope_type'>
 								<option v-for="(scope,idx) in scopes" :key="idx" :value='scope'>{{$t(scope)}}</option>
-							</select>							
+							</select>
 						</dd>
 					</div>
 				</div>
@@ -109,9 +109,9 @@ export default {
 				appropriate_permission: false,
 				download_permission: false,
 				not_before_time: moment().toDate(),
-				expiration_time: moment().add(7,'days').toDate()
+				expiration_time: moment().add(7, 'days').toDate()
 			},
-			scopes: ['user','album']
+			scopes: ['user', 'album']
 		}
 	},
 	computed: {
@@ -121,26 +121,26 @@ export default {
 	},
 	methods: {
 		createToken () {
-			if (this.token.scope_type !== "album"){
-				this.token.read_permission = false;
-				this.token.write_permission = false;
+			if (this.token.scope_type !== 'album') {
+				this.token.read_permission = false
+				this.token.write_permission = false
 			}
-			if (!this.token.read_permission){
+			if (!this.token.read_permission) {
 				this.token.download_permission = false
 				this.token.appropriate_permission = false
 			}
-			let token = this.token;
-			token.expiration_time = moment(this.token.expiration_time).format();
-			token.not_before_time = moment(this.token.not_before_time).format();
-			this.$store.dispatch('createToken',{token: token}).then( () => {
-				this.$snotify.success('token created successfully');
-				this.$emit('done');
+			let token = this.token
+			token.expiration_time = moment(this.token.expiration_time).format()
+			token.not_before_time = moment(this.token.not_before_time).format()
+			this.$store.dispatch('createToken', { token: token }).then(() => {
+				this.$snotify.success('token created successfully')
+				this.$emit('done')
 			}).catch(() => {
-				this.$snotify.error(this.$t('sorryerror'));
+				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
 		cancel () {
-			this.$emit('done');
+			this.$emit('done')
 		}
 	},
 	created () {

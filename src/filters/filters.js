@@ -33,10 +33,10 @@ Vue.filter('formatModality', value => {
 
 Vue.filter('formatPermissions', item => {
 	let perms = []
-	_.forEach(item, (value,key) => {
-		if (key.indexOf('permission') > -1 && value){
-			perms.push(key.replace("_permission",""))
+	_.forEach(item, (value, key) => {
+		if (key.indexOf('permission') > -1 && value) {
+			perms.push(key.replace('_permission', ''))
 		}
 	})
-	return (perms.length) ? perms.join(", ") : "-"
+	return (perms.length) ? perms.join(', ') : '-'
 })

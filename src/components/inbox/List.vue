@@ -92,9 +92,9 @@
 				<v-icon name = 'search' scale='2'/>
 			</button>
 		</div>
-		
+
 		<form-get-user @get-user='sendToUser' @cancel-user='form_send_study=false' v-if='form_send_study'></form-get-user>
-		
+
 
 		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
 
@@ -261,7 +261,7 @@ export default {
 					label: '',
 					sortable: false,
 					class: 'td_checkbox',
-					thClass: 'd-none d-sm-table-cell',
+					thClass: 'd-none d-sm-table-cell'
 					// margin: 'auto'
 				},
 				{
@@ -442,7 +442,7 @@ export default {
 			})
 
 			if (data.length) {
-				this.$store.dispatch('putStudiesInAlbum', { data: data }).then( () => {
+				this.$store.dispatch('putStudiesInAlbum', { data: data }).then(() => {
 					this.$snotify.success(this.$t('studyputtoalbum'))
 				})
 			}
@@ -457,12 +457,12 @@ export default {
 		loadStudiesMetadata (item) {
 			item.view = 'study'
 		},
-		sendToUser (user_sub) {
-			let studies = _.filter(this.studies, s => {return s.is_selected})
-			let studyIds = [], seriesIds = []
+		sendToUser (userSub) {
+			let studies = _.filter(this.studies, s => { return s.is_selected })
+			let studyIds = []; let seriesIds = []
 			_.forEach(studies, s => {
-				let selectedSeries = _.filter(s.series, oneSeries => {return oneSeries.is_selected});
-				if (selectedSeries.length == s.series.length) studyIds.push(s.StudyInstanceUID[0]);
+				let selectedSeries = _.filter(s.series, oneSeries => { return oneSeries.is_selected })
+				if (selectedSeries.length === s.series.length) studyIds.push(s.StudyInstanceUID[0])
 				else {
 					_.forEach(selectedSeries, oneSeries => {
 						seriesIds.push({
@@ -472,11 +472,13 @@ export default {
 					})
 				}
 			})
-			
-			if (studyIds.length || seriesIds.length) this.$store.dispatch('sendStudies',{StudyInstanceUIDs: studyIds,SeriesInstanceUIDs: seriesIds, user: user_sub}).then( res => {
-				this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}` )
-				if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}` )
-			})
+
+			if (studyIds.length || seriesIds.length) {
+				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub }).then(res => {
+					this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}`)
+					if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
+				})
+			}
 		}
 	},
 
@@ -586,7 +588,7 @@ export default {
 	div.calendar-wrapper{
 		color: #333;
 	}
-		
+
 	a{
 		cursor: pointer;
 	}
