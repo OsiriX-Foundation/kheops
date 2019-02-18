@@ -42,7 +42,7 @@
     <div class="row justify-content-center">
       <div class="preview">
         <img
-          v-if="series.Modality !== 'SR'"
+          v-if="!series.Modality.includes('SR')"
           class="cursor-img"
           :src="series.imgSrc"
           width="250"
@@ -91,7 +91,7 @@
         </table>
 
         <dl
-          v-if="series.Modality !== 'SR'"
+          v-if="!series.Modality.includes('SR')"
           class="row justify-content-center"
         >
           <dd>
