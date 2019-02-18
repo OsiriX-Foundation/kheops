@@ -40,67 +40,160 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
-		<h3 class = 'pointer' v-if = '!form_add_user' style='width: 100%'>{{$t('userlist')}}<button @click='addUser()' class = 'btn btn-secondary float-right' v-if='album.add_user||album.is_admin'><v-icon name='user-plus' scale='1'></v-icon>{{$t('add_user')}}</button></h3>
-		<div class = 'card' v-if='form_add_user'>
-			<div class = 'card-body'>
-				<form @submit.prevent='addUser'>
-					<div class="input-group mb-2">
-						<div>
-							<input type="email" class = 'form-control' v-model='new_user_name' autofocus :placeholder="'email '+$t('user')">
-						</div>
-						<div class="input-group-append">
-              <button class="btn btn-primary" type="submit" :disabled='!validEmail(new_user_name)'>{{$t('add')}}</button>
-              <button class="btn btn-secondary" type="reset"  @keyup.esc='new_user_name=""' @click='new_user_name="";form_add_user=!form_add_user' tabindex="0">{{$t('cancel')}}</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class = 'user-table-container'>
-			<table class = 'table'>
-				<thead>
-					<tr>
-						<th>{{$t('username')}}</th>
-						<th v-if='album.is_admin'></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for='user in users' :key="user.user_name">
-						<td>{{user.user_name}} <span v-if='user.is_admin'>(Admin)</span></td>
-						<td class = 'showOnTrHover text-right'  v-if='album.is_admin'>
-							<div v-if='confirm_delete!=user.user_name' class = 'user_actions'>
-								<a @click.stop='toggleAdmin(user)'>{{$t('changerole')}} {{(user.is_admin)?$t('user'):"admin"}}</a> <a @click.stop='deleteUser(user)' v-if='album.is_admin' class='text-danger' style='margin-left: 20px'><v-icon name = 'trash'></v-icon></a>
-							</div>
-							<div v-if='confirm_delete==user.user_name'>
-								<div class = 'btn-group'><button type = 'button' @click.stop='deleteUser(user)' class = 'btn btn-sm btn-danger'>{{$t('confirm')}}</button><button type = 'button' @click.stop='confirm_delete=""' class = 'btn btn-sm btn-secondary'>{{$t('cancel')}}</button></div>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+  <div class="container">
+    <h3
+      v-if="!form_add_user"
+      class="pointer"
+      style="width: 100%"
+    >
+      {{ $t('userlist') }}<button
+        v-if="album.add_user||album.is_admin"
+        class="btn btn-secondary float-right"
+        @click="addUser()"
+      >
+        <v-icon
+          name="user-plus"
+          scale="1"
+        />{{ $t('add_user') }}
+      </button>
+    </h3>
+    <div
+      v-if="form_add_user"
+      class="card"
+    >
+      <div class="card-body">
+        <form @submit.prevent="addUser">
+          <div class="input-group mb-2">
+            <div>
+              <input
+                v-model="new_user_name"
+                type="email"
+                class="form-control"
+                autofocus
+                :placeholder="'email '+$t('user')"
+              >
+            </div>
+            <div class="input-group-append">
+              <button
+                class="btn btn-primary"
+                type="submit"
+                :disabled="!validEmail(new_user_name)"
+              >
+                {{ $t('add') }}
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="reset"
+                tabindex="0"
+                @keyup.esc="new_user_name=&quot;&quot;"
+                @click=" m_add_user=!form_add_user"
+              >
+                {{ $t('cancel') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="user-table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{{ $t('username') }}</th>
+            <th v-if="album.is_admin" />
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="user in users"
+            :key="user.user_name"
+          >
+            <td>
+              {{ user.user_name }} <span v-if="user.is_admin">
+                (Admin)
+              </span>
+            </td>
+            <td
+              v-if="album.is_admin"
+              class="showOnTrHover text-right"
+            >
+              <div
+                v-if="confirm_delete!=user.user_name"
+                class="user_actions"
+              >
+                <a @click.stop="toggleAdmin(user)">
+                  {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                </a> <a
+                  v-if="album.is_admin"
+                  class="text-danger"
+                  style="margin-left: 20px"
+                  @click.stop="deleteUser(user)"
+                >
+                  <v-icon name="trash" />
+                </a>
+              </div>
+              <div v-if="confirm_delete==user.user_name">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    @click.stop="deleteUser(user)"
+                  >
+                    {{ $t('confirm') }}
+                  </button><button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    @click.stop="confirm_delete=&quot;&quot;"
+                  >
+                    {{ $t('cancel') }}
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-		<fieldset class = 'user_settings'>
-			<legend>{{$t('usersettings')}}</legend>
-			<div class = 'row form-group' v-for='(label,idx) in userSettings' :key="idx" :class = '(label=="send_series")?"offset-1":""'>
-				<div>
-					<toggle-button v-model="album[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.download_series && label=='send_series')" :sync="true" @change='patchAlbum(label)' v-if="album.is_admin"/>
-					<v-icon name="ban" class="text-danger" v-if='!album.is_admin && !album[label]'></v-icon>
-					<v-icon name="check-circle" class="text-success" v-if='!album.is_admin && album[label]'></v-icon>
-				</div>
-				<label>{{$t(label)}}</label>
-			</div>
-		</fieldset>
-
-	</div>
+    <fieldset class="user_settings">
+      <legend>{{ $t('usersettings') }}</legend>
+      <div
+        v-for="(label,idx) in userSettings"
+        :key="idx"
+        class="row form-group"
+        :class="(label==&quot;send_series&quot;)?&quot;offset-1&quot;:&quot;&quot;"
+      >
+        <div>
+          <toggle-button
+            v-if="album.is_admin"
+            v-model="album[label]"
+            :labels="{checked: 'Yes', unchecked: 'No'}"
+            :disabled="(!album.download_series && label=='send_series')"
+            :sync="true"
+            @change="patchAlbum(label)"
+          />
+          <v-icon
+            v-if="!album.is_admin && !album[label]"
+            name="ban"
+            class="text-danger"
+          />
+          <v-icon
+            v-if="!album.is_admin && album[label]"
+            name="check-circle"
+            class="text-success"
+          />
+        </div>
+        <label>{{ $t(label) }}</label>
+      </div>
+    </fieldset>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'album_settings_user',
+	name: 'AlbumSettingsUser',
 	data () {
 		return {
 			confirm_delete: '',
@@ -115,6 +208,17 @@ export default {
 				'write_comments'
 			]
 		}
+	},
+	computed: {
+		...mapGetters({
+			album: 'album',
+			users: 'users'
+		})
+	},
+	watch: {
+	},
+	created () {
+		this.$store.dispatch('getUsers')
 	},
 	methods: {
 		addUser () {
@@ -164,17 +268,6 @@ export default {
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album',
-			users: 'users'
-		})
-	},
-	created () {
-		this.$store.dispatch('getUsers')
-	},
-	watch: {
 	}
 }
 

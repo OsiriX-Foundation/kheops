@@ -12,26 +12,46 @@
 </i18n>
 
 <template>
-		<div class = 'card'>
-			<div class = 'card-body'>
-				<form @submit.prevent='getUser'>
-					<div class="input-group mb-2">
-						<div>
-							<input type="email" class = 'form-control' v-model='new_user_name' autofocus :placeholder="'email '+$t('user')">
-						</div>
-						<div class="input-group-append">
-              <button class="btn btn-primary" type="submit" :disabled='!validEmail(new_user_name)'>{{$t('add')}}</button>
-              <button class="btn btn-secondary" type="reset"  @keyup.esc='new_user_name=""' @click='cancel' tabindex="0">{{$t('cancel')}}</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
+  <div class="card">
+    <div class="card-body">
+      <form @submit.prevent="getUser">
+        <div class="input-group mb-2">
+          <div>
+            <input
+              v-model="new_user_name"
+              type="email"
+              class="form-control"
+              autofocus
+              :placeholder="'email '+$t('user')"
+            >
+          </div>
+          <div class="input-group-append">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              :disabled="!validEmail(new_user_name)"
+            >
+              {{ $t('add') }}
+            </button>
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              tabindex="0"
+              @keyup.esc="new_user_name=&quot;&quot;"
+              @click="cancel"
+            >
+              {{ $t('cancel') }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-	name: 'formGetUser',
+	name: 'FormGetUser',
 	data () {
 		return {
 			new_user_name: ''

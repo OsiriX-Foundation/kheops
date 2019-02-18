@@ -8,14 +8,14 @@
 </i18n>
 
 <template>
-<div id = 'userSettingsProvider'>
-	<p>userSettingsProvider</p>
-</div>
+  <div id="userSettingsProvider">
+    <p>userSettingsProvider</p>
+  </div>
 </template>
 
 <script>
 export default {
-	name: 'userSettingsProvider'
+	name: 'UserSettingsProvider'
 }
 </script>
 

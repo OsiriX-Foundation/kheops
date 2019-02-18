@@ -12,17 +12,19 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
-		<h2>Token {{ $t("view") }}</h2>
-		<p class = 'text-center'><i>...TO DO ...</i></p>
-	</div>
+  <div class="container">
+    <h2>Token {{ $t("view") }}</h2>
+    <p class="text-center">
+      <i>...TO DO ...</i>
+    </p>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'album_settings_token',
+	name: 'AlbumSettingsToken',
 	data () {
 		return {
 		}
@@ -32,9 +34,9 @@ export default {
 			album: 'album'
 		})
 	},
-	created () {
-	},
 	watch: {
+	},
+	created () {
 	}
 }
 

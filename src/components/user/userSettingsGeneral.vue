@@ -10,24 +10,33 @@
 </i18n>
 
 <template>
-<div id = 'userSettingsGeneral'>
-	<form>
-		<dl class = 'row'>
-			<dt class = 'col-md-3 col-xs-12 text-right'>{{$t('language')}}</dt>
-			<dd class = 'col-md-9 col-xs-12 text-left'>
-				<select v-model='lang' class = 'form-control'>
-					<option value='en'>English</option>
-					<option value='fr'>Fançais</option>
-				</select>
-			</dd>
-		</dl>
-	</form>
-</div>
+  <div id="userSettingsGeneral">
+    <form>
+      <dl class="row">
+        <dt class="col-md-3 col-xs-12 text-right">
+          {{ $t('language') }}
+        </dt>
+        <dd class="col-md-9 col-xs-12 text-left">
+          <select
+            v-model="lang"
+            class="form-control"
+          >
+            <option value="en">
+              English
+            </option>
+            <option value="fr">
+              Fançais
+            </option>
+          </select>
+        </dd>
+      </dl>
+    </form>
+  </div>
 </template>
 
 <script>
 export default {
-	name: 'userSettingsGeneral',
+	name: 'UserSettingsGeneral',
 	data () {
 		return {
 		}

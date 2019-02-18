@@ -32,71 +32,131 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
+  <div class="container">
+    <h3>{{ displayName }}</h3>
+    <form @submit.prevent="createAlbum">
+      <fieldset>
+        <div class="row">
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('albumName') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <input
+                v-model="album.name"
+                type="text"
+                :placeholder="$t('albumName')"
+                class="form-control"
+              >
+            </dd>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('albumDescription') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <textarea
+                v-model="album.description"
+                rows="5"
+                class="form-control"
+                :placeholder="$t('albumDescription')"
+              />
+            </dd>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('users') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <h5 class="user">
+                <span
+                  v-for="user in album.users"
+                  :key="user.user_name"
+                  class="badge badge-secondary"
+                >
+                  {{ user.firstname+" "+user.lastname }} <span
+                    class="icon pointer"
+                    @click="deleteUser(user)"
+                  >
+                    <v-icon name="times" />
+                  </span>
+                </span>
+              </h5>
+              <h5 class="user">
+                <div class="input-group mb-3">
+                  <input
+                    v-model="newUserName"
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="email"
+                    aria-label="Email"
+                  >
+                  <div class="input-group-append">
+                    <button
+                      id="button-addon2"
+                      class="btn btn-outline-secondary btn-sm"
+                      type="button"
+                      title="add user"
+                      @click="checkUser()"
+                    >
+                      <v-icon name="plus" />
+                    </button>
+                  </div>
+                </div>
+              </h5>
+            </dd>
+          </div>
+        </div>
+      </fieldset>
 
-	<h3>{{displayName}}</h3>
-	<form v-on:submit.prevent="createAlbum">
-		<fieldset>
-			<div class = 'row'>
-				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('albumName')}}</dt></div>
-				<div class = 'col-xs-12 col-sm-9'>
-					<dd>
-						<input type = 'text' v-model='album.name' :placeholder="$t('albumName')" class = 'form-control' >
-					</dd>
-
-				</div>
-			</div>
-			<div class = 'row'>
-				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('albumDescription')}}</dt></div>
-				<div class = 'col-xs-12 col-sm-9'>
-					<dd>
-						<textarea rows='5' v-model='album.description' class = 'form-control' :placeholder="$t('albumDescription')"></textarea>
-					</dd>
-
-				</div>
-			</div>
-			<div class = 'row'>
-				<div class = 'col-xs-12 col-sm-3'><dt>{{$t('users')}}</dt></div>
-				<div class = 'col-xs-12 col-sm-9'>
-					<dd>
-						<h5 class = 'user'><span v-for="user in album.users" :key="user.user_name" class = 'badge badge-secondary'>{{user.firstname+" "+user.lastname}} <span class = 'icon pointer' @click='deleteUser(user)'><v-icon name='times'></v-icon></span></span></h5>
-						<h5 class = 'user'>
-							<div class="input-group mb-3">
-								<input type="text" class="form-control form-control-sm" placeholder="email" aria-label="Email"  v-model="newUserName">
-								<div class="input-group-append">
-									<button class="btn btn-outline-secondary btn-sm" type="button" id="button-addon2" @click='checkUser()' title = 'add user'><v-icon name="plus"></v-icon></button>
-								</div>
-							</div>
-						</h5>
-					</dd>
-
-				</div>
-			</div>
-		</fieldset>
-
-		<fieldset class='user_settings'>
-			<legend>{{$t('usersettings')}}</legend>
-			<div class = 'row form-group' v-for='(value,label) in album.userSettings' :key="label" :class = '(label=="sendSeries")?"offset-1":""'>
-				<div><toggle-button v-model="album.userSettings[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')" :sync="true"/></div>
-				<label>{{$t(label)}}</label>
-			</div>
-		</fieldset>
-		<fieldset>
-			<div class = 'row'>
-				<button type = 'submit' class = 'btn btn-primary' :disabled='!album.name'>{{$t('create')}}</button>
-				<router-link to="/albums" class = 'btn btn-secondary'>{{$t('cancel')}}</router-link>
-			</div>
-		</fieldset>
-
-	</form>
-
-	</div>
+      <fieldset class="user_settings">
+        <legend>{{ $t('usersettings') }}</legend>
+        <div
+          v-for="(value,label) in album.userSettings"
+          :key="label"
+          class="row form-group"
+          :class="(label==&quot;sendSeries&quot;)?&quot;offset-1&quot;:&quot;&quot;"
+        >
+          <div>
+            <toggle-button
+              v-model="album.userSettings[label]"
+              :labels="{checked: 'Yes', unchecked: 'No'}"
+              :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')"
+              :sync="true"
+            />
+          </div>
+          <label>{{ $t(label) }}</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <div class="row">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            :disabled="!album.name"
+          >
+            {{ $t('create') }}
+          </button>
+          <router-link
+            to="/albums"
+            class="btn btn-secondary"
+          >
+            {{ $t('cancel') }}
+          </router-link>
+        </div>
+      </fieldset>
+    </form>
+  </div>
 </template>
 
 <script>
 import { HTTP } from '@/router/http'
 export default {
-	name: 'new_album',
+	name: 'NewAlbum',
 
 	data () {
 		return {
@@ -128,6 +188,16 @@ export default {
 			return (!this.album.album_id) ? 'New album' : this.album.name
 		}
 	},
+	watch: {
+		'album.userSettings.downloadSeries' () {
+			console.log(this.album.userSettings.downloadSeries)
+			if (!this.album.userSettings.downloadSeries) {
+				console.log('ici')
+				this.album.userSettings.sendSeries = false
+				console.log(this.album)
+			}
+		}
+	},
 	methods: {
 		deleteUser (user) {
 			console.log('delete: ', user)
@@ -157,16 +227,6 @@ export default {
 			this.$store.dispatch('createAlbum', postValues).then(() => {
 				this.$router.push('/albums')
 			})
-		}
-	},
-	watch: {
-		'album.userSettings.downloadSeries' () {
-			console.log(this.album.userSettings.downloadSeries)
-			if (!this.album.userSettings.downloadSeries) {
-				console.log('ici')
-				this.album.userSettings.sendSeries = false
-				console.log(this.album)
-			}
 		}
 	}
 }

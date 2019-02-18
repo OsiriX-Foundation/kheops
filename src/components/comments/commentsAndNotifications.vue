@@ -36,81 +36,190 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
-		<div class = 'row justify-content-center'>
-			<p class = 'col-sm-12 col-md-10 offset-md-1 text-right' v-if='scope=="album"'><label>{{$t('includenotifications')}} </label> <toggle-button v-model="includeNotifications" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='getComments'/></p>
+  <div class="container">
+    <div class="row justify-content-center">
+      <p
+        v-if="scope==&quot;album&quot;"
+        class="col-sm-12 col-md-10 offset-md-1 text-right"
+      >
+        <label>{{ $t('includenotifications') }} </label> <toggle-button
+          v-model="includeNotifications"
+          :labels="{checked: 'Yes', unchecked: 'No'}"
+          :sync="true"
+          @change="getComments"
+        />
+      </p>
 
-			<div class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3" style = 'max-height: 600px; overflow-y: scroll;' :id = 'container_id'>
+      <div
+        :id="container_id"
+        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3"
+        style="max-height: 600px; overflow-y: scroll;"
+      >
+        <div
+          v-for="comment in comments"
+          :key="comment.id"
+        >
+          <!-- Comments -->
 
-				<div v-for="comment in comments" v-bind:key="comment.id">
+          <div
+            v-if="comment.event_type==&quot;Comment&quot;"
+            class="card mt-3 ml-5 mr-5"
+            :class="(comment.is_private)?'bg-primary':'bg-secondary'"
+          >
+            <div class="card-header">
+              <v-icon name="user" /> {{ comment.origin_name }}<span class="float-right">
+                {{ comment.post_date|formatDate }}
+              </span>
+            </div>
+            <div
+              class="card-body"
+              v-html="$options.filters.nl2br(comment.comment)"
+            />
+          </div>
 
-					<!-- Comments -->
+          <!-- Notifications -->
 
-					<div class="card mt-3 ml-5 mr-5" :class="(comment.is_private)?'bg-primary':'bg-secondary'"  v-if='comment.event_type=="Comment"'>
-						<div class = 'card-header'><v-icon name = 'user'></v-icon> {{comment.origin_name}}<span class = 'float-right'>{{comment.post_date|formatDate}}</span></div>
-						<div class = 'card-body' v-html="$options.filters.nl2br(comment.comment)">
-						</div>
-					</div>
+          <div
+            v-if="comment.event_type==&quot;Mutation&quot;"
+            class="card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-5 mr-5"
+          >
+            <div class="d-flex">
+              <!-- IMPORT_STUDY, REMOVE_STUDY : -->
+              <div
+                v-if="comment.mutation_type==&quot;IMPORT_STUDY&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('thestudy') }} {{ comment.study }}
+              </div>
+              <div
+                v-if="comment.mutation_type==&quot;REMOVE_STUDY&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('thestudy') }} {{ comment.study }}
+              </div>
 
-					<!-- Notifications -->
+              <!-- IMPORT_SERIES, REMOVE_SERIES -->
+              <div
+                v-if="comment.mutation_type==&quot;IMPORT_SERIES&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('theseries') }} {{ comment.series }} {{ $t('in') }} {{ $t('thestudy') }} {{ comment.study }}
+              </div>
+              <div
+                v-if="comment.mutation_type==&quot;REMOVE_SERIES&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theseries') }} {{ comment.series }} {{ $t('in') }} {{ $t('thestudy') }} {{ comment.study }}
+              </div>
 
-					<div class = 'card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-5 mr-5' v-if='comment.event_type=="Mutation"'>
+              <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
+              <div
+                v-if="comment.mutation_type==&quot;ADD_USER&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} {{ comment.target_name }}
+              </div>
+              <div
+                v-if="comment.mutation_type==&quot;ADD_ADMIN&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} {{ comment.target_name }}
+              </div>
+              <div
+                v-if="comment.mutation_type==&quot;REMOVE_USER&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theuser') }} {{ comment.target_name }}
+              </div>
+              <div
+                v-if="comment.mutation_type==&quot;PROMOTE_ADMIN&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} {{ comment.target_name }}
+              </div>
+              <div
+                v-if="comment.mutation_type==&quot;DEMOTE_ADMIN&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} {{ comment.target_name }}
+              </div>
 
-						<div class="d-flex">
+              <!-- LEAVE_ALBUM -->
+              <div
+                v-if="comment.mutation_type==&quot;LEAVE_ALBUM&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hasleft') }}
+              </div>
 
-							<!-- IMPORT_STUDY, REMOVE_STUDY : -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_STUDY"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('thestudy')}} {{comment.study}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_STUDY"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('thestudy')}} {{comment.study}}</div>
+              <!-- CREATE_ALBUM -->
+              <div
+                v-if="comment.mutation_type==&quot;CREATE_ALBUM&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
+              </div>
 
-							<!-- IMPORT_SERIES, REMOVE_SERIES -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="IMPORT_SERIES"'><i>{{comment.origin_name}}</i> {{$t('imported')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_SERIES"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theseries')}} {{comment.series}} {{$t('in')}} {{$t('thestudy')}} {{comment.study}}</div>
+              <!-- EDIT_ALBUM -->
+              <div
+                v-if="comment.mutation_type==&quot;EDIT_ALBUM&quot;"
+                class="p-2 flex-grow-1 bd-highlight"
+              >
+                <i>{{ comment.origin_name }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
+              </div>
 
-							<!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_USER"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theuser')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="ADD_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasadd')}} {{$t('theadmin')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="REMOVE_USER"'><i>{{comment.origin_name}}</i> {{$t('removed')}} {{$t('theuser')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="PROMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasgranted')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="DEMOTE_ADMIN"'><i>{{comment.origin_name}}</i> {{$t('hasremoved')}} {{$t('adminrights')}} {{$t('to')}} {{comment.target_name}}</div>
-
-							<!-- LEAVE_ALBUM -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="LEAVE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasleft')}} </div>
-
-							<!-- CREATE_ALBUM -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="CREATE_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hascreated')}} {{$t('thealbum')}} </div>
-
-							<!-- EDIT_ALBUM -->
-							<div class="p-2 flex-grow-1 bd-highlight" v-if = 'comment.mutation_type=="EDIT_ALBUM"'><i>{{comment.origin_name}}</i> {{$t('hasedited')}} {{$t('thealbum')}} </div>
-
-							<div class="bd-highlight"><small style = 'white-space: nowrap'>{{comment.post_date|formatDate}}</small></div>
-						</div>
-
-					</div>
-
-				</div>
-			</div>
-		</div>
-		<div class = 'row mt-4 justify-content-center'>
-			<div class = 'col-sm-12 col-md-10 offset-md-1'>
-				<form @submit.prevent='addComment'>
-					<div class = 'row justify-content-center'>
-						<div class = 'col-9 mb-2'>
-							<textarea class = 'form-control' rows=6 v-model='newComment.comment' placeholder="Use @... for a specific user"></textarea>
-						</div>
-						<div class = 'col-auto'><button type = 'submit' class = 'btn btn-lg btn-primary' :disabled="newComment.comment.length < 2" ><v-icon name='paper-plane'></v-icon>{{$t('send')}}</button></div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+              <div class="bd-highlight">
+                <small style="white-space: nowrap">
+                  {{ comment.post_date|formatDate }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4 justify-content-center">
+      <div class="col-sm-12 col-md-10 offset-md-1">
+        <form @submit.prevent="addComment">
+          <div class="row justify-content-center">
+            <div class="col-9 mb-2">
+              <textarea
+                v-model="newComment.comment"
+                class="form-control"
+                rows="6"
+                placeholder="Use @... for a specific user"
+              />
+            </div>
+            <div class="col-auto">
+              <button
+                type="submit"
+                class="btn btn-lg btn-primary"
+                :disabled="newComment.comment.length < 2"
+              >
+                <v-icon name="paper-plane" />{{ $t('send') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'commentsAndNotifications',
-	props: ['scope', 'id'],
+	name: 'CommentsAndNotifications',
+	props: {
+		scope: {
+			type: String,
+			required: true
+		},
+		id: {
+			type: String,
+			required: true
+		} },
 	data () {
 		return {
 			newComment: {
@@ -139,6 +248,10 @@ export default {
 		container_id () {
 			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
 		}
+	},
+	created () {
+		this.getComments()
+		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
 	methods: {
 		addComment () {
@@ -204,10 +317,6 @@ export default {
 				})
 			}
 		}
-	},
-	created () {
-		this.getComments()
-		if (this.album.album_id) this.$store.dispatch('getUsers')
 	}
 }
 
