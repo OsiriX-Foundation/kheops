@@ -44,14 +44,14 @@
         <img
           v-if="series.Modality !== 'SR'"
           class="cursor-img"
-          :src="previewImg()"
+          :src="series.imgSrc"
           width="250"
           height="250"
           @click="openViewer"
         >
         <img
           v-else
-          :src="previewImg()"
+          :src="series.imgSrc"
           width="250"
           height="250"
         >
@@ -163,9 +163,6 @@ export default {
 	methods: {
 		toggleChecked () {
 			this.isSelected = !this.isSelected
-		},
-		previewImg () {
-			return this.series.imgSrc
 		},
 		openViewer () {
 			let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
