@@ -32,7 +32,7 @@ const state = {
 const getters = {
 	album: state => state.album,
 	users: state => state.users,
-	album_comments: state => state.comments
+	albumComments: state => state.comments
 }
 
 // actions

@@ -85,8 +85,8 @@
                 class="btn btn-secondary"
                 type="reset"
                 tabindex="0"
-                @keyup.esc="new_user_name=&quot;&quot;"
-                @click=" m_add_user=!form_add_user"
+                @keyup.esc="new_user_name=''"
+                @click="new_user_name='';form_add_user=!form_add_user"
               >
                 {{ $t('cancel') }}
               </button>
@@ -143,7 +143,7 @@
                   </button><button
                     type="button"
                     class="btn btn-sm btn-secondary"
-                    @click.stop="confirm_delete=&quot;&quot;"
+                    @click.stop="confirm_delete=''"
                   >
                     {{ $t('cancel') }}
                   </button>
@@ -161,7 +161,7 @@
         v-for="(label,idx) in userSettings"
         :key="idx"
         class="row form-group"
-        :class="(label==&quot;send_series&quot;)?&quot;offset-1&quot;:&quot;&quot;"
+        :class="(label=='send_series')?'offset-1':''"
       >
         <div>
           <toggle-button

@@ -119,7 +119,7 @@
           v-for="(value,label) in album.userSettings"
           :key="label"
           class="row form-group"
-          :class="(label==&quot;sendSeries&quot;)?&quot;offset-1&quot;:&quot;&quot;"
+          :class="(label==='sendSeries')?'offset-1':''"
         >
           <div>
             <toggle-button

@@ -37,7 +37,7 @@
               class="btn btn-secondary"
               type="reset"
               tabindex="0"
-              @keyup.esc="new_user_name=&quot;&quot;"
+              @keyup.esc="new_user_name=''"
               @click="cancel"
             >
               {{ $t('cancel') }}

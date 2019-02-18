@@ -39,7 +39,7 @@
   <div class="container">
     <div class="row justify-content-center">
       <p
-        v-if="scope==&quot;album&quot;"
+        v-if="scope==='album'"
         class="col-sm-12 col-md-10 offset-md-1 text-right"
       >
         <label>{{ $t('includenotifications') }} </label> <toggle-button
@@ -62,7 +62,7 @@
           <!-- Comments -->
 
           <div
-            v-if="comment.event_type==&quot;Comment&quot;"
+            v-if="comment.event_type==='Comment'"
             class="card mt-3 ml-5 mr-5"
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
@@ -80,19 +80,19 @@
           <!-- Notifications -->
 
           <div
-            v-if="comment.event_type==&quot;Mutation&quot;"
+            v-if="comment.event_type==='Mutation'"
             class="card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-5 mr-5"
           >
             <div class="d-flex">
               <!-- IMPORT_STUDY, REMOVE_STUDY : -->
               <div
-                v-if="comment.mutation_type==&quot;IMPORT_STUDY&quot;"
+                v-if="comment.mutation_type==='IMPORT_STUDY'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('thestudy') }} {{ comment.study }}
               </div>
               <div
-                v-if="comment.mutation_type==&quot;REMOVE_STUDY&quot;"
+                v-if="comment.mutation_type==='REMOVE_STUDY'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('thestudy') }} {{ comment.study }}
@@ -100,13 +100,13 @@
 
               <!-- IMPORT_SERIES, REMOVE_SERIES -->
               <div
-                v-if="comment.mutation_type==&quot;IMPORT_SERIES&quot;"
+                v-if="comment.mutation_type==='IMPORT_SERIES'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('theseries') }} {{ comment.series }} {{ $t('in') }} {{ $t('thestudy') }} {{ comment.study }}
               </div>
               <div
-                v-if="comment.mutation_type==&quot;REMOVE_SERIES&quot;"
+                v-if="comment.mutation_type==='REMOVE_SERIES'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theseries') }} {{ comment.series }} {{ $t('in') }} {{ $t('thestudy') }} {{ comment.study }}
@@ -114,31 +114,31 @@
 
               <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
               <div
-                v-if="comment.mutation_type==&quot;ADD_USER&quot;"
+                v-if="comment.mutation_type==='ADD_USER'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} {{ comment.target_name }}
               </div>
               <div
-                v-if="comment.mutation_type==&quot;ADD_ADMIN&quot;"
+                v-if="comment.mutation_type==='ADD_ADMIN'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} {{ comment.target_name }}
               </div>
               <div
-                v-if="comment.mutation_type==&quot;REMOVE_USER&quot;"
+                v-if="comment.mutation_type==='REMOVE_USER'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theuser') }} {{ comment.target_name }}
               </div>
               <div
-                v-if="comment.mutation_type==&quot;PROMOTE_ADMIN&quot;"
+                v-if="comment.mutation_type==='PROMOTE_ADMIN'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} {{ comment.target_name }}
               </div>
               <div
-                v-if="comment.mutation_type==&quot;DEMOTE_ADMIN&quot;"
+                v-if="comment.mutation_type==='DEMOTE_ADMIN'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} {{ comment.target_name }}
@@ -146,7 +146,7 @@
 
               <!-- LEAVE_ALBUM -->
               <div
-                v-if="comment.mutation_type==&quot;LEAVE_ALBUM&quot;"
+                v-if="comment.mutation_type==='LEAVE_ALBUM'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasleft') }}
@@ -154,7 +154,7 @@
 
               <!-- CREATE_ALBUM -->
               <div
-                v-if="comment.mutation_type==&quot;CREATE_ALBUM&quot;"
+                v-if="comment.mutation_type==='CREATE_ALBUM'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
@@ -162,7 +162,7 @@
 
               <!-- EDIT_ALBUM -->
               <div
-                v-if="comment.mutation_type==&quot;EDIT_ALBUM&quot;"
+                v-if="comment.mutation_type==='EDIT_ALBUM'"
                 class="p-2 flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
@@ -233,11 +233,11 @@ export default {
 		...mapGetters({
 			album: 'album',
 			studies: 'studies',
-			album_comments: 'album_comments',
+			albumComments: 'albumComments',
 			users: 'users'
 		}),
 		comments () {
-			if (this.scope === 'album') return this.album_comments
+			if (this.scope === 'album') return this.albumComments
 
 			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
 			if (studyIdx > -1) {

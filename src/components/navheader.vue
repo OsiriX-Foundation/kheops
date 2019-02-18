@@ -38,17 +38,17 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav right>
-          <b-nav-item v-access="&quot;admin&quot;">
+          <b-nav-item v-access="'admin'">
             <router-link to="/admin">
               Admin
             </router-link>
           </b-nav-item>
-          <b-nav-item v-access="&quot;active&quot;">
+          <b-nav-item v-access="'active'">
             {{ $t('welcome') }} <router-link to="/user">
               {{ user.fullname }}
             </router-link>
           </b-nav-item>
-          <b-nav-item v-access="&quot;active&quot;">
+          <b-nav-item v-access="'active'">
             <a
               class="pointer"
               @click="logout()"

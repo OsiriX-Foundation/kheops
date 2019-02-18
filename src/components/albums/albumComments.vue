@@ -36,7 +36,7 @@
 <template>
   <div class="container">
     <comments-and-notifications
-      :id="album_id"
+      :id="albumId"
       scope="album"
     />
   </div>

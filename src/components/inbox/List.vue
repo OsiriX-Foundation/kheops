@@ -395,7 +395,7 @@
               </nav>
             </div>
             <div
-              v-if="row.item.view==&quot;series&quot;"
+              v-if="row.item.view==='series'"
               class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
             >
               <div class="row">
@@ -415,7 +415,7 @@
             </div>
 
             <div
-              v-if="row.item.view==&quot;comments&quot;"
+              v-if="row.item.view==='comments'"
               class="col-md-10"
             >
               <comments-and-notifications
@@ -425,7 +425,7 @@
             </div>
 
             <div
-              v-if="row.item.view==&quot;study&quot;"
+              v-if="row.item.view==='study'"
               class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
             >
               <study-metadata

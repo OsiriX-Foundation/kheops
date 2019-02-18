@@ -31,13 +31,13 @@
     <p>
       <b-button
         size="lg"
-        @click="changeLocation(&quot;home&quot;)"
+        @click="changeLocation('home')"
       >
         {{ $t("gotohome") }}
       </b-button>
       <b-button
         size="lg"
-        @click="changeLocation(&quot;login&quot;)"
+        @click="changeLocation('login')"
       >
         {{ $t("gotologin") }}
       </b-button>

@@ -32,11 +32,10 @@ const router = new Router({
 	},
 	{
 		path: '/albums/new',
-		name: 'new_album',
+		name: 'newAlbum',
 		component: NewAlbum,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
-
 	},
 	{
 		path: '/albums/:album_id',
@@ -44,7 +43,6 @@ const router = new Router({
 		component: Album,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
-
 	},
 	{
 		path: '/user',

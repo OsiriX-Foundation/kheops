@@ -42,7 +42,7 @@
     <div class="row justify-content-center">
       <div class="preview">
         <img
-          v-if="series.Modality != &quot;SR&quot;"
+          v-if="series.Modality !== 'SR'"
           class="cursor-img"
           :src="previewImg()"
           width="250"
@@ -91,7 +91,7 @@
         </table>
 
         <dl
-          v-if="series.Modality != &quot;SR&quot;"
+          v-if="series.Modality !== 'SR'"
           class="row justify-content-center"
         >
           <dd>
@@ -136,9 +136,9 @@ export default {
 			user: 'currentUser'
 		}),
 		series () {
-			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.StudyInstanceUID })
+			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
 			if (studyIndex > -1) {
-				let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.SeriesInstanceUID })
+				let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
 				if (seriesIndex > -1) return this.studies[studyIndex].series[seriesIndex]
 			}
 			return {}
@@ -150,34 +150,25 @@ export default {
 			},
 			// setter
 			set: function (newValue) {
-				let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.StudyInstanceUID })
+				let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
 				if (studyIndex > -1) {
-					let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.SeriesInstanceUID })
+					let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
 					if (seriesIndex > -1) {
 						this.$store.dispatch('toggleSelected', { type: 'series', index: studyIndex + ':' + seriesIndex, selected: newValue })
 					}
 				}
 			}
-
 		}
 	},
 	methods: {
 		toggleChecked () {
 			this.isSelected = !this.isSelected
 		},
-
 		previewImg () {
-			if (this.series.Modality === 'SR') this.series.imgSrc = 'static/img/SR_2.png'
-			if (this.series.imgSrc !== undefined && this.series.imgSrc !== '') return this.series.imgSrc
-			else {
-				return this.$store.dispatch('getImage', { SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID }).then(img => {
-					this.series.imgSrc = img
-					return img
-				})
-			}
+			return this.series.imgSrc
 		},
 		openViewer () {
-			let url = `${process.env.VUE_APP_URL_API}/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}`
+			let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
 			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`, 'OHIFViewer')
 		}
 	}
