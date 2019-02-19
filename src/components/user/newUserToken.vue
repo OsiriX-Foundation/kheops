@@ -10,7 +10,9 @@
 		"read": "read",
 		"download": "download",
 		"appropriate": "appropriate",
-		"expirationdate": "expiration date"
+		"expirationdate": "expiration date",
+		"tokencopysuccess": "Token copied successfully"
+
 	},
 	"fr": {
 		"newtoken": "Nouveau token",
@@ -22,7 +24,8 @@
 		"read": "lecture",
 		"download": "téléchargement",
 		"appropriate": "approprier",
-		"expirationdate": "date d'expiration"
+		"expirationdate": "date d'expiration",
+		"tokencopysuccess": "Token copié avec succès"
 	}
 }
 </i18n>
@@ -88,7 +91,16 @@
 				</div>
 			</fieldset>
 		</form>
-	</div>
+
+		<b-modal id="tokenModal" ref="tokenModal" centered no-fade hide-footer no-close-on-backdrop size="lg">
+		<dl class="my-2 row">
+			<dt class="col-xs-12 col-sm-3">{{token.title}}</dt>
+			<dd class="col-xs-10 col-sm-8"><input type="text" readonly v-model="token.secret" class="form-control form-control-sm"></dd>
+			<div class="col-xs-2 col-sm-1 pointer"><button type="button" class="btn btn-secondary btn-sm" v-clipboard:copy="token.secret" v-clipboard:success="onCopy" v-clipboard:error="onCopyError"><v-icon name="paste" scale="1"></v-icon></button></div>
+		</dl>
+	</b-modal>
+
+</div>
 </template>
 
 <script>
@@ -104,6 +116,7 @@ export default {
 				title: '',
 				scope_type: 'user',
 				album: '',
+				secret: '',
 				read_permission: false,
 				write_permission: false,
 				appropriate_permission: false,
@@ -132,19 +145,30 @@ export default {
 			let token = this.token
 			token.expiration_time = moment(this.token.expiration_time).format()
 			token.not_before_time = moment(this.token.not_before_time).format()
-			this.$store.dispatch('createToken', { token: token }).then(() => {
+			this.$store.dispatch('createToken', { token: token }).then(res => {
+				this.token.secret = res.data.secret
 				this.$snotify.success('token created successfully')
-				this.$emit('done')
+				this.$refs.tokenModal.show()
 			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
+		onCopy () {
+			this.$snotify.success(this.$t('tokencopysuccess'))
+			this.$refs.tokenModal.hide()
+			this.$emit('done')
+		},
+		onCopyError () {
+			this.$snotify.error(this.$t('sorryerror'))
+			this.$refs.tokenModal.hide()
+		},
+
 		cancel () {
 			this.$emit('done')
 		}
 	},
 	created () {
-		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
+		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 100, sortBy: 'created_time', sortDesc: true, canCreateCapabilityToken: 'true' })
 	}
 }
 </script>

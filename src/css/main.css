@@ -1,3 +1,19 @@
+body{
+	min-height: 100vh;
+	position: relative;	
+	padding-bottom: 50px;
+	border: 1px solid #343434;
+	top: 0;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+}
+
+
 .link, .pointer{
 	cursor: pointer;
+}
+.nowrap{
+	white-space: nowrap;
 }

@@ -19,7 +19,8 @@ const state = {
 			modalities: '',
 			last_event_time: '',
 			created_time: ''
-		}
+		},
+		canCreateCapabilityToken: false
 	},
 	request: ''
 }
@@ -33,11 +34,11 @@ const getters = {
 const actions = {
 
 	getAlbums ({ commit }, params) {
-		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy === params.sortBy && state.filterParams.sortDesc === params.sortDesc && _.isEqual(state.filterParams.filters, params.filters)) {
+		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy === params.sortBy && state.filterParams.sortDesc === params.sortDesc && state.filterParams.canCreateCapabilityToken === params.canCreateCapabilityToken && _.isEqual(state.filterParams.filters, params.filters)) {
 			return
 		}
 		//
-		var reset = false
+		var reset = false; var request
 
 		let requestParams = ''
 		_.forEach(params.filters, function (value, filterName) {
@@ -81,7 +82,11 @@ const actions = {
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
-		var request = 'albums?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+		if (params.canCreateCapabilityToken) {
+			request = 'albums?canCreateCapabilityToken=true&sort=name'
+		} else {
+			request = 'albums?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+		}
 		HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
 			let data = []

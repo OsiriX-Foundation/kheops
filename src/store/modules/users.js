@@ -92,6 +92,7 @@ const actions = {
 			if (res.status === 201) {
 				commit('SET_TOKEN', res.data)
 			}
+			return res
 		})
 	},
 	revokeToken ({ commit }, params) {
