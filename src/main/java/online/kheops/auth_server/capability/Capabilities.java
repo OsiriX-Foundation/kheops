@@ -212,7 +212,7 @@ public class Capabilities {
         return  capabilityResponse;
     }
 
-    public static List<CapabilitiesResponse.Response> getCapabilities(Long callingUserPk, boolean showRevoked)
+    public static List<CapabilitiesResponse.Response> getCapabilities(Long callingUserPk, boolean valid)
             throws UserNotFoundException {
         List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
@@ -225,10 +225,40 @@ public class Capabilities {
             final User user = Users.getUser(callingUserPk, em);
 
             List<Capability> capabilities;
-            if(showRevoked) {
-                capabilities = findCapabilitiesByUserWithRevoke(user, em);
+            if(valid) {
+                capabilities = findCapabilitiesByUserValidOnly(user, em);
             } else {
-                capabilities = findCapabilitiesByUserWitoutRevoke(user, em);
+                capabilities = findAllCapabilitiesByUser(user, em);
+            }
+
+            for (Capability capability: capabilities) {
+                capabilityResponses.add(new CapabilitiesResponse(capability, false, false).getResponse());
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return capabilityResponses;
+    }
+
+    public static List<CapabilitiesResponse.Response> getCapabilities(String albumId, boolean valid) {
+        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            List<Capability> capabilities;
+            if(valid) {
+                capabilities = findCapabilitiesByAlbumValidOnly(albumId, em);
+            } else {
+                capabilities = findAllCapabilitiesByAlbum(albumId, em);
             }
 
             for (Capability capability: capabilities) {

@@ -186,6 +186,20 @@ public enum UserPermissionEnum {
 
 
     },
+    MANAGE_CAPABILITIES_TOKEN {
+        @Override
+        public boolean hasUserPermission(Album album) {
+            return false;
+        }
+        @Override
+        public boolean hasCapabilityPermission(Capability capability) {
+            return false;
+        }
+        @Override
+        public boolean hasViewerPermission(Album album) { return false; }
+
+
+    },
     EDIT_FAVORITES {
         @Override
         public boolean hasUserPermission(Album album) {
