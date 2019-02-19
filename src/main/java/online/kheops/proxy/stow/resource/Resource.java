@@ -112,7 +112,8 @@ public final class Resource {
             }
         } catch (AccessTokenException e) {
             LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
-            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
+            throw new InternalServerErrorException(e);
+//            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
         }
 
         final InputStream inputStream;
