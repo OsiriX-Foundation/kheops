@@ -51,10 +51,7 @@ const actions = {
 			let after = key.substring(key.lastIndexOf('_') + 1)
 			let id = key.substring(0, key.lastIndexOf('_')) + after.charAt(0).toUpperCase() + after.slice(1)
 			query += encodeURIComponent(id) + '=' + encodeURIComponent(value) + '&'
-			let body = {}
-			body[id] = value
 		})
-
 		let config = {
 			headers: {
 				'Accept': 'application/json',
@@ -62,7 +59,7 @@ const actions = {
 			}
 		}
 
-		return HTTP.patch('/albums/' + state.album.album_id + '?' + query, '', config).then(res => {
+		return HTTP.patch('/albums/' + state.album.album_id, query, config).then(res => {
 			if (res.status === 200) {
 				commit('PATCH_ALBUM', params)
 			}
