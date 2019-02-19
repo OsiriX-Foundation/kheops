@@ -100,9 +100,9 @@
 				</div>
 			</div>
 		</div>
-		<div class = 'row mt-4 justify-content-center'>
+		<div class = 'row mt-4 justify-content-center' >
 			<div class = 'col-sm-12 col-md-10 offset-md-1'>
-				<form @submit.prevent='addComment'>
+				<form @submit.prevent='addComment' v-if='scope==="studies" || album.is_admin || album.write_comments'>
 					<div class = 'row justify-content-center'>
 						<div class = 'col-9 mb-2'>
 							<textarea class = 'form-control' rows=6 v-model='newComment.comment' placeholder="Use @... for a specific user"></textarea>

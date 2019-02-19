@@ -283,6 +283,10 @@ const actions = {
 			})
 			return summary
 		})
+	},
+	selfAppropriateSeries (ctx, params) {
+		let series = (params.SeriesInstanceUID) ? `/series/${params.SeriesInstanceUID}` : `?album=${params.AlbumId}`
+		return HTTP.put(`studies/${params.StudyInstanceUID}${series}`)
 	}
 
 }

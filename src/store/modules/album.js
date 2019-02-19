@@ -48,16 +48,28 @@ const actions = {
 	patchAlbum ({ commit }, params) {
 		var query = ''
 		_.forEach(params, (value, key) => {
-			query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
+			let after = key.substring(key.lastIndexOf('_') + 1)
+			let id = key.substring(0, key.lastIndexOf('_')) + after.charAt(0).toUpperCase() + after.slice(1)
+			query += encodeURIComponent(id) + '=' + encodeURIComponent(value) + '&'
+			let body = {}
+			body[id] = value
 		})
-		return HTTP.patch('/albums/' + state.album.album_id, query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+
+		let config = {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		}
+
+		return HTTP.patch('/albums/' + state.album.album_id + '?' + query, '', config).then(res => {
 			if (res.status === 200) {
 				commit('PATCH_ALBUM', params)
 			}
 		})
 	},
 	getUsers ({ commit }) {
-		return HTTP.get('/albums/' + state.album.album_id + '/users', { headers: { 'Accept': 'application/json' } }).then(res => {
+		return HTTP.get('/albums/' + state.album.album_id + '/users', '', { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) {
 				commit('SET_USERS', res.data)
 			}
@@ -120,7 +132,6 @@ const actions = {
 const mutations = {
 	SET_ALBUM (state, data) {
 		state.album = data
-		console.log(state.album)
 	},
 	PATCH_ALBUM (state, params) {
 		_.forEach(params, (v, k) => {
