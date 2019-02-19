@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
-import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 
 public class Sending {
@@ -398,6 +397,37 @@ public class Sending {
         }
     }
 
+    public static void appropriateStudy(long callingUserPk, String studyInstanceUID, String albumId)
+            throws UserNotFoundException, AlbumNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+
+            final User callingUser = getUser(callingUserPk, em);
+            final Album album = getAlbum(albumId, em);
+            final Album inbox = callingUser.getInbox();
+
+            final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(callingUser, album, studyInstanceUID, em);
+
+            for (Series series : seriesLst) {
+                final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
+                em.persist(inboxSeries);
+            }
+
+            tx.commit();
+            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + " to " + callingUser.getKeycloakId() + "from album :" + albumId);
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+
     public static Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws UserNotFoundException, AlbumNotFoundException , StudyNotFoundException {
         Set<String> availableSeriesUIDs;
@@ -412,7 +442,7 @@ public class Sending {
 
             if (fromAlbumId != null) {
                 final Album album = getAlbum(fromAlbumId, em);
-                availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromAlbum(callingUser, album, studyInstanceUID, em);
+                availableSeriesUIDs = findAllSeriesInstanceUIDbyStudyUIDfromAlbum(callingUser, album, studyInstanceUID, em);
             } else if (fromInbox) {
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromInbox(callingUser, studyInstanceUID, em);
             } else {

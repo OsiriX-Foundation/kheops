@@ -100,7 +100,7 @@ public class SendingResource
     @PUT
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
-    public Response putSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response appropriateSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                               @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
@@ -126,6 +126,39 @@ public class SendingResource
                 Sending.appropriateSeries(callingUserPk, studyInstanceUID, seriesInstanceUID);
             }
         } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
+        return Response.status(CREATED).build();
+    }
+
+    @PUT
+    @Secured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.SEND_SERIES)
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
+    public Response appropriateStudy(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                     @QueryParam(ALBUM) String albumId) {
+
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final long callingUserPk = kheopsPrincipal.getDBID();
+
+
+        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            return Response.status(FORBIDDEN).build();
+        }
+
+        try {
+            if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                final String albumID = kheopsPrincipal.getAlbumID();
+                if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
+                    Sending.putStudyInAlbum(callingUserPk, albumID, studyInstanceUID, albumId, false);
+                } else {
+                    return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
+                }
+            } else {
+                Sending.appropriateStudy(callingUserPk, studyInstanceUID, albumId);
+            }
+        } catch (UserNotFoundException | AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(CREATED).build();
