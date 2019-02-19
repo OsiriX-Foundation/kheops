@@ -279,14 +279,13 @@ export default {
 					key: 'is_selected',
 					label: '',
 					sortable: false,
-					class: 'td_checkbox',
-					thClass: 'd-none d-sm-table-cell'
-					// margin: 'auto'
+					class: 'td_checkbox'
+					// thClass: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'PatientName',
 					label: 'PatientName',
-					thClass: 'd-none d-sm-table-cell',
+					// thClass: 'd-none d-sm-table-cell',
 					tdClass: 'patientName',
 					sortable: true
 				},
@@ -519,19 +518,17 @@ export default {
 			studies.forEach(study => {
 				let selectedSeries = study.series.filter(serie => { return serie.is_selected })
 				if (selectedSeries.length === study.series.length) {
-					let params = {
+					this.$store.dispatch('selfAppropriateSeries', {
 						StudyInstanceUID: study.StudyInstanceUID[0],
 						AlbumId: this.album.album_id
-					}
-					this.$store.dispatch('selfAppropriateSeries', params)
+					})
 					this.$snotify.success(`Send to inbox : ${study.StudyInstanceUID[0]} `)
 				} else {
 					selectedSeries.forEach(serie => {
-						let params = {
+						this.$store.dispatch('selfAppropriateSeries', {
 							StudyInstanceUID: serie.StudyInstanceUID[0],
 							SeriesInstanceUID: serie.SeriesInstanceUID[0]
-						}
-						this.$store.dispatch('selfAppropriateSeries', params)
+						})
 					})
 				}
 			})
