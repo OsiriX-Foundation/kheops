@@ -65,15 +65,7 @@
 					<span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br/>
 					{{ $t("send") }}
 				</button>
-				<!-- <button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br/>{{ $t("addalbum") }}</button> -->
-				<!-- TODO: a revoir la condition .. -->
-				<b-dropdown variant="link" size="sm" no-caret v-if='!filters.album_id'>
-					<template slot="button-content">
-						<span><v-icon class="align-middle" name="book"></v-icon></span><br/>{{ $t("addalbum") }}
-					</template>
-					<b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in allowedAlbums' :key="album.id">{{album.name}}</b-dropdown-item>
-				</b-dropdown>
-				<b-dropdown variant="link" size="sm" no-caret v-if='filters.album_id && (album.send_series || album.is_admin)'>
+				<b-dropdown variant="link" size="sm" no-caret v-if='!filters.album_id || (album.send_series || album.is_admin)'>
 					<template slot="button-content">
 						<span><v-icon class="align-middle" name="book"></v-icon></span><br/>{{ $t("addalbum") }}
 					</template>
@@ -93,11 +85,7 @@
 					<span><v-icon class="align-middle" name="star"></v-icon></span><br/>
 					{{ $t(infoFavorites) }}
 				</button>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id' @click = "deleteSelectedStudies()">
-					<span><v-icon class="align-middle" name="trash"></v-icon></span><br/>
-					{{ $t("delete") }}
-				</button>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='filters.album_id && (album.is_admin || album.delete_series)' @click = "deleteSelectedStudies()">
+				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id || (album.is_admin || album.delete_series)' @click = "deleteSelectedStudies()">
 					<span><v-icon class="align-middle" name="trash"></v-icon></span><br/>
 					{{ $t("delete") }}
 				</button>
@@ -242,8 +230,7 @@
 						<div class = 'patientNameIcons col-md-auto'>
 							<span @click="toggleFavorite(row.item)" :class="row.item.is_favorite?'selected':''">
 								<v-icon v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-								<v-icon v-else-if="!album" class="align-middle" style="margin-right:0" name="star" color="grey"></v-icon>
-								<v-icon v-else-if="album.add_series || album.is_admin" class="align-middle" style="margin-right:0" name="star" color="grey"></v-icon>
+								<v-icon v-else-if="!album || (album.add_series || album.is_admin)" class="align-middle" style="margin-right:0" name="star" color="grey"></v-icon>
 							</span>
 							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''">
 								<v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon>
