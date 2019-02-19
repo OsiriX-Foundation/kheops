@@ -13,6 +13,7 @@ RUN dpkg -i metricbeat-6.6.0-amd64.deb
 COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
 
 RUN metricbeat modules enable nginx
+RUN metricbeat modules list
 RUN metricbeat setup
 RUN service metricbeat start
 
