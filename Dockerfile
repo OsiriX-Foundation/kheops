@@ -9,10 +9,10 @@ RUN chmod +x /etc/nginx/conf.d/script.sh
 RUN apt-get update
 RUN apt-get install -y curl
 RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-6.6.0-amd64.deb
-RUN sudo dpkg -i metricbeat-6.6.0-amd64.deb
-RUN sudo metricbeat modules enable nginx
-RUN sudo metricbeat setup
-RUN sudo service metricbeat start
+RUN dpkg -i metricbeat-6.6.0-amd64.deb
+RUN metricbeat modules enable nginx
+RUN metricbeat setup
+RUN service metricbeat start
 
 
 
