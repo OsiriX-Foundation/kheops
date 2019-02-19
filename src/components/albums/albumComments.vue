@@ -34,21 +34,29 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
-		<comments-and-notifications scope='album' :id='album_id'></comments-and-notifications>
-	</div>
+  <div class="container">
+    <comments-and-notifications
+      :id="albumId"
+      scope="album"
+    />
+  </div>
 </template>
 
 <script>
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 export default {
-	name: 'album_comments',
-	props: ['album_id'],
+	name: 'AlbumComments',
+	components: { commentsAndNotifications },
+	props: {
+		'albumId': {
+			type: String,
+			required: true
+		}
+	},
 	data () {
 		return {
 		}
-	},
-	components: { commentsAndNotifications }
+	}
 }
 </script>
 

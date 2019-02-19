@@ -24,118 +24,327 @@
 </i18n>
 
 <template>
-	<div class = 'container-fluid'>
-		<div class="my-3 selection-button-container" style = ' position: relative;'>
-			<h3 >
-				<router-link to="albums/new" class="nav-link" active-class="active" style = 'display: inline'><v-icon name = 'plus'></v-icon>{{$t('newalbum')}}</router-link>
-				<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters' style='position: absolute; right: 20px;top: 0'><v-icon name = 'search' scale='2'/></button>
-			</h3>
-		</div>
-		<b-table  striped :items="albums" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true" @row-clicked='selectAlbum' >
+  <div class="container-fluid">
+    <div
+      class="my-3 selection-button-container"
+      style=" position: relative;"
+    >
+      <h3>
+        <router-link
+          to="albums/new"
+          class="nav-link"
+          active-class="active"
+          style="display: inline"
+        >
+          <v-icon name="plus" />{{ $t('newalbum') }}
+        </router-link>
+        <button
+          type="button"
+          class="btn btn-link btn-lg float-right"
+          style="position: absolute; right: 20px;top: 0"
+          @click="showFilters=!showFilters"
+        >
+          <v-icon
+            name="search"
+            scale="2"
+          />
+        </button>
+      </h3>
+    </div>
+    <b-table
+      striped
+      :items="albums"
+      :fields="fields"
+      :sort-desc="true"
+      :sort-by.sync="sortBy"
+      :no-local-sorting="true"
+      @sort-changed="sortingChanged"
+      @row-clicked="selectAlbum"
+    >
+      <template
+        slot="HEAD_is_selected"
+        slot-scope="data"
+      >
+        {{ $t(data.label) }}
+        <b-button
+          variant="link"
+          size="sm"
+          class="mr-2"
+        >
+          <v-icon
+            class="align-middle"
+            name="chevron-down"
+            style="visibility: hidden"
+          />
+        </b-button>
+        <b-form-checkbox
+          v-model="albums.allSelected"
+          name="allSelected"
+          @click.native.stop
+          @change="selectAll(albums.allSelected)"
+        />
+      </template>
+      <template
+        slot="HEAD_name"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.name"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="HEAD_number_of_studies"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.NbStudies"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="HEAD_modalities"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.ModalitiesInStudy"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="HEAD_number_of_users"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.NbUsers"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="HEAD_number_of_comments"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.NbMessages"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="HEAD_created_time"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          class="form-row"
+          @click.stop=""
+        >
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.CreateDateFrom"
+                :bootstrap-styling="false"
+                :disabled-dates="disabledFromCreateDates"
+                input-class="form-control form-control-sm  search-calendar"
+                :calendar-button="false"
+                calendar-button-icon=""
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('fromDate')"
+                :clear-button="true"
+                clear-button-icon="fa fa-times"
+              />
+            </div>
+          </div>
 
-			<template slot="HEAD_is_selected" slot-scope="data">
-				{{$t(data.label)}}
-				<b-button variant="link" size="sm"  class="mr-2" >
-					<v-icon  class="align-middle"   name="chevron-down" style = 'visibility: hidden'></v-icon>
-				</b-button>
-				<b-form-checkbox @click.native.stop @change="selectAll(albums.allSelected)" v-model="albums.allSelected" name="allSelected">
-				</b-form-checkbox>
-			</template>
-			<template slot="HEAD_name" slot-scope="data">
-				<div v-if='showFilters' @click.stop='' ><input type = 'search' class = 'form-control form-control-sm' v-model='filters.name' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.CreateDateTo"
+                :bootstrap-styling="false"
+                :disabled-dates="disabledToCreateDates"
+                input-class="form-control form-control-sm search-calendar"
+                :calendar-button="false"
+                calendar-button-icon=""
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('toDate')"
+                :clear-button="true"
+                clear-button-icon="fa fa-times"
+              />
+            </div>
+          </div>
+          <!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
+        </div>
+        <br v-if="showFilters">
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="HEAD_last_event_time"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          class="form-row"
+          @click.stop=""
+        >
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.EventDateFrom"
+                :bootstrap-styling="false"
+                :disabled-dates="disabledFromEventDates"
+                input-class="form-control form-control-sm  search-calendar"
+                :calendar-button="false"
+                calendar-button-icon=""
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('fromDate')"
+                :clear-button="true"
+                clear-button-icon="fa fa-times"
+              />
+            </div>
+          </div>
 
-			</template>
-			<template slot="HEAD_number_of_studies" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbStudies' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-			</template>
-			<template slot="HEAD_modalities" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-			</template>
-			<template slot="HEAD_number_of_users" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbUsers' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-			</template>
-			<template slot="HEAD_number_of_comments" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.NbMessages' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-			</template>
-			<template slot="HEAD_created_time" slot-scope="data">
-				<div v-if='showFilters' @click.stop='' class = 'form-row'>
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.EventDateTo"
+                :bootstrap-styling="false"
+                :disabled-dates="disabledToEventDates"
+                input-class="form-control form-control-sm search-calendar"
+                :calendar-button="false"
+                calendar-button-icon=""
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('toDate')"
+                :clear-button="true"
+                clear-button-icon="fa fa-times"
+              />
+            </div>
+          </div>
+          <!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
+        </div>
+        <br v-if="showFilters">
+        {{ $t(data.label) }}
+      </template>
+      <template
+        slot="is_selected"
+        slot-scope="row"
+      >
+        <b-form-group>
+          <b-button
+            variant="link"
+            size="sm"
+            class="mr-2"
+            @click.stop="row.toggleDetails"
+          >
+            <v-icon
+              v-if="row.detailsShowing"
+              class="align-middle"
+              name="chevron-down"
+            />
+            <v-icon
+              v-else
+              class="align-middle"
+              name="chevron-right"
+            />
+          </b-button>
+          <b-form-checkbox
+            v-model="row.item.is_selected"
+            @click.native.stop
+            @change="toggleSelected(row.item,'album',!row.item.is_selected)"
+          />
+        </b-form-group>
+      </template>
+      <template
+        slot="name"
+        slot-scope="data"
+      >
+        <div class="nameContainer">
+          {{ data.item.name }}
+          <div class="nameIcons">
+            <span
+              :class="data.item.is_favorite?'selected':''"
+              @click.stop="toggleFavorite(data.index)"
+            >
+              <v-icon
+                v-if="data.item.is_favorite"
+                class="align-middle"
+                style="margin-right:0"
+                name="star"
+              />
+              <v-icon
+                v-else
+                class="align-middle"
+                style="margin-right:0"
+                name="star"
+                color="grey"
+                :invert="true"
+              />
+            </span>
+          </div>
+        </div>
+      </template>
 
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.CreateDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromCreateDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
+      <template
+        slot="created_time"
+        slot-scope="data"
+      >
+        {{ data.item.created_time | formatDate }}
+      </template>
+      <template
+        slot="last_event_time"
+        slot-scope="data"
+      >
+        {{ data.item.last_event_time | formatDate }}
+      </template>
 
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.CreateDateTo" :bootstrap-styling='false' :disabledDates="disabledToCreateDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
-					<!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
-				</div>
-				<br v-if='showFilters' />
-				{{$t(data.label)}}
-
-			</template>
-			<template slot="HEAD_last_event_time" slot-scope="data">
-				<div v-if='showFilters' @click.stop='' class = 'form-row'>
-
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.EventDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromEventDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
-
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.EventDateTo" :bootstrap-styling='false' :disabledDates="disabledToEventDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
-					<!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br> -->
-				</div>
-				<br v-if='showFilters' />
-				{{$t(data.label)}}
-
-			</template>
-			<template slot="is_selected" slot-scope="row">
-				<b-form-group>
-					<b-button variant="link" size="sm"  class="mr-2" @click.stop="row.toggleDetails">
-						<v-icon v-if= "row.detailsShowing" class="align-middle" name="chevron-down"></v-icon>
-						<v-icon v-else class="align-middle" name="chevron-right"></v-icon>
-					</b-button>
-					<b-form-checkbox v-model = "row.item.is_selected" @click.native.stop @change="toggleSelected(row.item,'album',!row.item.is_selected)" >
-					</b-form-checkbox>
-
-				</b-form-group>
-			</template>
-			<template slot = 'name' slot-scope='data'>
-				<div class = 'nameContainer'>
-					{{data.item.name}}
-					<div class = 'nameIcons'>
-						<span @click.stop = "toggleFavorite(data.index)" :class="data.item.is_favorite?'selected':''">
-							<v-icon  v-if="data.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-							<v-icon v-else class="align-middle" style="margin-right:0" name="star" color="grey" :invert="true"></v-icon>
-						</span>
-					</div>
-				</div>
-			</template>
-
-			<template slot = 'created_time' slot-scope='data'>{{data.item.created_time | formatDate}}</template>
-			<template slot = 'last_event_time' slot-scope='data'>{{data.item.last_event_time | formatDate}}</template>
-
-			<template slot="row-details" slot-scope="row">
-				<b-card>
-					<dl><dt>Description</dt><dd>{{row.item.description}}</dd></dl>
-				</b-card>
-			</template>
-
-		</b-table>
-	</div>
+      <template
+        slot="row-details"
+        slot-scope="row"
+      >
+        <b-card>
+          <dl><dt>Description</dt><dd>{{ row.item.description }}</dd></dl>
+        </b-card>
+      </template>
+    </b-table>
+  </div>
 </template>
 <script>
 
@@ -143,7 +352,8 @@ import { mapGetters } from 'vuex'
 import Datepicker from 'vuejs-datepicker'
 
 export default {
-	name: 'albums',
+	name: 'Albums',
+	components: { Datepicker },
 	data () {
 		return {
 			pageNb: 1,
@@ -212,7 +422,6 @@ export default {
 
 		}
 	},
-	components: { Datepicker },
 	computed: {
 		...mapGetters({
 			albums: 'albums'
@@ -248,6 +457,31 @@ export default {
 			}
 		}
 
+	},
+	watch: {
+		filters: {
+			handler: function (filters) {
+				if (this.filterTimeout) {
+					clearTimeout(this.filterTimeout)
+				}
+				this.filterTimeout = setTimeout(() => this.searchOnline(filters), 300)
+			},
+			deep: true
+		},
+		showFilters: {
+			handler: function (showFilters) {
+				if (!showFilters) {
+					this.filters = {
+					}
+				}
+			}
+		}
+	},
+	created () {
+		this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+	},
+	mounted () {
+		this.scroll()
 	},
 	methods: {
 		scroll () {
@@ -316,31 +550,6 @@ export default {
 			}
 		}
 
-	},
-	created () {
-		this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-	},
-	mounted () {
-		this.scroll()
-	},
-	watch: {
-		filters: {
-			handler: function (filters) {
-				if (this.filterTimeout) {
-					clearTimeout(this.filterTimeout)
-				}
-				this.filterTimeout = setTimeout(() => this.searchOnline(filters), 300)
-			},
-			deep: true
-		},
-		showFilters: {
-			handler: function (showFilters) {
-				if (!showFilters) {
-					this.filters = {
-					}
-				}
-			}
-		}
 	}
 
 }

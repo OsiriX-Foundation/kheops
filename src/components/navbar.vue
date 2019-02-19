@@ -16,20 +16,35 @@
 </i18n>
 
 <template>
-	<div class = 'container' id = 'navbar_container'>
-		<div class = 'buttons-container'>
-			<p></p>
-		</div>
+  <div
+    id="navbar_container"
+    class="container"
+  >
+    <div class="buttons-container">
+      <p />
+    </div>
 
-		<div class = 'nav-container'>
-			<ul class="nav nav-pills nav-fill">
-				<li class="nav-item">
-					<router-link to="/inbox" class="nav-link" active-class="active"><v-icon name='bars'/>{{ $t("inbox") }}</router-link>
-				</li>
-				<li class="nav-item">
-					<router-link to="/albums" class="nav-link" active-class="active"><v-icon name='book'/>{{ $t("albums") }}</router-link>
-				</li>
-				<!--
+    <div class="nav-container">
+      <ul class="nav nav-pills nav-fill">
+        <li class="nav-item">
+          <router-link
+            to="/inbox"
+            class="nav-link"
+            active-class="active"
+          >
+            <v-icon name="bars" />{{ $t("inbox") }}
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link
+            to="/albums"
+            class="nav-link"
+            active-class="active"
+          >
+            <v-icon name="book" />{{ $t("albums") }}
+          </router-link>
+        </li>
+        <!--
 				<li class="nav-item">
 					<router-link to="/favorites" class="nav-link" active-class="active"><v-icon name='star'/>{{ $t("favorites") }}</router-link>
 				</li>
@@ -37,14 +52,14 @@
 					<router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock'/>{{ $t("recents") }}</router-link>
 				</li>
 				-->
-			</ul>
-		</div>
-	</div>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-	name: 'navBar',
+	name: 'NavBar',
 	data () {
 		return {
 			activePath: 'inbox'

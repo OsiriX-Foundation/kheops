@@ -1,12 +1,11 @@
 
 <template>
-	<h1>Favorites in dev</h1>
-
+  <h1>Favorites in dev</h1>
 </template>
 
 <script>
 
 export default {
-	name: 'favorites'
+	name: 'Favorites'
 }
 </script>

@@ -21,77 +21,112 @@
 </i18n>
 
 <template>
-	<div class = 'seriesSummaryContainer'>
-		<div class='row justify-content-center'>
-			<div class='mb-2'>
-				<b-form-checkbox v-model="isSelected" v-if='series.SeriesDescription'>
-					{{series.SeriesDescription[0]}}
-				</b-form-checkbox>
+  <div class="seriesSummaryContainer">
+    <div class="row justify-content-center">
+      <div class="mb-2">
+        <b-form-checkbox
+          v-if="series.SeriesDescription"
+          v-model="isSelected"
+        >
+          {{ series.SeriesDescription[0] }}
+        </b-form-checkbox>
 
-				<b-form-checkbox v-model="isSelected" v-else>
-					No description
-				</b-form-checkbox>
-				<!--
-				<span>
-					<v-icon class="align-middle" name="star"></v-icon>
-				</span>
-				-->
-			</div>
-		</div>
-		<div class = 'row justify-content-center'>
-			<div class = 'preview'>
-				<img class="cursor-img" @click="openViewer" :src='previewImg()' width= '250' height = '250' v-if='series.Modality != "SR"'>
-				<img src="../../assets/SR.png" width= '250' height = '250' v-else>
-			</div>
-			<!--
+        <b-form-checkbox
+          v-else
+          v-model="isSelected"
+        >
+          No description
+        </b-form-checkbox>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="preview">
+        <img
+          v-if="!series.Modality.includes('SR')"
+          class="cursor-img"
+          :src="series.imgSrc"
+          width="250"
+          height="250"
+          @click="openViewer"
+        >
+        <img
+          v-else
+          :src="series.imgSrc"
+          width="250"
+          height="250"
+        >
+      </div>
+      <!--
 				div - col col-mb-2 col-md-auto description
 				table - table table-striped col-md-auto
 			-->
-			<div class = 'col col-mb-2 col-sm-10 col-md-8 col-lg-6 description'>
-				<table class="table table-striped">
-					<tbody>
-						<tr v-if="series.Modality">
-							<th>{{ $t('modality') }}</th>
-							<td>{{ series.Modality[0] }}</td>
-						</tr>
-						<tr v-if="series.RetrieveAETitle">
-							<th>{{ $t('applicationentity') }}</th>
-							<td>{{ series.RetrieveAETitle[0] }}</td>
-						</tr>
-						<tr v-if="series.NumberOfSeriesRelatedInstances">
-							<th>{{ $t('numberimages') }}</th>
-							<td>{{ series.NumberOfSeriesRelatedInstances[0] }}</td>
-						</tr>
-						<tr v-if="series.SeriesDescription">
-							<th>{{ $t('description') }}</th>
-							<td>{{ series.SeriesDescription[0] }}</td>
-						</tr>
-						<tr v-if="series.SeriesDate">
-							<th>{{ $t('seriesdate') }}</th>
-							<td>{{ series.SeriesDate[0]|formatDate }}</td>
-						</tr>
-						<tr v-if="series.SeriesTime">
-							<th>{{ $t('seriestime') }}</th>
-							<td>{{ series.SeriesTime[0] }}</td>
-						</tr>
-					</tbody>
-				</table>
+      <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
+        <table class="table table-striped">
+          <tbody>
+            <tr v-if="series.Modality">
+              <th>{{ $t('modality') }}</th>
+              <td>{{ series.Modality[0] }}</td>
+            </tr>
+            <tr v-if="series.RetrieveAETitle">
+              <th>{{ $t('applicationentity') }}</th>
+              <td>{{ series.RetrieveAETitle[0] }}</td>
+            </tr>
+            <tr v-if="series.NumberOfSeriesRelatedInstances">
+              <th>{{ $t('numberimages') }}</th>
+              <td>{{ series.NumberOfSeriesRelatedInstances[0] }}</td>
+            </tr>
+            <tr v-if="series.SeriesDescription">
+              <th>{{ $t('description') }}</th>
+              <td>{{ series.SeriesDescription[0] }}</td>
+            </tr>
+            <tr v-if="series.SeriesDate">
+              <th>{{ $t('seriesdate') }}</th>
+              <td>{{ series.SeriesDate[0]|formatDate }}</td>
+            </tr>
+            <tr v-if="series.SeriesTime">
+              <th>{{ $t('seriestime') }}</th>
+              <td>{{ series.SeriesTime[0] }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-				<dl class = 'row justify-content-center' v-if='series.Modality != "SR"'>
-					<dd>
-						<button type = 'button' class = 'btn-primary btn-sm' @click='openViewer'>{{$t('openviewer')}}</button>
-					</dd>
-				</dl>
-			</div>
-		</div>
-	</div>
+        <dl
+          v-if="!series.Modality.includes('SR')"
+          class="row justify-content-center"
+        >
+          <dd>
+            <button
+              type="button"
+              class="btn-primary btn-sm"
+              @click="openViewer"
+            >
+              {{ $t('openviewer') }}
+            </button>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 export default {
-	name: 'seriesSummary',
-	props: ['SeriesInstanceUID', 'StudyInstanceUID', 'selected'],
+	name: 'SeriesSummary',
+	props: {
+		seriesInstanceUID: {
+			type: String,
+			required: true
+		},
+		studyInstanceUID: {
+			type: String,
+			required: true
+		},
+		selected: {
+			type: Boolean,
+			required: true
+		}
+	},
 	data () {
 		return {}
 	},
@@ -101,9 +136,9 @@ export default {
 			user: 'currentUser'
 		}),
 		series () {
-			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.StudyInstanceUID })
+			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
 			if (studyIndex > -1) {
-				let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.SeriesInstanceUID })
+				let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
 				if (seriesIndex > -1) return this.studies[studyIndex].series[seriesIndex]
 			}
 			return {}
@@ -115,33 +150,22 @@ export default {
 			},
 			// setter
 			set: function (newValue) {
-				let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.StudyInstanceUID })
+				let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
 				if (studyIndex > -1) {
-					let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.SeriesInstanceUID })
+					let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
 					if (seriesIndex > -1) {
 						this.$store.dispatch('toggleSelected', { type: 'series', index: studyIndex + ':' + seriesIndex, selected: newValue })
 					}
 				}
 			}
-
 		}
 	},
 	methods: {
 		toggleChecked () {
 			this.isSelected = !this.isSelected
 		},
-
-		previewImg () {
-			if (this.series.imgSrc !== undefined && this.series.imgSrc !== '') return this.series.imgSrc
-			else {
-				return this.$store.dispatch('getImage', { SeriesInstanceUID: this.SeriesInstanceUID, StudyInstanceUID: this.StudyInstanceUID }).then(img => {
-					this.series.imgSrc = img
-					return img
-				})
-			}
-		},
 		openViewer () {
-			let url = `${process.env.VUE_APP_URL_API}/studies/${this.StudyInstanceUID}/ohifmetadata?firstseries=${this.SeriesInstanceUID}`
+			let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
 			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`, 'OHIFViewer')
 		}
 	}

@@ -31,31 +31,61 @@
 </i18n>
 
 <template>
-	<div class = 'container-fluid'>
-		<div class = 'container'>
-			<div class = 'row'>
-				<div class = 'col-md'>
-					<h3>
-						<v-icon name="book" scale="2"></v-icon>
-						<span class = 'p-2'>{{album.name}}</span>
-						<v-icon name="star" scale="2" v-if="view=='studies' && album.is_favorite"></v-icon>
-					</h3>
-				</div>
-				<div class = 'col-md'>	<nav class="nav nav-pills nav-fill">
-						<a class="nav-link" :class="(view=='studies')?'active':''" @click.stop="view='studies'" >Studies</a>
-						<a class="nav-link" :class="(view=='comments')?'active':''" @click.stop="view='comments'">Comments</a>
-						<a class="nav-link" :class="(view=='settings')?'active':''" @click.stop="view='settings'">Settings</a>
-					</nav>
-				</div>
-				<!-- <div class = 'col-md'></div> -->
-			</div>
-		</div>
+  <div class="container-fluid">
+    <div class="container">
+      <div class="row">
+        <div class="col-md">
+          <h3>
+            <v-icon
+              name="book"
+              scale="2"
+            />
+            <span class="p-2">
+              {{ album.name }}
+            </span>
+            <v-icon
+              v-if="view=='studies' && album.is_favorite"
+              name="star"
+              scale="2"
+            />
+          </h3>
+        </div>
+        <div class="col-md">
+          <nav class="nav nav-pills nav-fill">
+            <a
+              class="nav-link"
+              :class="(view=='studies')?'active':''"
+              @click.stop="view='studies'"
+            >
+              Studies
+            </a>
+            <a
+              class="nav-link"
+              :class="(view=='comments')?'active':''"
+              @click.stop="view='comments'"
+            >
+              Comments
+            </a>
+            <a
+              class="nav-link"
+              :class="(view=='settings')?'active':''"
+              @click.stop="view='settings'"
+            >
+              Settings
+            </a>
+          </nav>
+        </div>
+        <!-- <div class = 'col-md'></div> -->
+      </div>
+    </div>
 
-		<album-studies v-if="view=='studies'"></album-studies>
-		<album-comments v-if="view=='comments'" :album_id='album.album_id'></album-comments>
-		<album-settings v-if="view=='settings'"></album-settings>
-
-	</div>
+    <album-studies v-if="view=='studies'" />
+    <album-comments
+      v-if="view=='comments'"
+      :album_id="album.album_id"
+    />
+    <album-settings v-if="view=='settings'" />
+  </div>
 </template>
 
 <script>
@@ -65,12 +95,7 @@ import albumComments from '@/components/albums/albumComments'
 import albumSettings from '@/components/albums/albumSettings'
 
 export default {
-	name: 'album',
-	computed: {
-		...mapGetters({
-			album: 'album'
-		})
-	},
+	name: 'Album',
 	components: { albumStudies, albumSettings, albumComments },
 	data () {
 		return {
@@ -78,11 +103,9 @@ export default {
 			newUserName: ''
 		}
 	},
-	methods: {
-	},
-	created () {
-		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
-			this.view = this.$route.query.view || 'studies'
+	computed: {
+		...mapGetters({
+			album: 'album'
 		})
 	},
 	watch: {
@@ -91,6 +114,13 @@ export default {
 			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
 			this.$router.push({ query: queryParams })
 		}
+	},
+	created () {
+		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
+			this.view = this.$route.query.view || 'studies'
+		})
+	},
+	methods: {
 	}
 }
 </script>

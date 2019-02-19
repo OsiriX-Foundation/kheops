@@ -16,21 +16,34 @@
 </i18n>
 
 <template>
-	<div id = 'user' class = 'container'>
-		<h3 class = 'pb-3'>{{$t('usersettings')}}</h3>
-		<div class = 'row'>
-			<div class = 'col-sm-2 col-xs-12' >
-				<nav class="nav nav-pills nav-justified flex-column">
-					<a class="nav-link" v-for="(cat,idx) in categories" :key="idx" :class="(view==cat)?'active':''" @click="view=cat">{{$t(cat)}}</a>
-				</nav>
-			</div>
-			<div class = 'col-sm-10 col-xs-12' >
-				<user-settings-general v-if="view=='general'"></user-settings-general>
-				<user-settings-token v-if="view=='token'"></user-settings-token>
-				<user-settings-provider v-if="view=='provider'"></user-settings-provider>
-			</div>
-		</div>
-	</div>
+  <div
+    id="user"
+    class="container"
+  >
+    <h3 class="pb-3">
+      {{ $t('usersettings') }}
+    </h3>
+    <div class="row">
+      <div class="col-sm-2 col-xs-12">
+        <nav class="nav nav-pills nav-justified flex-column">
+          <a
+            v-for="(cat,idx) in categories"
+            :key="idx"
+            class="nav-link"
+            :class="(view==cat)?'active':''"
+            @click="view=cat"
+          >
+            {{ $t(cat) }}
+          </a>
+        </nav>
+      </div>
+      <div class="col-sm-10 col-xs-12">
+        <user-settings-general v-if="view=='general'" />
+        <user-settings-token v-if="view=='token'" />
+        <user-settings-provider v-if="view=='provider'" />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -40,7 +53,7 @@ import userSettingsGeneral from '@/components/user/userSettingsGeneral'
 import userSettingsToken from '@/components/user/userSettingsToken'
 import userSettingsProvider from '@/components/user/userSettingsProvider'
 export default {
-	name: 'user',
+	name: 'User',
 	components: { userSettingsGeneral, userSettingsToken, userSettingsProvider },
 	data () {
 		return {
@@ -53,14 +66,14 @@ export default {
 			user: 'currentUser'
 		})
 	},
-	mounted () {
-		this.view = this.$route.query.view || 'general'
-	},
 	watch: {
 		view () {
 			let queryParams = { view: this.view }
 			this.$router.push({ query: queryParams })
 		}
+	},
+	mounted () {
+		this.view = this.$route.query.view || 'general'
 	}
 }
 </script>

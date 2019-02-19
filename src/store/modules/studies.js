@@ -3,6 +3,7 @@ import dicom from '@/mixins/dicom'
 import customdicom from '@/mixins/customdicom'
 import moment from 'moment'
 import axios from 'axios'
+import SRImage from '@/assets/SR_2.png'
 // initial state
 const state = {
 	all: [],
@@ -150,19 +151,26 @@ const actions = {
 							})
 							if (!found) t[k] = v
 						}
-						if (t.SeriesInstanceUID !== undefined) {
-							if (state.flags[t.SeriesInstanceUID[0]] === undefined) {
-								let flag = {
-									id: t.SeriesInstanceUID[0],
-									is_selected: study.is_selected,
-									is_favorite: study.is_favorite,
-									comment: false
-								}
-								commit('SET_FLAG', flag)
-							}
-							dispatch('getImage', { StudyInstanceUID: study.StudyInstanceUID[0], SeriesInstanceUID: t.SeriesInstanceUID[0] })
-						}
 					})
+					if (t.SeriesInstanceUID !== undefined) {
+						if (state.flags[t.SeriesInstanceUID[0]] === undefined) {
+							let flag = {
+								id: t.SeriesInstanceUID[0],
+								is_selected: study.is_selected,
+								is_favorite: study.is_favorite,
+								comment: false
+							}
+							commit('SET_FLAG', flag)
+						}
+					}
+					if (t.Modality && t.Modality.includes('SR')) {
+						t.imgSrc = SRImage
+					} else {
+						dispatch('getImage', {
+							StudyInstanceUID: study.StudyInstanceUID[0],
+							SeriesInstanceUID: t.SeriesInstanceUID[0]
+						})
+					}
 					if (t.SeriesInstanceUID !== undefined) data.push(t)
 				})
 				commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: data })
@@ -404,9 +412,9 @@ const mutations = {
 		state.request = request
 	},
 	SET_IMAGE (state, params) {
-		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID === params.StudyInstanceUID })
+		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		if (idx > -1) {
-			let sidx = _.findIndex(state.all[idx].series, s => { return s.SeriesInstanceUID === params.SeriesInstanceUID })
+			let sidx = _.findIndex(state.all[idx].series, s => { return s.SeriesInstanceUID[0] === params.SeriesInstanceUID })
 			if (sidx > -1) state.all[idx].series[sidx].imgSrc = params.img
 		}
 	},

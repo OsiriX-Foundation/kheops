@@ -35,65 +35,192 @@
 </i18n>
 
 <template>
-	<div id = 'userSettingsToken'>
-		<div class="my-3 selection-button-container" style = ' position: relative;' v-if="view=='list'">
-			<h4>
-				<span class = 'link' @click="view='new'"><v-icon name = 'plus' scale='1' class='mr-3'></v-icon>{{$t('newtoken')}}</span>
-			</h4>
-		</div>
+  <div id="userSettingsToken">
+    <div
+      v-if="view=='list'"
+      class="my-3 selection-button-container"
+      style=" position: relative;"
+    >
+      <h4>
+        <span
+          class="link"
+          @click="view='new'"
+        >
+          <v-icon
+            name="plus"
+            scale="1"
+            class="mr-3"
+          />{{ $t('newtoken') }}
+        </span>
+      </h4>
+    </div>
 
-		<new-user-token v-if="view=='new'" @done="view='list'"></new-user-token>
-		<user-token v-if="view=='token'" :token="token" @done='showList' @revoke='revoke'></user-token>
+    <new-user-token
+      v-if="view=='new'"
+      @done="view='list'"
+    />
+    <user-token
+      v-if="view=='token'"
+      :token="token"
+      @done="showList"
+      @revoke="revoke"
+    />
 
-		<div class = 'tokens' v-if="view=='list'">
-			<h4>
-				Tokens
-				<small class = 'float-right'>
-					<toggle-button v-model="showRevoked" :labels="{checked: 'Yes', unchecked: 'No'}" @change="getTokens" /><span class = 'ml-2 toggle-label'>{{$t('showrevokedtoken')}}</span>
-				</small>
-			</h4>
-			<b-table stacked="sm" striped hover :items="user.tokens" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @row-clicked='selectToken' tbody-tr-class="link">
-			<template slot='scope_type' slot-scope='data'>
-				<div v-if="data.value=='album'"><router-link :to="`/albums/${data.item.album.id}`" @click.stop ><v-icon name="book" class="mr-2"></v-icon>{{data.item.album.name}}</router-link></div>
-				<div v-if="data.value=='user'"><v-icon name="user" class="mr-2"></v-icon>{{$t('user')}}</div>
-			</template>
-			<template slot="HEAD_expiration_time" slot-scope="data">
-				{{$t(data.label)}}
-			</template>
-			<template slot="expiration_time" slot-scope="data">
-				<span :class="(data.item.revoked)?'text-danger':''">{{data.value|formatDate}} <br class='d-lg-none'> <small>{{data.value|formatTime}}</small> </span>
-			</template>
-			<template slot="HEAD_issued_at_time" slot-scope="data">
-				{{$t(data.label)}}
-			</template>
-			<template slot="issued_at_time" slot-scope="data">
-				{{data.value|formatDate}} <br class='d-lg-none'> <small>{{data.value|formatTime}}</small>
-			</template>
-			<template slot="HEAD_permission" slot-scope="data">
-				{{$t(data.label)}}
-			</template>
-			<template slot="permission" slot-scope="data">
-				{{data.item|formatPermissions}}
-			</template>
-			<template slot="status" slot-scope="data">
-				<div class="text-success" v-if="tokenStatus(data.item)=='active'"><span class="nowrap"><v-icon name="check-circle" class='mr-2'></v-icon>{{$t("active")}}</span></div>
-				<div class="text-danger" v-if="tokenStatus(data.item)=='revoked'"><v-icon name="ban" class="mr-2"></v-icon>{{$t("revoked")}}<br>{{data.item.revoke_time|formatDate}} <br class='d-lg-none'> <small>{{data.item.revoke_time|formatTime}}</small></div>
-				<div class="text-danger" v-if="tokenStatus(data.item)=='expired'"><v-icon name="ban" class="mr-2"></v-icon>{{$t("expired")}}<br>{{data.item.expiration_time|formatDate}} <br class='d-lg-none'> <small>{{data.item.expiration_time|formatTime}}</small></div>
-				<div v-if="tokenStatus(data.item)=='wait'"><v-icon name="clock" class="mr-2"></v-icon><br>{{data.item.not_before_time|formatDate}} <br class='d-lg-none'> <small>{{data.item.not_before_time|formatTime}}</small></div>
-			</template>
-			<template slot="HEAD_status" slot-scope="data">
-				{{$t(data.label)}}
-			</template>
-			<template slot="actions" slot-scope="data">
-				<button type="button" class="btn btn-danger btn-xs revoke-btn" v-if="!data.item.revoked" @click.stop="revoke(data.item.id)">{{$t('revoke')}}</button>
-				<span class="text-danger revoke-btn" v-if="data.item.revoked">{{$t('revoked')}}</span>
-			</template>
-
-		</b-table>
-	</div>
-
-
-</div>
+    <div
+      v-if="view=='list'"
+      class="tokens"
+    >
+      <h4>
+        Tokens
+        <small class="float-right">
+          <toggle-button
+            v-model="showRevoked"
+            :labels="{checked: 'Yes', unchecked: 'No'}"
+            @change="getTokens"
+          /><span class="ml-2 toggle-label">
+            {{ $t('showrevokedtoken') }}
+          </span>
+        </small>
+      </h4>
+      <b-table
+        stacked="sm"
+        striped
+        hover
+        :items="user.tokens"
+        :fields="fields"
+        :sort-desc="true"
+        :sort-by.sync="sortBy"
+        tbody-tr-class="link"
+        @row-clicked="selectToken"
+      >
+        <template
+          slot="scope_type"
+          slot-scope="data"
+        >
+          <div v-if="data.value=='album'">
+            <router-link
+              :to="`/albums/${data.item.album.id}`"
+              @click.stop
+            >
+              <v-icon
+                name="book"
+                class="mr-2"
+              />{{ data.item.album.name }}
+            </router-link>
+          </div>
+          <div v-if="data.value=='user'">
+            <v-icon
+              name="user"
+              class="mr-2"
+            />{{ $t('user') }}
+          </div>
+        </template>
+        <template
+          slot="HEAD_expiration_time"
+          slot-scope="data"
+        >
+          {{ $t(data.label) }}
+        </template>
+        <template
+          slot="expiration_time"
+          slot-scope="data"
+        >
+          <span :class="(data.item.revoked)?'text-danger':''">
+            {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
+          </span>
+        </template>
+        <template
+          slot="HEAD_issued_at_time"
+          slot-scope="data"
+        >
+          {{ $t(data.label) }}
+        </template>
+        <template
+          slot="issued_at_time"
+          slot-scope="data"
+        >
+          {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
+        </template>
+        <template
+          slot="HEAD_permission"
+          slot-scope="data"
+        >
+          {{ $t(data.label) }}
+        </template>
+        <template
+          slot="permission"
+          slot-scope="data"
+        >
+          {{ data.item|formatPermissions }}
+        </template>
+        <template
+          slot="status"
+          slot-scope="data"
+        >
+          <div
+            v-if="tokenStatus(data.item)=='active'"
+            class="text-success"
+          >
+            <span class="nowrap">
+              <v-icon
+                name="check-circle"
+                class="mr-2"
+              />{{ $t("active") }}
+            </span>
+          </div>
+          <div
+            v-if="tokenStatus(data.item)=='revoked'"
+            class="text-danger"
+          >
+            <v-icon
+              name="ban"
+              class="mr-2"
+            />{{ $t("revoked") }}<br>{{ data.item.revoke_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.revoke_time|formatTime }}</small>
+          </div>
+          <div
+            v-if="tokenStatus(data.item)=='expired'"
+            class="text-danger"
+          >
+            <v-icon
+              name="ban"
+              class="mr-2"
+            />{{ $t("expired") }}<br>{{ data.item.expiration_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.expiration_time|formatTime }}</small>
+          </div>
+          <div v-if="tokenStatus(data.item)=='wait'">
+            <v-icon
+              name="clock"
+              class="mr-2"
+            /><br>{{ data.item.not_before_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.not_before_time|formatTime }}</small>
+          </div>
+        </template>
+        <template
+          slot="HEAD_status"
+          slot-scope="data"
+        >
+          {{ $t(data.label) }}
+        </template>
+        <template
+          slot="actions"
+          slot-scope="data"
+        >
+          <button
+            v-if="!data.item.revoked"
+            type="button"
+            class="btn btn-danger btn-xs revoke-btn"
+            @click.stop="revoke(data.item.id)"
+          >
+            {{ $t('revoke') }}
+          </button>
+          <span
+            v-if="data.item.revoked"
+            class="text-danger revoke-btn"
+          >
+            {{ $t('revoked') }}
+          </span>
+        </template>
+      </b-table>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -107,7 +234,7 @@ import moment from 'moment'
 VueClipboard.config.autoSetContainer = true // add this line
 Vue.use(VueClipboard)
 export default {
-	name: 'userSettingsToken',
+	name: 'UserSettingsToken',
 	components: { newUserToken, userToken },
 	data () {
 		return {
@@ -181,6 +308,9 @@ export default {
 			albums: 'albums'
 		})
 	},
+	created () {
+		this.getTokens()
+	},
 	methods: {
 		selectToken (item) {
 			this.token = item
@@ -226,9 +356,6 @@ export default {
 				return 'active'
 			}
 		}
-	},
-	created () {
-		this.getTokens()
 	}
 }
 </script>
