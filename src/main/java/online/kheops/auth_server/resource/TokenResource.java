@@ -354,7 +354,9 @@ public class TokenResource
                         (assertion.getCapability().get().isReadPermission()?"read ":"") +
                         (assertion.getCapability().get().isDownloadPermission()?"download ":"") +
                         (assertion.getCapability().get().isAppropriatePermission()?"appropriate ":"");
-                intreospectResponse.scope = intreospectResponse.scope.substring(0, intreospectResponse.scope.length()-1);
+                if (intreospectResponse.scope.length() > 0) {
+                    intreospectResponse.scope = intreospectResponse.scope.substring(0, intreospectResponse.scope.length() - 1);
+                }
             } else {
                 intreospectResponse.scope = "read write";
             }
