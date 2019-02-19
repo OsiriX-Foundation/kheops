@@ -10,9 +10,9 @@ import online.kheops.proxy.stow.GatewayException;
 import online.kheops.proxy.stow.Proxy;
 import online.kheops.proxy.stow.RequestException;
 import online.kheops.proxy.stow.authorization.AuthorizationManager;
+import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
-import online.kheops.proxy.tokens.Introspect;
 import org.dcm4che3.io.SAXReader;
 import org.dcm4che3.ws.rs.MediaTypes;
 import org.xml.sax.SAXException;
@@ -104,16 +104,14 @@ public final class Resource {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
-        final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
-        try {
-            if (!Introspect.endpoint(introspectionURI).token(authorizationToken.getToken()).validForScope("write")) {
-                LOG.log(Level.WARNING, "Authorization token is not valid for writing");
-                throw new WebApplicationException(Response.status(FORBIDDEN).entity("Authorization is not valid for posting").build());
-            }
-        } catch (AccessTokenException e) {
-            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
-            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
-        }
+//        try {
+//            AccessToken.createBuilder(authorizationURI)
+//                    .withCapability(authorizationToken.getToken())
+//                    .build();
+//        } catch (AccessTokenException e) {
+//            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
+//            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
+//        }
 
         final InputStream inputStream;
         try {
