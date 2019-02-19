@@ -14,7 +14,7 @@
 				</div>
 			</div>
 		</div>
-		<studies></studies>
+		<studies :album="album"></studies>
 	</div>
 </template>
 
