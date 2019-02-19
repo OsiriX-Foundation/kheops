@@ -56,15 +56,17 @@ public class AccessToken {
             if (capability == null) {
                 throw new IllegalStateException("Capability is not set");
             }
+            if (seriesID == null) {
+                throw new IllegalStateException("SeriesID is not set");
+            }
 
             final Form form = new Form()
                     .param("assertion", capability)
-                    .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer");
-            if (seriesID != null) {
-                form.param("scope", "pep")
-                        .param("study_instance_uid", seriesID.getStudyUID())
-                        .param("series_instance_uid", seriesID.getSeriesUID());
-            }
+                    .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer")
+                    .param("scope", "pep")
+                    .param("study_instance_uid", seriesID.getStudyUID())
+                    .param("series_instance_uid", seriesID.getSeriesUID());
+
             URI uri = UriBuilder.fromUri(authorizationServerRoot).path("token").build();
 
             final TokenResponse tokenResponse;

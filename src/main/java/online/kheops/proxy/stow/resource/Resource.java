@@ -104,14 +104,14 @@ public final class Resource {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
-        try {
-            AccessToken.createBuilder(authorizationURI)
-                    .withCapability(authorizationToken.getToken())
-                    .build();
-        } catch (AccessTokenException e) {
-            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
-            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
-        }
+//        try {
+//            AccessToken.createBuilder(authorizationURI)
+//                    .withCapability(authorizationToken.getToken())
+//                    .build();
+//        } catch (AccessTokenException e) {
+//            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
+//            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid").build());
+//        }
 
         final InputStream inputStream;
         try {
