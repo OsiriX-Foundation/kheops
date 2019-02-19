@@ -18,6 +18,7 @@ public class FetchResource {
     private static final Logger LOG = Logger.getLogger(FetchResource.class.getName());
 
     @POST
+    @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @Context SecurityContext securityContext) {
