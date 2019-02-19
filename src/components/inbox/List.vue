@@ -56,7 +56,7 @@
 </i18n>
 
 <template>
-	<div class = 'container-fluid'>
+	<div class = 'container-fluid' v-if='!loading'>
 		<!--button Study selected -->
 		<div class="container-fluid my-3 selection-button-container">
 			<span class="float-left" v-if="selectedStudiesNb">
@@ -250,6 +250,9 @@
 			<template slot = 'StudyDate' slot-scope='data'>{{ data.item.StudyDate[0] | formatDate }}</template>
 		</b-table>
 	</div>
+	<div class = 'container-fluid' v-else style="margin-top: 30px; text-align:center;">
+		<pulse-loader :loading='loading' color="white"></pulse-loader>
+	</div>
 </template>
 
 <script>
@@ -261,6 +264,8 @@ import studyMetadata from '@/components/study/studyMetadata.vue'
 import ToggleButton from 'vue-js-toggle-button'
 import Datepicker from 'vuejs-datepicker'
 import Vue from 'vue'
+// https://github.com/greyby/vue-spinner
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 Vue.use(ToggleButton)
 
@@ -333,10 +338,11 @@ export default {
 				ModalitiesInStudy: '',
 				inbox_and_albums: false,
 				album_id: ''
-			}
+			},
+			loading: true
 		}
 	},
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader },
 	computed: {
 		...mapGetters({
 			studies: 'studies',
@@ -450,6 +456,7 @@ export default {
 		},
 		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+				.then(() => { this.loading = false })
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
@@ -536,10 +543,12 @@ export default {
 	},
 
 	created () {
+		this.loading = true
 		if (this.$route.params.album_id) {
 			this.filters.album_id = this.$route.params.album_id
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+				.then(() => { this.loading = false })
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
 	},
