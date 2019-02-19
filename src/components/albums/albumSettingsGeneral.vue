@@ -31,8 +31,8 @@
 								<input type="text" class = 'form-control' v-model='edit.name'>
 							</div>
 							<div class="input-group-append">
-                <button class="btn btn-primary" type="submit">{{$t('update')}}</button>
-                <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.name="-1"' @click='edit.name="-1"' tabindex="0">{{$t('cancel')}}</button>
+								<button class="btn btn-primary" type="submit">{{$t('update')}}</button>
+								<button class="btn btn-secondary" type="reset"  @keyup.esc='edit.name="-1"' @click='edit.name="-1"' tabindex="0">{{$t('cancel')}}</button>
 							</div>
 						</div>
 					</form>
@@ -50,7 +50,7 @@
 							</div>
 							<div>
 								<button class="btn btn-primary" type="submit">{{$t('update')}}</button>
-                <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.description="-1"' @click='edit.description="-1"' tabindex="0">{{$t('cancel')}}</button>
+								<button class="btn btn-secondary" type="reset"  @keyup.esc='edit.description="-1"' @click='edit.description="-1"' tabindex="0">{{$t('cancel')}}</button>
 							</div>
 						</div>
 					</form>
@@ -103,7 +103,7 @@ export default {
 			}
 			let params = {}
 			_.forEach(this.edit, (v, k) => {
-				if (v === -1) return
+				if (v === '-1') return
 				if (this.album[k] !== v) {
 					params[k] = v
 				}

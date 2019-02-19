@@ -48,8 +48,11 @@ const actions = {
 	patchAlbum ({ commit }, params) {
 		var query = ''
 		_.forEach(params, (value, key) => {
-			let after = key.substring(key.lastIndexOf('_') + 1)
-			let id = key.substring(0, key.lastIndexOf('_')) + after.charAt(0).toUpperCase() + after.slice(1)
+			let id = key
+			if (key.includes('_')) {
+				let after = key.substring(key.lastIndexOf('_') + 1)
+				id = key.substring(0, key.lastIndexOf('_')) + after.charAt(0).toUpperCase() + after.slice(1)
+			}
 			query += encodeURIComponent(id) + '=' + encodeURIComponent(value) + '&'
 		})
 		let config = {
