@@ -198,9 +198,9 @@ public class TokenResource
 
         if (pepScope) {
 
-            if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ) {
+            if (assertion.getTokenType() == Assertion.TokenType.PEP_TOKEN ) {
                 errorResponse.error = "Unauthorized";
-                errorResponse.errorDescription = "Request a pep token is unauthorized with a viewer token";
+                errorResponse.errorDescription = "Request a pep token is unauthorized with a pep token";
                 return Response.status(UNAUTHORIZED).entity(errorResponse).build();
             }
 
