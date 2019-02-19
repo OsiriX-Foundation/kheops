@@ -27,7 +27,7 @@
 		"add_user": "Inviter un utilisateur",
 		"add_series": "Ajouter une étude / série",
 		"download_series": "Télécharger une étude / série",
-		"send_series": "Ajouter à album / inbox",
+		"send_series": "Ajouter à un album / inbox",
 		"delete_series": "Supprimer une étude / série",
 		"write_comments": "Commenter",
 		"albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
@@ -85,7 +85,7 @@
 			<legend>{{$t('usersettings')}}</legend>
 			<div class = 'row form-group' v-for='(label,idx) in userSettings' :key="idx" :class = '(label=="send_series")?"offset-1":""'>
 				<div>
-					<toggle-button v-model="album[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.download_series && label=='send_series')" :sync="true" @change='patchAlbum(label)' v-if="album.is_admin"/>
+					<toggle-button v-model="album[label]" :labels="{checked: 'Yes', unchecked: 'No'}" :disabled="(!album.download_series && !album.send_series && label=='send_series')" :sync="true" @change='patchAlbum(label)' v-if="album.is_admin"/>
 					<v-icon name="ban" class="text-danger" v-if='!album.is_admin && !album[label]'></v-icon>
 					<v-icon name="check-circle" class="text-success" v-if='!album.is_admin && album[label]'></v-icon>
 				</div>
@@ -156,10 +156,9 @@ export default {
 			return re.test(email)
 		},
 		patchAlbum (field) {
-			let params = { field: this.album[field] }
-			this.$store.dispatch('patchAlbum', params).then(() => {
-				this.$snotify.success(this.$t('albumupdatesuccess'))
-			}).catch(err => {
+			let params = {}
+			params[field] = this.album[field]
+			this.$store.dispatch('patchAlbum', params).catch(err => {
 				console.error(err)
 				this.$snotify.error(this.$t('sorryerror'))
 			})
