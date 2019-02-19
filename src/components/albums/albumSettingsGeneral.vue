@@ -30,7 +30,7 @@
             <v-icon name="pencil-alt" />
           </span>
         </div>
-        <div v-if="edit.name!='-1'">
+        <div v-if="edit.name!=='-1'">
           <form @submit.prevent="updateAlbum">
             <div class="input-group mb-2">
               <div>
@@ -72,10 +72,15 @@
         </span>
       </dt>
       <dd class="album_description">
-        <div
-          v-if="edit.description === '-1'"
-          v-html="$options.filters.nl2br(album.description)"
-        />
+        <div v-if="edit.description === '-1'">
+          <p
+            v-for="(p,pidx) in formattedAlbumDescription"
+            :key="pidx"
+            class="my-0"
+          >
+            {{ p }}
+          </p>
+        </div>
         <div v-if="edit.description !== '-1'">
           <form @submit.prevent="updateAlbum">
             <div class="">
@@ -171,7 +176,10 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
+		}),
+		formattedAlbumDescription () {
+			return this.album.description.split('\n')
+		}
 	},
 	methods: {
 		updateAlbum () {
@@ -180,8 +188,9 @@ export default {
 				return
 			}
 			let params = {}
+			console.log(this.edit)
 			_.forEach(this.edit, (v, k) => {
-				if (v === -1) return
+				if (v === '-1') return
 				if (this.album[k] !== v) {
 					params[k] = v
 				}

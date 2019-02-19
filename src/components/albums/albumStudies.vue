@@ -10,7 +10,16 @@
     <div class="container">
       <div class="card">
         <div class="card-body">
-          <p><strong>Album description:</strong> <span v-html="$options.filters.nl2br(album.description)" /></p>
+          <p
+            v-for="(p,idx) in formattedAlbumDescription"
+            :key="idx"
+            class="py-0 my-0"
+            :class="(idx)?'pl-3':''"
+          >
+            <strong v-if="idx===0">
+              Album description:
+            </strong>{{ p }}
+          </p>
         </div>
       </div>
     </div>
@@ -33,7 +42,10 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
+		}),
+		formattedAlbumDescription () {
+			return this.album.description.split('\n')
+		}
 	}
 }
 

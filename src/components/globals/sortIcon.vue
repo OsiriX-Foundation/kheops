@@ -26,10 +26,6 @@ export default {
 		sorter: {
 			type: Object,
 			required: true
-		},
-		// What is ccas?!?! I don't see it set anywhere
-		ccas: {
-
 		}
 	}
 }

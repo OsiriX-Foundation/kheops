@@ -472,7 +472,7 @@
                   v-if="row.item.comments.length"
                   class="align-middle"
                   style="margin-right:0"
-                  name="comment"
+                  name="comment-dots"
                 />
                 <v-icon
                   v-else

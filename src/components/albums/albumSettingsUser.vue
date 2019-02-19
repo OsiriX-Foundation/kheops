@@ -54,6 +54,7 @@
         <v-icon
           name="user-plus"
           scale="1"
+          class="mr-2"
         />{{ $t('add_user') }}
       </button>
     </h3>
@@ -183,7 +184,9 @@
             class="text-success"
           />
         </div>
-        <label>{{ $t(label) }}</label>
+        <label class="ml-2">
+          {{ $t(label) }}
+        </label>
       </div>
     </fieldset>
   </div>
@@ -296,8 +299,6 @@ fieldset.user_settings {
 	border: 1px solid #333;
 	padding: 20px;
 	background-color: #303030 ;
-	font-size: 0.75rem;
-	line-height: 0.75rem;
 }
 
 fieldset.user_settings legend{

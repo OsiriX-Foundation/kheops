@@ -42,7 +42,9 @@
         v-if="scope==='album'"
         class="col-sm-12 col-md-10 offset-md-1 text-right"
       >
-        <label>{{ $t('includenotifications') }} </label> <toggle-button
+        <label class="mr-2">
+          {{ $t('includenotifications') }}
+        </label> <toggle-button
           v-model="includeNotifications"
           :labels="{checked: 'Yes', unchecked: 'No'}"
           :sync="true"
@@ -73,8 +75,15 @@
             </div>
             <div
               class="card-body"
-              v-html="$options.filters.nl2br(comment.comment)"
-            />
+            >
+              <p
+                v-for="(p,pidx) in `${comment.comment.split('\n')}`"
+                :key="pidx"
+                class="my-0"
+              >
+                {{ p }}
+              </p>
+            </div>
           </div>
 
           <!-- Notifications -->
@@ -196,7 +205,10 @@
                 class="btn btn-lg btn-primary"
                 :disabled="newComment.comment.length < 2"
               >
-                <v-icon name="paper-plane" />{{ $t('send') }}
+                <v-icon
+                  name="paper-plane"
+                  class="mr-2"
+                />{{ $t('send') }}
               </button>
             </div>
           </div>

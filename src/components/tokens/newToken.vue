@@ -31,7 +31,7 @@
 </i18n>
 
 <template>
-  <div id="newUserToken">
+  <div id="newToken">
     <div
       class="my-3 selection-button-container"
       style=" position: relative;"
@@ -58,7 +58,10 @@
             </dd>
           </div>
         </div>
-        <div class="row">
+        <div
+          v-if="scope!=='album'"
+          class="row"
+        >
           <div class="col-xs-12 col-sm-3">
             <dt>{{ $t('scope') }}</dt>
           </div>
@@ -69,18 +72,18 @@
                 class="form-control"
               >
                 <option
-                  v-for="(scope,idx) in scopes"
+                  v-for="(option_scope,idx) in scopes"
                   :key="idx"
-                  :value="scope"
+                  :value="option_scope"
                 >
-                  {{ $t(scope) }}
+                  {{ $t(option_scope) }}
                 </option>
               </select>
             </dd>
           </div>
         </div>
         <div
-          v-if="token.scope_type=='album'"
+          v-if="token.scope_type==='album' && scope!=='album'"
           class="row"
         >
           <div class="col-xs-12 col-sm-3">
@@ -224,14 +227,25 @@ import moment from 'moment'
 import Datepicker from 'vuejs-datepicker'
 import { mapGetters } from 'vuex'
 export default {
-	name: 'NewUserToken',
+	name: 'NewToken',
 	components: { Datepicker },
+	props: {
+		scope: {
+			type: String,
+			required: true
+		},
+		albumid: {
+			type: String,
+			required: false,
+			default: null
+		}
+	},
 	data () {
 		return {
 			token: {
 				title: '',
-				scope_type: 'user',
-				album: '',
+				scope_type: this.scope,
+				album: this.albumid,
 				secret: '',
 				read_permission: false,
 				write_permission: false,
