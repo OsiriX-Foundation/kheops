@@ -36,7 +36,7 @@
 <template>
   <div class="container">
     <comments-and-notifications
-      :id="albumId"
+      :id="id"
       scope="album"
     />
   </div>
@@ -48,7 +48,7 @@ export default {
 	name: 'AlbumComments',
 	components: { commentsAndNotifications },
 	props: {
-		'albumId': {
+		id: {
 			type: String,
 			required: true
 		}

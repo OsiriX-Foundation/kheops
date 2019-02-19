@@ -38,7 +38,7 @@
 </i18n>
 
 <template>
-  <div class="userToken">
+  <div class="token">
     <div
       class="my-3 selection-button-container"
       style=" position: relative;"
@@ -158,10 +158,10 @@
 
 <script>
 export default {
-	name: 'UserToken',
+	name: 'Token',
 	props: {
 		token: {
-			type: String,
+			type: Object,
 			required: true
 		}
 	},

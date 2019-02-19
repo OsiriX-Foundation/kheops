@@ -190,11 +190,8 @@ export default {
 	},
 	watch: {
 		'album.userSettings.downloadSeries' () {
-			console.log(this.album.userSettings.downloadSeries)
 			if (!this.album.userSettings.downloadSeries) {
-				console.log('ici')
 				this.album.userSettings.sendSeries = false
-				console.log(this.album)
 			}
 		}
 	},

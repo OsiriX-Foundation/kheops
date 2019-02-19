@@ -32,7 +32,18 @@
 
 <template>
   <div class="container-fluid">
-    <div class="container">
+    <div
+      v-if="loading"
+      class="container"
+    >
+      <p class="text-center fade">
+        loading...
+      </p>
+    </div>
+    <div
+      v-if="!loading"
+      class="container"
+    >
       <div class="row">
         <div class="col-md">
           <h3>
@@ -78,11 +89,10 @@
         <!-- <div class = 'col-md'></div> -->
       </div>
     </div>
-
     <album-studies v-if="view=='studies'" />
     <album-comments
       v-if="view=='comments'"
-      :album_id="album.album_id"
+      :id="album.album_id"
     />
     <album-settings v-if="view=='settings'" />
   </div>
@@ -100,7 +110,8 @@ export default {
 	data () {
 		return {
 			view: 'studies',
-			newUserName: ''
+			newUserName: '',
+			loading: false
 		}
 	},
 	computed: {
@@ -116,7 +127,9 @@ export default {
 		}
 	},
 	created () {
+		this.loading = true
 		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
+			this.loading = false
 			this.view = this.$route.query.view || 'studies'
 		})
 	},
@@ -145,8 +158,7 @@ h5.user{
 label{
 	margin-left: 10px;
 }
-nav a{
+a.nav-link{
 	cursor: pointer;
 }
 </style>
-
