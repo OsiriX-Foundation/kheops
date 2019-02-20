@@ -24,7 +24,8 @@
 		"study": "study",
 		"studiessharedsuccess": "studies shared successfully",
 		"studiessharederror": "studies could not be shared",
-		"addInbox": "Add to inbox"
+		"addInbox": "Add to inbox",
+    "nostudy": "No study find"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -50,7 +51,8 @@
 		"study": "étude",
 		"studiessharedsuccess": "études ont été partagées avec succès",
 		"studiessharederror": "études n'ont pas pu être partagée",
-		"addInbox": "Add to inbox"
+		"addInbox": "Add to inbox",
+    "nostudy": "Aucne étude trouvée"
 	}
 }
 </i18n>
@@ -100,7 +102,7 @@
             :key="allowedAlbum.id"
             @click.stop="addToAlbum(allowedAlbum.album_id)"
           >
-            {{ album.name }}
+            {{ allowedAlbum.name }}
           </b-dropdown-item>
         </b-dropdown>
         <!--
@@ -523,6 +525,17 @@
         {{ data.item.StudyDate[0] | formatDate }}
       </template>
     </b-table>
+    <div
+      style="text-align:center;"
+      class="card"
+      v-if='studies.length===0'
+    >
+      <div
+        class="card-body"
+      >
+        {{ $t('nostudy') }} No study
+      </div>
+    </div>
   </div>
   <div
     v-else
@@ -556,7 +569,7 @@ export default {
 	props: {
 		album: {
 			type: Object,
-			required: true
+			required: false
 		}
 	},
 	data () {
@@ -694,12 +707,12 @@ export default {
 	},
 
 	created () {
-		this.loading = true
+		this.setLoading(true)
 		if (this.$route.params.album_id) {
 			this.filters.album_id = this.$route.params.album_id
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
-				.then(() => { this.loading = false })
+				.then(() => { setTimeout(() => this.setLoading(false), 300) })
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
 	},
@@ -785,7 +798,7 @@ export default {
 		},
 		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
-				.then(() => { this.loading = false })
+				.then(() => { this.setLoading(false) })
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
@@ -868,6 +881,9 @@ export default {
 					})
 				}
 			})
+		},
+		setLoading (val) {
+			this.loading = val
 		}
 	}
 }
