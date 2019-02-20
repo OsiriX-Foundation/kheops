@@ -22,7 +22,11 @@ public class Introspect {
         @XmlElement(name = "scope")
         String scope;
 
-        public boolean validForScope(String requestedScope) {
+        public boolean isActive() {
+            return active;
+        }
+
+        public boolean isValidForScope(String requestedScope) {
             if (!active) {
                 return false;
             }

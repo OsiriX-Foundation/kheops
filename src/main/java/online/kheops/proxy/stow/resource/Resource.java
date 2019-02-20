@@ -28,8 +28,6 @@ import javax.ws.rs.ext.Providers;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -108,18 +106,18 @@ public final class Resource {
 
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
         try {
-            if (!Introspect.endpoint(introspectionURI).token(authorizationToken.getToken()).validForScope("write")) {
+            Introspect.Response introspectResponse = Introspect.endpoint(introspectionURI).token(authorizationToken.getToken());
+            if (!introspectResponse.isActive()) {
+                LOG.log(Level.WARNING, "Authorization token is not valid for writing");
+                throw new WebApplicationException(Response.status(UNAUTHORIZED).build());
+            }
+            if (!introspectResponse.isValidForScope("write")) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
                 throw new WebApplicationException(Response.status(FORBIDDEN).entity("Authorization is not valid for posting").build());
             }
         } catch (AccessTokenException e) {
-            LOG.log(Level.WARNING, "Unable to get an AccessToken", e);
-            StringWriter writer = new StringWriter();
-            PrintWriter printWriter = new PrintWriter( writer );
-            e.printStackTrace(printWriter);
-            printWriter.flush();
-            
-            throw new WebApplicationException(Response.status(UNAUTHORIZED).entity("Authorization is invalid:" + writer.toString()).build());
+            LOG.log(Level.SEVERE, "Unable to introspect the token", e);
+            throw new WebApplicationException(Response.status(BAD_GATEWAY).build());
         }
 
         final InputStream inputStream;
@@ -168,7 +166,7 @@ public final class Resource {
                 WebApplicationException cause = (WebApplicationException)e.getCause();
                 throw new WebApplicationException(cause.getResponse().getStatus());
             } else {
-                throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+                throw new InternalServerErrorException(e);
             }
         }
 
