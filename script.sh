@@ -10,4 +10,4 @@ sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|" 
 
 sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|" /etc/nginx/conf.d/kheops.conf
 
-nginx-debug -g 'daemon off;'
+nginx -g 'daemon off;'
