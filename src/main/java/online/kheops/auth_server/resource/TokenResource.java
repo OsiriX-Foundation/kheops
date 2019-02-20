@@ -345,7 +345,9 @@ public class TokenResource
         } catch (UserNotFoundException e) {
             errorResponse.error = "unknown_user";
             errorResponse.errorDescription = "The user was not found in the DB";
-            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+            intreospectResponse.error = errorResponse;
+            intreospectResponse.active = false;
+            return Response.status(OK).entity(intreospectResponse).build();
         }
 
         if(assertion.getCapability().isPresent()) {
