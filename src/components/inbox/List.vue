@@ -474,7 +474,7 @@
                   name="star"
                 />
                 <v-icon
-                  v-else-if="!album || (album.add_series || album.is_admin)"
+                  v-else-if="Object.keys(album).length === 0 || (album.add_series || album.is_admin)"
                   class="align-middle"
                   style="margin-right:0"
                   name="star"
@@ -526,14 +526,14 @@
       </template>
     </b-table>
     <div
+      v-if="studies.length===0"
       style="text-align:center;"
       class="card"
-      v-if='studies.length===0'
     >
       <div
         class="card-body"
       >
-        {{ $t('nostudy') }} No study
+        {{ $t('nostudy') }}
       </div>
     </div>
   </div>
@@ -569,7 +569,8 @@ export default {
 	props: {
 		album: {
 			type: Object,
-			required: false
+			required: false,
+			default: () => ({})
 		}
 	},
 	data () {
