@@ -341,7 +341,7 @@ public class TokenResource
 
         final User callingUser;
         try {
-            callingUser = getUser(assertion.getSub());
+            callingUser = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
             errorResponse.error = "unknown_user";
             errorResponse.errorDescription = "The user was not found in the DB";
