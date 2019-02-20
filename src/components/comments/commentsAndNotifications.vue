@@ -77,7 +77,7 @@
               class="card-body"
             >
               <p
-                v-for="(p,pidx) in `${comment.comment.split('\n')}`"
+                v-for="(p,pidx) in splitComment(comment.comment)"
                 :key="pidx"
                 class="my-0"
               >
@@ -294,7 +294,7 @@ export default {
 				}
 				if (this.scope === 'album') {
 					this.$store.dispatch('postAlbumComment', this.newComment).then(() => {
-						this.$snotify.success('commentpostsuccess')
+						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					}).catch(res => {
@@ -304,7 +304,7 @@ export default {
 					})
 				} else if (this.scope === 'studies') {
 					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(() => {
-						this.$snotify.success('commentpostsuccess')
+						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					}).catch(res => {
@@ -328,6 +328,9 @@ export default {
 					container.scrollTop = container.scrollHeight
 				})
 			}
+		},
+		splitComment (comment) {
+			return comment.split('\n')
 		}
 	}
 }
