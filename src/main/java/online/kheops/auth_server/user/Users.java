@@ -38,11 +38,11 @@ public class Users {
             }
         }
 
-        try {
+        //try {
             return findUserByUserId(userReference, entityManager);
-        } catch (UserNotFoundException e) {
-            return getOrCreateUser(userReference);
-        }
+        //} catch (UserNotFoundException e) {
+        //    return getOrCreateUser(userReference);
+        //}
     }
 
     private static User getUser(String userReference) throws UserNotFoundException{

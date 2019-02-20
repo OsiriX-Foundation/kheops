@@ -414,8 +414,13 @@ public class Sending {
             final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(callingUser, album, studyInstanceUID, em);
 
             for (Series series : seriesLst) {
-                final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-                em.persist(inboxSeries);
+                if(!inbox.containsSeries(series, em)) {
+                    final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
+                    series.addAlbumSeries(inboxSeries);
+                    inbox.addSeries(inboxSeries);
+
+                    em.persist(inboxSeries);
+                }
             }
 
             tx.commit();
