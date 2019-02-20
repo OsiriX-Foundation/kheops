@@ -60,6 +60,10 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
+        if (name.isEmpty()) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
+        }
+
         final AlbumResponse albumResponse;
 
         try {
