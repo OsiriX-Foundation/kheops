@@ -81,7 +81,7 @@
               class="card-body"
             >
               <p
-                v-for="(p,pidx) in `${comment.comment.split('\n')}`"
+                v-for="(p,pidx) in comment.comment.split('\n')"
                 :key="pidx"
                 class="my-0"
               >
@@ -269,11 +269,11 @@ export default {
 		...mapGetters({
 			album: 'album',
 			studies: 'studies',
-			album_comments: 'album_comments',
+			albumComments: 'albumComments',
 			users: 'users'
 		}),
 		comments () {
-			if (this.scope === 'album') return this.album_comments
+			if (this.scope === 'album') return this.albumComments
 
 			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
 			if (studyIdx > -1) {
