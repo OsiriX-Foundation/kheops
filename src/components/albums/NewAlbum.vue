@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 <i18n>
 {
 	"en": {
@@ -78,7 +76,7 @@
                   :key="user.user_name"
                   class="badge badge-secondary"
                 >
-                  {{ user.firstname+" "+user.lastname }} <span
+                  {{ user.email }} <span
                     class="icon pointer"
                     @click="deleteUser(user)"
                   >
@@ -170,7 +168,7 @@ export default {
 				deleteSeries: false,
 				addSeries: true,
 				writeComments: true,
-				users: [{ email: 'robin.liechti@sib.swiss', 'firstname': 'Robin', 'lastname': 'Liechti' }],
+				users: [],
 				userSettings: {
 					addUser: false,
 					addSeries: true,
@@ -197,14 +195,19 @@ export default {
 	},
 	methods: {
 		deleteUser (user) {
-			console.log('delete: ', user)
+			let index = this.album.users.findIndex(i => i.email === user.email)
+			if (index > -1) this.album.users.splice(index, 1)
 		},
 		checkUser () {
 			let vm = this
 			let idx = _.findIndex(vm.album.users, u => { return u.email === vm.newUserName })
 			if (vm.newUserName && idx === -1) {
 				HTTP.get('users?reference=' + vm.newUserName, { headers: { 'Accept': 'application/json' } }).then(res => {
-					console.log(res.data)
+					if (res.status === 204) this.$snotify.error('User unknown')
+					else if (res.status === 200) {
+						this.album.users.push({ email: res.data.email })
+						vm.newUserName = ''
+					}
 				}).catch(() => {
 					console.log('Sorry, an error occured')
 				})
@@ -219,7 +222,8 @@ export default {
 				sendSeries: this.album.userSettings.sendSeries,
 				deleteSeries: this.album.userSettings.deleteSeries,
 				addSeries: this.album.userSettings.addSeries,
-				writeComments: this.album.userSettings.writeComments
+				writeComments: this.album.userSettings.writeComments,
+				users: this.album.users
 			}
 			this.$store.dispatch('createAlbum', postValues).then(() => {
 				this.$router.push('/albums')

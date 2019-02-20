@@ -140,20 +140,24 @@ const actions = {
 	},
 
 	createAlbum ({ commit }, params) {
+		/*
+		TODO : A modifier lorsque 1a requêtes pour créer et ajouter users
+		*/
 		var query = ''
 		_.forEach(params, (value, key) => {
-			query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
+			if (key !== 'users') query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
 		})
-
 		return HTTP.post('albums', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			commit('CREATE_ALBUM', res.data)
+			params.users.forEach(user => {
+				this.dispatch('add_user_to_album', { album_id: res.data.album_id, user_name: user.email })
+			})
 		}).catch(() => {
 		})
 	},
 
 	putStudiesInAlbum ({ commit }, params) {
 		let promises = []
-
 		_.forEach(params.data, d => {
 			if (d.series_id) {
 				promises.push(HTTP.put('studies/' + d.study_id + '/series/' + d.series_id + '/albums/' + d.album_id))

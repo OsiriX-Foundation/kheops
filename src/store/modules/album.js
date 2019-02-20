@@ -76,7 +76,8 @@ const actions = {
 		})
 	},
 	add_user_to_album ({ commit }, params) {
-		return HTTP.put('/albums/' + state.album.album_id + '/users/' + params.user_name).then(res => {
+		let albumId = params.album_id ? params.album_id : state.album.album_id
+		return HTTP.put('/albums/' + albumId + '/users/' + params.user_name).then(res => {
 			if (res.status === 201) {
 				commit('ADD_USER', { user_name: params.user_name, is_admin: false })
 			}
