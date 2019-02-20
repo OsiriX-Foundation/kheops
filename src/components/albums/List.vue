@@ -105,68 +105,24 @@
         slot="HEAD_number_of_studies"
         slot-scope="data"
       >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.NbStudies"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
         {{ $t(data.label) }}
       </template>
       <template
         slot="HEAD_modalities"
         slot-scope="data"
       >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.ModalitiesInStudy"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
         {{ $t(data.label) }}
       </template>
       <template
         slot="HEAD_number_of_users"
         slot-scope="data"
       >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.NbUsers"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
         {{ $t(data.label) }}
       </template>
       <template
         slot="HEAD_number_of_comments"
         slot-scope="data"
       >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.NbMessages"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
         {{ $t(data.label) }}
       </template>
       <template
@@ -362,7 +318,7 @@ export default {
 				{
 					key: 'is_selected',
 					label: '',
-					sortable: true,
+					sortable: false,
 					class: 'td_checkbox'
 				},
 				{
@@ -379,7 +335,7 @@ export default {
 				{
 					key: 'modalities',
 					label: 'Modalities',
-					sortable: true
+					sortable: false
 				},
 				{
 					key: 'number_of_users',
