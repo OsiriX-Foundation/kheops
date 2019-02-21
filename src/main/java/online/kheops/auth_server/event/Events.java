@@ -30,7 +30,7 @@ public class Events {
 
     public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES, EDIT_ALBUM, ADD_FAV, REMOVE_FAV}
 
-    public static void albumPostComment(long callingUserPk,String albumId,String commentContent, String user)
+    public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -41,7 +41,7 @@ public class Events {
 
             final boolean isPrivateComment = user != null;
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
             final Comment comment = new Comment(commentContent, callingUser, album);
@@ -94,8 +94,8 @@ public class Events {
         return new Mutation(callingUser, album, MutationType.EDIT_ALBUM);
     }
 
-    public static PairListXTotalCount<EventResponse.Response> getEventsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
-            throws UserNotFoundException, AlbumNotFoundException {
+    public static PairListXTotalCount<EventResponse.Response> getEventsAlbum(User callingUser, String albumId, Integer offset, Integer limit)
+            throws AlbumNotFoundException {
 
         final List<EventResponse.Response> eventResponses = new ArrayList<>();
         final PairListXTotalCount<EventResponse.Response> pair;
@@ -107,7 +107,7 @@ public class Events {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
@@ -163,8 +163,8 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponse.Response> getCommentsAlbum(long callingUserPk, String albumId, Integer offset, Integer limit)
-            throws UserNotFoundException, AlbumNotFoundException {
+    public static PairListXTotalCount<EventResponse.Response> getCommentsAlbum(User callingUser, String albumId, Integer offset, Integer limit)
+            throws AlbumNotFoundException {
 
         final List<EventResponse.Response> eventResponses = new ArrayList<>();
         final PairListXTotalCount<EventResponse.Response> pair;
@@ -176,7 +176,7 @@ public class Events {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
@@ -194,8 +194,7 @@ public class Events {
         return pair;
     }
 
-    public static PairListXTotalCount<EventResponse.Response> getCommentsByStudyUID(long callingUserPk, String studyInstanceUID, Integer offset, Integer limit)
-            throws UserNotFoundException {
+    public static PairListXTotalCount<EventResponse.Response>  getCommentsByStudyUID(User callingUser, String studyInstanceUID, Integer offset, Integer limit) {
 
         final List<EventResponse.Response> eventResponses = new ArrayList<>();
         final PairListXTotalCount<EventResponse.Response> pair;
@@ -207,7 +206,7 @@ public class Events {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
 
             for (Comment c : EventQueries.getCommentsByStudy(callingUser, studyInstanceUID, offset, limit, em)) {
                 eventResponses.add(new EventResponse(c).getResponse());
@@ -226,7 +225,7 @@ public class Events {
     }
 
 
-    public static void studyPostComment(long callingUserPk, String studyInstanceUID, String commentContent, String targetUserPk)
+    public static void studyPostComment(User callingUser, String studyInstanceUID, String commentContent, String targetUserPk)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -241,7 +240,7 @@ public class Events {
 
             final boolean isPrivateComment = targetUserPk != null;
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Study study = getStudy(studyInstanceUID, em);
 
             final Comment comment = new Comment(commentContent, callingUser, study);

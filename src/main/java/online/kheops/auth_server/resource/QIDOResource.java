@@ -172,7 +172,6 @@ public class QIDOResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
@@ -218,8 +217,8 @@ public class QIDOResource {
 
         final Set<String> availableSeriesUIDs;
         try {
-            availableSeriesUIDs = availableSeriesUIDs(callingUserPk, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
+            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
+        } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -302,7 +301,6 @@ public class QIDOResource {
         fromInbox = fromInbox != null;
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
@@ -334,8 +332,8 @@ public class QIDOResource {
 
         final Set<String> availableSeriesUIDs;
         try {
-            availableSeriesUIDs = availableSeriesUIDs(callingUserPk, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
+            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
+        } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

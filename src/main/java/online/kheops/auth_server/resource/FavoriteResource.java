@@ -60,15 +60,14 @@ public class FavoriteResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(FORBIDDEN).build();
         }
 
         try {
-            Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumId, favorite);
-        } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
+            Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite);
+        } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(NO_CONTENT).build();
@@ -112,7 +111,6 @@ public class FavoriteResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
             if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
@@ -123,8 +121,8 @@ public class FavoriteResource {
         }
 
         try {
-            Series.editFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite);
-        } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite);
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

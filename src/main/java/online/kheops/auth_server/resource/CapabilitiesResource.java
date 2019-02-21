@@ -47,11 +47,11 @@ public class CapabilitiesResource {
                                                          @NotNull @FormParam("download_permission") boolean downloadPermission,
                                                          @NotNull @FormParam("write_permission") boolean writePermission) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface) securityContext.getUserPrincipal();
         final Response capabilityResponse;
 
         final CapabilityParametersBuilder capabilityParametersBuilder = new CapabilityParametersBuilder()
-                .callingUserPk(callingUserPk)
+                .callingUser(kheopsPrincipal.getUser())
                 .title(title)
                 .readPermission(readPermission)
                 .writePermission(writePermission);
@@ -107,12 +107,12 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
         Response capabilityResponse;
 
         try {
-            capabilityResponse = Capabilities.revokeCapability(callingUserPk, capabilityId);
-        } catch (UserNotFoundException |CapabilityNotFoundException e) {
+            capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
+        } catch (CapabilityNotFoundException e) {
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -130,18 +130,15 @@ public class CapabilitiesResource {
     public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
                                                      @PathParam(ALBUM) String albumId) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<Response> capabilityResponses;
 
-        try {
-            if(albumId != null) {
-                capabilityResponses = Capabilities.getCapabilities(albumId, valid);
-            } else {
-                capabilityResponses = Capabilities.getCapabilities(callingUserPk, valid);
-            }
-        } catch (UserNotFoundException e) {
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if(albumId != null) {
+            capabilityResponses = Capabilities.getCapabilities(albumId, valid);
+        } else {
+            final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
+            capabilityResponses = Capabilities.getCapabilities(kheopsPrincipal.getUser(), valid);
         }
+
         GenericEntity<List<Response>> genericCapabilityResponsesList = new GenericEntity<List<Response>>(capabilityResponses) {};
         return javax.ws.rs.core.Response.status(OK).entity(genericCapabilityResponsesList).build();
     }

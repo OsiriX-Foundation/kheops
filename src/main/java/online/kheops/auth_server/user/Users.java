@@ -17,14 +17,14 @@ public class Users {
         throw new IllegalStateException("Utility class");
     }
 
-    public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
+    /*public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
         final User user = findUserByPk(callingUserPk, entityManager);
         if (user != null) {
             return user;
         } else {
             throw new UserNotFoundException("User :" +callingUserPk +"does not exist.");
         }
-    }
+    }*/
 
     public static User getUser(String userReference, EntityManager entityManager)
             throws UserNotFoundException {

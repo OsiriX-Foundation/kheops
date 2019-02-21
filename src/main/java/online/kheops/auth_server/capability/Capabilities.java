@@ -116,7 +116,7 @@ public class Capabilities {
 
         try {
             tx.begin();
-            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
+            final User user = em.merge(capabilityParameters.getCallingUser());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
@@ -150,7 +150,7 @@ public class Capabilities {
 
         try {
             tx.begin();
-            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
+            final User user = em.merge(capabilityParameters.getCallingUser());
 
             final Album album = getAlbum(capabilityParameters.getAlbumId(), em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
@@ -184,8 +184,8 @@ public class Capabilities {
         return capabilityResponse;
     }
     
-    public static CapabilitiesResponse.Response revokeCapability(Long callingUserPk, String capabilityId)
-    throws UserNotFoundException, CapabilityNotFoundException {
+    public static CapabilitiesResponse.Response revokeCapability(User callingUser, String capabilityId)
+    throws CapabilityNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -194,8 +194,8 @@ public class Capabilities {
         try {
             tx.begin();
 
-            final User user = Users.getUser(callingUserPk, em);
-            final Capability capability = getCapability(user, capabilityId, em);
+            callingUser = em.merge(callingUser);
+            final Capability capability = getCapability(callingUser, capabilityId, em);
 
             capability.setRevoked(true);
             em.persist(capability);
@@ -212,8 +212,7 @@ public class Capabilities {
         return  capabilityResponse;
     }
 
-    public static List<CapabilitiesResponse.Response> getCapabilities(Long callingUserPk, boolean valid)
-            throws UserNotFoundException {
+    public static List<CapabilitiesResponse.Response> getCapabilities(User callingUser, boolean valid) {
         List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
         EntityManager em = EntityManagerListener.createEntityManager();
@@ -222,13 +221,13 @@ public class Capabilities {
         try {
             tx.begin();
 
-            final User user = Users.getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
 
             List<Capability> capabilities;
             if(valid) {
-                capabilities = findCapabilitiesByUserValidOnly(user, em);
+                capabilities = findCapabilitiesByUserValidOnly(callingUser, em);
             } else {
-                capabilities = findAllCapabilitiesByUser(user, em);
+                capabilities = findAllCapabilitiesByUser(callingUser, em);
             }
 
             for (Capability capability: capabilities) {

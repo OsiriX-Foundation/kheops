@@ -155,8 +155,8 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(long callingUserPk, String albumId, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, AlbumNotFoundException {
+    public static void putSeriesInAlbum(User callingUser, String albumId, String studyInstanceUID, String seriesInstanceUID)
+            throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -164,7 +164,7 @@ public class Sending {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album targetAlbum = getAlbum(albumId, em);
 
             Series availableSeries;
@@ -203,15 +203,15 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(long callingUserPk, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
+    public static void putStudyInAlbum(User callingUser, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+            throws AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album targetAlbum = getAlbum(albumId, em);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -244,7 +244,7 @@ public class Sending {
         }
     }
 
-    public static void shareStudyWithUser(long callingUserPk, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+    public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -252,10 +252,10 @@ public class Sending {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final User targetUser = getUser(targetUsername, em);
 
-            if (callingUserPk == targetUser.getPk()) {
+            if (callingUser == targetUser) {
                 //return Response.status(Response.Status.BAD_REQUEST).entity("Can't send a study to yourself").build();
                 return;
             }
@@ -281,7 +281,7 @@ public class Sending {
         }
     }
 
-    public static void shareSeriesWithUser(long callingUserPk, String targetUsername, String studyInstanceUID, String seriesInstanceUID)
+    public static void shareSeriesWithUser(User callingUser, String targetUsername, String studyInstanceUID, String seriesInstanceUID)
             throws UserNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -291,8 +291,9 @@ public class Sending {
             tx.begin();
 
             final User targetUser = getUser(targetUsername, em);
+            callingUser = em.merge(callingUser);
 
-            if (targetUser.getPk() == callingUserPk) { // the user is requesting access to a new series
+            if (targetUser == callingUser) { // the user is requesting access to a new series
                 //return Response.status(Response.Status.FORBIDDEN).entity("Use studies/{StudyInstanceUID}/series/{SeriesInstanceUID} for request access to a new series").build();
                 return;
             }
@@ -324,8 +325,8 @@ public class Sending {
         }
     }
 
-    public static void appropriateSeries(long callingUserPk, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, SeriesForbiddenException {
+    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID)
+            throws SeriesForbiddenException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -333,7 +334,7 @@ public class Sending {
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
 
             try {
                 final Series storedSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
@@ -346,7 +347,9 @@ public class Sending {
                     inbox.addSeries(inboxSeries);
                     em.persist(inboxSeries);
                     tx.commit();
-                    LOG.info(() -> "Claim accepted because the series is inside an album where the calling user (" + callingUser.getKeycloakId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
+
+                    final User finalCallingUser1 = callingUser;
+                    LOG.info(() -> "Claim accepted because the series is inside an album where the calling user (" + finalCallingUser1.getKeycloakId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
                     return; //appropriate OK
                 } else {
                     try {
@@ -385,10 +388,12 @@ public class Sending {
 
             em.persist(series);
             em.persist(inboxSeries);
-            LOG.info(() -> "finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getKeycloakId());
+
+            final User finalCallingUser = callingUser;
+            LOG.info(() -> "finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + finalCallingUser.getKeycloakId());
 
             tx.commit();
-            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + callingUser.getKeycloakId());
+            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + finalCallingUser.getKeycloakId());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -397,8 +402,8 @@ public class Sending {
         }
     }
 
-    public static void appropriateStudy(long callingUserPk, String studyInstanceUID, String albumId)
-            throws UserNotFoundException, AlbumNotFoundException {
+    public static void appropriateStudy(User callingUser, String studyInstanceUID, String albumId)
+            throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -407,7 +412,7 @@ public class Sending {
             tx.begin();
 
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
             final Album inbox = callingUser.getInbox();
 
@@ -424,7 +429,8 @@ public class Sending {
             }
 
             tx.commit();
-            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + " to " + callingUser.getKeycloakId() + "from album :" + albumId);
+            final User finalCallingUser = callingUser;
+            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + " to " + finalCallingUser.getKeycloakId() + "from album :" + albumId);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -433,8 +439,8 @@ public class Sending {
         }
     }
 
-    public static Set<String> availableSeriesUIDs(long userPk, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
-            throws UserNotFoundException, AlbumNotFoundException , StudyNotFoundException {
+    public static Set<String> availableSeriesUIDs(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+            throws AlbumNotFoundException , StudyNotFoundException {
         Set<String> availableSeriesUIDs;
 
         EntityManager em = EntityManagerListener.createEntityManager();
@@ -443,7 +449,7 @@ public class Sending {
         try {
             tx.begin();
 
-            final User callingUser = getUser(userPk, em);
+            callingUser = em.merge(callingUser);
 
             if (fromAlbumId != null) {
                 final Album album = getAlbum(fromAlbumId, em);
