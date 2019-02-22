@@ -60,12 +60,6 @@ public abstract class AssertionVerifier {
                     }
                     try {
                         return CAPABILITY.getAssertionBuilder().build(assertionToken);
-
-                    } catch (BadAssertionException e) {
-                        exceptionList.add(e);
-                    }
-                    try {
-                        return VIEWER.getAssertionBuilder().build(assertionToken);
                     } catch (BadAssertionException e) {
                         exceptionList.add(e);
                     }
