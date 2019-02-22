@@ -1,5 +1,6 @@
 package online.kheops.auth_server.capability;
 
+import online.kheops.auth_server.album.AlbumResponse;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,6 +10,14 @@ import java.time.ZonedDateTime;
 public class CapabilitiesResponse {
 
     private Response response = new Response();
+
+    //TODO include directly an AlbumResponse
+    public static class AlbumScope {
+        @XmlElement(name = "id")
+        String id;
+        @XmlElement(name = "name")
+        String name;
+    }
 
     public static class Response {
         @XmlElement(name = "id")
@@ -23,6 +32,8 @@ public class CapabilitiesResponse {
         String issuedAt;
         @XmlElement(name = "not_before_time")
         String notBeforeTime;
+        @XmlElement(name = "last_use")
+        String lastUse;
         @XmlElement(name = "expiration_time")
         String expirationTime;
         @XmlElement(name = "revoke_time")
@@ -42,8 +53,8 @@ public class CapabilitiesResponse {
 
         @XmlElement(name = "scope_type")
         String scopeType;
-        @XmlElement(name = "scope_album")
-        String albumId;
+        @XmlElement(name = "album")
+        AlbumScope albumScope;
         @XmlElement(name = "scope_series")
         String series;
         @XmlElement(name = "scope_study")
@@ -59,11 +70,14 @@ public class CapabilitiesResponse {
             }
             response.title = capability.getTitle();
             response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
-
+            if(capability.getLastUse() != null) {
+                response.lastUse = ZonedDateTime.of(capability.getLastUse(), ZoneOffset.UTC).toString();
+            }
         }
 
         response.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
         response.revoked = capability.isRevoked();
+
         if (capability.isActive()) {
             response.notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
         }

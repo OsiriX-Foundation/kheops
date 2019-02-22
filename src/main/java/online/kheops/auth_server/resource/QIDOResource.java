@@ -5,11 +5,9 @@ import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.annotation.AlbumAccessSecured;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UIDValidator;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
@@ -23,6 +21,7 @@ import org.dcm4che3.data.VR;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
 
+import javax.annotation.security.RolesAllowed;
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
@@ -68,6 +67,7 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
@@ -81,15 +81,7 @@ public class QIDOResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        try {
-            if(fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, fromAlbumId)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-
-        if(fromInbox != null && !kheopsPrincipal.hasUserAccess()) {
+        if(fromInbox != null && fromInbox && !kheopsPrincipal.hasUserAccess()) {
             return Response.status(FORBIDDEN).build();
         }
 
@@ -137,6 +129,9 @@ public class QIDOResource {
 
     @GET
     @Secured
+    @ViewerTokenAccess
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -159,10 +154,10 @@ public class QIDOResource {
 
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {
-                return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param").build();
+                return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param").build();
             }
             if(favoriteFilter != null) {
-                return Response.status(BAD_REQUEST).entity("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param").build();
+                return Response.status(BAD_REQUEST).entity("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={album_ID} as query param").build();
             }
         }
 
@@ -177,7 +172,6 @@ public class QIDOResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
@@ -195,6 +189,13 @@ public class QIDOResource {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
             }
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
+          catch (AlbumNotFoundException e) {
+              return Response.status(FORBIDDEN).build();
+          }
+
+        if(securityContext.isUserInRole("tokenViewer")) {
+            fromInbox = kheopsPrincipal.hasInboxAccess();
+        }
         //END kheopsPrincipal
 
         final MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
@@ -216,8 +217,8 @@ public class QIDOResource {
 
         final Set<String> availableSeriesUIDs;
         try {
-            availableSeriesUIDs = availableSeriesUIDs(callingUserPk, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
+            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
+        } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -284,6 +285,9 @@ public class QIDOResource {
 
     @GET
     @Secured
+    @ViewerTokenAccess
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -297,24 +301,26 @@ public class QIDOResource {
         fromInbox = fromInbox != null;
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
         }
 
         //BEGIN kheopsPrincipal
-        if (fromInbox && !kheopsPrincipal.hasUserAccess()) {
+        if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
             return Response.status(FORBIDDEN).build();
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId != kheopsPrincipal.getAlbumID()) {
+            if (fromAlbumId != null && fromAlbumId.compareTo(kheopsPrincipal.getAlbumID()) != 0) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
             }
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
+        catch (AlbumNotFoundException e) {
+            return Response.status(FORBIDDEN).build();
+        }
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
@@ -326,8 +332,8 @@ public class QIDOResource {
 
         final Set<String> availableSeriesUIDs;
         try {
-            availableSeriesUIDs = availableSeriesUIDs(callingUserPk, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
+            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
+        } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

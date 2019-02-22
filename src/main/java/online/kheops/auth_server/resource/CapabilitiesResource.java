@@ -1,14 +1,14 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.album.Albums;
+import online.kheops.auth_server.annotation.*;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
-import online.kheops.auth_server.annotation.CapabilitySecured;
-import online.kheops.auth_server.annotation.FormURLEncodedContentType;
-import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.capability.CapabilitiesResponse.Response;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.util.Consts.ALBUM;
 
 
 @Path("/")
@@ -46,11 +47,11 @@ public class CapabilitiesResource {
                                                          @NotNull @FormParam("download_permission") boolean downloadPermission,
                                                          @NotNull @FormParam("write_permission") boolean writePermission) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface) securityContext.getUserPrincipal();
         final Response capabilityResponse;
 
         final CapabilityParametersBuilder capabilityParametersBuilder = new CapabilityParametersBuilder()
-                .callingUserPk(callingUserPk)
+                .callingUser(kheopsPrincipal.getUser())
                 .title(title)
                 .readPermission(readPermission)
                 .writePermission(writePermission);
@@ -106,12 +107,12 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+        final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
         Response capabilityResponse;
 
         try {
-            capabilityResponse = Capabilities.revokeCapability(callingUserPk, capabilityId);
-        } catch (UserNotFoundException |CapabilityNotFoundException e) {
+            capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
+        } catch (CapabilityNotFoundException e) {
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -121,22 +122,27 @@ public class CapabilitiesResource {
     @GET
     @Secured
     @CapabilitySecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_CAPABILITIES_TOKEN)
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response getCapabilities(@QueryParam("show_revoked") boolean showRevoke ) {
+    public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
+                                                     @PathParam(ALBUM) String albumId) {
 
-        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
         List<Response> capabilityResponses;
 
-        try {
-            capabilityResponses = Capabilities.getCapabilities(callingUserPk, showRevoke);
-        } catch (UserNotFoundException e) {
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if(albumId != null) {
+            capabilityResponses = Capabilities.getCapabilities(albumId, valid);
+        } else {
+            final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
+            capabilityResponses = Capabilities.getCapabilities(kheopsPrincipal.getUser(), valid);
         }
+
         GenericEntity<List<Response>> genericCapabilityResponsesList = new GenericEntity<List<Response>>(capabilityResponses) {};
         return javax.ws.rs.core.Response.status(OK).entity(genericCapabilityResponsesList).build();
     }
+
 
     @GET
     @Path("capabilities/{capability_token:"+Capabilities.TOKEN_PATTERN+"}")
@@ -148,6 +154,26 @@ public class CapabilitiesResource {
 
         try {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
+        } catch (CapabilityNotFoundException e) {
+            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        }
+        return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();
+    }
+
+    @GET
+    @Secured
+    @UserAccessSecured
+    @Path("capabilities/{capability_token_id:"+ ID_PATTERN+"}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
+
+        Response capabilityResponses;
+
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
+
+        try {
+            capabilityResponses = Capabilities.getCapability(capabilityTokenID, callingUserPk);
         } catch (CapabilityNotFoundException e) {
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }

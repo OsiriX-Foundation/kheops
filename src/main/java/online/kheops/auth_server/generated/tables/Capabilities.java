@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
-    private static final long serialVersionUID = 1155374022;
+    private static final long serialVersionUID = -819381579;
 
     /**
      * The reference instance of <code>public.capabilities</code>
@@ -86,6 +86,11 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      * The column <code>public.capabilities.not_before_time</code>.
      */
     public final TableField<CapabilitiesRecord, Timestamp> NOT_BEFORE_TIME = createField("not_before_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+    /**
+     * The column <code>public.capabilities.last_use</code>.
+     */
+    public final TableField<CapabilitiesRecord, Timestamp> LAST_USE = createField("last_use", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
      * The column <code>public.capabilities.revoked_time</code>.

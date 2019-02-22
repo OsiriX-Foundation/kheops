@@ -1,6 +1,6 @@
 package online.kheops.auth_server;
 
-import org.junit.jupiter.api.BeforeAll;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

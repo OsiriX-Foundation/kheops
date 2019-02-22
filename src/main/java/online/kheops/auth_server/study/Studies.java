@@ -388,6 +388,15 @@ public class Studies {
         }
     }
 
+    public static boolean canAccessStudyInbox(User user, Study study, EntityManager em) {
+        try {
+            StudyQueries.findStudyByStudyandUserInbox(study, user, em);
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        }
+    }
+
     public static boolean canAccessStudy(Album album, Study study, EntityManager em) {
         try {
             StudyQueries.findStudyByStudyandAlbum(study, album, em);
@@ -397,14 +406,15 @@ public class Studies {
         }
     }
 
-    public static void editFavorites(Long callingUserPk, String studyInstanceUID, String fromAlbumId, boolean favorite) throws UserNotFoundException, AlbumNotFoundException, StudyNotFoundException {
+    public static void editFavorites(User callingUser, String studyInstanceUID, String fromAlbumId, boolean favorite)
+            throws AlbumNotFoundException, StudyNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             List<Series> seriesList;
             final Album album;
             if (fromAlbumId == null) {

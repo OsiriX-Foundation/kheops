@@ -17,14 +17,14 @@ public class Users {
         throw new IllegalStateException("Utility class");
     }
 
-    public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
+    /*public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
         final User user = findUserByPk(callingUserPk, entityManager);
         if (user != null) {
             return user;
         } else {
             throw new UserNotFoundException("User :" +callingUserPk +"does not exist.");
         }
-    }
+    }*/
 
     public static User getUser(String userReference, EntityManager entityManager)
             throws UserNotFoundException {
@@ -38,10 +38,14 @@ public class Users {
             }
         }
 
-        return findUserByUserId(userReference, entityManager);
+        //try {
+            return findUserByUserId(userReference, entityManager);
+        //} catch (UserNotFoundException e) {
+        //    return getOrCreateUser(userReference);
+        //}
     }
 
-    public static User getUser(String userReference) throws UserNotFoundException{
+    private static User getUser(String userReference) throws UserNotFoundException{
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         User user;
@@ -64,18 +68,18 @@ public class Users {
         return findUserByPk(callingUserPk, entityManager) != null;
     }
 
-    public static User getOrCreateUser(String keycloakId) throws UserNotFoundException {
+    public static User getOrCreateUser(String userReference) throws UserNotFoundException {
 
         //try to find the user in kheops db
         try {
-            return getUser(keycloakId);
+            return getUser(userReference);
         } catch (UserNotFoundException e) {/*empty*/ }
 
         //the user is not in kheops db
         //try to find the user in keycloak
         try {
             final Keycloak keycloak = Keycloak.getInstance();
-            keycloakId = keycloak.getUser(keycloakId).getSub();
+            userReference = keycloak.getUser(userReference).getSub();
         } catch (KeycloakException e) {
             throw new UserNotFoundException("Error during request to keycloak", e);
         }
@@ -86,7 +90,7 @@ public class Users {
 
         try {
             tx.begin();
-            final User newUser = new User(keycloakId);
+            final User newUser = new User(userReference);
             final Album inbox = new Album();
             inbox.setName("inbox");
             newUser.setInbox(inbox);

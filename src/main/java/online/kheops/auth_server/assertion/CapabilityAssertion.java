@@ -19,7 +19,7 @@ final class CapabilityAssertion implements Assertion {
     static final class Builder {
         CapabilityAssertion build(String capabilityToken) throws BadAssertionException {
             if (!Capabilities.isValidFormat(capabilityToken)) {
-                throw new BadAssertionException("Bad capability format");
+                throw new BadAssertionException("Bad capability token format");
             }
 
             final EntityManager em = EntityManagerListener.createEntityManager();
@@ -33,6 +33,8 @@ final class CapabilityAssertion implements Assertion {
 
                 final String sub = capability.getUser().getKeycloakId();
                 final String email = capability.getUser().getEmail();
+
+                capability.setLastUse();
 
                 tx.commit();
 
@@ -79,4 +81,7 @@ final class CapabilityAssertion implements Assertion {
     public Optional<Capability> getCapability() {
         return Optional.of(capability);
     }
+
+    @Override
+    public TokenType getTokenType() { return TokenType.CAPABILITY_TOKEN; }
 }

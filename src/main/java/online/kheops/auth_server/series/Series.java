@@ -70,15 +70,15 @@ public class Series {
     }
 
 
-    public static void editFavorites(Long callingUserPk, String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, boolean favorite)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
+    public static void editFavorites(User callingUser, String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, boolean favorite)
+            throws AlbumNotFoundException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            final User callingUser = getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
             final Album album;
             if (fromAlbumId == null) {
                 album = callingUser.getInbox();

@@ -1,5 +1,6 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.principal;
 
+import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.User;
@@ -13,11 +14,12 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     //for old version
     long getDBID();
-    String getAlbumID() throws NotAlbumScopeTypeException;
+    String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
     boolean hasSeriesReadAccess(String study, String series) throws SeriesNotFoundException;
     boolean hasStudyReadAccess(String study);
     boolean hasUserAccess();
+    boolean hasInboxAccess();
 
     boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;
     boolean hasStudyWriteAccess(String study);
