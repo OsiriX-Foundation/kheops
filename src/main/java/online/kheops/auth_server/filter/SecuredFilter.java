@@ -41,6 +41,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
         } catch (IllegalArgumentException e) {
+            LOG.log(Level.WARNING, "IllegalArgumentException", e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
@@ -58,6 +59,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             user = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
+            LOG.log(Level.WARNING, "User not found", e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
