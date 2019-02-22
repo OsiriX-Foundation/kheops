@@ -12,4 +12,4 @@ else
 fi
 
 # build proxy base image
-./scripts/build_proxy_base_image.sh
+./scripts/build_proxy_base_image.sh $1
