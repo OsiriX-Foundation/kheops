@@ -1,5 +1,7 @@
-package online.kheops.auth_server;
+package online.kheops.auth_server.principal;
 
+import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
@@ -279,6 +281,11 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean hasInboxAccess() {
+        return getScope() == ScopeType.USER;
     }
 
     @Override

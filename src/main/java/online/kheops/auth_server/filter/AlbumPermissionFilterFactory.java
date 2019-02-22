@@ -1,6 +1,6 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.user.UserPermissionEnum;
@@ -50,7 +50,6 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
                 }
 
                 final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
-                //TODO album or albums ??
                 if(queryParam.containsKey(ALBUM)) {
                     final String albumID = queryParam.get(ALBUM).get(0);
                     tryPermission(kheopsPrincipal, albumID, requestContext);

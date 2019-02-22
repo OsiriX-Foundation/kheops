@@ -1,10 +1,8 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UIDValidator;
-import online.kheops.auth_server.annotation.UserAccessSecured;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
@@ -23,14 +21,14 @@ import static online.kheops.auth_server.util.Consts.*;
 public class FavoriteResource {
 
     @Context
-    private UriInfo uriInfo;
-
-    @Context
     private SecurityContext securityContext;
+
 
     @PUT
     @Secured
     @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -43,6 +41,8 @@ public class FavoriteResource {
     @DELETE
     @Secured
     @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
@@ -60,24 +60,14 @@ public class FavoriteResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
-
-        try {
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
-        }
-
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(FORBIDDEN).build();
         }
 
         try {
-            Studies.editFavorites(callingUserPk, studyInstanceUID, fromAlbumId, favorite);
-        } catch (UserNotFoundException | AlbumNotFoundException | StudyNotFoundException e) {
+            Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite);
+        } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(NO_CONTENT).build();
@@ -86,6 +76,8 @@ public class FavoriteResource {
     @PUT
     @Secured
     @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
@@ -99,6 +91,8 @@ public class FavoriteResource {
     @DELETE
     @Secured
     @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
@@ -111,20 +105,12 @@ public class FavoriteResource {
 
     private Response editSeriesFavorites(String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, Boolean fromInbox,
                                         boolean favorite, SecurityContext securityContext) {
+
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
-
-        try {
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.EDIT_FAVORITES, fromAlbumId)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
-        }
 
         try {
             if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
@@ -135,8 +121,8 @@ public class FavoriteResource {
         }
 
         try {
-            Series.editFavorites(callingUserPk, studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite);
-        } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite);
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

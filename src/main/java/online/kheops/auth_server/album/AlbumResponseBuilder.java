@@ -1,5 +1,6 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import org.jooq.Record;
 
@@ -88,9 +89,7 @@ public class AlbumResponseBuilder {
         return this;
     }
 
-    public AlbumResponse build() {
-        return new AlbumResponse(this);
-    }
+    public AlbumResponse build() { return new AlbumResponse(this); }
 
     public String getId() {
         return id;

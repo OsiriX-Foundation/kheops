@@ -33,7 +33,7 @@ final class AuthorizationJWTAssertion implements Assertion {
 
                 final User user;
                 try {
-                    user = Users.getUser(jwt.getSubject());
+                    user = Users.getOrCreateUser(jwt.getSubject());
                 } catch (UserNotFoundException e) {
                     throw new BadAssertionException("Can't find user");
                 }
@@ -75,4 +75,8 @@ final class AuthorizationJWTAssertion implements Assertion {
         return capabilityAccess;
     }
 
+    @Override
+    public TokenType getTokenType() {
+        return TokenType.PEP_TOKEN;
+    }
 }

@@ -122,6 +122,10 @@ public class AlbumQueries {
                 conditionArrayList.add(ALBUM_USER.ADMIN.isTrue().or(ALBUMS.ADD_SERIES_PERMISSION.isTrue()));
             }
 
+            if(albumQueryParams.canCreateCapabilityToken()) {
+                conditionArrayList.add(ALBUM_USER.ADMIN.isTrue());
+            }
+
             if (albumQueryParams.isFavorite()) {
                 conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
             }
@@ -222,15 +226,15 @@ public class AlbumQueries {
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
 
-            final DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+            final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
 
-            query.addSelect(isnull(ALBUMS.PK,"NULL").as("album_pk"),
-                    isnull(ALBUMS.ID,"NULL").as("album_id"),
-                    isnull(ALBUMS.NAME,"NULL").as("album_name"),
+            query.addSelect(ALBUMS.PK.as("album_pk"),
+                    ALBUMS.ID.as("album_id"),
+                    ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    isnull(countDistinct(EVENTS.PK),"NULL").as("number_of_comments"),
-                    isnull(countDistinct(SERIES.STUDY_FK),"NULL").as("number_of_studies"),
+                    countDistinct(EVENTS.PK).as("number_of_comments"),
+                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUMS);
@@ -244,7 +248,8 @@ public class AlbumQueries {
 
             query.addConditions(ALBUMS.ID.eq(albumId));
 
-            query.addGroupBy(ALBUMS.PK);
+            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
+
             Record result = query.fetchOne();
 
             return new AlbumResponseBuilder().setAlbumFromCapabilityToken(result).build();

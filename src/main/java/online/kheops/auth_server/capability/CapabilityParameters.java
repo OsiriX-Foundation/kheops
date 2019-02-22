@@ -1,10 +1,12 @@
 package online.kheops.auth_server.capability;
 
+import online.kheops.auth_server.entity.User;
+
 import java.time.LocalDateTime;
 
 public class CapabilityParameters {
 
-    private final Long callingUserPk;
+    private final User callingUser;
     private final String title;
     private final LocalDateTime expirationTime;
     private final LocalDateTime notBeforeTime;
@@ -17,10 +19,10 @@ public class CapabilityParameters {
     private final boolean appropriatePermission;
     private final boolean downloadPermission;
 
-    protected CapabilityParameters(Long callingUserPk, String title, LocalDateTime expirationTime, LocalDateTime notBeforeTime,
+    protected CapabilityParameters(User callingUser, String title, LocalDateTime expirationTime, LocalDateTime notBeforeTime,
                                    ScopeType scopeType, String albumId, String studyInstanceUID, String seriesInstanceUID,
                                    boolean readPermission, boolean writePermission, boolean appropriatePermission, boolean downloadPermission) {
-        this.callingUserPk = callingUserPk;
+        this.callingUser = callingUser;
         this.title = title;
         this.expirationTime = expirationTime;
         this.notBeforeTime = notBeforeTime;
@@ -34,7 +36,7 @@ public class CapabilityParameters {
         this.downloadPermission = downloadPermission;
     }
 
-    public Long getCallingUserPk() { return callingUserPk; }
+    public User getCallingUser() { return callingUser; }
     public String getTitle() { return title; }
     public LocalDateTime getExpirationTime() { return expirationTime; }
     public LocalDateTime getNotBeforeTime() { return notBeforeTime; }

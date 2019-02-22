@@ -3,8 +3,13 @@ package online.kheops.auth_server.assertion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public abstract class AssertionVerifier {
+
+    private static final Logger LOG = Logger.getLogger(AssertionVerifier.class.getName());
+
+
     private static String superuserSecret;
     private static String authorizationSecret;
 
@@ -16,6 +21,7 @@ public abstract class AssertionVerifier {
 
     private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:grant-type:jwt-bearer";
     private static final String CAPABILITY_URN = "urn:x-kheops:params:oauth:grant-type:capability";
+    private static final String VIEWER_URN = "urn:x-kheops:params:oauth:grant-type:viewer";
     private static final String UNKNOWN_BEARER_URN = "urn:x-kheops:params:oauth:grant-type:unknown-bearer";
 
     private enum GrantType {
@@ -35,10 +41,18 @@ public abstract class AssertionVerifier {
                 return new CapabilityAssertionBuilder();
             }
         },
+        VIEWER(VIEWER_URN) {
+            AssertionBuilder getAssertionBuilder() {
+                if (authorizationSecret == null) {
+                    throw new IllegalStateException("authorization secret was never set");
+                }
+                return new ViewerAssertionBuilder(authorizationSecret);
+            }
+        },
         UNKNOWN_BEARER(UNKNOWN_BEARER_URN) {
             AssertionBuilder getAssertionBuilder() {
                 return assertionToken -> {
-                    List<BadAssertionException> exceptionList = new ArrayList<>(2);
+                    List<BadAssertionException> exceptionList = new ArrayList<>(3);
                     try {
                         return JWT_BEARER.getAssertionBuilder().build(assertionToken);
                     } catch (BadAssertionException e) {
@@ -46,6 +60,11 @@ public abstract class AssertionVerifier {
                     }
                     try {
                         return CAPABILITY.getAssertionBuilder().build(assertionToken);
+                    } catch (BadAssertionException e) {
+                        exceptionList.add(e);
+                    }
+                    try {
+                        return VIEWER.getAssertionBuilder().build(assertionToken);
                     } catch (BadAssertionException e) {
                         exceptionList.add(e);
                     }

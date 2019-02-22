@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
+import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 
 public class Capabilities {
 
@@ -70,7 +71,7 @@ public class Capabilities {
     public static String HashCapability(String capability) {
         final MessageDigest digest;
         try {
-            digest = MessageDigest.getInstance("SHA-512");
+            digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException();
         }
@@ -115,7 +116,7 @@ public class Capabilities {
 
         try {
             tx.begin();
-            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
+            final User user = em.merge(capabilityParameters.getCallingUser());
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
@@ -149,7 +150,7 @@ public class Capabilities {
 
         try {
             tx.begin();
-            final User user = Users.getUser(capabilityParameters.getCallingUserPk(), em);
+            final User user = em.merge(capabilityParameters.getCallingUser());
 
             final Album album = getAlbum(capabilityParameters.getAlbumId(), em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
@@ -183,8 +184,8 @@ public class Capabilities {
         return capabilityResponse;
     }
     
-    public static CapabilitiesResponse.Response revokeCapability(Long callingUserPk, String capabilityId)
-    throws UserNotFoundException, CapabilityNotFoundException {
+    public static CapabilitiesResponse.Response revokeCapability(User callingUser, String capabilityId)
+    throws CapabilityNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -193,8 +194,8 @@ public class Capabilities {
         try {
             tx.begin();
 
-            final User user = Users.getUser(callingUserPk, em);
-            final Capability capability = getCapability(user, capabilityId, em);
+            callingUser = em.merge(callingUser);
+            final Capability capability = getCapability(callingUser, capabilityId, em);
 
             capability.setRevoked(true);
             em.persist(capability);
@@ -211,8 +212,7 @@ public class Capabilities {
         return  capabilityResponse;
     }
 
-    public static List<CapabilitiesResponse.Response> getCapabilities(Long callingUserPk, boolean showRevoked)
-            throws UserNotFoundException {
+    public static List<CapabilitiesResponse.Response> getCapabilities(User callingUser, boolean valid) {
         List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
         EntityManager em = EntityManagerListener.createEntityManager();
@@ -221,13 +221,43 @@ public class Capabilities {
         try {
             tx.begin();
 
-            final User user = Users.getUser(callingUserPk, em);
+            callingUser = em.merge(callingUser);
 
             List<Capability> capabilities;
-            if(showRevoked) {
-                capabilities = findCapabilitiesByUserWithRevoke(user, em);
+            if(valid) {
+                capabilities = findCapabilitiesByUserValidOnly(callingUser, em);
             } else {
-                capabilities = findCapabilitiesByUserWitoutRevoke(user, em);
+                capabilities = findAllCapabilitiesByUser(callingUser, em);
+            }
+
+            for (Capability capability: capabilities) {
+                capabilityResponses.add(new CapabilitiesResponse(capability, false, false).getResponse());
+            }
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return capabilityResponses;
+    }
+
+    public static List<CapabilitiesResponse.Response> getCapabilities(String albumId, boolean valid) {
+        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
+
+        EntityManager em = EntityManagerListener.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            List<Capability> capabilities;
+            if(valid) {
+                capabilities = findCapabilitiesByAlbumValidOnly(albumId, em);
+            } else {
+                capabilities = findAllCapabilitiesByAlbum(albumId, em);
             }
 
             for (Capability capability: capabilities) {
@@ -253,6 +283,21 @@ public class Capabilities {
         try {
             Capability capability = getCapability(capabilityToken, em);
             capabilityResponse = new CapabilitiesResponse(capability, false, true).getResponse();
+        } finally {
+            em.close();
+        }
+        return capabilityResponse;
+    }
+
+    public static CapabilitiesResponse.Response getCapability(String capabilityTokenID, long callingUserPk)
+            throws CapabilityNotFoundException {
+        CapabilitiesResponse.Response capabilityResponse;
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final User user = findUserByPk(callingUserPk, em);
+        try {
+            Capability capability = getCapability(user, capabilityTokenID, em);
+            capabilityResponse = new CapabilitiesResponse(capability, false, false).getResponse();
         } finally {
             em.close();
         }

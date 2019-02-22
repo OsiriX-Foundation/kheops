@@ -108,7 +108,6 @@ public class AlbumResponse {
         if(!albumResponseBuilder.getUsers().isEmpty()) {
             response.users = albumResponseBuilder.getUsers();
         }
-
     }
 
     public void addUsersList(){

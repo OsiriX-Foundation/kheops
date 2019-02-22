@@ -122,7 +122,7 @@ public class SeriesQueries {
         }
     }
 
-    public static Set<String> findAllSeriesInstanceUIDbySeriesIUIDfromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em) throws NoResultException {
+    public static Set<String> findAllSeriesInstanceUIDbyStudyUIDfromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em) throws NoResultException {
         TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox <> a and :user = u and a = :album", String.class);
         query.setParameter("album", album);
         query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);

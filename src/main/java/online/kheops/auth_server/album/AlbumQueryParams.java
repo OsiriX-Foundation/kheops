@@ -1,6 +1,6 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.util.JOOQTools;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -19,6 +19,7 @@ public final class AlbumQueryParams {
     private final String orderBy;
 
     private final boolean canAddSeries; //add permission or admin
+    private final boolean canCreateCapabilityToken; //create a new capability token
 
     private boolean fuzzyMatching;
 
@@ -41,6 +42,7 @@ public final class AlbumQueryParams {
         lastEventTime = extractLastEventTime(queryParameters);
 
         canAddSeries = extractCanAddSeries(queryParameters);
+        canCreateCapabilityToken = extractCanCreateCapabilityToken(queryParameters);
 
         if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
             descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
@@ -120,6 +122,13 @@ public final class AlbumQueryParams {
         return false;
     }
 
+    private boolean extractCanCreateCapabilityToken(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey("canCreateCapabilityToken")) {
+            return Boolean.valueOf(queryParameters.get("canCreateCapabilityToken").get(0));
+        }
+        return false;
+    }
+
     private boolean extractFuzzyMatching(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(QUERY_PARAMETER_FUZZY_MATCHING)) {
             return Boolean.parseBoolean(queryParameters.get(QUERY_PARAMETER_FUZZY_MATCHING).get(0));
@@ -147,6 +156,8 @@ public final class AlbumQueryParams {
     public boolean isFavorite() { return favorite; }
 
     public boolean canAddSeries() { return canAddSeries; }
+
+    public boolean canCreateCapabilityToken() { return canCreateCapabilityToken; }
 
     public long getDBID() { return DBID; }
 }

@@ -1,11 +1,13 @@
 package online.kheops.auth_server.capability;
 
+import online.kheops.auth_server.entity.User;
+
 import java.time.*;
 import java.time.format.DateTimeParseException;
 
 public class CapabilityParametersBuilder {
 
-    private Long callingUserPk;
+    private User callingUser;
     private String title;
     private LocalDateTime expirationTime;
     private LocalDateTime notBeforeTime;
@@ -17,8 +19,8 @@ public class CapabilityParametersBuilder {
 
     public CapabilityParametersBuilder() { /*empty*/ }
 
-    public CapabilityParametersBuilder callingUserPk(Long callingUserPk) {
-        this.callingUserPk = callingUserPk;
+    public CapabilityParametersBuilder callingUser(User callingUser) {
+        this.callingUser = callingUser;
         return this;
     }
 
@@ -78,8 +80,8 @@ public class CapabilityParametersBuilder {
     }
 
     public CapabilityParameters build() {
-        if (callingUserPk == null) {
-            throw new IllegalStateException("Missing callingUserPk");
+        if (callingUser == null) {
+            throw new IllegalStateException("Missing callingUser");
         }
         if (title == null) {
             throw new IllegalStateException("Missing title");
@@ -97,7 +99,7 @@ public class CapabilityParametersBuilder {
             notBeforeTime = LocalDateTime.now(ZoneOffset.UTC);
         }
 
-        return new CapabilityParameters(callingUserPk, title, expirationTime, notBeforeTime,
+        return new CapabilityParameters(callingUser, title, expirationTime, notBeforeTime,
                 capabilityScopeBuilder.getScopeType(), capabilityScopeBuilder.getAlbumId(), capabilityScopeBuilder.getStudyInstanceUID(), capabilityScopeBuilder.getSeriesInstanceUID(),
                 readPermission, writePermission, appropriatePermission, downloadPermission);
     }

@@ -1,6 +1,6 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 
 
