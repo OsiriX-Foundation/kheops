@@ -4,18 +4,25 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.filter.SecuredFilter;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static online.kheops.auth_server.user.UserQueries.*;
 
 public class Users {
+    private static final Logger LOG = Logger.getLogger(Users.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient();
 
     private Users() {
@@ -124,10 +131,14 @@ public class Users {
         // Block until the reply so that the welcome bot has an opportunity to call back to the
         // Authorization server and share series/albums.
         if (newUser != null) {
-            CLIENT.target("http://welcomebot/share")
-                    .queryParam("user", newUser.getKeycloakId())
-                    .request()
-                    .post(Entity.text(""));
+            try {
+                CLIENT.target("http://welcomebot/share")
+                        .queryParam("user", newUser.getKeycloakId())
+                        .request()
+                        .post(Entity.text(""));
+            } catch (ProcessingException | WebApplicationException e) {
+                LOG.log(Level.SEVERE, "Unable to communicate with the welcomebot", e);
+            }
         }
 
         return newUser;
