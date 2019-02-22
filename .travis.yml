@@ -17,8 +17,9 @@ before_install:
    
 before_script:
    - chmod +x build
+   - export BRANCH=$TRAVIS_BRANCH
    
 script:
-   - ./build $TRAVIS_BRANCH
+   - ./build
    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
    - docker push osirixfoundation/pacs-authorization-proxy:$BRANCH
