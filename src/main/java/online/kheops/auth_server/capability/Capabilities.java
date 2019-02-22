@@ -71,7 +71,7 @@ public class Capabilities {
     public static String HashCapability(String capability) {
         final MessageDigest digest;
         try {
-            digest = MessageDigest.getInstance("SHA-512");
+            digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException();
         }
