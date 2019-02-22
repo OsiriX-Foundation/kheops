@@ -8,7 +8,10 @@
 <template>
   <div>
     <div class="container">
-      <div class="card">
+      <div
+        v-if="formattedAlbumDescription[0] !== ''"
+        class="card"
+      >
         <div class="card-body">
           <p
             v-for="(p,idx) in formattedAlbumDescription"
@@ -16,9 +19,7 @@
             class="py-0 my-0"
             :class="(idx)?'pl-3':''"
           >
-            <strong v-if="idx===0">
-              Album description:
-            </strong>{{ p }}
+            {{ p }}
           </p>
         </div>
       </div>

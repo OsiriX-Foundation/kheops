@@ -18,12 +18,14 @@
     fixed="top"
   >
     <b-navbar-toggle target="nav_collapse" />
-
     <b-navbar-brand href="#">
+      <!--
       <img
         src="../assets/sib_logo_small.gif"
         style="margin-right:5px"
-      ><router-link
+      >
+      -->
+      <router-link
         to="/"
         style="font-size: 1.3rem;"
       >

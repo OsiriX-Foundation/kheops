@@ -1,3 +1,6 @@
+<!--
+  TODO: Remove settimeout when load studies.
+-->
 <i18n>
 {
 	"en": {
@@ -799,7 +802,7 @@ export default {
 		},
 		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
-				.then(() => { this.setLoading(false) })
+				.then(() => { setTimeout(() => this.setLoading(false), 50) })
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
@@ -872,7 +875,6 @@ export default {
 						StudyInstanceUID: study.StudyInstanceUID[0],
 						AlbumId: this.album.album_id
 					})
-					this.$snotify.success(`Send to inbox : ${study.StudyInstanceUID[0]} `)
 				} else {
 					selectedSeries.forEach(serie => {
 						this.$store.dispatch('selfAppropriateSeries', {
