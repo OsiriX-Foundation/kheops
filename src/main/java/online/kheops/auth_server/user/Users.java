@@ -9,10 +9,15 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 
 import static online.kheops.auth_server.user.UserQueries.*;
 
 public class Users {
+    private static final Client CLIENT = ClientBuilder.newClient();
+
     private Users() {
         throw new IllegalStateException("Utility class");
     }
@@ -88,9 +93,10 @@ public class Users {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
+        User newUser;
         try {
             tx.begin();
-            final User newUser = new User(userReference);
+            newUser = new User(userReference);
             final Album inbox = new Album();
             inbox.setName("inbox");
             newUser.setInbox(inbox);
@@ -106,7 +112,6 @@ public class Users {
             em.persist(newUser);
             em.persist(albumUser);
             tx.commit();
-            return newUser;
         } catch (Exception e) {
             throw new UserNotFoundException("Error while adding a new user to the kheops db", e);
         } finally {
@@ -115,5 +120,16 @@ public class Users {
             }
             em.close();
         }
+        // Demo specific, go tickle the welcomebot when a new user is added.
+        // Block until the reply so that the welcome bot has an opportunity to call back to the
+        // Authorization server and share series/albums.
+        if (newUser != null) {
+            CLIENT.target("http://welcomebot/share")
+                    .queryParam("user", newUser.getKeycloakId())
+                    .request()
+                    .post(Entity.text(""));
+        }
+
+        return newUser;
     }
 }
