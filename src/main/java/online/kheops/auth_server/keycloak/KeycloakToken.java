@@ -85,7 +85,7 @@ public class KeycloakToken {
             token = jsonReader.readObject();
             return;
         }
-        throw new KeycloakException("Error while requesting a new token");
+        throw new KeycloakException("Error while requesting a new token. Expected 200 but got : " + response.getStatus() +"___"+ response);
     }
 
     private void refreshToken() throws KeycloakException{
