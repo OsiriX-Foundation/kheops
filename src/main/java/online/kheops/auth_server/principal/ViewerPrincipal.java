@@ -202,4 +202,9 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         }
 
     }
+
+    @Override
+    public String toString() {
+        return "[ViewerPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
 }

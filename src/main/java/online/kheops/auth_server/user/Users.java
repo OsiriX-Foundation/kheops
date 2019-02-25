@@ -39,7 +39,7 @@ public class Users {
         }
 
         //try {
-            return findUserByUserId(userReference, entityManager);
+        return findUserByUserId(userReference, entityManager);
         //} catch (UserNotFoundException e) {
         //    return getOrCreateUser(userReference);
         //}

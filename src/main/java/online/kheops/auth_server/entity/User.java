@@ -109,4 +109,9 @@ public class User {
     public Album getInbox() { return inbox; }
 
     public void setInbox(Album inbox) { this.inbox = inbox; }
+
+    @Override
+    public String toString() {
+        return "[User keycloak_id:" + getKeycloakId() + " email:" + getEmail() + "]";
+    }
 }
