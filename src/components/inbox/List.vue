@@ -28,7 +28,8 @@
 		"studiessharedsuccess": "studies shared successfully",
 		"studiessharederror": "studies could not be shared",
 		"addInbox": "Add to inbox",
-    "nostudy": "No study find"
+		"nostudy": "No study find",
+		"studiessend": "studies send to inbox"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -55,7 +56,8 @@
 		"studiessharedsuccess": "études ont été partagées avec succès",
 		"studiessharederror": "études n'ont pas pu être partagée",
 		"addInbox": "Add to inbox",
-    "nostudy": "Aucne étude trouvée"
+    "nostudy": "Aucne étude trouvée",
+		"studiessend": "études envoyées dans votre boîte de réception"
 	}
 }
 </i18n>
@@ -641,7 +643,11 @@ export default {
 				inbox_and_albums: false,
 				album_id: ''
 			},
-			loading: true
+			loading: true,
+			send: {
+				expected: 0,
+				count: 0
+			}
 		}
 	},
 	computed: {
@@ -681,6 +687,14 @@ export default {
 	},
 
 	watch: {
+		send: {
+			handler: function (send) {
+				if (send.expected === send.count) {
+					this.$snotify.success(`${this.send.expected} ${this.$t('studiessend')}`)
+				}
+			},
+			deep: true
+		},
 		filters: {
 			handler: function (filters) {
 				if (this.filterTimeout) {
@@ -868,18 +882,28 @@ export default {
 		},
 		addToInbox () {
 			let studies = this.studies.filter(s => { return s.is_selected })
+			this.send.expected = studies.length
+			this.send.count = 0
 			studies.forEach(study => {
 				let selectedSeries = study.series.filter(serie => { return serie.is_selected })
 				if (selectedSeries.length === study.series.length) {
 					this.$store.dispatch('selfAppropriateSeries', {
 						StudyInstanceUID: study.StudyInstanceUID[0],
 						AlbumId: this.album.album_id
+					}).then(res => {
+						this.send.count++
+						if (res.error) this.$snotify.error(`${res.error} error`)
 					})
 				} else {
 					selectedSeries.forEach(serie => {
+						let tmp = ''
 						this.$store.dispatch('selfAppropriateSeries', {
 							StudyInstanceUID: serie.StudyInstanceUID[0],
 							SeriesInstanceUID: serie.SeriesInstanceUID[0]
+						}).then(res => {
+							if (tmp !== serie.StudyInstanceUID[0]) this.send.count++
+							if (res.error) this.$snotify.error(`${res.error} error`)
+							tmp = serie.StudyInstanceUID[0]
 						})
 					})
 				}
