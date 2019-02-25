@@ -29,44 +29,48 @@ do
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
 done
 
+missing_env_var=false
 
 if [ -z "$KHEOPS_AUTHDB_USER" ]; then
     echo "Missing KHEOPS_AUTHDB_USER environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_AUTHDB_URL" ]; then
     echo "Missing KHEOPS_AUTHDB_URL environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_AUTHDB_NAME" ]; then
     echo "Missing KHEOPS_AUTHDB_NAME environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_PACS_PEP_HOST" ]; then
     echo "Missing KHEOPS_PACS_PEP_HOST environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_PACS_PEP_PORT" ]; then
     echo "Missing KHEOPS_PACS_PEP_PORT environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_KEYCLOAK_URI" ]; then
     echo "Missing KHEOPS_KEYCLOAK_URI environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_KEYCLOAK_CLIENTID" ]; then
     echo "Missing KHEOPS_KEYCLOAK_CLIENTID environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_KEYCLOAK_USER" ]; then
     echo "Missing KHEOPS_KEYCLOAK_USER environment variable"
-    exit 1
+    missing_env_var=true
 fi
 if [ -z "$KHEOPS_KEYCLOAK_REALMS" ]; then
     echo "Missing KHEOPS_KEYCLOAK_REALMS environment variable"
-    exit 1
+    missing_env_var=true
 fi
 
+if [ "$missing_env_var" = true ]; then
+    exit 1
+fi
 
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${REPLACE_FILE_PATH}
