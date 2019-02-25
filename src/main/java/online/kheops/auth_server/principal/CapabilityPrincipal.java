@@ -306,4 +306,9 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             throw new NotAlbumScopeTypeException("");
         }
     }
+
+    @Override
+    public String toString() {
+        return "[CapabilityPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
 }

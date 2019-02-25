@@ -17,8 +17,10 @@ import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.util.Consts.*;
 
@@ -105,9 +107,11 @@ public class SendingResource
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                LOG.log(WARNING, "Principal " + kheopsPrincipal + ", does not have write access");
                 return Response.status(FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
+            LOG.log(WARNING, "StudyUID:" + studyInstanceUID + " SeriesUID:" + seriesInstanceUID + " was not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -117,12 +121,14 @@ public class SendingResource
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                     Sending.putSeriesInAlbum(kheopsPrincipal.getUser(), albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
+                    LOG.log(WARNING, "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
             } else {
                 Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
+            LOG.log(WARNING, "Unable to add series", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(CREATED).build();
