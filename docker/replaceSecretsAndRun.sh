@@ -71,6 +71,15 @@ fi
 #get secrets
 for f in ${SECRET_FILE_PATH}/*
 do
+  word_count=$(wc -w $f | cut -f1 -d" ")
+  line_count=$(wc -w $f | cut -f1 -d" ")
+
+  filename=$(basename "$f")
+
+  if [$word_count != 1 || $line_count != 1 ]; then
+    echo Error with secret $filename. He contains $word_count word and $line_count line
+  fi
+
   filename=$(basename "$f")
   value=$(cat ${f})
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
