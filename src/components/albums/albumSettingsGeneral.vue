@@ -17,47 +17,102 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
-		<dl>
-			<dt>{{$t('albumname')}}</dt>
-			<dd>
-				<div v-if='edit.name=="-1"'>
-					{{album.name}} <span class = 'icon-edit' @click="edit.name=album.name" v-if='album.is_admin && edit.name=="-1"'><v-icon name='pencil-alt'></v-icon></span>
-				</div>
-				<div v-if='edit.name!="-1"'>
-					<form @submit.prevent='updateAlbum'>
-						<div class="input-group mb-2">
-							<div>
-								<input type="text" class = 'form-control' v-model='edit.name'>
-							</div>
-							<div class="input-group-append">
-                <button class="btn btn-primary" type="submit">{{$t('update')}}</button>
-                <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.name="-1"' @click='edit.name="-1"' tabindex="0">{{$t('cancel')}}</button>
-							</div>
-						</div>
-					</form>
-				</div>
-
-			</dd>
-			<dt>{{$t('albumdescription')}}<span class = 'icon-edit float-right' @click="edit.description=album.description" v-if='album.is_admin && edit.description=="-1"'><v-icon name='pencil-alt'></v-icon></span></dt>
-			<dd class = 'album_description'>
-				<div v-if='edit.description=="-1"' v-html='$options.filters.nl2br(album.description)'></div>
-				<div v-if='edit.description!="-1"'>
-					<form @submit.prevent='updateAlbum'>
-						<div class="">
-							<div>
-								<textarea v-model='edit.description' rows='6' class = 'form-control'></textarea>
-							</div>
-							<div>
-								<button class="btn btn-primary" type="submit">{{$t('update')}}</button>
-                <button class="btn btn-secondary" type="reset"  @keyup.esc='edit.description="-1"' @click='edit.description="-1"' tabindex="0">{{$t('cancel')}}</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</dd>
-		</dl>
-
+  <div class="container">
+    <dl>
+      <dt>{{ $t('albumname') }}</dt>
+      <dd>
+        <div v-if="edit.name === '-1'">
+          {{ album.name }} <span
+            v-if="album.is_admin && edit.name === '-1'"
+            class="icon-edit"
+            @click="edit.name=album.name"
+          >
+            <v-icon name="pencil-alt" />
+          </span>
+        </div>
+        <div v-if="edit.name !== '-1'">
+          <form @submit.prevent="updateAlbum">
+            <div class="input-group mb-2">
+              <div>
+                <input
+                  v-model="edit.name"
+                  type="text"
+                  class="form-control"
+                >
+              </div>
+              <div class="input-group-append">
+                <button
+                  class="btn btn-primary"
+                  type="submit"
+                >
+                  {{ $t('update') }}
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  type="reset"
+                  tabindex="0"
+                  @keyup.esc="edit.name = '-1'"
+                  @click="edit.name = '-1'"
+                >
+                  {{ $t('cancel') }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </dd>
+      <dt>
+        {{ $t('albumdescription') }}<span
+          v-if="album.is_admin && edit.description === '-1'"
+          class="icon-edit float-right"
+          @click="edit.description=album.description"
+        >
+          <v-icon name="pencil-alt" />
+        </span>
+      </dt>
+      <dd class="album_description">
+        <div v-if="edit.description === '-1'">
+          <p
+            v-for="(p,pidx) in formattedAlbumDescription"
+            :key="pidx"
+            class="my-0"
+          >
+            {{ p }}
+          </p>
+        </div>
+        <div v-if="edit.description !== '-1'">
+          <form @submit.prevent="updateAlbum">
+            <div class="">
+              <div>
+                <textarea
+                  v-model="edit.description"
+                  rows="6"
+                  class="form-control"
+                />
+              </div>
+              <div>
+                <button
+                  class="btn btn-primary"
+                  type="submit"
+                >
+                  {{ $t('update') }}
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  type="reset"
+                  tabindex="0"
+                  @keyup.esc="edit.description = '-1'"
+                  @click="edit.description = '-1'"
+                >
+                  {{ $t('cancel') }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </dd>
+    </dl>
+    <!--
 		<dl>
 			<dt>{{$t('notification')}}</dt>
 			<dd style = 'margin-top: 10px'>
@@ -71,15 +126,34 @@
 				</div>
 			</dd>
 		</dl>
-		<p class = 'float-right'><button type = 'button' class = 'btn btn-danger' @click='deleteAlbum'>{{confirmDeletion?$t('confirmdeletion'):$t('delete')}}</button> <button type = 'button' class = 'btn btn-secondary' @click='confirmDeletion=!confirmDeletion' v-if='confirmDeletion'>{{$t('cancel')}}</button></p>
-	</div>
+		-->
+    <p
+      v-if="album.is_admin"
+      class="float-right"
+    >
+      <button
+        type="button"
+        class="btn btn-danger"
+        @click="deleteAlbum"
+      >
+        {{ confirmDeletion?$t('confirmdeletion'):$t('delete') }}
+      </button> <button
+        v-if="confirmDeletion"
+        type="button"
+        class="btn btn-secondary"
+        @click="confirmDeletion=!confirmDeletion"
+      >
+        {{ $t('cancel') }}
+      </button>
+    </p>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'album_settings_general',
+	name: 'AlbumSettingsGeneral',
 	data () {
 		return {
 			edit: {
@@ -92,7 +166,10 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
+		}),
+		formattedAlbumDescription () {
+			return this.album.description.split('\n')
+		}
 	},
 	methods: {
 		updateAlbum () {
@@ -101,8 +178,9 @@ export default {
 				return
 			}
 			let params = {}
+			console.log(this.edit)
 			_.forEach(this.edit, (v, k) => {
-				if (v === -1) return
+				if (v === '-1') return
 				if (this.album[k] !== v) {
 					params[k] = v
 				}
@@ -110,21 +188,21 @@ export default {
 			params.notificationNewComment = this.album.notification_new_comment
 			params.notificationNewSeries = this.album.notification_new_series
 
-			this.$store.dispatch('patchAlbum', params).then( () => {
+			this.$store.dispatch('patchAlbum', params).then(() => {
 				this.$snotify.success(this.$t('albumupdatesuccess'))
 				this.edit.name = '-1'
 				this.edit.description = '-1'
-			}).catch( () => {
+			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
 		deleteAlbum () {
 			if (!this.confirmDeletion) this.confirmDeletion = true
 			else {
-				this.$store.dispatch('deleteAlbum').then( () => {
+				this.$store.dispatch('deleteAlbum').then(() => {
 					this.$snotify.success(this.$t('albumdeletesuccess'))
 					this.$router.push('/albums')
-				}).catch( () => {
+				}).catch(() => {
 					this.$snotify.error(this.$t('sorryerror'))
 				})
 			}
@@ -134,7 +212,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 dd span.icon-edit, dt span.icon-edit {
 	margin: 0 10px;
 	cursor: pointer;

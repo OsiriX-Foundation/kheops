@@ -19,7 +19,8 @@ const state = {
 			modalities: '',
 			last_event_time: '',
 			created_time: ''
-		}
+		},
+		canCreateCapabilityToken: false
 	},
 	request: ''
 }
@@ -33,11 +34,11 @@ const getters = {
 const actions = {
 
 	getAlbums ({ commit }, params) {
-		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy === params.sortBy && state.filterParams.sortDesc === params.sortDesc && _.isEqual(state.filterParams.filters, params.filters)) {
+		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy === params.sortBy && state.filterParams.sortDesc === params.sortDesc && state.filterParams.canCreateCapabilityToken === params.canCreateCapabilityToken && _.isEqual(state.filterParams.filters, params.filters)) {
 			return
 		}
 		//
-		var reset = false
+		var reset = false; var request
 
 		let requestParams = ''
 		_.forEach(params.filters, function (value, filterName) {
@@ -81,7 +82,11 @@ const actions = {
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
-		var request = 'album?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+		if (params.canCreateCapabilityToken) {
+			request = 'albums?canCreateCapabilityToken=true&sort=name'
+		} else {
+			request = 'albums?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+		}
 		HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
 			let data = []
@@ -94,7 +99,7 @@ const actions = {
 							let flag = {
 								id: album.album_id,
 								is_selected: false,
-								is_favorite: false,
+								is_favorite: d.is_favorite,
 								comment: false
 							}
 							commit('SET_FLAG', flag)
@@ -109,11 +114,11 @@ const actions = {
 		})
 	},
 	toggleFavorite ({ commit }, params) {
-		if (params.type === 'album') {
+		if (params.type === 'albums') {
 			let isFavorite = !state.all[params.index].is_favorite
 			let albumId = state.all[params.index].album_id
 			if (isFavorite) {
-				return HTTP.put('/albums/' + albumId + '/favorites').then( () => {
+				return HTTP.put('/albums/' + albumId + '/favorites').then(() => {
 					console.log('OK ' + albumId + ' is in favorites')
 					commit('TOGGLE_FAVORITE', params)
 					return true
@@ -122,8 +127,10 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/albums/' + albumId + '/favorites').then( () => {
+				return HTTP.delete('/albums/' + albumId + '/favorites').then(() => {
 					console.log('KO ' + albumId + ' is NOT in favorites')
+					commit('TOGGLE_FAVORITE', params)
+					return true
 				})
 			}
 		}
@@ -133,20 +140,24 @@ const actions = {
 	},
 
 	createAlbum ({ commit }, params) {
+		/*
+		TODO : A modifier lorsque 1a requêtes pour créer et ajouter users
+		*/
 		var query = ''
 		_.forEach(params, (value, key) => {
-			query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
+			if (key !== 'users') query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
 		})
-
-		return HTTP.post('album', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+		return HTTP.post('albums', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			commit('CREATE_ALBUM', res.data)
-		}).catch( () => {
+			params.users.forEach(user => {
+				this.dispatch('add_user_to_album', { album_id: res.data.album_id, user_name: user.email })
+			})
+		}).catch(() => {
 		})
 	},
 
 	putStudiesInAlbum ({ commit }, params) {
 		let promises = []
-
 		_.forEach(params.data, d => {
 			if (d.series_id) {
 				promises.push(HTTP.put('studies/' + d.study_id + '/series/' + d.series_id + '/albums/' + d.album_id))
@@ -212,7 +223,7 @@ const mutations = {
 		state.totalItems = value
 	},
 	TOGGLE_FAVORITE (state, params) {
-		if (params.type === 'album') {
+		if (params.type === 'albums') {
 			state.all[params.index].is_favorite = !state.all[params.index].is_favorite
 			state.flags[state.all[params.index].album_id].is_favorite = state.all[params.index].is_favorite
 		}

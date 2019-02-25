@@ -1,7 +1,9 @@
 import { HTTP } from '@/router/http'
 import dicom from '@/mixins/dicom'
+import customdicom from '@/mixins/customdicom'
 import moment from 'moment'
 import axios from 'axios'
+import SRImage from '@/assets/SR_2.png'
 // initial state
 const state = {
 	all: [],
@@ -54,9 +56,12 @@ const actions = {
 				}
 			} else if (filterName.indexOf('StudyDate') === -1) {
 				if (value) {
-					requestParams += '&' + filterName + '=' + value + '*'
+					requestParams += '&' + filterName + '=' + value + (filterName !== 'ModalitiesInStudy' ? '*' : '')
 				}
 			}
+		})
+		params.includefield.forEach(function (value) {
+			requestParams += `&includefield=${value}`
 		})
 		if (requestParams.indexOf('&album=') > -1) {
 			requestParams = requestParams.replace('&inbox=true', '')
@@ -88,20 +93,20 @@ const actions = {
 					if (dicom.dicom2name[k] !== undefined) {
 						if (dicom.dicom2name[k] === 'PatientName' || dicom.dicom2name[k] === 'ReferringPhysicianName') v.Value = v.Value[0].Alphabetic
 						t[dicom.dicom2name[k]] = v.Value
+					} else if (customdicom.customdicom2name[k] !== undefined) {
+						t[customdicom.customdicom2name[k]] = v.Value
 					} else t[k] = v
-					if (t.StudyInstanceUID !== undefined) {
-						if (state.flags[t.StudyInstanceUID[0]] === undefined) {
-							let flag = {
-								id: t.StudyInstanceUID[0],
-								is_selected: false,
-								is_favorite: false,
-								comment: false
-							}
-							commit('SET_FLAG', flag)
-						}
-					}
 				})
-				if (t.StudyInstanceUID !== undefined) data.push(t)
+				if (t.StudyInstanceUID !== undefined) {
+					let flag = {
+						id: t.StudyInstanceUID[0],
+						is_selected: false,
+						is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
+						comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
+					}
+					commit('SET_FLAG', flag)
+					data.push(t)
+				}
 				dispatch('getStudiesComments', { StudyInstanceUID: t.StudyInstanceUID })
 			})
 			commit('SET_STUDIES', { data: data, reset: reset })
@@ -123,6 +128,9 @@ const actions = {
 
 			let queryString = (params.album_id) ? '&album=' + params.album_id : '&inbox=true'
 
+			_.forEach(params.includefield, function (value) {
+				queryString += `&includefield=${value}`
+			})
 			HTTP.get('/studies/' + study.StudyInstanceUID + '/series?includefield=00080021&includefield=00080031' + queryString, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 				let data = []
 				_.forEach(res.data, (d) => {
@@ -143,19 +151,26 @@ const actions = {
 							})
 							if (!found) t[k] = v
 						}
-						if (t.SeriesInstanceUID !== undefined) {
-							if (state.flags[t.SeriesInstanceUID[0]] === undefined) {
-								let flag = {
-									id: t.SeriesInstanceUID[0],
-									is_selected: study.is_selected,
-									is_favorite: study.is_favorite,
-									comment: false
-								}
-								commit('SET_FLAG', flag)
-							}
-							dispatch('getImage', { StudyInstanceUID: study.StudyInstanceUID[0], SeriesInstanceUID: t.SeriesInstanceUID[0] })
-						}
 					})
+					if (t.SeriesInstanceUID !== undefined) {
+						if (state.flags[t.SeriesInstanceUID[0]] === undefined) {
+							let flag = {
+								id: t.SeriesInstanceUID[0],
+								is_selected: study.is_selected,
+								is_favorite: study.is_favorite,
+								comment: false
+							}
+							commit('SET_FLAG', flag)
+						}
+					}
+					if (t.Modality && t.Modality.includes('SR')) {
+						t.imgSrc = SRImage
+					} else {
+						dispatch('getImage', {
+							StudyInstanceUID: study.StudyInstanceUID[0],
+							SeriesInstanceUID: t.SeriesInstanceUID[0]
+						})
+					}
 					if (t.SeriesInstanceUID !== undefined) data.push(t)
 				})
 				commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: data })
@@ -182,17 +197,17 @@ const actions = {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'study', index: studyIdx })
-		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + queryParam).then( () => {
-			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID[0] })
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}${queryParam}`).then(() => {
+			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
 		})
 	},
 	deleteSeries ({ commit }, params) {
 		let queryParam = (params.album_id) ? '/albums/' + params.album_id : '?inbox=true'
 		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
-		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID === params.SeriesInstanceUID })
+		let seriesIdx = _.findIndex(state.all[studyIdx].series, s => { return s.SeriesInstanceUID[0] === params.SeriesInstanceUID })
 		commit('TOGGLE_SELECTED_STUDY', { selected: false, type: 'series', index: studyIdx + ':' + seriesIdx })
-		return HTTP.delete('/studies/' + params.StudyInstanceUID[0] + '/series/' + params.SeriesInstanceUID[0] + queryParam).then( () => {
-			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID[0], SeriesInstanceUID: params.SeriesInstanceUID[0] })
+		return HTTP.delete(`/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}${queryParam}`).then(() => {
+			commit('DELETE_SERIES', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 		})
 	},
 	downloadStudy () {
@@ -205,13 +220,21 @@ const actions = {
 		// HTTP.GET('/studies/'+params.StudyInstanceUID[0]+"&inbox=true");
 	},
 
+	// TODO: Improve if condition.
 	toggleFavorite ({ commit }, params) {
-		if (params.type === 'study') {
-			let isFavorite = !state.all[params.index].is_favorite
-			let StudyInstanceUID = state.all[params.index].StudyInstanceUID[0]
+		if (params.type === 'study' || params.type === 'album') {
+			let index = state.all.findIndex(function (item) { return item.StudyInstanceUID[0] === params.StudyInstanceUID })
+			params.index = index
+			let isFavorite = !state.all[index].is_favorite
+			let StudyInstanceUID = params.StudyInstanceUID
+			let urlParameters = '?'
+			_.forEach(params.queryparams, (value, key) => {
+				urlParameters += (urlParameters === '?' ? '' : '&') + key + '=' + value
+			})
 			if (isFavorite) {
-				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites').then( () => {
-					console.log('OK ' + StudyInstanceUID + ' is in favorites')
+				// let urlParameters = (params.inbox) ? {inbox: true} : {album: params.album}
+				// return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' , urlParameters).then( () => {
+				return HTTP.put('/studies/' + StudyInstanceUID + '/favorites' + urlParameters).then(() => {
 					commit('TOGGLE_FAVORITE', params)
 					return true
 				}).catch(err => {
@@ -219,20 +242,22 @@ const actions = {
 					return false
 				})
 			} else {
-				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites').then( () => {
-					console.log('KO ' + StudyInstanceUID + ' is NOT in favorites')
+				return HTTP.delete('/studies/' + StudyInstanceUID + '/favorites' + urlParameters).then(() => {
+					commit('TOGGLE_FAVORITE', params)
+					return true
 				})
 			}
 		}
 	},
 	toggleSelected ({ commit }, params) {
-		console.log(params)
 		commit('TOGGLE_SELECTED_STUDY', params)
 	},
 	getStudiesComments ({ commit }, params) {
-		return HTTP.get('/studies/' + params.StudyInstanceUID[0] + '/comments', { headers: { 'Accept': 'application/json' } }).then(res => {
+		let ID = (params.StudyInstanceUID.constructor === Array) ? params.StudyInstanceUID[0] : params.StudyInstanceUID
+
+		return HTTP.get('/studies/' + ID + '/comments', { headers: { 'Accept': 'application/json' } }).then(res => {
 			if (res.status === 200) {
-				commit('SET_STUDIES_COMMENTS', { data: res.data, StudyInstanceUID: params.StudyInstanceUID })
+				commit('SET_STUDIES_COMMENTS', { data: res.data, StudyInstanceUID: ID })
 			}
 		})
 	},
@@ -249,7 +274,7 @@ const actions = {
 			} else return res
 		})
 	},
-	sendStudies (ctx, params){
+	sendStudies (ctx, params) {
 		let promises = []
 
 		_.forEach(params.StudyInstanceUIDs, StudyInstanceUID => {
@@ -260,15 +285,18 @@ const actions = {
 		})
 
 		return axios.all(promises).then(results => {
-			let summary = {success: 0, error: 0}
+			let summary = { success: 0, error: 0 }
 			_.forEach(results, res => {
 				if (res.status === 201 || res.status === 204) {
 					summary.success++
-				}
-				else summary.error++
+				} else summary.error++
 			})
 			return summary
 		})
+	},
+	selfAppropriateSeries (ctx, params) {
+		let series = (params.SeriesInstanceUID) ? `/series/${params.SeriesInstanceUID}` : `?album=${params.AlbumId}`
+		return HTTP.put(`studies/${params.StudyInstanceUID}${series}`)
 	}
 
 }
@@ -339,8 +367,9 @@ const mutations = {
 	SET_TOTAL (state, value) {
 		state.totalItems = value
 	},
+	// TODO: Improve if condition.
 	TOGGLE_FAVORITE (state, params) {
-		if (params.type === 'study') {
+		if (params.type === 'study' || params.type === 'album') {
 			state.all[params.index].is_favorite = !state.all[params.index].is_favorite
 			state.flags[state.all[params.index].StudyInstanceUID[0]].is_favorite = state.all[params.index].is_favorite
 		}
@@ -385,9 +414,9 @@ const mutations = {
 		state.request = request
 	},
 	SET_IMAGE (state, params) {
-		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID === params.StudyInstanceUID })
+		let idx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		if (idx > -1) {
-			let sidx = _.findIndex(state.all[idx].series, s => { return s.SeriesInstanceUID === params.SeriesInstanceUID })
+			let sidx = _.findIndex(state.all[idx].series, s => { return s.SeriesInstanceUID[0] === params.SeriesInstanceUID })
 			if (sidx > -1) state.all[idx].series[sidx].imgSrc = params.img
 		}
 	},
@@ -406,7 +435,7 @@ const mutations = {
 	},
 	SET_STUDIES_COMMENTS (state, params) {
 		let data = params.data
-		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID[0] })
+		let studyIdx = _.findIndex(state.all, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
 		if (studyIdx > -1) {
 			state.all[studyIdx].comments.splice(0)
 			_.forEach(data, d => {
