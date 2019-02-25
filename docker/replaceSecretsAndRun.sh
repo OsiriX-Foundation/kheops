@@ -76,7 +76,7 @@ do
 
   filename=$(basename "$f")
 
-  if [$word_count != 1 || $line_count != 1 ]; then
+  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
     echo Error with secret $filename. He contains $word_count word and $line_count line
   fi
 
