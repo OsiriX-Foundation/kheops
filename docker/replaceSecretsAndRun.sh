@@ -68,7 +68,7 @@ if [ "$missing_env_var_secret" = true ]; then
     exit 1
 fi
 
-#get secrets
+#get secrets and verify content
 for f in ${SECRET_FILE_PATH}/*
 do
   word_count=$(wc -w $f | cut -f1 -d" ")
@@ -76,12 +76,9 @@ do
 
   filename=$(basename "$f")
 
-
-  echo test with secret $filename. He contains $word_count word and $line_count line
-
-
   if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
     echo Error with secret $filename. He contains $word_count word and $line_count line
+    exit 1
   fi
 
   filename=$(basename "$f")
