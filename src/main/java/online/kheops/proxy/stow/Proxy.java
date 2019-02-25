@@ -83,7 +83,7 @@ public final class Proxy {
             throw new RequestException("Unable to parse for part:\n" + partNumber, e);
         } catch (AuthorizationManagerException e) {
             LOG.log(WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString);
-            LOG.log(FINE, "Authorization failure exception:\n" , e);
+            LOG.log(WARNING, "Authorization failure exception:\n" , e);
         }
     }
 
