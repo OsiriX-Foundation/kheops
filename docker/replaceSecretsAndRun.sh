@@ -23,11 +23,11 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_password ]; then
 fi
 
 
-for f in ${SECRET_FILE_PATH}
+for f in ${SECRET_FILE_PATH}/*
 do
   filename=$(basename "$f")
   value=$(cat ${f})
-  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
+  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}/*
 done
 
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
