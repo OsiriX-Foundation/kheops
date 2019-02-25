@@ -100,6 +100,8 @@ public class Users {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
+        LOG.log(Level.INFO, "Adding new user: " + userReference);
+
         User newUser;
         try {
             tx.begin();
@@ -132,6 +134,7 @@ public class Users {
         // Authorization server and share series/albums.
         if (newUser != null) {
             try {
+                LOG.log(Level.INFO, "About to try to share with the welcomebot");
                 CLIENT.target("http://welcomebot/share")
                         .queryParam("user", newUser.getKeycloakId())
                         .request()
@@ -139,6 +142,7 @@ public class Users {
             } catch (ProcessingException | WebApplicationException e) {
                 LOG.log(Level.SEVERE, "Unable to communicate with the welcomebot", e);
             }
+            LOG.log(Level.INFO, "Finished sharing with the welcomebot");
         }
 
         return newUser;
