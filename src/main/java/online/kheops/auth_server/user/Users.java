@@ -135,7 +135,7 @@ public class Users {
         if (newUser != null) {
             try {
                 LOG.log(Level.INFO, "About to try to share with the welcomebot");
-                CLIENT.target("http://welcomebot/share")
+                CLIENT.target("http://welcomebot:8080/share")
                         .queryParam("user", newUser.getKeycloakId())
                         .request()
                         .post(Entity.text(""));
