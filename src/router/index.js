@@ -4,6 +4,7 @@ import Study from '@/components/inbox/List'
 import Albums from '@/components/albums/List'
 import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
+import User from '@/components/user/user'
 import store from '@/store'
 
 // import PermissionDenied from '@/components/user/permissionDenied'
@@ -31,11 +32,10 @@ const router = new Router({
 	},
 	{
 		path: '/albums/new',
-		name: 'new_album',
+		name: 'newAlbum',
 		component: NewAlbum,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
-
 	},
 	{
 		path: '/albums/:album_id',
@@ -43,7 +43,13 @@ const router = new Router({
 		component: Album,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
-
+	},
+	{
+		path: '/user',
+		name: 'user',
+		component: User,
+		beforeEnter: requireAuth,
+		meta: { permissions: 'active', condition: 'any' }
 	},
 	{
 		path: '*',
@@ -52,7 +58,19 @@ const router = new Router({
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
 	}
+	/* {
+		path: '/favorites',
+		name: 'favorites',
+		component: Favorites,
+		beforeEnter: requireAuth,
+		meta: { permissions: 'active', condition: 'any' }
+	} */
 	]
+})
+
+router.beforeEach((to, from, next) => {
+	document.title = 'Kheops'
+	next()
 })
 
 function requireAuth (to, from, next) {

@@ -32,73 +32,78 @@
 </i18n>
 
 <template>
-	<div class="studyMetadataContainer">
-		<div class="row">
-			<div class="col-xl-1"></div>
-			<div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
-				<h5>{{ $t('patientinfo') }}</h5>
-				<table class="table table-striped">
-					<tbody>
-						<tr v-if="metadata.PatientName">
-							<th>{{ $t('patientname') }}</th>
-							<td>{{ metadata.PatientName }}</td>
-						</tr>
-						<tr v-if="matchNumbers(metadata.PatientBirthDate)">
-							<th>{{ $t('patientbirthdate') }}</th>
-							<td>{{ getDate(metadata.PatientBirthDate[0]) }}</td>
-						</tr>
-						<tr v-if="metadata.PatientID">
-							<th>{{ $t('patientid') }}</th>
-							<td>{{ metadata.PatientID[0] }}</td>
-						</tr>
-						<tr v-if="matchSex(metadata.PatientSex[0])">
-							<th>{{ $t('patientsex') }}</th>
-							<td>{{ metadata.PatientSex[0] }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+  <div class="studyMetadataContainer">
+    <div class="row">
+      <div class="col-xl-1" />
+      <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
+        <h5>{{ $t('patientinfo') }}</h5>
+        <table class="table table-striped">
+          <tbody>
+            <tr v-if="metadata.PatientName">
+              <th>{{ $t('patientname') }}</th>
+              <td>{{ metadata.PatientName }}</td>
+            </tr>
+            <tr v-if="matchNumbers(metadata.PatientBirthDate)">
+              <th>{{ $t('patientbirthdate') }}</th>
+              <td>{{ getDate(metadata.PatientBirthDate[0]) }}</td>
+            </tr>
+            <tr v-if="metadata.PatientID">
+              <th>{{ $t('patientid') }}</th>
+              <td>{{ metadata.PatientID[0] }}</td>
+            </tr>
+            <tr v-if="matchSex(metadata.PatientSex[0])">
+              <th>{{ $t('patientsex') }}</th>
+              <td>{{ metadata.PatientSex[0] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-			<div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
-				<h5>{{ $t('studyinfo') }}</h5>
-				<table class="table table-striped">
-					<tbody>
-						<tr v-if="metadata.ModalitiesInStudy">
-							<th>{{ $t('modalitiesinstudy') }}</th>
-							<td>{{ metadata.ModalitiesInStudy[0] }}</td>
-						</tr>
-						<tr v-if="matchNumbers(metadata.StudyDate)">
-							<th>{{ $t('studydate') }}</th>
-							<td>{{ metadata.StudyDate[0]|formatDate }}</td>
-						</tr>
-						<tr v-if="metadata.StudyID">
-							<th>{{ $t('studyid') }}</th>
-							<td>{{ metadata.StudyID[0] }}</td>
-						</tr>
-						<tr v-if="matchNumbers(metadata.StudyTime)">
-							<th>{{ $t('studytime') }}</th>
-							<td>{{ metadata.StudyTime[0]|formatTime }}</td>
-						</tr>
-						<tr v-if="matchNumbers(metadata.NumberOfStudyRelatedSeries)">
-							<th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
-							<td>{{ metadata.NumberOfStudyRelatedSeries[0] }}</td>
-						</tr>
-						<tr v-if="matchNumbers(metadata.NumberOfStudyRelatedInstances)">
-							<th>{{ $t('NumberOfStudyRelatedInstances') }}</th>
-							<td>{{ metadata.NumberOfStudyRelatedInstances[0] }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+      <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
+        <h5>{{ $t('studyinfo') }}</h5>
+        <table class="table table-striped">
+          <tbody>
+            <tr v-if="metadata.ModalitiesInStudy">
+              <th>{{ $t('modalitiesinstudy') }}</th>
+              <td>{{ metadata.ModalitiesInStudy[0] }}</td>
+            </tr>
+            <tr v-if="matchNumbers(metadata.StudyDate)">
+              <th>{{ $t('studydate') }}</th>
+              <td>{{ metadata.StudyDate[0]|formatDate }}</td>
+            </tr>
+            <tr v-if="metadata.StudyID">
+              <th>{{ $t('studyid') }}</th>
+              <td>{{ metadata.StudyID[0] }}</td>
+            </tr>
+            <tr v-if="matchNumbers(metadata.StudyTime)">
+              <th>{{ $t('studytime') }}</th>
+              <td>{{ metadata.StudyTime[0] }}</td>
+            </tr>
+            <tr v-if="matchNumbers(metadata.NumberOfStudyRelatedSeries)">
+              <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
+              <td>{{ metadata.NumberOfStudyRelatedSeries[0] }}</td>
+            </tr>
+            <tr v-if="matchNumbers(metadata.NumberOfStudyRelatedInstances)">
+              <th>{{ $t('NumberOfStudyRelatedInstances') }}</th>
+              <td>{{ metadata.NumberOfStudyRelatedInstances[0] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 export default {
-	name: 'studyMetadata',
-	props: ['id'],
+	name: 'StudyMetadata',
+	props: {
+		id: {
+			type: String,
+			required: true
+		}
+	},
 	data () {
 		return {}
 	},
@@ -135,7 +140,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 div.description {
 	width: 290px;
 	padding: 0 20px;

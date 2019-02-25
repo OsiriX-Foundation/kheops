@@ -1,3 +1,6 @@
+<!--
+  TODO: Remove settimeout when load studies.
+-->
 <i18n>
 {
 	"en": {
@@ -5,6 +8,7 @@
 		"addalbum": "Add to an album",
 		"download": "Download",
 		"addfavorite": "Add to favorite",
+		"removefavorite": "Remove to favorite",
 		"PatientName": "Patient Name",
 		"Modality": "Modality",
 		"StudyDate": "Study Date",
@@ -22,13 +26,17 @@
 		"series": "series",
 		"study": "study",
 		"studiessharedsuccess": "studies shared successfully",
-		"studiessharederror": "studies could not be shared"
+		"studiessharederror": "studies could not be shared",
+		"addInbox": "Add to inbox",
+		"nostudy": "No study find",
+		"studiessend": "studies send to inbox"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
 		"addalbum": "Ajouter à un album",
 		"download": "Télécharger",
 		"addfavorite": "Ajouter aux favoris",
+		"removefavorite": "Supprimer des favoris",
 		"PatientName": "Nom du patient",
 		"Modality": "Modalité",
 		"StudyDate": "Date de l'étude",
@@ -46,193 +54,504 @@
 		"series": "séries",
 		"study": "étude",
 		"studiessharedsuccess": "études ont été partagées avec succès",
-		"studiessharederror": "études n'ont pas pu être partagée"
+		"studiessharederror": "études n'ont pas pu être partagée",
+		"addInbox": "Add to inbox",
+    "nostudy": "Aucne étude trouvée",
+		"studiessend": "études envoyées dans votre boîte de réception"
 	}
 }
 </i18n>
 
 <template>
-	<div class = 'container-fluid'>
-
-		<!--button Study selected -->
-		<div class="my-3 selection-button-container">
-			<span  :style="(selectedStudiesNb)?'':'visibility: hidden'">
-				<span >{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id' @click.stop='form_send_study=!form_send_study'>
-					<span><v-icon class="align-middle" name="paper-plane"></v-icon></span><br/>
-					{{ $t("send") }}
-				</button>
-				<!-- <button type="button" class="btn btn-link btn-sm text-center"><span><v-icon class="align-middle" name="book"></v-icon></span><br/>{{ $t("addalbum") }}</button> -->
-				<b-dropdown variant="link" size="sm" no-caret>
-					<template slot="button-content">
-						<span><v-icon class="align-middle" name="book"></v-icon></span><br/>{{ $t("addalbum") }}
-					</template>
-					<b-dropdown-item @click.stop="addToAlbum(album.album_id)" v-for='album in albums' v-bind:key="album.id">{{album.name}}</b-dropdown-item>
-				</b-dropdown>
-
+  <div
+    v-if="!loading"
+    class="container-fluid"
+  >
+    <!--button Study selected -->
+    <div class="container-fluid my-3 selection-button-container">
+      <span
+        v-if="selectedStudiesNb"
+        class="float-left"
+      >
+        <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
+        <button
+          v-if="!filters.album_id"
+          type="button"
+          class="btn btn-link btn-sm text-center"
+          @click.stop="form_send_study=!form_send_study"
+        >
+          <span>
+            <v-icon
+              class="align-middle"
+              name="paper-plane"
+            />
+          </span><br>
+          {{ $t("send") }}
+        </button>
+        <b-dropdown
+          v-if="!filters.album_id || (album.send_series || album.is_admin)"
+          variant="link"
+          size="sm"
+          no-caret
+        >
+          <template slot="button-content">
+            <span>
+              <v-icon
+                class="align-middle"
+                name="book"
+              />
+            </span><br>{{ $t("addalbum") }}
+          </template>
+          <b-dropdown-item
+            v-for="allowedAlbum in allowedAlbums"
+            :key="allowedAlbum.id"
+            @click.stop="addToAlbum(allowedAlbum.album_id)"
+          >
+            {{ allowedAlbum.name }}
+          </b-dropdown-item>
+        </b-dropdown>
+        <!--
 				<button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()">
 					<span><v-icon class="align-middle" name="download"></v-icon></span><br/>
 					{{ $t("download") }}
 				</button>
-				<button type="button" class="btn btn-link btn-sm text-center" v-if='!filters.album_id'>
-					<span><v-icon class="align-middle" name="star"></v-icon></span><br/>
-					{{ $t("addfavorite") }}
-				</button>
-				<button type="button" class="btn btn-link btn-sm text-center" @click = "deleteSelectedStudies()">
-					<span><v-icon class="align-middle" name="trash"></v-icon></span><br/>
-					{{ $t("delete") }}
-				</button>
-			</span>
+				-->
+        <button
+          v-if="filters.album_id && (album.send_series || album.is_admin)"
+          type="button"
+          class="btn btn-link btn-sm text-center"
+          @click="addToInbox()"
+        >
+          <span>
+            <v-icon
+              class="align-middle"
+              name="bars"
+            />
+          </span><br>
+          {{ $t("addInbox") }}
+        </button>
+        <button
+          v-if="!filters.album_id"
+          type="button"
+          class="btn btn-link btn-sm text-center"
+          @click="addSelectedStudiesFavorite()"
+        >
+          <span>
+            <v-icon
+              class="align-middle"
+              name="star"
+            />
+          </span><br>
+          {{ $t(infoFavorites) }}
+        </button>
+        <button
+          v-if="!filters.album_id || (album.is_admin || album.delete_series)"
+          type="button"
+          class="btn btn-link btn-sm text-center"
+          @click="deleteSelectedStudies()"
+        >
+          <span>
+            <v-icon
+              class="align-middle"
+              name="trash"
+            />
+          </span><br>
+          {{ $t("delete") }}
+        </button>
+      </span>
 
+      <!--
 			<span style = 'margin-left: 30px;' v-if='!filters.album_id'>
 				<toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" />
 				<label class = 'ml-3'>{{$t('includeseriesfromalbum')}}</label>
 			</span>
+			-->
 
-			<button type = 'button' class = "btn btn-link btn-lg float-right" @click='showFilters=!showFilters'>
-				<v-icon name = 'search' scale='2'/>
-			</button>
-		</div>
-		
-		<form-get-user @get-user='sendToUser' @cancel-user='form_send_study=false' v-if='form_send_study'></form-get-user>
-		
+      <button
+        type="button"
+        class="d-none d-sm-block btn btn-link btn-lg float-right"
+        @click="showFilters=!showFilters"
+      >
+        <v-icon
+          name="search"
+          scale="2"
+        />
+      </button>
+    </div>
 
-		<b-table class="container-fluid" responsive striped :items="studies" :fields="fields" :sort-desc="true" :sort-by.sync="sortBy"  @sort-changed="sortingChanged" :no-local-sorting="true">
+    <form-get-user
+      v-if="form_send_study && selectedStudiesNb"
+      @get-user="sendToUser"
+      @cancel-user="form_send_study=false"
+    />
 
-			<template slot="HEAD_is_selected" >
-				<b-button variant="link" size="sm" class="mr-2" >
-					<v-icon  class="align-middle" name="chevron-down" style = 'visibility: hidden'></v-icon>
-				</b-button>
-				<b-form-checkbox @click.native.stop @change="selectAll(studies.allSelected)" v-model="studies.allSelected" name="allSelected">
-				</b-form-checkbox>
-			</template>
+    <b-table
+      class="container-fluid"
+      responsive
+      striped
+      :items="studies"
+      :fields="fields"
+      :sort-desc="true"
+      :sort-by.sync="sortBy"
+      :no-local-sorting="true"
+      @sort-changed="sortingChanged"
+    >
+      <template
+        slot="HEAD_is_selected"
+        slot-scope="data"
+      >
+        {{ $t(data.label) }}
+        <b-button
+          variant="link"
+          size="sm"
+          class="mr-2"
+        >
+          <v-icon
+            class="align-middle"
+            name="chevron-down"
+            style="visibility: hidden"
+          />
+        </b-button>
 
-			<template slot="HEAD_PatientName" slot-scope="data">
-				<div v-if='showFilters' @click.stop='' >
-					<input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientName' :placeholder="$t('filter')"> <br/>
-				</div>
-				{{$t(data.label)}}
-			</template>
+        <b-form-checkbox
+          v-model="studies.allSelected"
+          name="allSelected"
+          @click.native.stop
+          @change="selectAll(studies.allSelected)"
+        />
+      </template>
 
-			<template slot="HEAD_PatientID" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''><input type = 'search' class = 'form-control form-control-sm' v-model='filters.PatientID' :placeholder="$t('filter')"> <br/></div>
-				{{$t(data.label)}}
-			</template>
+      <template
+        slot="HEAD_PatientName"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.PatientName"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
 
-			<template slot="HEAD_AccessionNumber" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''>
-					<input type = 'search' class = 'form-control form-control-sm' v-model='filters.AccessionNumber' :placeholder="$t('filter')"> <br/>
-				</div>
-				{{$t(data.label)}}
-			</template>
+      <template
+        slot="HEAD_PatientID"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.PatientID"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
 
-			<template slot="HEAD_StudyDate" slot-scope="data">
-				<div v-if='showFilters' @click.stop='' class = 'form-row'>
+      <template
+        slot="HEAD_AccessionNumber"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.AccessionNumber"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
 
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.StudyDateFrom"  :bootstrap-styling='false' :disabledDates="disabledFromDates" input-class="form-control form-control-sm  search-calendar" :calendar-button="false" calendar-button-icon=""  wrapper-class='calendar-wrapper' :placeholder="$t('fromDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
+      <template
+        slot="HEAD_StudyDate"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          class="form-row"
+          @click.stop=""
+        >
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.StudyDateFrom"
+                :bootstrap-styling="false"
+                :disabled-dates="disabledFromDates"
+                input-class="form-control form-control-sm  search-calendar"
+                :calendar-button="false"
+                calendar-button-icon=""
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('fromDate')"
+                :clear-button="true"
+                clear-button-icon="fa fa-times"
+              />
+            </div>
+          </div>
 
-					<div class = 'col form-inline'>
-						<div class = 'form-group'>
-							<datepicker v-model="filters.StudyDateTo" :bootstrap-styling='false' :disabledDates="disabledToDates"  input-class="form-control form-control-sm search-calendar" :calendar-button="false"  calendar-button-icon="" wrapper-class='calendar-wrapper' :placeholder="$t('toDate')" :clear-button="true" clear-button-icon='fa fa-times'></datepicker>
-						</div>
-					</div>
-					<!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br/> -->
-				</div>
-				<br v-if='showFilters' />
-				{{$t(data.label)}}
-			</template>
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.StudyDateTo"
+                :bootstrap-styling="false"
+                :disabled-dates="disabledToDates"
+                input-class="form-control form-control-sm search-calendar"
+                :calendar-button="false"
+                calendar-button-icon=""
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('toDate')"
+                :clear-button="true"
+                clear-button-icon="fa fa-times"
+              />
+            </div>
+          </div>
+          <!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br/> -->
+        </div>
+        <br v-if="showFilters">
+        {{ $t(data.label) }}
+      </template>
 
-			<template slot="HEAD_ModalitiesInStudy" slot-scope="data">
-				<div v-if='showFilters' @click.stop=''>
-					<input type = 'search' class = 'form-control form-control-sm' v-model='filters.ModalitiesInStudy' :placeholder="$t('filter')"><br/>
-				</div>
-				{{$t(data.label)}}
-			</template>
+      <template
+        slot="HEAD_ModalitiesInStudy"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.ModalitiesInStudy"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          ><br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
 
-			<template slot = 'ModalitiesInStudy' slot-scope='data'>
-				{{ data.item.ModalitiesInStudy[0] | formatModality }}
-			</template>
+      <template
+        slot="ModalitiesInStudy"
+        slot-scope="data"
+      >
+        {{ data.item.ModalitiesInStudy[0] | formatModality }}
+      </template>
 
-			<template slot="is_selected" slot-scope="row">
-				<b-form-group>
+      <template
+        slot="is_selected"
+        slot-scope="row"
+      >
+        <b-form-group>
+          <b-button
+            variant="link"
+            size="sm"
+            class="mr-2"
+            @click.stop="showSeries(row)"
+          >
+            <v-icon
+              v-if="row.detailsShowing"
+              class="align-middle"
+              name="chevron-down"
+              @click.stop="row.toggleDetails"
+            />
+            <v-icon
+              v-else
+              class="align-middle"
+              name="chevron-right"
+              @click.stop="row.toggleDetails"
+            />
+          </b-button>
+          <b-form-checkbox
+            v-model="row.item.is_selected"
+            @click.native.stop
+            @change="toggleSelected(row.item,'study',!row.item.is_selected)"
+          />
+        </b-form-group>
+      </template>
 
-					<b-button variant="link" size="sm" @click.stop="showSeries(row)" class="mr-2">
-						<v-icon v-if= "row.detailsShowing" class="align-middle"  @click.stop="row.toggleDetails" name="chevron-down"></v-icon>
-						<v-icon v-else class="align-middle"  @click.stop="row.toggleDetails" name="chevron-right"></v-icon>
+      <!--Infos study (Series / Comments / Study Metadata) -->
+      <template
+        slot="row-details"
+        slot-scope="row"
+      >
+        <b-card>
+          <div class="row">
+            <div class="col-xl-auto mb-4">
+              <nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
+                <a
+                  class="nav-link"
+                  :class="(row.item.view=='series')?'active':''"
+                  @click="row.item.view='series'"
+                >
+                  {{ $t('series') }}
+                </a>
+                <a
+                  class="nav-link"
+                  :class="(row.item.view=='comments')?'active':''"
+                  @click="loadStudiesComments(row.item)"
+                >
+                  {{ $t('comments') }}
+                </a>
+                <a
+                  class="nav-link"
+                  :class="(row.item.view=='study')?'active':''"
+                  @click="loadStudiesMetadata(row.item)"
+                >
+                  {{ $t('study') }}
+                </a>
+              </nav>
+            </div>
+            <div
+              v-if="row.item.view==&quot;series&quot;"
+              class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+            >
+              <div class="row">
+                <div
+                  v-for="serie in row.item.series"
+                  :key="serie.id"
+                  class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
+                >
+                  <series-summary
+                    :key="serie.SeriesInstanceUID[0]"
+                    :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
+                    :selected="serie.is_selected"
+                    :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
+                  />
+                </div>
+              </div>
+            </div>
 
-					</b-button>
-					<b-form-checkbox v-model = "row.item.is_selected" @click.native.stop @change="toggleSelected(row.item,'study',!row.item.is_selected)" >
-					</b-form-checkbox>
+            <div
+              v-if="row.item.view==&quot;comments&quot;"
+              class="col-md-10"
+            >
+              <comments-and-notifications
+                :id="row.item.StudyInstanceUID[0]"
+                scope="studies"
+              />
+            </div>
 
-				</b-form-group>
-			</template>
-
-			<!--Infos study (Series / Comments / Study Metadata) -->
-			<template slot="row-details" slot-scope="row">
-				<b-card>
-					<div class = 'row'>
-						<div class = 'col-xl-auto mb-4' >
-							<nav class="nav nav-pills nav-justified flex-column">
-								<a class="nav-link" :class="(row.item.view=='series')?'active':''" @click="row.item.view='series'">{{$t('series')}}</a>
-								<a class="nav-link" :class="(row.item.view=='comments')?'active':''" @click="loadStudiesComments(row.item)">{{$t('comments')}}</a>
-								<a class="nav-link" :class="(row.item.view=='study')?'active':''" @click="loadStudiesMetadata(row.item)">{{$t('study')}}</a>
-							</nav>
-						</div>
-						<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-10' v-if='row.item.view=="series"'>
-							<div class = 'row'>
-
-								<div class = 'col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5'  v-for='serie in row.item.series' :key="serie.id">
-									<series-summary
-										:SeriesInstanceUID="serie.SeriesInstanceUID[0]"
-										:selected="serie.is_selected"
-										:StudyInstanceUID="row.item.StudyInstanceUID[0]"
-										:key="serie.SeriesInstanceUID[0]">
-									</series-summary>
-								</div>
-
-							</div>
-						</div>
-
-						<div v-if='row.item.view=="comments"'  class = 'col-md-10'>
-							<comments-and-notifications scope='studies' :id='row.item.StudyInstanceUID[0]'></comments-and-notifications>
-						</div>
-
-						<div v-if='row.item.view=="study"'  class = 'col-sm-12 col-md-12 col-lg-12 col-xl-10'>
-							<study-metadata scope='studies' :id='row.item.StudyInstanceUID[0]'></study-metadata>
-						</div>
-					</div>
-				</b-card>
-			</template>
-			<!-- Button next to patient name -->
-			<template slot = 'PatientName' slot-scope='row'>
-				<div class = 'patientNameContainer'>
-					<div class="row">
-						<div class="patientName col-md-auto">
-							{{row.item.PatientName}}
-						</div>
-						<div class = 'patientNameIcons col-md-auto'>
-							<span @click = "toggleFavorite(row.index,'study')" :class="row.item.is_favorite?'selected':''">
-								<v-icon  v-if="row.item.is_favorite" class="align-middle" style="margin-right:0" name="star"></v-icon>
-								<v-icon v-else class="align-middle" style="margin-right:0" name="star"></v-icon>
-							</span>
-							<span @click="handleComments(row)" :class="row.item.comments.length?'selected':''">
-								<v-icon v-if="row.item.comments.length" class="align-middle" style="margin-right:0" name="comment"></v-icon>
-								<v-icon v-else  class="align-middle" style="margin-right:0" name="comment"></v-icon>
-							</span>
-							<a :href="getURLDownload(row.item.StudyInstanceUID)" class = 'download'><v-icon class="align-middle" style="margin-right:0" name="download"></v-icon></a>
+            <div
+              v-if="row.item.view==&quot;study&quot;"
+              class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+            >
+              <study-metadata
+                :id="row.item.StudyInstanceUID[0]"
+                scope="studies"
+              />
+            </div>
+          </div>
+        </b-card>
+      </template>
+      <!-- Button next to patient name -->
+      <template
+        slot="PatientName"
+        slot-scope="row"
+      >
+        <div class="patientNameContainer">
+          <div class="row">
+            <div class="patientName col-md-auto">
+              {{ row.item.PatientName }}
+            </div>
+            <div class="patientName_ct col-md-auto d-block d-sm-none">
+              {{ row.item.ModalitiesInStudy [0] | formatModality }}
+            </div>
+            <div class="patientNameIcons col-md-auto">
+              <span
+                :class="row.item.is_favorite?'selected':''"
+                @click="toggleFavorite(row.item)"
+              >
+                <v-icon
+                  v-if="row.item.is_favorite"
+                  class="align-middle"
+                  style="margin-right:0"
+                  name="star"
+                />
+                <v-icon
+                  v-else-if="Object.keys(album).length === 0 || (album.add_series || album.is_admin)"
+                  class="align-middle"
+                  style="margin-right:0"
+                  name="star"
+                  color="grey"
+                />
+              </span>
+              <span
+                :class="row.item.comments.length?'selected':''"
+                @click="handleComments(row)"
+              >
+                <v-icon
+                  v-if="row.item.comments.length"
+                  class="align-middle"
+                  style="margin-right:0"
+                  name="comment-dots"
+                />
+                <v-icon
+                  v-else
+                  class="align-middle"
+                  style="margin-right:0"
+                  name="comment"
+                  color="grey"
+                />
+              </span>
+              <a
+                v-if="!filters.album_id || (album.download_series || album.is_admin)"
+                :href="getURLDownload(row.item.StudyInstanceUID)"
+                class="download"
+              >
+                <v-icon
+                  class="align-middle"
+                  style="margin-right:0"
+                  name="download"
+                />
+              </a>
+              <!--
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
-						</div>
-					</div>
-				</div>
-			</template>
+							-->
+            </div>
+          </div>
+        </div>
+      </template>
 
-			<template slot = 'StudyDate' slot-scope='data'>{{ data.item.StudyDate[0] | formatDate }}</template>
-		</b-table>
-	</div>
+      <template
+        slot="StudyDate"
+        slot-scope="data"
+      >
+        {{ data.item.StudyDate[0] | formatDate }}
+      </template>
+    </b-table>
+    <div
+      v-if="studies.length===0"
+      style="text-align:center;"
+      class="card"
+    >
+      <div
+        class="card-body"
+      >
+        {{ $t('nostudy') }}
+      </div>
+    </div>
+  </div>
+  <div
+    v-else
+    class="container-fluid"
+    style="margin-top: 30px; text-align:center;"
+  >
+    <pulse-loader
+      :loading="loading"
+      color="white"
+    />
+  </div>
 </template>
 
 <script>
@@ -244,11 +563,21 @@ import studyMetadata from '@/components/study/studyMetadata.vue'
 import ToggleButton from 'vue-js-toggle-button'
 import Datepicker from 'vuejs-datepicker'
 import Vue from 'vue'
+// https://github.com/greyby/vue-spinner
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 Vue.use(ToggleButton)
 
 export default {
-	name: 'studies',
+	name: 'Studies',
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader },
+	props: {
+		album: {
+			type: Object,
+			required: false,
+			default: () => ({})
+		}
+	},
 	data () {
 		return {
 			pageNb: 1,
@@ -259,14 +588,13 @@ export default {
 					key: 'is_selected',
 					label: '',
 					sortable: false,
-					class: 'td_checkbox',
-					thClass: 'd-none d-sm-table-cell',
-					margin: 'auto'
+					class: 'td_checkbox'
+					// thClass: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'PatientName',
 					label: 'PatientName',
-					thClass: 'd-none d-sm-table-cell',
+					// thClass: 'd-none d-sm-table-cell',
 					tdClass: 'patientName',
 					sortable: true
 				},
@@ -296,7 +624,7 @@ export default {
 					thClass: 'd-none d-sm-table-cell',
 					tdClass: 'd-none d-sm-table-cell',
 					label: 'Modality',
-					sortable: true
+					sortable: false
 				}
 			],
 			sortBy: 'StudyDate',
@@ -314,10 +642,14 @@ export default {
 				ModalitiesInStudy: '',
 				inbox_and_albums: false,
 				album_id: ''
+			},
+			loading: true,
+			send: {
+				expected: 0,
+				count: 0
 			}
 		}
 	},
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser },
 	computed: {
 		...mapGetters({
 			studies: 'studies',
@@ -330,6 +662,13 @@ export default {
 		selectedStudiesNb () {
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
+		infoFavorites () {
+			if (this.studies.filter(s => { return s.is_selected }).every(s => { return s.is_favorite === true })) {
+				return 'removefavorite'
+			} else {
+				return 'addfavorite'
+			}
+		},
 		disabledToDates: function () {
 			let vm = this
 			return {
@@ -341,155 +680,21 @@ export default {
 			return {
 				from: new Date()
 			}
+		},
+		allowedAlbums () {
+			return _.filter(this.albums, a => { return (a.add_series || a.is_admin) && this.filters.album_id !== a.album_id })
 		}
-	},
-	methods: {
-		getURLDownload (StudyInstanceUID) {
-			return `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application%2Fzip`
-		},
-		scroll () {
-			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
-				if (bottomOfWindow) {
-					this.pageNb++
-					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-				}
-			}
-		},
-		sortingChanged (ctx) {
-			// ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
-			// ctx.sortDesc ==> true if sorting descending, false otherwise
-
-			this.pageNb = ctx.currentPage
-			this.sortBy = ctx.sortBy
-			this.sortDesc = ctx.sortDesc
-			this.limit = this.studies.length
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-		},
-		showSeries (row) {
-			if (!row.detailsShowing) {
-				this.$store.dispatch('getSeries', { StudyInstanceUID: row.item.StudyInstanceUID[0], album_id: this.filters.album_id })
-			}
-			row.toggleDetails()
-		},
-
-		toggleFavorite (index, type) {
-			var vm = this
-			this.$store.dispatch('toggleFavorite', { type: type, index: index }).then(res => {
-				if (res) vm.$snotify.success(type + 'is now in favorites')
-				else vm.$snotify.error('Sorry, an error occured')
-			})
-		},
-		handleComments (row) {
-			this.showSeries(row)
-			row.item.view = 'comments'
-		},
-		selectAll (isSelected) {
-			this.$store.commit('SELECT_ALL_STUDIES', !isSelected)
-			this.studies.allSelected = !this.studies.allSelected
-		},
-		deleteSelectedStudies () {
-			var vm = this
-			var i, j
-			for (i = this.studies.length - 1; i > -1; i--) {
-				if (this.studies[i].is_selected) {
-					let selectedSeries = _.filter(this.studies[i].series, s => { return s.is_selected })
-					if (this.studies[i].series.length === 0 || this.studies[i].series.length === selectedSeries.length) {
-						vm.$store.dispatch('deleteStudy', { StudyInstanceUID: this.studies[i].StudyInstanceUID, album_id: this.filters.album_id })
-						// vm.$delete(vm.studies, i);
-					} else {
-						for (j = selectedSeries.length - 1; j > -1; j--) {
-							let s = selectedSeries[j]
-							vm.$store.dispatch('deleteSeries', { StudyInstanceUID: this.studies[i].StudyInstanceUID, SeriesInstanceUID: s.SeriesInstanceUID, album_id: this.filters.album_id })
-							// vm.$delete(vm.studies[i].series,j);
-						}
-					}
-				}
-			}
-		},
-		toggleSelected (item, type, isSelected) {
-			let index = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === item.StudyInstanceUID[0] })
-			this.$store.dispatch('toggleSelected', { type: type, index: index, is_selected: isSelected })
-		},
-		downloadSelectedStudies () {
-			var vm = this
-			_.forEach(this.studies, function (study) {
-				if (study.is_selected) {
-					vm.$store.dispatch('downloadStudy', { StudyInstanceUID: study.StudyInstanceUID })
-				}
-			})
-		},
-		searchOnline () {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-		},
-		addToAlbum (albumId) {
-			let studies = _.filter(this.studies, s => { return s.is_selected })
-			let data = []
-
-			_.forEach(studies, s => {
-				let series = _.filter(s.series, oneSeries => { return oneSeries.is_selected })
-				if (series.length === s.series.length) {
-					data.push({ study_id: s.StudyInstanceUID[0], series_id: null, album_id: albumId })
-				} else {
-					_.forEach(series, oneSeries => {
-						data.push({ study_id: s.StudyInstanceUID[0], series_id: oneSeries.SeriesInstanceUID[0], album_id: albumId })
-					})
-				}
-			})
-
-			if (data.length) {
-				this.$store.dispatch('putStudiesInAlbum', { data: data }).then( () => {
-					this.$snotify.success(this.$t('studyputtoalbum'))
-				})
-			}
-		},
-		toggleStudyView (item) {
-			this.$store.commit('TOGGLE_STUDY_VIEW', { StudyInstanceUID: item.StudyInstanceUID[0] })
-		},
-		loadStudiesComments (item) {
-			item.view = 'comments'
-			// this.$store.dispatch('getStudiesComments',{StudyInstanceUID: item.StudyInstanceUID[0]})
-		},
-		loadStudiesMetadata (item) {
-			item.view = 'study'
-		},
-		sendToUser (user_sub) {
-			let studies = _.filter(this.studies, s => {return s.is_selected})
-			let studyIds = [], seriesIds = []
-			_.forEach(studies, s => {
-				let selectedSeries = _.filter(s.series, oneSeries => {return oneSeries.is_selected});
-				if (selectedSeries.length == s.series.length) studyIds.push(s.StudyInstanceUID[0]);
-				else {
-					_.forEach(selectedSeries, oneSeries => {
-						seriesIds.push({
-							StudyInstanceUID: s.StudyInstanceUID[0],
-							SeriesInstanceUID: oneSeries.SeriesInstanceUID[0]
-						})
-					})
-				}
-			})
-			
-			if (studyIds.length || seriesIds.length) this.$store.dispatch('sendStudies',{StudyInstanceUIDs: studyIds,SeriesInstanceUIDs: seriesIds, user: user_sub}).then( res => {
-				this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}` )
-				if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}` )
-			})
-		}
-	},
-
-	created () {
-		if (this.$route.params.album_id) {
-			this.filters.album_id = this.$route.params.album_id
-		} else {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
-			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
-		}
-	},
-
-	mounted () {
-		this.scroll()
 	},
 
 	watch: {
+		send: {
+			handler: function (send) {
+				if (send.expected === send.count) {
+					this.$snotify.success(`${this.send.expected} ${this.$t('studiessend')}`)
+				}
+			},
+			deep: true
+		},
 		filters: {
 			handler: function (filters) {
 				if (this.filterTimeout) {
@@ -517,6 +722,196 @@ export default {
 			}
 		}
 
+	},
+
+	created () {
+		this.setLoading(true)
+		if (this.$route.params.album_id) {
+			this.filters.album_id = this.$route.params.album_id
+		} else {
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+				.then(() => { setTimeout(() => this.setLoading(false), 300) })
+			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
+		}
+	},
+
+	mounted () {
+		this.scroll()
+	},
+	methods: {
+		getURLDownload (StudyInstanceUID) {
+			return `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application%2Fzip`
+		},
+		scroll () {
+			window.onscroll = () => {
+				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+				if (bottomOfWindow) {
+					this.pageNb++
+					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+				}
+			}
+		},
+		sortingChanged (ctx) {
+			// ctx.sortBy   ==> Field key for sorting by (or null for no sorting)
+			// ctx.sortDesc ==> true if sorting descending, false otherwise
+
+			this.pageNb = ctx.currentPage
+			this.sortBy = ctx.sortBy
+			this.sortDesc = ctx.sortDesc
+			this.limit = this.studies.length
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+		},
+		showSeries (row) {
+			if (!row.detailsShowing) {
+				this.$store.dispatch('getSeries', { StudyInstanceUID: row.item.StudyInstanceUID[0], album_id: this.filters.album_id })
+			}
+			row.toggleDetails()
+		},
+
+		toggleFavorite (study) {
+			var vm = this
+			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
+			this.$store.dispatch('toggleFavorite', { type: 'study', StudyInstanceUID: study.StudyInstanceUID[0], queryparams: params }).then(res => {
+				if (!res) vm.$snotify.error('Sorry, an error occured')
+			})
+		},
+		handleComments (row) {
+			this.showSeries(row)
+			row.item.view = 'comments'
+		},
+		selectAll (isSelected) {
+			this.$store.commit('SELECT_ALL_STUDIES', !isSelected)
+			this.studies.allSelected = !this.studies.allSelected
+		},
+		deleteSelectedStudies () {
+			var vm = this
+			var i, j
+			for (i = this.studies.length - 1; i > -1; i--) {
+				if (this.studies[i].is_selected) {
+					let selectedSeries = _.filter(this.studies[i].series, s => { return s.is_selected })
+					if (this.studies[i].series.length === 0 || this.studies[i].series.length === selectedSeries.length) {
+						vm.$store.dispatch('deleteStudy', { StudyInstanceUID: this.studies[i].StudyInstanceUID[0], album_id: this.filters.album_id })
+						// vm.$delete(vm.studies, i);
+					} else {
+						for (j = selectedSeries.length - 1; j > -1; j--) {
+							let s = selectedSeries[j]
+							vm.$store.dispatch('deleteSeries', { StudyInstanceUID: this.studies[i].StudyInstanceUID[0], SeriesInstanceUID: s.SeriesInstanceUID[0], album_id: this.filters.album_id })
+							// vm.$delete(vm.studies[i].series,j);
+						}
+					}
+				}
+			}
+		},
+		toggleSelected (item, type, isSelected) {
+			let index = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === item.StudyInstanceUID[0] })
+			this.$store.dispatch('toggleSelected', { type: type, index: index, is_selected: isSelected })
+		},
+		downloadSelectedStudies () {
+			var vm = this
+			_.forEach(this.studies, function (study) {
+				if (study.is_selected) {
+					vm.$store.dispatch('downloadStudy', { StudyInstanceUID: study.StudyInstanceUID })
+				}
+			})
+		},
+		searchOnline () {
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+				.then(() => { setTimeout(() => this.setLoading(false), 50) })
+		},
+		addToAlbum (albumId) {
+			let studies = _.filter(this.studies, s => { return s.is_selected })
+			let data = []
+
+			_.forEach(studies, s => {
+				let series = _.filter(s.series, oneSeries => { return oneSeries.is_selected })
+				if (series.length === s.series.length) {
+					data.push({ study_id: s.StudyInstanceUID[0], series_id: null, album_id: albumId })
+				} else {
+					_.forEach(series, oneSeries => {
+						data.push({ study_id: s.StudyInstanceUID[0], series_id: oneSeries.SeriesInstanceUID[0], album_id: albumId })
+					})
+				}
+			})
+
+			if (data.length) {
+				this.$store.dispatch('putStudiesInAlbum', { data: data }).then(() => {
+					this.$snotify.success(this.$t('studyputtoalbum'))
+				})
+			}
+		},
+		toggleStudyView (item) {
+			this.$store.commit('TOGGLE_STUDY_VIEW', { StudyInstanceUID: item.StudyInstanceUID[0] })
+		},
+		loadStudiesComments (item) {
+			item.view = 'comments'
+			// this.$store.dispatch('getStudiesComments',{StudyInstanceUID: item.StudyInstanceUID[0]})
+		},
+		loadStudiesMetadata (item) {
+			item.view = 'study'
+		},
+		sendToUser (userSub) {
+			let studies = _.filter(this.studies, s => { return s.is_selected })
+			let studyIds = []; let seriesIds = []
+			_.forEach(studies, s => {
+				let selectedSeries = _.filter(s.series, oneSeries => { return oneSeries.is_selected })
+				if (selectedSeries.length === s.series.length) studyIds.push(s.StudyInstanceUID[0])
+				else {
+					_.forEach(selectedSeries, oneSeries => {
+						seriesIds.push({
+							StudyInstanceUID: s.StudyInstanceUID[0],
+							SeriesInstanceUID: oneSeries.SeriesInstanceUID[0]
+						})
+					})
+				}
+			})
+			if (studyIds.length || seriesIds.length) {
+				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub }).then(res => {
+					this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}`)
+					if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
+				})
+			}
+		},
+		addSelectedStudiesFavorite () {
+			let studies = this.studies.filter(s => { return s.is_selected })
+			let favorites = studies.every(s => { return s.is_favorite === true }) ||
+				studies.every(s => { return s.is_favorite === false })
+			studies.forEach(study => {
+				if (favorites) this.toggleFavorite(study, 'study')
+				else if (study.is_favorite === false) this.toggleFavorite(study, 'study')
+			})
+		},
+		addToInbox () {
+			let studies = this.studies.filter(s => { return s.is_selected })
+			this.send.expected = studies.length
+			this.send.count = 0
+			studies.forEach(study => {
+				let selectedSeries = study.series.filter(serie => { return serie.is_selected })
+				if (selectedSeries.length === study.series.length) {
+					this.$store.dispatch('selfAppropriateSeries', {
+						StudyInstanceUID: study.StudyInstanceUID[0],
+						AlbumId: this.album.album_id
+					}).then(res => {
+						this.send.count++
+						if (res.error) this.$snotify.error(`${res.error} error`)
+					})
+				} else {
+					selectedSeries.forEach(serie => {
+						let tmp = ''
+						this.$store.dispatch('selfAppropriateSeries', {
+							StudyInstanceUID: serie.StudyInstanceUID[0],
+							SeriesInstanceUID: serie.SeriesInstanceUID[0]
+						}).then(res => {
+							if (tmp !== serie.StudyInstanceUID[0]) this.send.count++
+							if (res.error) this.$snotify.error(`${res.error} error`)
+							tmp = serie.StudyInstanceUID[0]
+						})
+					})
+				}
+			})
+		},
+		setLoading (val) {
+			this.loading = val
+		}
 	}
 }
 
@@ -595,4 +990,3 @@ export default {
 		color: #fd7e14;
 	}
 </style>
-

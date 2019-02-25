@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 <i18n>
 {
 	"en": {
@@ -12,17 +10,20 @@
 </i18n>
 
 <template>
-	<div class = 'container'>
-		<h2>Token {{ $t("view") }}</h2>
-		<p class = 'text-center'><i>...TO DO ...</i></p>
-	</div>
+  <div class="container albumSettingsToken">
+    <tokens
+      scope="album"
+      :albumid="album.album_id"
+    />
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
+import tokens from '@/components/tokens/tokens'
 export default {
-	name: 'album_settings_token',
+	name: 'AlbumSettingsToken',
+	components: { tokens },
 	data () {
 		return {
 		}
@@ -31,16 +32,12 @@ export default {
 		...mapGetters({
 			album: 'album'
 		})
-	},
-	created () {
-	},
-	watch: {
 	}
 }
 
 </script>
 
-<style>
+<style scoped>
 
 </style>
 
