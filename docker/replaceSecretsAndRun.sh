@@ -37,6 +37,10 @@ if [ -z "$KHEOPS_ROOT_HOST" ]; then
     echo "Missing KHEOPS_ROOT_HOST environment variable"
     missing_env_var_secret=true
 fi
+if [ -z "$KHEOPS_ROOT_PATH" ]; then
+    echo "Missing KHEOPS_ROOT_PATH environment variable"
+    missing_env_var_secret=true
+fi
 
 #if missing env var or secret => exit
 if [ "$missing_env_var_secret" = true ]; then
