@@ -10,6 +10,7 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+<<<<<<< HEAD
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -18,6 +19,9 @@ import javax.ws.rs.client.Entity;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+=======
+import javax.persistence.PersistenceException;
+>>>>>>> master
 
 import static online.kheops.auth_server.user.UserQueries.*;
 
@@ -121,6 +125,13 @@ public class Users {
             em.persist(newUser);
             em.persist(albumUser);
             tx.commit();
+        } catch (PersistenceException e) {
+            try {
+                return getUser(userReference);
+            } catch (UserNotFoundException notFoundException) {
+                notFoundException.addSuppressed(e);
+                throw notFoundException;
+            }
         } catch (Exception e) {
             throw new UserNotFoundException("Error while adding a new user to the kheops db", e);
         } finally {
