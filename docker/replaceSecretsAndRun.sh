@@ -72,9 +72,13 @@ fi
 for f in ${SECRET_FILE_PATH}/*
 do
   word_count=$(wc -w $f | cut -f1 -d" ")
-  line_count=$(wc -w $f | cut -f1 -d" ")
+  line_count=$(wc -l $f | cut -f1 -d" ")
 
   filename=$(basename "$f")
+
+
+  echo test with secret $filename. He contains $word_count word and $line_count line
+
 
   if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
     echo Error with secret $filename. He contains $word_count word and $line_count line
