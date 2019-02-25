@@ -81,7 +81,6 @@ do
     exit 1
   fi
 
-  filename=$(basename "$f")
   value=$(cat ${f})
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
 done
