@@ -29,10 +29,7 @@ import static online.kheops.auth_server.util.Consts.*;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class SecuredFilter implements ContainerRequestFilter {
-
     private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
-    public ContainerRequestContext requestContext;
-
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -41,7 +38,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
         } catch (IllegalArgumentException e) {
-            LOG.log(Level.WARNING, "IllegalArgumentException " + requestContext.getUriInfo().getRequestUri(), e);
+            LOG.log(Level.WARNING, "IllegalArgumentException " + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
@@ -50,7 +47,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             assertion = AssertionVerifier.createAssertion(token);
         } catch (BadAssertionException e) {
-            LOG.log(Level.WARNING, "Received bad assertion" + requestContext.getUriInfo().getRequestUri(), e);
+            LOG.log(Level.WARNING, "Received bad assertion" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
@@ -100,7 +97,6 @@ public class SecuredFilter implements ContainerRequestFilter {
                 return "BEARER";
             }
         });
-        this.requestContext = requestContext;
     }
 
     private static String getToken(String authorizationHeader) {
@@ -135,5 +131,9 @@ public class SecuredFilter implements ContainerRequestFilter {
         }
 
         return token;
+    }
+
+    private String getRequestString(ContainerRequestContext requestContext) {
+        return requestContext.getMethod() + " " + requestContext.getUriInfo().getRequestUri();
     }
 }
