@@ -1,27 +1,26 @@
 #! /bin/sh
 
 
-if ! [ -f ${SECRET_FILE_PATH}/kheops_authdb_pass ]; then
+if ! [[ -f ${SECRET_FILE_PATH}/kheops_authdb_pass ]]; then
     echo "Missing kheops_authdb_pass secret"
     exit 1
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_superuser_hmasecret ]; then
+if ! [[ -f ${SECRET_FILE_PATH}/kheops_superuser_hmasecret ]]; then
     echo "Missing kheops_superuser_hmasecret secret"
     exit 1
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_auth_hmasecret ]; then
+if ! [[ -f ${SECRET_FILE_PATH}/kheops_auth_hmasecret ]]; then
     echo "Missing kheops kheops_auth_hmasecret secret"
     exit 1
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_clientsecret ]; then
+if ! [[ -f ${SECRET_FILE_PATH}/kheops_keycloak_clientsecret ]]; then
     echo "Missing kheops_keycloak_clientsecret secret"
     exit 1
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_password ]; then
+if ! [[ -f ${SECRET_FILE_PATH}/kheops_keycloak_password ]]; then
     echo "Missing kheops_keycloak_password secret"
     exit 1
 fi
-
 
 for f in ${SECRET_FILE_PATH}/*
 do
