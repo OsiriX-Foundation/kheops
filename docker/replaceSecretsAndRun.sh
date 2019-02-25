@@ -2,6 +2,7 @@
 
 missing_env_var_secret=false
 
+#Verify secrets
 if ! [ -f ${SECRET_FILE_PATH}/kheops_authdb_pass ]; then
     echo "Missing kheops_authdb_pass secret"
     missing_env_var_secret=true
@@ -24,7 +25,7 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_password ]; then
 fi
 
 
-
+#Verify environment variables
 if [ -z "$KHEOPS_AUTHDB_USER" ]; then
     echo "Missing KHEOPS_AUTHDB_USER environment variable"
     missing_env_var_secret=true
@@ -62,12 +63,12 @@ if [ -z "$KHEOPS_KEYCLOAK_REALMS" ]; then
     missing_env_var_secret=true
 fi
 
-
+#if missing env var or secret => exit
 if [ "missing_env_var_secret" = true ]; then
     exit 1
 fi
 
-
+#get secrets
 for f in ${SECRET_FILE_PATH}/*
 do
   filename=$(basename "$f")
@@ -76,6 +77,7 @@ do
 done
 
 
+#get env var
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
@@ -85,4 +87,6 @@ sed -i "s|\${kheops_keycloak_clientid}|$KHEOPS_KEYCLOAK_CLIENTID|" ${REPLACE_FIL
 sed -i "s|\${kheops_keycloak_user}|$KHEOPS_KEYCLOAK_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PATH}
 
+
+#run tomcat
 catalina.sh run;
