@@ -9,6 +9,7 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 
 import static online.kheops.auth_server.user.UserQueries.*;
 
@@ -107,6 +108,13 @@ public class Users {
             em.persist(albumUser);
             tx.commit();
             return newUser;
+        } catch (PersistenceException e) {
+            try {
+                return getUser(userReference);
+            } catch (UserNotFoundException notFoundException) {
+                notFoundException.addSuppressed(e);
+                throw notFoundException;
+            }
         } catch (Exception e) {
             throw new UserNotFoundException("Error while adding a new user to the kheops db", e);
         } finally {
