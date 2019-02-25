@@ -41,7 +41,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
         } catch (IllegalArgumentException e) {
-            LOG.log(Level.WARNING, "IllegalArgumentException", e);
+            LOG.log(Level.WARNING, "IllegalArgumentException " + requestContext.getUriInfo().getRequestUri(), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
@@ -50,7 +50,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             assertion = AssertionVerifier.createAssertion(token);
         } catch (BadAssertionException e) {
-            LOG.log(Level.WARNING, "Received bad assertion", e);
+            LOG.log(Level.WARNING, "Received bad assertion" + requestContext.getUriInfo().getRequestUri(), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
@@ -59,7 +59,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             user = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
-            LOG.log(Level.WARNING, "User not found", e);
+            LOG.log(Level.WARNING, "User not found" + requestContext.getUriInfo().getRequestUri(), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
