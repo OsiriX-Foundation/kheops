@@ -4,13 +4,11 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.filter.SecuredFilter;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-<<<<<<< HEAD
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -19,9 +17,8 @@ import javax.ws.rs.client.Entity;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-=======
+
 import javax.persistence.PersistenceException;
->>>>>>> master
 
 import static online.kheops.auth_server.user.UserQueries.*;
 
