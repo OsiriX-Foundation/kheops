@@ -12,6 +12,5 @@ COPY KheopsDICOMwebProxy.war /usr/local/tomcat/webapps/capabilities.war
 COPY context.xml /usr/local/tomcat/conf/context.xml
 
 COPY replaceSecretsAndRun.sh replaceSecretsAndRun.sh
-RUN chmod +x replaceSecretsAndRun.sh
 
 CMD ["./replaceSecretsAndRun.sh"]
