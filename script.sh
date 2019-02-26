@@ -65,7 +65,7 @@ fi
 
 
 #if missing env var or secret => exit
-if [[ missing_env_var_secret=true ]]; then
+if [[ $missing_env_var_secret = true ]]; then
   exit 1
 fi
 
