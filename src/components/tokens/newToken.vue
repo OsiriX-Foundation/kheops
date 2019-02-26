@@ -11,7 +11,7 @@
 		"download": "download",
 		"appropriate": "appropriate",
 		"expirationdate": "expiration date",
-		"tokencopysuccess": "Token copied successfully"
+		"tokencopysuccess": "Token successfully copied"
 
 	},
 	"fr": {
