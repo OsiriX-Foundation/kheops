@@ -102,12 +102,9 @@ else
    echo -e "environment variable KHEOPS_UI_PORT \e[92mOK\e[0m"
 fi
 
-echo missing_env_var_secret:
-echo $missing_env_var_secret
 
 #if missing env var or secret => exit
-if [[ missing_env_var_secret=true ]]; then
-  echo "exit because missing_env_var_secret is true" 
+if [[ $missing_env_var_secret=true ]]; then
   exit 1
 else
    echo -e "all secrets and all env var \e[92mOK\e[0m"
