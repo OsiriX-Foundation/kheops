@@ -50,18 +50,14 @@ if [ "$missing_env_var_secret" = true ]; then
     exit 1
 fi
 
-sed -i "s|\${kheops_ui_title}|$KHEOPS_UI_TITLE|" $FILENAME
-sed -i "s|\${kheops_keycloak_uri}|$KHEOPS_KEYCLOAK_URI|" $FILENAME
-sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" $FILENAME
-sed -i "s|\${kheops_ui_keycloak_clientid}|$KHEOPS_UI_KEYCLOAK_CLIENTID|" $FILENAME
+sed -i "s|\${kheops_ui_title}|$KHEOPS_UI_TITLE|g" $FILENAME
+sed -i "s|\${kheops_keycloak_uri}|$KHEOPS_KEYCLOAK_URI|g" $FILENAME
+sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|g" $FILENAME
+sed -i "s|\${kheops_ui_keycloak_clientid}|$KHEOPS_UI_KEYCLOAK_CLIENTID|g" $FILENAME
 api="${KHEOPS_ROOT_SCHEME}://${KHEOPS_ROOT_HOST}${KHEOPS_API_PATH}"
-while [ $(tr ' ' '\n' < $FILENAME | grep {kheops_api_url} | wc -l) -gt 0 ]
-do
-    sed -i "s|\${kheops_api_url}|$api|" $FILENAME
-done
-sed -i "s|\${kheops_viewer_url}|$KHEOPS_VIEWER_URL|" $FILENAME
+sed -i "s|\${kheops_api_url}|$api|g" $FILENAME
+sed -i "s|\${kheops_viewer_url}|$KHEOPS_VIEWER_URL|g" $FILENAME
 
 chmod a+w /etc/nginx/conf.d/ui.conf
-sed -i "s|\${server_name}|$SERVER_NAME|" /etc/nginx/conf.d/ui.conf
 
 nginx-debug -g 'daemon off;'
