@@ -8,9 +8,7 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
 
 COPY context.xml /usr/local/tomcat/conf/context.xml
-
 COPY replaceSecretsAndRun.sh replaceSecretsAndRun.sh
-RUN chmod +x replaceSecretsAndRun.sh
 
 COPY KheopsZipper.war /usr/local/tomcat/webapps/zipper.war
 
