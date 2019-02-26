@@ -2,16 +2,18 @@
 
 missing_env_var_secret=false
 
-echo "start script"
-
 #Verify secrets
 if ! [ -f ${SECRET_FILE_PATH}/privkey1.pem ]; then
     echo "Missing privkey1.pem secret"
     missing_env_var_secret=true
+else
+   echo -e "secret privkey1.pem \e[92mOK"
 fi
 if ! [ -f ${SECRET_FILE_PATH}/fullchain1.pem ]; then
     echo "Missing fullchain1.pem secret"
     missing_env_var_secret=true
+else
+   echo -e "secret fullchain1.pem \e[92mOK"
 fi
 
 
