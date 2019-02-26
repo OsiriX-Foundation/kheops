@@ -104,6 +104,7 @@
         slot-scope="data"
       >
         {{ $t(data.label) }}
+        <!--
         <b-button
           variant="link"
           size="sm"
@@ -121,6 +122,7 @@
           @click.native.stop
           @change="selectAll(albums.allSelected)"
         />
+				-->
       </template>
       <template
         slot="HEAD_name"
