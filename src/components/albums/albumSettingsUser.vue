@@ -13,10 +13,10 @@
 		"send_series": "Add to album / inbox",
 		"delete_series": "Remove Studies / Series",
 		"write_comments": "Write Comments",
-		"albumuseraddsuccess": "User added successfully to the album",
+		"albumuseraddsuccess": "User successfully added to the album",
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"usersettoadmin": "User has admin rights",
-		"usernotsettoadmin": "User has no more admin rights",
+		"usernotsettoadmin": "User no longer has admin rights",
 		"Unknown user": "Unknown user"
 	},
 	"fr": {

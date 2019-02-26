@@ -2,7 +2,7 @@
 	{
 		"en": {
 			"newtoken": "New token",
-			"showrevokedtoken": "Show revoked tokens",
+			"showrevokedtoken": "Show invalid tokens",
 			"revoke": "revoke",
 			"revoked": "revoked",
 			"active": "active",
@@ -19,7 +19,7 @@
 		},
 		"fr": {
 			"newtoken": "Nouveau token",
-			"showrevokedtoken": "Afficher les tokens expirés",
+			"showrevokedtoken": "Afficher les tokens invalides",
 			"revoke": "révoquer",
 			"revoked": "révoqué",
 			"active": "actif",

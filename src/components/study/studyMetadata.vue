@@ -9,8 +9,8 @@
 		"studydate": "Study date",
 		"studyid": "Study ID",
 		"studytime": "Study time",
-		"patientinfo": "Patient's informations",
-		"studyinfo": "Study's informations",
+		"patientinfo": "Patient details",
+		"studyinfo": "Study details",
 		"NumberOfStudyRelatedInstances": "Number of instances",
 		"NumberOfStudyRelatedSeries": "Number of series"
 	},
