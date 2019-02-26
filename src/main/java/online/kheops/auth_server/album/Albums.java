@@ -54,13 +54,11 @@ public class Albums {
         try {
             tx.begin();
 
-            //TODO ??? 2x em.merge callingUser
             callingUser = em.merge(callingUser);
-            final User mergedCallingUser = em.merge(callingUser);
 
             final Album newAlbum = new Album(name, description, usersPermission);
-            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, mergedCallingUser, true);
-            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(mergedCallingUser, newAlbum);
+            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
+            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
 
             em.persist(newAlbum);
             em.persist(newAlbumUser);
@@ -68,7 +66,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(newAlbum.getId(), mergedCallingUser.getPk());
+            albumResponse = findAlbumByUserPkAndAlbumId(newAlbum.getId(), callingUser.getPk());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -80,7 +78,7 @@ public class Albums {
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
-            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException, UserNotMemberException {
+            throws AlbumNotFoundException, AlbumForbiddenException, JOOQException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -150,7 +148,7 @@ public class Albums {
     }
 
     public static void deleteAlbum(User callingUser, String albumId)
-            throws AlbumNotFoundException, UserNotFoundException {
+            throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

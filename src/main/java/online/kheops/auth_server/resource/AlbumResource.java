@@ -169,7 +169,7 @@ public class AlbumResource {
 
         try {
             albumResponse = Albums.editAlbum(kheopsPrincipal.getUser(), albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
-        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
+        } catch (AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Edit album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
@@ -196,7 +196,7 @@ public class AlbumResource {
 
         try {
             Albums.deleteAlbum(kheopsPrincipal.getUser(), albumId);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
