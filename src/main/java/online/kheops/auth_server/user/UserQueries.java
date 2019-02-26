@@ -2,7 +2,9 @@ package online.kheops.auth_server.user;
 
 import online.kheops.auth_server.entity.User;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 public class UserQueries {
 

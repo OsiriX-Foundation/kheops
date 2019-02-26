@@ -1,7 +1,5 @@
 package online.kheops.auth_server.annotation;
 
-import online.kheops.auth_server.user.UserPermissionEnum;
-
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

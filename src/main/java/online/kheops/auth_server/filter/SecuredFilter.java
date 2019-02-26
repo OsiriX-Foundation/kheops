@@ -15,7 +15,9 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -23,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
-import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
 
 @Secured
 @Provider

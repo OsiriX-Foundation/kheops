@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.album.BadQueryParametersException;
@@ -9,6 +8,7 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.event.EventResponse;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;

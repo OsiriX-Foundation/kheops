@@ -10,7 +10,6 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,13 +17,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static online.kheops.auth_server.generated.tables.Users.USERS;
-import static online.kheops.auth_server.util.JOOQTools.*;
-import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
+import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
+import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
+import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {

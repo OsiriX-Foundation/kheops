@@ -2,12 +2,10 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
-
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
-
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;

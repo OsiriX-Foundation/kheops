@@ -8,7 +8,10 @@ import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.capability.ScopeType;
-import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
@@ -16,14 +19,13 @@ import online.kheops.auth_server.user.UserPermissionEnum;
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-
 import java.util.List;
 
-import static online.kheops.auth_server.album.Albums.*;
-import static online.kheops.auth_server.series.Series.canAccessSeries;
+import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.series.Series.getSeries;
-import static online.kheops.auth_server.series.SeriesQueries.*;
-import static online.kheops.auth_server.study.Studies.canAccessStudy;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class ViewerPrincipal implements KheopsPrincipalInterface {

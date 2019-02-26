@@ -1,12 +1,11 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.album.Albums;
-import online.kheops.auth_server.annotation.*;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.capability.CapabilitiesResponse.Response;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
@@ -17,7 +16,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.capability.Capabilities.ID_PATTERN;
+import static online.kheops.auth_server.capability.Capabilities.generateCapability;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 
 

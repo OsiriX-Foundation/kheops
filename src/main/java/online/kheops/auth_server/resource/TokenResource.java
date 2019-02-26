@@ -1,26 +1,12 @@
 package online.kheops.auth_server.resource;
 
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.*;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlElement;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.ViewerTokenAccess;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.AssertionVerifier;
-
-import online.kheops.auth_server.assertion.BadAssertionException;
-import online.kheops.auth_server.assertion.DownloadKeyException;
-import online.kheops.auth_server.assertion.UnknownGrantTypeException;
-
+import online.kheops.auth_server.assertion.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
@@ -38,16 +24,22 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.lang.JoseException;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.*;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.UnsupportedEncodingException;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.Users.*;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 

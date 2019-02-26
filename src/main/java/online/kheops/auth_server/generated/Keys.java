@@ -4,29 +4,14 @@
 package online.kheops.auth_server.generated;
 
 
-import javax.annotation.Generated;
-
-import online.kheops.auth_server.generated.tables.AlbumSeries;
-import online.kheops.auth_server.generated.tables.AlbumUser;
-import online.kheops.auth_server.generated.tables.Albums;
-import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Events;
-import online.kheops.auth_server.generated.tables.Series;
-import online.kheops.auth_server.generated.tables.Studies;
-import online.kheops.auth_server.generated.tables.Users;
-import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
-import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
-import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
-import online.kheops.auth_server.generated.tables.records.CapabilitiesRecord;
-import online.kheops.auth_server.generated.tables.records.EventsRecord;
-import online.kheops.auth_server.generated.tables.records.SeriesRecord;
-import online.kheops.auth_server.generated.tables.records.StudiesRecord;
-import online.kheops.auth_server.generated.tables.records.UsersRecord;
-
+import online.kheops.auth_server.generated.tables.*;
+import online.kheops.auth_server.generated.tables.records.*;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
+
+import javax.annotation.Generated;
 
 
 /**

@@ -3,9 +3,11 @@ package online.kheops.auth_server.capability;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
-import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.Users;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;

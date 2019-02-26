@@ -3,13 +3,17 @@ package online.kheops.auth_server.filter;
 import online.kheops.auth_server.annotation.ViewerTokenAccess;
 
 import javax.annotation.Priority;
-import javax.ws.rs.container.*;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
-import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
+import static online.kheops.auth_server.util.Consts.VIEWER_TOKEN_ACCESS_PRIORITY;
 
 @Provider
 public class ViewerTokenFilterFactory implements DynamicFeature {

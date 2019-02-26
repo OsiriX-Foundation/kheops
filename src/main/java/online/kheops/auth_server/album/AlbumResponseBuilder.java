@@ -1,6 +1,5 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import org.jooq.Record;
 

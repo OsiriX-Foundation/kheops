@@ -1,13 +1,12 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.annotation.UserAccessSecured;
-
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.util.logging.Logger;
 

@@ -1,8 +1,6 @@
 package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.AlbumResponse;
-import online.kheops.auth_server.album.AlbumResponseBuilder;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
@@ -12,7 +10,8 @@ import online.kheops.auth_server.user.UserNotFoundException;
 
 import java.time.format.DateTimeParseException;
 
-import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.capability.Capabilities.createAlbumCapability;
+import static online.kheops.auth_server.capability.Capabilities.createUserCapability;
 
 public enum ScopeType {
     USER {

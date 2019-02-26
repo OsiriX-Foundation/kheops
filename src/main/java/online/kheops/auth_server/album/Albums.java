@@ -2,9 +2,9 @@ package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;

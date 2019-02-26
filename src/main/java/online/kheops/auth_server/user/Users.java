@@ -10,7 +10,8 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import static online.kheops.auth_server.user.UserQueries.*;
+import static online.kheops.auth_server.user.UserQueries.findUserByPk;
+import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 
 public class Users {
     private Users() {

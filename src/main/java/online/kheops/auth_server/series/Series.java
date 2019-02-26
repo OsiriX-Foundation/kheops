@@ -2,13 +2,11 @@ package online.kheops.auth_server.series;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.user.UserNotFoundException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.VR;
 
@@ -21,7 +19,6 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByPk;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUID;
-import static online.kheops.auth_server.user.Users.getUser;
 
 public class Series {
 

@@ -4,17 +4,15 @@
 package online.kheops.auth_server.generated.tables.records;
 
 
-import java.sql.Timestamp;
-
-import javax.annotation.Generated;
-
 import online.kheops.auth_server.generated.tables.Capabilities;
-
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record17;
 import org.jooq.Row17;
 import org.jooq.impl.UpdatableRecordImpl;
+
+import javax.annotation.Generated;
+import java.sql.Timestamp;
 
 
 /**

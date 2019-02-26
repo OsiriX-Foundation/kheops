@@ -1,6 +1,9 @@
 package online.kheops.auth_server.entity;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 @Entity(name = "Comment")
 @DiscriminatorValue("Comment")
