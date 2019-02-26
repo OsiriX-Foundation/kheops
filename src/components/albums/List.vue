@@ -9,7 +9,11 @@
 		"User #": "user #",
 		"Message #": "message #",
 		"Date": "date",
-		"LastEvent": "last event"
+		"LastEvent": "last event",
+		"selectednbalbums": "{count} album is selected | {count} albums are selected",
+		"share": "Share",
+		"permissionsfailed": "You can't send this albums : ",
+		"send": "send"
 	},
 	"fr": {
 		"newalbum": "Nouvel album",
@@ -18,7 +22,11 @@
 		"User #": "# utilisateurs",
 		"Message #": "# messages",
 		"Date": "date",
-		"LastEvent": "dern. evnt"
+		"LastEvent": "dern. evnt",
+		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
+		"share": "Partager",
+		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
+		"send": "envoyés"
 	}
 }
 </i18n>
@@ -51,6 +59,36 @@
         </button>
       </h3>
     </div>
+    <!--
+			TODO: Generate a components ?
+			send icon
+		-->
+    <div class="container-fluid my-3 selection-button-container">
+      <span
+        v-if="selectedAlbumsNb"
+        class="float-left"
+      >
+        <span>{{ $tc("selectednbalbums",selectedAlbumsNb,{count: selectedAlbumsNb}) }}</span>
+        <button
+          type="button"
+          class="btn btn-link btn-sm text-center"
+          @click.stop="form_send_album=!form_send_album"
+        >
+          <span>
+            <v-icon
+              class="align-middle"
+              name="paper-plane"
+            />
+          </span><br>
+          {{ $t("share") }}
+        </button>
+      </span>
+    </div>
+    <form-get-user
+      v-if="form_send_album && selectedAlbumsNb"
+      @get-user="sendToUser"
+      @cancel-user="form_send_album=false"
+    />
     <b-table
       striped
       :items="albums"
@@ -306,14 +344,16 @@
 
 import { mapGetters } from 'vuex'
 import Datepicker from 'vuejs-datepicker'
+import formGetUser from '@/components/user/getUser'
 
 export default {
 	name: 'Albums',
-	components: { Datepicker },
+	components: { Datepicker, formGetUser },
 	data () {
 		return {
 			pageNb: 1,
 			active: false,
+			form_send_album: false,
 			fields: [
 				{
 					key: 'is_selected',
@@ -503,6 +543,24 @@ export default {
 		selectAlbum (item) {
 			if (item.album_id) {
 				this.$router.push('/albums/' + item.album_id)
+			}
+		},
+		sendToUser (userSub) {
+			let albumsSelected = this.albums.filter(album => { return album.is_selected === true })
+			let permissions = albumsSelected.every(album => { return album.is_admin || album.add_user })
+			if (!permissions) {
+				let noperms = albumsSelected.filter(album => { return !(album.is_admin || album.add_user) })
+				this.$snotify.error(`${this.$t('permissionsfailed')} ${noperms.map(a => a.name).join(', ')}`)
+			} else {
+				albumsSelected.forEach(album => {
+					this.$store.dispatch('add_user_to_album', { album_id: album.album_id, user_name: userSub })
+						.then(() => {
+							this.$snotify.success(`${album.name} ${this.$t('send')}`)
+						})
+						.catch(res => {
+							this.$snotify.error(this.$t(res))
+						})
+				})
 			}
 		}
 
