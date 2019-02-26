@@ -128,7 +128,7 @@ public class CapabilitiesResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
-                                                     @PathParam(ALBUM) String albumId) {
+                                                     @QueryParam(ALBUM) String albumId) {
 
         List<Response> capabilityResponses;
 
