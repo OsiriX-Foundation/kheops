@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
-import static online.kheops.auth_server.user.Users.getUser;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Sending {
 
@@ -255,7 +255,7 @@ public class Sending {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = getUser(targetUsername, em);
+            final User targetUser = em.merge(getOrCreateUser(targetUsername));
 
             if (callingUser == targetUser) {
                 //return Response.status(Response.Status.BAD_REQUEST).entity("Can't send a study to yourself").build();
@@ -292,7 +292,7 @@ public class Sending {
         try {
             tx.begin();
 
-            final User targetUser = getUser(targetUsername, em);
+            final User targetUser = em.merge(getOrCreateUser(targetUsername));
             callingUser = em.merge(callingUser);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series

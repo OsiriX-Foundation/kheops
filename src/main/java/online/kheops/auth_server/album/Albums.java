@@ -15,7 +15,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
-import static online.kheops.auth_server.user.Users.getUser;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.user.Users.userExist;
 
 public class Albums {
@@ -232,7 +232,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = getUser(userName, em);
+            final User targetUser = em.merge(getOrCreateUser(userName));
 
             if (targetUser.getPk() == callingUser.getPk()) {
                 throw new AlbumForbiddenException("Add yourself forbidden");
@@ -287,7 +287,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = getUser(userName, em);
+            final User removedUser = em.merge(getOrCreateUser(userName));
             final Album album = getAlbum(albumId, em);
             final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
             final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
@@ -339,7 +339,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = getUser(userName, em);
+            final User removedUser = em.merge(getOrCreateUser(userName));
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 

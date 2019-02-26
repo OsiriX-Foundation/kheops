@@ -18,16 +18,7 @@ public class Users {
         throw new IllegalStateException("Utility class");
     }
 
-    /*public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
-        final User user = findUserByPk(callingUserPk, entityManager);
-        if (user != null) {
-            return user;
-        } else {
-            throw new UserNotFoundException("User :" +callingUserPk +"does not exist.");
-        }
-    }*/
-
-    public static User getUser(String userReference, EntityManager entityManager)
+    private static User getUser(String userReference, EntityManager entityManager)
             throws UserNotFoundException {
 
         if(userReference.contains("@")) {
@@ -39,41 +30,20 @@ public class Users {
             }
         }
 
-        //try {
         return findUserByUserId(userReference, entityManager);
-        //} catch (UserNotFoundException e) {
-        //    return getOrCreateUser(userReference);
-        //}
-    }
-
-    private static User getUser(String userReference) throws UserNotFoundException{
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
-        User user;
-
-        try {
-            tx.begin();
-            user = getUser(userReference, em);
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-
-        return user;
     }
 
     public static boolean userExist(long callingUserPk, EntityManager entityManager){
         return findUserByPk(callingUserPk, entityManager) != null;
     }
 
-    public static User getOrCreateUser(String userReference) throws UserNotFoundException {
+    public static User getOrCreateUser(String userReference)
+            throws UserNotFoundException {
 
+        final EntityManager em = EntityManagerListener.createEntityManager();
         //try to find the user in kheops db
         try {
-            return getUser(userReference);
+            return getUser(userReference, em);
         } catch (UserNotFoundException e) {/*empty*/ }
 
         //the user is not in kheops db
@@ -86,7 +56,6 @@ public class Users {
         }
 
         //the user is in keycloak but not in kheops => add the user in kheops
-        final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
         try {

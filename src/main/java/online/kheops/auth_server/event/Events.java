@@ -19,7 +19,7 @@ import java.util.List;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.study.Studies.getStudy;
-import static online.kheops.auth_server.user.Users.getUser;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Events {
 
@@ -46,7 +46,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, album);
 
             if(isPrivateComment) {
-                final User targetUser = getUser(user, em);
+                final User targetUser = em.merge(getOrCreateUser(user));
 
                 if (targetUser == callingUser) {
                     throw new BadQueryParametersException("Self comment forbidden");
@@ -245,7 +245,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, study);
 
             if(isPrivateComment) {
-                User targetUser = getUser(targetUserPk, em);
+                User targetUser = em.merge(getOrCreateUser(targetUserPk));
 
                 if (targetUser == callingUser) {
                     throw new BadQueryParametersException("Self comment forbidden");

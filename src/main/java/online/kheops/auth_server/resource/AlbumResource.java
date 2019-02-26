@@ -245,10 +245,10 @@ public class AlbumResource {
         try {
             Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
+            LOG.log(Level.INFO, "Add a user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Add a user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -317,10 +317,10 @@ public class AlbumResource {
         try {
             Albums.deleteUser(kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove a user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Remove a user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
