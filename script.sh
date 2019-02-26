@@ -2,6 +2,8 @@
 
 missing_env_var_secret=false
 
+echo "start script"
+
 #Verify secrets
 if ! [ -f ${SECRET_FILE_PATH}/privkey1.pem ]; then
     echo "Missing privkey1.pem secret"
