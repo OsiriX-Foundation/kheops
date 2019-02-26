@@ -245,16 +245,12 @@ public class Albums {
             if (isMemberOfAlbum(targetUser, album, em)) {
                 try {
                     final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
-                    if (targetAlbumUser.isAdmin() == isAdmin) {
-                        return; // the target is already a member of the album with the same profile (admin / non-admin)
+                    if (! targetAlbumUser.isAdmin() && isAdmin) {
+                        //Here, the targetUser is an normal member and he will be promot admin
+                        targetAlbumUser.setAdmin(isAdmin);
+                        final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
+                        em.persist(mutationPromoteAdmin);
                     }
-                    if (targetAlbumUser.isAdmin() && !isAdmin) {
-                        throw new AlbumForbiddenException("The user: " + targetUser.getEmail() + "is an admin. Use : DELETE /albums/" + albumId + "/users/" + callingUser.getKeycloakId() + "/admin");
-                    }
-                    //From here, the targetUser is an normal member and he will be promot admin
-                    targetAlbumUser.setAdmin(isAdmin);
-                    final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
-                    em.persist(mutationPromoteAdmin);
 
                 } catch (UserNotMemberException e) {
                     throw new AlbumNotFoundException("Album not found");//normally, this exception should never happen
