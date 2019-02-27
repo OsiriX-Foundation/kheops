@@ -22,9 +22,9 @@ public class CapabilitiesQueries {
         return query.getSingleResult();
     }
 
-    public static Capability findCapabilityByCapabilityTokenandUser(User user, String capabilityId, EntityManager em)
+    public static Capability findCapabilityByIdandUser(User user, String capabilityId, EntityManager em)
             throws NoResultException {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user AND :capabilityId = c.id", Capability.class);
+        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c join c.album a join a.albumUser au where ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id", Capability.class);
         query.setParameter("user", user);
         query.setParameter("capabilityId", capabilityId);
         return query.getSingleResult();

@@ -188,6 +188,7 @@ public class Capabilities {
     
     public static CapabilitiesResponse.Response revokeCapability(User callingUser, String capabilityId)
     throws CapabilityNotFoundException {
+
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -334,20 +335,24 @@ public class Capabilities {
         }
     }
 
-    public static Capability getCapability(User user, String capabilityId, EntityManager em) throws CapabilityNotFoundException {
+    public static Capability getCapability(User user, String capabilityId, EntityManager em)
+            throws CapabilityNotFoundException {
+
         try {
-            return findCapabilityByCapabilityTokenandUser(user, capabilityId, em);
+            return findCapabilityByIdandUser(user, capabilityId, em);
         } catch (NoResultException e) {
-            throw new CapabilityNotFoundException();
+            throw new CapabilityNotFoundException("Capability token not found");
         }
     }
 
-    public static Capability getCapability(String secret, EntityManager em) throws CapabilityNotFoundException {
+    public static Capability getCapability(String secret, EntityManager em)
+            throws CapabilityNotFoundException {
+
         try {
             secret = HashCapability(secret);
             return findCapabilityByCapabilityToken(secret, em);
         } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capabability token not found");
+            throw new CapabilityNotFoundException("Capability token not found");
         }
     }
 }
