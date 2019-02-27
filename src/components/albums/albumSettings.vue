@@ -11,7 +11,6 @@
 		"general": "Général",
 		"user": "Utilisateur",
 		"token": "Token"
-
 	}
 }
 </i18n>

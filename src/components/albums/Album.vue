@@ -1,12 +1,11 @@
 /* eslint-disable */
 
-<i18n>
+<i18n scoped>
 {
 	"en": {
 		"albumName": "Album Name",
 		"albumDescription": "Album Description",
 		"users": "Users",
-		"usersettings": "Album user settings",
 		"addUser": "Add User",
 		"addSeries": "Add Studies / Series",
 		"downloadSeries": "Download Studies / Series",
@@ -19,7 +18,6 @@
 		"albumName": "Nom de l'album",
 		"albumDescription": "Description de l'album",
 		"users": "Utilisateurs",
-		"usersettings": "Réglages des utilisateurs de l'album",
 		"addUser": "Ajouter un utilisateur",
 		"addSeries": "Ajouter une étude / série",
 		"downloadSeries": "Télécharger une étude / série",
