@@ -292,18 +292,6 @@ public class Albums {
             final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
             final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
-            final Events.MutationType mutationType;
-
-            if (callingUser.getPk() == removedUser.getPk()) {
-                mutationType = Events.MutationType.LEAVE_ALBUM;
-            } else if (callingAlbumUser.isAdmin()){
-                mutationType = Events.MutationType.REMOVE_USER;
-            } else {
-                throw new AlbumForbiddenException("You must be an admin for removing another user");
-            }
-
-            final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
-
             if (removedAlbumUser.isAdmin()) {
                 for (Capability capability: album.getCapabilities()) {
                     if (capability.getUser() == removedUser) {
@@ -312,12 +300,23 @@ public class Albums {
                 }
             }
 
-            em.persist(mutation);
-            em.remove(removedAlbumUser);
-
             //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
                 deleteAlbum(callingUser, albumId);
+            } else {
+                final Events.MutationType mutationType;
+
+                if (callingUser.getPk() == removedUser.getPk()) {
+                    mutationType = Events.MutationType.LEAVE_ALBUM;
+                } else if (callingAlbumUser.isAdmin()){
+                    mutationType = Events.MutationType.REMOVE_USER;
+                } else {
+                    throw new AlbumForbiddenException("You must be an admin for removing another user");
+                }
+
+                final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
+                em.persist(mutation);
+                em.remove(removedAlbumUser);
             }
 
             tx.commit();
