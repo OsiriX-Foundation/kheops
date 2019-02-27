@@ -3,10 +3,7 @@
 <i18n>
 {
 	"en": {
-		"username": "User name",
-		"user": "user",
 		"userlist": "List of users",
-		"changerole": "change role to",
 		"add_user": "Invite a user",
 		"add_series": "Add Studies / Series",
 		"download_series": "Download Studies / Series",
@@ -17,13 +14,11 @@
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"usersettoadmin": "User has admin rights",
 		"usernotsettoadmin": "User no longer has admin rights",
-		"Unknown user": "Unknown user"
+		"Unknown user": "Unknown user",
+    "usersettings": "Album user settings"
 	},
 	"fr": {
-		"username": "Utilisateur",
-		"user": "Utilisateur",
 		"userlist": "Liste d'utilisateurs",
-		"changerole": "changer le rôle pour",
 		"add_user": "Inviter un utilisateur",
 		"add_series": "Ajouter une étude / série",
 		"download_series": "Télécharger une étude / série",
@@ -34,7 +29,8 @@
 		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
 		"usersettoadmin": "L'utilisateur a des droits admin",
 		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
-		"Unknown user": "Utilisateur inconnu"
+		"Unknown user": "Utilisateur inconnu",
+    "usersettings": "Réglages des utilisateurs de l'album"
 	}
 }
 </i18n>
@@ -96,65 +92,11 @@
         </form>
       </div>
     </div>
-    <div class="user-table-container">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{{ $t('username') }}</th>
-            <th v-if="album.is_admin" />
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="user in users"
-            :key="user.user_name"
-          >
-            <td>
-              {{ user.user_name }} <span v-if="user.is_admin">
-                (Admin)
-              </span>
-            </td>
-            <td
-              v-if="album.is_admin"
-              class="showOnTrHover text-right"
-            >
-              <div
-                v-if="confirm_delete!=user.user_name"
-                class="user_actions"
-              >
-                <a @click.stop="toggleAdmin(user)">
-                  {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
-                </a> <a
-                  v-if="album.is_admin"
-                  class="text-danger"
-                  style="margin-left: 20px"
-                  @click.stop="deleteUser(user)"
-                >
-                  <v-icon name="trash" />
-                </a>
-              </div>
-              <div v-if="confirm_delete==user.user_name">
-                <div class="btn-group">
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger"
-                    @click.stop="deleteUser(user)"
-                  >
-                    {{ $t('confirm') }}
-                  </button><button
-                    type="button"
-                    class="btn btn-sm btn-secondary"
-                    @click.stop="confirm_delete=''"
-                  >
-                    {{ $t('cancel') }}
-                  </button>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
+    <album-users
+      :album="album"
+      :users="users"
+    />
 
     <fieldset class="user_settings">
       <legend>{{ $t('usersettings') }}</legend>
@@ -194,12 +136,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import AlbumUsers from '@/components/albums/AlbumUsers'
 
 export default {
 	name: 'AlbumSettingsUser',
+	components: { AlbumUsers },
 	data () {
 		return {
-			confirm_delete: '',
 			form_add_user: false,
 			new_user_name: '',
 			userSettings: [
@@ -218,10 +161,10 @@ export default {
 			users: 'users'
 		})
 	},
-	watch: {
-	},
 	created () {
-		this.$store.dispatch('getUsers')
+		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
+		this.$store.dispatch('getUsers', { album_id: this.$route.params.album_id })
+		console.log(this.users)
 	},
 	methods: {
 		addUser () {
@@ -237,25 +180,6 @@ export default {
 						this.$snotify.error(this.$t(res))
 					})
 				}
-			}
-		},
-		toggleAdmin (user) {
-			user.is_admin = !user.is_admin
-			this.$store.dispatch('toggleAlbumUserAdmin', user).then(() => {
-				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
-				this.$snotify.success(message)
-			}).catch(err => {
-				console.error(err)
-				this.$snotify.error(this.$t('sorryerror'))
-			})
-		},
-		deleteUser (user) {
-			if (this.confirm_delete !== user.user_name) this.confirm_delete = user.user_name
-			else {
-				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(() => {
-					this.$snotify.success(this.$t('albumuserdeletesuccess'))
-					this.confirm_delete = ''
-				})
 			}
 		},
 		validEmail (email) {
@@ -276,21 +200,6 @@ export default {
 </script>
 
 <style scoped>
-div.user-table-container{
-	min-height: 200px;
-	padding: 50px 0;
-}
-
-a {
-	cursor: pointer;
-}
-td.showOnTrHover div.user_actions{
-	visibility: hidden;
-}
-
-tr:hover  td.showOnTrHover div.user_actions{
-	visibility: visible;
-}
 input::placeholder {
 	text-transform: lowercase;
 }

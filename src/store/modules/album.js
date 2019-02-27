@@ -125,6 +125,13 @@ const actions = {
 				dispatch('getAlbumComments')
 			} else return res
 		})
+	},
+	quitAlbum ({ commit }, user) {
+		return HTTP.delete(`/albums/${state.album.album_id}/users/${user}`).then(res => {
+			if (res.status === 204) {
+				commit('DELETE_ALBUM')
+			}
+		})
 	}
 
 }

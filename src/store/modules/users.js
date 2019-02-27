@@ -7,7 +7,9 @@ const state = {
 		fullname: null,
 		permissions: [],
 		jwt: null,
-		tokens: []
+		tokens: [],
+		email: null,
+		sub: null
 	}
 }
 
@@ -20,12 +22,15 @@ const getters = {
 const actions = {
 	login ({ commit }, userData) {
 		return new Promise((resolve) => {
+			let jwtInfo = JSON.parse(atob(userData.jwt.split('.')[1]))
 			var loggedUser = {
 				username: userData.login,
 				jwt: userData.jwt,
 				fullname: userData.fullname,
 				permissions: userData.permissions,
-				tokens: []
+				tokens: [],
+				email: jwtInfo.email,
+				sub: jwtInfo.sub
 			}
 			HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
 			localStorage.setItem('currentUser', JSON.stringify(loggedUser))

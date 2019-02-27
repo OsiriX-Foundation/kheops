@@ -4,14 +4,12 @@
 	"en":{
 		"albumname": "Album name",
 		"albumdescription": "Album description",
-		"notification": "Notifications",
-		"albumdeletesuccess": "Album deleted successfully"
+		"notification": "Notifications"
 	},
 	"fr": {
 		"albumname": "Nom de l'album",
 		"albumdescription": "Description de l'album",
-		"notification": "Notifications",
-		"albumdeletesuccess": "Album supprimé avec succès"
+		"notification": "Notifications"
 	}
 }
 </i18n>
@@ -127,40 +125,27 @@
 			</dd>
 		</dl>
 		-->
-    <p
-      v-if="album.is_admin"
-      class="float-right"
-    >
-      <button
-        type="button"
-        class="btn btn-danger"
-        @click="deleteAlbum"
-      >
-        {{ confirmDeletion?$t('confirmdeletion'):$t('delete') }}
-      </button> <button
-        v-if="confirmDeletion"
-        type="button"
-        class="btn btn-secondary"
-        @click="confirmDeletion=!confirmDeletion"
-      >
-        {{ $t('cancel') }}
-      </button>
-    </p>
+    <album-buttons
+      :album="album"
+      :show-quit="true"
+      :show-delete="album.is_admin"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import AlbumButtons from '@/components/albums/AlbumButtons'
 
 export default {
 	name: 'AlbumSettingsGeneral',
+	components: { AlbumButtons },
 	data () {
 		return {
 			edit: {
 				name: '-1',
 				description: '-1'
-			},
-			confirmDeletion: false
+			}
 		}
 	},
 	computed: {
@@ -171,6 +156,9 @@ export default {
 			return this.album.description.split('\n')
 		}
 	},
+	created () {
+		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
+	},
 	methods: {
 		updateAlbum () {
 			if (!this.album.is_admin) {
@@ -178,7 +166,6 @@ export default {
 				return
 			}
 			let params = {}
-			console.log(this.edit)
 			_.forEach(this.edit, (v, k) => {
 				if (v === '-1') return
 				if (this.album[k] !== v) {
@@ -195,17 +182,6 @@ export default {
 			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
 			})
-		},
-		deleteAlbum () {
-			if (!this.confirmDeletion) this.confirmDeletion = true
-			else {
-				this.$store.dispatch('deleteAlbum').then(() => {
-					this.$snotify.success(this.$t('albumdeletesuccess'))
-					this.$router.push('/albums')
-				}).catch(() => {
-					this.$snotify.error(this.$t('sorryerror'))
-				})
-			}
 		}
 	}
 }
