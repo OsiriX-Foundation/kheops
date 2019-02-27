@@ -96,7 +96,11 @@ public class EventRessource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @FormParam("to_user") String user,
-                                     @FormParam("comment") String comment) {
+                                     @FormParam("comment") @NotNull @NotEmpty String comment) {
+
+        if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
+            return Response.status(BAD_REQUEST).entity("Param 'comment' is too long. max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length()).build();
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -123,7 +127,7 @@ public class EventRessource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
+            return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
         }
 
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -158,6 +162,10 @@ public class EventRessource {
 
         if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
+        }
+
+        if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
+            return Response.status(BAD_REQUEST).entity("Param 'comment' is too long. max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length()).build();
         }
 
         try {

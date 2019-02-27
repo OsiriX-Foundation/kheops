@@ -9,8 +9,10 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
+import javax.validation.constraints.Max;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
@@ -46,6 +48,16 @@ public class AlbumResource {
                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                              MultivaluedMap<String, String> form) {
 
+        if (name.isEmpty()) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
+        }
+        if(name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
+        }
+        if(description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+            return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
+        }
+
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         final UsersPermission usersPermission = new UsersPermission();
@@ -57,9 +69,7 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
-        if (name.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
-        }
+
 
         final AlbumResponse albumResponse;
 
@@ -151,8 +161,14 @@ public class AlbumResource {
                               @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                               @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                               @FormParam("notificationNewSeries") Boolean notificationNewSeries,
-                              @FormParam("notificationNewComment") Boolean notificationNewComment,
-                              MultivaluedMap<String, String> form) {
+                              @FormParam("notificationNewComment") Boolean notificationNewComment) {
+
+        if(name != null && name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
+        }
+        if(description != null && description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+            return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();

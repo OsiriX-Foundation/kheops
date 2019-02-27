@@ -8,6 +8,8 @@ import online.kheops.auth_server.capability.CapabilitiesResponse.Response;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.util.Consts;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -37,7 +39,7 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response createNewCapability(@NotNull @FormParam("title") String title,
+    public javax.ws.rs.core.Response createNewCapability(@NotNull @NotEmpty @FormParam("title") String title,
                                                          @FormParam("expiration_time") String expirationTime,
                                                          @FormParam("not_before_time") String notBeforeTime,
                                                          @NotNull @FormParam("scope_type") String scopeType,
@@ -46,6 +48,10 @@ public class CapabilitiesResource {
                                                          @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
                                                          @NotNull @FormParam("download_permission") boolean downloadPermission,
                                                          @NotNull @FormParam("write_permission") boolean writePermission) {
+
+        if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
+            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface) securityContext.getUserPrincipal();
         final Response capabilityResponse;
@@ -130,7 +136,7 @@ public class CapabilitiesResource {
     public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
                                                      @QueryParam(ALBUM) String albumId) {
 
-        List<Response> capabilityResponses;
+        final List<Response> capabilityResponses;
 
         if(albumId != null) {
             capabilityResponses = Capabilities.getCapabilities(albumId, valid);
