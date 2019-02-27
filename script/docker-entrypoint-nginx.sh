@@ -22,7 +22,7 @@ if [ -z "$KHEOPS_KEYCLOAK_REALMS" ]; then
 fi
 
 if [ -z "$KHEOPS_UI_KEYCLOAK_CLIENTID" ]; then
-    echo "Missing KHEOPS_KEYCLOAK_URI environment variable"
+    echo "Missing KHEOPS_UI_KEYCLOAK_CLIENTID environment variable"
     missing_env_var_secret=true
 fi
 
