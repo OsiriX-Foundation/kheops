@@ -44,7 +44,8 @@ public class Keycloak {
         return instance;
     }
 
-    public UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{
+    public UserResponse getUser(String user)
+            throws UserNotFoundException, KeycloakException {
 
         if(user.contains("@")) {
             final Response response;
@@ -103,5 +104,4 @@ public class Keycloak {
     }
 
 }
-
 

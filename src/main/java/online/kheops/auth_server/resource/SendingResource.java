@@ -60,7 +60,7 @@ public class SendingResource
 
         try {
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -88,7 +88,7 @@ public class SendingResource
 
         try {
             Sending.shareSeriesWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, seriesInstanceUID);
-        } catch(UserNotFoundException | SeriesNotFoundException e) {
+        } catch (UserNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -189,14 +189,14 @@ public class SendingResource
                 }
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
-            } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+            } catch (AlbumNotFoundException | SeriesNotFoundException e) {
                 return Response.status(NOT_FOUND).entity(e.getMessage()).build();
             }
         }
 
         try {
             Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID);
-        } catch(SeriesNotFoundException e) {
+        } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + kheopsPrincipal.getDBID());
@@ -233,14 +233,14 @@ public class SendingResource
                 }
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
-            } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+            } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         }
 
         try {
             Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
-        } catch(SeriesNotFoundException e) {
+        } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + kheopsPrincipal.getDBID());
@@ -269,7 +269,7 @@ public class SendingResource
 
         try {
             Sending.putSeriesInAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, seriesInstanceUID);
-        } catch(AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -310,7 +310,7 @@ public class SendingResource
 
         try {
             Sending.putStudyInAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch( AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -331,7 +331,7 @@ public class SendingResource
 
         try {
             Sending.deleteStudyFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID);
-        } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -353,7 +353,7 @@ public class SendingResource
 
         try {
             Sending.deleteSeriesFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, seriesInstanceUID);
-        } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

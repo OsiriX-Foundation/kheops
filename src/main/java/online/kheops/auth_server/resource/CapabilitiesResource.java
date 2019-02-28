@@ -90,7 +90,7 @@ public class CapabilitiesResource {
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
         }
 
-        CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
+        final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
 
         try {
             capabilityResponse = generateCapability(capabilityParameters);
@@ -114,7 +114,7 @@ public class CapabilitiesResource {
     public javax.ws.rs.core.Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
-        Response capabilityResponse;
+        final Response capabilityResponse;
 
         try {
             capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
@@ -156,7 +156,7 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
 
-        Response capabilityResponses;
+        final Response capabilityResponses;
 
         try {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
@@ -174,8 +174,7 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
 
-        Response capabilityResponses;
-
+        final Response capabilityResponses;
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {

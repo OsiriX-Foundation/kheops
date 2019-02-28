@@ -130,7 +130,6 @@ public class EventRessource {
             return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
         }
 
-        final long callingUserPk = kheopsPrincipal.getDBID();
         final PairListXTotalCount<EventResponse.Response> pair;
 
         if( offset < 0 ) {

@@ -36,8 +36,6 @@ public class Capabilities {
     private static final String ID_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int ID_LENGTH = 10;
     public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-    private static final String ID_PATTERN_STRICT = "^" + ID_PATTERN + "$";
-    private static final Pattern idPattern = Pattern.compile(ID_PATTERN_STRICT);
 
     private static final Random rdm = new SecureRandom();
 
@@ -46,7 +44,7 @@ public class Capabilities {
     }
 
     public static String newCapabilityToken() {
-        StringBuilder secretBuilder = new StringBuilder();
+        final StringBuilder secretBuilder = new StringBuilder();
         do {
             while (secretBuilder.length() < TOKEN_LENGTH) {
                 int index = rdm.nextInt(TOKEN_DICT.length());
@@ -57,7 +55,7 @@ public class Capabilities {
     }
 
     public static String newCapabilityID() {
-        StringBuilder idBuilder = new StringBuilder();
+        final StringBuilder idBuilder = new StringBuilder();
 
         do {
             idBuilder.setLength(0);
@@ -81,10 +79,10 @@ public class Capabilities {
     }
 
     private static String bytesToHex(byte[] hash) {
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) hexString.append('0');
+        final StringBuilder hexString = new StringBuilder();
+        for (byte hash1 : hash) {
+            String hex = Integer.toHexString(0xff & hash1);
+            if (hex.length() == 1) hexString.append('0');
             hexString.append(hex);
         }
         return hexString.toString();
@@ -102,10 +100,10 @@ public class Capabilities {
     public static CapabilitiesResponse.Response createUserCapability(CapabilityParameters capabilityParameters)
             throws CapabilityBadRequestException {
 
-        CapabilitiesResponse.Response capabilityResponse;
+        final CapabilitiesResponse.Response capabilityResponse;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -136,10 +134,10 @@ public class Capabilities {
     public static CapabilitiesResponse.Response createAlbumCapability(CapabilityParameters capabilityParameters)
             throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
 
-        CapabilitiesResponse.Response capabilityResponse;
+        final CapabilitiesResponse.Response capabilityResponse;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -178,12 +176,12 @@ public class Capabilities {
     }
     
     public static CapabilitiesResponse.Response revokeCapability(User callingUser, String capabilityId)
-    throws CapabilityNotFoundException {
+            throws CapabilityNotFoundException {
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
-        CapabilitiesResponse.Response capabilityResponse;
+        final CapabilitiesResponse.Response capabilityResponse;
 
         try {
             tx.begin();
@@ -207,17 +205,18 @@ public class Capabilities {
     }
 
     public static List<CapabilitiesResponse.Response> getCapabilities(User callingUser, boolean valid) {
-        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
             callingUser = em.merge(callingUser);
 
-            List<Capability> capabilities;
+            final List<Capability> capabilities;
             if(valid) {
                 capabilities = findCapabilitiesByUserValidOnly(callingUser, em);
             } else {
@@ -239,15 +238,16 @@ public class Capabilities {
     }
 
     public static List<CapabilitiesResponse.Response> getCapabilities(String albumId, boolean valid) {
-        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            List<Capability> capabilities;
+            final List<Capability> capabilities;
             if(valid) {
                 capabilities = findCapabilitiesByAlbumValidOnly(albumId, em);
             } else {
@@ -270,7 +270,8 @@ public class Capabilities {
 
     public static CapabilitiesResponse.Response getCapabilityInfo(String capabilityToken)
             throws CapabilityNotFoundException {
-        CapabilitiesResponse.Response capabilityResponse;
+
+        final CapabilitiesResponse.Response capabilityResponse;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
@@ -285,10 +286,12 @@ public class Capabilities {
 
     public static CapabilitiesResponse.Response getCapability(String capabilityTokenID, long callingUserPk)
             throws CapabilityNotFoundException {
-        CapabilitiesResponse.Response capabilityResponse;
+
+        final CapabilitiesResponse.Response capabilityResponse;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final User user = findUserByPk(callingUserPk, em);
+
         try {
             Capability capability = getCapability(user, capabilityTokenID, em);
             capabilityResponse = new CapabilitiesResponse(capability, false, false).getResponse();
