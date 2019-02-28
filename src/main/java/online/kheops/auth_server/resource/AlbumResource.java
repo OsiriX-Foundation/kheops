@@ -91,16 +91,11 @@ public class AlbumResource {
     public Response getAlbums() {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
-
         final PairListXTotalCount<AlbumResponse.Response> pairAlbumsTotalAlbum;
 
         try {
             final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.INFO, "Get albums list by user pk:"+callingUserPk+" FAILED", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();

@@ -22,8 +22,6 @@ public class Albums {
     private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int ID_LENGTH = 10;
     public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-    private static final String ID_PATTERN_STRICT = "^" + ID_PATTERN + "$";
-    private static final Pattern pattern = Pattern.compile(ID_PATTERN_STRICT);
     private static final Random rdm = new SecureRandom();
 
     private Albums() {
@@ -31,7 +29,7 @@ public class Albums {
     }
 
     public static String newAlbumID() {
-        StringBuilder idBuilder = new StringBuilder();
+        final StringBuilder idBuilder = new StringBuilder();
 
         do {
             idBuilder.setLength(0);
@@ -132,17 +130,8 @@ public class Albums {
     }
 
     public static PairListXTotalCount<AlbumResponse.Response> getAlbumList(AlbumQueryParams albumQueryParams)
-            throws UserNotFoundException, JOOQException, BadQueryParametersException {
+            throws JOOQException, BadQueryParametersException {
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        try {
-            if (!userExist(albumQueryParams.getDBID(), em)) {
-                throw new UserNotFoundException();
-            }
-        } finally {
-            em.close();
-        }
         return findAlbumsByUserPk(albumQueryParams);
     }
 

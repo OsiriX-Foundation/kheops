@@ -1,5 +1,6 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.util.JOOQTools;
 
@@ -30,9 +31,9 @@ public final class AlbumQueryParams {
     private final Optional<String> createdTime;
     private final Optional<String> lastEventTime;
 
-    private boolean favorite = false;
+    private final boolean favorite;
 
-    private long DBID;
+    private final User user;
 
     public AlbumQueryParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
@@ -62,7 +63,7 @@ public final class AlbumQueryParams {
         limit = extractLimit(queryParameters);
         offset = extractOffset(queryParameters);
 
-        DBID = kheopsPrincipal.getDBID();
+        user = kheopsPrincipal.getUser();
     }
 
     private Optional<String> extractName(MultivaluedMap<String, String> queryParameters) {
@@ -159,5 +160,5 @@ public final class AlbumQueryParams {
 
     public boolean canCreateCapabilityToken() { return canCreateCapabilityToken; }
 
-    public long getDBID() { return DBID; }
+    public User getUser() { return user; }
 }

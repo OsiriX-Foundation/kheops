@@ -127,8 +127,8 @@ public class AlbumQueries {
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
                     .and(EVENTS.EVENT_TYPE.eq("Comment"))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getDBID()))
-                            .or(EVENTS.USER_FK.eq(albumQueryParams.getDBID()))));
+                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getUser().getPk()))
+                            .or(EVENTS.USER_FK.eq(albumQueryParams.getUser().getPk()))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
 
@@ -149,7 +149,7 @@ public class AlbumQueries {
             }
 
             conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
-            query.addConditions(ALBUM_USER.USER_FK.eq(albumQueryParams.getDBID()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
+            query.addConditions(ALBUM_USER.USER_FK.eq(albumQueryParams.getUser().getPk()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
 
             for (Condition c : conditionArrayList) {
                 if (c != null) {
@@ -172,7 +172,7 @@ public class AlbumQueries {
                 albumResponses.add(new AlbumResponseBuilder().setAlbumFromUser(r).build().getResponse());
             }
 
-            final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getDBID(), conditionArrayList, connection);
+            final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getUser().getPk(), conditionArrayList, connection);
 
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {
