@@ -164,7 +164,6 @@ export default {
 	created () {
 		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
 		this.$store.dispatch('getUsers', { album_id: this.$route.params.album_id })
-		console.log(this.users)
 	},
 	methods: {
 		addUser () {
