@@ -40,10 +40,8 @@ public class ViewerTokenFilterFactory implements DynamicFeature {
 
         @Override
         public void filter(ContainerRequestContext requestContext) {
-            if(requestContext.getSecurityContext().isUserInRole(USER_IN_ROLE.VIEWER_TOKEN)) {
-                if(!canAccessWithViewerToken) {
-                    requestContext.abortWith(Response.status(FORBIDDEN).entity("This resource is not available with a viewer token").build());
-                }
+            if(requestContext.getSecurityContext().isUserInRole(USER_IN_ROLE.VIEWER_TOKEN) && !canAccessWithViewerToken) {
+                requestContext.abortWith(Response.status(FORBIDDEN).entity("This resource is not available with a viewer token").build());
             }
         }
     }

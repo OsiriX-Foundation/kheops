@@ -11,19 +11,19 @@ public class Comment extends Event{
 
     @Basic(optional = true)
     @Column(name = "comment", updatable = false)
-    private String comment;
+    private String commentContent;
 
-    public String getComment() { return comment; }
+    public String getComment() { return commentContent; }
 
     public Comment() {}
 
-    public Comment(String comment, User user, Album album) {
+    public Comment(String commentContent, User user, Album album) {
         super(user, album);
-        this.comment = comment;
+        this.commentContent = commentContent;
     }
 
-    public Comment(String comment, User user, Study study) {
+    public Comment(String commentContent, User user, Study study) {
         super(user, study);
-        this.comment = comment;
+        this.commentContent = commentContent;
     }
 }
