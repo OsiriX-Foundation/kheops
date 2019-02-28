@@ -77,9 +77,6 @@ public class SecuredFilter implements ContainerRequestFilter {
                 } else {
                     return new UserPrincipal(finalUser);
                 }
-
-                assertion.getViewer().ifPresent(this::new ViewerPrincipal());
-
             }
 
             @Override
