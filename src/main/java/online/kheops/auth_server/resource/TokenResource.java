@@ -273,7 +273,7 @@ public class TokenResource
                 token = serializedJwe;
                 expiresIn = 43200L;
             } catch (JoseException e) {
-                e.printStackTrace();
+                LOG.log(Level.SEVERE, "JoseException", e);
                 return Response.status(INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();//TODO
             }
         } else {

@@ -56,14 +56,15 @@ public class Keycloak {
 
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
-                JsonReader jsonReader = Json.createReader(new StringReader(output));
-                JsonArray reply = jsonReader.readArray();
-                final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
-                if(keycloakUsers.size() > 0) {
-                    final int index = keycloakUsers.verifyEmail(user);
-                    return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0)).build();
-                } else {
-                    throw new UserNotFoundException();
+                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                    JsonArray reply = jsonReader.readArray();
+                    final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
+                    if (keycloakUsers.size() > 0) {
+                        final int index = keycloakUsers.verifyEmail(user);
+                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0)).build();
+                    } else {
+                        throw new UserNotFoundException();
+                    }
                 }
             }
 
@@ -84,14 +85,15 @@ public class Keycloak {
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
                 output = "["+output+"]";
-                JsonReader jsonReader = Json.createReader(new StringReader(output));
-                JsonArray reply = jsonReader.readArray();
-                final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
-                if(keycloakUser.size() == 1) {
-                    cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
-                    return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0)).build();
-                } else {
-                    throw new UserNotFoundException();
+                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                    JsonArray reply = jsonReader.readArray();
+                    final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
+                    if (keycloakUser.size() == 1) {
+                        cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
+                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0)).build();
+                    } else {
+                        throw new UserNotFoundException();
+                    }
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();

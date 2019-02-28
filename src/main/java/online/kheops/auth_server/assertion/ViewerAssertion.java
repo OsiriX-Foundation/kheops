@@ -15,20 +15,22 @@ final class ViewerAssertion implements Assertion {
     private final Assertion assertion;
     static final class Builder {
 
-        ViewerAssertion build(String assertionToken) throws BadAssertionException {
+        ViewerAssertion build(String assertionToken)
+                throws BadAssertionException {
 
-            JsonReader jsonReader = Json.createReader(new StringReader(assertionToken));
-            JsonObject jwe = jsonReader.readObject();
-
-            return new ViewerAssertion(jwe);
+            try(JsonReader jsonReader = Json.createReader(new StringReader(assertionToken))) {
+                JsonObject jwe = jsonReader.readObject();
+                return new ViewerAssertion(jwe);
+            }
         }
     }
 
     static Builder getBuilder() { return BUILDER; }
 
-    private ViewerAssertion(JsonObject jwe) throws BadAssertionException {
-        this.jwe = jwe;
+    private ViewerAssertion(JsonObject jwe)
+            throws BadAssertionException {
 
+        this.jwe = jwe;
 
         assertion = AssertionVerifier.createAssertion(jwe.getString("token"));
         this.sub = assertion.getSub();
