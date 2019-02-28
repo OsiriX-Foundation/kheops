@@ -17,8 +17,7 @@ import javax.persistence.NoResultException;
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesByPk;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUID;
+import static online.kheops.auth_server.series.SeriesQueries.*;
 
 public class Series {
 
@@ -29,14 +28,6 @@ public class Series {
     public static void safeAttributeSetString(Attributes attributes, int tag, VR vr, String string) {
         if (string != null) {
             attributes.setString(tag, vr, string);
-        }
-    }
-
-    public static online.kheops.auth_server.entity.Series getSeries(Long seriesPk, EntityManager em) throws SeriesNotFoundException{
-        try {
-            return findSeriesByPk(seriesPk, em);
-        } catch (NoResultException e) {
-            throw new SeriesNotFoundException("Series PK : "+seriesPk+" not found");
         }
     }
 
@@ -52,16 +43,16 @@ public class Series {
         try {
             findSeriesByStudyUIDandSeriesUID(user, studyInstanceUID,  seriesInstanceUID, em);
             return true;
-        }catch (NoResultException e) {
+        }catch (SeriesNotFoundException e) {
             return false;
         }
     }
 
     public static boolean canAccessSeries(Album album, String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
         try {
-            findSeriesByStudyUIDandSeriesUID(album, studyInstanceUID,  seriesInstanceUID, em);
+            findSeriesByStudyUIDandSeriesUIDFromAlbum(album, studyInstanceUID,  seriesInstanceUID, em);
             return true;
-        }catch (NoResultException e) {
+        }catch (SeriesNotFoundException e) {
             return false;
         }
     }
@@ -136,6 +127,13 @@ public class Series {
         return albumSeries.isFavorite();
     }
 
-
+    public static boolean isSeriesInInbox(User callingUser, online.kheops.auth_server.entity.Series series, EntityManager em) {
+        try {
+            findSeriesBySeriesAndUserInbox(callingUser, series, em);
+            return true;
+        } catch (SeriesNotFoundException e) {
+            return false;
+        }
+    }
 
 }

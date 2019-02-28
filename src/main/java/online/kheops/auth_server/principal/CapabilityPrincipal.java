@@ -16,6 +16,7 @@ import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
+import static online.kheops.auth_server.series.Series.isSeriesInInbox;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
@@ -124,22 +125,20 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Series series;
                 try {
                     series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                } catch (NoResultException e) {
+                } catch (SeriesNotFoundException e) {
                     //if the series not exist
                     return true;
                 }
 
                 // we need to check here if the series that was found is owned by the user
-
-                try {
-                    findSeriesBySeriesAndUserInbox(mergeUser, series, em);
+                if(isSeriesInInbox(mergeUser, series, em)) {
                     return true;
-                } catch (NoResultException ignored) {/*empty*/}
+                }
 
                 try {
                     findSeriesBySeriesAndAlbumWithSendPermission(mergeUser, series, em);
                     return true;
-                } catch (NoResultException ignored) {
+                } catch (SeriesNotFoundException ignored) {
                     if (isOrphan(series, em)) {
                         return true;
                     }
@@ -168,7 +167,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Series series;
                 try {
                     series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                } catch (NoResultException e) {
+                } catch (SeriesNotFoundException e) {
                     //if the series not exist
                     return true;
                 }

@@ -15,8 +15,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.*;
-import static online.kheops.auth_server.series.Series.canAccessSeries;
-import static online.kheops.auth_server.series.Series.getSeries;
+import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
@@ -98,10 +97,9 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             }
 
             // we need to check here if the series that was found is owned by the user
-            try {
-                findSeriesBySeriesAndUserInbox(user, series, em);
+            if(isSeriesInInbox(user, series, em)) {
                 return true;
-            } catch (NoResultException ignored) {/*empty*/}
+            }
 
             try {
                 findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);

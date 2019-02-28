@@ -12,7 +12,6 @@ import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
-import javax.validation.constraints.Max;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;

@@ -16,7 +16,6 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -356,12 +355,10 @@ public class Studies {
         }
     }
 
-    public static Study getStudy(String studyInstanceUID, EntityManager em) throws StudyNotFoundException{
-        try {
+    public static Study getStudy(String studyInstanceUID, EntityManager em)
+            throws StudyNotFoundException
+    {
             return findStudyByStudyUID(studyInstanceUID, em);
-        } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : "+studyInstanceUID+" not found");
-        }
     }
 
     public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
@@ -381,7 +378,7 @@ public class Studies {
         try {
             StudyQueries.findStudyByStudyandUser(study, user, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (StudyNotFoundException e) {
             return false;
         }
     }
@@ -390,7 +387,7 @@ public class Studies {
         try {
             StudyQueries.findStudyByStudyandUserInbox(study, user, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (StudyNotFoundException e) {
             return false;
         }
     }
@@ -399,7 +396,7 @@ public class Studies {
         try {
             StudyQueries.findStudyByStudyandAlbum(study, album, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (StudyNotFoundException e) {
             return false;
         }
     }

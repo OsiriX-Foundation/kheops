@@ -9,7 +9,6 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.regex.Pattern;

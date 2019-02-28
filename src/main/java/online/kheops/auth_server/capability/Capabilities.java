@@ -11,7 +11,6 @@ import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -79,14 +78,6 @@ public class Capabilities {
         }
         byte[] encodedhash = digest.digest(capability.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(encodedhash);
-        /*Maby use :
-        https://en.wikipedia.org/wiki/Argon2
-        https://en.wikipedia.org/wiki/Bcrypt
-        https://en.wikipedia.org/wiki/Scrypt
-        https://en.wikipedia.org/wiki/PBKDF2
-        or another sha-512 is just for test
-        https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
-        */
     }
 
     private static String bytesToHex(byte[] hash) {
@@ -109,7 +100,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse.Response createUserCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, CapabilityBadRequestException {
+            throws CapabilityBadRequestException {
 
         CapabilitiesResponse.Response capabilityResponse;
 
