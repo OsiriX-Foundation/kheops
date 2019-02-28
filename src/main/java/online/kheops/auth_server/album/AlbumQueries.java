@@ -33,17 +33,29 @@ public class AlbumQueries {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Album findAlbumById(String albumId, EntityManager em) throws NoResultException{
-        return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
-                .setParameter("albumId", albumId)
-                .getSingleResult();
+    public static Album findAlbumById(String albumId, EntityManager em)
+            throws AlbumNotFoundException {
+
+        try {
+            return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
+                    .setParameter("albumId", albumId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new AlbumNotFoundException("Album albumId:" + albumId + " not found", e);
+        }
     }
 
-    public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em ) throws NoResultException {
-        return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
-                .setParameter("targetUser", user)
-                .setParameter("targetAlbum", album)
-                .getSingleResult();
+    public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em )
+            throws UserNotMemberException {
+
+        try {
+            return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
+                    .setParameter("targetUser", user)
+                    .setParameter("targetAlbum", album)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new UserNotMemberException("User : " + user.getKeycloakId() + " is not a member of the album :"+album.getId(), e);
+        }
     }
 
     public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em) throws NoResultException {

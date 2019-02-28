@@ -389,27 +389,19 @@ public class Albums {
     public static Album getAlbum(String albumId, EntityManager em)
             throws AlbumNotFoundException {
 
-        try {
             return findAlbumById(albumId, em);
-        } catch (NoResultException e) {
-            throw new AlbumNotFoundException("Album : " + albumId + " does not exist.");
-        }
     }
 
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)
             throws UserNotMemberException {
 
-        try {
             return findAlbumUserByUserAndAlbum(user, album, em);
-        } catch (NoResultException e) {
-            throw new UserNotMemberException(e);
-        }
     }
 
     public static boolean albumExist(String albumId, EntityManager em) {
         try {
             findAlbumById(albumId, em);
-        } catch (NoResultException e) {
+        } catch (AlbumNotFoundException e) {
             return false;
         }
         return true;
@@ -419,7 +411,7 @@ public class Albums {
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             findAlbumById(albumId, em);
-        } catch (NoResultException e) {
+        } catch (AlbumNotFoundException e) {
             return false;
         } finally {
             em.close();
@@ -430,7 +422,7 @@ public class Albums {
     public static boolean isMemberOfAlbum(User user, Album album, EntityManager em) {
         try {
             findAlbumUserByUserAndAlbum(user, album, em);
-        } catch (NoResultException e) {
+        } catch (UserNotMemberException e) {
             return false;
         }
         return true;

@@ -143,7 +143,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse.Response createAlbumCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
+            throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
 
         CapabilitiesResponse.Response capabilityResponse;
 
@@ -314,7 +314,7 @@ public class Capabilities {
         try {
             findCapabilityByCapabilityID(capabilityId, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (CapabilityNotFoundException e) {
             return false;
         } finally {
             em.close();
@@ -338,21 +338,13 @@ public class Capabilities {
     public static Capability getCapability(User user, String capabilityId, EntityManager em)
             throws CapabilityNotFoundException {
 
-        try {
             return findCapabilityByIdandUser(user, capabilityId, em);
-        } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capability token not found");
-        }
     }
 
     public static Capability getCapability(String secret, EntityManager em)
             throws CapabilityNotFoundException {
 
-        try {
-            secret = HashCapability(secret);
-            return findCapabilityByCapabilityToken(secret, em);
-        } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capability token not found");
-        }
+            final String hashSecret = HashCapability(secret);
+            return findCapabilityByCapabilityToken(hashSecret, em);
     }
 }
