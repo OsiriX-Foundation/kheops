@@ -41,11 +41,12 @@ public class KeycloakToken {
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
-            JsonReader jsonReader = Json.createReader(new StringReader(output));
-            JsonObject wellKnownResponse = jsonReader.readObject();
-            tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
-            introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
-        } else {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                JsonObject wellKnownResponse = jsonReader.readObject();
+                tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
+                introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
+            }
+        } else{
             throw new KeycloakException("Error during request OpenID Connect well-known");
         }
 

@@ -114,7 +114,6 @@ public class TokenResource
         }
 
         boolean pepScope = false;
-        boolean viewerScope = false;
         errorResponse.error = "Bad Request";
 
         if(scope != null) {
@@ -149,7 +148,6 @@ public class TokenResource
                     errorResponse.errorDescription = "'source_id' must be set when 'source_type'=" + ALBUM;
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                viewerScope = true;
             } else {
                 errorResponse.errorDescription = "scope: must be 'pep' or 'viewer' not " + scope;
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -244,7 +242,7 @@ public class TokenResource
             token = jwtBuilder.sign(algorithmHMAC);
             expiresIn = 3600L;
 
-        } else if (viewerScope) {
+        } else { //viewerScope
             // Generate a new Viewer token (JWE)
 
             if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ||
@@ -276,8 +274,6 @@ public class TokenResource
                 LOG.log(Level.SEVERE, "JoseException", e);
                 return Response.status(INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();//TODO
             }
-        } else {
-            return Response.status(BAD_REQUEST).build();
         }
 
         TokenResponse tokenResponse = new TokenResponse();
@@ -289,10 +285,8 @@ public class TokenResource
         }
         if(pepScope) {
             LOG.info("Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        } else if(viewerScope) {
+        } else { //viewerScope
             LOG.info("Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
-        } else {
-            LOG.info("Returning access token for user: " + assertion.getSub());
         }
         return Response.status(responseStatus).entity(tokenResponse).build();
     }
