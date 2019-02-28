@@ -220,6 +220,7 @@
                 class="form-control"
                 rows="6"
                 placeholder="Use @... for a specific user"
+                maxlength="1024"
               />
             </div>
             <div class="col-auto">

@@ -54,6 +54,7 @@
                 :placeholder="$t('description')"
                 class="form-control"
                 required
+                maxlength="255"
               >
             </dd>
           </div>

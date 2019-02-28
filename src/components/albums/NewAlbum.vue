@@ -45,6 +45,7 @@
                 type="text"
                 :placeholder="$t('albumName')"
                 class="form-control"
+                maxlength="255"
               >
             </dd>
           </div>
@@ -60,6 +61,7 @@
                 rows="5"
                 class="form-control"
                 :placeholder="$t('albumDescription')"
+                maxlength="2048"
               />
             </dd>
           </div>
