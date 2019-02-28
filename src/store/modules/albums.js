@@ -85,7 +85,7 @@ const actions = {
 		if (params.canCreateCapabilityToken) {
 			request = 'albums?canCreateCapabilityToken=true&sort=name'
 		} else {
-			request = 'albums?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+			request = 'albums?limit=' + params.limit + '&offset=' + offset + (params.sortBy ? '&sort=' + sortSense + params.sortBy : '') + requestParams
 		}
 		HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
