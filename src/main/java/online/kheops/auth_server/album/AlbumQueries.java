@@ -4,6 +4,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -58,11 +59,16 @@ public class AlbumQueries {
         }
     }
 
-    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em) throws NoResultException {
-        return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
-                .setParameter("seriesUID", seriesUID)
-                .setParameter("albumID", albumID)
-                .getSingleResult();
+    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em)
+            throws SeriesNotFoundException {
+        try {
+            return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
+                    .setParameter("seriesUID", seriesUID)
+                    .setParameter("albumID", albumID)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new SeriesNotFoundException("SeriesInstanceUID : " + seriesUID + " not found in the album : " + albumID, e);
+        }
     }
 
     @FunctionalInterface

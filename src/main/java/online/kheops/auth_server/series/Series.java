@@ -12,7 +12,6 @@ import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
@@ -31,12 +30,9 @@ public class Series {
         }
     }
 
-    public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws SeriesNotFoundException{
-        try {
-            return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
-        } catch (NoResultException e) {
-            throw new SeriesNotFoundException("seriesInstanceUID : "+seriesInstanceUID+" not found");
-        }
+    public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
+            throws SeriesNotFoundException{
+        return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
     }
 
     public static boolean canAccessSeries(User user, String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
@@ -119,7 +115,7 @@ public class Series {
         final AlbumSeries albumSeries;
         try {
             albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
-        } catch (NoResultException e) {
+        } catch (SeriesNotFoundException e) {
             throw new IllegalStateException("SeriesUID: "+seriesUID+"Not found inside the albumID: "+albumID);
         } finally {
             em.close();
