@@ -12,7 +12,6 @@ import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.*;
@@ -104,7 +103,7 @@ public class UserPrincipal implements KheopsPrincipalInterface {
             try {
                 findSeriesBySeriesAndAlbumWithSendPermission(user, series, em);
                 return true;
-            } catch (NoResultException ignored) {
+            } catch (SeriesNotFoundException ignored) {
                 if (isOrphan(series, em)) {
                     return true;
                 }

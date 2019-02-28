@@ -12,7 +12,6 @@ import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
@@ -178,7 +177,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if(mergeCapability.getAlbum().containsSeries(series, em)) {
                     return true;
                 }
-            } catch (UserNotMemberException | NoResultException e) {
+            } catch (UserNotMemberException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {

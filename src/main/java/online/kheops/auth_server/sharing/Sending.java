@@ -11,7 +11,6 @@ import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -289,13 +288,7 @@ public class Sending {
                 return;
             }
 
-            final Series series;
-            try {
-                series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-            } catch (NoResultException exception) {
-                throw new SeriesNotFoundException("Unknown series");
-            }
-
+            final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
             final Album inbox = targetUser.getInbox();
             if(inbox.containsSeries(series, em)) {
                 //target user has already access to the series
