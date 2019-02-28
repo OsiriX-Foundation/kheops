@@ -108,7 +108,6 @@ const actions = {
 	getAlbumComments ({ commit }, params) {
 		let query = ''
 		if (params.type) query = '?types=' + params.type
-
 		return HTTP.get('/albums/' + state.album.album_id + '/events' + query).then(res => {
 			if (res.status === 200) {
 				commit('SET_COMMENTS', res.data)
@@ -117,12 +116,12 @@ const actions = {
 	},
 	postAlbumComment ({ dispatch }, params) {
 		var query = ''
-		_.forEach(params, (value, key) => {
+		_.forEach(params.query, (value, key) => {
 			if (value) query += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&'
 		})
 		return HTTP.post('/albums/' + state.album.album_id + '/comments', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			if (res.status === 204) {
-				dispatch('getAlbumComments')
+				dispatch('getAlbumComments', params)
 			} else return res
 		})
 	},
