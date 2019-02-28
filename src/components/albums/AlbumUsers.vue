@@ -1,4 +1,11 @@
-
+<!--
+Components : AlbumUsers
+Props :
+	Users						Array
+	album						Object
+	showDeleteUser	Boolean
+	showChangeRole	Boolean
+-->
 <i18n>
 {
 	"en": {
@@ -40,10 +47,13 @@
               v-if="confirm_delete!=user.user_name"
               class="user_actions"
             >
-              <a @click.stop="toggleAdmin(user)">
+              <a
+                v-if="showChangeRole"
+                @click.stop="toggleAdmin(user)"
+              >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
               </a> <a
-                v-if="album.is_admin"
+                v-if="album.is_admin && showDeleteUser"
                 class="text-danger"
                 style="margin-left: 20px"
                 @click.stop="deleteUser(user)"
@@ -87,6 +97,16 @@ export default {
 			type: Array,
 			required: true,
 			default: () => ([])
+		},
+		showDeleteUser: {
+			type: Boolean,
+			required: true,
+			default: true
+		},
+		showChangeRole: {
+			type: Boolean,
+			required: true,
+			default: true
 		}
 	},
 	data () {

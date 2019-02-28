@@ -1,3 +1,11 @@
+<!--
+Components : AlbumButtons
+Props :
+	Users				Array
+	album				Object
+	showQuit		Boolean
+	showDelete	Boolean
+-->
 <i18n>
 {
 	"en":{
@@ -43,6 +51,8 @@
         <album-users
           :album="album"
           :users="users"
+          :show-delete-user="false"
+          :show-change-role="true"
         />
       </div>
       <div
@@ -115,6 +125,11 @@ export default {
 			required: true,
 			default: () => ({})
 		},
+		users: {
+			type: Array,
+			required: true,
+			default: () => ([])
+		},
 		showQuit: {
 			type: Boolean,
 			required: true,
@@ -136,8 +151,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			user: 'currentUser',
-			users: 'users'
+			user: 'currentUser'
 		})
 	},
 	methods: {

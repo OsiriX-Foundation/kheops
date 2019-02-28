@@ -96,6 +96,8 @@
     <album-users
       :album="album"
       :users="users"
+      :show-delete-user="true"
+      :show-change-role="true"
     />
 
     <fieldset class="user_settings">

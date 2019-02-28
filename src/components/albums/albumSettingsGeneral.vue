@@ -127,6 +127,7 @@
 		-->
     <album-buttons
       :album="album"
+      :users="users"
       :show-quit="true"
       :show-delete="album.is_admin"
     />
@@ -150,7 +151,8 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			album: 'album'
+			album: 'album',
+			users: 'users'
 		}),
 		formattedAlbumDescription () {
 			return this.album.description.split('\n')
@@ -158,6 +160,7 @@ export default {
 	},
 	created () {
 		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
+		this.$store.dispatch('getUsers')
 	},
 	methods: {
 		updateAlbum () {
