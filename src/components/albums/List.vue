@@ -101,9 +101,7 @@
     >
       <template
         slot="HEAD_is_selected"
-        slot-scope="data"
       >
-        {{ $t(data.label) }}
         <!--
         <b-button
           variant="link"
