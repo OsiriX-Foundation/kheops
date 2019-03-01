@@ -15,6 +15,7 @@ import online.kheops.auth_server.principal.UserPrincipal;
 import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.JweAesKey;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -256,11 +257,11 @@ public class TokenResource
                 final JsonWebEncryption jwe = new JsonWebEncryption();
 
                 JSONObject data = new JSONObject();
-                data.put("token", assertionToken);
-                data.put("sourceId", sourceId);
-                data.put("isInbox", sourceType.compareTo(INBOX) == 0);
-                data.put("studyInstanceUID", studyInstanceUID);
-                data.put("exp", Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
+                data.put(Consts.JWE.TOKEN, assertionToken);
+                data.put(Consts.JWE.SOURCE_ID, sourceId);
+                data.put(Consts.JWE.IS_INBOX, sourceType.compareTo(INBOX) == 0);
+                data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
+                data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
 
                 jwe.setPayload(data.toJSONString());
                 jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);

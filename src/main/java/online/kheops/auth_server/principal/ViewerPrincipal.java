@@ -15,6 +15,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.util.Consts;
 
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
@@ -38,18 +39,18 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     public ViewerPrincipal(JsonObject jwe) {
 
-        Assertion assertion;
+        final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(jwe.getString("token"));
+            assertion = AssertionVerifier.createAssertion(jwe.getString(Consts.JWE.TOKEN));
         } catch (BadAssertionException e) {
-            assertion = null;
+            throw new IllegalStateException(e);
         }
 
-        User user;
+        final User user;
         try {
             user = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
-            user = null;
+            throw new IllegalStateException(e);
         }
         if(assertion.getCapability().isPresent()) {
             kheopsPrincipal = new CapabilityPrincipal(assertion.getCapability().get(), user);
@@ -83,10 +84,10 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
             tx.begin();
 
             List<Series> seriesList;
-            if(jwe.getBoolean("isInbox")) {
+            if(jwe.getBoolean(Consts.JWE.IS_INBOX)) {
                 seriesList = findSeriesListByStudyUIDFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, em);
             } else {
-                final Album album = getAlbum(jwe.getString("sourceId"), em);
+                final Album album = getAlbum(jwe.getString(Consts.JWE.SOURCE_ID), em);
                 seriesList = findSeriesListByStudyUIDFromAlbum(kheopsPrincipal.getUser(), album, studyInstanceUID, em);
             }
 
@@ -111,7 +112,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
             return false;
         }
 
-        if (studyInstanceUID.compareTo(jwe.getString("studyInstanceUID")) == 0) {
+        if (studyInstanceUID.compareTo(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID)) == 0) {
             return true;
         } else {
             return false;
@@ -164,7 +165,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasAlbumAccess(String albumId){
         try {
-            return kheopsPrincipal.hasAlbumAccess(albumId) && !jwe.getBoolean("isInbox") && jwe.getString("sourceId").compareTo(albumId) == 0;
+            return kheopsPrincipal.hasAlbumAccess(albumId) && !jwe.getBoolean(Consts.JWE.IS_INBOX) && jwe.getString(Consts.JWE.SOURCE_ID).compareTo(albumId) == 0;
         } catch (AlbumNotFoundException e) {
             return false;
         }
@@ -172,7 +173,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public boolean hasInboxAccess() {
-        return jwe.getBoolean("isInbox");
+        return jwe.getBoolean(Consts.JWE.IS_INBOX);
     }
 
     @Override
@@ -180,7 +181,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public ScopeType getScope() {
-        if(!jwe.getBoolean("isInbox") || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        if(!jwe.getBoolean(Consts.JWE.IS_INBOX) || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             return ScopeType.ALBUM;
         } else {
             return ScopeType.USER;
@@ -191,8 +192,8 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     @Override
     public String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException {
         final String albumID;
-        if(!jwe.getBoolean("isInbox")) {
-            albumID = jwe.getString("sourceId");
+        if(!jwe.getBoolean(Consts.JWE.IS_INBOX)) {
+            albumID = jwe.getString(Consts.JWE.SOURCE_ID);
         } else {
             throw new NotAlbumScopeTypeException("");
         }
