@@ -11,11 +11,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
-import static online.kheops.auth_server.user.Users.userExist;
 
 public class Albums {
 

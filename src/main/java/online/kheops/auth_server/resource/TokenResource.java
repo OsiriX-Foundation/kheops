@@ -285,9 +285,9 @@ public class TokenResource
             tokenResponse.user = assertion.getSub();
         }
         if(pepScope) {
-            LOG.info("Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
+            LOG.info(() -> "Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
         } else { //viewerScope
-            LOG.info("Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
+            LOG.info(() ->"Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
         }
         return Response.status(responseStatus).entity(tokenResponse).build();
     }

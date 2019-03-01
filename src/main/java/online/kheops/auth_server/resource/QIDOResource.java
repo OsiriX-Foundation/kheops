@@ -88,7 +88,7 @@ public class QIDOResource {
         try (Connection connection = getDataSource().getConnection()) {
             qidoParams = new QIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
-            LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
+            LOG.info(() -> "QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();

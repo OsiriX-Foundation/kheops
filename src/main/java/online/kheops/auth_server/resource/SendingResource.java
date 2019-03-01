@@ -106,7 +106,7 @@ public class SendingResource
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                LOG.log(WARNING, "Principal " + kheopsPrincipal + ", does not have write access");
+                LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
                 return Response.status(FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
@@ -120,7 +120,7 @@ public class SendingResource
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                     Sending.putSeriesInAlbum(kheopsPrincipal.getUser(), albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
-                    LOG.log(WARNING, "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
+                    LOG.warning(() -> "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
             } else {

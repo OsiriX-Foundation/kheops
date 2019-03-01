@@ -67,7 +67,7 @@ public class Capabilities {
         return idBuilder.toString();
     }
 
-    public static String HashCapability(String capability) {
+    public static String hashCapability(String capability) {
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");
@@ -338,7 +338,7 @@ public class Capabilities {
     public static Capability getCapability(String secret, EntityManager em)
             throws CapabilityNotFoundException {
 
-            final String hashSecret = HashCapability(secret);
+            final String hashSecret = hashCapability(secret);
             return findCapabilityByCapabilityToken(hashSecret, em);
     }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static online.kheops.auth_server.capability.Capabilities.HashCapability;
+import static online.kheops.auth_server.capability.Capabilities.hashCapability;
 import static online.kheops.auth_server.capability.Capabilities.newCapabilityID;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
@@ -108,7 +108,7 @@ public class Capability {
 
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
         secretBeforeHash = Capabilities.newCapabilityToken();
-        this.secret = HashCapability(secretBeforeHash);
+        this.secret = hashCapability(secretBeforeHash);
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
         this.title  = builder.title;
