@@ -181,7 +181,7 @@ public class QIDOResource {
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId != kheopsPrincipal.getAlbumID()) {
+            if (fromAlbumId != null && fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
@@ -310,7 +310,7 @@ public class QIDOResource {
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId.compareTo(kheopsPrincipal.getAlbumID()) != 0) {
+            if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();

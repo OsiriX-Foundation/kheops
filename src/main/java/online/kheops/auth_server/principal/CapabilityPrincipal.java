@@ -217,7 +217,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
                 final Album album = em.merge(capability.getAlbum());
 
-                if (albumId.compareTo(album.getId()) != 0) {
+                if (!albumId.equals(album.getId())) {
                     return false;
                 }
 
@@ -254,7 +254,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (getScope() == ScopeType.ALBUM) {
             if (albumId  == null) {
                 albumId = capability.getAlbum().getId();
-            } else  if (albumId.compareTo(capability.getAlbum().getId()) != 0) {
+            } else  if (!albumId.equals(capability.getAlbum().getId())) {
                 return false;
             }
             return true;

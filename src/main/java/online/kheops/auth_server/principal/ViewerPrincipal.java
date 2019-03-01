@@ -112,7 +112,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
             return false;
         }
 
-        if (studyInstanceUID.compareTo(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID)) == 0) {
+        if (studyInstanceUID.equals(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID))) {
             return true;
         } else {
             return false;
@@ -165,7 +165,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasAlbumAccess(String albumId){
         try {
-            return kheopsPrincipal.hasAlbumAccess(albumId) && !jwe.getBoolean(Consts.JWE.IS_INBOX) && jwe.getString(Consts.JWE.SOURCE_ID).compareTo(albumId) == 0;
+            return kheopsPrincipal.hasAlbumAccess(albumId) && !jwe.getBoolean(Consts.JWE.IS_INBOX) && jwe.getString(Consts.JWE.SOURCE_ID).equals(albumId);
         } catch (AlbumNotFoundException e) {
             return false;
         }

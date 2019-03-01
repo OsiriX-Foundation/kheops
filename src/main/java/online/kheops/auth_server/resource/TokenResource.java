@@ -118,7 +118,7 @@ public class TokenResource
         errorResponse.error = "Bad Request";
 
         if(scope != null) {
-            if (scope.compareTo("pep") == 0) {
+            if (scope.equals("pep")) {
                 if (studyInstanceUID == null || seriesInstanceUID == null) {
                     errorResponse.errorDescription = "With the scope: 'pep', 'study_instance_uid' and 'series_instance_uid' must be set";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -132,7 +132,7 @@ public class TokenResource
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 pepScope = true;
-            } else if (scope.compareTo("viewer") == 0) {
+            } else if (scope.equals("viewer")) {
                 if (studyInstanceUID == null || sourceType == null) {
                     errorResponse.errorDescription = "With the scope: 'viewer', 'study_instance_uid' and 'source_type' must be set";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -141,11 +141,11 @@ public class TokenResource
                     errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                if (sourceType.compareTo(ALBUM) != 0 && sourceType.compareTo(INBOX) != 0) {
+                if (!sourceType.equals(ALBUM) && !sourceType.equals(INBOX)) {
                     errorResponse.errorDescription = "'source_type' can be only '" + ALBUM + "' or '" + INBOX + "'";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                if (sourceType.compareTo(ALBUM) == 0 && (sourceId.isEmpty() || sourceId == null)) {
+                if (sourceType.equals(ALBUM) && (sourceId.isEmpty() || sourceId == null)) {
                     errorResponse.errorDescription = "'source_id' must be set when 'source_type'=" + ALBUM;
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
@@ -259,7 +259,7 @@ public class TokenResource
                 JSONObject data = new JSONObject();
                 data.put(Consts.JWE.TOKEN, assertionToken);
                 data.put(Consts.JWE.SOURCE_ID, sourceId);
-                data.put(Consts.JWE.IS_INBOX, sourceType.compareTo(INBOX) == 0);
+                data.put(Consts.JWE.IS_INBOX, sourceType.equals(INBOX));
                 data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
                 data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
 
@@ -338,7 +338,7 @@ public class TokenResource
         }
 
         if(assertion.getCapability().isPresent()) {
-            if (assertion.getCapability().get().getScopeType().compareToIgnoreCase(ScopeType.ALBUM.name()) == 0) {
+            if (assertion.getCapability().get().getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
                 intreospectResponse.scope = (assertion.getCapability().get().isWritePermission()?"write ":"") +
                         (assertion.getCapability().get().isReadPermission()?"read ":"") +
                         (assertion.getCapability().get().isDownloadPermission()?"download ":"") +

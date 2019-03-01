@@ -81,9 +81,9 @@ public class SecuredFilter implements ContainerRequestFilter {
 
             @Override
             public boolean isUserInRole(String role) {
-                if (role.compareTo(USER_IN_ROLE.CAPABILITY) == 0) {
+                if (role.equals(USER_IN_ROLE.CAPABILITY)) {
                     return capabilityAccess;
-                } else if (role.compareTo(USER_IN_ROLE.VIEWER_TOKEN) == 0) {
+                } else if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
                     return viewerTokenAccess;
                 }
                 return false;

@@ -26,7 +26,7 @@ public class KeycloakUsers {
 
     public int verifyEmail(String email) throws UserNotFoundException {
         for (int index = 0; index < users.size(); index++) {
-            if (users.getJsonObject(index).getString("email").compareTo(email) == 0) {
+            if (users.getJsonObject(index).getString("email").equals(email)) {
                 return index;
             }
         }

@@ -296,16 +296,16 @@ public class AlbumQueries {
 
             Field ord;
 
-            if (orderByParameter.compareTo("created_time") == 0) ord = ALBUMS.CREATED_TIME;
-            else if (orderByParameter.compareTo("last_event_time") == 0) ord = ALBUMS.LAST_EVENT_TIME;
-            else if (orderByParameter.compareTo("name") == 0) ord = ALBUMS.NAME;
-            else if (orderByParameter.compareTo("number_of_users") == 0) {
+            if (orderByParameter.equals("created_time")) ord = ALBUMS.CREATED_TIME;
+            else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
+            else if (orderByParameter.equals("name") == 0) ord = ALBUMS.NAME;
+            else if (orderByParameter.equals("number_of_users")) {
                 ord = create.select(countDistinct(ALBUM_USER.PK)).asField();
             }
-            else if (orderByParameter.compareTo("number_of_studies") == 0) {
+            else if (orderByParameter.equals("number_of_studies")) {
                 ord = create.select(countDistinct(EVENTS.PK)).asField();
             }
-            else if (orderByParameter.compareTo("number_of_comments") == 0) {
+            else if (orderByParameter.equals("number_of_comments")) {
                 ord = create.select(countDistinct(SERIES.STUDY_FK)).asField();
             }
             else throw new BadQueryParametersException("sort: " + orderByParameter);
