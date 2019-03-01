@@ -298,7 +298,7 @@ public class AlbumQueries {
 
             if (orderByParameter.equals("created_time")) ord = ALBUMS.CREATED_TIME;
             else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
-            else if (orderByParameter.equals("name") == 0) ord = ALBUMS.NAME;
+            else if (orderByParameter.equals("name")) ord = ALBUMS.NAME;
             else if (orderByParameter.equals("number_of_users")) {
                 ord = create.select(countDistinct(ALBUM_USER.PK)).asField();
             }
