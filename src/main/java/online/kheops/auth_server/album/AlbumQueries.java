@@ -117,7 +117,6 @@ public class AlbumQueries {
                     ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
                     ALBUM_USER.ADMIN.as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
-                    //modalities.as("modalities"));
 
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
