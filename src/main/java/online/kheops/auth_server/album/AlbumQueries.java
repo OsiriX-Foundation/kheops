@@ -97,11 +97,6 @@ public class AlbumQueries {
                     .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
-            /*Field<Object> modalities = create.select(groupConcatDistinct(SERIES.MODALITY).as("modalities"))
-                    .from(ALBUMS)
-                    .leftOuterJoin(ALBUM_SERIES)
-                    .leftOuterJoin(SERIES);*/
-
             query.addSelect(ALBUMS.PK.as("album_pk"),
                     ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
@@ -122,6 +117,7 @@ public class AlbumQueries {
                     ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
                     ALBUM_USER.ADMIN.as("admin"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
+                    //modalities.as("modalities"));
 
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
@@ -169,7 +165,21 @@ public class AlbumQueries {
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
-            final Result<? extends Record> result = query.fetch();
+            final Result<? extends Record> result;
+
+            final String modalityFilter = albumQueryParams.getModality().orElse(null);
+
+            if(modalityFilter != null) {
+                final Table<Record> t = query.asTable();
+                final Field<String> f = (Field<String>) t.field("modalities");
+
+                final SelectQuery<Record> q = create.selectQuery();
+                q.addFrom(t);
+                q.addConditions(f.containsIgnoreCase(modalityFilter));
+                result = q.fetch();
+            } else {
+                result = query.fetch();
+            }
 
             final List<AlbumResponse.Response> albumResponses = new ArrayList<>();
 
