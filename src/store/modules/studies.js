@@ -13,7 +13,7 @@ const state = {
 	filterParams: {
 		sortBy: 'StudyDate',
 		sortDesc: true,
-		limit: 10,
+		limit: 100,
 		pageNb: 1,
 		filters: {
 			AccessionNumber: '',
@@ -80,7 +80,7 @@ const actions = {
 		let offset = 0
 		if (state.filterParams.sortBy !== params.sortBy || state.filterParams.sortDesc !== params.sortDesc || state.request !== requestParams) {
 			offset = 0
-			params.limit = (state.all.length > 10) ? state.all.length : 10
+			params.limit = (state.all.length > 100) ? state.all.length : 100
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
