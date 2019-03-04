@@ -31,17 +31,26 @@ public class CapabilityParametersBuilder {
         return this;
     }
 
-    private LocalDateTime stringToLocalDateTime(String dateTime)  throws DateTimeParseException {
+    /**
+     * @throws DateTimeParseException if the text cannot be parsed
+     */
+    private LocalDateTime stringToLocalDateTime(String dateTime) {
         OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTime);
         return LocalDateTime.ofInstant(offsetDateTime.toInstant(), ZoneOffset.UTC);
     }
 
-    public CapabilityParametersBuilder expirationTime(String expirationTime) throws DateTimeParseException {
+    /**
+     * @throws DateTimeParseException if the text cannot be parsed
+     */
+    public CapabilityParametersBuilder expirationTime(String expirationTime) {
         this.expirationTime = stringToLocalDateTime(expirationTime);
         return this;
     }
 
-    public CapabilityParametersBuilder notBeforeTime(String notBeforeTime) throws DateTimeParseException{
+    /**
+     * @throws DateTimeParseException if the text cannot be parsed
+     */
+    public CapabilityParametersBuilder notBeforeTime(String notBeforeTime) {
         this.notBeforeTime = stringToLocalDateTime(notBeforeTime);
         return this;
     }

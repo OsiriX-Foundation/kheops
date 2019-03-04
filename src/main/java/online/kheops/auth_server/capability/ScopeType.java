@@ -17,7 +17,7 @@ public enum ScopeType {
     USER {
         @Override
         public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
-                throws DateTimeParseException, CapabilityBadRequestException {
+                throws CapabilityBadRequestException {
             return createUserCapability(capabilityParameters);
         }
 
@@ -41,7 +41,7 @@ public enum ScopeType {
     ALBUM {
         @Override
         public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
-                throws DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
+                throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
             return createAlbumCapability(capabilityParameters);
         }
 
@@ -79,8 +79,11 @@ public enum ScopeType {
     };
 
     public abstract CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
+    /**
+     * @throws DateTimeParseException if the text cannot be parsed
+     */
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
             throws CapabilityBadRequestException;
 
