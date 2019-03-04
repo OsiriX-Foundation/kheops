@@ -30,6 +30,7 @@ public final class AlbumQueryParams {
     private final Optional<String> name;
     private final Optional<String> createdTime;
     private final Optional<String> lastEventTime;
+    private final Optional<String> modality;
 
     private final boolean favorite;
 
@@ -41,6 +42,7 @@ public final class AlbumQueryParams {
         name = extractName(queryParameters);
         createdTime = extractCreatedTime(queryParameters);
         lastEventTime = extractLastEventTime(queryParameters);
+        modality = extractModality(queryParameters);
 
         canAddSeries = extractCanAddSeries(queryParameters);
         canCreateCapabilityToken = extractCanCreateCapabilityToken(queryParameters);
@@ -70,6 +72,15 @@ public final class AlbumQueryParams {
 
         if (queryParameters.containsKey(NAME)) {
             return Optional.ofNullable(queryParameters.get(NAME).get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> extractModality(MultivaluedMap<String, String> queryParameters) {
+
+        if (queryParameters.containsKey("modality")) {
+            return Optional.ofNullable(queryParameters.get("modality").get(0));
         } else {
             return Optional.empty();
         }
@@ -149,6 +160,8 @@ public final class AlbumQueryParams {
     public OptionalInt getOffset() { return offset; }
 
     public Optional<String> getName() { return name; }
+
+    public Optional<String> getModality() { return modality; }
 
     public Optional<String> getCreatedTime() { return createdTime; }
 

@@ -102,6 +102,5 @@ public class Keycloak {
         }
         throw new KeycloakException("ERROR:");
     }
-
 }
 

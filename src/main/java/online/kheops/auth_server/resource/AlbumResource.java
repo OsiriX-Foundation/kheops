@@ -68,8 +68,6 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
-
-
         final AlbumResponse albumResponse;
 
         try {

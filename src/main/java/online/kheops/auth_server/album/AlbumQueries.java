@@ -135,6 +135,7 @@ public class AlbumQueries {
             applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
             applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
             applyIfPresent(albumQueryParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
+            applyIfPresent(albumQueryParams::getModality, filter -> conditionArrayList.add(SERIES.MODALITY.equalIgnoreCase(filter)));
 
             if(albumQueryParams.canAddSeries()) {
                 conditionArrayList.add(ALBUM_USER.ADMIN.isTrue().or(ALBUMS.ADD_SERIES_PERMISSION.isTrue()));
@@ -327,13 +328,13 @@ public class AlbumQueries {
         } else {
             Condition condition;
             if (parameter.startsWith("*") && parameter.endsWith("*")) {
-                condition = column.lower().contains(parameterNoStar.toLowerCase());
+                condition = column.containsIgnoreCase(parameterNoStar);
             } else if (parameter.startsWith("*")) {
                 condition = column.lower().endsWith(parameterNoStar.toLowerCase());
             } else if (parameter.endsWith("*")) {
                 condition = column.lower().startsWith(parameterNoStar.toLowerCase());
             } else {
-                condition = column.lower().equal(parameterNoStar.toLowerCase());
+                condition = column.equalIgnoreCase(parameterNoStar);
             }
 
             if (fuzzyMatching) {

@@ -235,7 +235,7 @@ public class Studies {
         if (filter.equalsIgnoreCase("null")) {
             return SERIES.MODALITY.isNull();
         } else {
-            return SERIES.MODALITY.lower().equal(filter.toLowerCase());
+            return SERIES.MODALITY.equalIgnoreCase(filter);
         }
     }
 
@@ -332,13 +332,13 @@ public class Studies {
         } else {
             Condition condition;
             if (filter.startsWith("*") && filter.endsWith("*")) {
-                condition = column.lower().contains(parameterNoStar.toLowerCase());
+                condition = column.containsIgnoreCase(parameterNoStar);
             } else if (filter.startsWith("*")) {
                 condition = column.lower().endsWith(parameterNoStar.toLowerCase());
             } else if (filter.endsWith("*")) {
                 condition = column.lower().startsWith(parameterNoStar.toLowerCase());
             } else {
-                condition = column.lower().equal(parameterNoStar.toLowerCase());
+                condition = column.equalIgnoreCase(parameterNoStar);
             }
 
             if (isFuzzyMatching) {
