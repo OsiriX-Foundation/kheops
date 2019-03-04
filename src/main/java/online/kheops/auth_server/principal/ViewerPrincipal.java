@@ -52,13 +52,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         } catch (UserNotFoundException e) {
             throw new IllegalStateException(e);
         }
-        if(assertion.getCapability().isPresent()) {
-            kheopsPrincipal = new CapabilityPrincipal(assertion.getCapability().get(), user);
-        } else if(assertion.getViewer().isPresent()) {
-            kheopsPrincipal = new ViewerPrincipal(assertion.getViewer().get());
-        } else {
-            kheopsPrincipal = new UserPrincipal(user);
-        }
+        kheopsPrincipal = assertion.newPrincipal(user);
 
         this.jwe = jwe;
     }

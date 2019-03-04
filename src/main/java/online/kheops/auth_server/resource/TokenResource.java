@@ -205,14 +205,7 @@ public class TokenResource
             }
 
             try {
-                final KheopsPrincipalInterface principal;
-                if(assertion.getCapability().isPresent()) {
-                    principal = new CapabilityPrincipal(assertion.getCapability().get(), callingUser);
-                } else if(assertion.getViewer().isPresent()) {
-                    principal = new ViewerPrincipal(assertion.getViewer().get());
-                } else {
-                    principal = new UserPrincipal(callingUser);
-                }
+                final KheopsPrincipalInterface principal = assertion.newPrincipal(callingUser);
                 if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                     throw new SeriesNotFoundException("");
                 }
