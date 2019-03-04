@@ -8,6 +8,7 @@ import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.ViewerTokenAccess;
 import online.kheops.auth_server.assertion.*;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
@@ -337,12 +338,14 @@ public class TokenResource
             return Response.status(OK).entity(intreospectResponse).build();
         }
 
-        if(assertion.getCapability().isPresent()) {
-            if (assertion.getCapability().get().getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
-                intreospectResponse.scope = (assertion.getCapability().get().isWritePermission()?"write ":"") +
-                        (assertion.getCapability().get().isReadPermission()?"read ":"") +
-                        (assertion.getCapability().get().isDownloadPermission()?"download ":"") +
-                        (assertion.getCapability().get().isAppropriatePermission()?"appropriate ":"");
+        final Capability capability = assertion.getCapability().orElse(null);
+
+        if(capability != null) {
+            if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+                intreospectResponse.scope = (capability.isWritePermission()?"write ":"") +
+                        (capability.isReadPermission()?"read ":"") +
+                        (capability.isDownloadPermission()?"download ":"") +
+                        (capability.isAppropriatePermission()?"appropriate ":"");
                 if (intreospectResponse.scope.length() > 0) {
                     intreospectResponse.scope = intreospectResponse.scope.substring(0, intreospectResponse.scope.length() - 1);
                 }

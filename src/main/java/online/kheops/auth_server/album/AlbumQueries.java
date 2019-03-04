@@ -97,6 +97,11 @@ public class AlbumQueries {
                     .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
+            /*Field<Object> modalities = create.select(groupConcatDistinct(SERIES.MODALITY).as("modalities"))
+                    .from(ALBUMS)
+                    .leftOuterJoin(ALBUM_SERIES)
+                    .leftOuterJoin(SERIES);*/
+
             query.addSelect(ALBUMS.PK.as("album_pk"),
                     ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
@@ -135,7 +140,6 @@ public class AlbumQueries {
             applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
             applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
             applyIfPresent(albumQueryParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
-            applyIfPresent(albumQueryParams::getModality, filter -> conditionArrayList.add(SERIES.MODALITY.equalIgnoreCase(filter)));
 
             if(albumQueryParams.canAddSeries()) {
                 conditionArrayList.add(ALBUM_USER.ADMIN.isTrue().or(ALBUMS.ADD_SERIES_PERMISSION.isTrue()));
