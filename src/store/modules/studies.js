@@ -4,6 +4,7 @@ import customdicom from '@/mixins/customdicom'
 import moment from 'moment'
 import axios from 'axios'
 import SRImage from '@/assets/SR_2.png'
+import DicomLogo from '@/assets/dicom_logo.png'
 // initial state
 const state = {
 	all: [],
@@ -180,8 +181,13 @@ const actions = {
 	getImage ({ commit }, params) {
 		let StudyInstanceUID = params.StudyInstanceUID
 		let SeriesInstanceUID = params.SeriesInstanceUID
-		return HTTP.get('/wado?studyUID=' + StudyInstanceUID + '&seriesUID=' + SeriesInstanceUID + '&requestType=WADO&rows=250&columns=250', { responseType: 'arraybuffer' }).then(resp => {
-			let img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=' // blank image
+		return HTTP.get('/wado?studyUID=' + StudyInstanceUID + '&seriesUID=' + SeriesInstanceUID + '&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg', {
+			responseType: 'arraybuffer',
+			headers: {
+				'Accept': 'image/jpeg'
+			}
+		}).then(resp => {
+			let img = DicomLogo
 			if (resp.data) {
 				let arr = new Uint8Array(resp.data)
 				let raw = String.fromCharCode.apply(null, arr)
@@ -190,7 +196,8 @@ const actions = {
 				img = 'data:' + mimeType + ';base64,' + b64
 			}
 			commit('SET_IMAGE', { StudyInstanceUID: StudyInstanceUID, SeriesInstanceUID: SeriesInstanceUID, img: img })
-			return img
+		}).catch(() => {
+			commit('SET_IMAGE', { StudyInstanceUID: StudyInstanceUID, SeriesInstanceUID: SeriesInstanceUID, img: DicomLogo })
 		})
 	},
 	deleteStudy ({ commit }, params) {
