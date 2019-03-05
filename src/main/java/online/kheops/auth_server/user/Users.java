@@ -80,7 +80,7 @@ public class Users {
             return newUser;
         } catch (PersistenceException e) {
             try {
-                return getUser(userReference);
+                return getUser(userReference, em);
             } catch (UserNotFoundException notFoundException) {
                 notFoundException.addSuppressed(e);
                 throw notFoundException;
