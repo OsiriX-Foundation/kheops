@@ -400,7 +400,7 @@ export default {
 			],
 			sortBy: 'created_time',
 			sortDesc: true,
-			limit: 8,
+			limit: 100,
 			optionsNbPages: [5, 10, 25, 50, 100],
 			showFilters: false,
 			filterTimeout: null,
