@@ -168,7 +168,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              :disabled="!token.title || (token.scope_type==='album' && !token.album)"
+              :disabled="disabledCreateToken"
             >
               {{ $t('create') }}
             </button><button
@@ -261,7 +261,10 @@ export default {
 	computed: {
 		...mapGetters({
 			albums: 'albums'
-		})
+		}),
+		disabledCreateToken () {
+			return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (!this.token.read_permission && !this.token.write_permission)
+		}
 	},
 	created () {
 		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 100, sortBy: 'created_time', sortDesc: true, canCreateCapabilityToken: 'true' })

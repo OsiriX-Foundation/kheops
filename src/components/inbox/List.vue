@@ -184,7 +184,6 @@
       @get-user="sendToUser"
       @cancel-user="form_send_study=false"
     />
-
     <b-table
       class="container-fluid"
       responsive
@@ -376,6 +375,8 @@
           </b-button>
           <b-form-checkbox
             v-model="row.item.is_selected"
+            class="pt-2"
+            inline
             @click.native.stop
             @change="toggleSelected(row.item,'study',!row.item.is_selected)"
           />

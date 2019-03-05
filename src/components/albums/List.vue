@@ -96,6 +96,7 @@
       :sort-desc="true"
       :sort-by.sync="sortBy"
       :no-local-sorting="true"
+      :dark="false"
       @sort-changed="sortingChanged"
       @row-clicked="selectAlbum"
     >
@@ -281,6 +282,8 @@
           </b-button>
           <b-form-checkbox
             v-model="row.item.is_selected"
+            class="pt-2"
+            inline
             @click.native.stop
             @change="toggleSelected(row.item,'album',!row.item.is_selected)"
           />
@@ -571,9 +574,6 @@ export default {
 </script>
 
 <style scoped>
-table th{
-	text-transform: capitalize;
-}
 select{
 	display: inline !important;
 }
