@@ -324,7 +324,7 @@ export default {
 			if (this.scope === 'user') {
 				return this.user.tokens
 			} else {
-				return _.filter(this.user.tokens, t => { return t.scope_type === 'album' && +t.album.id === +this.albumid })
+				return _.filter(this.user.tokens, t => { return t.scope_type === 'album' && t.album.id === this.albumid })
 			}
 		}
 	},

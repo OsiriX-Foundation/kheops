@@ -191,6 +191,7 @@
       hide-footer
       no-close-on-backdrop
       size="lg"
+      @hidden="cancel"
     >
       <dl class="my-2 row">
         <dt class="col-xs-12 col-sm-3">
@@ -292,15 +293,12 @@ export default {
 		},
 		onCopy () {
 			this.$snotify.success(this.$t('tokencopysuccess'))
-			this.$refs.tokenModal.hide()
-			this.$emit('done')
 		},
 		onCopyError () {
 			this.$snotify.error(this.$t('sorryerror'))
-			this.$refs.tokenModal.hide()
 		},
-
 		cancel () {
+			this.$refs.tokenModal.hide()
 			this.$emit('done')
 		}
 	}
