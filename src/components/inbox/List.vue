@@ -489,11 +489,11 @@
                 />
               </span>
               <span
-                :class="row.item.comments.length?'selected':''"
+                :class="row.item.SumComments[0]?'selected':''"
                 @click="handleComments(row)"
               >
                 <v-icon
-                  v-if="row.item.comments.length"
+                  v-if="row.item.SumComments[0]"
                   class="align-middle"
                   style="margin-right:0"
                   name="comment-dots"

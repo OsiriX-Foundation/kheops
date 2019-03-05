@@ -108,7 +108,6 @@ const actions = {
 					commit('SET_FLAG', flag)
 					data.push(t)
 				}
-				dispatch('getStudiesComments', { StudyInstanceUID: t.StudyInstanceUID })
 			})
 			commit('SET_STUDIES', { data: data, reset: reset })
 			commit('SET_STUDIES_FILTER_PARAMS', params)
