@@ -23,6 +23,7 @@ import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
+import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
@@ -121,6 +122,7 @@ public class AlbumQueries {
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(USERS, ALBUM_USER.USER_FK.eq(USERS.PK));
 
@@ -131,6 +133,8 @@ public class AlbumQueries {
                             .or(EVENTS.USER_FK.eq(albumQueryParams.getUser().getPk()))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
+            conditionArrayList.add(SERIES.POPULATED.isTrue());
+            conditionArrayList.add(STUDIES.POPULATED.isTrue());
 
             applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
             applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
@@ -232,6 +236,7 @@ public class AlbumQueries {
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
@@ -243,6 +248,8 @@ public class AlbumQueries {
             query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
             query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
+            query.addConditions(SERIES.POPULATED.isTrue());
+            query.addConditions(STUDIES.POPULATED.isTrue());
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
@@ -272,6 +279,7 @@ public class AlbumQueries {
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
@@ -279,6 +287,8 @@ public class AlbumQueries {
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
 
             query.addConditions(ALBUMS.ID.eq(albumId));
+            query.addConditions(SERIES.POPULATED.isTrue());
+            query.addConditions(STUDIES.POPULATED.isTrue());
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
