@@ -102,7 +102,6 @@ public final class Resource {
 
     private Response store(AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
-        URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
         try {
@@ -120,12 +119,21 @@ public final class Resource {
             throw new WebApplicationException(Response.status(BAD_GATEWAY).build());
         }
 
-        final InputStream inputStream;
-        try {
-            inputStream = request.getInputStream();
+        final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken);
+        final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId);
+
+        try (InputStream inputStream = request.getInputStream()) {
+            final Proxy proxy = new Proxy(providers, contentType, inputStream, authorizationManager, fetchRequester::addStudies);
+            return proxy(proxy, authorizationManager, inputStream, studyInstanceUID);
         } catch (IOException e) {
             throw new WebApplicationException(BAD_REQUEST);
+        } finally {
+            fetchRequester.fetch();
         }
+    }
+
+    private Response proxy(Proxy proxy, AuthorizationManager authorizationManager, InputStream inputStream, String studyInstanceUID) {
+        URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
         if (studyInstanceUID != null) {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);
@@ -133,9 +141,6 @@ public final class Resource {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies").build();
         }
 
-        AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId);
-
-        final Proxy proxy = new Proxy(providers, contentType, inputStream, authorizationManager);
         MultipartStreamingOutput multipartStreamingOutput = output -> {
             try {
                 proxy.processStream(output);
@@ -169,8 +174,6 @@ public final class Resource {
                 throw new InternalServerErrorException(e);
             }
         }
-
-        FetchRequester.newFetchRequester(authorizationURI, authorizationToken).fetchStudies(proxy.getSentStudies());
 
         if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
             LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());

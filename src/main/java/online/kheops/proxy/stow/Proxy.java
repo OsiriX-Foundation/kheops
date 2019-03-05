@@ -15,10 +15,10 @@ import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_LOCATION;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
@@ -33,26 +33,23 @@ public final class Proxy {
 
     private final AuthorizationManager authorizationManager;
 
-    private final Set<String> sentStudies = new HashSet<>();
-
     private MultipartOutputStream multipartOutputStream;
 
-    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final AuthorizationManager authorizationManager)
+    private final Consumer<Set<String>> sentStudies;
+
+    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final AuthorizationManager authorizationManager, Consumer<Set<String>> sentStudies)
                      {
         this.providers = Objects.requireNonNull(providers);
         this.contentType = Objects.requireNonNull(contentType);
         this.inputStream = Objects.requireNonNull(inputStream);
         this.authorizationManager = Objects.requireNonNull(authorizationManager);
+        this.sentStudies = sentStudies;
     }
 
     public void processStream(final MultipartOutputStream multipartOutputStream) throws GatewayException, RequestException
     {
         this.multipartOutputStream = Objects.requireNonNull(multipartOutputStream);
         processMultipart();
-    }
-
-    public Set<String> getSentStudies() {
-        return Collections.unmodifiableSet(sentStudies);
     }
 
     private void processMultipart() throws RequestException, GatewayException {
@@ -73,10 +70,11 @@ public final class Proxy {
         try (Part part = Part.getInstance(providers, multipartInputStream)) {
             partString = part.toString();
             writePart(partNumber, authorizationManager.getAuthorization(part), part);
-            sentStudies.addAll(part.getInstanceIDs()
-                    .stream()
-                    .map((instanceID -> instanceID.getSeriesID().getStudyUID()))
-                    .collect(Collectors.toSet()));
+            if (sentStudies != null) {
+                sentStudies.accept(part.getInstanceIDs().stream()
+                        .map((instanceID -> instanceID.getSeriesID().getStudyUID()))
+                        .collect(Collectors.toSet()));
+            }
         } catch (GatewayException e) {
             throw e;
         } catch (IOException e) {
