@@ -2,7 +2,8 @@
 	{
 		"en": {
 			"newtoken": "New token",
-			"showrevokedtoken": "Show invalid tokens",
+			"showrevokedtoken": "Show revoked tokens",
+			"showinvalidtoken": "Show invalid tokens",
 			"revoke": "revoke",
 			"revoked": "revoked",
 			"active": "active",
@@ -19,7 +20,8 @@
 		},
 		"fr": {
 			"newtoken": "Nouveau token",
-			"showrevokedtoken": "Afficher les tokens invalides",
+			"showrevokedtoken": "Afficher les tokens révoqués",
+			"showinvalidtoken": "Afficher les tokens invalides",
 			"revoke": "révoquer",
 			"revoked": "révoqué",
 			"active": "actif",
@@ -76,11 +78,11 @@
         Tokens
         <small class="float-right">
           <toggle-button
-            v-model="showRevoked"
+            v-model="showInvalid"
             :labels="{checked: 'Yes', unchecked: 'No'}"
             @change="getTokens"
           /><span class="ml-2 toggle-label">
-            {{ $t('showrevokedtoken') }}
+            {{ $t('showinvalidtoken') }}
           </span>
         </small>
       </h4>
@@ -251,7 +253,8 @@ export default {
 	},
 	data () {
 		return {
-			showRevoked: false,
+			showRevoked: false, // not used anymore...
+			showInvalid: false,
 			view: 'list',
 			sortBy: 'expiration_date',
 			token: {
@@ -359,7 +362,7 @@ export default {
 			this.view = 'list'
 		},
 		getTokens () {
-			this.$store.dispatch('getUserTokens', { showRevoked: this.showRevoked, album_id: this.albumid })
+			this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
 		},
 		revoke (tokenId) {
 			this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {

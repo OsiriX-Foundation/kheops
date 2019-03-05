@@ -79,7 +79,7 @@ const actions = {
 		})
 	},
 	getUserTokens ({ commit }, params) {
-		return HTTP.get(`/capabilities?show_revoked=${params.showRevoked}`).then(res => {
+		return HTTP.get(`/capabilities?valid=${!params.showInvalid}`).then(res => {
 			if (res.status === 200) {
 				commit('SET_TOKENS', res.data)
 			}
