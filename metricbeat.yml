@@ -20,6 +20,7 @@ metricbeat.config.modules:
   #reload.period: 10s
 
 
+metricbeat.modules:
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
   metricsets: ["stubstatus"]
