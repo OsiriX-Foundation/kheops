@@ -66,6 +66,9 @@ export default {
 	watch: {
 		view () {
 			this.$router.push({ query: { view: 'settings', cat: this.view } })
+		},
+		'$route.query' () {
+			this.view = this.$route.query.cat
 		}
 	},
 	created () {

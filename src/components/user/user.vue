@@ -70,6 +70,9 @@ export default {
 		view () {
 			let queryParams = { view: this.view }
 			this.$router.push({ query: queryParams })
+		},
+		'$route.query' () {
+			this.view = this.$route.query.view
 		}
 	},
 	mounted () {

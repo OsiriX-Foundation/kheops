@@ -122,6 +122,9 @@ export default {
 			let queryParams = { view: this.view }
 			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
 			this.$router.push({ query: queryParams })
+		},
+		'$route.query' () {
+			this.view = this.$route.query.view
 		}
 	},
 	created () {
