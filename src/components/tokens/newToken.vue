@@ -264,7 +264,7 @@ export default {
 			albums: 'albums'
 		}),
 		disabledCreateToken () {
-			return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (!this.token.read_permission && !this.token.write_permission)
+			return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (this.token.scope_type === 'album' && !this.token.read_permission && !this.token.write_permission)
 		}
 	},
 	created () {
