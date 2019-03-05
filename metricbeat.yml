@@ -19,6 +19,19 @@ metricbeat.config.modules:
   # Period on which files under path should be checked for changes
   #reload.period: 10s
 
+
+#-------------------------------- Nginx Module -------------------------------
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+
+  # Nginx hosts
+  hosts: ["http://127.0.0.1:1234"]
+
+  # Path to server status. Default server-status
+  server_status_path: "nginx_status"
+
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
