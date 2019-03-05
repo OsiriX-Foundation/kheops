@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
@@ -43,6 +42,8 @@ public final class AuthorizationManager {
     private final Set<ContentLocation> authorizedContentLocations = new HashSet<>();
     private final UriBuilder authorizationUriBuilder;
     private final AuthorizationToken bearerToken;
+
+    private int processingFailures;
 
     public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId) {
         this.bearerToken = Objects.requireNonNull(authorizationToken);
@@ -77,6 +78,10 @@ public final class AuthorizationManager {
         }
     }
 
+    public void incrementProcessingFailure() {
+        processingFailures++;
+    }
+
     public Response getResponse(Attributes attributes, final int status) {
         if (attributes == null) {
             attributes = new Attributes(2);
@@ -97,6 +102,16 @@ public final class AuthorizationManager {
             failedSOPs.add(failedAttributes);
         }
 
+        Sequence otherFailures = attributes.getSequence(Tag.OtherFailuresSequence);
+        if (otherFailures == null && processingFailures > 0) {
+            otherFailures = attributes.newSequence(Tag.OtherFailuresSequence, processingFailures);
+        }
+        for (int i = 0; i < processingFailures; i++) {
+            Attributes failureAttributes = new Attributes(1);
+            failureAttributes.setInt(Tag.FailureReason, VR.US, Status.ProcessingFailure);
+            otherFailures.add(failureAttributes);
+        }
+
         Response.Status responseStatus;
         switch (status) {
             case 200:
@@ -110,7 +125,7 @@ public final class AuthorizationManager {
                 break;
         }
 
-        if (status == OK.getStatusCode() && !forbiddenInstanceIDs.isEmpty()) {
+        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || processingFailures > 0)) {
             responseStatus = ACCEPTED;
         }
 

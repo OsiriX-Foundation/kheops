@@ -126,6 +126,7 @@ public final class Resource {
             final Proxy proxy = new Proxy(providers, contentType, inputStream, authorizationManager, fetchRequester::addStudies);
             return proxy(proxy, authorizationManager, inputStream, studyInstanceUID);
         } catch (IOException e) {
+            LOG.log(Level.WARNING, "", e);
             throw new WebApplicationException(BAD_REQUEST);
         } finally {
             fetchRequester.fetch();
@@ -166,7 +167,7 @@ public final class Resource {
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, contentType));
         } catch (ProcessingException e) {
-            LOG.log(Level.SEVERE, "Processing Error", e);
+            LOG.log(Level.SEVERE, "Gateway Processing Error", e);
             if (e.getCause() instanceof WebApplicationException) {
                 WebApplicationException cause = (WebApplicationException)e.getCause();
                 throw new WebApplicationException(cause.getResponse().getStatus());

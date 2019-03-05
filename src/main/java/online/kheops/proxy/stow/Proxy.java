@@ -38,7 +38,7 @@ public final class Proxy {
     private final Consumer<Set<String>> sentStudies;
 
     public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final AuthorizationManager authorizationManager, Consumer<Set<String>> sentStudies)
-                     {
+    {
         this.providers = Objects.requireNonNull(providers);
         this.contentType = Objects.requireNonNull(contentType);
         this.inputStream = Objects.requireNonNull(inputStream);
@@ -56,32 +56,33 @@ public final class Proxy {
         final MultipartParser multipartParser = new MultipartParser(getBoundary());
         try {
             multipartParser.parse(inputStream, this::processPart);
-        } catch (RequestException | GatewayException e) {
+        } catch (GatewayException e) {
             throw e;
         } catch (IOException e) {
-            throw new GatewayException("Error parsing input", e);
+            throw new RequestException("Error parsing input", e);
         }
     }
 
     private void processPart(final int partNumber, final MultipartInputStream multipartInputStream)
-            throws RequestException, GatewayException {
+            throws GatewayException {
 
         String partString = "Unknown part";
         try (Part part = Part.getInstance(providers, multipartInputStream)) {
             partString = part.toString();
-            writePart(partNumber, authorizationManager.getAuthorization(part), part);
+            Set<InstanceID> authorizedInstanceIDs = authorizationManager.getAuthorization(part);
+            writePart(partNumber, authorizedInstanceIDs, part);
             if (sentStudies != null) {
-                sentStudies.accept(part.getInstanceIDs().stream()
+                sentStudies.accept(authorizedInstanceIDs.stream()
                         .map((instanceID -> instanceID.getSeriesID().getStudyUID()))
                         .collect(Collectors.toSet()));
             }
         } catch (GatewayException e) {
             throw e;
         } catch (IOException e) {
-            throw new RequestException("Unable to parse for part:\n" + partNumber, e);
+            authorizationManager.incrementProcessingFailure();
+            LOG.log(WARNING, "IOException while parsing part:\n" + partNumber, e);
         } catch (AuthorizationManagerException e) {
-            LOG.log(WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString);
-            LOG.log(WARNING, "Authorization failure exception:\n" , e);
+            LOG.log(WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString, e);
         }
     }
 
