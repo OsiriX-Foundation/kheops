@@ -1,137 +1,122 @@
-########################## Metricbeat Configuration ###########################
+###################### Metricbeat Configuration Example #######################
 
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see metricbeat.yml in the same directory.
+# This file is an example configuration file highlighting only the most common
+# options. The metricbeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
-#============================  Config Reloading ===============================
+#==========================  Modules configuration ============================
 
-# Config reloading allows to dynamically load modules. Each file which is
-# monitored must contain one or multiple modules as a list.
 metricbeat.config.modules:
-
-  # Glob pattern for configuration reloading
-  path: ${path.config}/conf.d/*.yml
-
-  # Period on which files under path should be checked for changes
-  reload.period: 10s
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
 
   # Set to true to enable config reloading
   reload.enabled: false
 
-# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
-# disable startup delay.
-metricbeat.max_start_delay: 10s
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
 
-#============================== Autodiscover ===================================
+#==================== Elasticsearch template setting ==========================
 
-# Autodiscover allows you to detect changes in the system and spawn new modules
-# as they happen.
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false
 
-#metricbeat.autodiscover:
-  # List of enabled autodiscover providers
-#  providers:
-#    - type: docker
-#      templates:
-#        - condition:
-#            equals.docker.container.image: etcd
-#          config:
-#            - module: etcd
-#              metricsets: ["leader", "self", "store"]
-#              period: 10s
-#              hosts: ["${host}:2379"]
+#================================ General =====================================
 
-#==========================  Modules configuration ============================
-metricbeat.modules:
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
 
-#------------------------------- System Module -------------------------------
-- module: system
-  metricsets:
-    - cpu             # CPU usage
-    - load            # CPU load averages
-    - memory          # Memory usage
-    - network         # Network IO
-    - process         # Per process metrics
-    - process_summary # Process summary
-    - uptime          # System Uptime
-    #- core           # Per CPU core usage
-    #- diskio         # Disk IO
-    #- filesystem     # File system usage for each mountpoint
-    #- fsstat         # File system summary metrics
-    #- raid           # Raid
-    #- socket         # Sockets and connection info (linux only)
-  enabled: true
-  period: 10s
-  processes: ['.*']
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
 
-  # Configure the metric types that are included by these metricsets.
-  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
-  core.metrics: ["percentages"]  # The other available option is ticks.
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
 
-  # A list of filesystem types to ignore. The filesystem metricset will not
-  # collect data from filesystems matching any of the specified types, and
-  # fsstats will not include data from these filesystems in its summary stats.
-  # If not set, types associated to virtual filesystems are automatically
-  # added when this information is available in the system (e.g. the list of
-  # `nodev` types in `/proc/filesystem`).
-  #filesystem.ignore_types: []
 
-  # These options allow you to filter out all processes that are not
-  # in the top N by CPU or memory, in order to reduce the number of documents created.
-  # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
-  # is included.
-  #process.include_top_n:
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
 
-    # Set to false to disable this feature and include all processes
-    #enabled: true
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
 
-    # How many processes to include from the top by CPU. The processes are sorted
-    # by the `system.process.cpu.total.pct` field.
-    #by_cpu: 0
+#============================== Kibana =====================================
 
-    # How many processes to include from the top by memory. The processes are sorted
-    # by the `system.process.memory.rss.bytes` field.
-    #by_memory: 0
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
 
-  # If false, cmdline of a process is not cached.
-  #process.cmdline.cache.enabled: true
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
 
-  # Enable collection of cgroup metrics from processes on Linux.
-  #process.cgroups.enabled: true
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
 
-  # A list of regular expressions used to whitelist environment variables
-  # reported with the process metricset's events. Defaults to empty.
-  #process.env.whitelist: []
+#============================= Elastic Cloud ==================================
 
-  # Include the cumulative CPU tick values with the process metrics. Defaults
-  # to false.
-  #process.include_cpu_ticks: false
+# These settings simplify using metricbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
-  # Raid mount point to monitor
-  #raid.mount_point: '/'
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
 
-  # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
-  #socket.reverse_lookup.enabled: false
-  #socket.reverse_lookup.success_ttl: 60s
-  #socket.reverse_lookup.failure_ttl: 60s
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
 
-  # Diskio configurations
-  #diskio.include_devices: []
+#================================ Processors =====================================
 
-#-------------------------------- Nginx Module -------------------------------
-- module: nginx
-  metricsets: ["stubstatus"]
-  enabled: true
-  period: 10s
+# Configure processors to enhance or manipulate events generated by the beat.
 
-  # Nginx hosts
-  hosts: ["http://127.0.0.1"]
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
 
-  # Path to server status. Default server-status
-  server_status_path: "server-status"
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]
+
+#============================== Xpack Monitoring ===============================
+# metricbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#xpack.monitoring.enabled: false
+
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well. Any setting that is not set is
+# automatically inherited from the Elasticsearch output configuration, so if you
+# have the Elasticsearch output configured, you can simply uncomment the
+# following line.
+#xpack.monitoring.elasticsearch:
 
 #============================= Elastic Cloud ==================================
 
