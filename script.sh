@@ -124,4 +124,7 @@ sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|" /etc/nginx/conf.d/kheops.conf
 
 echo "Ending setup secrets and env var"
 
+service filebeat start
+service metricbeat start
+
 nginx-debug -g 'daemon off;'
