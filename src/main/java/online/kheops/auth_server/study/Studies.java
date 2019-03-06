@@ -127,6 +127,10 @@ public class Studies {
                 countDistinct(when(ALBUM_SERIES.FAVORITE.eq(true), ALBUM_SERIES.PK)).as("sum_fav"),
                 countDistinct(EVENTS).as("sum_comments"));
 
+        if(qidoParams.includeStudyDescriptionField()) {
+            selectQuery.addSelect(isnull(STUDIES.STUDY_DESCRIPTION, "NULL").as(STUDIES.STUDY_DESCRIPTION.getName()));
+        }
+
         selectQuery.addFrom(USERS);
         selectQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
         selectQuery.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
@@ -178,6 +182,7 @@ public class Studies {
             if (!qidoParams.getModalityFilter().isPresent()) {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
             }
+
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
@@ -197,6 +202,9 @@ public class Studies {
             }
             if(qidoParams.includeCommentField()) {
                 attributes.setInt(0x00012346, VR.IS, ((Integer)r.getValue("sum_comments")));
+            }
+            if(qidoParams.includeStudyDescriptionField()) {
+                safeAttributeSetString(attributes, Tag.StudyDescription, VR.CS, r.getValue(STUDIES.STUDY_DESCRIPTION.getName()).toString());
             }
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
