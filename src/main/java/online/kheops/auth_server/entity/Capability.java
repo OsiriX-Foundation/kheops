@@ -48,8 +48,8 @@ public class Capability {
     @Column(name = "revoked_time")
     private LocalDateTime revokedTime;
 
-    @Column(name = "last_use")
-    private LocalDateTime lastUse;
+    @Column(name = "last_used")
+    private LocalDateTime lastUsed;
 
     @Column(name = "not_before_time")
     private LocalDateTime notBeforeTime;
@@ -168,9 +168,9 @@ public class Capability {
 
     public  LocalDateTime getNotBeforeTime() {return notBeforeTime; }
 
-    public LocalDateTime getLastUse() { return lastUse; }
+    public LocalDateTime getLastUsed() { return lastUsed; }
 
-    public void setLastUse() { this.lastUse = LocalDateTime.now(ZoneOffset.UTC); }
+    public void setLastUsed() { this.lastUsed = LocalDateTime.now(ZoneOffset.UTC); }
 
     public boolean isActive() {return notBeforeTime != null; }
 

@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements Record12<Long, Timestamp, Timestamp, String, String, String, String, Integer, String, Integer, Long, Boolean> {
 
-    private static final long serialVersionUID = -1074427100;
+    private static final long serialVersionUID = -2008117870;
 
     /**
      * Setter for <code>public.series.pk</code>.
@@ -145,16 +145,16 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
     }
 
     /**
-     * Setter for <code>public.series.series_protocol_name</code>.
+     * Setter for <code>public.series.body_part_examined</code>.
      */
-    public void setSeriesProtocolName(String value) {
+    public void setBodyPartExamined(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>public.series.series_protocol_name</code>.
+     * Getter for <code>public.series.body_part_examined</code>.
      */
-    public String getSeriesProtocolName() {
+    public String getBodyPartExamined() {
         return (String) get(8);
     }
 
@@ -301,7 +301,7 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
      */
     @Override
     public Field<String> field9() {
-        return Series.SERIES.SERIES_PROTOCOL_NAME;
+        return Series.SERIES.BODY_PART_EXAMINED;
     }
 
     /**
@@ -397,7 +397,7 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
      */
     @Override
     public String component9() {
-        return getSeriesProtocolName();
+        return getBodyPartExamined();
     }
 
     /**
@@ -493,7 +493,7 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
      */
     @Override
     public String value9() {
-        return getSeriesProtocolName();
+        return getBodyPartExamined();
     }
 
     /**
@@ -597,7 +597,7 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
      */
     @Override
     public SeriesRecord value9(String value) {
-        setSeriesProtocolName(value);
+        setBodyPartExamined(value);
         return this;
     }
 
@@ -662,7 +662,7 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
     /**
      * Create a detached, initialised SeriesRecord
      */
-    public SeriesRecord(Long pk, Timestamp createdTime, Timestamp updatedTime, String modality, String timezoneOffsetFromUtc, String seriesDescription, String seriesUid, Integer seriesNumber, String seriesProtocolName, Integer numberOfSeriesRelatedInstances, Long studyFk, Boolean populated) {
+    public SeriesRecord(Long pk, Timestamp createdTime, Timestamp updatedTime, String modality, String timezoneOffsetFromUtc, String seriesDescription, String seriesUid, Integer seriesNumber, String bodyPartExamined, Integer numberOfSeriesRelatedInstances, Long studyFk, Boolean populated) {
         super(Series.SERIES);
 
         set(0, pk);
@@ -673,7 +673,7 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
         set(5, seriesDescription);
         set(6, seriesUid);
         set(7, seriesNumber);
-        set(8, seriesProtocolName);
+        set(8, bodyPartExamined);
         set(9, numberOfSeriesRelatedInstances);
         set(10, studyFk);
         set(11, populated);

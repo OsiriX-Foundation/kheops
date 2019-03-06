@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> implements Record17<Long, String, Timestamp, Timestamp, Timestamp, Timestamp, Timestamp, Timestamp, String, String, Boolean, Boolean, Boolean, Boolean, Long, String, Long> {
 
-    private static final long serialVersionUID = 731183281;
+    private static final long serialVersionUID = 1382247585;
 
     /**
      * Setter for <code>public.capabilities.pk</code>.
@@ -117,16 +117,16 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
     }
 
     /**
-     * Setter for <code>public.capabilities.last_use</code>.
+     * Setter for <code>public.capabilities.last_used</code>.
      */
-    public void setLastUse(Timestamp value) {
+    public void setLastUsed(Timestamp value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>public.capabilities.last_use</code>.
+     * Getter for <code>public.capabilities.last_used</code>.
      */
-    public Timestamp getLastUse() {
+    public Timestamp getLastUsed() {
         return (Timestamp) get(6);
     }
 
@@ -355,7 +355,7 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
      */
     @Override
     public Field<Timestamp> field7() {
-        return Capabilities.CAPABILITIES.LAST_USE;
+        return Capabilities.CAPABILITIES.LAST_USED;
     }
 
     /**
@@ -491,7 +491,7 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
      */
     @Override
     public Timestamp component7() {
-        return getLastUse();
+        return getLastUsed();
     }
 
     /**
@@ -627,7 +627,7 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
      */
     @Override
     public Timestamp value7() {
-        return getLastUse();
+        return getLastUsed();
     }
 
     /**
@@ -769,7 +769,7 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
      */
     @Override
     public CapabilitiesRecord value7(Timestamp value) {
-        setLastUse(value);
+        setLastUsed(value);
         return this;
     }
 
@@ -902,7 +902,7 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
     /**
      * Create a detached, initialised CapabilitiesRecord
      */
-    public CapabilitiesRecord(Long pk, String id, Timestamp issuedAtTime, Timestamp updatedTime, Timestamp expirationTime, Timestamp notBeforeTime, Timestamp lastUse, Timestamp revokedTime, String title, String secret, Boolean readPermission, Boolean appropriatePermission, Boolean downloadPermission, Boolean writePermission, Long userFk, String scopeType, Long albumFk) {
+    public CapabilitiesRecord(Long pk, String id, Timestamp issuedAtTime, Timestamp updatedTime, Timestamp expirationTime, Timestamp notBeforeTime, Timestamp lastUsed, Timestamp revokedTime, String title, String secret, Boolean readPermission, Boolean appropriatePermission, Boolean downloadPermission, Boolean writePermission, Long userFk, String scopeType, Long albumFk) {
         super(Capabilities.CAPABILITIES);
 
         set(0, pk);
@@ -911,7 +911,7 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
         set(3, updatedTime);
         set(4, expirationTime);
         set(5, notBeforeTime);
-        set(6, lastUse);
+        set(6, lastUsed);
         set(7, revokedTime);
         set(8, title);
         set(9, secret);
