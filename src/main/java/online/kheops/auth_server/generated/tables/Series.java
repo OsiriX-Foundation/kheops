@@ -4,18 +4,29 @@
 package online.kheops.auth_server.generated.tables;
 
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Generated;
+
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
 import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.SeriesRecord;
-import org.jooq.*;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.Name;
+import org.jooq.Record;
+import org.jooq.Schema;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
-
-import javax.annotation.Generated;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -31,7 +42,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Series extends TableImpl<SeriesRecord> {
 
-    private static final long serialVersionUID = -1426854373;
+    private static final long serialVersionUID = 1490417939;
 
     /**
      * The reference instance of <code>public.series</code>
@@ -85,6 +96,11 @@ public class Series extends TableImpl<SeriesRecord> {
      * The column <code>public.series.series_number</code>.
      */
     public final TableField<SeriesRecord, Integer> SERIES_NUMBER = createField("series_number", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>public.series.series_protocol_name</code>.
+     */
+    public final TableField<SeriesRecord, String> SERIES_PROTOCOL_NAME = createField("series_protocol_name", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.series.number_of_series_related_instances</code>.

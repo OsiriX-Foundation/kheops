@@ -4,14 +4,15 @@
 package online.kheops.auth_server.generated.tables.records;
 
 
+import javax.annotation.Generated;
+
 import online.kheops.auth_server.generated.tables.AlbumSeries;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record4;
 import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import javax.annotation.Generated;
 
 
 /**

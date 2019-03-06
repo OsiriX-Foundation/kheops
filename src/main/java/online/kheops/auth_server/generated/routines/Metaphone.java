@@ -4,12 +4,13 @@
 package online.kheops.auth_server.generated.routines;
 
 
+import javax.annotation.Generated;
+
 import online.kheops.auth_server.generated.Public;
+
 import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
-
-import javax.annotation.Generated;
 
 
 /**

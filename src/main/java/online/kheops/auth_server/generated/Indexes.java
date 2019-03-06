@@ -4,12 +4,20 @@
 package online.kheops.auth_server.generated;
 
 
-import online.kheops.auth_server.generated.tables.*;
+import javax.annotation.Generated;
+
+import online.kheops.auth_server.generated.tables.AlbumSeries;
+import online.kheops.auth_server.generated.tables.AlbumUser;
+import online.kheops.auth_server.generated.tables.Albums;
+import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.Series;
+import online.kheops.auth_server.generated.tables.Studies;
+import online.kheops.auth_server.generated.tables.Users;
+
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.Internal;
-
-import javax.annotation.Generated;
 
 
 /**

@@ -4,11 +4,21 @@
 package online.kheops.auth_server.generated;
 
 
-import online.kheops.auth_server.generated.routines.*;
+import javax.annotation.Generated;
+
+import online.kheops.auth_server.generated.routines.Difference;
+import online.kheops.auth_server.generated.routines.Dmetaphone;
+import online.kheops.auth_server.generated.routines.DmetaphoneAlt;
+import online.kheops.auth_server.generated.routines.Levenshtein1;
+import online.kheops.auth_server.generated.routines.Levenshtein2;
+import online.kheops.auth_server.generated.routines.LevenshteinLessEqual1;
+import online.kheops.auth_server.generated.routines.LevenshteinLessEqual2;
+import online.kheops.auth_server.generated.routines.Metaphone;
+import online.kheops.auth_server.generated.routines.Soundex;
+import online.kheops.auth_server.generated.routines.TextSoundex;
+
 import org.jooq.Configuration;
 import org.jooq.Field;
-
-import javax.annotation.Generated;
 
 
 /**

@@ -4,18 +4,29 @@
 package online.kheops.auth_server.generated.tables;
 
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Generated;
+
 import online.kheops.auth_server.generated.Indexes;
 import online.kheops.auth_server.generated.Keys;
 import online.kheops.auth_server.generated.Public;
 import online.kheops.auth_server.generated.tables.records.StudiesRecord;
-import org.jooq.*;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.Name;
+import org.jooq.Record;
+import org.jooq.Schema;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
-
-import javax.annotation.Generated;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -31,7 +42,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Studies extends TableImpl<StudiesRecord> {
 
-    private static final long serialVersionUID = 432005038;
+    private static final long serialVersionUID = 268800595;
 
     /**
      * The reference instance of <code>public.studies</code>
@@ -75,6 +86,11 @@ public class Studies extends TableImpl<StudiesRecord> {
      * The column <code>public.studies.study_time</code>.
      */
     public final TableField<StudiesRecord, String> STUDY_TIME = createField("study_time", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.studies.study_description</code>.
+     */
+    public final TableField<StudiesRecord, String> STUDY_DESCRIPTION = createField("study_description", org.jooq.impl.SQLDataType.VARCHAR(155), this, "");
 
     /**
      * The column <code>public.studies.timezone_offset_from_utc</code>.

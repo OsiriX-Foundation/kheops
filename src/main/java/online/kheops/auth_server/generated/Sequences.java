@@ -4,10 +4,10 @@
 package online.kheops.auth_server.generated;
 
 
+import javax.annotation.Generated;
+
 import org.jooq.Sequence;
 import org.jooq.impl.SequenceImpl;
-
-import javax.annotation.Generated;
 
 
 /**

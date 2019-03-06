@@ -4,14 +4,29 @@
 package online.kheops.auth_server.generated;
 
 
-import online.kheops.auth_server.generated.tables.*;
-import online.kheops.auth_server.generated.tables.records.*;
+import javax.annotation.Generated;
+
+import online.kheops.auth_server.generated.tables.AlbumSeries;
+import online.kheops.auth_server.generated.tables.AlbumUser;
+import online.kheops.auth_server.generated.tables.Albums;
+import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.Series;
+import online.kheops.auth_server.generated.tables.Studies;
+import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
+import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
+import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
+import online.kheops.auth_server.generated.tables.records.CapabilitiesRecord;
+import online.kheops.auth_server.generated.tables.records.EventsRecord;
+import online.kheops.auth_server.generated.tables.records.SeriesRecord;
+import online.kheops.auth_server.generated.tables.records.StudiesRecord;
+import online.kheops.auth_server.generated.tables.records.UsersRecord;
+
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
-
-import javax.annotation.Generated;
 
 
 /**
@@ -75,6 +90,7 @@ public class Keys {
     public static final ForeignKey<EventsRecord, AlbumsRecord> EVENTS__EVENT_ALBUM_FK_FKEY = ForeignKeys0.EVENTS__EVENT_ALBUM_FK_FKEY;
     public static final ForeignKey<EventsRecord, StudiesRecord> EVENTS__EVENT_STUDY_FK_FKEY = ForeignKeys0.EVENTS__EVENT_STUDY_FK_FKEY;
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_USER_FK_FKEY;
+    public static final ForeignKey<EventsRecord, CapabilitiesRecord> EVENTS__EVENT_CAPABILITY_FK_FKEY = ForeignKeys0.EVENTS__EVENT_CAPABILITY_FK_FKEY;
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_TO_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_TO_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, SeriesRecord> EVENTS__EVENT_SERIES_FK_FKEY = ForeignKeys0.EVENTS__EVENT_SERIES_FK_FKEY;
@@ -125,6 +141,7 @@ public class Keys {
         public static final ForeignKey<EventsRecord, AlbumsRecord> EVENTS__EVENT_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, Events.EVENTS, "events__event_album_fk_fkey", Events.EVENTS.ALBUM_FK);
         public static final ForeignKey<EventsRecord, StudiesRecord> EVENTS__EVENT_STUDY_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.STUDIES_PK, Events.EVENTS, "events__event_study_fk_fkey", Events.EVENTS.STUDY_FK);
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_user_fk_fkey", Events.EVENTS.USER_FK);
+        public static final ForeignKey<EventsRecord, CapabilitiesRecord> EVENTS__EVENT_CAPABILITY_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.CAPABILITIES_PK, Events.EVENTS, "events__event_capability_fk_fkey", Events.EVENTS.CAPABILITY_FK);
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_private_target_user_fk_fkey", Events.EVENTS.PRIVATE_TARGET_USER_FK);
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_TO_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_to_user_fk_fkey", Events.EVENTS.TO_USER_FK);
         public static final ForeignKey<EventsRecord, SeriesRecord> EVENTS__EVENT_SERIES_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.SERIES_PK, Events.EVENTS, "events__event_series_fk_fkey", Events.EVENTS.SERIES_FK);
