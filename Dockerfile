@@ -12,9 +12,10 @@ RUN apt-get update
 RUN apt-get install -y curl
 
 #METRICBEAT
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-6.6.0-amd64.deb
-RUN dpkg -i metricbeat-6.6.0-amd64.deb
-RUN rm metricbeat-6.6.0-amd64.deb
+ENV METRICBEAT_VERSION 6.6.1
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb
+RUN dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb
+RUN rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
 
 COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
@@ -25,9 +26,10 @@ RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 
 #FILEBEAT
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.6.0-amd64.deb
-RUN dpkg -i filebeat-6.6.0-amd64.deb
-RUN rm filebeat-6.6.0-amd64.deb
+ENV FILEBEAT_VERSION 6.6.1
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILECBEAT_VERSION}-amd64.deb
+RUN dpkg -i filebeat-${FILECBEAT_VERSION}-amd64.deb
+RUN rm filebeat-${FILECBEAT_VERSION}-amd64.deb
 
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
