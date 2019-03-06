@@ -27,9 +27,9 @@ RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 #FILEBEAT
 ENV FILEBEAT_VERSION 6.6.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILECBEAT_VERSION}-amd64.deb
-RUN dpkg -i filebeat-${FILECBEAT_VERSION}-amd64.deb
-RUN rm filebeat-${FILECBEAT_VERSION}-amd64.deb
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
+RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb
+RUN rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
