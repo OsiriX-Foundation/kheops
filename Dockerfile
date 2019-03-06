@@ -8,7 +8,6 @@ COPY script.sh /etc/nginx/conf.d/script.sh
 
 RUN chmod +x /etc/nginx/conf.d/script.sh
 
-
 RUN apt-get update
 RUN apt-get install -y curl
 
@@ -20,13 +19,9 @@ RUN rm metricbeat-6.6.0-amd64.deb
 COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
 
-#RUN metricbeat modules list
 RUN metricbeat modules enable nginx
-#RUN metricbeat modules list
 COPY nginx.yml /etc/metricbeat/modules.d/nginx.yml
 RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
-#RUN metricbeat setup
-#RUN cat /etc/metricbeat/metricbeat.yml
 
 
 #FILEBEAT
@@ -40,10 +35,9 @@ RUN chmod go-w /etc/filebeat/filebeat.yml
 RUN filebeat modules enable nginx
 COPY filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
-#RUN filebeat setup
+
 
 RUN apt-get remove -y curl
-
 
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log
 
