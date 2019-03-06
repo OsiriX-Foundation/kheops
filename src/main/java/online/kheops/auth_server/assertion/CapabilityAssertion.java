@@ -35,7 +35,7 @@ final class CapabilityAssertion implements Assertion {
                 final String sub = capability.getUser().getKeycloakId();
                 final String email = capability.getUser().getEmail();
 
-                capability.setLastUse();
+                capability.setLastUsed();
 
                 tx.commit();
 

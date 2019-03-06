@@ -69,8 +69,8 @@ public class CapabilitiesResponse {
             }
             response.title = capability.getTitle();
             response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
-            if(capability.getLastUse() != null) {
-                response.lastUsed = ZonedDateTime.of(capability.getLastUse(), ZoneOffset.UTC).toString();
+            if(capability.getLastUsed() != null) {
+                response.lastUsed = ZonedDateTime.of(capability.getLastUsed(), ZoneOffset.UTC).toString();
             }
         }
 
