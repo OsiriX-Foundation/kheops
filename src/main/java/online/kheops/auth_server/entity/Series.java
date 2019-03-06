@@ -42,6 +42,9 @@ public class Series {
     @Column(name = "series_description")
     private String seriesDescription;
 
+    @Column(name = "series_protocol_name")
+    private String seriesProtocolName;
+
     @Column(name = "series_number")
     private int seriesNumber;
 
@@ -103,6 +106,7 @@ public class Series {
     // doesn't set populated, but the caller probably will want to set populated after calling this method
     public void mergeAttributes(Attributes attributes) {
         setModality(attributes.getString(Tag.Modality, getModality()));
+        setSeriesProtocolName(attributes.getString(Tag.ProtocolName, getSeriesProtocolName()));
         setSeriesDescription(attributes.getString(Tag.SeriesDescription, getSeriesDescription()));
         setTimezoneOffsetFromUTC(attributes.getString(Tag.TimezoneOffsetFromUTC, getTimezoneOffsetFromUTC()));
         setSeriesNumber(attributes.getInt(Tag.SeriesNumber, getSeriesNumber()));
@@ -190,4 +194,8 @@ public class Series {
     public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
 
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
+
+    public String getSeriesProtocolName() { return seriesProtocolName; }
+
+    public void setSeriesProtocolName(String seriesProtocolName) { this.seriesProtocolName = seriesProtocolName; }
 }

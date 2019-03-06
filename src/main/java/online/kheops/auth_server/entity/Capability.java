@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static online.kheops.auth_server.capability.Capabilities.hashCapability;
 import static online.kheops.auth_server.capability.Capabilities.newCapabilityID;
@@ -87,6 +89,10 @@ public class Capability {
     @ManyToOne
     @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
     private Album album;
+
+    @OneToMany
+    @JoinColumn (name = "capability_fk")
+    private Set<Mutation> mutation = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {

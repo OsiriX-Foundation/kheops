@@ -40,6 +40,9 @@ public class Study {
     @Column(name = "study_time")
     private String studyTime;
 
+    @Column(name = "study_description")
+    private String studyDescription;
+
     @Column(name = "timezone_offset_from_utc")
     private String timezoneOffsetFromUTC;
 
@@ -98,6 +101,7 @@ public class Study {
 
         safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, getStudyDate());
         safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, getStudyTime());
+        safeAttributeSetString(attributes, Tag.StudyDescription, VR.LO, getStudyDescription());
         safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, getTimezoneOffsetFromUTC());
         safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, getAccessionNumber());
         safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, getReferringPhysicianName());
@@ -116,6 +120,7 @@ public class Study {
     public void mergeAttributes(Attributes attributes) {
         setStudyDate(attributes.getString(Tag.StudyDate, getStudyDate()));
         setStudyTime(attributes.getString(Tag.StudyTime, getStudyTime()));
+        setStudyDescription(attributes.getString(Tag.StudyDescription, getStudyDescription()));
         setTimezoneOffsetFromUTC(attributes.getString(Tag.TimezoneOffsetFromUTC, getTimezoneOffsetFromUTC()));
         setAccessionNumber(attributes.getString(Tag.AccessionNumber, getAccessionNumber()));
         setReferringPhysicianName(attributes.getString(Tag.ReferringPhysicianName, getReferringPhysicianName()));
@@ -211,6 +216,10 @@ public class Study {
     public String getStudyID() {
         return studyID;
     }
+
+    public String getStudyDescription() { return studyDescription; }
+
+    public void setStudyDescription(String studyDescription) { this.studyDescription = studyDescription; }
 
     public void setStudyID(String studyID) {
         this.studyID = studyID;

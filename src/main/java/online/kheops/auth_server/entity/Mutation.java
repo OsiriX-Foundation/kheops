@@ -16,6 +16,10 @@ public class Mutation extends Event{
     @JoinColumn(name = "series_fk", nullable=true, insertable = false, updatable = false)
     private Series series;
 
+    @ManyToOne
+    @JoinColumn(name = "capability_fk", nullable=true, insertable = false, updatable = false)
+    private Capability capability;
+
     @Basic(optional = false)
     @Column(name = "mutation_type", updatable = false)
     private String mutationType;
