@@ -29,7 +29,8 @@
 		"studiessharederror": "studies could not be shared",
 		"addInbox": "Add to inbox",
 		"nostudy": "No studies found",
-		"studiessend": "studies send to inbox"
+		"studiessend": "studies send to inbox",
+    "confirmDelete": "Are you sure to delete ? "
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -57,7 +58,8 @@
 		"studiessharederror": "études n'ont pas pu être partagée",
 		"addInbox": "Add to inbox",
     "nostudy": "Aucne étude trouvée",
-		"studiessend": "études envoyées dans votre boîte de réception"
+		"studiessend": "études envoyées dans votre boîte de réception",
+    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? "
 	}
 }
 </i18n>
@@ -148,7 +150,7 @@
           v-if="!filters.album_id || (album.is_admin || album.delete_series)"
           type="button"
           class="btn btn-link btn-sm text-center"
-          @click="deleteSelectedStudies()"
+          @click="confirmDelete=!confirmDelete"
         >
           <span>
             <v-icon
@@ -178,7 +180,15 @@
         />
       </button>
     </div>
-
+    <!--deleteSelectedStudies()-->
+    <confirm-button
+      v-if="confirmDelete && selectedStudiesNb"
+      :btn-primary-text="$t('delete')"
+      :btn-danger-text="$t('cancel')"
+      :text="$t('confirmDelete')"
+      :method-confirm="deleteSelectedStudies"
+      :method-cancel="() => confirmDelete=false"
+    />
     <form-get-user
       v-if="form_send_study && selectedStudiesNb"
       @get-user="sendToUser"
@@ -568,12 +578,13 @@ import Datepicker from 'vuejs-datepicker'
 import Vue from 'vue'
 // https://github.com/greyby/vue-spinner
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton },
 	props: {
 		album: {
 			type: Object,
@@ -650,7 +661,8 @@ export default {
 			send: {
 				expected: 0,
 				count: 0
-			}
+			},
+			confirmDelete: false
 		}
 	},
 	computed: {
@@ -690,6 +702,14 @@ export default {
 	},
 
 	watch: {
+		selectedStudiesNb: {
+			handler: function (selectedStudiesNb) {
+				if (selectedStudiesNb === 0) {
+					this.confirmDelete = false
+					this.form_send_study = false
+				}
+			}
+		},
 		send: {
 			handler: function (send) {
 				if (send.expected === send.count) {
