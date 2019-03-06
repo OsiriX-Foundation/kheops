@@ -21,7 +21,7 @@ COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
 
 RUN metricbeat modules enable nginx
-COPY nginx.yml /etc/metricbeat/modules.d/nginx.yml
+COPY metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
 RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 
