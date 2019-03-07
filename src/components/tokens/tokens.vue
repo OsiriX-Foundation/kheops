@@ -146,7 +146,7 @@
           {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
         </template>
         <template
-          slot="last_use"
+          slot="last_used"
           slot-scope="data"
         >
           {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
@@ -309,7 +309,7 @@ export default {
 					class: 'd-none d-md-table-cell'
 				},
 				{
-					key: 'last_use',
+					key: 'last_used',
 					label: 'last used',
 					sortable: true,
 					class: 'd-none d-md-table-cell'
