@@ -4,6 +4,7 @@ import customdicom from '@/mixins/customdicom'
 import moment from 'moment'
 import axios from 'axios'
 import SRImage from '@/assets/SR_2.png'
+import DicomLogo from '@/assets/dicom_logo.png'
 // initial state
 const state = {
 	all: [],
@@ -12,7 +13,7 @@ const state = {
 	filterParams: {
 		sortBy: 'StudyDate',
 		sortDesc: true,
-		limit: 10,
+		limit: 100,
 		pageNb: 1,
 		filters: {
 			AccessionNumber: '',
@@ -79,11 +80,11 @@ const actions = {
 		let offset = 0
 		if (state.filterParams.sortBy !== params.sortBy || state.filterParams.sortDesc !== params.sortDesc || state.request !== requestParams) {
 			offset = 0
-			params.limit = (state.all.length > 10) ? state.all.length : 10
+			params.limit = (state.all.length > 100) ? state.all.length : 100
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
-		var request = 'studies?limit=' + params.limit + '&offset=' + offset + '&sort=' + sortSense + params.sortBy + requestParams
+		var request = 'studies?limit=' + params.limit + '&offset=' + offset + (params.sortBy ? '&sort=' + sortSense + params.sortBy : '') + requestParams
 		HTTP.get(request, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
 			let data = []
@@ -107,7 +108,6 @@ const actions = {
 					commit('SET_FLAG', flag)
 					data.push(t)
 				}
-				dispatch('getStudiesComments', { StudyInstanceUID: t.StudyInstanceUID })
 			})
 			commit('SET_STUDIES', { data: data, reset: reset })
 			commit('SET_STUDIES_FILTER_PARAMS', params)
@@ -180,8 +180,13 @@ const actions = {
 	getImage ({ commit }, params) {
 		let StudyInstanceUID = params.StudyInstanceUID
 		let SeriesInstanceUID = params.SeriesInstanceUID
-		return HTTP.get('/wado?studyUID=' + StudyInstanceUID + '&seriesUID=' + SeriesInstanceUID + '&requestType=WADO&rows=250&columns=250', { responseType: 'arraybuffer' }).then(resp => {
-			let img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=' // blank image
+		return HTTP.get('/wado?studyUID=' + StudyInstanceUID + '&seriesUID=' + SeriesInstanceUID + '&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg', {
+			responseType: 'arraybuffer',
+			headers: {
+				'Accept': 'image/jpeg'
+			}
+		}).then(resp => {
+			let img = DicomLogo
 			if (resp.data) {
 				let arr = new Uint8Array(resp.data)
 				let raw = String.fromCharCode.apply(null, arr)
@@ -190,7 +195,8 @@ const actions = {
 				img = 'data:' + mimeType + ';base64,' + b64
 			}
 			commit('SET_IMAGE', { StudyInstanceUID: StudyInstanceUID, SeriesInstanceUID: SeriesInstanceUID, img: img })
-			return img
+		}).catch(() => {
+			commit('SET_IMAGE', { StudyInstanceUID: StudyInstanceUID, SeriesInstanceUID: SeriesInstanceUID, img: DicomLogo })
 		})
 	},
 	deleteStudy ({ commit }, params) {

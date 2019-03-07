@@ -11,7 +11,7 @@
 		"download": "download",
 		"appropriate": "appropriate",
 		"expirationdate": "expiration date",
-		"tokencopysuccess": "Token copied successfully"
+		"tokencopysuccess": "Token successfully copied"
 
 	},
 	"fr": {
@@ -54,6 +54,7 @@
                 :placeholder="$t('description')"
                 class="form-control"
                 required
+                maxlength="255"
               >
             </dd>
           </div>
@@ -167,7 +168,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              :disabled="!token.title || (token.scope_type==='album' && !token.album)"
+              :disabled="disabledCreateToken"
             >
               {{ $t('create') }}
             </button><button
@@ -190,6 +191,7 @@
       hide-footer
       no-close-on-backdrop
       size="lg"
+      @hidden="cancel"
     >
       <dl class="my-2 row">
         <dt class="col-xs-12 col-sm-3">
@@ -260,7 +262,10 @@ export default {
 	computed: {
 		...mapGetters({
 			albums: 'albums'
-		})
+		}),
+		disabledCreateToken () {
+			return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (this.token.scope_type === 'album' && !this.token.read_permission && !this.token.write_permission)
+		}
 	},
 	created () {
 		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 100, sortBy: 'created_time', sortDesc: true, canCreateCapabilityToken: 'true' })
@@ -288,15 +293,12 @@ export default {
 		},
 		onCopy () {
 			this.$snotify.success(this.$t('tokencopysuccess'))
-			this.$refs.tokenModal.hide()
-			this.$emit('done')
 		},
 		onCopyError () {
 			this.$snotify.error(this.$t('sorryerror'))
-			this.$refs.tokenModal.hide()
 		},
-
 		cancel () {
+			this.$refs.tokenModal.hide()
 			this.$emit('done')
 		}
 	}

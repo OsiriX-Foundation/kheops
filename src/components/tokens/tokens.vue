@@ -3,6 +3,7 @@
 		"en": {
 			"newtoken": "New token",
 			"showrevokedtoken": "Show revoked tokens",
+			"showinvalidtoken": "Show invalid tokens",
 			"revoke": "revoke",
 			"revoked": "revoked",
 			"active": "active",
@@ -19,7 +20,8 @@
 		},
 		"fr": {
 			"newtoken": "Nouveau token",
-			"showrevokedtoken": "Afficher les tokens expirés",
+			"showrevokedtoken": "Afficher les tokens révoqués",
+			"showinvalidtoken": "Afficher les tokens invalides",
 			"revoke": "révoquer",
 			"revoked": "révoqué",
 			"active": "actif",
@@ -76,11 +78,11 @@
         Tokens
         <small class="float-right">
           <toggle-button
-            v-model="showRevoked"
+            v-model="showInvalid"
             :labels="{checked: 'Yes', unchecked: 'No'}"
             @change="getTokens"
           /><span class="ml-2 toggle-label">
-            {{ $t('showrevokedtoken') }}
+            {{ $t('showinvalidtoken') }}
           </span>
         </small>
       </h4>
@@ -139,6 +141,12 @@
         </template>
         <template
           slot="issued_at_time"
+          slot-scope="data"
+        >
+          {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
+        </template>
+        <template
+          slot="last_use"
           slot-scope="data"
         >
           {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
@@ -208,14 +216,16 @@
           <button
             v-if="!data.item.revoked"
             type="button"
-            class="btn btn-danger btn-xs revoke-btn"
+            class="btn btn-danger btn-xs"
+            :class="class_revoke_btn"
             @click.stop="revoke(data.item.id)"
           >
             {{ $t('revoke') }}
           </button>
           <span
             v-if="data.item.revoked"
-            class="text-danger revoke-btn"
+            class="text-danger"
+            :class="class_revoke_btn"
           >
             {{ $t('revoked') }}
           </span>
@@ -232,6 +242,7 @@ import { mapGetters } from 'vuex'
 import newToken from '@/components/tokens/newToken'
 import token from '@/components/tokens/token'
 import moment from 'moment'
+import mobiledetect from '@/mixins/mobiledetect.js'
 
 VueClipboard.config.autoSetContainer = true // add this line
 Vue.use(VueClipboard)
@@ -251,7 +262,8 @@ export default {
 	},
 	data () {
 		return {
-			showRevoked: false,
+			showRevoked: false, // not used anymore...
+			showInvalid: false,
 			view: 'list',
 			sortBy: 'expiration_date',
 			token: {
@@ -297,7 +309,7 @@ export default {
 					class: 'd-none d-md-table-cell'
 				},
 				{
-					key: 'last_used',
+					key: 'last_use',
 					label: 'last used',
 					sortable: true,
 					class: 'd-none d-md-table-cell'
@@ -324,8 +336,11 @@ export default {
 			if (this.scope === 'user') {
 				return this.user.tokens
 			} else {
-				return _.filter(this.user.tokens, t => { return t.scope_type === 'album' && +t.album.id === +this.albumid })
+				return _.filter(this.user.tokens, t => { return t.scope_type === 'album' && t.album.id === this.albumid })
 			}
+		},
+		class_revoke_btn () {
+			return mobiledetect.mobileAndTabletcheck() ? '' : 'revoke-btn'
 		}
 	},
 	created () {
@@ -359,7 +374,7 @@ export default {
 			this.view = 'list'
 		},
 		getTokens () {
-			this.$store.dispatch('getUserTokens', { showRevoked: this.showRevoked, album_id: this.albumid })
+			this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
 		},
 		revoke (tokenId) {
 			this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {

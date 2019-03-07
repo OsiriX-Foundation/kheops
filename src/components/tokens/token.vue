@@ -8,14 +8,15 @@
 		"permission": "permission",
 		"write": "write",
 		"read": "read",
-		"download": "download",
-		"appropriate": "appropriate",
+		"download": "show download button",
+		"appropriate": "send / add to inbox or an album",
 		"expirationdate": "expiration date",
 		"startdate": "start date",
 		"creationdate": "creation date",
 		"revokeddate": "revoke date",
 		"revoke": "revoke",
-		"thistokenrevoked": "this token is revoked"
+		"thistokenrevoked": "this token is revoked",
+		"lastuse": "last use date"
 	},
 	"fr": {
 		"token": "token",
@@ -25,14 +26,15 @@
 		"permission": "permission",
 		"write": "écriture",
 		"read": "lecture",
-		"download": "téléchargement",
+		"download": "bouton téléchargement",
 		"appropriate": "approprier",
 		"expirationdate": "date d'expiration",
 		"startdate": "date de début",
 		"creationdate": "date de création",
 		"revokeddate": "date de révoquation",
 		"revoke": "révoquer",
-		"thistokenrevoked": "ce token a été revoqué"
+		"thistokenrevoked": "ce token a été revoqué",
+		"lastuse": "dernière utilisation"
 	}
 }
 </i18n>
@@ -117,6 +119,19 @@
         <div class="col-xs-12 col-sm-3">
           <dd>
             {{ token.issued_at_time|formatDateTime }}
+          </dd>
+        </div>
+      </div>
+      <div
+        v-if="token.last_use"
+        class="row"
+      >
+        <div class="col-xs-12 col-sm-3">
+          <dt>{{ $t('lastuse') }}</dt>
+        </div>
+        <div class="col-xs-12 col-sm-3">
+          <dd>
+            {{ token.last_use|formatDateTime }}
           </dd>
         </div>
       </div>

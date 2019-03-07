@@ -220,6 +220,7 @@
                 class="form-control"
                 rows="6"
                 placeholder="Use @... for a specific user"
+                maxlength="1024"
               />
             </div>
             <div class="col-auto">
@@ -317,7 +318,11 @@ export default {
 					}
 				}
 				if (this.scope === 'album') {
-					this.$store.dispatch('postAlbumComment', this.newComment).then(() => {
+					let params = {
+						type: (this.includeNotifications) ? '' : 'comments',
+						query: this.newComment
+					}
+					this.$store.dispatch('postAlbumComment', params).then(() => {
 						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
