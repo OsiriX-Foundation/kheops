@@ -139,8 +139,8 @@ setup.kibana:
 # The cloud.auth setting overwrites the `output.elasticsearch.username` and
 # `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
 #cloud.auth:
-cloud.id: "kheops_test:ZXUtY2VudHJhbC0xLmF3cy5jbG91ZC5lcy5pbyQ2MTA1Zjk4YTJhMTA0OWRmOGEyZDc1MzQyMjI4ZDUxZSQ4Y2I4MTZhNzAyNzA0YzBlODgzZTI0ZTNkMmY1MGY3Mg=="
-cloud.auth: "elastic:FggE75oMjBPgWmGfpkSrJCBJ"
+cloud.id: "${elastic_cloud_id}"
+cloud.auth: "${elastic_cloud_auth}"
 
 #================================ Outputs =====================================
 
@@ -207,4 +207,3 @@ processors:
 # have the Elasticsearch output configured, you can simply uncomment the
 # following line.
 #xpack.monitoring.elasticsearch:
-

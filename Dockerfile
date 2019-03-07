@@ -20,7 +20,7 @@ RUN rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
 COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
 
-RUN metricbeat modules enable nginx
+#RUN metricbeat modules enable nginx
 COPY metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
 RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
@@ -34,7 +34,7 @@ RUN rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
-RUN filebeat modules enable nginx
+#RUN filebeat modules enable nginx
 COPY filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
 
