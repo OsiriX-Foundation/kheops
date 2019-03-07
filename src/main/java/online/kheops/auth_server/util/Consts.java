@@ -28,9 +28,9 @@ public class Consts {
 
     //AlbumQueryParams.java
     public static final String FAVORITE = "favorite";
-    public static final String CUSTOM_DICOM_TAG_FAVORITE = "00012345";
+    public static final int CUSTOM_DICOM_TAG_FAVORITE = 0x00012345;
     public static final String COMMENTS = "comments";
-    public static final String CUSTOM_DICOM_TAG_COMMENTS = "00012346";
+    public static final int CUSTOM_DICOM_TAG_COMMENTS = 0x00012346;
     public static final String NAME = "name";
     public static final String CREATED_TIME = "created_time";
     public static final String LAST_EVENT_TIME = "last_event_time";

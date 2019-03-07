@@ -7,6 +7,7 @@ import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Tag;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -41,8 +42,8 @@ public abstract class Fetcher {
     }
 
     static void setDicomWebURI(URI dicomWebURI) {
-        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}").queryParam("includefield", "00081030");
-        seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", "00180015");
+        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}").queryParam("includefield", String.format("%08X", Tag.StudyDescription));
+        seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
     public static void  fetchStudy(String studyInstanceUID) {
