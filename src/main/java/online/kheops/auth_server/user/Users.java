@@ -11,10 +11,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 
 public class Users {
+    private static final Logger LOG = Logger.getLogger(Users.class.getName());
+
     private Users() {
         throw new IllegalStateException("Utility class");
     }
@@ -41,6 +46,7 @@ public class Users {
     public static User getOrCreateUser(String userReference)
             throws UserNotFoundException {
 
+
         final EntityManager em = EntityManagerListener.createEntityManager();
         //try to find the user in kheops db
         try {
@@ -59,9 +65,12 @@ public class Users {
         //the user is in keycloak but not in kheops => add the user in kheops
         final EntityTransaction tx = em.getTransaction();
 
+        LOG.log(INFO, "Adding new user: " + userReference);
+
+        final User newUser;
         try {
             tx.begin();
-            final User newUser = new User(userReference);
+            newUser = new User(userReference);
             final Album inbox = new Album();
             inbox.setName("inbox");
             newUser.setInbox(inbox);
