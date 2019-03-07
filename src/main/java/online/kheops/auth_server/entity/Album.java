@@ -141,7 +141,7 @@ public class Album {
 
     public boolean containsSeries(Series series, EntityManager em) {
         try {
-            final AlbumSeries albumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
+            em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
                     .setParameter("series", series)
                     .setParameter("album", this)
                     .getSingleResult();
@@ -156,13 +156,13 @@ public class Album {
     }
 
     public void removeSeries(Series series, EntityManager em) {
-        AlbumSeries albumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
+        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
                 .setParameter("series", series)
                 .setParameter("album", this)
                 .getSingleResult();
-        series.removeAlbumSeries(albumSeries);
-        this.albumSeries.remove(albumSeries);
-        em.remove(albumSeries);
+        series.removeAlbumSeries(localAlbumSeries);
+        this.albumSeries.remove(localAlbumSeries);
+        em.remove(localAlbumSeries);
     }
 
     public Set<AlbumSeries> getAlbumSeries() { return albumSeries; }

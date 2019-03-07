@@ -41,11 +41,12 @@ public class KeycloakToken {
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
-            JsonReader jsonReader = Json.createReader(new StringReader(output));
-            JsonObject wellKnownResponse = jsonReader.readObject();
-            tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
-            introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
-        } else {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                JsonObject wellKnownResponse = jsonReader.readObject();
+                tokenUri = UriBuilder.fromUri(wellKnownResponse.getString("token_endpoint")).build();
+                introspectUri = UriBuilder.fromUri(wellKnownResponse.getString("token_introspection_endpoint")).build();
+            }
+        } else{
             throw new KeycloakException("Error during request OpenID Connect well-known");
         }
 
@@ -81,9 +82,10 @@ public class KeycloakToken {
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
-            JsonReader jsonReader = Json.createReader(new StringReader(output));
-            token = jsonReader.readObject();
-            return;
+            try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                token = jsonReader.readObject();
+                return;
+            }
         }
         throw new KeycloakException("Error while requesting a new token. Expected 200 but got : " + response.getStatus() +"___"+ response);
     }
@@ -106,9 +108,9 @@ public class KeycloakToken {
             throw new KeycloakException("Status of:" + response.getStatus() + " while getting a refresh token");
         }
 
-        try {
-            String output = response.readEntity(String.class);
-            JsonReader jsonReader = Json.createReader(new StringReader(output));
+        String output = response.readEntity(String.class);
+
+        try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
             token = jsonReader.readObject();
         } catch (Exception e) {
             throw new KeycloakException("Error while parsing the refresh token response", e);
@@ -155,9 +157,10 @@ public class KeycloakToken {
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
-            JsonReader jsonReader = Json.createReader(new StringReader(output));
-            JsonObject result = jsonReader.readObject();
-            return result.getBoolean("active");
+            try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                JsonObject result = jsonReader.readObject();
+                return result.getBoolean("active");
+            }
         }
         throw new KeycloakException("Error during token introspect");
     }

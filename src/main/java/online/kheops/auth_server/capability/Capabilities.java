@@ -3,13 +3,14 @@ package online.kheops.auth_server.capability;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
-import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.Users;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,8 +36,6 @@ public class Capabilities {
     private static final String ID_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int ID_LENGTH = 10;
     public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-    private static final String ID_PATTERN_STRICT = "^" + ID_PATTERN + "$";
-    private static final Pattern idPattern = Pattern.compile(ID_PATTERN_STRICT);
 
     private static final Random rdm = new SecureRandom();
 
@@ -45,7 +44,7 @@ public class Capabilities {
     }
 
     public static String newCapabilityToken() {
-        StringBuilder secretBuilder = new StringBuilder();
+        final StringBuilder secretBuilder = new StringBuilder();
         do {
             while (secretBuilder.length() < TOKEN_LENGTH) {
                 int index = rdm.nextInt(TOKEN_DICT.length());
@@ -56,7 +55,7 @@ public class Capabilities {
     }
 
     public static String newCapabilityID() {
-        StringBuilder idBuilder = new StringBuilder();
+        final StringBuilder idBuilder = new StringBuilder();
 
         do {
             idBuilder.setLength(0);
@@ -68,7 +67,7 @@ public class Capabilities {
         return idBuilder.toString();
     }
 
-    public static String HashCapability(String capability) {
+    public static String hashCapability(String capability) {
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");
@@ -77,21 +76,13 @@ public class Capabilities {
         }
         byte[] encodedhash = digest.digest(capability.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(encodedhash);
-        /*Maby use :
-        https://en.wikipedia.org/wiki/Argon2
-        https://en.wikipedia.org/wiki/Bcrypt
-        https://en.wikipedia.org/wiki/Scrypt
-        https://en.wikipedia.org/wiki/PBKDF2
-        or another sha-512 is just for test
-        https://howtodoinjava.com/security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
-        */
     }
 
     private static String bytesToHex(byte[] hash) {
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) hexString.append('0');
+        final StringBuilder hexString = new StringBuilder();
+        for (byte hash1 : hash) {
+            String hex = Integer.toHexString(0xff & hash1);
+            if (hex.length() == 1) hexString.append('0');
             hexString.append(hex);
         }
         return hexString.toString();
@@ -107,12 +98,12 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse.Response createUserCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, CapabilityBadRequestException {
+            throws CapabilityBadRequestException {
 
-        CapabilitiesResponse.Response capabilityResponse;
+        final CapabilitiesResponse.Response capabilityResponse;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -141,12 +132,12 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse.Response createAlbumCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
+            throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
 
-        CapabilitiesResponse.Response capabilityResponse;
+        final CapabilitiesResponse.Response capabilityResponse;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -185,11 +176,12 @@ public class Capabilities {
     }
     
     public static CapabilitiesResponse.Response revokeCapability(User callingUser, String capabilityId)
-    throws CapabilityNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+            throws CapabilityNotFoundException {
 
-        CapabilitiesResponse.Response capabilityResponse;
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        final CapabilitiesResponse.Response capabilityResponse;
 
         try {
             tx.begin();
@@ -213,17 +205,18 @@ public class Capabilities {
     }
 
     public static List<CapabilitiesResponse.Response> getCapabilities(User callingUser, boolean valid) {
-        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
             callingUser = em.merge(callingUser);
 
-            List<Capability> capabilities;
+            final List<Capability> capabilities;
             if(valid) {
                 capabilities = findCapabilitiesByUserValidOnly(callingUser, em);
             } else {
@@ -245,15 +238,16 @@ public class Capabilities {
     }
 
     public static List<CapabilitiesResponse.Response> getCapabilities(String albumId, boolean valid) {
-        List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
 
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final List<CapabilitiesResponse.Response> capabilityResponses = new ArrayList<>();
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
 
-            List<Capability> capabilities;
+            final List<Capability> capabilities;
             if(valid) {
                 capabilities = findCapabilitiesByAlbumValidOnly(albumId, em);
             } else {
@@ -276,7 +270,8 @@ public class Capabilities {
 
     public static CapabilitiesResponse.Response getCapabilityInfo(String capabilityToken)
             throws CapabilityNotFoundException {
-        CapabilitiesResponse.Response capabilityResponse;
+
+        final CapabilitiesResponse.Response capabilityResponse;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
@@ -291,10 +286,12 @@ public class Capabilities {
 
     public static CapabilitiesResponse.Response getCapability(String capabilityTokenID, long callingUserPk)
             throws CapabilityNotFoundException {
-        CapabilitiesResponse.Response capabilityResponse;
+
+        final CapabilitiesResponse.Response capabilityResponse;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final User user = findUserByPk(callingUserPk, em);
+
         try {
             Capability capability = getCapability(user, capabilityTokenID, em);
             capabilityResponse = new CapabilitiesResponse(capability, false, false).getResponse();
@@ -311,7 +308,7 @@ public class Capabilities {
         try {
             findCapabilityByCapabilityID(capabilityId, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (CapabilityNotFoundException e) {
             return false;
         } finally {
             em.close();
@@ -332,20 +329,16 @@ public class Capabilities {
         }
     }
 
-    public static Capability getCapability(User user, String capabilityId, EntityManager em) throws CapabilityNotFoundException {
-        try {
-            return findCapabilityByCapabilityTokenandUser(user, capabilityId, em);
-        } catch (NoResultException e) {
-            throw new CapabilityNotFoundException();
-        }
+    public static Capability getCapability(User user, String capabilityId, EntityManager em)
+            throws CapabilityNotFoundException {
+
+            return findCapabilityByIdandUser(user, capabilityId, em);
     }
 
-    public static Capability getCapability(String secret, EntityManager em) throws CapabilityNotFoundException {
-        try {
-            secret = HashCapability(secret);
-            return findCapabilityByCapabilityToken(secret, em);
-        } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capabability token not found");
-        }
+    public static Capability getCapability(String secret, EntityManager em)
+            throws CapabilityNotFoundException {
+
+            final String hashSecret = hashCapability(secret);
+            return findCapabilityByCapabilityToken(hashSecret, em);
     }
 }

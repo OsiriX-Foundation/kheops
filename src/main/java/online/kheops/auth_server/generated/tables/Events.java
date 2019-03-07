@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Events extends TableImpl<EventsRecord> {
 
-    private static final long serialVersionUID = -559662952;
+    private static final long serialVersionUID = 2119705138;
 
     /**
      * The reference instance of <code>public.events</code>
@@ -86,6 +86,11 @@ public class Events extends TableImpl<EventsRecord> {
      * The column <code>public.events.user_fk</code>.
      */
     public final TableField<EventsRecord, Long> USER_FK = createField("user_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.events.capability_fk</code>.
+     */
+    public final TableField<EventsRecord, Long> CAPABILITY_FK = createField("capability_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.events.private_target_user_fk</code>.
@@ -190,7 +195,7 @@ public class Events extends TableImpl<EventsRecord> {
      */
     @Override
     public List<ForeignKey<EventsRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<EventsRecord, ?>>asList(Keys.EVENTS__EVENT_ALBUM_FK_FKEY, Keys.EVENTS__EVENT_STUDY_FK_FKEY, Keys.EVENTS__EVENT_USER_FK_FKEY, Keys.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENTS__EVENT_TO_USER_FK_FKEY, Keys.EVENTS__EVENT_SERIES_FK_FKEY);
+        return Arrays.<ForeignKey<EventsRecord, ?>>asList(Keys.EVENTS__EVENT_ALBUM_FK_FKEY, Keys.EVENTS__EVENT_STUDY_FK_FKEY, Keys.EVENTS__EVENT_USER_FK_FKEY, Keys.EVENTS__EVENT_CAPABILITY_FK_FKEY, Keys.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENTS__EVENT_TO_USER_FK_FKEY, Keys.EVENTS__EVENT_SERIES_FK_FKEY);
     }
 
     public Albums albums() {
@@ -203,6 +208,10 @@ public class Events extends TableImpl<EventsRecord> {
 
     public Users events_EventUserFkFkey() {
         return new Users(this, Keys.EVENTS__EVENT_USER_FK_FKEY);
+    }
+
+    public Capabilities capabilities() {
+        return new Capabilities(this, Keys.EVENTS__EVENT_CAPABILITY_FK_FKEY);
     }
 
     public Users events_EventPrivateTargetUserFkFkey() {

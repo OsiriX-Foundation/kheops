@@ -2,11 +2,11 @@ package online.kheops.auth_server.fetch;
 
 import online.kheops.auth_server.EntityManagerListener;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 import java.net.URI;
 import java.util.List;
-
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

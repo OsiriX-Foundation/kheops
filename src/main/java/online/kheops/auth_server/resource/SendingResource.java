@@ -1,22 +1,22 @@
 package online.kheops.auth_server.resource;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.Albums;
-import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
@@ -60,7 +60,7 @@ public class SendingResource
 
         try {
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch(UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -88,7 +88,7 @@ public class SendingResource
 
         try {
             Sending.shareSeriesWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, seriesInstanceUID);
-        } catch(UserNotFoundException | SeriesNotFoundException e) {
+        } catch (UserNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -106,7 +106,7 @@ public class SendingResource
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                LOG.log(WARNING, "Principal " + kheopsPrincipal + ", does not have write access");
+                LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
                 return Response.status(FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
@@ -120,7 +120,7 @@ public class SendingResource
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                     Sending.putSeriesInAlbum(kheopsPrincipal.getUser(), albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
-                    LOG.log(WARNING, "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
+                    LOG.warning(() -> "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
                     return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
                 }
             } else {
@@ -189,14 +189,14 @@ public class SendingResource
                 }
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
-            } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+            } catch (AlbumNotFoundException | SeriesNotFoundException e) {
                 return Response.status(NOT_FOUND).entity(e.getMessage()).build();
             }
         }
 
         try {
             Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID);
-        } catch(SeriesNotFoundException e) {
+        } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + kheopsPrincipal.getDBID());
@@ -233,14 +233,14 @@ public class SendingResource
                 }
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).build();
-            } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+            } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         }
 
         try {
             Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
-        } catch(SeriesNotFoundException e) {
+        } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + kheopsPrincipal.getDBID());
@@ -269,7 +269,7 @@ public class SendingResource
 
         try {
             Sending.putSeriesInAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, seriesInstanceUID);
-        } catch(AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -310,7 +310,7 @@ public class SendingResource
 
         try {
             Sending.putStudyInAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, fromAlbumId, fromInbox);
-        } catch( AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -331,7 +331,7 @@ public class SendingResource
 
         try {
             Sending.deleteStudyFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID);
-        } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -353,7 +353,7 @@ public class SendingResource
 
         try {
             Sending.deleteSeriesFromAlbum(kheopsPrincipal.getUser(), albumId, studyInstanceUID, seriesInstanceUID);
-        } catch(AlbumNotFoundException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

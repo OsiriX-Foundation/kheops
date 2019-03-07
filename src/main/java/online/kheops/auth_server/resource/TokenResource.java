@@ -1,27 +1,14 @@
 package online.kheops.auth_server.resource;
 
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.*;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlElement;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.ViewerTokenAccess;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.AssertionVerifier;
-
-import online.kheops.auth_server.assertion.BadAssertionException;
-import online.kheops.auth_server.assertion.DownloadKeyException;
-import online.kheops.auth_server.assertion.UnknownGrantTypeException;
-
+import online.kheops.auth_server.assertion.*;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
@@ -29,6 +16,7 @@ import online.kheops.auth_server.principal.UserPrincipal;
 import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.JweAesKey;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -38,16 +26,22 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.lang.JoseException;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.*;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.UnsupportedEncodingException;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.Users.*;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 
@@ -122,11 +116,10 @@ public class TokenResource
         }
 
         boolean pepScope = false;
-        boolean viewerScope = false;
         errorResponse.error = "Bad Request";
 
         if(scope != null) {
-            if (scope.compareTo("pep") == 0) {
+            if (scope.equals("pep")) {
                 if (studyInstanceUID == null || seriesInstanceUID == null) {
                     errorResponse.errorDescription = "With the scope: 'pep', 'study_instance_uid' and 'series_instance_uid' must be set";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -140,7 +133,7 @@ public class TokenResource
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 pepScope = true;
-            } else if (scope.compareTo("viewer") == 0) {
+            } else if (scope.equals("viewer")) {
                 if (studyInstanceUID == null || sourceType == null) {
                     errorResponse.errorDescription = "With the scope: 'viewer', 'study_instance_uid' and 'source_type' must be set";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -149,15 +142,14 @@ public class TokenResource
                     errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                if (sourceType.compareTo(ALBUM) != 0 && sourceType.compareTo(INBOX) != 0) {
+                if (!sourceType.equals(ALBUM) && !sourceType.equals(INBOX)) {
                     errorResponse.errorDescription = "'source_type' can be only '" + ALBUM + "' or '" + INBOX + "'";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                if (sourceType.compareTo(ALBUM) == 0 && (sourceId.isEmpty() || sourceId == null)) {
+                if (sourceType.equals(ALBUM) && (sourceId.isEmpty() || sourceId == null)) {
                     errorResponse.errorDescription = "'source_id' must be set when 'source_type'=" + ALBUM;
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                viewerScope = true;
             } else {
                 errorResponse.errorDescription = "scope: must be 'pep' or 'viewer' not " + scope;
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -213,14 +205,7 @@ public class TokenResource
             }
 
             try {
-                final KheopsPrincipalInterface principal;
-                if(assertion.getCapability().isPresent()) {
-                    principal = new CapabilityPrincipal(assertion.getCapability().get(), callingUser);
-                } else if(assertion.getViewer().isPresent()) {
-                    principal = new ViewerPrincipal(assertion.getViewer().get());
-                } else {
-                    principal = new UserPrincipal(callingUser);
-                }
+                final KheopsPrincipalInterface principal = assertion.newPrincipal(callingUser);
                 if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                     throw new SeriesNotFoundException("");
                 }
@@ -252,7 +237,7 @@ public class TokenResource
             token = jwtBuilder.sign(algorithmHMAC);
             expiresIn = 3600L;
 
-        } else if (viewerScope) {
+        } else { //viewerScope
             // Generate a new Viewer token (JWE)
 
             if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ||
@@ -266,11 +251,11 @@ public class TokenResource
                 final JsonWebEncryption jwe = new JsonWebEncryption();
 
                 JSONObject data = new JSONObject();
-                data.put("token", assertionToken);
-                data.put("sourceId", sourceId);
-                data.put("isInbox", sourceType.compareTo(INBOX) == 0);
-                data.put("studyInstanceUID", studyInstanceUID);
-                data.put("exp", Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
+                data.put(Consts.JWE.TOKEN, assertionToken);
+                data.put(Consts.JWE.SOURCE_ID, sourceId);
+                data.put(Consts.JWE.IS_INBOX, sourceType.equals(INBOX));
+                data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
+                data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
 
                 jwe.setPayload(data.toJSONString());
                 jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
@@ -281,11 +266,9 @@ public class TokenResource
                 token = serializedJwe;
                 expiresIn = 43200L;
             } catch (JoseException e) {
-                e.printStackTrace();
+                LOG.log(Level.SEVERE, "JoseException", e);
                 return Response.status(INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();//TODO
             }
-        } else {
-            return Response.status(BAD_REQUEST).build();
         }
 
         TokenResponse tokenResponse = new TokenResponse();
@@ -296,11 +279,9 @@ public class TokenResource
             tokenResponse.user = assertion.getSub();
         }
         if(pepScope) {
-            LOG.info("Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        } else if(viewerScope) {
-            LOG.info("Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
-        } else {
-            LOG.info("Returning access token for user: " + assertion.getSub());
+            LOG.info(() -> "Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
+        } else { //viewerScope
+            LOG.info(() ->"Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
         }
         return Response.status(responseStatus).entity(tokenResponse).build();
     }
@@ -350,12 +331,14 @@ public class TokenResource
             return Response.status(OK).entity(intreospectResponse).build();
         }
 
-        if(assertion.getCapability().isPresent()) {
-            if (assertion.getCapability().get().getScopeType().compareToIgnoreCase(ScopeType.ALBUM.name()) == 0) {
-                intreospectResponse.scope = (assertion.getCapability().get().isWritePermission()?"write ":"") +
-                        (assertion.getCapability().get().isReadPermission()?"read ":"") +
-                        (assertion.getCapability().get().isDownloadPermission()?"download ":"") +
-                        (assertion.getCapability().get().isAppropriatePermission()?"appropriate ":"");
+        final Capability capability = assertion.getCapability().orElse(null);
+
+        if(capability != null) {
+            if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+                intreospectResponse.scope = (capability.isWritePermission()?"write ":"") +
+                        (capability.isReadPermission()?"read ":"") +
+                        (capability.isDownloadPermission()?"download ":"") +
+                        (capability.isAppropriatePermission()?"appropriate ":"");
                 if (intreospectResponse.scope.length() > 0) {
                     intreospectResponse.scope = intreospectResponse.scope.substring(0, intreospectResponse.scope.length() - 1);
                 }

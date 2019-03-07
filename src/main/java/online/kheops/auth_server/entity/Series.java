@@ -42,6 +42,9 @@ public class Series {
     @Column(name = "series_description")
     private String seriesDescription;
 
+    @Column(name = "body_part_examined")
+    private String bodyPartExamined;
+
     @Column(name = "series_number")
     private int seriesNumber;
 
@@ -93,6 +96,7 @@ public class Series {
         safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, getTimezoneOffsetFromUTC());
         safeAttributeSetString(attributes, Tag.SeriesDescription, VR.LO, getSeriesDescription());
         safeAttributeSetString(attributes, Tag.SeriesInstanceUID, VR.UI, getSeriesInstanceUID());
+        safeAttributeSetString(attributes, Tag.BodyPartExamined, VR.CS, getBodyPartExamined());
 
         attributes.setInt(Tag.SeriesNumber, VR.IS, getSeriesNumber());
         attributes.setInt(Tag.NumberOfSeriesRelatedInstances, VR.IS, getNumberOfSeriesRelatedInstances());
@@ -103,6 +107,7 @@ public class Series {
     // doesn't set populated, but the caller probably will want to set populated after calling this method
     public void mergeAttributes(Attributes attributes) {
         setModality(attributes.getString(Tag.Modality, getModality()));
+        setBodyPartExamined(attributes.getString(Tag.BodyPartExamined, getBodyPartExamined()));
         setSeriesDescription(attributes.getString(Tag.SeriesDescription, getSeriesDescription()));
         setTimezoneOffsetFromUTC(attributes.getString(Tag.TimezoneOffsetFromUTC, getTimezoneOffsetFromUTC()));
         setSeriesNumber(attributes.getInt(Tag.SeriesNumber, getSeriesNumber()));
@@ -190,4 +195,8 @@ public class Series {
     public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
 
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
+
+    public String getBodyPartExamined() { return bodyPartExamined; }
+
+    public void setBodyPartExamined(String bodyPartExamined) { this.bodyPartExamined = bodyPartExamined; }
 }

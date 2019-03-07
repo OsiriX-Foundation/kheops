@@ -7,8 +7,12 @@ import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Tag;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -38,17 +42,17 @@ public abstract class Fetcher {
     }
 
     static void setDicomWebURI(URI dicomWebURI) {
-        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}");
-        seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}");
+        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}").queryParam("includefield", String.format("%08X", Tag.StudyDescription));
+        seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
-    public static void fetchStudy(String studyInstanceUID) {
+    public static void  fetchStudy(String studyInstanceUID) {
         final URI studyUri = studyUriBuilder.build(studyInstanceUID);
 
         final Attributes attributes;
         try {
             String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
-            LOG.log(Level.WARNING, "authToken is: " + authToken);
+            LOG.warning(() -> "authToken is: " + authToken);
             List<Attributes> studyList = CLIENT.target(studyUri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
             if (studyList == null || studyList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch study returned nothing");

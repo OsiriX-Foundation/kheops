@@ -1,14 +1,15 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.album.Albums;
-import online.kheops.auth_server.annotation.*;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.capability.CapabilitiesResponse.Response;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.util.Consts;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -17,7 +18,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.capability.Capabilities.ID_PATTERN;
+import static online.kheops.auth_server.capability.Capabilities.generateCapability;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 
 
@@ -37,7 +39,7 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response createNewCapability(@NotNull @FormParam("title") String title,
+    public javax.ws.rs.core.Response createNewCapability(@NotNull @NotEmpty @FormParam("title") String title,
                                                          @FormParam("expiration_time") String expirationTime,
                                                          @FormParam("not_before_time") String notBeforeTime,
                                                          @NotNull @FormParam("scope_type") String scopeType,
@@ -46,6 +48,10 @@ public class CapabilitiesResource {
                                                          @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
                                                          @NotNull @FormParam("download_permission") boolean downloadPermission,
                                                          @NotNull @FormParam("write_permission") boolean writePermission) {
+
+        if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
+            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface) securityContext.getUserPrincipal();
         final Response capabilityResponse;
@@ -84,7 +90,7 @@ public class CapabilitiesResource {
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
         }
 
-        CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
+        final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
 
         try {
             capabilityResponse = generateCapability(capabilityParameters);
@@ -108,7 +114,7 @@ public class CapabilitiesResource {
     public javax.ws.rs.core.Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
-        Response capabilityResponse;
+        final Response capabilityResponse;
 
         try {
             capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
@@ -128,9 +134,9 @@ public class CapabilitiesResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
-                                                     @PathParam(ALBUM) String albumId) {
+                                                     @QueryParam(ALBUM) String albumId) {
 
-        List<Response> capabilityResponses;
+        final List<Response> capabilityResponses;
 
         if(albumId != null) {
             capabilityResponses = Capabilities.getCapabilities(albumId, valid);
@@ -150,7 +156,7 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
 
-        Response capabilityResponses;
+        final Response capabilityResponses;
 
         try {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
@@ -168,8 +174,7 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
 
-        Response capabilityResponses;
-
+        final Response capabilityResponses;
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {

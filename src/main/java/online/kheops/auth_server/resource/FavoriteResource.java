@@ -1,17 +1,19 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.util.Consts.*;

@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Series extends TableImpl<SeriesRecord> {
 
-    private static final long serialVersionUID = -1426854373;
+    private static final long serialVersionUID = 1077087058;
 
     /**
      * The reference instance of <code>public.series</code>
@@ -96,6 +96,11 @@ public class Series extends TableImpl<SeriesRecord> {
      * The column <code>public.series.series_number</code>.
      */
     public final TableField<SeriesRecord, Integer> SERIES_NUMBER = createField("series_number", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>public.series.body_part_examined</code>.
+     */
+    public final TableField<SeriesRecord, String> BODY_PART_EXAMINED = createField("body_part_examined", org.jooq.impl.SQLDataType.VARCHAR(32), this, "");
 
     /**
      * The column <code>public.series.number_of_series_related_instances</code>.

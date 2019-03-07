@@ -4,13 +4,13 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,13 +18,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static online.kheops.auth_server.generated.tables.Users.USERS;
-import static online.kheops.auth_server.util.JOOQTools.*;
-import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
+import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
+import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
+import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
+import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
@@ -33,24 +35,41 @@ public class AlbumQueries {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Album findAlbumById(String albumId, EntityManager em) throws NoResultException{
-        return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
-                .setParameter("albumId", albumId)
-                .getSingleResult();
+    public static Album findAlbumById(String albumId, EntityManager em)
+            throws AlbumNotFoundException {
+
+        try {
+            return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
+                    .setParameter("albumId", albumId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new AlbumNotFoundException("Album albumId:" + albumId + " not found", e);
+        }
     }
 
-    public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em ) throws NoResultException {
-        return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
-                .setParameter("targetUser", user)
-                .setParameter("targetAlbum", album)
-                .getSingleResult();
+    public static AlbumUser findAlbumUserByUserAndAlbum(User user, Album album, EntityManager em )
+            throws UserNotMemberException {
+
+        try {
+            return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
+                    .setParameter("targetUser", user)
+                    .setParameter("targetAlbum", album)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new UserNotMemberException("User : " + user.getKeycloakId() + " is not a member of the album :"+album.getId(), e);
+        }
     }
 
-    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em) throws NoResultException {
-        return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
-                .setParameter("seriesUID", seriesUID)
-                .setParameter("albumID", albumID)
-                .getSingleResult();
+    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em)
+            throws SeriesNotFoundException {
+        try {
+            return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
+                    .setParameter("seriesUID", seriesUID)
+                    .setParameter("albumID", albumID)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new SeriesNotFoundException("SeriesInstanceUID : " + seriesUID + " not found in the album : " + albumID, e);
+        }
     }
 
     @FunctionalInterface
@@ -103,16 +122,19 @@ public class AlbumQueries {
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(USERS, ALBUM_USER.USER_FK.eq(USERS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
                     .and(EVENTS.EVENT_TYPE.eq("Comment"))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getDBID()))
-                            .or(EVENTS.USER_FK.eq(albumQueryParams.getDBID()))));
+                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getUser().getPk()))
+                            .or(EVENTS.USER_FK.eq(albumQueryParams.getUser().getPk()))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
+            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
+            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
             applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
             applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
@@ -131,7 +153,7 @@ public class AlbumQueries {
             }
 
             conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
-            query.addConditions(ALBUM_USER.USER_FK.eq(albumQueryParams.getDBID()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
+            query.addConditions(ALBUM_USER.USER_FK.eq(albumQueryParams.getUser().getPk()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
 
             for (Condition c : conditionArrayList) {
                 if (c != null) {
@@ -146,7 +168,21 @@ public class AlbumQueries {
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
-            final Result<? extends Record> result = query.fetch();
+            final Result<? extends Record> result;
+
+            final String modalityFilter = albumQueryParams.getModality().orElse(null);
+
+            if(modalityFilter != null) {
+                final Table<Record> t = query.asTable();
+                final Field<String> f = (Field<String>) t.field("modalities");
+
+                final SelectQuery<Record> q = create.selectQuery();
+                q.addFrom(t);
+                q.addConditions(f.containsIgnoreCase(modalityFilter));
+                result = q.fetch();
+            } else {
+                result = query.fetch();
+            }
 
             final List<AlbumResponse.Response> albumResponses = new ArrayList<>();
 
@@ -154,7 +190,7 @@ public class AlbumQueries {
                 albumResponses.add(new AlbumResponseBuilder().setAlbumFromUser(r).build().getResponse());
             }
 
-            final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getDBID(), conditionArrayList, connection);
+            final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getUser().getPk(), conditionArrayList, connection);
 
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
         } catch (BadQueryParametersException e) {
@@ -200,6 +236,7 @@ public class AlbumQueries {
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
@@ -211,6 +248,8 @@ public class AlbumQueries {
             query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
             query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
+            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
+            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
@@ -240,6 +279,7 @@ public class AlbumQueries {
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
@@ -247,6 +287,8 @@ public class AlbumQueries {
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
 
             query.addConditions(ALBUMS.ID.eq(albumId));
+            query.addConditions(SERIES.POPULATED.isTrue());
+            query.addConditions(STUDIES.POPULATED.isTrue());
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
@@ -278,16 +320,16 @@ public class AlbumQueries {
 
             Field ord;
 
-            if (orderByParameter.compareTo("created_time") == 0) ord = ALBUMS.CREATED_TIME;
-            else if (orderByParameter.compareTo("last_event_time") == 0) ord = ALBUMS.LAST_EVENT_TIME;
-            else if (orderByParameter.compareTo("name") == 0) ord = ALBUMS.NAME;
-            else if (orderByParameter.compareTo("number_of_users") == 0) {
+            if (orderByParameter.equals("created_time")) ord = ALBUMS.CREATED_TIME;
+            else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
+            else if (orderByParameter.equals("name")) ord = ALBUMS.NAME;
+            else if (orderByParameter.equals("number_of_users")) {
                 ord = create.select(countDistinct(ALBUM_USER.PK)).asField();
             }
-            else if (orderByParameter.compareTo("number_of_studies") == 0) {
+            else if (orderByParameter.equals("number_of_studies")) {
                 ord = create.select(countDistinct(EVENTS.PK)).asField();
             }
-            else if (orderByParameter.compareTo("number_of_comments") == 0) {
+            else if (orderByParameter.equals("number_of_comments")) {
                 ord = create.select(countDistinct(SERIES.STUDY_FK)).asField();
             }
             else throw new BadQueryParametersException("sort: " + orderByParameter);
@@ -309,13 +351,13 @@ public class AlbumQueries {
         } else {
             Condition condition;
             if (parameter.startsWith("*") && parameter.endsWith("*")) {
-                condition = column.lower().contains(parameterNoStar.toLowerCase());
+                condition = column.containsIgnoreCase(parameterNoStar);
             } else if (parameter.startsWith("*")) {
                 condition = column.lower().endsWith(parameterNoStar.toLowerCase());
             } else if (parameter.endsWith("*")) {
                 condition = column.lower().startsWith(parameterNoStar.toLowerCase());
             } else {
-                condition = column.lower().equal(parameterNoStar.toLowerCase());
+                condition = column.equalIgnoreCase(parameterNoStar);
             }
 
             if (fuzzyMatching) {

@@ -3,7 +3,7 @@ sudo: required
 
 services:
   - docker
-  
+
 notifications:
   email: false
 
@@ -16,15 +16,14 @@ cache:
     - $HOME/.gradle/wrapper/
 
 after_success:
-  - chmod +x docker/docker_push.sh
   - export BRANCH=$TRAVIS_BRANCH
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
   - git fetch --unshallow
   - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
-  
+
 #addons:
 #  sonarcloud: $SONAR_ORGANIZATION
-#    organization: 
+#    organization:
 #    token:
 #      secure: $SONAR_LOGIN
 #script:
@@ -34,6 +33,6 @@ after_success:
 deploy:
   skip_cleanup: true
   provider: script
-  script: docker/docker_push.sh 
+  script: docker/docker_push.sh
   on:
     all_branches: true

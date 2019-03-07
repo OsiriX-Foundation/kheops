@@ -5,7 +5,9 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonReader;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
@@ -13,7 +15,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.StringReader;
 import java.net.URI;
-
 import java.util.logging.Logger;
 
 public class Keycloak {
@@ -43,7 +44,8 @@ public class Keycloak {
         return instance;
     }
 
-    public UserResponse getUser(String user) throws UserNotFoundException, KeycloakException{
+    public UserResponse getUser(String user)
+            throws UserNotFoundException, KeycloakException {
 
         if(user.contains("@")) {
             final Response response;
@@ -55,14 +57,15 @@ public class Keycloak {
 
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
-                JsonReader jsonReader = Json.createReader(new StringReader(output));
-                JsonArray reply = jsonReader.readArray();
-                final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
-                if(keycloakUsers.size() > 0) {
-                    final int index = keycloakUsers.verifyEmail(user);
-                    return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0)).build();
-                } else {
-                    throw new UserNotFoundException();
+                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                    JsonArray reply = jsonReader.readArray();
+                    final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
+                    if (keycloakUsers.size() > 0) {
+                        final int index = keycloakUsers.verifyEmail(user);
+                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0)).build();
+                    } else {
+                        throw new UserNotFoundException();
+                    }
                 }
             }
 
@@ -83,14 +86,15 @@ public class Keycloak {
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
                 output = "["+output+"]";
-                JsonReader jsonReader = Json.createReader(new StringReader(output));
-                JsonArray reply = jsonReader.readArray();
-                final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
-                if(keycloakUser.size() == 1) {
-                    cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
-                    return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0)).build();
-                } else {
-                    throw new UserNotFoundException();
+                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                    JsonArray reply = jsonReader.readArray();
+                    final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
+                    if (keycloakUser.size() == 1) {
+                        cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
+                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0)).build();
+                    } else {
+                        throw new UserNotFoundException();
+                    }
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
@@ -98,7 +102,5 @@ public class Keycloak {
         }
         throw new KeycloakException("ERROR:");
     }
-
 }
-
 

@@ -1,11 +1,11 @@
 package online.kheops.auth_server.util;
 
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import org.dcm4che3.data.Tag;
 
@@ -44,6 +44,7 @@ public final class QIDOParams {
     private final Optional<Boolean> favoriteFilter;
     private final boolean favoriteField;
     private final boolean commentField;
+    private final boolean studyDescriptionField;
 
     public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
 
@@ -111,6 +112,7 @@ public final class QIDOParams {
         favoriteField = getFavoriteField(queryParameters);
         commentField = getCommentField(queryParameters);
         favoriteFilter = getFavoriteFilter(queryParameters);
+        studyDescriptionField = getStudyDescriptionField(queryParameters);
 
         if(!albumID.isPresent() && !fromInbox) {
             if(favoriteField) {
@@ -199,6 +201,8 @@ public final class QIDOParams {
 
     public boolean includeCommentField() { return commentField; }
 
+    public boolean includeStudyDescriptionField() { return studyDescriptionField; }
+
     private static Optional<String> getFilter(int tag, MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
             return Optional.ofNullable(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0));
@@ -211,7 +215,7 @@ public final class QIDOParams {
 
     private static boolean getFavoriteField(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(INCLUDE_FIELD)) {
-            return queryParameters.get(INCLUDE_FIELD).contains(CUSTOM_DICOM_TAG_FAVORITE) || queryParameters.get(INCLUDE_FIELD).contains(FAVORITE);
+            return queryParameters.get(INCLUDE_FIELD).contains(String.format("%08X", CUSTOM_DICOM_TAG_FAVORITE)) || queryParameters.get(INCLUDE_FIELD).contains(FAVORITE);
         } else {
             return false;
         }
@@ -230,7 +234,16 @@ public final class QIDOParams {
 
     private static boolean getCommentField(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(INCLUDE_FIELD)) {
-            return queryParameters.get(INCLUDE_FIELD).contains(CUSTOM_DICOM_TAG_COMMENTS) || queryParameters.get(INCLUDE_FIELD).contains(COMMENTS);
+            return queryParameters.get(INCLUDE_FIELD).contains(String.format("%08X", CUSTOM_DICOM_TAG_COMMENTS)) || queryParameters.get(INCLUDE_FIELD).contains(COMMENTS);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean getStudyDescriptionField(MultivaluedMap<String, String> queryParameters) {
+        if (queryParameters.containsKey(INCLUDE_FIELD)) {
+            return queryParameters.get(INCLUDE_FIELD).contains(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDescription)) ||
+                    queryParameters.get(INCLUDE_FIELD).contains(String.format("%08X", Tag.StudyDescription));
         } else {
             return false;
         }

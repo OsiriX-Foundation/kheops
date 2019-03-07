@@ -1,12 +1,13 @@
 package online.kheops.auth_server.assertion;
 
-import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.capability.CapabilityNotValidException;
+import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.capability.CapabilityNotFoundException;
+import online.kheops.auth_server.capability.CapabilityNotValidException;
 import online.kheops.auth_server.entity.Capability;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ final class CapabilityAssertion implements Assertion {
                 final String sub = capability.getUser().getKeycloakId();
                 final String email = capability.getUser().getEmail();
 
-                capability.setLastUse();
+                capability.setLastUsed();
 
                 tx.commit();
 

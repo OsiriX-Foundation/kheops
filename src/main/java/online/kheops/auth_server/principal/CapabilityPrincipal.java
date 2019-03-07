@@ -12,12 +12,10 @@ import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
-import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
-import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
+import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
+import static online.kheops.auth_server.series.Series.isSeriesInInbox;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
@@ -126,22 +124,20 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Series series;
                 try {
                     series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                } catch (NoResultException e) {
+                } catch (SeriesNotFoundException e) {
                     //if the series not exist
                     return true;
                 }
 
                 // we need to check here if the series that was found is owned by the user
-
-                try {
-                    findSeriesBySeriesAndUserInbox(mergeUser, series, em);
+                if(isSeriesInInbox(mergeUser, series, em)) {
                     return true;
-                } catch (NoResultException ignored) {/*empty*/}
+                }
 
                 try {
                     findSeriesBySeriesAndAlbumWithSendPermission(mergeUser, series, em);
                     return true;
-                } catch (NoResultException ignored) {
+                } catch (SeriesNotFoundException ignored) {
                     if (isOrphan(series, em)) {
                         return true;
                     }
@@ -170,7 +166,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 final Series series;
                 try {
                     series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                } catch (NoResultException e) {
+                } catch (SeriesNotFoundException e) {
                     //if the series not exist
                     return true;
                 }
@@ -181,7 +177,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 if(mergeCapability.getAlbum().containsSeries(series, em)) {
                     return true;
                 }
-            } catch (UserNotMemberException | NoResultException e) {
+            } catch (UserNotMemberException e) {
                 return false;
             } finally {
                 if (tx.isActive()) {
@@ -221,7 +217,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
                 final Album album = em.merge(capability.getAlbum());
 
-                if (albumId.compareTo(album.getId()) != 0) {
+                if (!albumId.equals(album.getId())) {
                     return false;
                 }
 
@@ -258,7 +254,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (getScope() == ScopeType.ALBUM) {
             if (albumId  == null) {
                 albumId = capability.getAlbum().getId();
-            } else  if (albumId.compareTo(capability.getAlbum().getId()) != 0) {
+            } else  if (!albumId.equals(capability.getAlbum().getId())) {
                 return false;
             }
             return true;

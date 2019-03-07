@@ -16,36 +16,59 @@ public class StudyQueries {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Study findStudyByStudyUID(String studyInstanceUID, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
-        return query.getSingleResult();
+    public static Study findStudyByStudyUID(String studyInstanceUID, EntityManager em)
+            throws StudyNotFoundException {
+
+        try {
+            TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found", e);
+        }
     }
 
+    public static Study findStudyByStudyandUser(Study study, User user, EntityManager em)
+            throws StudyNotFoundException {
 
-    public static Study findStudyByStudyandUser(Study study, User user, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study", Study.class);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        query.setParameter("study", study);
-        query.setParameter("user", user);
-        return query.getSingleResult();
+        try {
+            TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study", Study.class);
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            query.setParameter("study", study);
+            query.setParameter("user", user);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new StudyNotFoundException("StudyInstanceUID : " + study.getStudyInstanceUID() + " is not accessible by the user :" + user.getKeycloakId(), e);
+        }
     }
 
-    public static Study findStudyByStudyandUserInbox(Study study, User user, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study and a = u.inbox", Study.class);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        query.setParameter("study", study);
-        query.setParameter("user", user);
-        return query.getSingleResult();
+    public static Study findStudyByStudyandUserInbox(Study study, User user, EntityManager em)
+            throws StudyNotFoundException {
+
+        try {
+            TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study and a = u.inbox", Study.class);
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            query.setParameter("study", study);
+            query.setParameter("user", user);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new StudyNotFoundException("StudyInstanceUID : " + study.getStudyInstanceUID() + " is not in the inbox of the user :" + user.getKeycloakId(), e);
+        }
     }
 
-    public static Study findStudyByStudyandAlbum(Study study, Album album, EntityManager em) throws NoResultException {
-        TypedQuery<Study> query = em.createQuery("select st from Album a join a.albumSeries alS join alS.series s join s.study st where a=:album and st = :study", Study.class);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        query.setParameter("study", study);
-        query.setParameter("album", album);
-        return query.getSingleResult();
+    public static Study findStudyByStudyandAlbum(Study study, Album album, EntityManager em)
+            throws StudyNotFoundException {
+
+        try {
+            TypedQuery<Study> query = em.createQuery("select st from Album a join a.albumSeries alS join alS.series s join s.study st where a=:album and st = :study", Study.class);
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            query.setParameter("study", study);
+            query.setParameter("album", album);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new StudyNotFoundException("StudyInstanceUID : " + study.getStudyInstanceUID() + " is not in the album :" + album.getId(), e);
+        }
     }
 
 }

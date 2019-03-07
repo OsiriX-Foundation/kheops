@@ -5,10 +5,7 @@ import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
-import org.jose4j.keys.AesKey;
 import org.jose4j.lang.JoseException;
-
-import java.security.Key;
 
 final class ViewerAssertionBuilder implements AssertionBuilder {
 

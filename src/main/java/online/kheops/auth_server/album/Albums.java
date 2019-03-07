@@ -2,29 +2,24 @@ package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
-import static online.kheops.auth_server.user.Users.getUser;
-import static online.kheops.auth_server.user.Users.userExist;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Albums {
 
     private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int ID_LENGTH = 10;
     public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-    private static final String ID_PATTERN_STRICT = "^" + ID_PATTERN + "$";
-    private static final Pattern pattern = Pattern.compile(ID_PATTERN_STRICT);
     private static final Random rdm = new SecureRandom();
 
     private Albums() {
@@ -32,7 +27,7 @@ public class Albums {
     }
 
     public static String newAlbumID() {
-        StringBuilder idBuilder = new StringBuilder();
+        final StringBuilder idBuilder = new StringBuilder();
 
         do {
             idBuilder.setLength(0);
@@ -54,13 +49,11 @@ public class Albums {
         try {
             tx.begin();
 
-            //TODO ??? 2x em.merge callingUser
             callingUser = em.merge(callingUser);
-            final User mergedCallingUser = em.merge(callingUser);
 
             final Album newAlbum = new Album(name, description, usersPermission);
-            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, mergedCallingUser, true);
-            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(mergedCallingUser, newAlbum);
+            final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
+            final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
 
             em.persist(newAlbum);
             em.persist(newAlbumUser);
@@ -68,7 +61,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(newAlbum.getId(), mergedCallingUser.getPk());
+            albumResponse = findAlbumByUserPkAndAlbumId(newAlbum.getId(), callingUser.getPk());
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -80,7 +73,7 @@ public class Albums {
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
-            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, JOOQException, UserNotMemberException {
+            throws AlbumNotFoundException, AlbumForbiddenException, JOOQException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -135,22 +128,13 @@ public class Albums {
     }
 
     public static PairListXTotalCount<AlbumResponse.Response> getAlbumList(AlbumQueryParams albumQueryParams)
-            throws UserNotFoundException, JOOQException, BadQueryParametersException {
+            throws JOOQException, BadQueryParametersException {
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        try {
-            if (!userExist(albumQueryParams.getDBID(), em)) {
-                throw new UserNotFoundException();
-            }
-        } finally {
-            em.close();
-        }
         return findAlbumsByUserPk(albumQueryParams);
     }
 
     public static void deleteAlbum(User callingUser, String albumId)
-            throws AlbumNotFoundException, UserNotFoundException {
+            throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -234,7 +218,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = getUser(userName, em);
+            final User targetUser = em.merge(getOrCreateUser(userName));
 
             if (targetUser.getPk() == callingUser.getPk()) {
                 throw new AlbumForbiddenException("Add yourself forbidden");
@@ -245,16 +229,12 @@ public class Albums {
             if (isMemberOfAlbum(targetUser, album, em)) {
                 try {
                     final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
-                    if (targetAlbumUser.isAdmin() == isAdmin) {
-                        return; // the target is already a member of the album with the same profile (admin / non-admin)
+                    if (! targetAlbumUser.isAdmin() && isAdmin) {
+                        //Here, the targetUser is an normal member and he will be promot admin
+                        targetAlbumUser.setAdmin(isAdmin);
+                        final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
+                        em.persist(mutationPromoteAdmin);
                     }
-                    if (targetAlbumUser.isAdmin() && !isAdmin) {
-                        throw new AlbumForbiddenException("The user: " + targetUser.getEmail() + "is an admin. Use : DELETE /albums/" + albumId + "/users/" + callingUser.getKeycloakId() + "/admin");
-                    }
-                    //From here, the targetUser is an normal member and he will be promot admin
-                    targetAlbumUser.setAdmin(isAdmin);
-                    final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
-                    em.persist(mutationPromoteAdmin);
 
                 } catch (UserNotMemberException e) {
                     throw new AlbumNotFoundException("Album not found");//normally, this exception should never happen
@@ -293,22 +273,10 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = getUser(userName, em);
+            final User removedUser = em.merge(getOrCreateUser(userName));
             final Album album = getAlbum(albumId, em);
             final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
             final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
-
-            final Events.MutationType mutationType;
-
-            if (callingUser.getPk() == removedUser.getPk()) {
-                mutationType = Events.MutationType.LEAVE_ALBUM;
-            } else if (callingAlbumUser.isAdmin()){
-                mutationType = Events.MutationType.REMOVE_USER;
-            } else {
-                throw new AlbumForbiddenException("You must be an admin for removing another user");
-            }
-
-            final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
 
             if (removedAlbumUser.isAdmin()) {
                 for (Capability capability: album.getCapabilities()) {
@@ -318,12 +286,23 @@ public class Albums {
                 }
             }
 
-            em.persist(mutation);
-            em.remove(removedAlbumUser);
-
             //Delete the album if it was the last User
             if (album.getAlbumUser().size() == 1) {
                 deleteAlbum(callingUser, albumId);
+            } else {
+                final Events.MutationType mutationType;
+
+                if (callingUser.getPk() == removedUser.getPk()) {
+                    mutationType = Events.MutationType.LEAVE_ALBUM;
+                } else if (callingAlbumUser.isAdmin()){
+                    mutationType = Events.MutationType.REMOVE_USER;
+                } else {
+                    throw new AlbumForbiddenException("You must be an admin for removing another user");
+                }
+
+                final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
+                em.persist(mutation);
+                em.remove(removedAlbumUser);
             }
 
             tx.commit();
@@ -345,7 +324,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = getUser(userName, em);
+            final User removedUser = em.merge(getOrCreateUser(userName));
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 
@@ -396,27 +375,19 @@ public class Albums {
     public static Album getAlbum(String albumId, EntityManager em)
             throws AlbumNotFoundException {
 
-        try {
             return findAlbumById(albumId, em);
-        } catch (NoResultException e) {
-            throw new AlbumNotFoundException("Album : " + albumId + " does not exist.");
-        }
     }
 
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)
             throws UserNotMemberException {
 
-        try {
             return findAlbumUserByUserAndAlbum(user, album, em);
-        } catch (NoResultException e) {
-            throw new UserNotMemberException(e);
-        }
     }
 
     public static boolean albumExist(String albumId, EntityManager em) {
         try {
             findAlbumById(albumId, em);
-        } catch (NoResultException e) {
+        } catch (AlbumNotFoundException e) {
             return false;
         }
         return true;
@@ -426,7 +397,7 @@ public class Albums {
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             findAlbumById(albumId, em);
-        } catch (NoResultException e) {
+        } catch (AlbumNotFoundException e) {
             return false;
         } finally {
             em.close();
@@ -437,7 +408,7 @@ public class Albums {
     public static boolean isMemberOfAlbum(User user, Album album, EntityManager em) {
         try {
             findAlbumUserByUserAndAlbum(user, album, em);
-        } catch (NoResultException e) {
+        } catch (UserNotMemberException e) {
             return false;
         }
         return true;

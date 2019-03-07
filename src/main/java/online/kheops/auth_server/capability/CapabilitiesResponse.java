@@ -1,6 +1,5 @@
 package online.kheops.auth_server.capability;
 
-import online.kheops.auth_server.album.AlbumResponse;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -32,8 +31,8 @@ public class CapabilitiesResponse {
         String issuedAt;
         @XmlElement(name = "not_before_time")
         String notBeforeTime;
-        @XmlElement(name = "last_use")
-        String lastUse;
+        @XmlElement(name = "last_used")
+        String lastUsed;
         @XmlElement(name = "expiration_time")
         String expirationTime;
         @XmlElement(name = "revoke_time")
@@ -70,8 +69,8 @@ public class CapabilitiesResponse {
             }
             response.title = capability.getTitle();
             response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
-            if(capability.getLastUse() != null) {
-                response.lastUse = ZonedDateTime.of(capability.getLastUse(), ZoneOffset.UTC).toString();
+            if(capability.getLastUsed() != null) {
+                response.lastUsed = ZonedDateTime.of(capability.getLastUsed(), ZoneOffset.UTC).toString();
             }
         }
 

@@ -9,18 +9,20 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.persistence.PersistenceException;
 
-import static online.kheops.auth_server.user.UserQueries.*;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+import static online.kheops.auth_server.user.UserQueries.findUserByPk;
+import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 
 public class Users {
     private static final Logger LOG = Logger.getLogger(Users.class.getName());
@@ -30,16 +32,7 @@ public class Users {
         throw new IllegalStateException("Utility class");
     }
 
-    /*public static User getUser(long callingUserPk, EntityManager entityManager) throws UserNotFoundException {
-        final User user = findUserByPk(callingUserPk, entityManager);
-        if (user != null) {
-            return user;
-        } else {
-            throw new UserNotFoundException("User :" +callingUserPk +"does not exist.");
-        }
-    }*/
-
-    public static User getUser(String userReference, EntityManager entityManager)
+    private static User getUser(String userReference, EntityManager entityManager)
             throws UserNotFoundException {
 
         if(userReference.contains("@")) {
@@ -51,41 +44,20 @@ public class Users {
             }
         }
 
-        //try {
-            return findUserByUserId(userReference, entityManager);
-        //} catch (UserNotFoundException e) {
-        //    return getOrCreateUser(userReference);
-        //}
-    }
-
-    private static User getUser(String userReference) throws UserNotFoundException{
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
-        User user;
-
-        try {
-            tx.begin();
-            user = getUser(userReference, em);
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
-
-        return user;
+        return findUserByUserId(userReference, entityManager);
     }
 
     public static boolean userExist(long callingUserPk, EntityManager entityManager){
         return findUserByPk(callingUserPk, entityManager) != null;
     }
 
-    public static User getOrCreateUser(String userReference) throws UserNotFoundException {
+    public static User getOrCreateUser(String userReference)
+            throws UserNotFoundException {
 
+        final EntityManager em = EntityManagerListener.createEntityManager();
         //try to find the user in kheops db
         try {
-            return getUser(userReference);
+            return getUser(userReference, em);
         } catch (UserNotFoundException e) {/*empty*/ }
 
         //the user is not in kheops db
@@ -98,12 +70,11 @@ public class Users {
         }
 
         //the user is in keycloak but not in kheops => add the user in kheops
-        final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
-        LOG.log(Level.INFO, "Adding new user: " + userReference);
+        LOG.log(INFO, "Adding new user: " + userReference);
 
-        User newUser;
+        final User newUser;
         try {
             tx.begin();
             newUser = new User(userReference);
@@ -124,7 +95,7 @@ public class Users {
             tx.commit();
         } catch (PersistenceException e) {
             try {
-                return getUser(userReference);
+                return getUser(userReference, em);
             } catch (UserNotFoundException notFoundException) {
                 notFoundException.addSuppressed(e);
                 throw notFoundException;
@@ -140,18 +111,16 @@ public class Users {
         // Demo specific, go tickle the welcomebot when a new user is added.
         // Block until the reply so that the welcome bot has an opportunity to call back to the
         // Authorization server and share series/albums.
-        if (newUser != null) {
-            try {
-                LOG.log(Level.INFO, "About to try to share with the welcomebot");
-                CLIENT.target("http://welcomebot:8080/share")
-                        .queryParam("user", newUser.getKeycloakId())
-                        .request()
-                        .post(Entity.text(""));
-            } catch (ProcessingException | WebApplicationException e) {
-                LOG.log(Level.SEVERE, "Unable to communicate with the welcomebot", e);
-            }
-            LOG.log(Level.INFO, "Finished sharing with the welcomebot");
+        try {
+            LOG.log(INFO, "About to try to share with the welcomebot");
+            CLIENT.target("http://welcomebot:8080/share")
+                    .queryParam("user", newUser.getKeycloakId())
+                    .request()
+                    .post(Entity.text(""));
+        } catch (ProcessingException | WebApplicationException e) {
+            LOG.log(SEVERE, "Unable to communicate with the welcomebot", e);
         }
+        LOG.log(INFO, "Finished sharing with the welcomebot");
 
         return newUser;
     }

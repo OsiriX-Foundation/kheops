@@ -16,25 +16,40 @@ public class CapabilitiesQueries {
     }
 
     public static Capability findCapabilityByCapabilityToken(String secret, EntityManager em)
-            throws NoResultException {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where c.secret = :secret", Capability.class);
-        query.setParameter("secret", secret);
-        return query.getSingleResult();
+            throws CapabilityNotFoundException {
+
+        try {
+            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where c.secret = :secret", Capability.class);
+            query.setParameter("secret", secret);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new CapabilityNotFoundException("Capability token search by secret not found", e);
+        }
     }
 
-    public static Capability findCapabilityByCapabilityTokenandUser(User user, String capabilityId, EntityManager em)
-            throws NoResultException {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user AND :capabilityId = c.id", Capability.class);
-        query.setParameter("user", user);
-        query.setParameter("capabilityId", capabilityId);
-        return query.getSingleResult();
+    public static Capability findCapabilityByIdandUser(User user, String capabilityId, EntityManager em)
+            throws CapabilityNotFoundException {
+
+        try {
+            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c left join c.album a left join a.albumUser au where ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id", Capability.class);
+            query.setParameter("user", user);
+            query.setParameter("capabilityId", capabilityId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new CapabilityNotFoundException("Capability token : " + capabilityId + " not found with the user : " + user.getKeycloakId(), e);
+        }
     }
 
     public static Capability findCapabilityByCapabilityID(String capabilityId, EntityManager em)
-            throws NoResultException {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :capabilityId = c.id", Capability.class);
-        query.setParameter("capabilityId", capabilityId);
-        return query.getSingleResult();
+            throws CapabilityNotFoundException {
+
+        try {
+            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :capabilityId = c.id", Capability.class);
+            query.setParameter("capabilityId", capabilityId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            throw new CapabilityNotFoundException("Capability token : " + capabilityId + "not found", e);
+        }
     }
 
 
@@ -50,7 +65,6 @@ public class CapabilitiesQueries {
         query.setParameter("dateTimeNow", LocalDateTime.now());
         return query.getResultList();
     }
-
 
     public static  List<Capability> findAllCapabilitiesByAlbum(String albumId, EntityManager em) {
         TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :albumId = c.album.id order by c.issuedAtTime desc", Capability.class);

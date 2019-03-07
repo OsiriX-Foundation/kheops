@@ -45,7 +45,7 @@ if (gradle.startParameter.initScripts) {
             stream.writeUTF(":jettyStart")
             socket.getInputStream().read();
         }
-        catch(Exception e) {}
+        catch (Exception e) {}
         finally {
             if (socket != null) socket.close()
             if (stream != null) stream.close()

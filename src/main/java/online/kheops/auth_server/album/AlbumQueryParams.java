@@ -1,5 +1,6 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.util.JOOQTools;
 
@@ -29,10 +30,11 @@ public final class AlbumQueryParams {
     private final Optional<String> name;
     private final Optional<String> createdTime;
     private final Optional<String> lastEventTime;
+    private final Optional<String> modality;
 
-    private boolean favorite = false;
+    private final boolean favorite;
 
-    private long DBID;
+    private final User user;
 
     public AlbumQueryParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
@@ -40,6 +42,7 @@ public final class AlbumQueryParams {
         name = extractName(queryParameters);
         createdTime = extractCreatedTime(queryParameters);
         lastEventTime = extractLastEventTime(queryParameters);
+        modality = extractModality(queryParameters);
 
         canAddSeries = extractCanAddSeries(queryParameters);
         canCreateCapabilityToken = extractCanCreateCapabilityToken(queryParameters);
@@ -62,13 +65,22 @@ public final class AlbumQueryParams {
         limit = extractLimit(queryParameters);
         offset = extractOffset(queryParameters);
 
-        DBID = kheopsPrincipal.getDBID();
+        user = kheopsPrincipal.getUser();
     }
 
     private Optional<String> extractName(MultivaluedMap<String, String> queryParameters) {
 
         if (queryParameters.containsKey(NAME)) {
             return Optional.ofNullable(queryParameters.get(NAME).get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> extractModality(MultivaluedMap<String, String> queryParameters) {
+
+        if (queryParameters.containsKey("modality")) {
+            return Optional.ofNullable(queryParameters.get("modality").get(0));
         } else {
             return Optional.empty();
         }
@@ -149,6 +161,8 @@ public final class AlbumQueryParams {
 
     public Optional<String> getName() { return name; }
 
+    public Optional<String> getModality() { return modality; }
+
     public Optional<String> getCreatedTime() { return createdTime; }
 
     public Optional<String> getLastEventTime() { return lastEventTime; }
@@ -159,5 +173,5 @@ public final class AlbumQueryParams {
 
     public boolean canCreateCapabilityToken() { return canCreateCapabilityToken; }
 
-    public long getDBID() { return DBID; }
+    public User getUser() { return user; }
 }

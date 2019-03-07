@@ -5,13 +5,12 @@ import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
@@ -21,7 +20,6 @@ import org.dcm4che3.data.VR;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
 
-import javax.annotation.security.RolesAllowed;
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
@@ -31,13 +29,13 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
-import javax.ws.rs.core.Context;
-
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,7 +88,7 @@ public class QIDOResource {
         try (Connection connection = getDataSource().getConnection()) {
             qidoParams = new QIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
-            LOG.info("QueryParameters : " + uriInfo.getQueryParameters().toString());
+            LOG.info(() -> "QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
@@ -146,7 +144,8 @@ public class QIDOResource {
         }
 
         final boolean includeFieldFavorite;
-        if(uriInfo.getQueryParameters().containsKey("includefield") && (uriInfo.getQueryParameters().get("includefield").contains(CUSTOM_DICOM_TAG_FAVORITE)||uriInfo.getQueryParameters().get("includefield").contains(FAVORITE))) {
+        if(uriInfo.getQueryParameters().containsKey("includefield") && (uriInfo.getQueryParameters().get("includefield").contains(String.format("%08X", CUSTOM_DICOM_TAG_FAVORITE)) ||
+                uriInfo.getQueryParameters().get("includefield").contains(FAVORITE))) {
             includeFieldFavorite = true;
         } else {
             includeFieldFavorite = false;
@@ -183,7 +182,7 @@ public class QIDOResource {
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId != kheopsPrincipal.getAlbumID()) {
+            if (fromAlbumId != null && fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
@@ -312,7 +311,7 @@ public class QIDOResource {
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId.compareTo(kheopsPrincipal.getAlbumID()) != 0) {
+            if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();

@@ -6,9 +6,6 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 
 import javax.persistence.*;
-
-import javax.persistence.Table;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;

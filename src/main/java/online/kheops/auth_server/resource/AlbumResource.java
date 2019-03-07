@@ -1,17 +1,15 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.album.*;
-
-import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
+import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
-
-
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.ws.rs.*;
@@ -49,6 +47,16 @@ public class AlbumResource {
                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                              MultivaluedMap<String, String> form) {
 
+        if (name.isEmpty()) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
+        }
+        if(name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
+        }
+        if(description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+            return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
+        }
+
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         final UsersPermission usersPermission = new UsersPermission();
@@ -59,10 +67,6 @@ public class AlbumResource {
         if (deleteSeries != null) { usersPermission.setDeleteSeries(deleteSeries); }
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
-
-        if (name.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
-        }
 
         final AlbumResponse albumResponse;
 
@@ -85,16 +89,11 @@ public class AlbumResource {
     public Response getAlbums() {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
-
         final PairListXTotalCount<AlbumResponse.Response> pairAlbumsTotalAlbum;
 
         try {
             final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.INFO, "Get albums list by user pk:"+callingUserPk+" FAILED", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -154,8 +153,14 @@ public class AlbumResource {
                               @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                               @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                               @FormParam("notificationNewSeries") Boolean notificationNewSeries,
-                              @FormParam("notificationNewComment") Boolean notificationNewComment,
-                              MultivaluedMap<String, String> form) {
+                              @FormParam("notificationNewComment") Boolean notificationNewComment) {
+
+        if(name != null && name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+            return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
+        }
+        if(description != null && description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+            return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
@@ -172,7 +177,7 @@ public class AlbumResource {
 
         try {
             albumResponse = Albums.editAlbum(kheopsPrincipal.getUser(), albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
-        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
+        } catch (AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Edit album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
@@ -199,7 +204,7 @@ public class AlbumResource {
 
         try {
             Albums.deleteAlbum(kheopsPrincipal.getUser(), albumId);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -248,10 +253,10 @@ public class AlbumResource {
         try {
             Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
+            LOG.log(Level.INFO, "Add a user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Add an user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Add a user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
@@ -320,10 +325,10 @@ public class AlbumResource {
         try {
             Albums.deleteUser(kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
+            LOG.log(Level.INFO, "Remove a user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
-            LOG.log(Level.INFO, "Remove an user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
+            LOG.log(Level.INFO, "Remove a user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FORBIDDEN", e);
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 

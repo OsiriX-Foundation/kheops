@@ -3,10 +3,9 @@ package online.kheops.auth_server.study;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
@@ -17,7 +16,6 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -30,14 +28,13 @@ import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.generated.Tables.*;
-import static online.kheops.auth_server.series.Series.editSeriesFavorites;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
-import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.series.Series.editSeriesFavorites;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static org.jooq.impl.DSL.*;
 
@@ -130,6 +127,10 @@ public class Studies {
                 countDistinct(when(ALBUM_SERIES.FAVORITE.eq(true), ALBUM_SERIES.PK)).as("sum_fav"),
                 countDistinct(EVENTS).as("sum_comments"));
 
+        if(qidoParams.includeStudyDescriptionField()) {
+            selectQuery.addSelect(isnull(STUDIES.STUDY_DESCRIPTION, "NULL").as(STUDIES.STUDY_DESCRIPTION.getName()));
+        }
+
         selectQuery.addFrom(USERS);
         selectQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
         selectQuery.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
@@ -181,6 +182,7 @@ public class Studies {
             if (!qidoParams.getModalityFilter().isPresent()) {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
             }
+
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
@@ -200,6 +202,9 @@ public class Studies {
             }
             if(qidoParams.includeCommentField()) {
                 attributes.setInt(0x00012346, VR.IS, ((Integer)r.getValue("sum_comments")));
+            }
+            if(qidoParams.includeStudyDescriptionField()) {
+                safeAttributeSetString(attributes, Tag.StudyDescription, VR.CS, r.getValue(STUDIES.STUDY_DESCRIPTION.getName()).toString());
             }
 
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
@@ -238,7 +243,7 @@ public class Studies {
         if (filter.equalsIgnoreCase("null")) {
             return SERIES.MODALITY.isNull();
         } else {
-            return SERIES.MODALITY.lower().equal(filter.toLowerCase());
+            return SERIES.MODALITY.equalIgnoreCase(filter);
         }
     }
 
@@ -335,13 +340,13 @@ public class Studies {
         } else {
             Condition condition;
             if (filter.startsWith("*") && filter.endsWith("*")) {
-                condition = column.lower().contains(parameterNoStar.toLowerCase());
+                condition = column.containsIgnoreCase(parameterNoStar);
             } else if (filter.startsWith("*")) {
                 condition = column.lower().endsWith(parameterNoStar.toLowerCase());
             } else if (filter.endsWith("*")) {
                 condition = column.lower().startsWith(parameterNoStar.toLowerCase());
             } else {
-                condition = column.lower().equal(parameterNoStar.toLowerCase());
+                condition = column.equalIgnoreCase(parameterNoStar);
             }
 
             if (isFuzzyMatching) {
@@ -358,12 +363,10 @@ public class Studies {
         }
     }
 
-    public static Study getStudy(String studyInstanceUID, EntityManager em) throws StudyNotFoundException{
-        try {
+    public static Study getStudy(String studyInstanceUID, EntityManager em)
+            throws StudyNotFoundException
+    {
             return findStudyByStudyUID(studyInstanceUID, em);
-        } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : "+studyInstanceUID+" not found");
-        }
     }
 
     public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
@@ -383,7 +386,7 @@ public class Studies {
         try {
             StudyQueries.findStudyByStudyandUser(study, user, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (StudyNotFoundException e) {
             return false;
         }
     }
@@ -392,7 +395,7 @@ public class Studies {
         try {
             StudyQueries.findStudyByStudyandUserInbox(study, user, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (StudyNotFoundException e) {
             return false;
         }
     }
@@ -401,7 +404,7 @@ public class Studies {
         try {
             StudyQueries.findStudyByStudyandAlbum(study, album, em);
             return true;
-        } catch (NoResultException e) {
+        } catch (StudyNotFoundException e) {
             return false;
         }
     }

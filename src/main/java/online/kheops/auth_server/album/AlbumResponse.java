@@ -80,6 +80,19 @@ public class AlbumResponse {
             }
             return false;
         }
+
+        private int hashCode;
+        @Override
+        public int hashCode() {
+            int result = hashCode;
+            if(result == 0) {
+                result = userId.hashCode();
+                result = 31 * result + isAdmin.hashCode();
+                result = 31 * result + userName.hashCode();
+                hashCode = result;
+            }
+            return result;
+        }
     }
 
     protected AlbumResponse(AlbumResponseBuilder albumResponseBuilder) {

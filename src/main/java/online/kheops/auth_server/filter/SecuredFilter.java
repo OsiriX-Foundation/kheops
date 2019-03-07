@@ -5,17 +5,16 @@ import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.principal.UserPrincipal;
-import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -23,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
-import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
 
 @Secured
 @Provider
@@ -68,20 +67,14 @@ public class SecuredFilter implements ContainerRequestFilter {
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public KheopsPrincipalInterface getUserPrincipal() {
-                if(assertion.getCapability().isPresent()) {
-                    return new CapabilityPrincipal(assertion.getCapability().get(), finalUser);
-                } else if(assertion.getViewer().isPresent()) {
-                    return new ViewerPrincipal(assertion.getViewer().get());
-                } else {
-                    return new UserPrincipal(finalUser);
-                }
+                return assertion.newPrincipal(finalUser);
             }
 
             @Override
             public boolean isUserInRole(String role) {
-                if (role.compareTo(USER_IN_ROLE.CAPABILITY) == 0) {
+                if (role.equals(USER_IN_ROLE.CAPABILITY)) {
                     return capabilityAccess;
-                } if (role.compareTo(USER_IN_ROLE.VIEWER_TOKEN) == 0) {
+                } else if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
                     return viewerTokenAccess;
                 }
                 return false;

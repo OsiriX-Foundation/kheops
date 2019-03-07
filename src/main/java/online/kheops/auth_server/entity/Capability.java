@@ -9,8 +9,10 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
-import static online.kheops.auth_server.capability.Capabilities.HashCapability;
+import static online.kheops.auth_server.capability.Capabilities.hashCapability;
 import static online.kheops.auth_server.capability.Capabilities.newCapabilityID;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
@@ -46,8 +48,8 @@ public class Capability {
     @Column(name = "revoked_time")
     private LocalDateTime revokedTime;
 
-    @Column(name = "last_use")
-    private LocalDateTime lastUse;
+    @Column(name = "last_used")
+    private LocalDateTime lastUsed;
 
     @Column(name = "not_before_time")
     private LocalDateTime notBeforeTime;
@@ -88,6 +90,10 @@ public class Capability {
     @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
     private Album album;
 
+    @OneToMany
+    @JoinColumn (name = "capability_fk")
+    private Set<Mutation> mutation = new HashSet<>();
+
     @PrePersist
     public void onPrePersist() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -108,7 +114,7 @@ public class Capability {
 
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
         secretBeforeHash = Capabilities.newCapabilityToken();
-        this.secret = HashCapability(secretBeforeHash);
+        this.secret = hashCapability(secretBeforeHash);
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
         this.title  = builder.title;
@@ -162,9 +168,9 @@ public class Capability {
 
     public  LocalDateTime getNotBeforeTime() {return notBeforeTime; }
 
-    public LocalDateTime getLastUse() { return lastUse; }
+    public LocalDateTime getLastUsed() { return lastUsed; }
 
-    public void setLastUse() { this.lastUse = LocalDateTime.now(ZoneOffset.UTC); }
+    public void setLastUsed() { this.lastUsed = LocalDateTime.now(ZoneOffset.UTC); }
 
     public boolean isActive() {return notBeforeTime != null; }
 

@@ -2,26 +2,21 @@ package online.kheops.auth_server.series;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.user.UserNotFoundException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesByPk;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesByStudyUIDandSeriesUID;
-import static online.kheops.auth_server.user.Users.getUser;
+import static online.kheops.auth_server.series.SeriesQueries.*;
 
 public class Series {
 
@@ -35,36 +30,25 @@ public class Series {
         }
     }
 
-    public static online.kheops.auth_server.entity.Series getSeries(Long seriesPk, EntityManager em) throws SeriesNotFoundException{
-        try {
-            return findSeriesByPk(seriesPk, em);
-        } catch (NoResultException e) {
-            throw new SeriesNotFoundException("Series PK : "+seriesPk+" not found");
-        }
-    }
-
-    public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em) throws SeriesNotFoundException{
-        try {
-            return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
-        } catch (NoResultException e) {
-            throw new SeriesNotFoundException("seriesInstanceUID : "+seriesInstanceUID+" not found");
-        }
+    public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
+            throws SeriesNotFoundException{
+        return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
     }
 
     public static boolean canAccessSeries(User user, String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
         try {
             findSeriesByStudyUIDandSeriesUID(user, studyInstanceUID,  seriesInstanceUID, em);
             return true;
-        }catch (NoResultException e) {
+        }catch (SeriesNotFoundException e) {
             return false;
         }
     }
 
     public static boolean canAccessSeries(Album album, String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
         try {
-            findSeriesByStudyUIDandSeriesUID(album, studyInstanceUID,  seriesInstanceUID, em);
+            findSeriesByStudyUIDandSeriesUIDFromAlbum(album, studyInstanceUID,  seriesInstanceUID, em);
             return true;
-        }catch (NoResultException e) {
+        }catch (SeriesNotFoundException e) {
             return false;
         }
     }
@@ -131,7 +115,7 @@ public class Series {
         final AlbumSeries albumSeries;
         try {
             albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
-        } catch (NoResultException e) {
+        } catch (SeriesNotFoundException e) {
             throw new IllegalStateException("SeriesUID: "+seriesUID+"Not found inside the albumID: "+albumID);
         } finally {
             em.close();
@@ -139,6 +123,13 @@ public class Series {
         return albumSeries.isFavorite();
     }
 
-
+    public static boolean isSeriesInInbox(User callingUser, online.kheops.auth_server.entity.Series series, EntityManager em) {
+        try {
+            findSeriesBySeriesAndUserInbox(callingUser, series, em);
+            return true;
+        } catch (SeriesNotFoundException e) {
+            return false;
+        }
+    }
 
 }

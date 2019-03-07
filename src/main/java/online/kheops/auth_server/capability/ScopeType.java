@@ -1,8 +1,6 @@
 package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.AlbumResponse;
-import online.kheops.auth_server.album.AlbumResponseBuilder;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
@@ -12,13 +10,14 @@ import online.kheops.auth_server.user.UserNotFoundException;
 
 import java.time.format.DateTimeParseException;
 
-import static online.kheops.auth_server.capability.Capabilities.*;
+import static online.kheops.auth_server.capability.Capabilities.createAlbumCapability;
+import static online.kheops.auth_server.capability.Capabilities.createUserCapability;
 
 public enum ScopeType {
     USER {
         @Override
         public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
-                throws UserNotFoundException, DateTimeParseException, CapabilityBadRequestException {
+                throws CapabilityBadRequestException {
             return createUserCapability(capabilityParameters);
         }
 
@@ -42,7 +41,7 @@ public enum ScopeType {
     ALBUM {
         @Override
         public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
-                throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
+                throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
             return createAlbumCapability(capabilityParameters);
         }
 
@@ -80,8 +79,11 @@ public enum ScopeType {
     };
 
     public abstract CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
-            throws UserNotFoundException, DateTimeParseException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
+    /**
+     * @throws DateTimeParseException if the text cannot be parsed
+     */
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
             throws CapabilityBadRequestException;
 
