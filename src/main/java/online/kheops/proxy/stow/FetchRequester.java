@@ -10,6 +10,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -25,6 +26,8 @@ public class FetchRequester {
     private final UriBuilder fetchUriBuilder;
     private final AuthorizationToken bearerToken;
 
+    private final Set<String> studies = new HashSet<>();
+
     public static FetchRequester newFetchRequester(URI authorizationServerRoot, AuthorizationToken authorizationToken) {
         return new FetchRequester(authorizationServerRoot, authorizationToken);
     }
@@ -34,8 +37,12 @@ public class FetchRequester {
         fetchUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/fetch");
     }
 
-    public void fetchStudies(final Set<String> studyInstanceUIDs) {
-        studyInstanceUIDs.forEach(this::triggerFetch);
+    public void addStudies(final Set<String> addedStudies) {
+        studies.addAll(addedStudies);
+    }
+
+    public void fetch() {
+        studies.forEach(this::triggerFetch);
     }
 
     private void triggerFetch(String studyInstanceUID) {
