@@ -174,6 +174,8 @@ fi
 
 metricbeat modules enable nginx
 filebeat modules enable nginx
+metricbeat modules disabled system
+filebeat modules disabled system
 
 service filebeat start
 service metricbeat start
