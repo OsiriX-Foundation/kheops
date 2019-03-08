@@ -107,7 +107,7 @@ fi
 if [[ $missing_env_var_secret = true ]]; then
   exit 1
 else
-   echo -e "all secrets and all env var \e[92mOK\e[0m"
+   echo -e "all nginx secrets and all env var \e[92mOK\e[0m"
 fi
 
 #get env var
@@ -170,6 +170,13 @@ else
    echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
    sed -i "s|\${$filename}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
    sed -i "s|\${$filename}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
+fi
+
+#if missing env var or secret => exit
+if [[ $missing_env_var_secret = true ]]; then
+  exit 1
+else
+   echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
 fi
 
 metricbeat modules enable nginx
