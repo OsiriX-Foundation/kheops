@@ -70,14 +70,14 @@ echo "Ending setup PEP secrets and env var"
 missing_env_var_secret=false
 
 #Verify secrets
-if ! [ -f ${SECRET_FILE_PATH}/elastic_cloud_id ]; then
+if ! [ -f /run/secrets/elastic_cloud_id ]; then
     echo "Missing elastic_cloud_id secret"
     missing_env_var_secret=true
 else
    echo -e "secret elastic_cloud_id \e[92mOK\e[0m"
 fi
 
-if ! [ -f ${SECRET_FILE_PATH}/elastic_cloud_auth ]; then
+if ! [ -f /run/secrets/elastic_cloud_auth ]; then
     echo "Missing elastic_cloud_auth secret"
     missing_env_var_secret=true
 else
@@ -86,7 +86,7 @@ fi
 
 
 #get secrets and verify content
-for f in ${SECRET_FILE_PATH}/*
+for f in /run/secrets/*
 do
   filename=$(basename "$f")
   value=$(cat ${f})
