@@ -136,14 +136,13 @@ export default {
 
 			// Capture the files from the drop event and add them to local files array
 			this.$refs.fileform.addEventListener('drop', function (e) {
-				let _this = this
 				if (this.hover) this.hover = false
 				for (let i = 0; i < e.dataTransfer.items.length; i++) {
 					var entry = e.dataTransfer.items[i].webkitGetAsEntry()
 					if (entry.isFile) {
 						entry.file(function (file) {
-							_this.loadFile(file, file.name)
-						})
+							this.loadFile(file, file.name)
+						}.bind(this))
 					} else if (entry.isDirectory) {
 						this.loadDir(entry, [])
 					}
@@ -185,17 +184,15 @@ export default {
 		loadDir (dir, parentDir) {
 			let _this = this
 			if (dir.isDirectory) {
-				parentDir.push(dir.name)
 				let directoryReader = dir.createReader()
 				directoryReader.readEntries(function (entries) {
-					console.log(this)
 					entries.forEach(function (entry) {
-						_this.loadDir(entry, parentDir)
+						_this.loadDir(entry, entry.fullPath)
 					})
 				})
 			} else {
 				dir.file(function (file) {
-					_this.loadFile(file, `${parentDir.join('/')}/${file.name}`)
+					_this.loadFile(file, `${parentDir}`)
 				})
 			}
 		},
