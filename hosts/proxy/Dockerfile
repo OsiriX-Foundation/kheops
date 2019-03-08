@@ -65,12 +65,12 @@ COPY default/nginx $NGINX_PREFIX/
 
 
 
-RUN apt-get update
-RUN apt-get install -y curl
+#RUN apt-get update
+#RUN apt-get install -y curl
 
 #METRICBEAT
 ENV METRICBEAT_VERSION 6.6.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb
+RUN curl -L -k -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
 
@@ -84,7 +84,7 @@ RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 #FILEBEAT
 ENV FILEBEAT_VERSION 6.6.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
+RUN curl -L -k -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 
@@ -96,9 +96,9 @@ COPY filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
 
 
-RUN apt-get remove -y curl
+#RUN apt-get remove -y curl
 
-RUN rm /var/log/nginx/access.log /var/log/nginx/error.log
+#RUN rm /var/log/nginx/access.log /var/log/nginx/error.log
 
 
 
