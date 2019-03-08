@@ -122,9 +122,7 @@ sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" /etc/ngin
 
 sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|" /etc/nginx/conf.d/kheops.conf
 
-echo "Ending setup secrets and env var"
-
-
+echo "Ending setup NGINX secrets and env var"
 
 #######################################################################################
 #ELASTIC SEARCH
@@ -151,16 +149,28 @@ fi
 #get secrets and verify content
 for f in ${SECRET_FILE_PATH}/*
 do
-
-
   filename=$(basename "$f")
-
-
-
   value=$(cat ${f})
   sed -i "s|\${$filename}|$value|" /etc/metricbeat/metricbeat.yml
   sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
 done
+
+if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_NAME ]]; then
+  echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_NAME environment variable"
+  missing_env_var_secret=true
+else
+   echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_NAME \e[92mOK\e[0m"
+   sed -i "s|\${$filename}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
+   sed -i "s|\${$filename}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
+fi
+if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_TAGS ]]; then
+  echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_TAGS environment variable"
+  missing_env_var_secret=true
+else
+   echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
+   sed -i "s|\${$filename}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
+   sed -i "s|\${$filename}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
+fi
 
 metricbeat modules enable nginx
 filebeat modules enable nginx
@@ -168,5 +178,8 @@ filebeat modules enable nginx
 service filebeat start
 service metricbeat start
 
+echo "Ending setup METRICBEAT and FILEBEAT"
+
 #######################################################################################
+
 nginx-debug -g 'daemon off;'
