@@ -61,7 +61,7 @@ export JWT_SECRET=$kheops_auth_hmasecret
 export JWT_POST_SECRET=$kheops_auth_hmasecret_post
 
 
-echo "Ending setup NGINX secrets and env var"
+echo "Ending setup PEP secrets and env var"
 
 #######################################################################################
 #ELASTIC SEARCH
@@ -94,21 +94,21 @@ do
   sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
 done
 
-if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_NAME ]]; then
-  echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_NAME environment variable"
+if [[ -z $KHEOPS_PEP_ELASTIC_NAME ]]; then
+  echo "Missing KHEOPS_PEP_ELASTIC_NAME environment variable"
   missing_env_var_secret=true
 else
-   echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_NAME \e[92mOK\e[0m"
-   sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
-   sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
+   echo -e "environment variable KHEOPS_PEP_ELASTIC_NAME \e[92mOK\e[0m"
+   sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
+   sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
 fi
-if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_TAGS ]]; then
-  echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_TAGS environment variable"
+if [[ -z $KHEOPS_PEP_ELASTIC_TAGS ]]; then
+  echo "Missing KHEOPS_PEP_ELASTIC_TAGS environment variable"
   missing_env_var_secret=true
 else
-   echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
-   sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
-   sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
+   echo -e "environment variable KHEOPS_PEP_ELASTIC_TAGS \e[92mOK\e[0m"
+   sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
+   sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
 fi
 
 #if missing env var or secret => exit
