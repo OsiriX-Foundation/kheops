@@ -5,6 +5,7 @@ ENV SECRET_FILE_PATH=/run/secrets
 COPY kheops.conf /etc/nginx/conf.d/kheops.conf
 COPY metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
 COPY script.sh /etc/nginx/conf.d/script.sh
+COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN chmod +x /etc/nginx/conf.d/script.sh
 
