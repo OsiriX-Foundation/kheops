@@ -1,10 +1,14 @@
 <i18n>
 {
 	"en": {
-		"language": "language"
+		"language": "language",
+    "accountmanagement": "Account management",
+    "manage": "Manage"
 	},
 	"fr": {
-		"language": "langue"
+		"language": "langue",
+    "accountmanagement": "Gérer son profil utilisateur",
+    "manage": "Gérer"
 	}
 }
 </i18n>
@@ -29,6 +33,19 @@
             </option>
           </select>
         </dd>
+
+        <dt class="col-md-3 col-xs-12 text-right">
+          {{ $t('accountmanagement') }}
+        </dt>
+        <dd class="col-md-9 col-xs-12 text-left">
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="gomanagement()"
+          >
+            {{ $t('manage') }}
+          </button>
+        </dd>
       </dl>
     </form>
   </div>
@@ -49,6 +66,11 @@ export default {
 			set (value) {
 				this.$root.$i18n.locale = value
 			}
+		}
+	},
+	methods: {
+		gomanagement () {
+			window.open(`${process.env.VUE_APP_URL_KEYCLOAK}/auth/realms/${process.env.VUE_APP_REALM_KEYCLOAK}/account`)
 		}
 	}
 }
