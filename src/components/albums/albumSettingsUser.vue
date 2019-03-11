@@ -12,8 +12,6 @@
 		"write_comments": "Write Comments",
 		"albumuseraddsuccess": "User successfully added to the album",
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
-		"usersettoadmin": "User has admin rights",
-		"usernotsettoadmin": "User no longer has admin rights",
 		"Unknown user": "Unknown user",
     "usersettings": "Album user settings"
 	},
@@ -27,8 +25,6 @@
 		"write_comments": "Commenter",
 		"albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
 		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
-		"usersettoadmin": "L'utilisateur a des droits admin",
-		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
 		"Unknown user": "Utilisateur inconnu",
     "usersettings": "Réglages des utilisateurs de l'album"
 	}

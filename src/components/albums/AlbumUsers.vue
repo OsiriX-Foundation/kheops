@@ -11,12 +11,16 @@ Props :
 	"en": {
 		"username": "User name",
 		"user": "user",
-		"changerole": "change role to"
+		"changerole": "change role to",
+		"usernotsettoadmin": "User no longer has admin rights",
+		"usersettoadmin": "User has admin rights"
 	},
 	"fr": {
 		"username": "Utilisateur",
 		"user": "Utilisateur",
-		"changerole": "changer le rôle pour"
+		"changerole": "changer le rôle pour",
+		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
+		"usersettoadmin": "L'utilisateur a des droits admin"
 	}
 }
 </i18n>
