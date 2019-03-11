@@ -24,8 +24,8 @@
       {{ $t('usersettings') }}
     </h3>
     <div class="row">
-      <div class="col-sm-2 col-xs-12">
-        <nav class="nav nav-pills nav-justified flex-column">
+      <div class="col-lg-2 col-sm-12 col-xs-12 mb-2">
+        <nav class="nav nav-pills nav-justified flex-column text-center text-lg-left">
           <a
             v-for="(cat,idx) in categories"
             :key="idx"
@@ -37,7 +37,7 @@
           </a>
         </nav>
       </div>
-      <div class="col-sm-10 col-xs-12">
+      <div class="col-lg-10 col-sm-12 col-xs-12">
         <user-settings-general v-if="view=='general'" />
         <user-settings-token v-if="view=='token'" />
         <user-settings-provider v-if="view=='provider'" />

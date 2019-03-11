@@ -1,12 +1,12 @@
 <i18n>
 {
 	"en": {
-		"language": "language",
+		"language": "Language",
     "accountmanagement": "Account management",
     "manage": "Manage"
 	},
 	"fr": {
-		"language": "langue",
+		"language": "Langue",
     "accountmanagement": "Gérer son profil utilisateur",
     "manage": "Gérer"
 	}
@@ -16,11 +16,11 @@
 <template>
   <div id="userSettingsGeneral">
     <form>
-      <dl class="row">
-        <dt class="col-md-3 col-xs-12 text-right">
+      <div class="row">
+        <div class="col-xs-3 col-sm-3 col-md-3 text-left text-sm-right">
           {{ $t('language') }}
-        </dt>
-        <dd class="col-md-9 col-xs-12 text-left">
+        </div>
+        <div class="col-xs-9 col-sm-9 col-md-9 text-left mb-2">
           <select
             v-model="lang"
             class="form-control"
@@ -32,12 +32,11 @@
               Fançais
             </option>
           </select>
-        </dd>
-
-        <dt class="col-md-3 col-xs-12 text-right">
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-xs-12 text-left text-sm-right">
           {{ $t('accountmanagement') }}
-        </dt>
-        <dd class="col-md-9 col-xs-12 text-left">
+        </div>
+        <div class="col-xs-9 col-sm-9 col-md-9 col-xs-12 text-left mb-2">
           <button
             type="button"
             class="btn btn-primary"
@@ -45,8 +44,8 @@
           >
             {{ $t('manage') }}
           </button>
-        </dd>
-      </dl>
+        </div>
+      </div>
     </form>
   </div>
 </template>
