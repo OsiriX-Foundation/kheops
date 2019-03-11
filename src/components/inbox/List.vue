@@ -77,7 +77,7 @@
       >
         <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
         <button
-          v-if="!filters.album_id"
+          v-if="!filters.album_id || (album.is_admin || album.send_series)"
           type="button"
           class="btn btn-link btn-sm text-center"
           @click.stop="form_send_study=!form_send_study"

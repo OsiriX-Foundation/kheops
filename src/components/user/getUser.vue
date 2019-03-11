@@ -2,11 +2,13 @@
 {
 	"en": {
 		"username": "User name",
-		"user": "user"
+		"user": "user",
+    "send": "Send"
 	},
 	"fr": {
 		"username": "Utilisateur",
-		"user": "Utilisateur"
+    "user": "Utilisateur",
+    "send": "Envoyer"
 	}
 }
 </i18n>
@@ -31,7 +33,7 @@
               type="submit"
               :disabled="!validEmail(new_user_name)"
             >
-              {{ $t('add') }}
+              {{ $t('send') }}
             </button>
             <button
               class="btn btn-secondary"
