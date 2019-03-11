@@ -182,19 +182,24 @@ export default {
 			}
 		},
 		loadDir (dir, parentDir) {
-			let _this = this
 			if (dir.isDirectory) {
 				let directoryReader = dir.createReader()
-				directoryReader.readEntries(function (entries) {
-					entries.forEach(function (entry) {
-						_this.loadDir(entry, entry.fullPath)
-					})
-				})
+				this.readDir(directoryReader)
 			} else {
 				dir.file(function (file) {
-					_this.loadFile(file, `${parentDir}`)
-				})
+					this.loadFile(file, `${parentDir}`)
+				}.bind(this))
 			}
+		},
+		readDir (directoryReader) {
+			directoryReader.readEntries(function (entries) {
+				if (entries.length) {
+					entries.forEach(function (entry) {
+						this.loadDir(entry, entry.fullPath)
+					}.bind(this))
+					this.readDir(directoryReader)
+				}
+			}.bind(this))
 		},
 		removeFile (index) {
 			this.files.splice(index, 1)
