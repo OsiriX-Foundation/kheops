@@ -43,7 +43,7 @@
       class="container"
     >
       <div class="row">
-        <div class="col-md">
+        <div class="col-md-4 col-lg-6">
           <h3>
             <v-icon
               name="book"
@@ -59,8 +59,8 @@
             />
           </h3>
         </div>
-        <div class="col-md">
-          <nav class="nav nav-pills nav-fill">
+        <div class="col-md-8 col-lg-6">
+          <nav class="nav nav-pills nav-fill float-md-right">
             <a
               class="nav-link"
               :class="(view=='studies')?'active':''"
