@@ -11,7 +11,7 @@
 		"Date": "date",
 		"LastEvent": "last event",
 		"selectednbalbums": "{count} album is selected | {count} albums are selected",
-		"share": "Share",
+		"share": "Send",
 		"permissionsfailed": "You can't send this albums : ",
 		"send": "send"
 	},
@@ -24,7 +24,7 @@
 		"Date": "date",
 		"LastEvent": "dern. evnt",
 		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-		"share": "Partager",
+		"share": "Envoyer",
 		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
 		"send": "envoyés"
 	}
