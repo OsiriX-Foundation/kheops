@@ -2,7 +2,7 @@ FROM ubuntu:14.04.2
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-    curl perl make build-essential procps \
+    curl perl make build-essential procps ca-certificates\
     libreadline-dev libncurses5-dev libpcre3-dev libssl-dev \
  && rm -rf /var/lib/apt/lists/*
 
@@ -39,6 +39,7 @@ RUN cd /root \
     --with-pcre-jit \
     --with-ipv6 \
     --with-http_ssl_module \
+    --with-http_stub_status_module \
     --without-http_ssi_module \
     --without-http_userid_module \
     --without-http_fastcgi_module \
@@ -64,43 +65,30 @@ RUN rm -rf conf/* html/*
 COPY default/nginx $NGINX_PREFIX/
 
 
-
-#RUN apt-get update
-#RUN apt-get install -y curl
-
 #METRICBEAT
 ENV METRICBEAT_VERSION 6.6.1
-RUN curl -L -k -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
 
 COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
 
-#RUN metricbeat modules enable nginx
 COPY metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
 RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 
 #FILEBEAT
 ENV FILEBEAT_VERSION 6.6.1
-RUN curl -L -k -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
-#RUN filebeat modules enable nginx
 COPY filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
-
-
-#RUN apt-get remove -y curl
-
-#RUN rm /var/log/nginx/access.log /var/log/nginx/error.log
-
-
 
 
 
