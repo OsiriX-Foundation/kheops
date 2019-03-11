@@ -28,7 +28,7 @@ Vue.filter('nl2br', value => {
 })
 
 Vue.filter('formatModality', value => {
-	return value.split(',').join('/')
+	return value.split(',').join(' / ')
 })
 
 Vue.filter('formatPermissions', item => {

@@ -331,6 +331,12 @@
       >
         {{ data.item.last_event_time | formatDate }}
       </template>
+      <template
+        slot="modalities"
+        slot-scope="data"
+      >
+        {{ data.item.modalities[0] | formatModality }}
+      </template>
 
       <template
         slot="row-details"
@@ -373,7 +379,9 @@ export default {
 				{
 					key: 'number_of_studies',
 					label: 'Study #',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-sm-table-cell',
+					tdClass: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'modalities',
@@ -383,22 +391,30 @@ export default {
 				{
 					key: 'number_of_users',
 					label: 'User #',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-md-table-cell',
+					tdClass: 'd-none d-md-table-cell'
 				},
 				{
 					key: 'number_of_comments',
 					label: 'Messages #',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-lg-table-cell',
+					tdClass: 'd-none d-lg-table-cell'
 				},
 				{
 					key: 'created_time',
 					label: 'Date',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-sm-table-cell',
+					tdClass: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'last_event_time',
 					label: 'LastEvent',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-lg-table-cell',
+					tdClass: 'd-none d-lg-table-cell'
 				}
 			],
 			sortBy: 'created_time',
