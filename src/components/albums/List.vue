@@ -13,7 +13,8 @@
 		"selectednbalbums": "{count} album is selected | {count} albums are selected",
 		"share": "Send",
 		"permissionsfailed": "You can't send this albums : ",
-		"send": "send"
+    "send": "send",
+    "nomodality": "No modality"
 	},
 	"fr": {
 		"newalbum": "Nouvel album",
@@ -26,7 +27,8 @@
 		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
 		"share": "Envoyer",
 		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
-		"send": "envoyés"
+		"send": "envoyés",
+    "nomodality": "Aucune modalité"
 	}
 }
 </i18n>
@@ -335,7 +337,7 @@
         slot="modalities"
         slot-scope="data"
       >
-        {{ data.item.modalities[0] | formatModality }}
+        {{ data.item.modalities.length > 0 ? ( data.item.modalities[0].split(',').join(' / ') ) : $t('nomodality') }}
       </template>
 
       <template
