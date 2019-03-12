@@ -70,11 +70,10 @@ public class Users {
         //the user is in keycloak but not in kheops => add the user in kheops
         LOG.log(INFO, "Adding new user: " + userReference);
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx;
         final User newUser;
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
         try {
-            tx = em.getTransaction();
             tx.begin();
             newUser = new User(userReference);
             final Album inbox = new Album();
