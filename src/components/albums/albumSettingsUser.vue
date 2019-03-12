@@ -11,7 +11,6 @@
 		"delete_series": "Remove Studies / Series",
 		"write_comments": "Write Comments",
 		"albumuseraddsuccess": "User successfully added to the album",
-		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"Unknown user": "Unknown user",
     "usersettings": "Album user settings"
 	},
@@ -24,7 +23,6 @@
 		"delete_series": "Supprimer une étude / série",
 		"write_comments": "Commenter",
 		"albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
-		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
 		"Unknown user": "Utilisateur inconnu",
     "usersettings": "Réglages des utilisateurs de l'album"
 	}
