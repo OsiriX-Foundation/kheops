@@ -18,9 +18,10 @@ import javax.ws.rs.client.Entity;
 
 import java.util.logging.Logger;
 
-
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 
@@ -54,11 +55,15 @@ public class Users {
     public static User getOrCreateUser(String userReference)
             throws UserNotFoundException {
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityManager getUserEntityManager = EntityManagerListener.createEntityManager();
         //try to find the user in kheops db
         try {
-            return getUser(userReference, em);
-        } catch (UserNotFoundException e) {/*empty*/ }
+            return getUser(userReference, getUserEntityManager);
+        } catch (UserNotFoundException e) {
+            LOG.log(WARNING, "User was not found in the db, going on to try to add the user", e);
+        } finally {
+            getUserEntityManager.close();
+        }
 
         //the user is not in kheops db
         //try to find the user in keycloak
@@ -70,11 +75,11 @@ public class Users {
         }
 
         //the user is in keycloak but not in kheops => add the user in kheops
-        final EntityTransaction tx = em.getTransaction();
-
         LOG.log(INFO, "Adding new user: " + userReference);
 
         final User newUser;
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
             newUser = new User(userReference);
@@ -94,11 +99,14 @@ public class Users {
             em.persist(albumUser);
             tx.commit();
         } catch (PersistenceException e) {
+            final EntityManager secondTryEntityManager = EntityManagerListener.createEntityManager();
             try {
-                return getUser(userReference, em);
+                return getUser(userReference, secondTryEntityManager);
             } catch (UserNotFoundException notFoundException) {
                 notFoundException.addSuppressed(e);
                 throw notFoundException;
+            } finally {
+                secondTryEntityManager.close();
             }
         } catch (Exception e) {
             throw new UserNotFoundException("Error while adding a new user to the kheops db", e);
