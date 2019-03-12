@@ -12,14 +12,13 @@
 		"PatientName": "Patient Name",
 		"Modality": "Modality",
 		"StudyDate": "Study Date",
-		"AccessionNumber": "Accession #",
+		"StudyDescription": "Study description",
 		"PatientID": "Patient ID",
 		"filter": "Filter",
 		"fromDate": "From",
 		"toDate": "To",
 		"studyputtoalbum": "Studies successfully added to the album",
 		"includeseriesfromalbum": "Include series in albums",
-		"MRN": "MRN",
 		"send": "Send",
 		"delete": "Delete",
 		"comments": "comments",
@@ -41,14 +40,13 @@
 		"PatientName": "Nom du patient",
 		"Modality": "Modalité",
 		"StudyDate": "Date de l'étude",
-		"AccessionNumber": "# accession",
-		"PatientID": "ID patient",
+		"StudyDescription": "Description de l'étude",
+		"PatientID": "Patient ID",
 		"filter": "Filtrer",
 		"fromDate": "De",
 		"toDate": "A",
 		"studyputtoalbum": "L'étude a été enregistrée dans l'album avec succès",
 		"includeseriesfromalbum": "inclure des séries présentes dans les albums",
-		"MRN": "MRN",
 		"send": "Envoyer",
 		"delete": "Supprimer",
 		"comments": "commentaire",
@@ -269,7 +267,7 @@
       </template>
 
       <template
-        slot="HEAD_AccessionNumber"
+        slot="HEAD_StudyDescription"
         slot-scope="data"
       >
         <div
@@ -277,7 +275,7 @@
           @click.stop=""
         >
           <input
-            v-model="filters.AccessionNumber"
+            v-model="filters.StudyDescription"
             type="search"
             class="form-control form-control-sm"
             :placeholder="$t('filter')"
@@ -614,23 +612,23 @@ export default {
 				},
 				{
 					key: 'PatientID',
-					label: 'MRN',
+					label: 'PatientID',
 					sortable: true,
-					thClass: 'd-none d-md-table-cell',
-					tdClass: 'd-none d-md-table-cell'
+					thClass: 'd-none d-md-table-cell d-lg-table-cell',
+					tdClass: 'd-none d-md-table-cell d-lg-table-cell'
 				},
 				{
-					key: 'AccessionNumber',
-					label: 'AccessionNumber',
-					sortable: true,
+					key: 'StudyDescription',
+					label: 'StudyDescription',
+					sortable: false,
 					thClass: 'd-none d-lg-table-cell',
 					tdClass: 'd-none d-lg-table-cell'
 				},
 				{
 					key: 'StudyDate',
 					label: 'StudyDate',
-					thClass: 'd-none d-sm-table-cell',
-					tdClass: 'd-none d-sm-table-cell',
+					thClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
+					tdClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
 					sortable: true
 				},
 				{
@@ -650,7 +648,7 @@ export default {
 			filters: {
 				PatientName: '',
 				PatientID: '',
-				AccessionNumber: '',
+				StudyDescription: '',
 				StudyDateFrom: '',
 				StudyDateTo: '',
 				ModalitiesInStudy: '',
@@ -733,7 +731,7 @@ export default {
 					this.filters = {
 						PatientName: '',
 						PatientID: '',
-						AccessionNumber: '',
+						StudyDescription: '',
 						StudyDateFrom: '',
 						StudyDateTo: '',
 						ModalitiesInStudy: '',
@@ -752,7 +750,7 @@ export default {
 		if (this.$route.params.album_id) {
 			this.filters.album_id = this.$route.params.album_id
 		} else {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				.then(() => { setTimeout(() => this.setLoading(false), 300) })
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
@@ -770,7 +768,7 @@ export default {
 				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
-					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
 			}
 		},
@@ -782,7 +780,7 @@ export default {
 			this.sortBy = ctx.sortBy
 			this.sortDesc = ctx.sortDesc
 			this.limit = this.studies.length
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 		},
 		showSeries (row) {
 			if (!row.detailsShowing) {
@@ -838,7 +836,7 @@ export default {
 			})
 		},
 		searchOnline () {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				.then(() => { setTimeout(() => this.setLoading(false), 50) })
 		},
 		addToAlbum (albumId) {
