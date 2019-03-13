@@ -953,14 +953,14 @@ export default {
 		setLoading (val) {
 			this.loading = val
 		},
-    countSelectedSeries () {
-      this.selectedSeriesNb = 0
-      this.studies.filter(s => { return s.is_selected }).forEach(function (study) {
-        if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
-        else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
-      }.bind(this))
-    }
-  }
+		countSelectedSeries () {
+			this.selectedSeriesNb = 0
+			this.studies.filter(s => { return s.is_selected }).forEach(function (study) {
+				if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
+				else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
+			}.bind(this))
+		}
+	}
 }
 
 </script>
