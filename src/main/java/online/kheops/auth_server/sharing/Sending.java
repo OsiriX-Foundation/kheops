@@ -236,8 +236,8 @@ public class Sending {
 
     public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -455,17 +455,24 @@ public class Sending {
             throws AlbumNotFoundException , SeriesNotFoundException{
         List<Series> availableSeries;
 
+        LOG.warning("inside getSeriesList keycloakid:" + callingUser.getKeycloakId()+ " study:"+studyInstanceUID+" fromalbum:"+fromAlbumId+" frominbox:"+fromInbox);
+
         if (fromAlbumId != null) {
             final Album callingAlbum = getAlbum(fromAlbumId, em);
 
+            LOG.warning("1111");
             availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
         } else if (fromInbox) {
+            LOG.warning("222222");
             availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
         } else {
+            LOG.warning("33333");
             availableSeries = findSeriesListByStudyUIDFromAlbumAndInbox(callingUser, studyInstanceUID, em);
         }
 
+        LOG.warning(availableSeries.toArray().toString());
         if (availableSeries.isEmpty()) {
+            LOG.warning("empty");
             throw new SeriesNotFoundException("No study with the given StudyInstanceUID");
         }
         return availableSeries;
