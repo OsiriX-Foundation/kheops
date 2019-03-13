@@ -76,14 +76,14 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
             echo "Missing elastic_cloud_id secret"
             missing_env_var_secret=true
         else
-           echo -e "secret elastic_cloud_id \e[92mOK\e[0m"
+           echo "secret elastic_cloud_id OK"
         fi
 
         if ! [ -f /run/secrets/elastic_cloud_auth ]; then
             echo "Missing elastic_cloud_auth secret"
             missing_env_var_secret=true
         else
-           echo -e "secret elastic_cloud_authm \e[92mOK\e[0m"
+           echo "secret elastic_cloud_authm OK"
         fi
 
 
@@ -136,8 +136,6 @@ else
 fi
 
 #######################################################################################
-
-
 
 
 nginx -g 'daemon off; error_log /dev/stderr info;'
