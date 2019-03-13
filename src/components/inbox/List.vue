@@ -859,9 +859,9 @@ export default {
 					})
 				}
 			})
-
+			let src = this.filters.album_id ? this.filters.album_id : 'inbox'
 			if (data.length) {
-				this.$store.dispatch('putStudiesInAlbum', { data: data }).then(() => {
+				this.$store.dispatch('putStudiesInAlbum', { data: data, src: src }).then(() => {
 					this.$snotify.success(this.$t('studyputtoalbum'))
 				})
 			}
@@ -892,8 +892,8 @@ export default {
 				}
 			})
 			if (studyIds.length || seriesIds.length) {
-				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub }).then(res => {
-					this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}`)
+				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub, src: this.filters.album_id ? this.filters.album_id : 'inbox' }).then(res => {
+					this.$snotify.success(`${studies.length} ${this.$t('studiessharedsuccess')}`)
 					if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
 				})
 			}

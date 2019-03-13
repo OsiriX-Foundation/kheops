@@ -158,11 +158,12 @@ const actions = {
 
 	putStudiesInAlbum ({ commit }, params) {
 		let promises = []
+		let queryParams = params.src === 'inbox' ? '?inbox=true' : '?album=' + params.src
 		_.forEach(params.data, d => {
 			if (d.series_id) {
-				promises.push(HTTP.put('studies/' + d.study_id + '/series/' + d.series_id + '/albums/' + d.album_id))
+				promises.push(HTTP.put('studies/' + d.study_id + '/series/' + d.series_id + '/albums/' + d.album_id + queryParams))
 			} else {
-				promises.push(HTTP.put('studies/' + d.study_id + '/albums/' + d.album_id))
+				promises.push(HTTP.put('studies/' + d.study_id + '/albums/' + d.album_id + queryParams))
 			}
 		})
 		axios.all(promises).then(results => {
