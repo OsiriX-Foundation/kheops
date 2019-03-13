@@ -248,9 +248,9 @@ public class Sending {
 
             if (callingUser == targetUser) {
                 if(fromAlbumId == null) {
-                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID);
+                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "?inbox=true");
                 } else {
-                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "/" + fromAlbumId);
+                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "?album=" + fromAlbumId);
 
                 }
             }
