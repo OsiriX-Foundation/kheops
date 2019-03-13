@@ -30,11 +30,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { AlbumRedirect } from '../../mixins/redirect.js'
 import Studies from '@/components/inbox/List.vue'
 
 export default {
 	name: 'AlbumStudies',
 	components: { Studies },
+	mixins: [ AlbumRedirect ],
 	data () {
 		return {
 

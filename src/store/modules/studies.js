@@ -106,8 +106,8 @@ const actions = {
 							show_details: false,
 							is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
 							comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
-						}							
-						commit('SET_FLAG', flag)						
+						}
+						commit('SET_FLAG', flag)
 					}
 					data.push(t)
 				}
@@ -115,7 +115,7 @@ const actions = {
 			commit('SET_STUDIES', { data: data, reset: reset })
 			commit('SET_STUDIES_FILTER_PARAMS', params)
 			commit('SET_REQUEST_PARAMS', requestParams)
-			_.forEach(state.flags, (flag,StudyInstanceUID) => {
+			_.forEach(state.flags, (flag, StudyInstanceUID) => {
 				if (flag.show_details) {
 					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null })
 				}
@@ -383,7 +383,7 @@ const mutations = {
 	SET_TOTAL (state, value) {
 		state.totalItems = value
 	},
-	TOGGLE_DETAILS (state, params){
+	TOGGLE_DETAILS (state, params) {
 		state.flags[params.StudyInstanceUID].show_details = !state.flags[params.StudyInstanceUID].show_details
 	},
 	// TODO: Improve if condition.

@@ -3,22 +3,21 @@ import moment from 'moment'
 
 Vue.filter('formatDate', value => {
 	if (value) {
-		return moment(String(value)).format('MMM Do YYYY')
+		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY') : 'Invalide Date'
 	}
 	return value
 })
 
 Vue.filter('formatDateTime', value => {
 	if (value) {
-		return moment(String(value)).format('MMM Do YYYY HH:mm')
+		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY HH:mm') : 'Invalide Date'
 	}
 	return value
 })
 
-
 Vue.filter('formatTime', value => {
 	if (value) {
-		return moment(String(value)).format('HH:mm')
+		return moment(String(value)).isValid() ? moment(String(value)).format('HH:mm') : 'Invalide Date'
 	}
 	return value
 })
@@ -28,7 +27,7 @@ Vue.filter('nl2br', value => {
 })
 
 Vue.filter('formatModality', value => {
-	return value.split(',').join('/')
+	return value.split(',').join(' / ')
 })
 
 Vue.filter('formatPermissions', item => {

@@ -11,12 +11,18 @@ Props :
 	"en": {
 		"username": "User name",
 		"user": "user",
-		"changerole": "change role to"
+		"changerole": "change role to",
+		"albumuserdeletesuccess": "Access to the album has been successfully removed",
+		"usernotsettoadmin": "User no longer has admin rights",
+		"usersettoadmin": "User has admin rights"
 	},
 	"fr": {
 		"username": "Utilisateur",
 		"user": "Utilisateur",
-		"changerole": "changer le rôle pour"
+		"changerole": "changer le rôle pour",
+		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
+		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
+		"usersettoadmin": "L'utilisateur a des droits admin"
 	}
 }
 </i18n>
