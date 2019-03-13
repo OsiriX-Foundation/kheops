@@ -68,7 +68,6 @@
 <template>
   <div
     v-if="!loading"
-    class="container-fluid"
   >
     <!--button Study selected -->
     <div class="container-fluid my-3 selection-button-container">
