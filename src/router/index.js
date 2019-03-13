@@ -17,10 +17,6 @@ Vue.use(Router)
 const router = new Router({
 	mode: 'history',
 	routes: [{
-		path: '/',
-		redirect: '/inbox'
-	},
-	{
 		path: '/inbox',
 		name: 'studies',
 		component: Study,
@@ -57,7 +53,10 @@ const router = new Router({
 	},
 	{
 		path: '*',
-		redirect: '/inbox'
+		name: 'inbox',
+		component: Study,
+		beforeEnter: requireAuth,
+		meta: { permissions: 'active', condition: 'any' }
 	}
 	/* {
 		path: '/favorites',

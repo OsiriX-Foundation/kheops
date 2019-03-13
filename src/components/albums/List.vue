@@ -46,10 +46,7 @@
           active-class="active"
           style="display: inline"
         >
-          <v-icon
-            name="plus"
-            class="mr-2"
-          />{{ $t('newalbum') }}
+          <v-icon name="plus" />{{ $t('newalbum') }}
         </router-link>
         <button
           type="button"
@@ -424,7 +421,7 @@ export default {
 			],
 			sortBy: 'created_time',
 			sortDesc: true,
-			limit: 10,
+			limit: 100,
 			optionsNbPages: [5, 10, 25, 50, 100],
 			showFilters: false,
 			filterTimeout: null,
