@@ -11,6 +11,7 @@ import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -235,7 +236,7 @@ public class Sending {
     }
 
     public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException, BadRequestException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -246,8 +247,12 @@ public class Sending {
             final User targetUser = em.merge(getOrCreateUser(targetUsername));
 
             if (callingUser == targetUser) {
-                //return Response.status(Response.Status.BAD_REQUEST).entity("Can't send a study to yourself").build();
-                return;
+                if(fromAlbumId == null) {
+                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID);
+                } else {
+                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "/" + fromAlbumId);
+
+                }
             }
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -284,8 +289,7 @@ public class Sending {
             callingUser = em.merge(callingUser);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                //return Response.status(Response.Status.FORBIDDEN).entity("Use studies/{StudyInstanceUID}/series/{SeriesInstanceUID} for request access to a new series").build();
-                return;
+                throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "/series/" + seriesInstanceUID);
             }
 
             final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);

@@ -37,7 +37,7 @@ public class SeriesQueries {
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbumAndInbox(User callingUser, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:callingUser and st.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(Consts.StudyInstanceUID,studyInstanceUID);
         query.setParameter("callingUser",callingUser);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);

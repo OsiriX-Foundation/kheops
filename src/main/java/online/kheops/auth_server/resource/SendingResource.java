@@ -46,11 +46,14 @@ public class SendingResource
                                        @QueryParam(ALBUM) String fromAlbumId,
                                        @QueryParam(INBOX) Boolean fromInbox) {
 
-        if ((fromAlbumId != null && fromInbox != null)) {
-            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} or {"+INBOX+"} not both").build();
+        if ((fromAlbumId == null && fromInbox == null) ||
+                (fromAlbumId != null && fromInbox != null && fromInbox)) {
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"} not both").build();
         }
 
-        fromInbox = fromInbox == null && fromAlbumId == null;
+        if(fromAlbumId != null) {
+            fromInbox = false;
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -100,7 +103,7 @@ public class SendingResource
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                              @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
+                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -288,11 +291,14 @@ public class SendingResource
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox) {
 
-        if ((fromAlbumId != null && fromInbox != null)) {
-            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+        if ((fromAlbumId == null && fromInbox == null) ||
+                (fromAlbumId != null && fromInbox != null && fromInbox)) {
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"} not both").build();
         }
 
-        fromInbox = fromInbox != null;
+        if(fromAlbumId != null) {
+            fromInbox = false;
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
