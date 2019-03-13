@@ -248,6 +248,7 @@ public class Sending {
             if (callingUser == targetUser) {
                 if(fromAlbumId != null) {
                     appropriateStudy(callingUser, studyInstanceUID, fromAlbumId);
+                    return;
                 }
                 throw new BadRequestException("CallingUser ant targetUser are the same : it's for appropriate a study. But queryParam 'album' is null");
             }
