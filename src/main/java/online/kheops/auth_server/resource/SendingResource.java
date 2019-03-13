@@ -48,7 +48,7 @@ public class SendingResource
 
         if ((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) {
-            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"} not both").build();
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
         if(fromAlbumId != null) {
@@ -65,6 +65,8 @@ public class SendingResource
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox);
         } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        } catch (BadRequestException e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
@@ -93,6 +95,8 @@ public class SendingResource
             Sending.shareSeriesWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, seriesInstanceUID);
         } catch (UserNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        } catch (BadRequestException e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" with "+username);
@@ -293,7 +297,7 @@ public class SendingResource
 
         if ((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) {
-            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"} not both").build();
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
         if(fromAlbumId != null) {
