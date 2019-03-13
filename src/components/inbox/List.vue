@@ -364,13 +364,11 @@
               v-if="row.detailsShowing"
               class="align-middle"
               name="chevron-down"
-              @click.stop="row.toggleDetails"
             />
             <v-icon
               v-else
               class="align-middle"
               name="chevron-right"
-              @click.stop="row.toggleDetails"
             />
           </b-button>
           <b-form-checkbox
@@ -632,7 +630,7 @@ export default {
 			],
 			sortBy: 'StudyDate',
 			sortDesc: true,
-			limit: 100,
+			limit: 5,
 			optionsNbPages: [5, 10, 25, 50, 100],
 			showFilters: false,
 			filterTimeout: null,
@@ -747,9 +745,10 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.ceil(document.documentElement.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
+					console.log(this.pageNb)
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
 				}
 			}
@@ -765,12 +764,15 @@ export default {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
 		},
 		showSeries (row) {
-			if (!row.detailsShowing) {
+			if (!row.item.detailsShowing) {
 				this.$store.dispatch('getSeries', { StudyInstanceUID: row.item.StudyInstanceUID[0], album_id: this.filters.album_id })
 			}
-			row.toggleDetails()
+			this.toggleDetails(row)
 		},
-
+		toggleDetails (row){
+			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.item.StudyInstanceUID[0] })
+			row.toggleDetails();
+		},
 		toggleFavorite (study) {
 			var vm = this
 			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }

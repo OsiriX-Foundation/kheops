@@ -57,7 +57,8 @@ export default {
 	components: { userSettingsGeneral, userSettingsToken, userSettingsProvider },
 	data () {
 		return {
-			categories: ['general', 'token', 'provider'],
+			// categories: ['general', 'token', 'provider'],
+			categories: ['general', 'token'],
 			view: 'general'
 		}
 	},

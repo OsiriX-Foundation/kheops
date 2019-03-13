@@ -403,7 +403,7 @@ export default {
 			],
 			sortBy: 'created_time',
 			sortDesc: true,
-			limit: 100,
+			limit: 10,
 			optionsNbPages: [5, 10, 25, 50, 100],
 			showFilters: false,
 			filterTimeout: null,

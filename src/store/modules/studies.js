@@ -13,7 +13,7 @@ const state = {
 	filterParams: {
 		sortBy: 'StudyDate',
 		sortDesc: true,
-		limit: 100,
+		limit: 10,
 		pageNb: 1,
 		filters: {
 			AccessionNumber: '',
@@ -80,7 +80,7 @@ const actions = {
 		let offset = 0
 		if (state.filterParams.sortBy !== params.sortBy || state.filterParams.sortDesc !== params.sortDesc || state.request !== requestParams) {
 			offset = 0
-			params.limit = (state.all.length > 100) ? state.all.length : 100
+			params.limit = (state.all.length > 5) ? state.all.length : 5
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
@@ -99,19 +99,27 @@ const actions = {
 					} else t[k] = v
 				})
 				if (t.StudyInstanceUID !== undefined) {
-					let flag = {
-						id: t.StudyInstanceUID[0],
-						is_selected: false,
-						is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
-						comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
+					if (state.flags[t.StudyInstanceUID[0]] === undefined) {
+						let flag = {
+							id: t.StudyInstanceUID[0],
+							is_selected: false,
+							show_details: false,
+							is_favorite: t.SumFavorites !== undefined ? t.SumFavorites[0] > 0 : false,
+							comment: t.SumComments !== undefined ? t.SumFavorites[0] > 0 : false
+						}							
+						commit('SET_FLAG', flag)						
 					}
-					commit('SET_FLAG', flag)
 					data.push(t)
 				}
 			})
 			commit('SET_STUDIES', { data: data, reset: reset })
 			commit('SET_STUDIES_FILTER_PARAMS', params)
 			commit('SET_REQUEST_PARAMS', requestParams)
+			_.forEach(state.flags, (flag,StudyInstanceUID) => {
+				if (flag.show_details) {
+					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null })
+				}
+			})
 		})
 	},
 
@@ -315,6 +323,7 @@ const mutations = {
 		_.forEach(studies, (d, i) => {
 			d.is_selected = false
 			d.is_favorite = false
+			d._showDetails = false
 			d.comment = null
 			d.view = 'series'
 			d.comments = []
@@ -322,6 +331,7 @@ const mutations = {
 				if (d.StudyInstanceUID[0] === StudyInstanceUID) {
 					studies[i].is_selected = flag.is_selected
 					studies[i].is_favorite = flag.is_favorite
+					studies[i]._showDetails = flag.show_details
 					studies[i].comment = flag.comment
 				}
 			})
@@ -373,6 +383,9 @@ const mutations = {
 	SET_TOTAL (state, value) {
 		state.totalItems = value
 	},
+	TOGGLE_DETAILS (state, params){
+		state.flags[params.StudyInstanceUID].show_details = !state.flags[params.StudyInstanceUID].show_details
+	},
 	// TODO: Improve if condition.
 	TOGGLE_FAVORITE (state, params) {
 		if (params.type === 'study' || params.type === 'album') {
@@ -415,6 +428,7 @@ const mutations = {
 			is_favorite: flag.is_favorite,
 			comment: flag.comment
 		}
+		if (flag.show_details !== undefined) state.flags[flag.id].show_details = flag.show_details
 	},
 	SET_REQUEST_PARAMS (state, request) {
 		state.request = request
