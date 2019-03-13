@@ -6,7 +6,6 @@ import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -95,8 +94,6 @@ public class SendingResource
             Sending.shareSeriesWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, seriesInstanceUID);
         } catch (UserNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        } catch (BadRequestException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" with "+username);
@@ -133,7 +130,7 @@ public class SendingResource
             } else {
                 Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
             }
-        } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
+        } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException e) {
             LOG.log(WARNING, "Unable to add series", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }

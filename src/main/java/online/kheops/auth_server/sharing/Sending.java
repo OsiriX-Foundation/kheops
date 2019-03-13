@@ -4,7 +4,6 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -247,12 +246,10 @@ public class Sending {
             final User targetUser = em.merge(getOrCreateUser(targetUsername));
 
             if (callingUser == targetUser) {
-                if(fromAlbumId == null) {
-                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "?inbox=true");
-                } else {
-                    throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "?album=" + fromAlbumId);
-
+                if(fromAlbumId != null) {
+                    appropriateStudy(callingUser, studyInstanceUID, fromAlbumId);
                 }
+                throw new BadRequestException("CallingUser ant targetUser are the same : it's for appropriate a study. But queryParam 'album' is null");
             }
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -277,7 +274,7 @@ public class Sending {
     }
 
     public static void shareSeriesWithUser(User callingUser, String targetUsername, String studyInstanceUID, String seriesInstanceUID)
-            throws UserNotFoundException, SeriesNotFoundException, BadRequestException{
+            throws UserNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -289,7 +286,7 @@ public class Sending {
             callingUser = em.merge(callingUser);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                throw new BadRequestException("CallingUser and target user are the same. Use PUT /studies/" + studyInstanceUID + "/series/" + seriesInstanceUID);
+                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID);
             }
 
             final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
@@ -314,7 +311,7 @@ public class Sending {
     }
 
     public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID)
-            throws SeriesForbiddenException {
+            throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -353,7 +350,7 @@ public class Sending {
                         tx.commit();
                         return;
                     } catch (SeriesNotFoundException e2) {
-                        throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                        throw new SeriesNotFoundException(e2.getMessage());
                     }
                 }
 
