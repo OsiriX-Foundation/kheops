@@ -37,7 +37,7 @@ const actions = {
 					str += '='
 					break
 				default:
-					throw new Error('Invalid token')
+					throw 'Invalid token'
 				}
 
 				str = (str + '===').slice(0, str.length + (str.length % 4))
