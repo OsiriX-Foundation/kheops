@@ -29,7 +29,9 @@
 		"addInbox": "Add to inbox",
 		"nostudy": "No studies found",
 		"studiessend": "studies send to inbox",
-    "confirmDelete": "Are you sure to delete ? "
+    "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
+    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+    "cancel": "Cancel"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -57,7 +59,8 @@
 		"addInbox": "Add to inbox",
     "nostudy": "Aucne étude trouvée",
 		"studiessend": "études envoyées dans votre boîte de réception",
-    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? "
+    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
+    "cancel": "Annuler"
 	}
 }
 </i18n>
@@ -183,7 +186,8 @@
       v-if="confirmDelete && selectedStudiesNb"
       :btn-primary-text="$t('delete')"
       :btn-danger-text="$t('cancel')"
-      :text="$t('confirmDelete')"
+      :text="$tc('confirmDelete',selectedStudiesNb,{count: selectedStudiesNb}) + ' ' +
+        $tc('confirmDeleteSeries', selectedSeriesNb, {count: selectedSeriesNb})"
       :method-confirm="deleteSelectedStudies"
       :method-cancel="() => confirmDelete=false"
     />
@@ -438,6 +442,7 @@
                     :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
                     :selected="serie.is_selected"
                     :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
+                    @selectedSeries="countSelectedSeries"
                   />
                 </div>
               </div>
@@ -660,7 +665,8 @@ export default {
 				expected: 0,
 				count: 0
 			},
-			confirmDelete: false
+			confirmDelete: false,
+			selectedSeriesNb: 0
 		}
 	},
 	computed: {
@@ -673,6 +679,7 @@ export default {
 			return this.studies.length
 		},
 		selectedStudiesNb () {
+			this.countSelectedSeries()
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
 		infoFavorites () {
@@ -742,7 +749,6 @@ export default {
 				}
 			}
 		}
-
 	},
 
 	created () {
@@ -932,8 +938,15 @@ export default {
 		},
 		setLoading (val) {
 			this.loading = val
-		}
-	}
+		},
+    countSelectedSeries () {
+      this.selectedSeriesNb = 0
+      this.studies.filter(s => { return s.is_selected }).forEach(function (study) {
+        if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
+        else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
+      }.bind(this))
+    }
+  }
 }
 
 </script>
