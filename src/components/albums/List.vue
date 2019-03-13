@@ -424,7 +424,7 @@ export default {
 			],
 			sortBy: 'created_time',
 			sortDesc: true,
-			limit: 10,
+			limit: 100,
 			optionsNbPages: [5, 10, 25, 50, 100],
 			showFilters: false,
 			filterTimeout: null,

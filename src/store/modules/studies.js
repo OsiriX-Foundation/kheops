@@ -13,7 +13,7 @@ const state = {
 	filterParams: {
 		sortBy: 'StudyDate',
 		sortDesc: true,
-		limit: 10,
+		limit: 100,
 		pageNb: 1,
 		filters: {
 			AccessionNumber: '',
