@@ -545,6 +545,20 @@
       >
         {{ data.item.StudyDate[0] | formatDate }}
       </template>
+
+      <template
+        slot="PatientID"
+        slot-scope="data"
+      >
+        {{ data.item.PatientID[0] }}
+      </template>
+
+      <template
+        slot="StudyDescription"
+        slot-scope="data"
+      >
+        {{ data.item.StudyDescription[0] }}
+      </template>
     </b-table>
     <div
       v-if="studies.length===0"
