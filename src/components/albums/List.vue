@@ -11,7 +11,7 @@
 		"Date": "date",
 		"LastEvent": "last event",
 		"selectednbalbums": "{count} album is selected | {count} albums are selected",
-		"share": "Send",
+		"share": "Invite user",
 		"permissionsfailed": "You can't send this albums : ",
     "send": "send",
     "nomodality": "No modality"
@@ -25,7 +25,7 @@
 		"Date": "date",
 		"LastEvent": "dern. evnt",
 		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-		"share": "Envoyer",
+		"share": "Inviter un utilisateur",
 		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
 		"send": "envoyés",
     "nomodality": "Aucune modalité"
@@ -286,6 +286,7 @@
             />
           </b-button>
           <b-form-checkbox
+            v-if="row.item.is_admin || row.item.add_user"
             v-model="row.item.is_selected"
             class="pt-2"
             inline
