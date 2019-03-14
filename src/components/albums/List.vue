@@ -79,7 +79,7 @@
           <span>
             <v-icon
               class="align-middle"
-              name="paper-plane"
+              name="user"
             />
           </span><br>
           {{ $t("share") }}
