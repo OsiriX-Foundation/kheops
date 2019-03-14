@@ -282,12 +282,12 @@ const actions = {
 	},
 	sendStudies (ctx, params) {
 		let promises = []
-
+		let queryParams = params.src === 'inbox' ? 'inbox=true' : 'album=' + params.src
 		_.forEach(params.StudyInstanceUIDs, StudyInstanceUID => {
-			promises.push(HTTP.put(`studies/${StudyInstanceUID}/users/${params.user}`))
+			promises.push(HTTP.put(`studies/${StudyInstanceUID}/users/${params.user}?${queryParams}`))
 		})
 		_.forEach(params.SeriesInstanceUIDs, s => {
-			promises.push(HTTP.put(`studies/${s.StudyInstanceUID}/series/${s.SeriesInstanceUID}/users/${params.user}`))
+			promises.push(HTTP.put(`studies/${s.StudyInstanceUID}/series/${s.SeriesInstanceUID}/users/${params.user}?${queryParams}`))
 		})
 
 		return axios.all(promises).then(results => {

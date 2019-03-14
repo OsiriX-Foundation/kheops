@@ -2,10 +2,10 @@
   <div class="card container-fluid my-3">
     <div class="card-body">
       <div class="row align-items-center">
-        <p class="col-sm-auto mb-1">
+        <p class="col-xl-auto mb-1">
           {{ text }}
         </p>
-        <div class="col-sm-auto mb-1">
+        <div class="col-auto col-sm-auto mb-1">
           <button
             type="button"
             class="btn btn-primary"
@@ -14,7 +14,7 @@
             {{ btnPrimaryText }}
           </button>
         </div>
-        <div class="col-sm-auto mb-1">
+        <div class="col-auto col-sm-auto mb-1">
           <button
             type="button"
             class="btn btn-danger"

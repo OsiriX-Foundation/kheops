@@ -29,7 +29,7 @@
 </i18n>
 
 <template>
-  <div class="container-fluid">
+  <div>
     <div
       v-if="loading"
       class="container"
@@ -43,7 +43,7 @@
       class="container"
     >
       <div class="row">
-        <div class="col-md-4 col-lg-6">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
           <h3>
             <v-icon
               name="book"
@@ -59,8 +59,8 @@
             />
           </h3>
         </div>
-        <div class="col-md-8 col-lg-6">
-          <nav class="nav nav-pills nav-fill float-md-right">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
+          <nav class="nav nav-pills nav-fill flex-column flex-lg-row text-center justify-content-lg-end">
             <a
               class="nav-link"
               :class="(view=='studies')?'active':''"
