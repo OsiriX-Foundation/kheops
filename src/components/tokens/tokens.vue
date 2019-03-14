@@ -330,14 +330,16 @@ export default {
 	computed: {
 		...mapGetters({
 			user: 'currentUser',
-			albums: 'albums'
+			album: 'album'
 		}),
 		tokens () {
+			let tokens = []
 			if (this.scope === 'user') {
-				return this.user.tokens
-			} else {
-				return _.filter(this.user.tokens, t => { return t.scope_type === 'album' && t.album.id === this.albumid })
+				tokens = this.user.tokens
+			} else if (this.scope === 'album') {
+				tokens = this.album.tokens
 			}
+			return tokens
 		},
 		class_revoke_btn () {
 			return mobiledetect.mobileAndTabletcheck() ? '' : 'revoke-btn'
@@ -374,7 +376,11 @@ export default {
 			this.view = 'list'
 		},
 		getTokens () {
-			this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
+			if (this.scope === 'album' && this.albumid) {
+				this.$store.dispatch('getAlbumTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
+			} else if (this.scope === 'user') {
+				this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
+			}
 		},
 		revoke (tokenId) {
 			this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {

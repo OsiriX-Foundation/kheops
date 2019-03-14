@@ -57,13 +57,16 @@ export default {
 	data () {
 		return {
 			view: 'general',
-			categories: ['general', 'user', 'token']
+			basicCategories: ['general', 'user']
 		}
 	},
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
+		}),
+		categories () {
+			return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories
+		}
 	},
 	watch: {
 		view () {

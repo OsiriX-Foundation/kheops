@@ -272,7 +272,7 @@
             variant="link"
             size="sm"
             class="mr-2"
-            @click.stop="row.toggleDetails"
+            @click.stop="toggleDetails(row)"
           >
             <v-icon
               v-if="row.detailsShowing"
@@ -507,8 +507,7 @@ export default {
 	methods: {
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
-
+				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
 					this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
@@ -530,7 +529,10 @@ export default {
 			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then(() => {
 			})
 		},
-
+		toggleDetails (row) {
+			this.$store.commit('TOGGLE_ALBUM_DETAILS', { albumId: row.item.album_id })
+			row.toggleDetails()
+		},
 		toggleFavorite (index) {
 			var vm = this
 			this.$store.dispatch('toggleFavorite', { type: this.$route.name, index: index }).then(res => {

@@ -133,6 +133,7 @@ export default {
 			this.loading = false
 			this.view = this.$route.query.view || 'studies'
 		})
+		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 	},
 	methods: {
 	}
