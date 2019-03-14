@@ -166,6 +166,7 @@ public class AlbumQueries {
 
             query.addOrderBy(getOrderBy(albumQueryParams.getOrderBy(), albumQueryParams.isDescending(), create));
 
+
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
             final Result<? extends Record> result;
@@ -324,13 +325,13 @@ public class AlbumQueries {
             else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
             else if (orderByParameter.equals("name")) ord = ALBUMS.NAME;
             else if (orderByParameter.equals("number_of_users")) {
-                ord = create.select(countDistinct(ALBUM_USER.PK)).asField();
+                ord = field("number_of_users");
             }
             else if (orderByParameter.equals("number_of_studies")) {
-                ord = create.select(countDistinct(EVENTS.PK)).asField();
+                ord = field("number_of_studies");
             }
             else if (orderByParameter.equals("number_of_comments")) {
-                ord = create.select(countDistinct(SERIES.STUDY_FK)).asField();
+                ord = field("number_of_comments");
             }
             else throw new BadQueryParametersException("sort: " + orderByParameter);
 

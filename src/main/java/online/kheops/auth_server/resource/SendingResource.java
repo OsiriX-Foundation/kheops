@@ -6,7 +6,6 @@ import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -46,11 +45,14 @@ public class SendingResource
                                        @QueryParam(ALBUM) String fromAlbumId,
                                        @QueryParam(INBOX) Boolean fromInbox) {
 
-        if ((fromAlbumId != null && fromInbox != null)) {
-            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} or {"+INBOX+"} not both").build();
+        if ((fromAlbumId == null && fromInbox == null) ||
+                (fromAlbumId != null && fromInbox != null && fromInbox)) {
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
-        fromInbox = fromInbox == null && fromAlbumId == null;
+        if(fromAlbumId != null) {
+            fromInbox = false;
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -62,6 +64,8 @@ public class SendingResource
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox);
         } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        } catch (BadRequestException e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
@@ -100,7 +104,7 @@ public class SendingResource
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                              @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
+                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
@@ -126,7 +130,7 @@ public class SendingResource
             } else {
                 Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
             }
-        } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesForbiddenException e) {
+        } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException e) {
             LOG.log(WARNING, "Unable to add series", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -288,11 +292,14 @@ public class SendingResource
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox) {
 
-        if ((fromAlbumId != null && fromInbox != null)) {
-            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+        if ((fromAlbumId == null && fromInbox == null) ||
+                (fromAlbumId != null && fromInbox != null && fromInbox)) {
+            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
-        fromInbox = fromInbox != null;
+        if(fromAlbumId != null) {
+            fromInbox = false;
+        }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 

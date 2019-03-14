@@ -4,13 +4,13 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.series.SeriesForbiddenException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -235,9 +235,9 @@ public class Sending {
     }
 
     public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException, BadRequestException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -246,8 +246,11 @@ public class Sending {
             final User targetUser = em.merge(getOrCreateUser(targetUsername));
 
             if (callingUser == targetUser) {
-                //return Response.status(Response.Status.BAD_REQUEST).entity("Can't send a study to yourself").build();
-                return;
+                if(fromAlbumId != null) {
+                    appropriateStudy(callingUser, studyInstanceUID, fromAlbumId);
+                    return;
+                }
+                throw new BadRequestException("CallingUser ant targetUser are the same : it's for appropriate a study. But queryParam 'album' is null");
             }
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -284,8 +287,7 @@ public class Sending {
             callingUser = em.merge(callingUser);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                //return Response.status(Response.Status.FORBIDDEN).entity("Use studies/{StudyInstanceUID}/series/{SeriesInstanceUID} for request access to a new series").build();
-                return;
+                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID);
             }
 
             final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
@@ -310,7 +312,7 @@ public class Sending {
     }
 
     public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID)
-            throws SeriesForbiddenException {
+            throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -349,7 +351,7 @@ public class Sending {
                         tx.commit();
                         return;
                     } catch (SeriesNotFoundException e2) {
-                        throw new SeriesForbiddenException("TODO the series already exist");//TODO
+                        throw new SeriesNotFoundException(e2.getMessage());
                     }
                 }
 
@@ -453,7 +455,7 @@ public class Sending {
 
     public static  List<Series> getSeriesList(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, EntityManager em)
             throws AlbumNotFoundException , SeriesNotFoundException{
-        List<Series> availableSeries;
+        final List<Series> availableSeries;
 
         if (fromAlbumId != null) {
             final Album callingAlbum = getAlbum(fromAlbumId, em);
