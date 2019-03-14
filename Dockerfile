@@ -1,4 +1,4 @@
-FROM nginx:stable-alpine
+FROM nginx:stable
 
 ENV SECRET_FILE_PATH=/run/secrets
 
