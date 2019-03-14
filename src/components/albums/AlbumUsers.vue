@@ -15,7 +15,7 @@ Props :
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"usernotsettoadmin": "User no longer has admin rights",
 		"usersettoadmin": "User has admin rights",
-		"warningtoggleadmin": "Warning! You are the owner of this album: "
+		"warningtoggleadmin": "Warning! do you really want to reovke your admin role? "
 	},
 	"fr": {
 		"username": "Utilisateur",
@@ -24,7 +24,7 @@ Props :
 		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
 		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
 		"usersettoadmin": "L'utilisateur a des droits admin",
-		"warningtoggleadmin": "Attention ! Vous êtes le propriétaire de cet album :  "
+		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  "
 	}
 }
 </i18n>
