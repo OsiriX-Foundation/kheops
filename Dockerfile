@@ -20,7 +20,7 @@ RUN chmod +x /docker-entrypoint.sh
 EXPOSE 3000
 
 #elastic
-COPY metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
+COPY docker/metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
 
 RUN apt-get update
 RUN apt-get install -y curl
@@ -31,11 +31,11 @@ RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbea
 RUN dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
 
-COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
+COPY docker/metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
 
 #RUN metricbeat modules enable nginx
-COPY metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
+COPY docker/metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
 RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 
@@ -45,11 +45,11 @@ RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${
 RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 
-COPY filebeat.yml /etc/filebeat/filebeat.yml
+COPY docker/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
 #RUN filebeat modules enable nginx
-COPY filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
+COPY docker/filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
 
 
