@@ -91,7 +91,7 @@
           {{ $t("send") }}
         </button>
         <b-dropdown
-          v-if="!filters.album_id || (album.send_series || album.is_admin)"
+          v-if="(!filters.album_id || (album.send_series || album.is_admin)) && allowedAlbums.length > 0"
           variant="link"
           size="sm"
           no-caret
