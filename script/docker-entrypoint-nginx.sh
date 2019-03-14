@@ -91,7 +91,7 @@ if ! [ -z "$KHEOPS_UI_ENABLE_ELASTIC" ]; then
           sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
         done
 
-        if [[ -z $KHEOPS_UI_ELASTIC_NAME ]]; then
+        if [ -z $KHEOPS_UI_ELASTIC_NAME ]; then
           echo "Missing KHEOPS_UI_ELASTIC_NAME environment variable"
           missing_env_var_secret=true
         else
@@ -99,7 +99,7 @@ if ! [ -z "$KHEOPS_UI_ENABLE_ELASTIC" ]; then
            sed -i "s|\${elastic_name}|$KHEOPS_UI_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_name}|$KHEOPS_UI_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
         fi
-        if [[ -z $KHEOPS_UI_ELASTIC_TAGS ]]; then
+        if [ -z $KHEOPS_UI_ELASTIC_TAGS ]; then
           echo "Missing KHEOPS_UI_ELASTIC_TAGS environment variable"
           missing_env_var_secret=true
         else
@@ -109,7 +109,7 @@ if ! [ -z "$KHEOPS_UI_ENABLE_ELASTIC" ]; then
         fi
 
         #if missing env var or secret => exit
-        if [[ $missing_env_var_secret = true ]]; then
+        if [ $missing_env_var_secret = true ]; then
           exit 1
         else
            echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
