@@ -784,7 +784,7 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
