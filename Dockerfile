@@ -7,7 +7,10 @@ COPY . .
 COPY .env.prod .env
 RUN npm run build
 
-FROM nginx:stable-alpine as production-stage
+FROM nginx:stable as production-stage
+
+ENV SECRET_FILE_PATH=/run/secrets
+
 COPY --from=build-stage /app/script/ui.conf /etc/nginx/conf.d/ui.conf
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY --from=build-stage /app/src/assets /usr/share/nginx/html/assets
@@ -20,8 +23,7 @@ RUN chmod +x /docker-entrypoint.sh
 EXPOSE 3000
 
 #elastic
-COPY docker/metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
-
+COPY --from=build-stage /app/docker/metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
 RUN apt-get update
 RUN apt-get install -y curl
 
@@ -31,11 +33,11 @@ RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbea
 RUN dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
 
-COPY docker/metricbeat.yml /etc/metricbeat/metricbeat.yml
+COPY --from=build-stage /app/docker/metricbeat.yml /etc/metricbeat/metricbeat.yml
 RUN chmod go-w /etc/metricbeat/metricbeat.yml
 
 #RUN metricbeat modules enable nginx
-COPY docker/metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
+COPY --from=build-stage /app/docker/metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
 RUN chmod go-w /etc/metricbeat/modules.d/nginx.yml
 
 
@@ -45,11 +47,11 @@ RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${
 RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 
-COPY docker/filebeat.yml /etc/filebeat/filebeat.yml
+COPY --from=build-stage /app/docker/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
 #RUN filebeat modules enable nginx
-COPY docker/filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
+COPY --from=build-stage /app/docker/filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
 
 

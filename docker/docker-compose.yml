@@ -1,10 +1,19 @@
 version: '3.1'
 services:
   kheops-ui:
-    image: kheops/ui:latest
+    image: kheops-ui/test:latest
     #image: osirixfoundation/kheops-ui-test:latest
     container_name: kheops-ui
     ports:
       - "80:3000"
     env_file: docker-compose.env
     restart: on-failure
+    secrets:
+      - elastic_cloud_auth
+      - elastic_cloud_id
+
+secrets:
+  elastic_cloud_auth:
+    file: secrets/elastic_cloud_auth
+  elastic_cloud_id:
+    file: secrets/elastic_cloud_id

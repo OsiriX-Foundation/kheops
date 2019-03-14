@@ -59,12 +59,11 @@ sed -i "s|\${kheops_api_url}|$api|g" $FILENAME
 sed -i "s|\${kheops_viewer_url}|$KHEOPS_VIEWER_URL|g" $FILENAME
 
 chmod a+w /etc/nginx/conf.d/ui.conf
-
 #######################################################################################
 #ELASTIC SEARCH
 
-if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
-    if [ "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" = true ]; then
+if ! [ -z "$KHEOPS_UI_ENABLE_ELASTIC" ]; then
+    if [ "$KHEOPS_UI_ENABLE_ELASTIC" = true ]; then
         missing_env_var_secret=false
 
         #Verify secrets
@@ -92,21 +91,21 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
           sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
         done
 
-        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_NAME ]]; then
-          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_NAME environment variable"
+        if [[ -z $KHEOPS_UI_ELASTIC_NAME ]]; then
+          echo "Missing KHEOPS_UI_ELASTIC_NAME environment variable"
           missing_env_var_secret=true
         else
-           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_NAME \e[92mOK\e[0m"
-           sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
-           sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
+           echo -e "environment variable KHEOPS_UI_ELASTIC_NAME \e[92mOK\e[0m"
+           sed -i "s|\${elastic_name}|$KHEOPS_UI_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_name}|$KHEOPS_UI_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
         fi
-        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_TAGS ]]; then
-          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_TAGS environment variable"
+        if [[ -z $KHEOPS_UI_ELASTIC_TAGS ]]; then
+          echo "Missing KHEOPS_UI_ELASTIC_TAGS environment variable"
           missing_env_var_secret=true
         else
-           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
-           sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
-           sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
+           echo -e "environment variable KHEOPS_UI_ELASTIC_TAGS \e[92mOK\e[0m"
+           sed -i "s|\${elastic_tags}|$KHEOPS_UI_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_tags}|$KHEOPS_UI_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
 
         #if missing env var or secret => exit
@@ -127,7 +126,7 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
         echo "Ending setup METRICBEAT and FILEBEAT"
     fi
 else
-    echo "[INFO] : Missing KHEOPS_REVERSE_PPROXY_ENABLE_ELASTIC environment variable. Elastic is not enable."
+    echo "[INFO] : Missing KHEOPS_UI_ENABLE_ELASTIC environment variable. Elastic is not enable."
 fi
 #######################################################################################
 
