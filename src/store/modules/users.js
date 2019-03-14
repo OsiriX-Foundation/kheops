@@ -123,7 +123,9 @@ const actions = {
 		})
 		return HTTP.post('/capabilities', query, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			if (res.status === 201) {
-				commit('SET_TOKEN', res.data)
+				let token = res.data
+				commit('SET_TOKEN', token)
+				if (token.scope_type === 'album') commit('SET_ALBUM_TOKEN', token)
 			}
 			return res
 		})
