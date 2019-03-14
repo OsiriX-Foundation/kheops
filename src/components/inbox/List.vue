@@ -29,7 +29,9 @@
 		"addInbox": "Add to inbox",
 		"nostudy": "No studies found",
 		"studiessend": "studies send to inbox",
-    "confirmDelete": "Are you sure to delete ? "
+    "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
+    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+    "cancel": "Cancel"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -57,7 +59,8 @@
 		"addInbox": "Add to inbox",
     "nostudy": "Aucne étude trouvée",
 		"studiessend": "études envoyées dans votre boîte de réception",
-    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? "
+    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
+    "cancel": "Annuler"
 	}
 }
 </i18n>
@@ -65,7 +68,6 @@
 <template>
   <div
     v-if="!loading"
-    class="container-fluid"
   >
     <!--button Study selected -->
     <div class="container-fluid my-3 selection-button-container">
@@ -89,7 +91,7 @@
           {{ $t("send") }}
         </button>
         <b-dropdown
-          v-if="!filters.album_id || (album.send_series || album.is_admin)"
+          v-if="(!filters.album_id || (album.send_series || album.is_admin)) && allowedAlbums.length > 0"
           variant="link"
           size="sm"
           no-caret
@@ -183,7 +185,8 @@
       v-if="confirmDelete && selectedStudiesNb"
       :btn-primary-text="$t('delete')"
       :btn-danger-text="$t('cancel')"
-      :text="$t('confirmDelete')"
+      :text="$tc('confirmDelete',selectedStudiesNb,{count: selectedStudiesNb}) + ' ' +
+        $tc('confirmDeleteSeries', selectedSeriesNb, {count: selectedSeriesNb})"
       :method-confirm="deleteSelectedStudies"
       :method-cancel="() => confirmDelete=false"
     />
@@ -438,6 +441,7 @@
                     :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
                     :selected="serie.is_selected"
                     :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
+                    @selectedSeries="countSelectedSeries"
                   />
                 </div>
               </div>
@@ -539,6 +543,20 @@
         slot-scope="data"
       >
         {{ data.item.StudyDate[0] | formatDate }}
+      </template>
+
+      <template
+        slot="PatientID"
+        slot-scope="data"
+      >
+        {{ data.item.PatientID[0] }}
+      </template>
+
+      <template
+        slot="StudyDescription"
+        slot-scope="data"
+      >
+        {{ data.item.StudyDescription[0] }}
       </template>
     </b-table>
     <div
@@ -660,7 +678,8 @@ export default {
 				expected: 0,
 				count: 0
 			},
-			confirmDelete: false
+			confirmDelete: false,
+			selectedSeriesNb: 0
 		}
 	},
 	computed: {
@@ -673,6 +692,7 @@ export default {
 			return this.studies.length
 		},
 		selectedStudiesNb () {
+			this.countSelectedSeries()
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
 		infoFavorites () {
@@ -742,7 +762,6 @@ export default {
 				}
 			}
 		}
-
 	},
 
 	created () {
@@ -765,7 +784,7 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
@@ -783,12 +802,15 @@ export default {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 		},
 		showSeries (row) {
-			if (!row.detailsShowing) {
+			if (!row.item.detailsShowing) {
 				this.$store.dispatch('getSeries', { StudyInstanceUID: row.item.StudyInstanceUID[0], album_id: this.filters.album_id })
 			}
+			this.toggleDetails(row)
+		},
+		toggleDetails (row) {
+			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.item.StudyInstanceUID[0] })
 			row.toggleDetails()
 		},
-
 		toggleFavorite (study) {
 			var vm = this
 			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
@@ -853,9 +875,9 @@ export default {
 					})
 				}
 			})
-
+			let src = this.filters.album_id ? this.filters.album_id : 'inbox'
 			if (data.length) {
-				this.$store.dispatch('putStudiesInAlbum', { data: data }).then(() => {
+				this.$store.dispatch('putStudiesInAlbum', { data: data, src: src }).then(() => {
 					this.$snotify.success(this.$t('studyputtoalbum'))
 				})
 			}
@@ -886,8 +908,8 @@ export default {
 				}
 			})
 			if (studyIds.length || seriesIds.length) {
-				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub }).then(res => {
-					this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}`)
+				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub, src: this.filters.album_id ? this.filters.album_id : 'inbox' }).then(res => {
+					this.$snotify.success(`${studies.length} ${this.$t('studiessharedsuccess')}`)
 					if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
 				})
 			}
@@ -932,6 +954,13 @@ export default {
 		},
 		setLoading (val) {
 			this.loading = val
+		},
+		countSelectedSeries () {
+			this.selectedSeriesNb = 0
+			this.studies.filter(s => { return s.is_selected }).forEach(function (study) {
+				if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
+				else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
+			}.bind(this))
 		}
 	}
 }

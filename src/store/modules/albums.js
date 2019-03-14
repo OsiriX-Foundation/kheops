@@ -94,12 +94,14 @@ const actions = {
 				let album = {}
 				_.forEach(d, (v, k) => {
 					album[k] = v
+					let showDetails = (state.flags[album.album_id] !== undefined) ? state.flags[album.album_id].show_details : false
 					if (album.album_id !== undefined) {
 						if (state.flags[album.album_id] === undefined) {
 							let flag = {
 								id: album.album_id,
 								is_selected: false,
 								is_favorite: d.is_favorite,
+								show_details: showDetails,
 								comment: false
 							}
 							commit('SET_FLAG', flag)
@@ -158,11 +160,12 @@ const actions = {
 
 	putStudiesInAlbum ({ commit }, params) {
 		let promises = []
+		let queryParams = params.src === 'inbox' ? '?inbox=true' : '?album=' + params.src
 		_.forEach(params.data, d => {
 			if (d.series_id) {
-				promises.push(HTTP.put('studies/' + d.study_id + '/series/' + d.series_id + '/albums/' + d.album_id))
+				promises.push(HTTP.put('studies/' + d.study_id + '/series/' + d.series_id + '/albums/' + d.album_id + queryParams))
 			} else {
-				promises.push(HTTP.put('studies/' + d.study_id + '/albums/' + d.album_id))
+				promises.push(HTTP.put('studies/' + d.study_id + '/albums/' + d.album_id + queryParams))
 			}
 		})
 		axios.all(promises).then(results => {
@@ -183,12 +186,14 @@ const mutations = {
 		_.forEach(albums, (d, i) => {
 			d.is_selected = false
 			d.is_favorite = false
+			d._showDetails = false
 			d.comment = null
 
 			_.forEach(state.flags, (flag, albumId) => {
 				if (d.album_id === albumId) {
 					albums[i].is_selected = flag.is_selected
 					albums[i].is_favorite = flag.is_favorite
+					albums[i]._showDetails = flag.show_details
 					albums[i].comment = flag.comment
 				}
 			})
@@ -221,6 +226,9 @@ const mutations = {
 	},
 	SET_TOTAL (state, value) {
 		state.totalItems = value
+	},
+	TOGGLE_ALBUM_DETAILS (state, params) {
+		state.flags[params.albumId].show_details = !state.flags[params.albumId].show_details
 	},
 	TOGGLE_FAVORITE (state, params) {
 		if (params.type === 'albums') {

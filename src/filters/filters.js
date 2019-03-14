@@ -3,21 +3,21 @@ import moment from 'moment'
 
 Vue.filter('formatDate', value => {
 	if (value) {
-		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY') : 'Invalide Date'
+		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY') : 'Invalid Date'
 	}
 	return value
 })
 
 Vue.filter('formatDateTime', value => {
 	if (value) {
-		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY HH:mm') : 'Invalide Date'
+		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY HH:mm') : 'Invalid Date'
 	}
 	return value
 })
 
 Vue.filter('formatTime', value => {
 	if (value) {
-		return moment(String(value)).isValid() ? moment(String(value)).format('HH:mm') : 'Invalide Date'
+		return moment(String(value)).isValid() ? moment(String(value)).format('HH:mm') : 'Invalid Date'
 	}
 	return value
 })

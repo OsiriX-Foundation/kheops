@@ -11,7 +11,7 @@
 		"Date": "date",
 		"LastEvent": "last event",
 		"selectednbalbums": "{count} album is selected | {count} albums are selected",
-		"share": "Send",
+		"share": "Invite user",
 		"permissionsfailed": "You can't send this albums : ",
     "send": "send",
     "nomodality": "No modality"
@@ -25,7 +25,7 @@
 		"Date": "date",
 		"LastEvent": "dern. evnt",
 		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-		"share": "Envoyer",
+		"share": "Inviter un utilisateur",
 		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
 		"send": "envoyés",
     "nomodality": "Aucune modalité"
@@ -46,7 +46,10 @@
           active-class="active"
           style="display: inline"
         >
-          <v-icon name="plus" />{{ $t('newalbum') }}
+          <v-icon
+            name="plus"
+            class="mr-2"
+          />{{ $t('newalbum') }}
         </router-link>
         <button
           type="button"
@@ -79,7 +82,7 @@
           <span>
             <v-icon
               class="align-middle"
-              name="paper-plane"
+              name="user"
             />
           </span><br>
           {{ $t("share") }}
@@ -269,7 +272,7 @@
             variant="link"
             size="sm"
             class="mr-2"
-            @click.stop="row.toggleDetails"
+            @click.stop="toggleDetails(row)"
           >
             <v-icon
               v-if="row.detailsShowing"
@@ -283,6 +286,7 @@
             />
           </b-button>
           <b-form-checkbox
+            v-if="row.item.is_admin || row.item.add_user"
             v-model="row.item.is_selected"
             class="pt-2"
             inline
@@ -503,8 +507,7 @@ export default {
 	methods: {
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
-
+				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
 					this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
@@ -526,7 +529,10 @@ export default {
 			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then(() => {
 			})
 		},
-
+		toggleDetails (row) {
+			this.$store.commit('TOGGLE_ALBUM_DETAILS', { albumId: row.item.album_id })
+			row.toggleDetails()
+		},
 		toggleFavorite (index) {
 			var vm = this
 			this.$store.dispatch('toggleFavorite', { type: this.$route.name, index: index }).then(res => {

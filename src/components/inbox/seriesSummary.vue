@@ -154,7 +154,9 @@ export default {
 				if (studyIndex > -1) {
 					let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
 					if (seriesIndex > -1) {
-						this.$store.dispatch('toggleSelected', { type: 'series', index: studyIndex + ':' + seriesIndex, selected: newValue })
+						this.$store.dispatch('toggleSelected', { type: 'series', index: studyIndex + ':' + seriesIndex, selected: newValue }).then(res => {
+							this.$emit('selectedSeries')
+						})
 					}
 				}
 			}
