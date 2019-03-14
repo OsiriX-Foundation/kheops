@@ -94,6 +94,7 @@
                     class="form-control form-control-sm"
                     placeholder="email"
                     aria-label="Email"
+                    @keydown.enter.prevent="checkUser"
                   >
                   <div class="input-group-append">
                     <button

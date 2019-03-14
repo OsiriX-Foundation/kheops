@@ -75,7 +75,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            <router-link :to="`/albums/${token.album.id}`">
+            <router-link :to="`/albums/${token.album.id}?view=studies`">
               {{ token.album.name }}
             </router-link>
           </dd>

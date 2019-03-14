@@ -46,7 +46,10 @@
           active-class="active"
           style="display: inline"
         >
-          <v-icon name="plus" />{{ $t('newalbum') }}
+          <v-icon
+            name="plus"
+            class="mr-2"
+          />{{ $t('newalbum') }}
         </router-link>
         <button
           type="button"
