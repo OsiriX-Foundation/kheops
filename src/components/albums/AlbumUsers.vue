@@ -15,7 +15,8 @@ Props :
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"usernotsettoadmin": "User no longer has admin rights",
 		"usersettoadmin": "User has admin rights",
-		"warningtoggleadmin": "Warning! do you really want to reovke your admin role? "
+		"warningtoggleadmin": "Warning! do you really want to reovke your admin role? ",
+		"remove": "Remove user"
 	},
 	"fr": {
 		"username": "Utilisateur",
@@ -24,7 +25,8 @@ Props :
 		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
 		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
 		"usersettoadmin": "L'utilisateur a des droits admin",
-		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  "
+		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
+		"remove": "Retirer l'utilisateur"
 	}
 }
 </i18n>
@@ -71,7 +73,7 @@ Props :
                 style="margin-left: 20px"
                 @click.stop="deleteUser(user)"
               >
-                {{ $t('delete') }}
+                {{ $t('remove') }}
                 <v-icon name="trash" />
               </a>
             </div>
