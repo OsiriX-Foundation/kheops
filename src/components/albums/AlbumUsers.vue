@@ -43,7 +43,11 @@ Props :
           :key="user.user_name"
         >
           <td>
-            {{ user.user_name }} <span v-if="user.is_admin">
+            {{ user.user_name }}
+            <span
+              v-if="user.is_admin"
+              style="color:#13B98B"
+            >
               (Admin)
             </span>
           </td>
@@ -60,12 +64,14 @@ Props :
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                <v-icon	name="user" />
               </a> <a
                 v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
                 class="text-danger"
                 style="margin-left: 20px"
                 @click.stop="deleteUser(user)"
               >
+                {{ $t('delete') }}
                 <v-icon name="trash" />
               </a>
             </div>

@@ -729,7 +729,7 @@ export default {
 			return _.filter(this.albums, a => { return (a.add_series || a.is_admin) && this.filters.album_id !== a.album_id })
 		},
 		OS () {
-      return navigator.platform
+			return navigator.platform
 		}
 	},
 
