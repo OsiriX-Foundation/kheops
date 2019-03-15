@@ -978,7 +978,7 @@ export default {
 		},
 		openOsiriX (StudyInstanceUID) {
 			let url = `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application/zip`
-			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, 'OsriXViewer')
+			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self')
 		}
 	}
 }
