@@ -50,7 +50,7 @@ public class Keycloak {
         if(user.contains("@")) {
             final Response response;
             try {
-                response = ClientBuilder.newClient().target(usersUri).queryParam("email", user).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+                response = ClientBuilder.newClient().target(usersUri).queryParam("email", user.toLowerCase()).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
             }
