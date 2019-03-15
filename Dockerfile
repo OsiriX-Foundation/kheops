@@ -2,14 +2,13 @@ FROM nginx:stable as builder
 
 COPY . .
 
-RUN apt-get update
-RUN apt-get install -y curl
-
 ENV METRICBEAT_VERSION 6.6.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb
-
 ENV FILEBEAT_VERSION 6.6.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
+
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb && \
+    curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
 #########################################################################################
 FROM nginx:stable
 
