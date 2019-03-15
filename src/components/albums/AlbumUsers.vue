@@ -87,7 +87,9 @@ Props :
               </div>
             </div>
             <div v-if="confirmResetAdmin==user.user_name">
-              <span class="text-danger mr-2">{{ $t("warningtoggleadmin") }}</span>
+              <span class="text-danger mr-2">
+                {{ $t("warningtoggleadmin") }}
+              </span>
               <div class="btn-group">
                 <button
                   type="button"
