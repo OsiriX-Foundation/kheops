@@ -5,7 +5,7 @@
 		"description": "Description",
 		"seriesdate": "Series date",
 		"seriestime": "Series time",
-		"openviewer": "Open viewer",
+		"openviewer": "Open OHIF viewer",
 		"applicationentity": "Application entity"
 	},
 	"fr": {
@@ -14,7 +14,7 @@
 		"description": "Description",
 		"seriesdate": "Date de la série",
 		"seriestime": "Heure de la série",
-		"openviewer": "Ouvrir une visionneuse",
+		"openviewer": "Ouvrir la visionneuse OHIF",
 		"applicationentity": "Application entity"
 	}
 }

@@ -531,6 +531,15 @@
                   name="download"
                 />
               </a>
+              <span
+                v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
+                @click="openOsiriX(row.item.StudyInstanceUID)"
+              >
+                <osirix-icon
+                  width="22px"
+                  height="22px"
+                />
+              </span>
               <!--
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
 							-->
@@ -596,12 +605,13 @@ import Vue from 'vue'
 // https://github.com/greyby/vue-spinner
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
+import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon },
 	props: {
 		album: {
 			type: Object,
@@ -717,6 +727,9 @@ export default {
 		},
 		allowedAlbums () {
 			return _.filter(this.albums, a => { return (a.add_series || a.is_admin) && this.filters.album_id !== a.album_id })
+		},
+		OS () {
+      return navigator.platform
 		}
 	},
 
@@ -962,6 +975,10 @@ export default {
 				if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
 				else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
 			}.bind(this))
+		},
+		openOsiriX (StudyInstanceUID) {
+			let url = `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application/zip`
+			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, 'OsriXViewer')
 		}
 	}
 }
