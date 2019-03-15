@@ -102,6 +102,7 @@
       :sort-by.sync="sortBy"
       :no-local-sorting="true"
       :dark="false"
+      :no-sort-reset="true"
       @sort-changed="sortingChanged"
       @row-clicked="selectAlbum"
     >
