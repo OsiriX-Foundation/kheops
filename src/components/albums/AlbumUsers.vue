@@ -15,7 +15,7 @@ Props :
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"usernotsettoadmin": "User no longer has admin rights",
 		"usersettoadmin": "User has admin rights",
-		"warningtoggleadmin": "Warning! do you really want to reovke your admin role? ",
+		"warningtoggleadmin": "Warning! do you really want to revoke your admin role? ",
 		"remove": "Remove user"
 	},
 	"fr": {
