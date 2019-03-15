@@ -204,6 +204,7 @@
       :sort-desc="true"
       :sort-by.sync="sortBy"
       :no-local-sorting="true"
+      :no-sort-reset="true"
       @sort-changed="sortingChanged"
     >
       <template
