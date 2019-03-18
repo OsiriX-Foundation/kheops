@@ -12,25 +12,26 @@
 		"PatientName": "Patient Name",
 		"Modality": "Modality",
 		"StudyDate": "Study Date",
-		"AccessionNumber": "Accession #",
+		"StudyDescription": "Study description",
 		"PatientID": "Patient ID",
 		"filter": "Filter",
 		"fromDate": "From",
 		"toDate": "To",
 		"studyputtoalbum": "Studies successfully added to the album",
 		"includeseriesfromalbum": "Include series in albums",
-		"MRN": "MRN",
 		"send": "Send",
 		"delete": "Delete",
 		"comments": "comments",
 		"series": "series",
 		"study": "study",
-		"studiessharedsuccess": "studies shared successfully",
-		"studiessharederror": "studies could not be shared",
+		"studiessharedsuccess": "studies sent successfully",
+		"studiessharederror": "studies could not be sent",
 		"addInbox": "Add to inbox",
 		"nostudy": "No studies found",
 		"studiessend": "studies send to inbox",
-    "confirmDelete": "Are you sure to delete ? "
+    "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
+    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+    "cancel": "Cancel"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -41,25 +42,25 @@
 		"PatientName": "Nom du patient",
 		"Modality": "Modalité",
 		"StudyDate": "Date de l'étude",
-		"AccessionNumber": "# accession",
-		"PatientID": "ID patient",
+		"StudyDescription": "Description de l'étude",
+		"PatientID": "Patient ID",
 		"filter": "Filtrer",
 		"fromDate": "De",
 		"toDate": "A",
 		"studyputtoalbum": "L'étude a été enregistrée dans l'album avec succès",
 		"includeseriesfromalbum": "inclure des séries présentes dans les albums",
-		"MRN": "MRN",
 		"send": "Envoyer",
 		"delete": "Supprimer",
 		"comments": "commentaire",
 		"series": "séries",
 		"study": "étude",
-		"studiessharedsuccess": "études ont été partagées avec succès",
-		"studiessharederror": "études n'ont pas pu être partagée",
+		"studiessharedsuccess": "études ont été envoyées avec succès",
+		"studiessharederror": "études n'ont pas pu être envoyée",
 		"addInbox": "Add to inbox",
     "nostudy": "Aucne étude trouvée",
 		"studiessend": "études envoyées dans votre boîte de réception",
-    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? "
+    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
+    "cancel": "Annuler"
 	}
 }
 </i18n>
@@ -67,7 +68,6 @@
 <template>
   <div
     v-if="!loading"
-    class="container-fluid"
   >
     <!--button Study selected -->
     <div class="container-fluid my-3 selection-button-container">
@@ -77,7 +77,7 @@
       >
         <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
         <button
-          v-if="!filters.album_id"
+          v-if="!filters.album_id || (album.is_admin || album.send_series)"
           type="button"
           class="btn btn-link btn-sm text-center"
           @click.stop="form_send_study=!form_send_study"
@@ -91,7 +91,7 @@
           {{ $t("send") }}
         </button>
         <b-dropdown
-          v-if="!filters.album_id || (album.send_series || album.is_admin)"
+          v-if="(!filters.album_id || (album.send_series || album.is_admin)) && allowedAlbums.length > 0"
           variant="link"
           size="sm"
           no-caret
@@ -185,7 +185,8 @@
       v-if="confirmDelete && selectedStudiesNb"
       :btn-primary-text="$t('delete')"
       :btn-danger-text="$t('cancel')"
-      :text="$t('confirmDelete')"
+      :text="$tc('confirmDelete',selectedStudiesNb,{count: selectedStudiesNb}) + ' ' +
+        $tc('confirmDeleteSeries', selectedSeriesNb, {count: selectedSeriesNb})"
       :method-confirm="deleteSelectedStudies"
       :method-cancel="() => confirmDelete=false"
     />
@@ -203,6 +204,7 @@
       :sort-desc="true"
       :sort-by.sync="sortBy"
       :no-local-sorting="true"
+      :no-sort-reset="true"
       @sort-changed="sortingChanged"
     >
       <template
@@ -269,7 +271,7 @@
       </template>
 
       <template
-        slot="HEAD_AccessionNumber"
+        slot="HEAD_StudyDescription"
         slot-scope="data"
       >
         <div
@@ -277,7 +279,7 @@
           @click.stop=""
         >
           <input
-            v-model="filters.AccessionNumber"
+            v-model="filters.StudyDescription"
             type="search"
             class="form-control form-control-sm"
             :placeholder="$t('filter')"
@@ -440,6 +442,7 @@
                     :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
                     :selected="serie.is_selected"
                     :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
+                    @selectedSeries="countSelectedSeries"
                   />
                 </div>
               </div>
@@ -528,6 +531,15 @@
                   name="download"
                 />
               </a>
+              <span
+                v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
+                @click="openOsiriX(row.item.StudyInstanceUID)"
+              >
+                <osirix-icon
+                  width="22px"
+                  height="22px"
+                />
+              </span>
               <!--
 							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
 							-->
@@ -541,6 +553,20 @@
         slot-scope="data"
       >
         {{ data.item.StudyDate[0] | formatDate }}
+      </template>
+
+      <template
+        slot="PatientID"
+        slot-scope="data"
+      >
+        {{ data.item.PatientID[0] }}
+      </template>
+
+      <template
+        slot="StudyDescription"
+        slot-scope="data"
+      >
+        {{ data.item.StudyDescription[0] }}
       </template>
     </b-table>
     <div
@@ -579,12 +605,13 @@ import Vue from 'vue'
 // https://github.com/greyby/vue-spinner
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
+import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon },
 	props: {
 		album: {
 			type: Object,
@@ -614,23 +641,23 @@ export default {
 				},
 				{
 					key: 'PatientID',
-					label: 'MRN',
+					label: 'PatientID',
 					sortable: true,
-					thClass: 'd-none d-md-table-cell',
-					tdClass: 'd-none d-md-table-cell'
+					thClass: 'd-none d-md-table-cell d-lg-table-cell',
+					tdClass: 'd-none d-md-table-cell d-lg-table-cell'
 				},
 				{
-					key: 'AccessionNumber',
-					label: 'AccessionNumber',
-					sortable: true,
+					key: 'StudyDescription',
+					label: 'StudyDescription',
+					sortable: false,
 					thClass: 'd-none d-lg-table-cell',
 					tdClass: 'd-none d-lg-table-cell'
 				},
 				{
 					key: 'StudyDate',
 					label: 'StudyDate',
-					thClass: 'd-none d-sm-table-cell',
-					tdClass: 'd-none d-sm-table-cell',
+					thClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
+					tdClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
 					sortable: true
 				},
 				{
@@ -650,7 +677,7 @@ export default {
 			filters: {
 				PatientName: '',
 				PatientID: '',
-				AccessionNumber: '',
+				StudyDescription: '',
 				StudyDateFrom: '',
 				StudyDateTo: '',
 				ModalitiesInStudy: '',
@@ -662,7 +689,8 @@ export default {
 				expected: 0,
 				count: 0
 			},
-			confirmDelete: false
+			confirmDelete: false,
+			selectedSeriesNb: 0
 		}
 	},
 	computed: {
@@ -675,6 +703,7 @@ export default {
 			return this.studies.length
 		},
 		selectedStudiesNb () {
+			this.countSelectedSeries()
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
 		infoFavorites () {
@@ -698,6 +727,9 @@ export default {
 		},
 		allowedAlbums () {
 			return _.filter(this.albums, a => { return (a.add_series || a.is_admin) && this.filters.album_id !== a.album_id })
+		},
+		OS () {
+      return navigator.platform
 		}
 	},
 
@@ -733,7 +765,7 @@ export default {
 					this.filters = {
 						PatientName: '',
 						PatientID: '',
-						AccessionNumber: '',
+						StudyDescription: '',
 						StudyDateFrom: '',
 						StudyDateTo: '',
 						ModalitiesInStudy: '',
@@ -744,7 +776,6 @@ export default {
 				}
 			}
 		}
-
 	},
 
 	created () {
@@ -752,7 +783,7 @@ export default {
 		if (this.$route.params.album_id) {
 			this.filters.album_id = this.$route.params.album_id
 		} else {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				.then(() => { setTimeout(() => this.setLoading(false), 300) })
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
@@ -767,10 +798,10 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
-					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
 			}
 		},
@@ -782,15 +813,18 @@ export default {
 			this.sortBy = ctx.sortBy
 			this.sortDesc = ctx.sortDesc
 			this.limit = this.studies.length
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 		},
 		showSeries (row) {
-			if (!row.detailsShowing) {
+			if (!row.item.detailsShowing) {
 				this.$store.dispatch('getSeries', { StudyInstanceUID: row.item.StudyInstanceUID[0], album_id: this.filters.album_id })
 			}
+			this.toggleDetails(row)
+		},
+		toggleDetails (row) {
+			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.item.StudyInstanceUID[0] })
 			row.toggleDetails()
 		},
-
 		toggleFavorite (study) {
 			var vm = this
 			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
@@ -838,7 +872,7 @@ export default {
 			})
 		},
 		searchOnline () {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments'] })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				.then(() => { setTimeout(() => this.setLoading(false), 50) })
 		},
 		addToAlbum (albumId) {
@@ -855,9 +889,9 @@ export default {
 					})
 				}
 			})
-
+			let src = this.filters.album_id ? this.filters.album_id : 'inbox'
 			if (data.length) {
-				this.$store.dispatch('putStudiesInAlbum', { data: data }).then(() => {
+				this.$store.dispatch('putStudiesInAlbum', { data: data, src: src }).then(() => {
 					this.$snotify.success(this.$t('studyputtoalbum'))
 				})
 			}
@@ -888,8 +922,8 @@ export default {
 				}
 			})
 			if (studyIds.length || seriesIds.length) {
-				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub }).then(res => {
-					this.$snotify.success(`${res.success} ${this.$t('studiessharedsuccess')}`)
+				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub, src: this.filters.album_id ? this.filters.album_id : 'inbox' }).then(res => {
+					this.$snotify.success(`${studies.length} ${this.$t('studiessharedsuccess')}`)
 					if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
 				})
 			}
@@ -934,6 +968,17 @@ export default {
 		},
 		setLoading (val) {
 			this.loading = val
+		},
+		countSelectedSeries () {
+			this.selectedSeriesNb = 0
+			this.studies.filter(s => { return s.is_selected }).forEach(function (study) {
+				if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
+				else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
+			}.bind(this))
+		},
+		openOsiriX (StudyInstanceUID) {
+			let url = `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application/zip`
+			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, 'OsriXViewer')
 		}
 	}
 }

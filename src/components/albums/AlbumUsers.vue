@@ -11,12 +11,20 @@ Props :
 	"en": {
 		"username": "User name",
 		"user": "user",
-		"changerole": "change role to"
+		"changerole": "change role to",
+		"albumuserdeletesuccess": "Access to the album has been successfully removed",
+		"usernotsettoadmin": "User no longer has admin rights",
+		"usersettoadmin": "User has admin rights",
+		"warningtoggleadmin": "Warning! do you really want to reovke your admin role? "
 	},
 	"fr": {
 		"username": "Utilisateur",
 		"user": "Utilisateur",
-		"changerole": "changer le rôle pour"
+		"changerole": "changer le rôle pour",
+		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
+		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
+		"usersettoadmin": "L'utilisateur a des droits admin",
+		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  "
 	}
 }
 </i18n>
@@ -44,16 +52,16 @@ Props :
             class="showOnTrHover text-right"
           >
             <div
-              v-if="confirm_delete!=user.user_name"
+              v-if="confirmDelete!=user.user_name"
               class="user_actions"
             >
               <a
-                v-if="showChangeRole"
+                v-if="showChangeRole && !confirmResetAdmin"
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
               </a> <a
-                v-if="album.is_admin && showDeleteUser"
+                v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
                 class="text-danger"
                 style="margin-left: 20px"
                 @click.stop="deleteUser(user)"
@@ -61,7 +69,7 @@ Props :
                 <v-icon name="trash" />
               </a>
             </div>
-            <div v-if="confirm_delete==user.user_name">
+            <div v-if="confirmDelete==user.user_name">
               <div class="btn-group">
                 <button
                   type="button"
@@ -72,7 +80,27 @@ Props :
                 </button><button
                   type="button"
                   class="btn btn-sm btn-secondary"
-                  @click.stop="confirm_delete=''"
+                  @click.stop="confirmDelete=''"
+                >
+                  {{ $t('cancel') }}
+                </button>
+              </div>
+            </div>
+            <div v-if="confirmResetAdmin==user.user_name">
+              <span class="text-danger mr-2">
+                {{ $t("warningtoggleadmin") }}
+              </span>
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger"
+                  @click.stop="toggleAdmin(user)"
+                >
+                  {{ $t('confirm') }}
+                </button><button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  @click.stop="confirmResetAdmin=''"
                 >
                   {{ $t('cancel') }}
                 </button>
@@ -85,6 +113,7 @@ Props :
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 export default {
 	name: 'AlbumUsers',
 	props: {
@@ -111,8 +140,14 @@ export default {
 	},
 	data () {
 		return {
-			confirm_delete: ''
+			confirmDelete: '',
+			confirmResetAdmin: ''
 		}
+	},
+	computed: {
+		...mapGetters({
+			user: 'currentUser'
+		})
 	},
 	watch: {
 		users: {
@@ -126,6 +161,10 @@ export default {
 	},
 	methods: {
 		toggleAdmin (user) {
+			if (this.user.sub === user.user_id && !this.confirmResetAdmin) {
+				this.confirmResetAdmin = user.user_name
+				return
+			}
 			user.is_admin = !user.is_admin
 			this.$store.dispatch('toggleAlbumUserAdmin', user).then(() => {
 				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
@@ -135,11 +174,11 @@ export default {
 			})
 		},
 		deleteUser (user) {
-			if (this.confirm_delete !== user.user_name) this.confirm_delete = user.user_name
+			if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name
 			else {
 				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(() => {
 					this.$snotify.success(this.$t('albumuserdeletesuccess'))
-					this.confirm_delete = ''
+					this.confirmDelete = ''
 				}).catch(() => {
 					this.$snotify.error(this.$t('sorryerror'))
 				})

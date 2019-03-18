@@ -21,7 +21,8 @@ const state = {
 		notification_new_series: true,
 		notification_new_comment: true,
 		is_admin: true,
-		users: []
+		users: [],
+		tokens: []
 	},
 	users: [],
 	comments: []
@@ -40,6 +41,7 @@ const actions = {
 
 	getAlbum ({ commit }, params) {
 		return HTTP.get('albums/' + params.album_id, { headers: { 'Accept': 'application/json' } }).then(res => {
+			res.data.tokens = []
 			commit('SET_ALBUM', res.data)
 		})
 	},
@@ -131,7 +133,18 @@ const actions = {
 				commit('DELETE_ALBUM')
 			}
 		})
+	},
+	getAlbumTokens ({ commit }, params) {
+		return HTTP.get(`/capabilities?valid=${!params.showInvalid}&album=${params.album_id}`).then(res => {
+			if (res.status === 200) {
+				commit('SET_ALBUM_TOKENS', res.data)
+			}
+			return res.data
+		}).catch(() => {
+			return false
+		})
 	}
+
 
 }
 
@@ -199,6 +212,12 @@ const mutations = {
 		_.forEach(data, d => {
 			state.comments.unshift(d)
 		})
+	},
+	SET_ALBUM_TOKENS (state, tokens) {
+		state.album.tokens = tokens
+	},
+	SET_ALBUM_TOKEN (state, token) {
+		state.album.tokens.push(token)
 	}
 
 }

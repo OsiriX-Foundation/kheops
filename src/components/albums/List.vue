@@ -11,9 +11,10 @@
 		"Date": "date",
 		"LastEvent": "last event",
 		"selectednbalbums": "{count} album is selected | {count} albums are selected",
-		"share": "Share",
+		"share": "Invite user",
 		"permissionsfailed": "You can't send this albums : ",
-		"send": "send"
+    "send": "send",
+    "nomodality": "No modality"
 	},
 	"fr": {
 		"newalbum": "Nouvel album",
@@ -24,9 +25,10 @@
 		"Date": "date",
 		"LastEvent": "dern. evnt",
 		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-		"share": "Partager",
+		"share": "Inviter un utilisateur",
 		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
-		"send": "envoyés"
+		"send": "envoyés",
+    "nomodality": "Aucune modalité"
 	}
 }
 </i18n>
@@ -44,7 +46,10 @@
           active-class="active"
           style="display: inline"
         >
-          <v-icon name="plus" />{{ $t('newalbum') }}
+          <v-icon
+            name="plus"
+            class="mr-2"
+          />{{ $t('newalbum') }}
         </router-link>
         <button
           type="button"
@@ -77,7 +82,7 @@
           <span>
             <v-icon
               class="align-middle"
-              name="paper-plane"
+              name="user"
             />
           </span><br>
           {{ $t("share") }}
@@ -97,6 +102,7 @@
       :sort-by.sync="sortBy"
       :no-local-sorting="true"
       :dark="false"
+      :no-sort-reset="true"
       @sort-changed="sortingChanged"
       @row-clicked="selectAlbum"
     >
@@ -267,7 +273,7 @@
             variant="link"
             size="sm"
             class="mr-2"
-            @click.stop="row.toggleDetails"
+            @click.stop="toggleDetails(row)"
           >
             <v-icon
               v-if="row.detailsShowing"
@@ -281,6 +287,7 @@
             />
           </b-button>
           <b-form-checkbox
+            v-if="row.item.is_admin || row.item.add_user"
             v-model="row.item.is_selected"
             class="pt-2"
             inline
@@ -331,6 +338,12 @@
       >
         {{ data.item.last_event_time | formatDate }}
       </template>
+      <template
+        slot="modalities"
+        slot-scope="data"
+      >
+        {{ data.item.modalities.length > 0 ? ( data.item.modalities[0].split(',').join(' / ') ) : $t('nomodality') }}
+      </template>
 
       <template
         slot="row-details"
@@ -373,7 +386,9 @@ export default {
 				{
 					key: 'number_of_studies',
 					label: 'Study #',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-sm-table-cell',
+					tdClass: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'modalities',
@@ -383,22 +398,30 @@ export default {
 				{
 					key: 'number_of_users',
 					label: 'User #',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-md-table-cell',
+					tdClass: 'd-none d-md-table-cell'
 				},
 				{
 					key: 'number_of_comments',
 					label: 'Messages #',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-lg-table-cell',
+					tdClass: 'd-none d-lg-table-cell'
 				},
 				{
 					key: 'created_time',
 					label: 'Date',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-sm-table-cell',
+					tdClass: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'last_event_time',
 					label: 'LastEvent',
-					sortable: true
+					sortable: true,
+					thClass: 'd-none d-lg-table-cell',
+					tdClass: 'd-none d-lg-table-cell'
 				}
 			],
 			sortBy: 'created_time',
@@ -485,8 +508,7 @@ export default {
 	methods: {
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
-
+				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++
 					this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
@@ -508,7 +530,10 @@ export default {
 			this.$store.dispatch('toggleSelectedAlbum', { type: type, index: index, is_selected: isSelected }).then(() => {
 			})
 		},
-
+		toggleDetails (row) {
+			this.$store.commit('TOGGLE_ALBUM_DETAILS', { albumId: row.item.album_id })
+			row.toggleDetails()
+		},
 		toggleFavorite (index) {
 			var vm = this
 			this.$store.dispatch('toggleFavorite', { type: this.$route.name, index: index }).then(res => {

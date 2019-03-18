@@ -75,7 +75,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            <router-link :to="`/albums/${token.album.id}`">
+            <router-link :to="`/albums/${token.album.id}?view=studies`">
               {{ token.album.name }}
             </router-link>
           </dd>
@@ -123,7 +123,7 @@
         </div>
       </div>
       <div
-        v-if="token.last_use"
+        v-if="token.last_used"
         class="row"
       >
         <div class="col-xs-12 col-sm-3">
@@ -131,7 +131,7 @@
         </div>
         <div class="col-xs-12 col-sm-3">
           <dd>
-            {{ token.last_use|formatDateTime }}
+            {{ token.last_used|formatDateTime }}
           </dd>
         </div>
       </div>

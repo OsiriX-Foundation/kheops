@@ -45,6 +45,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { AlbumRedirect } from '../../mixins/redirect.js'
 import albumSettingsGeneral from '@/components/albums/albumSettingsGeneral'
 import albumSettingsUser from '@/components/albums/albumSettingsUser'
 import albumSettingsToken from '@/components/albums/albumSettingsToken'
@@ -52,16 +53,20 @@ import albumSettingsToken from '@/components/albums/albumSettingsToken'
 export default {
 	name: 'AlbumSettings',
 	components: { albumSettingsGeneral, albumSettingsUser, albumSettingsToken },
+	mixins: [ AlbumRedirect ],
 	data () {
 		return {
 			view: 'general',
-			categories: ['general', 'user', 'token']
+			basicCategories: ['general', 'user']
 		}
 	},
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
+		}),
+		categories () {
+			return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories
+		}
 	},
 	watch: {
 		view () {
