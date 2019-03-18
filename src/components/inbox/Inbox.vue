@@ -7,12 +7,11 @@
 
 <script>
 import List from '@/components/inbox/List'
-import ImportStudy from '@/components/study/ImportStudy'
 import InputImportStudy from '@/components/study/InputImportStudy'
 
 export default {
 	name: 'Inbox',
-	components: { List, ImportStudy, InputImportStudy },
+	components: { List, InputImportStudy },
 	props: {
 	},
 	computed: {
