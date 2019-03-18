@@ -1,9 +1,11 @@
 package online.kheops.auth_server.event;
 
+import online.kheops.auth_server.capability.CapabilitiesResponse;
 import online.kheops.auth_server.entity.Comment;
 import online.kheops.auth_server.entity.Mutation;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import java.time.LocalDateTime;
 
 public class EventResponse {
@@ -31,7 +33,17 @@ public class EventResponse {
         public String series;
         @XmlElement(name = "study")
         public String study;
+        @XmlElement(name = "capability")
+        public CapabilityResponse capability;
     }
+
+    public static class CapabilityResponse {
+        @XmlElement(name = "title")
+        public String title;
+        @XmlElement(name = "id")
+        public String id;
+    }
+
 
     public EventResponse(Comment comment) {
         response = new Response();
@@ -78,6 +90,12 @@ public class EventResponse {
         if (mutation.getMutationType().equals(Events.MutationType.IMPORT_STUDY.toString()) ||
                 mutation.getMutationType().equals(Events.MutationType.REMOVE_STUDY.toString()) ) {
             response.study = mutation.getStudy().getStudyInstanceUID();
+        }
+        if(mutation.getCapability().isPresent()) {
+            final CapabilityResponse capabilityResponse = new CapabilityResponse();
+            capabilityResponse.id = mutation.getCapability().get().getId();
+            capabilityResponse.title = mutation.getCapability().get().getTitle();
+            response.capability = capabilityResponse;
         }
     }
 

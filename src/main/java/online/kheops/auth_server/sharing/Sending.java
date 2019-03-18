@@ -2,8 +2,10 @@ package online.kheops.auth_server.sharing;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -81,7 +83,7 @@ public class Sending {
         }
     }
 
-    public static void deleteStudyFromAlbum(User callingUser, String albumId, String studyInstanceUID)
+    public static void deleteStudyFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -90,7 +92,7 @@ public class Sending {
         try {
             tx.begin();
 
-            callingUser = em.merge(callingUser);
+            final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album callingAlbum = getAlbum(albumId, em);
 
             final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
@@ -104,8 +106,13 @@ public class Sending {
             }
 
             final Study study = availableSeries.get(0).getStudy();
-            final Mutation mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
-
+            final Mutation mutation;
+            if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                final Capability capability = em.merge(kheopsPrincipal.getCapability().get());
+                mutation = Events.albumPostStudyMutation(capability, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
+            } else {
+                mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
+            }
             em.persist(mutation);
 
             tx.commit();
@@ -117,7 +124,7 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromAlbum(User callingUser, String albumId, String studyInstanceUID, String seriesInstanceUID)
+    public static void deleteSeriesFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -126,13 +133,19 @@ public class Sending {
         try {
             tx.begin();
 
-            callingUser = em.merge(callingUser);
+            final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album callingAlbum = getAlbum(albumId, em);
 
             final Series availableSeries = findSeriesByStudyUIDandSeriesUIDFromAlbum(callingAlbum, studyInstanceUID, seriesInstanceUID, em);
 
             callingAlbum.removeSeries(availableSeries, em);
-            final Mutation mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_SERIES, availableSeries);
+            final Mutation mutation;
+            if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                final Capability capability = em.merge(kheopsPrincipal.getCapability().get());
+                mutation = Events.albumPostSeriesMutation(capability, callingAlbum, Events.MutationType.REMOVE_SERIES, availableSeries);
+            } else {
+                mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_SERIES, availableSeries);
+            }
 
             em.persist(mutation);
 
@@ -145,7 +158,7 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(User callingUser, String albumId, String studyInstanceUID, String seriesInstanceUID)
+    public static void putSeriesInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -154,7 +167,7 @@ public class Sending {
         try {
             tx.begin();
 
-            callingUser = em.merge(callingUser);
+            final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
 
             Series availableSeries;
@@ -181,9 +194,15 @@ public class Sending {
             availableSeries.addAlbumSeries(albumSeries);
             targetAlbum.addSeries(albumSeries);
             em.persist(albumSeries);
-            final Mutation mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
+
+            final Mutation mutation;
+            if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                final Capability capability = em.merge(kheopsPrincipal.getCapability().get());
+                mutation = Events.albumPostSeriesMutation(capability, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
+            } else {
+                mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
+            }
             em.persist(mutation);
-            //todo if the series is upload with a token...
             tx.commit();
         } finally {
             if (tx.isActive()) {
@@ -193,7 +212,7 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(User callingUser, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+    public static void putStudyInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -201,7 +220,7 @@ public class Sending {
         try {
             tx.begin();
 
-            callingUser = em.merge(callingUser);
+            final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -221,8 +240,13 @@ public class Sending {
                 return;
             }
                 final Study study = availableSeries.get(0).getStudy();
-                final Mutation mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
-
+            final Mutation mutation;
+            if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                final Capability capability = em.merge(kheopsPrincipal.getCapability().get());
+                mutation = Events.albumPostStudyMutation(capability, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
+            } else {
+                mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
+            }
                 em.persist(mutation);
 
             tx.commit();
