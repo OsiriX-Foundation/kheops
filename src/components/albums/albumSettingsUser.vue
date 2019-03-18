@@ -6,7 +6,7 @@
 		"userlist": "List of users",
 		"add_user": "Invite a user",
 		"add_series": "Add Studies / Series",
-		"download_series": "Download Studies / Series",
+		"download_series": "Show Download Button",
 		"send_series": "Add to album / inbox",
 		"delete_series": "Remove Studies / Series",
 		"write_comments": "Write Comments",

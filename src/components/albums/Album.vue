@@ -6,12 +6,12 @@
 		"albumName": "Album Name",
 		"albumDescription": "Album Description",
 		"users": "Users",
-		"addUser": "Add User",
-		"addSeries": "Add Studies / Series",
-		"downloadSeries": "Download Studies / Series",
-		"sendSeries": "Get Studies / Series",
-		"deleteSeries": "Remove Studies / Series",
-		"writeComments": "Write Comments"
+		"addUser": "Add user",
+		"addSeries": "Add studies / series",
+		"downloadSeries": "Show download button",
+		"sendSeries": "Get studies / series",
+		"deleteSeries": "Remove studies / series",
+		"writeComments": "Write comments"
 
 	},
 	"fr": {
@@ -21,7 +21,7 @@
 		"addUser": "Ajouter un utilisateur",
 		"addSeries": "Ajouter une étude / série",
 		"downloadSeries": "Télécharger une étude / série",
-		"sendSeries": "Récupérer une étude / série",
+		"sendSeries": "Ajouter à un album / inbox",
 		"deleteSeries": "Supprimer une étude / série",
 		"writeComments": "Commenter"
 	}

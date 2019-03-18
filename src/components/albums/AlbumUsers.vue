@@ -15,7 +15,8 @@ Props :
 		"albumuserdeletesuccess": "Access to the album has been successfully removed",
 		"usernotsettoadmin": "User no longer has admin rights",
 		"usersettoadmin": "User has admin rights",
-		"warningtoggleadmin": "Warning! do you really want to reovke your admin role? "
+		"warningtoggleadmin": "Warning! do you really want to revoke your admin role? ",
+		"remove": "Remove user"
 	},
 	"fr": {
 		"username": "Utilisateur",
@@ -24,7 +25,8 @@ Props :
 		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
 		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
 		"usersettoadmin": "L'utilisateur a des droits admin",
-		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  "
+		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
+		"remove": "Retirer l'utilisateur"
 	}
 }
 </i18n>
@@ -43,7 +45,11 @@ Props :
           :key="user.user_name"
         >
           <td>
-            {{ user.user_name }} <span v-if="user.is_admin">
+            {{ user.user_name }}
+            <span
+              v-if="user.is_admin"
+              style="color:#13B98B"
+            >
               (Admin)
             </span>
           </td>
@@ -60,12 +66,14 @@ Props :
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                <v-icon	name="user" />
               </a> <a
                 v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
                 class="text-danger"
                 style="margin-left: 20px"
                 @click.stop="deleteUser(user)"
               >
+                {{ $t('remove') }}
                 <v-icon name="trash" />
               </a>
             </div>
