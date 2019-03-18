@@ -49,8 +49,9 @@ public class Keycloak {
 
         if(user.contains("@")) {
             final Response response;
+            final String userLowerCase = user.toLowerCase();
             try {
-                response = ClientBuilder.newClient().target(usersUri).queryParam("email", user.toLowerCase()).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+                response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
             }
@@ -61,7 +62,7 @@ public class Keycloak {
                     JsonArray reply = jsonReader.readArray();
                     final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
                     if (keycloakUsers.size() > 0) {
-                        final int index = keycloakUsers.verifyEmail(user);
+                        final int index = keycloakUsers.verifyEmail(userLowerCase);
                         return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0)).build();
                     } else {
                         throw new UserNotFoundException();

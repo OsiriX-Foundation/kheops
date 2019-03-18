@@ -39,7 +39,7 @@ public class Users {
         if(userReference.contains("@")) {
             try {
                 final Keycloak keycloak = Keycloak.getInstance();
-                userReference= keycloak.getUser(userReference.toLowerCase()).getSub();
+                userReference= keycloak.getUser(userReference).getSub();
             } catch (KeycloakException e) {
                 throw new UserNotFoundException("Error during request to keycloak", e);
             }
