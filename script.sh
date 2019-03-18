@@ -132,19 +132,14 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
         missing_env_var_secret=false
 
         #Verify secrets
-        if ! [ -f ${SECRET_FILE_PATH}/elastic_cloud_id ]; then
+        if ! [ -f ${SECRET_FILE_PATH}/elastic_pwd ]; then
             echo "Missing elastic_cloud_id secret"
             missing_env_var_secret=true
         else
+           cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin
            echo -e "secret elastic_cloud_id \e[92mOK\e[0m"
         fi
 
-        if ! [ -f ${SECRET_FILE_PATH}/elastic_cloud_auth ]; then
-            echo "Missing elastic_cloud_auth secret"
-            missing_env_var_secret=true
-        else
-           echo -e "secret elastic_cloud_authm \e[92mOK\e[0m"
-        fi
 
 
         #get secrets and verify content
@@ -152,9 +147,10 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
         do
           filename=$(basename "$f")
           value=$(cat ${f})
-          sed -i "s|\${$filename}|$value|" /etc/metricbeat/metricbeat.yml
           sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
         done
+
+
 
         if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_NAME ]]; then
           echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_NAME environment variable"
