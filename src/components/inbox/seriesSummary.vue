@@ -160,9 +160,10 @@ export default {
 			this.isSelected = !this.isSelected
 		},
 		openViewer () {
+			let ohifWindow = window.open('', 'OHIFViewer')
 			this.getViewerToken(this.user.jwt, this.studyInstanceUID, this.source).then(res => {
 				let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
-				window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`, 'OHIFViewer')
+				ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`
 			}).catch(err => {
 				console.log(err)
 			})
