@@ -17,7 +17,8 @@
 		"hasedited": "has edited",
 		"includenotifications": "include notifications",
 		"addalbum": "add as favorite",
-		"removealbum": "remove as favorite"
+		"removealbum": "remove as favorite",
+    "to": "to"
 	},
 	"fr" : {
 		"commentpostsuccess": "le commentaire a été posté avec succès",
@@ -34,7 +35,8 @@
 		"hasedited": "a édité",
 		"includenotifications": "inclure les notifications",
 		"addalbum": "a mis en favori",
-		"removealbum": "a enlevé des favories"
+		"removealbum": "a enlevé des favories",
+    "to": "à"
 	}
 }
 </i18n>
@@ -73,7 +75,13 @@
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
             <div class="card-header">
-              <v-icon name="user" /> {{ comment.origin_name }}<span class="float-right">
+              <v-icon name="user" /> {{ comment.origin_name }}
+              <span
+                v-if="comment.target_name"
+              >
+                {{ $t('to') }} {{ comment.target_name}}
+              </span>
+              <span class="float-right">
                 {{ comment.post_date|formatDate }}
               </span>
             </div>
