@@ -992,8 +992,12 @@ export default {
 		openViewer (StudyInstanceUID, viewer) {
 			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
 			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
-				if (viewer === 'Osirix') this.openOsiriX(StudyInstanceUID, res.data.access_token)
-				else if (viewer === 'Ohif') this.openOhif(StudyInstanceUID, res.data.access_token)
+				if (viewer === 'Osirix') {
+					this.openOsiriX(StudyInstanceUID, res.data.access_token)
+				} else if (viewer === 'Ohif') {
+          window.open('', 'OHIFViewer')
+					this.openOhif(StudyInstanceUID, res.data.access_token, source === 'inbox' ? 'inbox=true' : 'album=' + source)
+				}
 			}).catch(err => {
 				console.log(err)
 			})
@@ -1002,8 +1006,8 @@ export default {
 			let url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`
 			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self')
 		},
-		openOhif (StudyInstanceUID, token) {
-			let url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata`
+		openOhif (StudyInstanceUID, token, queryparams) {
+			let url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`
 			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`, 'OHIFViewer')
 		}
 	}
