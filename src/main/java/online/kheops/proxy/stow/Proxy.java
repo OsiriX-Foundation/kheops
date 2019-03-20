@@ -49,10 +49,7 @@ public final class Proxy {
     public void processStream(final MultipartOutputStream multipartOutputStream) throws GatewayException, RequestException
     {
         this.multipartOutputStream = Objects.requireNonNull(multipartOutputStream);
-        processMultipart();
-    }
 
-    private void processMultipart() throws RequestException, GatewayException {
         final MultipartParser multipartParser = new MultipartParser(getBoundary());
         try {
             multipartParser.parse(inputStream, this::processPart);
