@@ -18,7 +18,8 @@
 		"includenotifications": "include notifications",
 		"addalbum": "add as favorite",
 		"removealbum": "remove as favorite",
-    "to": "to"
+    "to": "to",
+    "writecomment": "Write your comment here"
 	},
 	"fr" : {
 		"commentpostsuccess": "le commentaire a été posté avec succès",
@@ -36,7 +37,8 @@
 		"includenotifications": "inclure les notifications",
 		"addalbum": "a mis en favori",
 		"removealbum": "a enlevé des favories",
-    "to": "à"
+    "to": "à",
+    "writecomment": "Ecrivez votre commentaire ici"
 	}
 }
 </i18n>
@@ -79,7 +81,7 @@
               <span
                 v-if="comment.target_name"
               >
-                {{ $t('to') }} {{ comment.target_name}}
+                {{ $t('to') }} {{ comment.target_name }}
               </span>
               <span class="float-right">
                 {{ comment.post_date|formatDate }}
@@ -215,32 +217,30 @@
         </div>
       </div>
     </div>
+
     <div class="row mt-4 justify-content-center">
       <div class="col-sm-12 col-md-10 offset-md-1">
         <form
           v-if="scope === 'studies' || album.is_admin || album.write_comments"
           @submit.prevent="addComment"
         >
-          <div class="row justify-content-center">
-            <div class="col-9 mb-2">
-              <textarea
-                v-model="newComment.comment"
-                class="form-control"
-                rows="6"
-                placeholder="Use @... for a specific user"
-                maxlength="1024"
-              />
-            </div>
-            <div class="col-auto">
+          <div class="input-group mb-3">
+            <textarea
+              v-model="newComment.comment"
+              class="form-control form-control-sm"
+              :placeholder="$t('writecomment')"
+              @keydown.enter.prevent="addComment"
+              rows="2"
+              maxlength="1024"
+            />
+            <div class="input-group-append">
               <button
+                title="send comment"
                 type="submit"
-                class="btn btn-lg btn-primary"
+                class="btn btn-primary"
                 :disabled="newComment.comment.length < 2"
               >
-                <v-icon
-                  name="paper-plane"
-                  class="mr-2"
-                />{{ $t('send') }}
+                <v-icon name="paper-plane" />
               </button>
             </div>
           </div>
