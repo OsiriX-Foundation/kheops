@@ -41,8 +41,10 @@ public class OHIFMetadataResource {
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata")
     public MetadataDTO wado(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                             @PathParam("studyInstanceUID") String studyInstanceUID,
-                            @QueryParam("firstseries") String firstSeriesInstanceUID) {
-        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+                            @QueryParam("firstseries") String firstSeriesInstanceUID,
+                            @QueryParam("inbox") Boolean inbox,
+                            @QueryParam("album") String album) {
+        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), inbox, album);
     }
 
     @GET
@@ -50,14 +52,26 @@ public class OHIFMetadataResource {
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata")
     public MetadataDTO wadoWithCapability(@PathParam("capability") String capabilityToken,
                                           @PathParam("studyInstanceUID") String studyInstanceUID,
-                                          @QueryParam("firstseries") String firstSeriesInstanceUID) {
-        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.from(capabilityToken));
+                                          @QueryParam("firstseries") String firstSeriesInstanceUID,
+                                          @QueryParam("inbox") Boolean inbox,
+                                          @QueryParam("album") String album) {
+        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.from(capabilityToken), inbox, album);
     }
 
-    private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken) {
+    private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken, Boolean inbox, String album) {
         final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
-        final URI metadataServiceURI = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
+
+        final UriBuilder metadataServiceUriBuilder = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata");
+
+        if (inbox != null && inbox) {
+            metadataServiceUriBuilder.queryParam("inbox", "true");
+        }
+        if (album != null && !album.isEmpty()) {
+            metadataServiceUriBuilder.queryParam("album", album);
+        }
+
+        final URI metadataServiceURI = metadataServiceUriBuilder.build(studyInstanceUID);
 
         try {
             return MetadataDTO.from(rootURI, firstSeriesInstanceUID,
@@ -78,6 +92,9 @@ public class OHIFMetadataResource {
             } else if (status == NOT_FOUND.getStatusCode()) {
                 LOG.log(WARNING, "Metadata not found", e);
                 throw new WebApplicationException(NOT_FOUND);
+            } else if (status == BAD_REQUEST.getStatusCode()) {
+                LOG.log(WARNING, "Bad Request", e);
+                throw new WebApplicationException(BAD_REQUEST);
             } else {
                 LOG.log(SEVERE, "Bad Gateway", e);
                 throw new WebApplicationException(BAD_GATEWAY);
