@@ -217,8 +217,20 @@
         </div>
       </div>
     </div>
-
     <div class="row mt-4 justify-content-center">
+      <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
+        Send private message to
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <add-user
+          :show-edit="messageSend"
+          :scope="scope"
+          :album-id="album.album_id"
+          @private-user="setPrivateUser"
+        />
+      </div>
+    </div>
+    <div class="row mt-2 justify-content-center">
       <div class="col-sm-12 col-md-10 offset-md-1">
         <form
           v-if="scope === 'studies' || album.is_admin || album.write_comments"
@@ -229,9 +241,9 @@
               v-model="newComment.comment"
               class="form-control form-control-sm"
               :placeholder="$t('writecomment')"
-              @keydown.enter.prevent="addComment"
               rows="2"
               maxlength="1024"
+              @keydown.enter.prevent="addComment"
             />
             <div class="input-group-append">
               <button
@@ -252,9 +264,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import AddUser from '@/components/user/AddUser'
 
 export default {
 	name: 'CommentsAndNotifications',
+	components: { AddUser },
 	props: {
 		scope: {
 			type: String,
@@ -271,7 +285,9 @@ export default {
 				comment: '',
 				to_user: ''
 			},
-			includeNotifications: false
+			includeNotifications: false,
+			privateUser: '',
+			messageSend: false
 		}
 	},
 	computed: {
@@ -283,7 +299,6 @@ export default {
 		}),
 		comments () {
 			if (this.scope === 'album') return this.albumComments
-
 			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
 			if (studyIdx > -1) {
 				return this.studies[studyIdx].comments
@@ -299,32 +314,13 @@ export default {
 		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
 	methods: {
+		setPrivateUser (user) {
+			this.privateUser = user
+		},
 		addComment () {
 			if (this.newComment.comment.length > 2) {
-				if (this.newComment.comment.indexOf('@') > -1) {
-					if (this.users.length) { // album
-						_.forEach(this.users, user => {
-							if (this.newComment.comment.indexOf(user.user_name) > -1) {
-								this.newComment.to_user = user.user_name
-								this.newComment.comment = this.newComment.comment.replace('@' + user.user_name, '').trim()
-							}
-						})
-					} else {
-						let atIdx = this.newComment.comment.indexOf('@')
-						let end = this.newComment.comment.substr(atIdx).length
-						let match = this.newComment.comment.substr(atIdx).match(/\s/)
-						if (match) end = match.index
-						this.newComment.to_user = this.newComment.comment.substr(atIdx + 1, end - 1)
-						this.$store.dispatch('checkUser', this.newComment.to_user).then(res => {
-							if (res) {
-								this.newComment.comment = this.newComment.comment.replace('@' + this.newComment.to_user, '').trim()
-								this.newComment.to_user = res
-							} else {
-								this.newComment.to_user = ''
-							}
-						})
-					}
-				}
+        this.messageSend = false
+        this.newComment.to_user = this.privateUser
 				if (this.scope === 'album') {
 					let params = {
 						type: (this.includeNotifications) ? '' : 'comments',
@@ -334,6 +330,7 @@ export default {
 						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
+						this.messageSend = true
 					}).catch(res => {
 						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
 						this.newComment.comment = ''
@@ -344,6 +341,7 @@ export default {
 						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
+						this.messageSend = true
 					}).catch(res => {
 						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
 						this.newComment.comment = ''
