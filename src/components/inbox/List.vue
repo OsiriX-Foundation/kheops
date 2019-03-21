@@ -442,6 +442,7 @@
                     :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
                     :selected="serie.is_selected"
                     :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
+                    :source="$route.params.album_id ? $route.params.album_id : 'inbox'"
                     @selectedSeries="countSelectedSeries"
                   />
                 </div>
@@ -491,13 +492,13 @@
                 <v-icon
                   v-if="row.item.is_favorite"
                   class="align-middle"
-                  style="margin-right:0"
+                  style="margin-right:1"
                   name="star"
                 />
                 <v-icon
                   v-else-if="Object.keys(album).length === 0 || (album.add_series || album.is_admin)"
                   class="align-middle"
-                  style="margin-right:0"
+                  style="margin-right:1"
                   name="star"
                   color="grey"
                 />
@@ -509,13 +510,13 @@
                 <v-icon
                   v-if="row.item.SumComments[0]"
                   class="align-middle"
-                  style="margin-right:0"
+                  style="margin-right:1"
                   name="comment-dots"
                 />
                 <v-icon
                   v-else
                   class="align-middle"
-                  style="margin-right:0"
+                  style="margin-right:1"
                   name="comment"
                   color="grey"
                 />
@@ -527,17 +528,26 @@
               >
                 <v-icon
                   class="align-middle"
-                  style="margin-right:0"
+                  style="margin-right:1"
                   name="download"
                 />
               </a>
               <span
                 v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
-                @click="openOsiriX(row.item.StudyInstanceUID)"
+                @click="openViewer(row.item.StudyInstanceUID, 'Osirix')"
               >
                 <osirix-icon
                   width="22px"
                   height="22px"
+                />
+              </span>
+              <span
+                v-if="row.item.ModalitiesInStudy[0] !== 'SR'"
+                @click="openViewer(row.item.StudyInstanceUID, 'Ohif')"
+              >
+                <visibility-icon
+                  width="24px"
+                  height="24px"
                 />
               </span>
               <!--
@@ -606,12 +616,15 @@ import Vue from 'vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
+import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
+import { ViewerToken } from '@/mixins/tokens.js'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon },
+	mixins: [ ViewerToken ],
 	props: {
 		album: {
 			type: Object,
@@ -976,9 +989,26 @@ export default {
 				else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
 			}.bind(this))
 		},
-		openOsiriX (StudyInstanceUID) {
-			let url = `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application/zip`
+		openViewer (StudyInstanceUID, viewer) {
+			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
+			let ohifWindow = window.open('', 'OHIFViewer')
+			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
+				if (viewer === 'Osirix') {
+					this.openOsiriX(StudyInstanceUID, res.data.access_token)
+				} else if (viewer === 'Ohif') {
+					this.openOhif(StudyInstanceUID, res.data.access_token, source === 'inbox' ? 'inbox=true' : 'album=' + source, ohifWindow)
+				}
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		openOsiriX (StudyInstanceUID, token) {
+			let url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`
 			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self')
+		},
+		openOhif (StudyInstanceUID, token, queryparams, ohifWindow) {
+			let url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`
+			ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`
 		}
 	}
 }

@@ -89,21 +89,6 @@
             </tr>
           </tbody>
         </table>
-
-        <dl
-          v-if="!series.Modality.includes('SR')"
-          class="row justify-content-center"
-        >
-          <dd>
-            <button
-              type="button"
-              class="btn-primary btn-sm"
-              @click="openViewer"
-            >
-              {{ $t('openviewer') }}
-            </button>
-          </dd>
-        </dl>
       </div>
     </div>
   </div>
@@ -111,8 +96,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { ViewerToken } from '../../mixins/tokens.js'
+
 export default {
 	name: 'SeriesSummary',
+	mixins: [ ViewerToken ],
 	props: {
 		seriesInstanceUID: {
 			type: String,
@@ -125,6 +113,11 @@ export default {
 		selected: {
 			type: Boolean,
 			required: true
+		},
+		source: {
+			type: String,
+			required: true,
+			default: ''
 		}
 	},
 	data () {
@@ -167,8 +160,13 @@ export default {
 			this.isSelected = !this.isSelected
 		},
 		openViewer () {
-			let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
-			window.open(`${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${this.user.jwt}`, 'OHIFViewer')
+			let ohifWindow = window.open('', 'OHIFViewer')
+			this.getViewerToken(this.user.jwt, this.studyInstanceUID, this.source).then(res => {
+				let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
+				ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`
+			}).catch(err => {
+				console.log(err)
+			})
 		}
 	}
 }
