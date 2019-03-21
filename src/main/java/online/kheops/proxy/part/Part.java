@@ -5,19 +5,26 @@ import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.stream.TeeInputStream;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.ws.rs.MediaTypes;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 
-import static javax.ws.rs.core.HttpHeaders.CONTENT_LOCATION;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static org.dcm4che3.ws.rs.MediaTypes.*;
 
 
 public abstract class Part implements AutoCloseable {
+    private static final Logger LOG = Logger.getLogger(Part.class.getName());
+
     private final Providers providers;
 
     private final MediaType mediaType;
@@ -29,20 +36,35 @@ public abstract class Part implements AutoCloseable {
         this.cacheFilePath = cacheFilePath;
     }
 
-    public static Part getInstance(final Providers providers, final MultipartInputStream multipartInputStream) throws IOException {
+    public static Part getInstance(final MediaType contentType,
+                                   final Providers providers,
+                                   final MultipartInputStream multipartInputStream,
+                                   final Consumer<String> fileID) throws IOException {
         final Map<String, List<String>> headerParams = multipartInputStream.readHeaderParams();
         final ContentLocation contentLocation = ContentLocation.valueOf(getHeaderParamValue(headerParams, CONTENT_LOCATION));
-        final MediaType mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, CONTENT_TYPE));
         final BufferedInputStream bufferedInputStream = new BufferedInputStream(multipartInputStream);
+
+        final MediaType mediaType;
+        if (contentType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
+            try {
+                final ContentDisposition contentDisposition = new ContentDisposition(getHeaderParamValue(headerParams, CONTENT_DISPOSITION));
+                fileID.accept(contentDisposition.getParameters().get("name"));
+            } catch (ParseException e) {
+                LOG.log(WARNING, "Unable to parse content-disposition", e);
+            }
+            mediaType = APPLICATION_DICOM_TYPE;
+        } else {
+            mediaType = MediaType.valueOf(getHeaderParamValue(headerParams, CONTENT_TYPE));
+        }
 
         final Path cacheFilePath = Files.createTempFile("PartCache", null);
         final Part newPart;
         try (final OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(cacheFilePath))) {
-            if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_TYPE)) {
+            if (MediaTypes.equalsIgnoreParameters(mediaType, APPLICATION_DICOM_TYPE)) {
                 final TeeInputStream teeInputStream = new TeeInputStream(bufferedInputStream, outputStream);
                 newPart = new DICOMPart(providers, teeInputStream, mediaType, cacheFilePath);
                 teeInputStream.finish();
-            } else if (MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, MediaTypes.APPLICATION_DICOM_JSON_TYPE)) {
+            } else if (MediaTypes.equalsIgnoreParameters(mediaType, APPLICATION_DICOM_XML_TYPE) || MediaTypes.equalsIgnoreParameters(mediaType, APPLICATION_DICOM_JSON_TYPE)) {
                 final TeeInputStream teeInputStream = new TeeInputStream(bufferedInputStream, outputStream);
                 newPart = new DICOMMetadataPart(providers, teeInputStream, mediaType, cacheFilePath);
                 teeInputStream.finish();

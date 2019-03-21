@@ -42,6 +42,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static javax.ws.rs.core.Response.Status.*;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_TYPE;
@@ -76,7 +77,7 @@ public final class Resource {
 
     @POST
     @Path("/password/dicomweb/studies")
-    @Consumes("multipart/related,application/dicom")
+    @Consumes("multipart/related,multipart/form-data,application/dicom")
     @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stow(@HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
@@ -84,7 +85,7 @@ public final class Resource {
 
     @POST
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies")
-    @Consumes("multipart/related,application/dicom")
+    @Consumes("multipart/related,multipart/form-data,application/dicom")
     @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stowWithCapability(@PathParam("capability") String capabilityToken, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.from(capabilityToken), albumId, null);
@@ -92,7 +93,7 @@ public final class Resource {
 
     @POST
     @Path("/password/dicomweb/studies/{studyInstanceUID}")
-    @Consumes("multipart/related,application/dicom")
+    @Consumes("multipart/related,multipart/form-data,application/dicom")
     @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stowStudy(@HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
@@ -100,7 +101,7 @@ public final class Resource {
 
     @POST
     @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID}")
-    @Consumes("multipart/related,application/dicom")
+    @Consumes("multipart/related,multipart/form-data,application/dicom")
     @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
     public Response stowStudyWithCapability(@PathParam("capability") String capabilityToken, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.from(capabilityToken), albumId, studyInstanceUID);
@@ -130,7 +131,7 @@ public final class Resource {
 
         try (InputStream inputStream = getFilteredInputStream(request.getInputStream())) {
             final Proxy proxy = new Proxy(providers, getFilteredContentType(), inputStream, authorizationManager, fetchRequester::addStudies);
-            return proxy(proxy, authorizationManager, inputStream, studyInstanceUID);
+            return processProxy(proxy, authorizationManager, studyInstanceUID);
         } catch (IOException e) {
             LOG.log(Level.WARNING, "", e);
             throw new WebApplicationException(BAD_REQUEST);
@@ -151,6 +152,19 @@ public final class Resource {
         }
     }
 
+    private MediaType getGatewayContentType() {
+        MediaType filteredContentType = getFilteredContentType();
+        if (filteredContentType.isCompatible(MULTIPART_FORM_DATA_TYPE)) {
+            Map<String, String > parameters = new HashMap<>(2);
+            parameters.put("type", "\"application/dicom\"");
+//            parameters.put("boundary", filteredContentType.getParameters().get("boundary"));
+
+            return new MediaType("multipart", "related", parameters);
+        } else {
+            return contentType;
+        }
+    }
+
     private InputStream getFilteredInputStream(final InputStream inputStream) {
         if (contentType.isCompatible(APPLICATION_DICOM_TYPE)) {
             final Vector<InputStream> streams = new Vector<>(3);
@@ -164,7 +178,7 @@ public final class Resource {
         }
     }
 
-    private Response proxy(Proxy proxy, AuthorizationManager authorizationManager, InputStream inputStream, String studyInstanceUID) {
+    private Response processProxy(Proxy proxy, AuthorizationManager authorizationManager, String studyInstanceUID) {
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
         if (studyInstanceUID != null) {
@@ -196,7 +210,7 @@ public final class Resource {
                     .request()
                     .header(AUTHORIZATION, "Bearer " + getPostBearerToken())
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
-                    .post(Entity.entity(multipartStreamingOutput, getFilteredContentType()));
+                    .post(Entity.entity(multipartStreamingOutput, getGatewayContentType()));
         } catch (ProcessingException e) {
             LOG.log(Level.SEVERE, "Gateway Processing Error", e);
             if (e.getCause() instanceof WebApplicationException) {
@@ -213,9 +227,7 @@ public final class Resource {
         }
 
         try (InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
-            Response response = authorizationManager.getResponse(SAXReader.parse(responseStream), gatewayResponse.getStatus());
-            inputStream.close();
-            return response;
+            return authorizationManager.getResponse(SAXReader.parse(responseStream), gatewayResponse.getStatus());
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOG.log(Level.WARNING, "Error parsing response", e);
             throw new WebApplicationException(BAD_GATEWAY);

@@ -43,7 +43,19 @@ public final class AuthorizationManager {
     private final UriBuilder authorizationUriBuilder;
     private final AuthorizationToken bearerToken;
 
-    private int processingFailures;
+    private final List<ProcessingFailure> processingFailures = new ArrayList<>();
+
+    private final static class ProcessingFailure {
+        private final String fileID;
+
+        ProcessingFailure(final String fileID) {
+            this.fileID = fileID;
+        }
+
+        Optional<String> getFileID() {
+            return Optional.ofNullable(fileID);
+        }
+    }
 
     public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId) {
         this.bearerToken = Objects.requireNonNull(authorizationToken);
@@ -78,8 +90,8 @@ public final class AuthorizationManager {
         }
     }
 
-    public void incrementProcessingFailure() {
-        processingFailures++;
+    public void addProcessingFailure(final String fileID) {
+        processingFailures.add(new ProcessingFailure(fileID));
     }
 
     public Response getResponse(Attributes attributes, final int status) {
@@ -103,12 +115,15 @@ public final class AuthorizationManager {
         }
 
         Sequence otherFailures = attributes.getSequence(Tag.OtherFailuresSequence);
-        if (otherFailures == null && processingFailures > 0) {
-            otherFailures = attributes.newSequence(Tag.OtherFailuresSequence, processingFailures);
+        if (otherFailures == null && processingFailures.size() > 0) {
+            otherFailures = attributes.newSequence(Tag.OtherFailuresSequence, processingFailures.size());
         }
-        for (int i = 0; i < processingFailures; i++) {
+        for (ProcessingFailure processingFailure: processingFailures) {
             Attributes failureAttributes = new Attributes(1);
             failureAttributes.setInt(Tag.FailureReason, VR.US, Status.ProcessingFailure);
+            Optional<String> fileID = processingFailure.getFileID();
+            fileID.ifPresent(s -> failureAttributes.setString(Tag.ReferencedFileID, VR.CS, s));
+
             otherFailures.add(failureAttributes);
         }
 
@@ -125,7 +140,7 @@ public final class AuthorizationManager {
                 break;
         }
 
-        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || processingFailures > 0)) {
+        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || processingFailures.size() > 0)) {
             responseStatus = ACCEPTED;
         }
 
