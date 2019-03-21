@@ -319,8 +319,8 @@ export default {
 		},
 		addComment () {
 			if (this.newComment.comment.length > 2) {
-        this.messageSend = false
-        this.newComment.to_user = this.privateUser
+				this.messageSend = false
+				this.newComment.to_user = this.privateUser
 				if (this.scope === 'album') {
 					let params = {
 						type: (this.includeNotifications) ? '' : 'comments',
@@ -354,18 +354,20 @@ export default {
 			let type = (this.includeNotifications) ? '' : 'comments'
 			if (this.scope === 'album') {
 				this.$store.dispatch('getAlbumComments', { type: type }).then(() => {
-					let container = this.$el.querySelector('#album_comment_container')
-					container.scrollTop = container.scrollHeight
+					this.scrollBottom()
 				})
 			} else if (this.scope === 'studies') {
 				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then(() => {
-					let container = this.$el.querySelector('#study_' + this.id.replace(/\./g, '_') + '_comment_container')
-					container.scrollTop = container.scrollHeight
+					this.scrollBottom()
 				})
 			}
 		},
 		splitComment (comment) {
 			return comment.split('\n')
+		},
+		scrollBottom () {
+			let container = this.$el.querySelector(`#${this.container_id}`)
+			container.scrollTop = container.scrollHeight
 		}
 	}
 }
