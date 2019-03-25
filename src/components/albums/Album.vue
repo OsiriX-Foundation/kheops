@@ -131,7 +131,10 @@ export default {
 		this.loading = true
 		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
 			this.loading = false
-			this.view = this.$route.query.view || 'studies'
+			if (!this.$route.query.view) {
+				this.$router.push({ query: { view: 'studies' } })
+			}
+			this.view = this.$route.query.view
 		})
 		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 	},
