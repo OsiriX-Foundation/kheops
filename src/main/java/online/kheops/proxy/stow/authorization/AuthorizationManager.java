@@ -17,6 +17,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -45,6 +47,8 @@ public final class AuthorizationManager {
 
     private final List<ProcessingFailure> processingFailures = new ArrayList<>();
 
+    private final MultivaluedMap<String, String> fileIDMap = new MultivaluedHashMap<>();
+
     private final static class ProcessingFailure {
         private final String fileID;
 
@@ -69,7 +73,7 @@ public final class AuthorizationManager {
     // Throws an exception that describes the reason the authorization could not be acquired.
     // stores authorizations that have failed so that attributes can be patched
     // returns a set of InstanceID for which authorization has passed
-    public Set<InstanceID> getAuthorization(Part part) throws AuthorizationManagerException, GatewayException {
+    public Set<InstanceID> getAuthorization(Part part, String fileID) throws AuthorizationManagerException, GatewayException {
         Optional<ContentLocation> contentLocationOptional = part.getContentLocation();
         if (contentLocationOptional.isPresent()) {
             getAuthorization(contentLocationOptional.get());
@@ -77,6 +81,9 @@ public final class AuthorizationManager {
         } else {
             Set<InstanceID> authorizedInstanceIDs = new HashSet<>();
             for (InstanceID instanceID: part.getInstanceIDs()) {
+                if (fileID != null) {
+                    fileIDMap.add(instanceID.getSOPInstanceUID(), fileID);
+                }
                 if (getAuthorization(instanceID)) {
                     authorizedInstanceIDs.add(instanceID);
                     authorizeContentLocations(part.getBulkDataLocations(instanceID));
@@ -106,10 +113,17 @@ public final class AuthorizationManager {
         }
 
         for (InstanceID forbiddenInstance: forbiddenInstanceIDs) {
+            final String sopInstanceUID = forbiddenInstance.getSOPInstanceUID();
             Attributes failedAttributes = new Attributes(3);
             failedAttributes.setString(Tag.ReferencedSOPInstanceUID, VR.UI, forbiddenInstance.getSOPInstanceUID());
             failedAttributes.setString(Tag.ReferencedSOPClassUID, VR.UI, forbiddenInstance.getSOPClassUID());
             failedAttributes.setInt(Tag.FailureReason, VR.US, Status.NotAuthorized);
+
+            if (fileIDMap.containsKey(sopInstanceUID) && fileIDMap.get(sopInstanceUID).size() > 0) {
+                final String fileID = fileIDMap.getFirst(sopInstanceUID);
+                fileIDMap.get(sopInstanceUID).remove(0);
+                failedAttributes.setString(Tag.ReferencedFileID, VR.CS, fileID);
+            }
 
             failedSOPs.add(failedAttributes);
         }
