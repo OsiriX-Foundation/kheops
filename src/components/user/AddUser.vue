@@ -10,7 +10,7 @@
 		enableAdd: Enable input if this prop is true.
 			- type: Boolean
 			- required: true
-			- default: false
+			- default: true
 		
 		this component send emit "private-user" to the parent when :
 			- when user is delete
@@ -48,6 +48,7 @@
           aria-label="Email"
           :disabled="!enableAdd"
           @keydown.enter.prevent="checkUser"
+					ref="textcomment"
         >
         <div class="input-group-append">
           <button
@@ -85,7 +86,7 @@ export default {
 		enableAdd: {
 			type: Boolean,
 			required: true,
-			default: false
+			default: true
 		}
 	},
 	data () {
@@ -99,6 +100,9 @@ export default {
 			handler: function (enableAdd) {
 				if (!this.enableAdd) {
 					this.deleteUser()
+				} else {
+          let textcomment = this.$refs.textcomment
+          setTimeout(function() { textcomment.focus() }, 0)
 				}
 			}
 		}

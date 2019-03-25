@@ -249,15 +249,16 @@
               :placeholder="$t('writecomment')"
               rows="2"
               maxlength="1024"
-              :disabled="enableText"
+              :disabled="disabledText"
               @keydown.enter.prevent="addComment"
+              ref="textcomment"
             />
             <div class="input-group-append">
               <button
                 title="send comment"
                 type="submit"
                 class="btn btn-primary"
-                :disabled="newComment.comment.length < 2 || enableText"
+                :disabled="newComment.comment.length < 2 || disabledText"
               >
                 <v-icon name="paper-plane" />
               </button>
@@ -296,7 +297,7 @@ export default {
 			privateUser: '',
 			messageSend: false,
 			enablePrivate: false,
-			enableText: false
+			disabledText: false
 		}
 	},
 	computed: {
@@ -322,17 +323,27 @@ export default {
 		this.getComments()
 		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
+	watch: {
+		disabledText: {
+			handler: function (disabledText) {
+				if (!this.disabledText) {
+          let textcomment = this.$refs.textcomment
+          setTimeout(function() { textcomment.focus() }, 0)
+				}
+			}
+		}
+	},
 	methods: {
     SetEnabledVariables () {
       this.enablePrivate = !this.enablePrivate
-      this.enableText = !this.enableText
+      this.disabledText = !this.disabledText
     },
 		setPrivateUser (user) {
       if (user !== '') {
-        this.enableText = false
+        this.disabledText = false
         this.privateUser = user
       } else {
-        this.enableText = this.enablePrivate
+        this.disabledText = this.enablePrivate
       }
 		},
 		addComment () {
