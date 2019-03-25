@@ -85,16 +85,8 @@ public class Events {
         return new Mutation(callingUser, album, mutationType, series);
     }
 
-    public static Mutation albumPostSeriesMutation(Capability capability, Album album, MutationType mutationType, Series series) {
-        return new Mutation(capability, album, mutationType, series);
-    }
-
     public static Mutation albumPostStudyMutation(User callingUser, Album album, MutationType mutationType, Study study) {
         return new Mutation(callingUser, album, mutationType, study);
-    }
-
-    public static Mutation albumPostStudyMutation(Capability capability, Album album, MutationType mutationType, Study study) {
-        return new Mutation(capability, album, mutationType, study);
     }
 
     public static Mutation albumPostEditMutation(User callingUser, Album album) {

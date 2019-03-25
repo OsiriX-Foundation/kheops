@@ -13,8 +13,6 @@ import online.kheops.auth_server.user.UserPermissionEnum;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import java.util.Optional;
-
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.canAccessSeries;
 import static online.kheops.auth_server.series.Series.isSeriesInInbox;
@@ -29,6 +27,12 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
     private EntityManager em;
     private EntityTransaction tx;
+
+    /*public CapabilityPrincipal(ScopeType scopeType, boolean readPermission, boolean writePermission) {
+        this.scopeType = scopeType;
+        this.readPermission = readPermission;
+        this.writePermission = writePermission;
+    }*/
 
     //old version
     private final Long dbid;
@@ -303,7 +307,4 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     public String toString() {
         return "[CapabilityPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
     }
-
-    @Override
-    public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
 }

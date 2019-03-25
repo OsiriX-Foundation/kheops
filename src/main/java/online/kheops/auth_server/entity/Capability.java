@@ -92,7 +92,7 @@ public class Capability {
 
     @OneToMany
     @JoinColumn (name = "capability_fk")
-    private Set<Mutation> mutations = new HashSet<>();
+    private Set<Mutation> mutation = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -206,8 +206,6 @@ public class Capability {
     public void setAlbum(Album album) { this.album = album; }
 
     public String getSecretBeforeHash() { return secretBeforeHash; }
-
-    public void addMutation(Mutation mutation) { mutations.add(mutation); }
 
     public static class CapabilityBuilder {
 
