@@ -58,6 +58,8 @@ public class CapabilitiesResponse {
         String series;
         @XmlElement(name = "scope_study")
         String study;
+        @XmlElement(name = "created_by")
+        String createdBy;
     }
 
     public CapabilitiesResponse(Capability capability, boolean showSecret, boolean isIntrospect) {
@@ -72,6 +74,7 @@ public class CapabilitiesResponse {
             if(capability.getLastUsed() != null) {
                 response.lastUsed = ZonedDateTime.of(capability.getLastUsed(), ZoneOffset.UTC).toString();
             }
+            response.createdBy = capability.getUser().getEmail();
         }
 
         response.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
