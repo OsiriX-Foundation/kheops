@@ -289,7 +289,7 @@ export default {
 			})
 		},
 		errDicom (formData, res, iderr, idvalue) {
-			if (iderr in res) {
+			if (res.hasOwnProperty(iderr)) {
 				let err = this.dicom2array(res[iderr].Value, idvalue)
 
 				formData.forEach((val) => {
