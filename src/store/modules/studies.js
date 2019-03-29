@@ -44,7 +44,7 @@ const actions = {
 		}
 		//
 		var reset = false
-
+		if (params.resetDisplay) commit('RESET_FLAGS')
 		let requestParams = ''
 		_.forEach(params.filters, function (value, filterName) {
 			if (filterName === 'inbox_and_albums') {
@@ -429,6 +429,9 @@ const mutations = {
 		}
 		if (flag.show_details !== undefined) state.flags[flag.id].show_details = flag.show_details
 	},
+	RESET_FLAGS (state) {
+		state.flags = {}
+	},
 	SET_REQUEST_PARAMS (state, request) {
 		state.request = request
 	},
@@ -468,7 +471,6 @@ const mutations = {
 			state.all[idx].view = (state.all[idx].view === 'comments') ? 'series' : 'comments'
 		}
 	}
-
 }
 
 export default {

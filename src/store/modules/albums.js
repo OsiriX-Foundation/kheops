@@ -154,6 +154,7 @@ const actions = {
 			params.users.forEach(user => {
 				this.dispatch('add_user_to_album', { album_id: res.data.album_id, user_name: user.email })
 			})
+			return res.data
 		}).catch(() => {
 		})
 	},

@@ -794,10 +794,13 @@ export default {
 	created () {
 		this.setLoading(true)
 		if (this.$route.params.album_id) {
+			this.$store.commit('RESET_FLAGS')
 			this.filters.album_id = this.$route.params.album_id
 		} else {
-			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
-				.then(() => { setTimeout(() => this.setLoading(false), 300) })
+			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'], resetDisplay: true })
+				.then(() => {
+					setTimeout(() => this.setLoading(false), 300)
+				})
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
 	},
@@ -811,6 +814,9 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
+				// do not call for new studies if we are in the album > comments or album > settings view
+				if (this.$route.params.album_id && this.$route.query.view !== 'studies') return
+
 				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight
 				if (bottomOfWindow) {
 					this.pageNb++

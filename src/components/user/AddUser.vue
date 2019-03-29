@@ -1,3 +1,22 @@
+<!--
+		scope: Define the scope (Study or Album)
+			- type: String
+			- required: true
+			- default: ''
+		albumId: Define the album ID
+			- type: String
+			- required: false
+			- default: ''
+		enableAdd: Enable input if this prop is true.
+			- type: Boolean
+			- required: true
+			- default: true
+		
+		this component send emit "private-user" to the parent when :
+			- when user is delete
+			- when user is add
+			- when Enable Add is set to false in parent component
+-->
 <template>
   <div>
     <h5
@@ -27,7 +46,9 @@
           class="form-control form-control-sm"
           placeholder="email"
           aria-label="Email"
+          :disabled="!enableAdd"
           @keydown.enter.prevent="checkUser"
+					ref="textcomment"
         >
         <div class="input-group-append">
           <button
@@ -35,6 +56,7 @@
             class="btn btn-outline-secondary btn-sm"
             type="button"
             title="add user"
+            :disabled="!enableAdd"
             @click="checkUser()"
           >
             <v-icon name="plus" />
@@ -51,11 +73,6 @@ import { HTTP } from '@/router/http'
 export default {
 	name: 'AddUser',
 	props: {
-		showEdit: {
-			type: Boolean,
-			required: true,
-			default: false
-		},
 		scope: {
 			type: String,
 			required: true,
@@ -65,6 +82,11 @@ export default {
 			type: String,
 			required: false,
 			default: ''
+		},
+		enableAdd: {
+			type: Boolean,
+			required: true,
+			default: true
 		}
 	},
 	data () {
@@ -74,10 +96,13 @@ export default {
 		}
 	},
 	watch: {
-		showEdit: {
-			handler: function (showEdit) {
-				if (this.showEdit) {
+		enableAdd: {
+			handler: function (enableAdd) {
+				if (!this.enableAdd) {
 					this.deleteUser()
+				} else {
+          let textcomment = this.$refs.textcomment
+          setTimeout(function() { textcomment.focus() }, 0)
 				}
 			}
 		}

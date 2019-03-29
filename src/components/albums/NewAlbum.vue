@@ -228,8 +228,8 @@ export default {
 				writeComments: this.album.userSettings.writeComments,
 				users: this.album.users
 			}
-			this.$store.dispatch('createAlbum', postValues).then(() => {
-				this.$router.push('/albums')
+			this.$store.dispatch('createAlbum', postValues).then(album => {
+				this.$router.push('/albums/' + album.album_id)
 			})
 		}
 	}
