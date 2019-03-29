@@ -26,15 +26,19 @@
     <div
       v-if="files.length > 0"
     >
+			{{ files.length }}
+			<b-progress :value="lengthFilesSend-(files.length)" :max="lengthFilesSend" show-progress animated></b-progress>
       <div
+        v-if="errorFiles.length > 0"
         class="files-listing"
       >
         <div
-          v-for="(file, index) in files"
+          v-for="(file, index) in errorFiles"
           :key="index"
           class="file-listing"
         >
           <div
+            v-if="file.state.err"
             class="row align-items-center"
           >
             <div
@@ -45,29 +49,8 @@
             <div
               class="col-sm-auto"
             >
-              <span
-                v-if="file.state.sendFiles && !file.state.done"
-              >
-                <clip-loader
-                  :loading="file.state.sendFiles"
-                  :color="colorSpinner"
-                  :size="sizeSpinner"
-                />
-              </span>
-              <span
-                v-else-if="file.state.done"
-              >
-                <v-icon
-                  color="green"
-                  class="align-middle"
-                  name="check"
-                />
-              </span>
-              <span
-                v-else
-              >
+              <span>
                 <button
-                  v-if="file.state.err"
                   type="button"
                   class="btn btn-link btn-sm text-center"
                 >
@@ -82,7 +65,7 @@
                 <button
                   type="button"
                   class="btn btn-link btn-sm text-center"
-                  @click="removeFileName(file.name)"
+                  @click="removeUI(file.name)"
                 >
                   <span>
                     <v-icon
@@ -128,10 +111,12 @@ export default {
 		return {
 			dragAndDropCapable: false,
 			files: [],
+			errorFiles: [],
 			colorSpinner: 'white',
 			sizeSpinner: '24px',
 			hover: false,
-			maxsize: 10e6
+			maxsize: 10e6,
+			lengthFilesSend: 0
 		}
 	},
 	computed: {
@@ -187,6 +172,9 @@ export default {
 		}
 	},
 	methods: {
+		/**********************************************
+		 * Drag and Drop functions
+		**********************************************/
 		determineDragAndDropCapable () {
 			var div = document.createElement('div')
 			return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window
@@ -230,12 +218,17 @@ export default {
 				}
 			}.bind(this))
 		},
+		/**********************************************
+		 * Management of the sending of the files
+		**********************************************/
 		sendFiles () {
 			const config = {
 				headers: {
 					'Accept': 'application/dicom+json'
 				}
 			}
+			this.lengthFilesSend = this.files.length
+			this.errorFiles = []
 			if (this.maxsize > this.totalSizeFiles) {
 				this.sendFormDataPromise(this.files, config)
 			} else {
@@ -252,8 +245,7 @@ export default {
 			let promiseChain = Promise.resolve()
 			copyFiles.forEach((file, index) => {
 				state.size += file.content.size
-				if (state.size > this.maxsize) {
-					console.log(state.size)
+				if ((index + 1) % 100 === 0) {
 					let currentFiles = copyFiles.slice(state.tmpIndex, index)
 					const makeNextPromise = () => () => {
 						return this.sendFormDataPromise(currentFiles, config)
@@ -281,26 +273,6 @@ export default {
 			})
 			return formData
 		},
-		/*
-		sendFormData (files, config) {
-			let formData = this.createFormData(files)
-			HTTP.post('/studies', formData, config).then(res => {
-				if (res.status === 200) {
-					formData.forEach((val) => {
-						this.removeFileName(val.name)
-					})
-				}
-				if (res.status === 202) {
-					this.errDicom(formData, res.data, '0008119A', '00041500')
-					this.errDicom(formData, res, '00081198', '00081150')
-				}
-				return res
-			}).catch(res => {
-				this.errDicom(formData, res, '0008119A', '00041500')
-				this.errDicom(formData, res, '00081198', '00081150')
-			})
-		},
-		*/
 		sendFormDataPromise (files, config) {
 			return new Promise((resolve, reject) => {
 				let formData = this.createFormData(files)
@@ -330,22 +302,36 @@ export default {
 						this.removeFileName(val.name)
 					}
 				})
+
 				this.files.forEach((val) => {
-					val.state.sendFiles = false
-					val.state.err = true
+					if (err.indexOf(val.name) !== -1) {
+						val.state.sendFiles = false
+						val.state.err = true
+						this.errorFiles.push(val)
+					}
 				})
 			}
 		},
 		dicom2array (dicom, id) {
 			let tab = []
 			dicom.forEach(x => {
-				tab.push(x[id].Value[0])
+				if (x.hasOwnProperty(id)) {
+					tab.push(x[id].Value[0])
+				}
 			})
 			return tab
 		},
 		removeFileName (filename) {
 			let index = this.files.findIndex(x => x.name === filename)
 			this.files.splice(index, 1)
+		},
+		removeErrorName (filename) {
+			let index = this.errorFiles.findIndex(x => x.name === filename)
+			this.errorFiles.splice(index, 1)
+		},
+		removeUI (filename) {
+			this.removeFileName (filename)
+			this.removeErrorName (filename)
 		}
 	}
 }
