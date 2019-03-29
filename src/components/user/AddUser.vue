@@ -11,7 +11,7 @@
 			- type: Boolean
 			- required: true
 			- default: true
-		
+
 		this component send emit "private-user" to the parent when :
 			- when user is delete
 			- when user is add
@@ -41,6 +41,7 @@
     >
       <div class="input-group mb-3">
         <input
+          ref="textcomment"
           v-model="newUserName"
           type="text"
           class="form-control form-control-sm"
@@ -48,7 +49,6 @@
           aria-label="Email"
           :disabled="!enableAdd"
           @keydown.enter.prevent="checkUser"
-					ref="textcomment"
         >
         <div class="input-group-append">
           <button
@@ -101,8 +101,8 @@ export default {
 				if (!this.enableAdd) {
 					this.deleteUser()
 				} else {
-          let textcomment = this.$refs.textcomment
-          setTimeout(function() { textcomment.focus() }, 0)
+					let textcomment = this.$refs.textcomment
+					setTimeout(function () { textcomment.focus() }, 0)
 				}
 			}
 		}

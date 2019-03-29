@@ -244,6 +244,7 @@
         >
           <div class="input-group mb-3">
             <textarea
+              ref="textcomment"
               v-model="newComment.comment"
               class="form-control form-control-sm"
               :placeholder="$t('writecomment')"
@@ -251,7 +252,6 @@
               maxlength="1024"
               :disabled="disabledText"
               @keydown.enter.prevent="addComment"
-              ref="textcomment"
             />
             <div class="input-group-append">
               <button
@@ -319,38 +319,38 @@ export default {
 			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
 		}
 	},
-	created () {
-		this.getComments()
-		if (this.album.album_id) this.$store.dispatch('getUsers')
-	},
 	watch: {
 		disabledText: {
 			handler: function (disabledText) {
 				if (!this.disabledText) {
-          let textcomment = this.$refs.textcomment
-          setTimeout(function() { textcomment.focus() }, 0)
+					let textcomment = this.$refs.textcomment
+					setTimeout(function () { textcomment.focus() }, 0)
 				}
 			}
 		}
 	},
+	created () {
+		this.getComments()
+		if (this.album.album_id) this.$store.dispatch('getUsers')
+	},
 	methods: {
-    SetEnabledVariables () {
-      this.enablePrivate = !this.enablePrivate
-      this.disabledText = !this.disabledText
-    },
+		SetEnabledVariables () {
+			this.enablePrivate = !this.enablePrivate
+			this.disabledText = !this.disabledText
+		},
 		setPrivateUser (user) {
-      if (user !== '') {
-        this.disabledText = false
-        this.privateUser = user
-      } else {
-        this.disabledText = this.enablePrivate
-      }
+			if (user !== '') {
+				this.disabledText = false
+				this.privateUser = user
+			} else {
+				this.disabledText = this.enablePrivate
+			}
 		},
 		addComment () {
 			if (this.newComment.comment.length > 2) {
-        if (this.enablePrivate) {
-          this.newComment.to_user = this.privateUser
-        }
+				if (this.enablePrivate) {
+					this.newComment.to_user = this.privateUser
+				}
 
 				if (this.scope === 'album') {
 					let params = {
@@ -376,7 +376,7 @@ export default {
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					})
-        }
+				}
 			}
 		},
 		getComments () {
