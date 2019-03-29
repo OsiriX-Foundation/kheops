@@ -159,6 +159,7 @@ export default {
 			// Capture the files from the drop event and add them to local files array
 			this.$refs.fileform.addEventListener('drop', function (e) {
 				if (this.hover) this.hover = false
+				console.time('loadFiles')
 				for (let i = 0; i < e.dataTransfer.items.length; i++) {
 					var entry = e.dataTransfer.items[i].webkitGetAsEntry()
 					if (entry.isFile) {
@@ -169,6 +170,7 @@ export default {
 						this.loadDir(entry, [])
 					}
 				}
+				console.timeEnd('loadFiles')
 			}.bind(this))
 
 			this.$refs.dragdrop.addEventListener('dragenter', function (e) {
@@ -235,29 +237,38 @@ export default {
 				}
 			}
 			if (this.maxsize > this.totalSizeFiles) {
-				let formData = this.createFormData(this.files)
-				this.sendFormData(formData, config)
+				this.sendFormDataPromise(this.files, config)
 			} else {
 				this.sendBySize(this.files, config)
 			}
 		},
 		sendBySize (files, config) {
-			let size = 0
-			let tmpIndex = 0
+			let state = {
+				size: 0,
+				tmpIndex: 0
+			}
 			const copyFiles = files
+			// https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
+			let promiseChain = Promise.resolve()
 			copyFiles.forEach((file, index) => {
-				size += file.content.size
-				if (size > this.maxsize) {
-					let formData = this.createFormData(files.slice(tmpIndex, index))
-
-					this.sendFormData(formData, config)
-					tmpIndex = index
-					size = 0
+				state.size += file.content.size
+				if (state.size > this.maxsize) {
+					console.log(state.size)
+					let currentFiles = copyFiles.slice(state.tmpIndex, index)
+					const makeNextPromise = () => () => {
+						return this.sendFormDataPromise(currentFiles, config)
+					}
+					promiseChain = promiseChain.then(makeNextPromise())
+					state.tmpIndex = index
+					state.size = 0
 				}
 			})
-			if (tmpIndex < copyFiles.length) {
-				let formData = this.createFormData(copyFiles.slice(tmpIndex, copyFiles.length))
-				this.sendFormData(formData, config)
+			if (state.tmpIndex < copyFiles.length) {
+				let currentFiles = copyFiles.slice(state.tmpIndex, copyFiles.length)
+				const makeNextPromise = () => () => {
+					return this.sendFormDataPromise(currentFiles, config)
+				}
+				promiseChain = promiseChain.then(makeNextPromise())
 			}
 		},
 		createFormData (files) {
@@ -270,28 +281,50 @@ export default {
 			})
 			return formData
 		},
-		sendFormData (formData, config) {
+		/*
+		sendFormData (files, config) {
+			let formData = this.createFormData(files)
 			HTTP.post('/studies', formData, config).then(res => {
-				// TODO: Toutes les données sont passées
 				if (res.status === 200) {
 					formData.forEach((val) => {
 						this.removeFileName(val.name)
 					})
 				}
-				// TODO: Quelques données sont passées
 				if (res.status === 202) {
 					this.errDicom(formData, res.data, '0008119A', '00041500')
 					this.errDicom(formData, res, '00081198', '00081150')
 				}
+				return res
 			}).catch(res => {
 				this.errDicom(formData, res, '0008119A', '00041500')
 				this.errDicom(formData, res, '00081198', '00081150')
 			})
 		},
+		*/
+		sendFormDataPromise (files, config) {
+			return new Promise((resolve, reject) => {
+				let formData = this.createFormData(files)
+				HTTP.post('/studies', formData, config).then(res => {
+					if (res.status === 200) {
+						formData.forEach((val) => {
+							this.removeFileName(val.name)
+						})
+					}
+					if (res.status === 202) {
+						this.errDicom(formData, res.data, '0008119A', '00041500')
+						this.errDicom(formData, res, '00081198', '00081150')
+					}
+					resolve(res)
+				}).catch(res => {
+					this.errDicom(formData, res, '0008119A', '00041500')
+					this.errDicom(formData, res, '00081198', '00081150')
+					resolve(res)
+				})
+			})
+		},
 		errDicom (formData, res, iderr, idvalue) {
 			if (res.hasOwnProperty(iderr)) {
 				let err = this.dicom2array(res[iderr].Value, idvalue)
-
 				formData.forEach((val) => {
 					if (err.indexOf(val.name) === -1) {
 						this.removeFileName(val.name)
