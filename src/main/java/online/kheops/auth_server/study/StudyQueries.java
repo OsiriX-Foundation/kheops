@@ -21,7 +21,7 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -34,7 +34,7 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study", Study.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("study", study);
             query.setParameter("user", user);
             return query.getSingleResult();

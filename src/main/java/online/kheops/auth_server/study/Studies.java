@@ -396,8 +396,8 @@ public class Studies {
     public static boolean canAccessStudy(String sub, String studyUID) {
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
-            final Study study = findStudyByStudyUID(studyUID, em);
             final User user = findUserByUserId(sub, em);
+            final Study study = getStudy(studyUID, em);
             StudyQueries.findStudyByStudyandUser(study, user, em);
             return true;
         } catch (StudyNotFoundException | UserNotFoundException e) {
