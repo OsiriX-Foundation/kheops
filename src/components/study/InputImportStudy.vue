@@ -27,7 +27,22 @@
       v-if="files.length > 0"
     >
 			{{ files.length }}
-			<b-progress :value="lengthFilesSend-(files.length)" :max="lengthFilesSend" show-progress animated></b-progress>
+			{{ errorFiles.length }}
+			<div
+				class="row"
+			>
+				<div
+					class="col mb-2"
+				>
+					<b-progress-bar
+					:value="progressBarVal"
+					:max="lengthFilesSend"
+					show-progress
+					animated>
+						{{ progressBarVal }} / {{ lengthFilesSend }}
+					</b-progress-bar>
+				</div>
+			</div>
       <div
         v-if="errorFiles.length > 0"
         class="files-listing"
@@ -65,7 +80,7 @@
                 <button
                   type="button"
                   class="btn btn-link btn-sm text-center"
-                  @click="removeUI(file.name)"
+                  @click="removeFileUI(file.path)"
                 >
                   <span>
                     <v-icon
@@ -124,6 +139,10 @@ export default {
 			return this.files.reduce(function (total, currentValue) {
 				return total + currentValue.content.size
 			}, 0)
+		},
+		progressBarVal () {
+			let currentVal = this.lengthFilesSend - (this.files.length - this.errorFiles.length)
+			return currentVal < 0 ? 0 : currentVal
 		}
 	},
 	watch: {
@@ -144,18 +163,17 @@ export default {
 			// Capture the files from the drop event and add them to local files array
 			this.$refs.fileform.addEventListener('drop', function (e) {
 				if (this.hover) this.hover = false
-				console.time('loadFiles')
 				for (let i = 0; i < e.dataTransfer.items.length; i++) {
 					var entry = e.dataTransfer.items[i].webkitGetAsEntry()
-					if (entry.isFile) {
+					if (entry && entry.isFile) {
 						entry.file(function (file) {
 							this.loadFile(file, file.name)
 						}.bind(this))
-					} else if (entry.isDirectory) {
+					} else if (entry && entry.isDirectory) {
 						this.loadDir(entry, [])
 					}
+					this.initVariables()
 				}
-				console.timeEnd('loadFiles')
 			}.bind(this))
 
 			this.$refs.dragdrop.addEventListener('dragenter', function (e) {
@@ -180,7 +198,7 @@ export default {
 			return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window
 		},
 		loadFile (file, path, name) {
-			let objFile = {
+			const objFile = {
 				'content': file,
 				'state': {
 					done: false,
@@ -193,7 +211,7 @@ export default {
 			this.files.push(objFile)
 		},
 		inputLoadFiles () {
-			let files = this.$refs.inputfiles.files
+			const files = this.$refs.inputfiles.files
 			for (let i = 0; i < files.length; i++) {
 				this.loadFile(files[i], files[i].webkitRelativePath ? files[i].webkitRelativePath : files[i].name, files[i].name)
 			}
@@ -221,14 +239,17 @@ export default {
 		/**********************************************
 		 * Management of the sending of the files
 		**********************************************/
+		initVariables () {
+			this.lengthFilesSend = this.files.length
+			this.errorFiles = []
+		},
 		sendFiles () {
 			const config = {
 				headers: {
 					'Accept': 'application/dicom+json'
 				}
 			}
-			this.lengthFilesSend = this.files.length
-			this.errorFiles = []
+			this.initVariables()
 			if (this.maxsize > this.totalSizeFiles) {
 				this.sendFormDataPromise(this.files, config)
 			} else {
@@ -301,6 +322,9 @@ export default {
 					if (err.indexOf(val.name) === -1) {
 						this.removeFileName(val.name)
 					}
+					else {
+						console.log(val.name)
+					}
 				})
 
 				this.files.forEach((val) => {
@@ -325,13 +349,17 @@ export default {
 			let index = this.files.findIndex(x => x.name === filename)
 			this.files.splice(index, 1)
 		},
-		removeErrorName (filename) {
-			let index = this.errorFiles.findIndex(x => x.name === filename)
+		removeErrorPath (path) {
+			let index = this.errorFiles.findIndex(x => x.path === path)
 			this.errorFiles.splice(index, 1)
 		},
-		removeUI (filename) {
-			this.removeFileName (filename)
-			this.removeErrorName (filename)
+		removeFilePath (path) {
+			let index = this.files.findIndex(x => x.path === path)
+			this.files.splice(index, 1)
+		},
+		removeFileUI (path) {
+			this.removeErrorPath(path)
+			this.removeFilePath(path)
 		}
 	}
 }
