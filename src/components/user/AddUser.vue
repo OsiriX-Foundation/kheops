@@ -3,9 +3,9 @@
 			- type: String
 			- required: true
 			- default: ''
-		albumId: Define the album ID
+		id: Define the id of the target of the comment (StudyID or AlbumID)
 			- type: String
-			- required: false
+			- required: true
 			- default: ''
 		enableAdd: Enable input if this prop is true.
 			- type: Boolean
@@ -78,21 +78,26 @@ export default {
 			required: true,
 			default: ''
 		},
-		albumId: {
-			type: String,
-			required: false,
-			default: ''
-		},
 		enableAdd: {
 			type: Boolean,
 			required: true,
 			default: true
+		},
+		id: {
+			type: String,
+			required: true,
+			default: ''
 		}
 	},
 	data () {
 		return {
 			user: '',
 			newUserName: ''
+		}
+	},
+	computed: {
+		accessVar () {
+			return this.scope === 'album' ? 'album_access' : 'study_access'
 		}
 	},
 	watch: {
@@ -113,28 +118,12 @@ export default {
 			this.$emit('private-user', this.user)
 		},
 		checkUser () {
-			if (this.scope === 'album') {
-				this.checkUserAlbum()
-			} else {
-				this.checkUserStudies()
-			}
-		},
-		checkUserStudies () {
-			HTTP.get('users?reference=' + this.newUserName, { headers: { 'Accept': 'application/json' } }).then(res => {
-				if (res.status === 204) this.$snotify.error('User unknown')
-				else if (res.status === 200) {
+			const request = `users?reference=${this.newUserName}&${this.scope==='album' ? 'album' : 'studyInstanceUID'}=${this.id}`
+
+			HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
+				if (res.status === 204 || !res.data[this.accessVar]) this.$snotify.error('User unknown')
+				else if (res.status === 200 && res.data[this.accessVar]) {
 					this.setUser(res.data.email)
-				}
-			}).catch(() => {
-				console.log('Sorry, an error occured')
-			})
-		},
-		checkUserAlbum () {
-			HTTP.get('/albums/' + this.albumId + '/users', '', { headers: { 'Accept': 'application/json' } }).then(res => {
-				if (res.data.filter(user => { return user.user_name === this.newUserName }).length > 0) {
-					this.setUser(this.newUserName)
-				} else {
-					this.$snotify.error('User unknown in this album')
 				}
 			}).catch(() => {
 				console.log('Sorry, an error occured')

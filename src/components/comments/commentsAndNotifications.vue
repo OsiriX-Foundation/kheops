@@ -230,7 +230,7 @@
       <div class="col-sm-6 col-md-4">
         <add-user
           :scope="scope"
-          :album-id="album.album_id"
+          :id="id ? id : album.album_id"
           :enable-add="enablePrivate"
           @private-user="setPrivateUser"
         />
