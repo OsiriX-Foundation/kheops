@@ -45,7 +45,7 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getUserInfo(@QueryParam("reference") String reference,
                                 @QueryParam(ALBUM) String albumId,
-                                @QueryParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
+                                @QueryParam("studyInstanceUID") @UIDValidator String studyInstanceUID) {
 
         final UserResponseBuilder userResponseBuilder;
 
