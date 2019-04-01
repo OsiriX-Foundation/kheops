@@ -13,6 +13,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
+import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Albums {
@@ -412,5 +413,18 @@ public class Albums {
             return false;
         }
         return true;
+    }
+
+    public static boolean isMemberOfAlbum(String sub, String albumId) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            final Album album = findAlbumById(albumId, em);
+            final User user = findUserByUserId(sub, em);
+            return isMemberOfAlbum(user, album, em);
+        } catch (AlbumNotFoundException | UserNotFoundException e ) {
+            return false;
+        } finally {
+            em.close();
+        }
     }
 }

@@ -44,7 +44,7 @@ public class Keycloak {
         return instance;
     }
 
-    public UserResponse getUser(String user)
+    public UserResponseBuilder getUser(String user)
             throws UserNotFoundException, KeycloakException {
 
         if(user.contains("@")) {
@@ -63,7 +63,7 @@ public class Keycloak {
                     final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
                     if (keycloakUsers.size() > 0) {
                         final int index = keycloakUsers.verifyEmail(userLowerCase);
-                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0)).build();
+                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0));
                     } else {
                         throw new UserNotFoundException();
                     }
@@ -74,7 +74,7 @@ public class Keycloak {
 
             String userEmail = cacheUserName.getCachedValue(user);
             if(userEmail != null) {
-                 return new UserResponseBuilder().setEmail(userEmail).setSub(user).build();
+                 return new UserResponseBuilder().setEmail(userEmail).setSub(user);
             }
 
             final URI userUri = UriBuilder.fromUri(usersUri).path("/"+user).build();
@@ -92,7 +92,7 @@ public class Keycloak {
                     final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                     if (keycloakUser.size() == 1) {
                         cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
-                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0)).build();
+                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0));
                     } else {
                         throw new UserNotFoundException();
                     }
