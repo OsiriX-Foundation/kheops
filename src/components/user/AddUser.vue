@@ -11,7 +11,7 @@
 			- type: Boolean
 			- required: true
 			- default: true
-		
+
 		this component send emit "private-user" to the parent when :
 			- when user is delete
 			- when user is add
@@ -41,6 +41,7 @@
     >
       <div class="input-group mb-3">
         <input
+          ref="textcomment"
           v-model="newUserName"
           type="text"
           class="form-control form-control-sm"
@@ -48,7 +49,6 @@
           aria-label="Email"
           :disabled="!enableAdd"
           @keydown.enter.prevent="checkUser"
-					ref="textcomment"
         >
         <div class="input-group-append">
           <button
@@ -106,8 +106,8 @@ export default {
 				if (!this.enableAdd) {
 					this.deleteUser()
 				} else {
-          let textcomment = this.$refs.textcomment
-          setTimeout(function() { textcomment.focus() }, 0)
+					let textcomment = this.$refs.textcomment
+					setTimeout(function () { textcomment.focus() }, 0)
 				}
 			}
 		}
@@ -118,7 +118,7 @@ export default {
 			this.$emit('private-user', this.user)
 		},
 		checkUser () {
-			const request = `users?reference=${this.newUserName}&${this.scope==='album' ? 'album' : 'studyInstanceUID'}=${this.id}`
+			const request = `users?reference=${this.newUserName}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
 
 			HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 				if (res.status === 204 || !res.data[this.accessVar]) this.$snotify.error('User unknown')
