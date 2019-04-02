@@ -133,23 +133,11 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
 
         #Verify secrets
         if ! [ -f ${SECRET_FILE_PATH}/elastic_pwd ]; then
-            echo "Missing elastic_cloud_id secret"
+            echo "Missing elastic_pwd"
             missing_env_var_secret=true
         else
-           cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin
-           echo -e "secret elastic_cloud_id \e[92mOK\e[0m"
+           echo -e "secret elastic_pwd \e[92mOK\e[0m"
         fi
-
-
-
-        #get secrets and verify content
-        for f in ${SECRET_FILE_PATH}/*
-        do
-          filename=$(basename "$f")
-          value=$(cat ${f})
-          sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
-        done
-
 
 
         if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_NAME ]]; then
@@ -183,7 +171,15 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
 
         service filebeat start
         service metricbeat start
-
+        cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
+        metricbeat keystore list
+        metricbeat test output
+        service metricbeat restart
+        cat ${SECRET_FILE_PATH}/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
+        filebeat keystore list
+        filebbeat test output
+        service filebeat restart
+     
         echo "Ending setup METRICBEAT and FILEBEAT"
     fi
 else
