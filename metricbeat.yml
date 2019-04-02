@@ -74,7 +74,7 @@ setup.kibana:
 output.elasticsearch:
   enabled: true
   hosts: ["kibana.kheops.online"]
-  username: "elastic"
+  username: "beatuser"
   password: "${ES_PWD}"
 #============================= Elastic Cloud ==================================
 
