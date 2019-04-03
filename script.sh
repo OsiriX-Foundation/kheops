@@ -159,6 +159,15 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
 
+        #if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_USER ]]; then
+        #  echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_USER environment variable"
+        #  missing_env_var_secret=true
+        #else
+        #   echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_USER \e[92mOK\e[0m"
+        #   sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
+        #   sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/filebeat/filebeat.yml
+        #fi
+
         #if missing env var or secret => exit
         if [[ $missing_env_var_secret = true ]]; then
           exit 1
@@ -166,20 +175,12 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
         fi
 
-        #metricbeat modules enable nginx
-        #filebeat modules enable nginx
         metricbeat modules disable system
         filebeat modules disable system
 
-        ##service filebeat start
-        #service metricbeat start
         cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
-        #metricbeat keystore list
-        #metricbeat test output
         service metricbeat restart
         cat ${SECRET_FILE_PATH}/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
-        #filebeat keystore list
-        #filebbeat test output
         service filebeat restart
 
         echo "Ending setup METRICBEAT and FILEBEAT"

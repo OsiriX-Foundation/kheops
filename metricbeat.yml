@@ -74,7 +74,7 @@ setup.kibana:
 output.elasticsearch:
   enabled: true
   hosts: ["kibana.kheops.online"]
-  username: "beatuser"
+  username: ${KHEOPS_REVERSE_PROXY_ELASTIC_USER:?no elastic user Grrrrrrrr}
   password: "${ES_PWD}"
 #============================= Elastic Cloud ==================================
 
