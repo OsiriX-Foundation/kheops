@@ -159,14 +159,32 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
 
-        #if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_USER ]]; then
-        #  echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_USER environment variable"
-        #  missing_env_var_secret=true
-        #else
-        #   echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_USER \e[92mOK\e[0m"
-        #   sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
-        #   sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/filebeat/filebeat.yml
-        #fi
+        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_USER ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_USER environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_USER \e[92mOK\e[0m"
+           sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_URL ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_URL \e[92mOK\e[0m"
+           sed -i "s|\${elastic_url}|$KHEOPS_REVERSE_PROXY_ELASTIC_URL|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_url}|$KHEOPS_REVERSE_PROXY_ELASTIC_URL|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_REVERSE_PROXY_KIBANA_URL ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_KIBANA_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_KIBANA_URL \e[92mOK\e[0m"
+           sed -i "s|\${kibana_url}|$KHEOPS_REVERSE_PROXY_KIBANA_URL|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${kibana_url}|$KHEOPS_REVERSE_PROXY_KIBANA_URL|" /etc/filebeat/filebeat.yml
+        fi
 
         #if missing env var or secret => exit
         if [[ $missing_env_var_secret = true ]]; then
