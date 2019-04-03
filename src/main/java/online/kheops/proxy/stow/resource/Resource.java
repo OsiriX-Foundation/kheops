@@ -46,6 +46,7 @@ import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static javax.ws.rs.core.Response.Status.*;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_TYPE;
+import static org.dcm4che3.ws.rs.MediaTypes.MULTIPART_RELATED_APPLICATION_DICOM_TYPE;
 import static org.glassfish.jersey.client.ClientProperties.REQUEST_ENTITY_PROCESSING;
 import static org.glassfish.jersey.client.RequestEntityProcessing.CHUNKED;
 
@@ -129,8 +130,8 @@ public final class Resource {
         final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken);
         final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId);
 
-        try (InputStream inputStream = getFilteredInputStream(request.getInputStream())) {
-            final Proxy proxy = new Proxy(providers, getFilteredContentType(), inputStream, authorizationManager, fetchRequester::addStudies);
+        try (InputStream inputStream = getConvertedInputStream(request.getInputStream())) {
+            final Proxy proxy = new Proxy(providers, getConvertedContentType(), inputStream, authorizationManager, fetchRequester::addStudies);
             return processProxy(proxy, authorizationManager, studyInstanceUID);
         } catch (IOException e) {
             LOG.log(Level.WARNING, "", e);
@@ -140,7 +141,20 @@ public final class Resource {
         }
     }
 
-    private MediaType getFilteredContentType() {
+    private InputStream getConvertedInputStream(final InputStream inputStream) {
+        if (contentType.isCompatible(APPLICATION_DICOM_TYPE)) {
+            final Vector<InputStream> streams = new Vector<>(3);
+            streams.add(new ByteArrayInputStream(("\r\n--" + BOUNDARY + "\r\nContent-Type: application/dicom\r\n\r\n").getBytes(US_ASCII)));
+            streams.add(inputStream);
+            streams.add(new ByteArrayInputStream(("\r\n--" + BOUNDARY + "--").getBytes(US_ASCII)));
+
+            return new SequenceInputStream(streams.elements());
+        } else {
+            return inputStream;
+        }
+    }
+
+    private MediaType getConvertedContentType() {
         if (contentType.isCompatible(APPLICATION_DICOM_TYPE)) {
             Map<String, String > parameters = new HashMap<>(2);
             parameters.put("type", "\"application/dicom\"");
@@ -153,28 +167,11 @@ public final class Resource {
     }
 
     private MediaType getGatewayContentType() {
-        MediaType filteredContentType = getFilteredContentType();
+        MediaType filteredContentType = getConvertedContentType();
         if (filteredContentType.isCompatible(MULTIPART_FORM_DATA_TYPE)) {
-            Map<String, String > parameters = new HashMap<>(2);
-            parameters.put("type", "\"application/dicom\"");
-//            parameters.put("boundary", filteredContentType.getParameters().get("boundary"));
-
-            return new MediaType("multipart", "related", parameters);
+            return MULTIPART_RELATED_APPLICATION_DICOM_TYPE;
         } else {
-            return contentType;
-        }
-    }
-
-    private InputStream getFilteredInputStream(final InputStream inputStream) {
-        if (contentType.isCompatible(APPLICATION_DICOM_TYPE)) {
-            final Vector<InputStream> streams = new Vector<>(3);
-            streams.add(new ByteArrayInputStream(("\r\n--" + BOUNDARY + "\r\nContent-Type: application/dicom\r\n\r\n").getBytes(US_ASCII)));
-            streams.add(inputStream);
-            streams.add(new ByteArrayInputStream(("\r\n--" + BOUNDARY + "--").getBytes(US_ASCII)));
-
-            return new SequenceInputStream(streams.elements());
-        } else {
-            return inputStream;
+            return filteredContentType;
         }
     }
 
