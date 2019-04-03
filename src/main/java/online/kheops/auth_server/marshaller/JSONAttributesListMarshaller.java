@@ -15,8 +15,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,11 +38,10 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
 
     @Override
     public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) {
-        List<Attributes> list = new ArrayList<>();
+        final List<Attributes> list = new ArrayList<>();
 
-        try {
-            JsonParser parser = Json.createParser(inputStream);
-            JSONReader jsonReader = new JSONReader(parser);
+        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { public void close() {} })) {
+            final JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Exception e){
             throw new WebApplicationException("Error while reading JSON datasets", e);
@@ -64,16 +62,17 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     @Override
     public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
-        JsonGenerator generator = Json.createGenerator(entityStream);
-        JSONWriter jsonWriter = new JSONWriter(generator);
+        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { public void close() {} })) {
+            final JSONWriter jsonWriter = new JSONWriter(generator);
 
-        generator.writeStartArray();
+            generator.writeStartArray();
 
-        for (Attributes attributes: attributesList) {
-            jsonWriter.write(attributes);
+            for (final Attributes attributes : attributesList) {
+                jsonWriter.write(attributes);
+            }
+
+            generator.writeEnd();
+            generator.flush();
         }
-
-        generator.writeEnd();
-        generator.flush();
     }
 }

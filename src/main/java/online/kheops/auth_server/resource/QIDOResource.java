@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
@@ -324,37 +325,49 @@ public class QIDOResource {
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
-        InputStream is = CLIENT.target(uri).request("application/dicom+json").header("Authorization", "Bearer "+authToken).get(InputStream.class);
-
-        JsonParser parser = Json.createParser(is);
-        JSONReader jsonReader = new JSONReader(parser);
+        final Response upstreamResponse;
+        try {
+            upstreamResponse = CLIENT.target(uri).request("application/dicom+json").header("Authorization", "Bearer " + authToken).get();
+        } catch (ProcessingException e) {
+            LOG.log(WARNING, "unable to reach upstream", e);
+            return Response.status(BAD_GATEWAY).build();
+        }
+        if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+            LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
+            return Response.status(BAD_GATEWAY).build();
+        }
 
         final Set<String> availableSeriesUIDs;
         try {
             availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
         } catch (AlbumNotFoundException | StudyNotFoundException e) {
+            LOG.log(WARNING, "study or album not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final StreamingOutput stream = os -> {
-            final JsonGenerator generator = Json.createGenerator(os);
-            final JSONWriter jsonWriter = new JSONWriter(generator);
+            try (final JsonParser parser = Json.createParser(upstreamResponse.readEntity(InputStream.class));
+                 final JsonGenerator generator = Json.createGenerator(os)){
 
-            generator.writeStartArray();
+                final JSONReader jsonReader = new JSONReader(parser);
+                final JSONWriter jsonWriter = new JSONWriter(generator);
 
-            try {
+                generator.writeStartArray();
+
                 jsonReader.readDatasets((fmi, dataset) -> {
                     if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
                         jsonWriter.write(dataset);
                     }
                 });
+
+                generator.writeEnd();
+                generator.flush();
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Error while processing metadata", e);
                 throw new WebApplicationException(e);
+            } finally {
+                upstreamResponse.close();
             }
-
-            generator.writeEnd();
-            generator.flush();
         };
 
         return Response.ok(stream).build();
