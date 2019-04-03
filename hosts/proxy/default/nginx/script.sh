@@ -69,39 +69,23 @@ echo "Ending setup PEP secrets and env var"
 if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
     if [ "$KHEOPS_PEP_ENABLE_ELASTIC" = true ]; then
 
+        echo "Start init metricbeat and filebeat"
         missing_env_var_secret=false
 
         #Verify secrets
-        if ! [ -f /run/secrets/elastic_cloud_id ]; then
-            echo "Missing elastic_cloud_id secret"
+        if ! [ -f /run/secrets/elastic_pwd ]; then
+            echo "Missing elastic_pwd secret"
             missing_env_var_secret=true
         else
-           echo "secret elastic_cloud_id OK"
+           echo "secret elastic_pwd OK"
         fi
-
-        if ! [ -f /run/secrets/elastic_cloud_auth ]; then
-            echo "Missing elastic_cloud_auth secret"
-            missing_env_var_secret=true
-        else
-           echo "secret elastic_cloud_authm OK"
-        fi
-
-
-        #get secrets and verify content
-        for f in /run/secrets/*
-        do
-          filename=$(basename "$f")
-          value=$(cat ${f})
-          sed -i "s|\${$filename}|$value|" /etc/metricbeat/metricbeat.yml
-          sed -i "s|\${$filename}|$value|" /etc/filebeat/filebeat.yml
-        done
 
 
         if [ -z $KHEOPS_PEP_ELASTIC_NAME ]; then
           echo "Missing KHEOPS_PEP_ELASTIC_NAME environment variable"
           missing_env_var_secret=true
         else
-           echo "environment variable KHEOPS_PEP_ELASTIC_NAME OK"
+           echo -e "environment variable KHEOPS_PEP_ELASTIC_NAME OK"
            sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
         fi
@@ -109,10 +93,38 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
           echo "Missing KHEOPS_PEP_ELASTIC_TAGS environment variable"
           missing_env_var_secret=true
         else
-           echo "environment variable KHEOPS_PEP_ELASTIC_TAGS OK"
+           echo -e "environment variable KHEOPS_PEP_ELASTIC_TAGS OK"
            sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
+
+        if [ -z $KHEOPS_PEP_ELASTIC_USER ]; then
+          echo "Missing KHEOPS_PEP_ELASTIC_USER environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_PEP_ELASTIC_USER OK"
+           sed -i "s|\${elastic_user}|$KHEOPS_PEP_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_user}|$KHEOPS_PEP_ELASTIC_USER|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [ -z $KHEOPS_PEP_ELASTIC_URL ]; then
+          echo "Missing KHEOPS_PEP_ELASTIC_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_PEP_ELASTIC_URL OK"
+           sed -i "s|\${elastic_url}|$KHEOPS_PEP_ELASTIC_URL|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_url}|$KHEOPS_PEP_ELASTIC_URL|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [ -z $KHEOPS_PEP_KIBANA_URL ]; then
+          echo "Missing KHEOPS_PEP_KIBANA_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_PEP_KIBANA_URL OK"
+           sed -i "s|\${kibana_url}|$KHEOPS_PEP_KIBANA_URL|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${kibana_url}|$KHEOPS_PEP_KIBANA_URL|" /etc/filebeat/filebeat.yml
+        fi
+
 
         #if missing env var or secret => exit
         if [ $missing_env_var_secret = true ]; then
@@ -121,13 +133,13 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
            echo "all elastic secrets and all env var OK"
         fi
 
-        metricbeat modules enable nginx
-        filebeat modules enable nginx
         metricbeat modules disable system
         filebeat modules disable system
 
-        service filebeat start
-        service metricbeat start
+        cat /run/secrets/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
+        service metricbeat restart
+        cat /run/secrets/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
+        service filebeat restart
 
         echo "Ending setup METRICBEAT and FILEBEAT"
     fi

@@ -120,45 +120,17 @@ setup.kibana:
   # Scheme and port can be left out and will be set to the default (http and 5601)
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  #host: "localhost:5601"
+  host: "${kibana_url}"
 
   # Kibana Space ID
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
   # the Default Space will be used.
   #space.id:
-
-#============================= Elastic Cloud ==================================
-
-# These settings simplify using filebeat with the Elastic Cloud (https://cloud.elastic.co/).
-
-# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
-# `setup.kibana.host` options.
-# You can find the `cloud.id` in the Elastic Cloud web UI.
-#cloud.id:
-
-# The cloud.auth setting overwrites the `output.elasticsearch.username` and
-# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
-#cloud.auth:
-cloud.id: "${elastic_cloud_id}"
-cloud.auth: "${elastic_cloud_auth}"
-
-#================================ Outputs =====================================
-
-# Configure what output to use when sending the data collected by the beat.
-
-#-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-
+  enabled: true
+  hosts: ["${elastic_url}"]
+  username: ${elastic_user}
+  password: "${ES_PWD}"
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
