@@ -13,8 +13,6 @@ import java.net.URI;
 import java.util.Objects;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static online.kheops.zipper.instance.Instance.SERIES_INSTANCE_UID;
-import static online.kheops.zipper.instance.Instance.STUDY_INSTANCE_UID;
 
 public final class BearerTokenRetriever {
     private final Client client;
