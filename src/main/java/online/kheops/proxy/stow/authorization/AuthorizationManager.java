@@ -129,7 +129,7 @@ public final class AuthorizationManager {
         }
 
         Sequence otherFailures = attributes.getSequence(Tag.OtherFailuresSequence);
-        if (otherFailures == null && processingFailures.size() > 0) {
+        if (otherFailures == null && !processingFailures.isEmpty()) {
             otherFailures = attributes.newSequence(Tag.OtherFailuresSequence, processingFailures.size());
         }
         for (ProcessingFailure processingFailure: processingFailures) {
