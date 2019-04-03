@@ -18,7 +18,6 @@ public class UserQueries {
             TypedQuery<User> googleIdQuery = em.createQuery("SELECT u from User u where u.keycloakId = :userId", User.class);
             googleIdQuery.setParameter("userId", userId);
             return googleIdQuery.getSingleResult();
-
         } catch (NoResultException e) {
             throw new UserNotFoundException();
         }

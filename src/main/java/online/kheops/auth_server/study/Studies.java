@@ -6,6 +6,7 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.QIDOParams;
 import org.dcm4che3.data.Attributes;
@@ -36,6 +37,7 @@ import static online.kheops.auth_server.series.Series.editSeriesFavorites;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
+import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static org.jooq.impl.DSL.*;
 
 public class Studies {
@@ -387,6 +389,18 @@ public class Studies {
             StudyQueries.findStudyByStudyandUser(study, user, em);
             return true;
         } catch (StudyNotFoundException e) {
+            return false;
+        }
+    }
+
+    public static boolean canAccessStudy(String sub, String studyUID) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            final User user = findUserByUserId(sub, em);
+            final Study study = getStudy(studyUID, em);
+            StudyQueries.findStudyByStudyandUser(study, user, em);
+            return true;
+        } catch (StudyNotFoundException | UserNotFoundException e) {
             return false;
         }
     }

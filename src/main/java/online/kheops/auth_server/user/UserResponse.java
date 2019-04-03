@@ -10,6 +10,11 @@ public class UserResponse {
         private String email;
         @XmlElement(name = "sub")
         private String sub;
+
+        @XmlElement(name = "study_access")
+        private Boolean studyAccess;
+        @XmlElement(name = "album_access")
+        private Boolean albumAccess;
     }
 
     private Response response;
@@ -18,6 +23,9 @@ public class UserResponse {
         response = new Response();
         response.email = userResponseBuilder.getEmail();
         response.sub = userResponseBuilder.getSub();
+
+        response.albumAccess = userResponseBuilder.getAlbumAccess();
+        response.studyAccess = userResponseBuilder.getStudyAccess();
     }
 
     public String getEmail() { return response.email; }
