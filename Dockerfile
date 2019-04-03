@@ -18,6 +18,7 @@ COPY --from=builder kheops.conf /etc/nginx/conf.d/kheops.conf
 COPY --from=builder metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
 COPY --from=builder script.sh /etc/nginx/conf.d/script.sh
 COPY --from=builder nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder chain.pem /etc/nginx/chain.pem
 
 RUN chmod +x /etc/nginx/conf.d/script.sh
 
