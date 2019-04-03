@@ -219,13 +219,19 @@
     </div>
     <div class="row mt-4 justify-content-center">
       <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
-        Send private message to
+        <b-form-checkbox
+          class="pt-1"
+          inline
+          @change="SetEnabledVariables()"
+        >
+          Send private message to
+        </b-form-checkbox>
       </div>
       <div class="col-sm-6 col-md-4">
         <add-user
-          :show-edit="messageSend"
           :scope="scope"
-          :album-id="album.album_id"
+          :id="id ? id : album.album_id"
+          :enable-add="enablePrivate"
           @private-user="setPrivateUser"
         />
       </div>
@@ -243,14 +249,16 @@
               :placeholder="$t('writecomment')"
               rows="2"
               maxlength="1024"
+              :disabled="disabledText"
               @keydown.enter.prevent="addComment"
+              ref="textcomment"
             />
             <div class="input-group-append">
               <button
                 title="send comment"
                 type="submit"
                 class="btn btn-primary"
-                :disabled="newComment.comment.length < 2"
+                :disabled="newComment.comment.length < 2 || disabledText"
               >
                 <v-icon name="paper-plane" />
               </button>
@@ -287,7 +295,9 @@ export default {
 			},
 			includeNotifications: false,
 			privateUser: '',
-			messageSend: false
+			messageSend: false,
+			enablePrivate: false,
+			disabledText: false
 		}
 	},
 	computed: {
@@ -313,14 +323,35 @@ export default {
 		this.getComments()
 		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
+	watch: {
+		disabledText: {
+			handler: function (disabledText) {
+				if (!this.disabledText) {
+          let textcomment = this.$refs.textcomment
+          setTimeout(function() { textcomment.focus() }, 0)
+				}
+			}
+		}
+	},
 	methods: {
+    SetEnabledVariables () {
+      this.enablePrivate = !this.enablePrivate
+      this.disabledText = !this.disabledText
+    },
 		setPrivateUser (user) {
-			this.privateUser = user
+      if (user !== '') {
+        this.disabledText = false
+        this.privateUser = user
+      } else {
+        this.disabledText = this.enablePrivate
+      }
 		},
 		addComment () {
 			if (this.newComment.comment.length > 2) {
-				this.messageSend = false
-				this.newComment.to_user = this.privateUser
+        if (this.enablePrivate) {
+          this.newComment.to_user = this.privateUser
+        }
+
 				if (this.scope === 'album') {
 					let params = {
 						type: (this.includeNotifications) ? '' : 'comments',
@@ -330,7 +361,6 @@ export default {
 						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
-						this.messageSend = true
 					}).catch(res => {
 						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
 						this.newComment.comment = ''
@@ -341,13 +371,12 @@ export default {
 						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
-						this.messageSend = true
 					}).catch(res => {
 						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
 						this.newComment.comment = ''
 						this.newComment.to_user = ''
 					})
-				}
+        }
 			}
 		},
 		getComments () {
