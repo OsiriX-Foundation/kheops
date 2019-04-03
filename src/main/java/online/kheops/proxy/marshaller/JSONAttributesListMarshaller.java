@@ -1,5 +1,7 @@
 package online.kheops.proxy.marshaller;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.json.JSONReader;
 import org.dcm4che3.json.JSONWriter;
@@ -42,7 +44,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List>, Me
     public List<Attributes> readFrom(Class<List> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException {
         List<Attributes> list = new ArrayList<>();
 
-        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { public void close() {} })) {
+        try (final JsonParser parser = Json.createParser(new CloseShieldInputStream(inputStream))) {
             final JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Exception e){
@@ -64,7 +66,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List>, Me
     @Override
     public void writeTo(List attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
-        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { public void close() {} })) {
+        try (final JsonGenerator generator = Json.createGenerator(new CloseShieldOutputStream(entityStream))) {
             final JSONWriter jsonWriter = new JSONWriter(generator);
 
             generator.writeStartArray();

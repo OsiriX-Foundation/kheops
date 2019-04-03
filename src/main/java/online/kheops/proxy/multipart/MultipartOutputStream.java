@@ -1,5 +1,6 @@
 package online.kheops.proxy.multipart;
 
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.glassfish.jersey.media.multipart.internal.LocalizationMessages;
 import org.glassfish.jersey.message.MessageUtils;
 
@@ -20,7 +21,6 @@ public class MultipartOutputStream {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     private final OutputStream outputStream;
-    private final OutputStream closeShieldOutputStream;
     private final Providers providers;
     private final MediaType mediaType;
     private final Writer writer;
@@ -28,8 +28,7 @@ public class MultipartOutputStream {
     private boolean firstPartWritten = false;
 
     MultipartOutputStream(final OutputStream outputStream, final MediaType mediaType, final Providers providers) {
-        this.outputStream = outputStream;
-        this.closeShieldOutputStream = new FilterOutputStream(outputStream) { public void close() {} };
+        this.outputStream = new CloseShieldOutputStream(outputStream);
         this.mediaType = mediaType;
         this.providers = providers;
         writer = new BufferedWriter(new OutputStreamWriter(outputStream, MessageUtils.getCharset(mediaType)));
@@ -84,7 +83,7 @@ public class MultipartOutputStream {
                 EMPTY_ANNOTATIONS,
                 bodyMediaType,
                 bodyHeaders,
-                closeShieldOutputStream
+                outputStream
         );
         outputStream.flush();
     }

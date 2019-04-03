@@ -1,5 +1,6 @@
 package online.kheops.proxy.marshaller;
 
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.json.JSONWriter;
 
@@ -10,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.FilterOutputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -28,7 +28,7 @@ public class JSONAttributesWriter implements MessageBodyWriter<Attributes> {
 
     @Override
     public void writeTo(Attributes attributes, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
-        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { public void close() {} })) {
+        try (final JsonGenerator generator = Json.createGenerator(new CloseShieldOutputStream(entityStream))) {
             JSONWriter jsonWriter = new JSONWriter(generator);
             jsonWriter.write(attributes);
             generator.flush();
