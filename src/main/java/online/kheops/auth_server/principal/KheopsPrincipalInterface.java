@@ -3,10 +3,12 @@ package online.kheops.auth_server.principal;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
+import java.util.Optional;
 
 
 public interface KheopsPrincipalInterface extends java.security.Principal{
@@ -26,6 +28,8 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)throws AlbumNotFoundException;
 
     boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException;
+
+    default Optional<Capability> getCapability() {return Optional.empty();}
 
     User getUser();
 
