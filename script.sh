@@ -107,7 +107,7 @@ fi
 if [[ $missing_env_var_secret = true ]]; then
   exit 1
 else
-   echo -e "all secrets and all env var \e[92mOK\e[0m"
+   echo -e "all nginx secrets and all env var \e[92mOK\e[0m"
 fi
 
 #get env var
@@ -122,6 +122,91 @@ sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" /etc/ngin
 
 sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|" /etc/nginx/conf.d/kheops.conf
 
-echo "Ending setup secrets and env var"
+echo "Ending setup NGINX secrets and env var"
+
+#######################################################################################
+#ELASTIC SEARCH
+
+if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
+    if [ "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" = true ]; then
+
+        echo "Start init metricbeat and filebeat"
+        missing_env_var_secret=false
+
+        #Verify secrets
+        if ! [ -f ${SECRET_FILE_PATH}/elastic_pwd ]; then
+            echo "Missing elastic_pwd"
+            missing_env_var_secret=true
+        else
+           echo -e "secret elastic_pwd \e[92mOK\e[0m"
+        fi
+
+
+        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_NAME ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_NAME environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_NAME \e[92mOK\e[0m"
+           sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
+        fi
+        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_TAGS ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_TAGS environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
+           sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_USER ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_USER environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_USER \e[92mOK\e[0m"
+           sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_URL ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_URL \e[92mOK\e[0m"
+           sed -i "s|\${elastic_url}|$KHEOPS_REVERSE_PROXY_ELASTIC_URL|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${elastic_url}|$KHEOPS_REVERSE_PROXY_ELASTIC_URL|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_REVERSE_PROXY_KIBANA_URL ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_KIBANA_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_KIBANA_URL \e[92mOK\e[0m"
+           sed -i "s|\${kibana_url}|$KHEOPS_REVERSE_PROXY_KIBANA_URL|" /etc/metricbeat/metricbeat.yml
+           sed -i "s|\${kibana_url}|$KHEOPS_REVERSE_PROXY_KIBANA_URL|" /etc/filebeat/filebeat.yml
+        fi
+
+        #if missing env var or secret => exit
+        if [[ $missing_env_var_secret = true ]]; then
+          exit 1
+        else
+           echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
+        fi
+
+        metricbeat modules disable system
+        filebeat modules disable system
+
+        cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
+        service metricbeat restart
+        cat ${SECRET_FILE_PATH}/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
+        service filebeat restart
+
+        echo "Ending setup METRICBEAT and FILEBEAT"
+    fi
+else
+    echo "[INFO] : Missing KHEOPS_REVERSE_PPROXY_ENABLE_ELASTIC environment variable. Elastic is not enable."
+fi
+
+#######################################################################################
 
 nginx-debug -g 'daemon off;'
