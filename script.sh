@@ -129,6 +129,8 @@ echo "Ending setup NGINX secrets and env var"
 
 if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
     if [ "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" = true ]; then
+
+        echo "Start init metricbeat and filebeat"
         missing_env_var_secret=false
 
         #Verify secrets
@@ -164,22 +166,22 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
         fi
 
-        metricbeat modules enable nginx
-        filebeat modules enable nginx
+        #metricbeat modules enable nginx
+        #filebeat modules enable nginx
         metricbeat modules disable system
         filebeat modules disable system
 
-        service filebeat start
-        service metricbeat start
+        ##service filebeat start
+        #service metricbeat start
         cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
-        metricbeat keystore list
-        metricbeat test output
+        #metricbeat keystore list
+        #metricbeat test output
         service metricbeat restart
         cat ${SECRET_FILE_PATH}/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
-        filebeat keystore list
-        filebbeat test output
+        #filebeat keystore list
+        #filebbeat test output
         service filebeat restart
-     
+
         echo "Ending setup METRICBEAT and FILEBEAT"
     fi
 else
