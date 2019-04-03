@@ -143,12 +143,12 @@ public final class Resource {
 
     private InputStream getConvertedInputStream(final InputStream inputStream) {
         if (contentType.isCompatible(APPLICATION_DICOM_TYPE)) {
-            final Vector<InputStream> streams = new Vector<>(3);
+            final List<InputStream> streams = new ArrayList<>(3);
             streams.add(new ByteArrayInputStream(("\r\n--" + BOUNDARY + "\r\nContent-Type: application/dicom\r\n\r\n").getBytes(US_ASCII)));
             streams.add(inputStream);
             streams.add(new ByteArrayInputStream(("\r\n--" + BOUNDARY + "--").getBytes(US_ASCII)));
 
-            return new SequenceInputStream(streams.elements());
+            return new SequenceInputStream(Collections.enumeration(streams));
         } else {
             return inputStream;
         }

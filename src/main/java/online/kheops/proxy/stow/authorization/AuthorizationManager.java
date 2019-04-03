@@ -49,7 +49,7 @@ public final class AuthorizationManager {
 
     private final MultivaluedMap<String, String> fileIDMap = new MultivaluedHashMap<>();
 
-    private final static class ProcessingFailure {
+    private static final class ProcessingFailure {
         private final String fileID;
 
         ProcessingFailure(final String fileID) {
@@ -119,7 +119,7 @@ public final class AuthorizationManager {
             failedAttributes.setString(Tag.ReferencedSOPClassUID, VR.UI, forbiddenInstance.getSOPClassUID());
             failedAttributes.setInt(Tag.FailureReason, VR.US, Status.NotAuthorized);
 
-            if (fileIDMap.containsKey(sopInstanceUID) && fileIDMap.get(sopInstanceUID).size() > 0) {
+            if (fileIDMap.containsKey(sopInstanceUID) && !fileIDMap.get(sopInstanceUID).isEmpty()) {
                 final String fileID = fileIDMap.getFirst(sopInstanceUID);
                 fileIDMap.get(sopInstanceUID).remove(0);
                 failedAttributes.setString(Tag.ReferencedFileID, VR.CS, fileID);
@@ -154,7 +154,7 @@ public final class AuthorizationManager {
                 break;
         }
 
-        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || processingFailures.size() > 0)) {
+        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || !processingFailures.isEmpty())) {
             responseStatus = ACCEPTED;
         }
 

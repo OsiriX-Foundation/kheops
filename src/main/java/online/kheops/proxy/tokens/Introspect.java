@@ -16,6 +16,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 public class Introspect {
     private static final Client CLIENT = ClientBuilder.newClient();
 
+    private Introspect() {}
+
     public static class Response {
         @XmlElement(name = "active")
         boolean active;
