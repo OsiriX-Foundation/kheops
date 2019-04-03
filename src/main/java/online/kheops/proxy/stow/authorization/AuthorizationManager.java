@@ -173,27 +173,25 @@ public final class AuthorizationManager {
 
         URI uri = authorizationUriBuilder.build(seriesID.getStudyUID(), seriesID.getSeriesUID());
 
-        final Response response;
-        try {
-            response = CLIENT.target(uri)
+        try (final Response response = CLIENT.target(uri)
                     .request()
                     .header(AUTHORIZATION, bearerToken.getHeaderValue())
-                    .put(Entity.text(""));
+                    .put(Entity.text(""))) {
+
+            if (response.getStatusInfo().getFamily() == SUCCESSFUL) {
+                authorizedSeriesIDs.add(seriesID);
+                return true;
+            } else {
+                forbiddenSeriesIDs.add(seriesID);
+                forbiddenInstanceIDs.add(instanceID);
+                return false;
+            }
         } catch (ProcessingException e) {
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
             throw new GatewayException("Error while getting the access token", e);
         }  catch (WebApplicationException e) {
             LOG.log(WARNING, "Unable to get access to to a series using " + e.getResponse().getLocation(), e);
-            forbiddenSeriesIDs.add(seriesID);
-            forbiddenInstanceIDs.add(instanceID);
-            return false;
-        }
-
-        if (response.getStatusInfo().getFamily() == SUCCESSFUL) {
-            authorizedSeriesIDs.add(seriesID);
-            return true;
-        } else {
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
             return false;

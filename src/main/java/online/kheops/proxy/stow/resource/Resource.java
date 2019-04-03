@@ -201,13 +201,18 @@ public final class Resource {
             }
         };
 
-        final Response gatewayResponse;
-        try {
-            gatewayResponse = CLIENT.target(stowServiceURI)
+        try (final Response gatewayResponse = CLIENT.target(stowServiceURI)
                     .request()
                     .header(AUTHORIZATION, "Bearer " + getPostBearerToken())
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, getGatewayContentType()));
+             final InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
+            if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
+                LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
+                throw new WebApplicationException(BAD_GATEWAY);
+            }
+
+            return authorizationManager.getResponse(SAXReader.parse(responseStream), gatewayResponse.getStatus());
         } catch (ProcessingException e) {
             LOG.log(Level.SEVERE, "Gateway Processing Error", e);
             if (e.getCause() instanceof WebApplicationException) {
@@ -216,15 +221,6 @@ public final class Resource {
             } else {
                 throw new InternalServerErrorException(e);
             }
-        }
-
-        if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
-            LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
-            throw new WebApplicationException(BAD_GATEWAY);
-        }
-
-        try (InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
-            return authorizationManager.getResponse(SAXReader.parse(responseStream), gatewayResponse.getStatus());
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOG.log(Level.WARNING, "Error parsing response", e);
             throw new WebApplicationException(BAD_GATEWAY);

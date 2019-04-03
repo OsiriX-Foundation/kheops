@@ -105,28 +105,21 @@ public final class WadoRSSeries {
 
         final URI qidoServiceURI = qidoServiceURIBuilder.build(studyInstanceUID);
 
-        final Response listResponse;
-        try {
-            listResponse = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
-                    .header(AUTHORIZATION, authorizationHeader)
-                    .get();
-        } catch (ProcessingException e) {
-            LOG.log(SEVERE, "Error while accessing the studies list", e);
-            throw new WebApplicationException(BAD_GATEWAY);
-        }
-        if (listResponse.getStatus() == UNAUTHORIZED.getStatusCode() || listResponse.getStatus() == FORBIDDEN.getStatusCode()) {
-            LOG.log(WARNING, () -> "Authentication error while getting the series list, status: " + listResponse.getStatus());
-            throw new WebApplicationException(listResponse.getStatus());
-        } else if (listResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
-            LOG.log(SEVERE, () -> "Unable to successfully get the series list, status: " + listResponse.getStatus());
-            throw new WebApplicationException(BAD_GATEWAY);
-        }
-
         final List<Attributes> seriesList;
-        try {
+        try (final Response listResponse = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
+                    .header(AUTHORIZATION, authorizationHeader)
+                    .get()) {
+            if (listResponse.getStatus() == UNAUTHORIZED.getStatusCode() || listResponse.getStatus() == FORBIDDEN.getStatusCode()) {
+                LOG.log(WARNING, () -> "Authentication error while getting the series list, status: " + listResponse.getStatus());
+                throw new WebApplicationException(listResponse.getStatus());
+            } else if (listResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
+                LOG.log(SEVERE, () -> "Unable to successfully get the series list, status: " + listResponse.getStatus());
+                throw new WebApplicationException(BAD_GATEWAY);
+            }
+
             seriesList = listResponse.readEntity(new GenericType<List<Attributes>>() {});
         } catch (ProcessingException e) {
-            LOG.log(SEVERE, "Unable to parse the series list");
+            LOG.log(SEVERE, "Error while accessing the studies list", e);
             throw new WebApplicationException(BAD_GATEWAY);
         }
 
@@ -135,23 +128,30 @@ public final class WadoRSSeries {
                 .resolveTemplate("StudyInstanceUID", studyInstanceUID);
 
         final MultipartStreamingOutput multipartStreamingOutput = output -> {
-            try {
-                for (Attributes series : seriesList) {
-                    final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
-                    final AccessToken accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
-                    final Invocation.Builder invocationBuilder = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID)
-                            .request(requestAcceptType)
-                            .header(AUTHORIZATION, accessToken.getHeaderValue());
+            for (Attributes series : seriesList) {
+                final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
+                final AccessToken accessToken;
+                try {
+                    accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
+                } catch (AccessTokenException e) {
+                    LOG.log(WARNING, "Unable to get an access token", e);
+                    throw new WebApplicationException(UNAUTHORIZED);
+                }
 
-                    if (acceptCharsetParam != null) {
-                        invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
-                    }
+                final Invocation.Builder invocationBuilder = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID)
+                        .request(requestAcceptType)
+                        .header(AUTHORIZATION, accessToken.getHeaderValue());
 
-                    final Response wadoResponse = invocationBuilder.get(Response.class);
+                if (acceptCharsetParam != null) {
+                    invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
+                }
+
+                try (final Response wadoResponse = invocationBuilder.get(Response.class);
+                     final InputStream inputStream = wadoResponse.readEntity(InputStream.class)
+                ) {
                     if (!wadoResponse.getMediaType().isCompatible(acceptMediaType)) {
                         throw new ProcessingException("The response is not compatible");
                     }
-                    final InputStream inputStream = wadoResponse.readEntity(InputStream.class);
                     final String boundary = wadoResponse.getMediaType().getParameters().get(BOUNDARY_PARAMETER);
 
                     final MultipartParser.Handler handler = (partNumber, multipartInputStream) -> {
@@ -164,14 +164,10 @@ public final class WadoRSSeries {
                     };
 
                     new MultipartParser(boundary).parse(inputStream, handler);
-                    wadoResponse.close();
+                } catch (IOException | ProcessingException | WebApplicationException e) {
+                    LOG.log(SEVERE, "Error while streaming the output", e);
+                    throw new WebApplicationException(BAD_GATEWAY);
                 }
-            } catch (IOException | ProcessingException | WebApplicationException e) {
-                LOG.log(SEVERE, "Error while streaming the output", e);
-                throw new WebApplicationException(BAD_GATEWAY);
-            } catch (AccessTokenException e) {
-                LOG.log(WARNING, "Unable to get an access token", e);
-                throw new WebApplicationException(UNAUTHORIZED);
             }
         };
 

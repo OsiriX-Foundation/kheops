@@ -14,9 +14,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -44,9 +42,8 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List>, Me
     public List<Attributes> readFrom(Class<List> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException {
         List<Attributes> list = new ArrayList<>();
 
-        try {
-            JsonParser parser = Json.createParser(inputStream);
-            JSONReader jsonReader = new JSONReader(parser);
+        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { public void close() {} })) {
+            final JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Exception e){
             throw new IOException("Error while reading JSON datasets", e);
@@ -67,20 +64,21 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List>, Me
     @Override
     public void writeTo(List attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
-        JsonGenerator generator = Json.createGenerator(entityStream);
-        JSONWriter jsonWriter = new JSONWriter(generator);
+        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { public void close() {} })) {
+            final JSONWriter jsonWriter = new JSONWriter(generator);
 
-        generator.writeStartArray();
+            generator.writeStartArray();
 
-        for (Object object: attributesList) {
-            if (object instanceof Attributes) {
-                jsonWriter.write((Attributes) object);
-            } else {
-                throw new IllegalArgumentException("Trying to write an object that is not of class Attributes");
+            for (final Object object : attributesList) {
+                if (object instanceof Attributes) {
+                    jsonWriter.write((Attributes) object);
+                } else {
+                    throw new IllegalArgumentException("Trying to write an object that is not of class Attributes");
+                }
             }
-        }
 
-        generator.writeEnd();
-        generator.flush();
+            generator.writeEnd();
+            generator.flush();
+        }
     }
 }

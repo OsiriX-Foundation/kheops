@@ -12,6 +12,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -22,12 +24,9 @@ import java.util.regex.Pattern;
 
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT_CHARSET;
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static javax.ws.rs.core.HttpHeaders.*;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/")
 public final class WadoRsResource {
@@ -85,9 +84,7 @@ public final class WadoRsResource {
             throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
-
-    Pattern p = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)");
-        Matcher m = p.matcher(uriInfo.getPath());
+        final Matcher m = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)").matcher(uriInfo.getPath());
 
         final String resource;
         if (m.find()) {
@@ -110,10 +107,37 @@ public final class WadoRsResource {
             invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
+        final Response upstreamResponse;
+        try {
+            upstreamResponse = invocationBuilder.get();
+        } catch (ProcessingException e) {
+            LOG.log(SEVERE, "error processing response from upstream", e);
+            throw new WebApplicationException(BAD_GATEWAY);
+        } catch (Exception e) {
+            LOG.log(SEVERE, "unknown error while getting from upstream", e);
+            throw new InternalServerErrorException("unknown error while getting from upstream");
+        }
+
+        StreamingOutput streamingOutput = output -> {
+            try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class)) {
+                byte[] buffer = new byte[4096];
+                int len = inputStream.read(buffer);
+                while (len != -1) {
+                    output.write(buffer, 0, len);
+                    len = inputStream.read(buffer);
+                }
+            } catch (Exception e) {
+                throw new IOException(e);
+            } finally {
+                upstreamResponse.close();
+            }
+        };
+
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        return Response.fromResponse(invocationBuilder.get())
+        return Response.status(upstreamResponse.getStatus()).entity(streamingOutput)
+                .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
                 .cacheControl(cacheControl)
                 .build();
     }

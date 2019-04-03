@@ -136,30 +136,30 @@ class DICOMMetadataPart extends Part {
     }
 
     private byte[] getBytesForInstances(Set<InstanceID> instanceIDs) throws IOException {
-        final GenericType<List<Attributes>> genericType = new GenericType<List<Attributes>>() {
-        };
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final GenericType<List<Attributes>> genericType = new GenericType<List<Attributes>>() { };
 
-        final MessageBodyWriter<List> bodyWriter = getProviders().getMessageBodyWriter(
-                List.class,
-                genericType.getType(),
-                EMPTY_ANNOTATIONS,
-                MediaTypes.APPLICATION_DICOM_JSON_TYPE);
+        try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            final MessageBodyWriter<List> bodyWriter = getProviders().getMessageBodyWriter(
+                    List.class,
+                    genericType.getType(),
+                    EMPTY_ANNOTATIONS,
+                    MediaTypes.APPLICATION_DICOM_JSON_TYPE);
 
-        if (bodyWriter == null) {
-            throw new IllegalArgumentException("Could not get a MessageBodyWriter for List<Attributes>");
+            if (bodyWriter == null) {
+                throw new IllegalArgumentException("Could not get a MessageBodyWriter for List<Attributes>");
+            }
+
+            bodyWriter.writeTo(
+                    getAttributesListForInstances(instanceIDs),
+                    List.class,
+                    genericType.getType(),
+                    EMPTY_ANNOTATIONS,
+                    MediaTypes.APPLICATION_DICOM_JSON_TYPE,
+                    new MultivaluedHashMap<>(),
+                    byteArrayOutputStream);
+
+            return byteArrayOutputStream.toByteArray();
         }
-
-        bodyWriter.writeTo(
-                getAttributesListForInstances(instanceIDs),
-                List.class,
-                genericType.getType(),
-                EMPTY_ANNOTATIONS,
-                MediaTypes.APPLICATION_DICOM_JSON_TYPE,
-                new MultivaluedHashMap<>(),
-                byteArrayOutputStream);
-
-        return byteArrayOutputStream.toByteArray();
     }
 
     @Override

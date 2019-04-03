@@ -22,7 +22,6 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.*;
 import static javax.ws.rs.core.Response.Status.*;
-import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 @Path("/")
 public class WadoUriResource {
@@ -104,7 +103,6 @@ public class WadoUriResource {
             invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
-
         final Response upstreamResponse;
         try {
             upstreamResponse = invocationBuilder.get();
@@ -131,8 +129,12 @@ public class WadoUriResource {
             }
         };
 
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+
         return Response.status(upstreamResponse.getStatus()).entity(streamingOutput)
                 .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
+                .cacheControl(cacheControl)
                 .build();
     }
 

@@ -48,11 +48,10 @@ public class FetchRequester {
     private void triggerFetch(String studyInstanceUID) {
         URI uri = fetchUriBuilder.build(studyInstanceUID);
 
-        try {
-            Response response = CLIENT.target(uri)
+        try (final Response response = CLIENT.target(uri)
                     .request()
                     .header(AUTHORIZATION, bearerToken.getHeaderValue())
-                    .post(Entity.text(""));
+                    .post(Entity.text(""))) {
             if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
                 LOG.log(SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
             }

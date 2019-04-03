@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import java.io.FilterOutputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -27,9 +28,10 @@ public class JSONAttributesWriter implements MessageBodyWriter<Attributes> {
 
     @Override
     public void writeTo(Attributes attributes, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
-        JsonGenerator generator = Json.createGenerator(entityStream);
-        JSONWriter jsonWriter = new JSONWriter(generator);
-        jsonWriter.write(attributes);
-        generator.flush();
+        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { public void close() {} })) {
+            JSONWriter jsonWriter = new JSONWriter(generator);
+            jsonWriter.write(attributes);
+            generator.flush();
+        }
     }
 }
