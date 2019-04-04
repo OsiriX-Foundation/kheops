@@ -21,6 +21,7 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javax.ws.rs.core.HttpHeaders.WWW_AUTHENTICATE;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
 
@@ -38,7 +39,8 @@ public class SecuredFilter implements ContainerRequestFilter {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
         } catch (IllegalArgumentException e) {
             LOG.log(Level.WARNING, "IllegalArgumentException " + getRequestString(requestContext), e);
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                    .header(WWW_AUTHENTICATE,"Basic").header(WWW_AUTHENTICATE,"Bearer").build());
             return;
         }
 
