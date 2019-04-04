@@ -116,7 +116,7 @@ public final class WadoRSStudyInstance {
         int instancesToSkip = offset;
         boolean additionalInstances = false;
         final List<Attributes> instanceList = new ArrayList<>();
-        int i = 0;
+        int i;
         for (i = 0; i < seriesList.size() && instanceList.size() < limit; i++) {
             String seriesInstanceUID = seriesList.get(i).getString(Tag.SeriesInstanceUID);
             final WebTarget instanceWebTarget = webTarget.resolveTemplate("SeriesInstanceUID", seriesInstanceUID);
@@ -126,7 +126,7 @@ public final class WadoRSStudyInstance {
                 accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
             } catch (AccessTokenException e) {
                 LOG.log(SEVERE, "Unable to get an access token", e);
-                throw new WebApplicationException(UNAUTHORIZED);
+                throw new NotAuthorizedException("Bearer", "Basic");
             }
 
             final List<Attributes> seriesInstanceList;

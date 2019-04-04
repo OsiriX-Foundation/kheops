@@ -78,7 +78,7 @@ public final class WadoRsResource {
                     .build();
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);
-            throw new WebApplicationException(UNAUTHORIZED);
+            throw new NotAuthorizedException("Bearer", "Basic");
         } catch (Exception e) {
             LOG.log(SEVERE, "unknown error while getting an access token", e);
             throw new InternalServerErrorException("unknown error while getting an access token");

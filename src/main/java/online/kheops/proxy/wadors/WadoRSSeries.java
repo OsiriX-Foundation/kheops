@@ -111,7 +111,11 @@ public final class WadoRSSeries {
                     .get()) {
             if (listResponse.getStatus() == UNAUTHORIZED.getStatusCode() || listResponse.getStatus() == FORBIDDEN.getStatusCode()) {
                 LOG.log(WARNING, () -> "Authentication error while getting the series list, status: " + listResponse.getStatus());
-                throw new WebApplicationException(listResponse.getStatus());
+                if (listResponse.getStatus() == UNAUTHORIZED.getStatusCode()) {
+                    throw new NotAuthorizedException("Bearer", "Basic");
+                } else {
+                    throw new WebApplicationException(listResponse.getStatus());
+                }
             } else if (listResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
                 LOG.log(SEVERE, () -> "Unable to successfully get the series list, status: " + listResponse.getStatus());
                 throw new WebApplicationException(BAD_GATEWAY);

@@ -116,7 +116,7 @@ public final class Resource {
             Introspect.Response introspectResponse = Introspect.endpoint(introspectionURI).token(authorizationToken.getToken());
             if (!introspectResponse.isActive()) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
-                throw new WebApplicationException(Response.status(UNAUTHORIZED).build());
+                throw new NotAuthorizedException("Bearer", "Basic");
             }
             if (!introspectResponse.isValidForScope("write")) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
