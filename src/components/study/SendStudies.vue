@@ -25,16 +25,19 @@
           type="button"
           class="btn btn-link btn-sm text-center"
           style="color: red"
-          @click="showErrors=true"
+          @click="showErrors=!showErrors"
         >
-          <span>
-            Show errors
-            <error-icon
-              :height="SVGheight"
-              :width="SVGwidth"
-              color="red"
-            />
+          <span v-if="!showErrors">
+						Show errors
           </span>
+          <span v-else>
+						Hide errors
+					</span>
+					<error-icon
+						:height="SVGheight"
+						:width="SVGwidth"
+						color="red"
+					/>
         </button>
       </div>
     </div>

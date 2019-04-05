@@ -809,6 +809,16 @@ export default {
 		this.scroll()
 	},
 	methods: {
+		getStudies () {
+			this.$store.dispatch('getStudies', {
+				pageNb: this.pageNb,
+				filters: this.filters,
+				sortBy: this.sortBy,
+				sortDesc: this.sortDesc,
+				limit: this.limit,
+				includefield: ['favorite', 'comments', '00081030']
+			})
+		},
 		getURLDownload (StudyInstanceUID) {
 			return `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application%2Fzip`
 		},

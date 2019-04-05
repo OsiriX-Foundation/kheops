@@ -62,7 +62,9 @@
         <div
           :class="['dropzone-area', hover | loading ? 'dragenterClass' : '']"
         >
-          <list />
+          <list
+            ref="list"
+          />
         </div>
       </div>
     </form>
@@ -96,6 +98,11 @@ export default {
 	computed: {
 	},
 	watch: {
+		sendingFiles () {
+			if (!this.sendingFiles) {
+				this.$refs.list.getStudies()
+			}
+		}
 	},
 	created () {
 	},
