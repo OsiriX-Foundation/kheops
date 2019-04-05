@@ -29,21 +29,22 @@
           </div>
           <div
             class="col-sm-auto"
+            style="color: red"
           >
             {{ error.value }}
           </div>
         </div>
       </div>
-      <div
-        class="mt-2 d-flex justify-content-center"
+    </div>
+    <div
+      class="mt-2 d-flex justify-content-center"
+    >
+      <button
+        class="btn btn-primary"
+        @click="hideErrors"
       >
-        <button
-          class="btn btn-primary"
-          @click="hideErrors"
-        >
-          <span>Hide errors</span>
-        </button>
-      </div>
+        <span>Hide errors</span>
+      </button>
     </div>
   </div>
 </template>

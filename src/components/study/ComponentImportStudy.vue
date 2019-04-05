@@ -3,22 +3,17 @@
     id="file-drag-drop"
     ref="filedragdrop"
   >
-    <input
-      id="file"
-      ref="inputfiles"
-      type="file"
-      name="file"
-      class="inputfile"
-      allowdirs
-      multiple
-      @change="inputLoadFiles"
-    >
-    <form
-      id="fileform"
-      ref="fileform"
-      :class="['fileform', hover ? 'dragenterFormClass' : '']"
-    >
-      <!--
+    <!--
+			<input
+				id="file"
+				ref="inputfiles"
+				type="file"
+				name="file"
+				class="inputfile"
+				allowdirs
+				multiple
+				@change="inputLoadFiles"
+			>
       <label
         ref="dragdrop"
         class="drag-drop"
@@ -28,8 +23,12 @@
         Load your files
       </label>
 			https://stackoverflow.com/questions/34817656/add-class-in-drop-area-file-input-when-dragging-an-external-image-over-dragen
-			-->
-
+		-->
+    <form
+      id="fileform"
+      ref="fileform"
+      :class="['fileform', hover ? 'dragenterFormClass' : '']"
+    >
       <div
         id="dragingcomponenet"
         ref="dragingcomponenet"
@@ -138,66 +137,56 @@ export default {
 		}
 	},
 	methods: {
-		inputLoadFiles () {
-			const files = this.$refs.inputfiles.files
-			let tabFiles = []
-			for (let i = 0; i < files.length; i++) {
-				const objFile = this.createObjFiles(files[i], files[i].webkitRelativePath ? files[i].webkitRelativePath : files[i].name, files[i].name)
-				if (objFile) {
-					tabFiles.push(objFile)
-				}
-			}
-			this.emitFilesLength(tabFiles.length)
-			this.emitFilesLoad(tabFiles)
-		},
-		emitFilesLoad (files) {
-			this.$emit('files-loaded', files)
-		},
-		emitFilesLength (length) {
-			this.$emit('files-length', length)
-		},
 		createObjFiles (file, path, name) {
-			if (this.excludeFileName(name)) {
+			if (!this.excludeFileName(name)) {
 				const objFile = {
 					'content': file,
 					'path': path,
 					'name': name,
-					'id': this.count
+					'id': this.count.toString()
 				}
 				this.count++
 				return objFile
 			}
 		},
-		/**********************************************
-		 * Drag and Drop functions
-		**********************************************/
-		manageDataTransfer (items) {
+		inputLoadFiles () {
+			const filesFromInput = this.$refs.inputfiles.files
+			let arrayFiles = []
+			for (let i = 0; i < filesFromInput.length; i++) {
+				const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name
+				const objFile = this.createObjFiles(filesFromInput[i], pathFile, filesFromInput[i].name)
+				if (objFile) {
+					arrayFiles.push(objFile)
+				}
+			}
+			this.emitFilesLength(arrayFiles.length)
+			this.emitFilesLoad(arrayFiles)
+		},
+		manageDataTransfer (dataTransferItems) {
 			const arrayPromises = []
-			for (let i = 0; i < items.length; i++) {
-				let entry = this.determineGetAsEntry(items[i])
+			for (let i = 0; i < dataTransferItems.length; i++) {
+				let entry = this.determineGetAsEntry(dataTransferItems[i])
 				if (entry && entry.isFile) {
 					arrayPromises.push(this.readFilePromise(entry, this))
 				} else if (entry && entry.isDirectory) {
-					arrayPromises.push(this.readDirectoryPromise(entry, this).then((res) => {
-						return res
-					}))
+					arrayPromises.push(this.readDirectoryPromise(entry, this))
 				}
 			}
 
 			Promise.all(arrayPromises).then(res => {
-				const filesSend = this.flatten(res)
+				const filesSend = this.removeNonObjectFiles(this.arrayFlatten(res))
 				this.loading = false
 				this.emitFilesLength(filesSend.length)
 				this.emitFilesLoad(filesSend)
 			})
 		},
-		removeNonObjectFiles (arr) {
-			return arr.filter(ar => { return (ar) !== undefined })
+		removeNonObjectFiles (array) {
+			return array.filter(val => { return (val) !== undefined })
 		},
-		flatten (arr) {
-			return arr.reduce(function (flat, toFlatten) {
-				return flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten)
-			}.bind(this), []).filter(ar => { return (ar) !== undefined })
+		arrayFlatten (array) {
+			return array.reduce(function (arrayFlat, arrayToFlatten) {
+				return arrayFlat.concat(Array.isArray(arrayToFlatten) ? this.arrayFlatten(arrayToFlatten) : arrayToFlatten)
+			}.bind(this), [])
 		},
 		readFilePromise (entry, _this) {
 			return new Promise(function (resolve, reject) {
@@ -229,6 +218,12 @@ export default {
 				})()
 			})
 		},
+		emitFilesLoad (files) {
+			this.$emit('files-loaded', files)
+		},
+		emitFilesLength (length) {
+			this.$emit('files-length', length)
+		},
 		determineDragAndDropCapable () {
 			let div = document.createElement('div')
 			return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window
@@ -241,7 +236,7 @@ export default {
 			}
 		},
 		excludeFileName (name) {
-			return this.excludeFiles.indexOf(name) === -1
+			return this.excludeFiles.indexOf(name) > -1
 		}
 	}
 }

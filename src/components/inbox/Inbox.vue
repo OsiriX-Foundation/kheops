@@ -42,7 +42,6 @@ export default {
 	},
 	methods: {
 		loadFiles (files) {
-			// this.files = this.files.concat(files)
 			this.sendingFiles = true
 			this.files = files
 		},

@@ -5,12 +5,12 @@
     >
       <b-progress-bar
         :value="progressBarVal"
-        :max="length"
+        :max="lengthFilesSend"
         show-progress
         animated
         style="text-align:center"
       >
-        {{ progressBarVal }} / {{ length }}
+        {{ progressBarVal }} / {{ lengthFilesSend }}
       </b-progress-bar>
     </div>
     <div
@@ -30,8 +30,8 @@
           <span>
             Show errors
             <error-icon
-              :height="height"
-              :width="width"
+              :height="SVGheight"
+              :width="SVGwidth"
               color="red"
             />
           </span>
@@ -76,6 +76,8 @@ export default {
 	},
 	data () {
 		return {
+			SVGheight: '20',
+			SVGwidth: '20',
 			errorFiles: [],
 			maxsize: 10e7,
 			maxsend: 100,
@@ -85,14 +87,11 @@ export default {
 					'Accept': 'application/dicom+json'
 				}
 			},
-			height: '20',
-			width: '20',
 			showErrors: false,
 			errorValues: {
 				292: 'Authorization Error',
 				272: 'Non DICOM file'
-			},
-			length: 0
+			}
 		}
 	},
 	computed: {
@@ -102,7 +101,7 @@ export default {
 			}, 0)
 		},
 		progressBarVal () {
-			let currentVal = this.length - (this.files.length)
+			let currentVal = this.lengthFilesSend - (this.files.length)
 			return currentVal < 0 ? 0 : currentVal
 		}
 	},
@@ -123,16 +122,9 @@ export default {
 	mounted () {
 	},
 	methods: {
-		setShowErrors (value) {
-			this.showErrors = value
-		},
-		/**********************************************
-		 * Management of the sending of the files
-		**********************************************/
 		sendFiles () {
 			this.initVariables()
 			this.copyFiles = this.files
-			this.length = this.copyFiles.length
 			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length < this.maxsend) {
 				this.sendFormDataPromise(this.copyFiles)
 			} else {
@@ -169,7 +161,7 @@ export default {
 			}
 		},
 		getArrayFilesToSend (tmpIndex, index) {
-			if (tmpIndex === index) {
+			if (tmpIndex === index || index - 1 === tmpIndex) {
 				return [this.copyFiles[index]]
 			} else {
 				return this.copyFiles.slice(tmpIndex, index)
@@ -205,13 +197,13 @@ export default {
 		},
 		errDicom (formData, res, iderr, idvalue) {
 			if (res.hasOwnProperty(iderr)) {
-				let err = this.dicom2map(res[iderr].Value, idvalue)
-				this.files.forEach(val => {
-					let get = err.get(val.id.toString())
-					if (get) {
+				const err = this.dicom2map(res[iderr].Value, idvalue)
+				err.forEach((errorCode, id) => {
+					const fileError = this.files.find(file => { return file.id === id })
+					if (fileError) {
 						this.errorFiles.push({
-							'path': val.path,
-							'value': this.errorValues[get]
+							'path': fileError.path,
+							'value': this.errorValues[errorCode]
 						})
 					}
 				})
@@ -236,21 +228,8 @@ export default {
 			let index = this.files.findIndex(x => x.name === filename)
 			this.files.splice(index, 1)
 		},
-		removeErrorPath (path) {
-			let index = this.errorFiles.findIndex(x => x.path === path)
-			this.errorFiles.splice(index, 1)
-		},
-		removeFilePath (path) {
-			let index = this.files.findIndex(x => x.path === path)
-			this.files.splice(index, 1)
-		},
-		removeFileUI (path) {
-			this.removeErrorPath(path)
-			this.removeFilePath(path)
-		},
-		removeAllFiles () {
-			this.files.splice(0, this.files.length)
-			this.errorFiles.splice(0, this.errorFiles.length)
+		setShowErrors (value) {
+			this.showErrors = value
 		}
 	}
 }
