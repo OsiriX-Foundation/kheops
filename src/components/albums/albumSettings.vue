@@ -73,6 +73,9 @@ export default {
 			this.$router.push({ query: { view: 'settings', cat: this.view } })
 		},
 		'$route.query' () {
+			if (!this.$route.query.cat && this.$route.query.view === 'settings') {
+				this.$router.push({ query: { view: 'settings', cat: 'general' } })
+			}
 			this.view = this.$route.query.cat
 		}
 	},
@@ -80,6 +83,11 @@ export default {
 		if (this.categories.indexOf(this.$route.query.cat) > -1) {
 			this.view = this.$route.query.cat
 		}
+	},
+	beforeDestroy () {
+		let query = Object.assign({}, this.$route.query)
+		delete query.cat
+		this.$router.replace({ query })
 	}
 }
 </script>
