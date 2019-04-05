@@ -1,3 +1,19 @@
+<i18n>
+{
+	"en": {
+		"filesSend": "{count} file has been send. | {count} files has been send.",
+		"filesErrors": "{count} file occur an error. | {count} files occur an error.",
+		"showError": "Show errors",
+		"hideError": "Hide errors"
+	},
+	"fr": {
+		"filesSend": "{count} fichier a été envoyé. | {count} fichiers ont été envoyés.",
+		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
+		"showError": "Montrer les erreurs",
+		"hideError": "Cacher les erreurs"
+	}
+}
+</i18n>
 <template>
   <div>
     <div
@@ -16,11 +32,11 @@
     <div
       v-else-if="lengthFilesSend !== 0"
     >
-      {{ lengthFilesSend - errorFiles.length }} files has been upload
+      {{ $tc("filesSend", lengthFilesSend - errorFiles.length, {count: (lengthFilesSend - errorFiles.length)}) }}
       <div
         v-if="errorFiles.length > 0"
       >
-        {{ errorFiles.length }} files occurs an error
+        {{ $tc("filesErrors", errorFiles.length, {count: errorFiles.length}) }}
         <button
           type="button"
           class="btn btn-link btn-sm text-center"
@@ -28,16 +44,16 @@
           @click="showErrors=!showErrors"
         >
           <span v-if="!showErrors">
-						Show errors
+            {{ $t("showError") }}
           </span>
           <span v-else>
-						Hide errors
-					</span>
-					<error-icon
-						:height="SVGheight"
-						:width="SVGwidth"
-						color="red"
-					/>
+            {{ $t("hideError") }}
+          </span>
+          <error-icon
+            :height="SVGheight"
+            :width="SVGwidth"
+            color="red"
+          />
         </button>
       </div>
     </div>

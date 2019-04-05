@@ -1,3 +1,16 @@
+<i18n>
+{
+	"en": {
+		"cantUpload": "You can't upload when files are sending",
+		"upload": "Drop your files / directories !"
+	},
+	"fr": {
+		"cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
+		"upload": "Lâcher vos fichiers / dossiers !"
+	}
+}
+</i18n>
+
 <template>
   <div
     id="file-drag-drop"
@@ -41,12 +54,12 @@
           <p
             v-if="sendingFiles"
           >
-            You can't upload when files are sending
+            {{ $t("cantUpload") }}
           </p>
           <p
             v-else
           >
-            Drop your files !
+            {{ $t("upload") }}
           </p>
         </div>
         <div
