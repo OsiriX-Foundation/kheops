@@ -68,9 +68,11 @@
 			TODO: Generate a components ?
 			send icon
 		-->
-    <div class="container-fluid my-3 selection-button-container">
+    <div
+      v-if="selectedAlbumsNb"
+      class="container-fluid my-3 selection-button-container"
+    >
       <span
-        v-if="selectedAlbumsNb"
         class="float-left"
       >
         <span>{{ $tc("selectednbalbums",selectedAlbumsNb,{count: selectedAlbumsNb}) }}</span>

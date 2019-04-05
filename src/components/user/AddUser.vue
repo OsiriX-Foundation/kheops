@@ -118,7 +118,7 @@ export default {
 			this.$emit('private-user', this.user)
 		},
 		checkUser () {
-			const request = `users?reference=${this.newUserName}&${this.scope==='album' ? 'album' : 'studyInstanceUID'}=${this.id}`
+			const request = `users?reference=${this.newUserName}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
 
 			HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 				if (res.status === 204 || !res.data[this.accessVar]) this.$snotify.error('User unknown')

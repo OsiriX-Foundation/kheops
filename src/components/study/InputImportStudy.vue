@@ -26,23 +26,27 @@
     <div
       v-if="files.length > 0"
     >
-			{{ files.length }}
-			{{ errorFiles.length }}
-			<div
-				class="row"
-			>
-				<div
-					class="col mb-2"
-				>
-					<b-progress-bar
-					:value="progressBarVal"
-					:max="lengthFilesSend"
-					show-progress
-					animated>
-						{{ progressBarVal }} / {{ lengthFilesSend }}
-					</b-progress-bar>
-				</div>
-			</div>
+      <div
+        class="row justify-content-md-center"
+      >
+        {{ lengthFilesSend }} files ready to be upload
+      </div>
+      <div
+        class="row justify-content-md-center"
+      >
+        <div
+          class="col-md-6"
+        >
+          <b-progress-bar
+            :value="progressBarVal"
+            :max="lengthFilesSend"
+            show-progress
+            animated
+          >
+            {{ progressBarVal }} / {{ lengthFilesSend }}
+          </b-progress-bar>
+        </div>
+      </div>
       <div
         v-if="errorFiles.length > 0"
         class="files-listing"
@@ -115,7 +119,6 @@
 </template>
 
 <script>
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import { HTTP } from '@/router/http'
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue'
 
@@ -322,18 +325,18 @@ export default {
 					if (err.indexOf(val.name) === -1) {
 						this.removeFileName(val.name)
 					}
-					else {
-						console.log(val.name)
-					}
 				})
 
+				/*
+					Problème : ID est le nom du fichier, il se repète. A revoir la gestion des fichier.
+				*/
 				this.files.forEach((val) => {
 					if (err.indexOf(val.name) !== -1) {
 						val.state.sendFiles = false
 						val.state.err = true
-						this.errorFiles.push(val)
 					}
 				})
+				this.errorFiles = this.files.filter(val => { return val.state.err })
 			}
 		},
 		dicom2array (dicom, id) {
