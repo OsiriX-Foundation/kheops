@@ -165,7 +165,8 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
         fi
 
         metricbeat modules enable nginx
-        filebeat modules enable nginx
+        filebeat modules disable nginx
+        filebeat modules disable kheopsnginx
         metricbeat modules disable system
         filebeat modules disable system
 
@@ -179,7 +180,7 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
         filebeat keystore list
         filebbeat test output
         service filebeat restart
-     
+
         echo "Ending setup METRICBEAT and FILEBEAT"
     fi
 else
