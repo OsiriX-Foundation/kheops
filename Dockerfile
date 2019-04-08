@@ -41,6 +41,7 @@ RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb && \
 COPY --from=builder filebeat_nginx.yml /etc/filebeat/modules.d/nginx.yml
 COPY --from=builder filebeat.yml /etc/filebeat/filebeat.yml
 COPY --from=builder filebeat-nginx-ingest-default.json /usr/share/filebeat/module/nginx/access/ingest/default.json
+COPY --from=builder kheopsnginx /usr/share/filebeat/module/kheopsnginx
 RUN chmod go-w /etc/filebeat/filebeat.yml &&  \
     chmod go-w /etc/filebeat/modules.d/nginx.yml
 
