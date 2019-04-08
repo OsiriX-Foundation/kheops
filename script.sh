@@ -150,6 +150,7 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
         fi
+
         if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_TAGS ]]; then
           echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_TAGS environment variable"
           missing_env_var_secret=true
