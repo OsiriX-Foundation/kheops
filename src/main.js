@@ -23,6 +23,7 @@ import VueI18n from 'vue-i18n'
 import messages from '@/lang/messages'
 
 Vue.config.productionTip = false
+Vue.config.performance = true
 
 // globally (in your main .js file)
 const snotifyOptions = {
