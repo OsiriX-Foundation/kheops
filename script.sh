@@ -194,9 +194,6 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
         fi
 
-        metricbeat modules enable nginx
-        filebeat modules disable nginx
-        filebeat modules enable kheopsnginx
         metricbeat modules disable system
         filebeat modules disable system
 
