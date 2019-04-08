@@ -25,7 +25,7 @@
           <div
             class="col"
           >
-            {{ error.path }}
+            {{ error.id }}
           </div>
           <div
             class="col-sm-auto"

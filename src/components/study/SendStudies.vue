@@ -143,15 +143,13 @@ export default {
 	methods: {
 		sendFiles () {
 			this.initVariables()
-			this.copyFiles = this.files
+			this.copyFiles = _.cloneDeep(this.files)
 			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length < this.maxsend) {
 				this.sendFormDataPromise(this.copyFiles)
 			} else {
 				this.sendBySize()
 			}
 		},
-
-		// Big promise, quand c'est fini envoyer send !
 		sendBySize () {
 			let state = {
 				size: 0,
@@ -161,17 +159,17 @@ export default {
 			let promiseChain = Promise.resolve()
 			this.copyFiles.forEach(async (file, index) => {
 				state.size += file.content.size
-				if (this.maxsize < state.size || (index + 1) % this.maxsend === 0) {
-					let currentFiles = this.getArrayFilesToSend(state.tmpIndex, index)
+				if (this.maxsize < state.size || (((index + 1) % this.maxsend === 0) && index !== 0)) {
+					let currentFiles = this.getArrayFilesToSend(state.tmpIndex, index + 1)
 					const makeNextPromise = () => () => {
 						return this.sendFormDataPromise(currentFiles)
 					}
 					promiseChain = promiseChain.then(makeNextPromise())
-					state.tmpIndex = index
+					state.tmpIndex = index + 1
 					state.size = 0
 				}
 			})
-			if (state.tmpIndex < this.copyFiles.length) {
+			if (state.tmpIndex <= this.copyFiles.length) {
 				let currentFiles = this.copyFiles.slice(state.tmpIndex, this.copyFiles.length)
 				const makeNextPromise = () => () => {
 					return this.sendFormDataPromise(currentFiles)
@@ -179,11 +177,11 @@ export default {
 				promiseChain = promiseChain.then(makeNextPromise())
 			}
 		},
-		getArrayFilesToSend (tmpIndex, index) {
-			if (tmpIndex === index || index - 1 === tmpIndex) {
-				return [this.copyFiles[index]]
+		getArrayFilesToSend (firstIndex, secondIndex) {
+			if (firstIndex === secondIndex) {
+				return [this.copyFiles[secondIndex]]
 			} else {
-				return this.copyFiles.slice(tmpIndex, index)
+				return this.copyFiles.slice(firstIndex, secondIndex)
 			}
 		},
 		createFormData (files) {
@@ -218,12 +216,11 @@ export default {
 			if (res.hasOwnProperty(iderr)) {
 				const err = this.dicom2map(res[iderr].Value, idvalue)
 				err.forEach((errorCode, id) => {
-					const fileError = this.files.find(file => { return file.id === id })
+					const fileError = this.copyFiles.find(file => { return file.id === id })
 					if (fileError) {
-						this.errorFiles.push({
-							'path': fileError.path,
-							'value': this.errorValues[errorCode]
-						})
+						this.errorFiles.push(
+							this.createObjErrors(fileError.path, this.errorValues[errorCode])
+						)
 					}
 				})
 				formData.forEach((val) => {
@@ -239,6 +236,12 @@ export default {
 				}
 			})
 			return map
+		},
+		createObjErrors (id, value) {
+			return {
+				'id': id,
+				'value': value
+			}
 		},
 		initVariables () {
 			this.errorFiles = []
