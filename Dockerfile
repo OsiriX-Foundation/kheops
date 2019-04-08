@@ -2,8 +2,8 @@ FROM nginx:stable as builder
 
 COPY . .
 
-ENV METRICBEAT_VERSION 6.6.1
-ENV FILEBEAT_VERSION 6.6.1
+ENV METRICBEAT_VERSION 6.7.1
+ENV FILEBEAT_VERSION 6.7.1
 
 RUN apt-get update && \
     apt-get install -y curl && \
@@ -24,7 +24,7 @@ RUN chmod +x /etc/nginx/conf.d/script.sh
 
 
 #METRICBEAT
-ENV METRICBEAT_VERSION 6.6.1
+ENV METRICBEAT_VERSION 6.7.1
 COPY --from=builder metricbeat-${METRICBEAT_VERSION}-amd64.deb metricbeat-${METRICBEAT_VERSION}-amd64.deb
 RUN dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb && \
     rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
@@ -35,7 +35,7 @@ RUN chmod go-w /etc/metricbeat/metricbeat.yml && \
 
 
 #FILEBEAT
-ENV FILEBEAT_VERSION 6.6.1
+ENV FILEBEAT_VERSION 6.7.1
 COPY --from=builder filebeat-${FILEBEAT_VERSION}-amd64.deb filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb && \
     rm filebeat-${FILEBEAT_VERSION}-amd64.deb
