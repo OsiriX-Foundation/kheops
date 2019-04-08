@@ -142,13 +142,14 @@ export default {
 
 			/*
 			https://stackoverflow.com/questions/7110353/html5-dragleave-fired-when-hovering-a-child-element
+			//$refs.dragingcomponenet
 			*/
-			this.$refs.dragingcomponenet.addEventListener('dragenter', function (e) {
+			this.$refs.fileform.addEventListener('dragenter', function (e) {
 				this.counterDraging += 1
 				this.hover = true
 			}.bind(this))
 
-			this.$refs.dragingcomponenet.addEventListener('dragleave', function (e) {
+			this.$refs.fileform.addEventListener('dragleave', function (e) {
 				this.counterDraging--
 				if (this.counterDraging === 0) {
 					this.hover = false
@@ -278,7 +279,7 @@ export default {
 		border: 5px dotted green !important;
 	}
 	.outPopUp {
-		position: absolute;
+		position: fixed;
 		z-index: 15;
 		top: 50%;
 		left: 50%;
