@@ -166,7 +166,7 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
 
         metricbeat modules enable nginx
         filebeat modules disable nginx
-        filebeat modules disable kheopsnginx
+        filebeat modules enable kheopsnginx
         metricbeat modules disable system
         filebeat modules disable system
 
