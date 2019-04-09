@@ -24,7 +24,7 @@ EXPOSE 3000
 
 #elastic
 COPY --from=build-stage /app/docker/metricbeat.conf /etc/nginx/conf.d/metricbeat.conf
-COPY --from=osirixfoundation/kheops-beat:latest /install/ .
+COPY --from=osirixfoundation/kheops-beat:latest /install/deb/ .
 
 #METRICBEAT
 RUN dpkg -i metricbeat-amd64.deb
