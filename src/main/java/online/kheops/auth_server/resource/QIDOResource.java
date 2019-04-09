@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
@@ -165,6 +166,7 @@ public class QIDOResource {
         } catch (BadQueryParametersException e) {
             return Response.status(BAD_REQUEST).entity("Unknown query parameters " + e.getMessage()).build();
         }
+        LOG.log(INFO, "comparator:\n" + sortComparator);
 
         fromInbox = fromInbox != null;
 
@@ -275,7 +277,9 @@ public class QIDOResource {
             }
         }
 
+        LOG.log(INFO, "available series\n" + availableSeries);
         availableSeries.sort(sortComparator);
+        LOG.log(INFO, "available series after sort\n" + availableSeries);
 
         GenericEntity<List<Attributes>> genericAvailableSeries = new GenericEntity<List<Attributes>>(availableSeries) {};
 
