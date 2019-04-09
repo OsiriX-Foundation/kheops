@@ -50,16 +50,6 @@
         <param-value>mypwd</param-value>
     </context-param>
     <context-param>
-        <description>Password for the keycloak API</description>
-        <param-name>online.kheops.keycloak.password</param-name>
-        <param-value>mypwd</param-value>
-    </context-param>
-    <context-param>
-        <description>User for the keycloak API</description>
-        <param-name>online.kheops.keycloak.user</param-name>
-        <param-value>mypwd</param-value>
-    </context-param>
-    <context-param>
         <description>Client ID for the keycloak API</description>
         <param-name>online.kheops.keycloak.clientid</param-name>
         <param-value>mypwd</param-value>

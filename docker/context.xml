@@ -11,10 +11,6 @@
                override="false"/>
     <Parameter name="online.kheops.jdbc.password" value="${kheops_authdb_pass}"
                override="false"/>
-    <Parameter name="online.kheops.keycloak.password" value="${kheops_keycloak_password}"
-               override="false"/>
-    <Parameter name="online.kheops.keycloak.user" value="${kheops_keycloak_user}"
-               override="false"/>
     <Parameter name="online.kheops.keycloak.clientsecret" value="${kheops_keycloak_clientsecret}"
                override="false"/>
     <Parameter name="online.kheops.keycloak.clientid" value="${kheops_keycloak_clientid}"

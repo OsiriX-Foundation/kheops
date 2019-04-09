@@ -31,16 +31,6 @@ public class KeycloakContextListener implements ServletContextListener {
         return servletContext.getInitParameter("online.kheops.keycloak.uri");
     }
 
-    public static String getKeycloakUser() {
-        verifyState();
-        return servletContext.getInitParameter("online.kheops.keycloak.user");
-    }
-
-    public static String getKeycloakPassword() {
-        verifyState();
-        return servletContext.getInitParameter("online.kheops.keycloak.password");
-    }
-
     public static String getKeycloakClientId() {
         verifyState();
         return servletContext.getInitParameter("online.kheops.keycloak.clientid");
