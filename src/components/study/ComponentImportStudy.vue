@@ -75,9 +75,21 @@
         <div
           :class="['dropzone-area', hover | loading ? 'dragenterClass' : '']"
         >
-          <list
-            ref="list"
-          />
+          <div
+            v-if="scope === 'inbox'"
+          >
+            <list
+              ref="list"
+            />
+          </div>
+          <div
+            v-else-if="scope === 'album'"
+          >
+            <list
+              ref="list"
+              :album="album"
+            />
+          </div>
         </div>
       </div>
     </form>
@@ -96,6 +108,16 @@ export default {
 			type: Boolean,
 			required: true,
 			default: false
+		},
+		scope: {
+			type: String,
+			required: true,
+			default: ''
+		},
+		album: {
+			type: Object,
+			required: false,
+			default: () => ({})
 		}
 	},
 	data () {

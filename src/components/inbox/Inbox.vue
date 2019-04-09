@@ -1,35 +1,22 @@
 <template>
   <div>
-    <div class="container-fluid">
-      <send-studies
-        :files="files"
-        :length-files-send="lengthFiles"
-        :sending-files="sendingFiles"
-        @files-sending="setSendingFiles"
-      />
-    </div>
-    <component-import-study
-      :sending-files="sendingFiles"
-      @files-loaded="loadFiles"
-      @files-length="loadLength"
+    <manage-import-send
+      :scope="scope"
     />
   </div>
 </template>
 
 <script>
-import ComponentImportStudy from '@/components/study/ComponentImportStudy'
-import SendStudies from '@/components/study/SendStudies'
+import ManageImportSend from '@/components/study/ManageImportSend'
 
 export default {
 	name: 'Inbox',
-	components: { ComponentImportStudy, SendStudies },
+	components: { ManageImportSend },
 	props: {
 	},
 	data () {
 		return {
-			files: [],
-			lengthFiles: 0,
-			sendingFiles: false
+			scope: 'inbox'
 		}
 	},
 	computed: {
@@ -41,16 +28,6 @@ export default {
 	mounted () {
 	},
 	methods: {
-		loadFiles (files) {
-			this.sendingFiles = true
-			this.files = files
-		},
-		loadLength (length) {
-			this.lengthFiles = length
-		},
-		setSendingFiles (sendingFiles) {
-			this.sendingFiles = sendingFiles
-		}
 	}
 }
 
