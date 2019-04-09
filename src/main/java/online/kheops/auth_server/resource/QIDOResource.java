@@ -13,7 +13,8 @@ import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import online.kheops.auth_server.util.QIDOParams;
+import online.kheops.auth_server.util.SeriesQIDOSortParams;
+import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -33,9 +34,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,9 +84,9 @@ public class QIDOResource {
         }
 
         final PairListXTotalCount<Attributes> pair;
-        final QIDOParams qidoParams;
+        final StudyQIDOParams qidoParams;
         try (Connection connection = getDataSource().getConnection()) {
-            qidoParams = new QIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
+            qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
             LOG.info(() -> "QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
@@ -96,6 +95,9 @@ public class QIDOResource {
         } catch (BadQueryParametersException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (AlbumNotFoundException e) {
+            LOG.log(Level.INFO, e.getMessage(), e);
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (Exception e) {
@@ -145,12 +147,8 @@ public class QIDOResource {
         }
 
         final boolean includeFieldFavorite;
-        if(uriInfo.getQueryParameters().containsKey("includefield") && (uriInfo.getQueryParameters().get("includefield").contains(String.format("%08X", CUSTOM_DICOM_TAG_FAVORITE)) ||
-                uriInfo.getQueryParameters().get("includefield").contains(FAVORITE))) {
-            includeFieldFavorite = true;
-        } else {
-            includeFieldFavorite = false;
-        }
+        includeFieldFavorite = uriInfo.getQueryParameters().containsKey("includefield") && (uriInfo.getQueryParameters().get("includefield").contains(String.format("%08X", CUSTOM_DICOM_TAG_FAVORITE)) ||
+                uriInfo.getQueryParameters().get("includefield").contains(FAVORITE));
 
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {
@@ -161,6 +159,12 @@ public class QIDOResource {
             }
         }
 
+        final Comparator<Attributes> sortComparator;
+        try {
+            sortComparator = SeriesQIDOSortParams.sortComparator(uriInfo.getQueryParameters());
+        } catch (BadQueryParametersException e) {
+            return Response.status(BAD_REQUEST).entity("Unknown query parameters " + e.getMessage()).build();
+        }
 
         fromInbox = fromInbox != null;
 
@@ -205,6 +209,7 @@ public class QIDOResource {
         queryParameters.remove(QUERY_PARAMETER_OFFSET);
         queryParameters.remove(QUERY_PARAMETER_LIMIT);
         queryParameters.remove(FAVORITE);
+        queryParameters.remove(QUERY_PARAMETER_SORT);
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
         String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
@@ -269,6 +274,9 @@ public class QIDOResource {
                 }
             }
         }
+
+        availableSeries.sort(sortComparator);
+
         GenericEntity<List<Attributes>> genericAvailableSeries = new GenericEntity<List<Attributes>>(availableSeries) {};
 
         Response.ResponseBuilder responseBuilder = Response.ok(genericAvailableSeries)
@@ -380,5 +388,4 @@ public class QIDOResource {
             throw new IllegalStateException("online.kheops.pacs.uri is not a valid URI", e);
         }
     }
-
 }

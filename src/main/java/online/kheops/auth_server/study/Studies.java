@@ -8,7 +8,7 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import online.kheops.auth_server.util.QIDOParams;
+import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -58,7 +58,7 @@ public class Studies {
         }
     }
 
-    public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, QIDOParams qidoParams, Connection connection)
+    public static PairListXTotalCount<Attributes> findAttributesByUserPKJOOQ(long callingUserPK, StudyQIDOParams qidoParams, Connection connection)
             throws BadQueryParametersException {
 
         ArrayList<Condition> conditionArrayList = new ArrayList<>();
