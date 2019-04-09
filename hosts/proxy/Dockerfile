@@ -89,9 +89,6 @@ RUN chmod go-w /etc/filebeat/filebeat.yml
 
 COPY filebeat_kheopspepnginx.yml /etc/filebeat/modules.d/kheopspepnginx.yml
 COPY kheopspepnginx /usr/share/filebeat/module/kheopspepnginx
-RUN chmod go-w /etc/filebeat/modules.d/nginx.yml
-
-
 
 
 RUN chmod +x $NGINX_PREFIX/script.sh
