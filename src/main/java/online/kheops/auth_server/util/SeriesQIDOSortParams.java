@@ -2,21 +2,16 @@ package online.kheops.auth_server.util;
 
 import com.google.common.collect.Lists;
 import online.kheops.auth_server.album.BadQueryParametersException;
-import online.kheops.auth_server.resource.QIDOResource;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.logging.Logger;
 
-import static java.util.logging.Level.INFO;
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_SORT;
 
-public final class SeriesQIDOSortParams {
-    private static final Logger LOG = Logger.getLogger(SeriesQIDOSortParams.class.getName());
-
+public class SeriesQIDOSortParams {
     private static final HashSet<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Lists.newArrayList(Tag.Modality, Tag.SeriesInstanceUID, Tag.SeriesNumber, Tag.NumberOfSeriesRelatedInstances));
 
     public static Comparator<Attributes> sortComparator(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
@@ -55,12 +50,7 @@ public final class SeriesQIDOSortParams {
     }
 
     private static Comparator<Attributes> getIntAttributesComparator(int tag) {
-        return Comparator.comparingInt(value -> {
-            int tagValue = value.getInt(tag, 0);
-            LOG.log(INFO, "tag value:" + tagValue);
-            return tagValue;
-        }
-        );
+        return Comparator.comparingInt(value -> value.getInt(tag, 0));
     }
 
     private static Comparator<Attributes> getStringAttributesComparator(int tag) {
