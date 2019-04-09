@@ -16,7 +16,7 @@ public class SeriesQIDOSortParams {
 
     public static Comparator<Attributes> sortComparator(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
 
-        boolean descending = true;
+        boolean descending = false;
         int orderByTag = Tag.SeriesNumber;
 
         if (queryParameters.containsKey(QUERY_PARAMETER_SORT)) {
