@@ -824,7 +824,6 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
-				// do not call for new studies if we are in the album > comments or album > settings view
 				if (this.$route.params.album_id && this.$route.query.view !== 'studies') return
 
 				let bottomOfWindow = Math.floor((document.documentElement.scrollTop || document.body.scrollTop)) + Math.floor(window.innerHeight) === document.documentElement.offsetHeight

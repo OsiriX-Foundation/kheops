@@ -126,7 +126,7 @@ export default {
 	},
 	watch: {
 		sendingFiles () {
-			if (this.sendingFiles) {
+			if (this.sendingFiles === true) {
 				this.sendFiles()
 			}
 		},
@@ -194,7 +194,8 @@ export default {
 		sendFormDataPromise (files) {
 			return new Promise((resolve, reject) => {
 				let formData = this.createFormData(files)
-				HTTP.post('/studies', formData, this.config).then(res => {
+				const request = `/studies${this.$route.params.album_id ? '?album=' + this.$route.params.album_id : ''}`
+				HTTP.post(request, formData, this.config).then(res => {
 					if (res.status === 200) {
 						formData.forEach((val) => {
 							this.removeFileName(val.name)
