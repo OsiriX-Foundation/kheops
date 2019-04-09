@@ -42,7 +42,7 @@ public class SeriesQIDOSortParams {
                 comparator = getIntAttributesComparator(Tag.SeriesNumber);
         }
 
-        if (!descending) {
+        if (descending) {
             comparator = comparator.reversed();
         }
 
