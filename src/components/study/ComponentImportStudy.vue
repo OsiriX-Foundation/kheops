@@ -2,11 +2,13 @@
 {
 	"en": {
 		"cantUpload": "You can't upload when files are sending",
-		"upload": "Drop your files / directories !"
+		"upload": "Drop your files / directories !",
+		"cantUploadAlbum": "You can't load files in this album."
 	},
 	"fr": {
 		"cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
-		"upload": "Lâcher vos fichiers / dossiers !"
+		"upload": "Lâcher vos fichiers / dossiers !",
+		"cantUploadAlbum": "Vous ne pouvez pas charger des fichiers dans cet album."
 	}
 }
 </i18n>
@@ -54,7 +56,9 @@
           <p
             v-if="sendingFiles"
           >
-            {{ $t("cantUpload") }}
+            <span>
+              {{ $t("cantUpload") }}
+            </span>
           </p>
           <p
             v-else
@@ -202,7 +206,6 @@ export default {
 					arrayFiles.push(objFile)
 				}
 			}
-			this.emitFilesLength(arrayFiles.length)
 			this.emitFilesLoad(arrayFiles)
 		},
 		manageDataTransfer (dataTransferItems) {
@@ -219,7 +222,6 @@ export default {
 			Promise.all(arrayPromises).then(res => {
 				const filesSend = this.removeNonObjectFiles(this.arrayFlatten(res))
 				this.loading = false
-				this.emitFilesLength(filesSend.length)
 				this.emitFilesLoad(filesSend)
 			})
 		},
@@ -263,9 +265,6 @@ export default {
 		},
 		emitFilesLoad (files) {
 			this.$emit('files-loaded', files)
-		},
-		emitFilesLength (length) {
-			this.$emit('files-length', length)
 		},
 		determineDragAndDropCapable () {
 			let div = document.createElement('div')

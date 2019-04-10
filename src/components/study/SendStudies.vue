@@ -4,57 +4,103 @@
 		"filesSend": "{count} file has been send. | {count} files has been send.",
 		"filesErrors": "{count} file occur an error. | {count} files occur an error.",
 		"showError": "Show errors",
-		"hideError": "Hide errors"
+		"hideError": "Hide errors",
+		"cancel": "Cancel"
 	},
 	"fr": {
 		"filesSend": "{count} fichier a été envoyé. | {count} fichiers ont été envoyés.",
 		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
 		"showError": "Montrer les erreurs",
-		"hideError": "Cacher les erreurs"
+		"hideError": "Cacher les erreurs",
+		"cancel": "Annuler"
 	}
 }
 </i18n>
 <template>
-  <div>
+  <div class="container">
     <div
-      v-if="files.length > 0 && progressBarVal !== lengthFilesSend"
+      v-if="copyFiles.length > 0 && sendingFiles === true"
     >
-      <b-progress-bar
-        :value="progressBarVal"
-        :max="lengthFilesSend"
-        show-progress
-        animated
-        style="text-align:center"
+      <div
+        v-if="cancel === false"
       >
-        {{ progressBarVal }} / {{ lengthFilesSend }}
-      </b-progress-bar>
+        <div class="row">
+          <div
+            class="col-12"
+          >
+            <b-progress-bar
+              :value="lengthFilesSended"
+              :max="copyFiles.length"
+              show-progress
+              animated
+              style="text-align:center"
+            >
+              {{ lengthFilesSended }} / {{ copyFiles.length }}
+            </b-progress-bar>
+          </div>
+          <div
+            class="col-2"
+          >
+            <button
+              type="button"
+              class="btn btn-link btn-sm text-center"
+              style="color: red"
+              @click="cancel=!cancel"
+            >
+              <span>
+                {{ $t("cancel") }}
+              </span>
+              <block-icon
+                :height="SVGheight"
+                :width="SVGwidth"
+                color="red"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        v-else
+      >
+        <clip-loader
+          :loading="cancel"
+          :size="SpinnerCancelSize"
+          :color="'red'"
+        />
+      </div>
     </div>
     <div
-      v-else-if="lengthFilesSend !== 0"
+      v-else-if="copyFiles.length > 0 && (copyFiles.length === lengthFilesSended || sendingFiles === false)"
     >
-      {{ $tc("filesSend", lengthFilesSend - errorFiles.length, {count: (lengthFilesSend - errorFiles.length)}) }}
-      <div
-        v-if="errorFiles.length > 0"
-      >
-        {{ $tc("filesErrors", errorFiles.length, {count: errorFiles.length}) }}
-        <button
-          type="button"
-          class="btn btn-link btn-sm text-center"
-          style="color: red"
-          @click="showErrors=!showErrors"
+      <div class="row">
+        <div
+          class="col-12"
         >
-          <span v-if="!showErrors">
-            {{ $t("showError") }}
-          </span>
-          <span v-else>
-            {{ $t("hideError") }}
-          </span>
-          <error-icon
-            :height="SVGheight"
-            :width="SVGwidth"
-            color="red"
-          />
-        </button>
+          {{ $tc("filesSend", lengthFilesSended - errorFiles.length, {count: (lengthFilesSended - errorFiles.length)}) }}
+          <div
+            v-if="errorFiles.length > 0"
+          >
+            {{ $tc("filesErrors", errorFiles.length, {count: errorFiles.length}) }}
+            <button
+              type="button"
+              class="btn btn-link btn-sm text-center"
+              style="color: red"
+              @click="showErrors=!showErrors"
+            >
+              <span v-if="!showErrors">
+                {{ $t("showError") }}
+              </span>
+              <span v-else>
+                {{ $t("hideError") }}
+              </span>
+              <error-icon
+                :height="SVGheight"
+                :width="SVGwidth"
+                color="red"
+              />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -72,20 +118,17 @@
 import { HTTP } from '@/router/http'
 import ListErrorFiles from '@/components/study/ListErrorFiles'
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue'
+import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
+import BlockIcon from '@/components/kheopsSVG/BlockIcon'
 
 export default {
 	name: 'SendStudies',
-	components: { ListErrorFiles, ErrorIcon },
+	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon },
 	props: {
 		files: {
 			type: Array,
 			required: true,
 			default: () => []
-		},
-		lengthFilesSend: {
-			type: Number,
-			required: true,
-			default: 0
 		},
 		sendingFiles: {
 			type: Boolean,
@@ -97,6 +140,7 @@ export default {
 		return {
 			SVGheight: '20',
 			SVGwidth: '20',
+			SpinnerCancelSize: '30px',
 			errorFiles: [],
 			maxsize: 10e7,
 			maxsend: 100,
@@ -110,7 +154,19 @@ export default {
 			errorValues: {
 				292: 'Authorization Error',
 				272: 'Non DICOM file'
-			}
+			},
+			errorDicom: [
+				{
+					'key': '0008119A',
+					'value': '00041500'
+				},
+				{
+					'key': '00081198',
+					'value': '00041500'
+				}
+			],
+			cancel: false,
+			lengthFilesSended: 0
 		}
 	},
 	computed: {
@@ -118,20 +174,18 @@ export default {
 			return this.files.reduce(function (total, currentValue) {
 				return total + currentValue.content.size
 			}, 0)
-		},
-		progressBarVal () {
-			let currentVal = this.lengthFilesSend - (this.files.length)
-			return currentVal < 0 ? 0 : currentVal
 		}
 	},
 	watch: {
 		sendingFiles () {
 			if (this.sendingFiles === true) {
+				this.cancel = false
 				this.sendFiles()
 			}
 		},
 		files () {
-			if (this.files.length === 0) {
+			if (this.files.length === 0 && (this.copyFiles.length === this.lengthFilesSended || this.cancel === true)) {
+				this.cancel = false
 				this.$emit('files-sending', false)
 			}
 		}
@@ -143,12 +197,16 @@ export default {
 	methods: {
 		sendFiles () {
 			this.initVariables()
-			this.copyFiles = _.cloneDeep(this.files)
 			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length < this.maxsend) {
 				this.sendFormDataPromise(this.copyFiles)
 			} else {
 				this.sendBySize()
 			}
+		},
+		initVariables () {
+			this.errorFiles = []
+			this.copyFiles = _.cloneDeep(this.files)
+			this.lengthFilesSended = 0
 		},
 		sendBySize () {
 			let state = {
@@ -157,25 +215,28 @@ export default {
 			}
 			// https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
 			let promiseChain = Promise.resolve()
+
 			this.copyFiles.forEach(async (file, index) => {
 				state.size += file.content.size
 				if (this.maxsize < state.size || (((index + 1) % this.maxsend === 0) && index !== 0)) {
-					let currentFiles = this.getArrayFilesToSend(state.tmpIndex, index + 1)
-					const makeNextPromise = () => () => {
-						return this.sendFormDataPromise(currentFiles)
-					}
-					promiseChain = promiseChain.then(makeNextPromise())
+					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
+					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
 					state.size = 0
 				}
 			})
+
 			if (state.tmpIndex <= this.copyFiles.length) {
-				let currentFiles = this.copyFiles.slice(state.tmpIndex, this.copyFiles.length)
-				const makeNextPromise = () => () => {
-					return this.sendFormDataPromise(currentFiles)
-				}
-				promiseChain = promiseChain.then(makeNextPromise())
+				const nextPromise = this.createNextPromise(state.tmpIndex, this.copyFiles.length)
+				promiseChain = promiseChain.then(nextPromise())
 			}
+		},
+		createNextPromise (firstIndex, secondIndex) {
+			let currentFiles = this.getArrayFilesToSend(firstIndex, secondIndex)
+			const nextPromise = () => () => {
+				return this.sendFormDataPromise(currentFiles)
+			}
+			return nextPromise
 		},
 		getArrayFilesToSend (firstIndex, secondIndex) {
 			if (firstIndex === secondIndex) {
@@ -184,6 +245,30 @@ export default {
 				return this.copyFiles.slice(firstIndex, secondIndex)
 			}
 		},
+		sendFormDataPromise (files) {
+			return new Promise(resolve => {
+				if (!this.cancel) {
+					let formData = this.createFormData(files)
+					const request = `/studies${this.$route.params.album_id ? '?album=' + this.$route.params.album_id : ''}`
+
+					HTTP.post(request, formData, this.config).then(res => {
+						this.manageResult(files, res.data)
+						resolve(res)
+					}).catch(res => {
+						this.manageResult(files, res)
+						resolve(res)
+					})
+				} else {
+					this.removeFilesId(files)
+					resolve('removeFiles')
+				}
+			})
+		},
+		manageResult (files, data) {
+			this.getErrorsDicomFromResponse(data)
+			this.removeFilesId(files)
+			this.lengthFilesSended += files.length
+		},
 		createFormData (files) {
 			let formData = new FormData()
 			files.forEach((file) => {
@@ -191,29 +276,12 @@ export default {
 			})
 			return formData
 		},
-		sendFormDataPromise (files) {
-			return new Promise((resolve, reject) => {
-				let formData = this.createFormData(files)
-				const request = `/studies${this.$route.params.album_id ? '?album=' + this.$route.params.album_id : ''}`
-				HTTP.post(request, formData, this.config).then(res => {
-					if (res.status === 200) {
-						formData.forEach((val) => {
-							this.removeFileName(val.name)
-						})
-					}
-					if (res.status === 202) {
-						this.errDicom(formData, res.data, '0008119A', '00041500')
-						this.errDicom(formData, res.data, '00081198', '00041500')
-					}
-					resolve(res)
-				}).catch(res => {
-					this.errDicom(formData, res, '0008119A', '00041500')
-					this.errDicom(formData, res, '00081198', '00041500')
-					resolve(res)
-				})
+		getErrorsDicomFromResponse (res) {
+			this.errorDicom.forEach((error) => {
+				this.errDicom(res, error.key, error.value)
 			})
 		},
-		errDicom (formData, res, iderr, idvalue) {
+		errDicom (res, iderr, idvalue) {
 			if (res.hasOwnProperty(iderr)) {
 				const err = this.dicom2map(res[iderr].Value, idvalue)
 				err.forEach((errorCode, id) => {
@@ -223,9 +291,6 @@ export default {
 							this.createObjErrors(fileError.path, this.errorValues[errorCode])
 						)
 					}
-				})
-				formData.forEach((val) => {
-					this.removeFileName(val.name)
 				})
 			}
 		},
@@ -244,11 +309,13 @@ export default {
 				'value': value
 			}
 		},
-		initVariables () {
-			this.errorFiles = []
+		removeFilesId (files) {
+			files.forEach((val) => {
+				this.removeFileId(val.id)
+			})
 		},
-		removeFileName (filename) {
-			let index = this.files.findIndex(x => x.name === filename)
+		removeFileId (id) {
+			let index = this.files.findIndex(x => x.id === id)
 			this.files.splice(index, 1)
 		},
 		setShowErrors (value) {
