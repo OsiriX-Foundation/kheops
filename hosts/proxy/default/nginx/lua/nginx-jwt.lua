@@ -20,59 +20,54 @@ function M.auth(claim_specs, use_post_secret)
     local validation_secret = nil
     if auth_header ~= nil then
         _, _, token = string.find(auth_header, "Bearer%s+(.+)")
-        --ngx.log(ngx.INFO, "access_token from Header: "..token)
     else
-        if ngx.var.arg_access_token ~= nil then    
+        if ngx.var.arg_access_token ~= nil then
             token=ngx.var.arg_access_token
-	    --ngx.log(ngx.INFO, "access token from URI query parameter: "..token)
         else
             ngx.log(ngx.WARN,"access_token: missing")
             ngx.exit(ngx.HTTP_UNAUTHORIZED)
-        end 
+        end
     end
     if use_post_secret == true then
-	validation_secret = post_secret
+	      validation_secret = post_secret
     else
         validation_secret = secret;
     end
-	
+
     -- require valid JWT
     local jwt_obj = jwt:verify(validation_secret, token, 0)
     if jwt_obj.verified == false then
-	ngx.log(ngx.WARN, "token:"..token)
+	      ngx.log(ngx.WARN, "token:"..token)
         ngx.log(ngx.WARN, "Invalid token: ".. jwt_obj.reason)
         ngx.exit(ngx.HTTP_UNAUTHORIZED)
     end
 
     -- if wado uri request
     if string.starts(ngx.var.request_uri, "/wado") then
-        if ngx.var.arg_requestType == "WADO" then    
+        if ngx.var.arg_requestType == "WADO" then
             if ngx.var.arg_studyUID ~= nil then
                 if ngx.var.arg_studyUID ~= jwt_obj.payload["study_uid"] then
                     ngx.log(ngx.WARN,"studyUID: error (not same as JWT)")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
             else
-		ngx.log(ngx.WARN,"studyUID: missing")
+		            ngx.log(ngx.WARN,"studyUID: missing")
                 ngx.exit(ngx.HTTP_UNAUTHORIZED)
-	    end
+	          end
             if ngx.var.arg_seriesUID ~= nil then
                 if ngx.var.arg_seriesUID ~= jwt_obj.payload["series_uid"] then
                     ngx.log(ngx.WARN,"seriesUID: error (not same as JWT)")
                     ngx.exit(ngx.HTTP_UNAUTHORIZED)
                 end
             else
-		ngx.log(ngx.WARN,"seriesUID: missing")
+		            ngx.log(ngx.WARN,"seriesUID: missing")
                 ngx.exit(ngx.HTTP_UNAUTHORIZED)
-	    end
+	          end
         else
             ngx.log(ngx.WARN,"requestType: missing")
             ngx.exit(ngx.HTTP_BAD_REQUEST)
-        end 
+        end
     end
-
-    --ngx.log(ngx.INFO, "JWT: " .. cjson.encode(jwt_obj))
-
 
 
     -- optionally require specific claims
