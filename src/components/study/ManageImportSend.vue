@@ -3,7 +3,6 @@
     <div class="container-fluid">
       <send-studies
         :files="files"
-        :length-files-send="lengthFiles"
         :sending-files="sendingFiles"
         @files-sending="setSendingFiles"
       />
@@ -13,7 +12,6 @@
       :scope="scope"
       :album="album"
       @files-loaded="loadFiles"
-      @files-length="loadLength"
     />
   </div>
 </template>
@@ -57,9 +55,6 @@ export default {
 		loadFiles (files) {
 			this.sendingFiles = true
 			this.files = files
-		},
-		loadLength (length) {
-			this.lengthFiles = length
 		},
 		setSendingFiles (sendingFiles) {
 			this.sendingFiles = sendingFiles
