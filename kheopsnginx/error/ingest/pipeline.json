@@ -21,7 +21,7 @@
     "date": {
       "field": "nginx.error.time",
       "target_field": "@timestamp",
-      "timezone": "CEST",
+      "timezone": "Europe/Zurich",
       "formats": ["YYYY/MM/dd H:m:s"]
     }
   }, {
