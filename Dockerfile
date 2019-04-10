@@ -47,6 +47,7 @@ RUN chmod go-w /etc/filebeat/filebeat.yml
 
 
 
-RUN rm /var/log/nginx/access.log /var/log/nginx/error.log
+RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
+    rm /etc/nginx/conf.d/default.conf
 
 CMD ["./etc/nginx/conf.d/script.sh"]
