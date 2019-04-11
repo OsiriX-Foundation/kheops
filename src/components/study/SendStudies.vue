@@ -141,7 +141,7 @@ export default {
 			SVGheight: '20',
 			SVGwidth: '20',
 			SpinnerCancelSize: '30px',
-			maxsize: 10e7,
+			maxsize: 10e6,
 			maxsend: 100,
 			config: {
 				headers: {
