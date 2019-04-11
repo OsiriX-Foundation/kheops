@@ -190,7 +190,7 @@ export default {
 					'content': file,
 					'path': path,
 					'name': name,
-					'id': this.count.toString()
+					'id': this.count.toString(16)
 				}
 				this.count++
 				return objFile
