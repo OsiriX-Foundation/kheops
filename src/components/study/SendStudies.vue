@@ -155,16 +155,10 @@ export default {
 				292: 'Authorization Error',
 				272: 'Non DICOM file'
 			},
-			errorDicom: [
-				{
-					'key': '0008119A',
-					'value': '00041500'
-				},
-				{
-					'key': '00081198',
-					'value': '00041500'
-				}
-			],
+			errorDicom: {
+				'0008119A': '00041500',
+				'00081198': '00041500'
+			},
 			cancel: false,
 			lengthFilesSended: 0
 		}
@@ -223,13 +217,11 @@ export default {
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
 					state.size = 0
+				} else if (index === this.copyFiles.length - 1) {
+					const nextPromise = this.createNextPromise(state.tmpIndex, this.copyFiles.length)
+					promiseChain = promiseChain.then(nextPromise())
 				}
 			})
-
-			if (state.tmpIndex <= this.copyFiles.length) {
-				const nextPromise = this.createNextPromise(state.tmpIndex, this.copyFiles.length)
-				promiseChain = promiseChain.then(nextPromise())
-			}
 		},
 		createNextPromise (firstIndex, secondIndex) {
 			let currentFiles = this.getArrayFilesToSend(firstIndex, secondIndex)
@@ -277,22 +269,22 @@ export default {
 			return formData
 		},
 		getErrorsDicomFromResponse (res) {
-			this.errorDicom.forEach((error) => {
-				this.errDicom(res, error.key, error.value)
-			})
-		},
-		errDicom (res, iderr, idvalue) {
-			if (res.hasOwnProperty(iderr)) {
-				const err = this.dicom2map(res[iderr].Value, idvalue)
-				err.forEach((errorCode, id) => {
-					const fileError = this.copyFiles.find(file => { return file.id === id })
-					if (fileError) {
-						this.errorFiles.push(
-							this.createObjErrors(fileError.path, this.errorValues[errorCode])
-						)
-					}
-				})
+			for (var key in this.errorDicom) {
+				if (res.hasOwnProperty(key)) {
+					const errorInResponse = this.dicom2map(res[key].Value, this.errorDicom[key])
+					this.createListError(errorInResponse)
+				}
 			}
+		},
+		createListError (error) {
+			error.forEach((errorCode, id) => {
+				const fileError = this.copyFiles.find(file => { return file.id === id })
+				if (fileError) {
+					this.errorFiles.push(
+						this.createObjErrors(fileError.path, this.errorValues[errorCode])
+					)
+				}
+			})
 		},
 		dicom2map (dicom, id) {
 			let map = new Map()
