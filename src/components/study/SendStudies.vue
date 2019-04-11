@@ -141,16 +141,13 @@ export default {
 			SVGheight: '20',
 			SVGwidth: '20',
 			SpinnerCancelSize: '30px',
-			errorFiles: [],
 			maxsize: 10e7,
 			maxsend: 100,
-			copyFiles: [],
 			config: {
 				headers: {
 					'Accept': 'application/dicom+json'
 				}
 			},
-			showErrors: false,
 			errorValues: {
 				292: 'Authorization Error',
 				272: 'Non DICOM file'
@@ -159,8 +156,12 @@ export default {
 				'0008119A': '00041500',
 				'00081198': '00041500'
 			},
+			errorFiles: [],
+			copyFiles: [],
+			showErrors: false,
 			cancel: false,
-			lengthFilesSended: 0
+			lengthFilesSended: 0,
+			albumId: ''
 		}
 	},
 	computed: {
@@ -198,6 +199,7 @@ export default {
 			}
 		},
 		initVariables () {
+			this.albumId = this.$route.params.album_id ? this.$route.params.album_id : ''
 			this.errorFiles = []
 			this.copyFiles = _.cloneDeep(this.files)
 			this.lengthFilesSended = 0
@@ -241,7 +243,7 @@ export default {
 			return new Promise(resolve => {
 				if (!this.cancel) {
 					let formData = this.createFormData(files)
-					const request = `/studies${this.$route.params.album_id ? '?album=' + this.$route.params.album_id : ''}`
+					const request = `/studies${this.albumId ? '?album=' + this.albumId : ''}`
 
 					HTTP.post(request, formData, this.config).then(res => {
 						this.manageResult(files, res.data)
