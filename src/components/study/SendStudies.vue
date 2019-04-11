@@ -214,7 +214,7 @@ export default {
 
 			this.copyFiles.forEach(async (file, index) => {
 				state.size += file.content.size
-				if (this.maxsize < state.size || (((index + 1) % this.maxsend === 0) && index !== 0)) {
+				if (this.maxsize < state.size || (((index + state.tmpIndex) % this.maxsend === 0) && index !== 0)) {
 					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
