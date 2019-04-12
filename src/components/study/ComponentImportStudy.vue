@@ -54,7 +54,12 @@
           class="outPopUp"
         >
           <p
-            v-if="sendingFiles"
+            v-if="albumNoPermission"
+          >
+            {{ $t("cantUploadAlbum") }}
+          </p>
+          <p
+            v-else-if="sendingFiles"
           >
             <span>
               {{ $t("cantUpload") }}
@@ -135,6 +140,9 @@ export default {
 		}
 	},
 	computed: {
+		albumNoPermission () {
+			return !(this.album.is_admin || this.album.add_series) && this.scope === 'album'
+		}
 	},
 	watch: {
 		sendingFiles () {
@@ -159,7 +167,7 @@ export default {
 			// Capture the files from the drop event and add them to local files array
 			this.$refs.fileform.addEventListener('drop', async function (e) {
 				if (this.hover) this.hover = false
-				if (!this.sendingFiles && !this.loading) {
+				if (!this.sendingFiles && !this.loading && !this.albumNoPermission) {
 					this.loading = true
 					this.manageDataTransfer(e.dataTransfer.items)
 				}
