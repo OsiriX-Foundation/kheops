@@ -19,11 +19,6 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_clientsecret ]; then
     echo "Missing kheops_keycloak_clientsecret secret"
     missing_env_var_secret=true
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_password ]; then
-    echo "Missing kheops_keycloak_password secret"
-    missing_env_var_secret=true
-fi
-
 
 #Verify environment variables
 if [ -z "$KHEOPS_AUTHDB_USER" ]; then
@@ -52,10 +47,6 @@ if [ -z "$KHEOPS_KEYCLOAK_URI" ]; then
 fi
 if [ -z "$KHEOPS_KEYCLOAK_CLIENTID" ]; then
     echo "Missing KHEOPS_KEYCLOAK_CLIENTID environment variable"
-    missing_env_var_secret=true
-fi
-if [ -z "$KHEOPS_KEYCLOAK_USER" ]; then
-    echo "Missing KHEOPS_KEYCLOAK_USER environment variable"
     missing_env_var_secret=true
 fi
 if [ -z "$KHEOPS_KEYCLOAK_REALMS" ]; then
@@ -93,7 +84,6 @@ sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT
 
 sed -i "s|\${kheops_keycloak_uri}|$KHEOPS_KEYCLOAK_URI|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_keycloak_clientid}|$KHEOPS_KEYCLOAK_CLIENTID|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_keycloak_user}|$KHEOPS_KEYCLOAK_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PATH}
 
 

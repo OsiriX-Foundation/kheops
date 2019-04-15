@@ -15,7 +15,7 @@ import java.util.*;
 import static online.kheops.auth_server.util.Consts.*;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public final class QIDOParams {
+public final class StudyQIDOParams {
     private static final Integer[] ACCEPTED_TAGS_FOR_SORTING_ARRAY = {Tag.StudyDate, Tag.StudyTime, Tag.AccessionNumber, Tag.ReferringPhysicianName, Tag.PatientName, Tag.PatientID, Tag.StudyInstanceUID, Tag.StudyID};
     private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(ACCEPTED_TAGS_FOR_SORTING_ARRAY));
 
@@ -46,7 +46,7 @@ public final class QIDOParams {
     private final boolean commentField;
     private final boolean studyDescriptionField;
 
-    public QIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
+    public StudyQIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
 
         String albumIDLocal = null;
         boolean fromInboxLocal = false;
@@ -65,7 +65,9 @@ public final class QIDOParams {
             }
             try {
                 albumIDLocal = kheopsPrincipal.getAlbumID();
-            } catch (NotAlbumScopeTypeException notUsed) { /*empty*/ }
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException e) {
+                throw new IllegalStateException(" Should not happen", e);
+            }
 
             if (!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, albumIDLocal)) {
                 throw new AlbumForbiddenException("Token doesn't have read access");
