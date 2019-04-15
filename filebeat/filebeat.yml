@@ -19,7 +19,7 @@ filebeat.inputs:
 # Below are the input specific configurations.
 
 - type: log
-
+  pipeline: "toto"
   # Change to true to enable this input configuration.
   enabled: true
 
