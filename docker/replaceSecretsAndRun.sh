@@ -148,6 +148,7 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         fi
 
         filebeat modules disable system
+        service filebeat restart
 
         echo "Ending setup FILEBEAT"
     fi
