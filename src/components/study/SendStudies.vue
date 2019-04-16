@@ -242,7 +242,7 @@ export default {
 			SVGwidth: '20',
 			SpinnerCancelSize: '30px',
 			maxsize: 10e6,
-			maxsend: 100,
+			maxsend: 99,
 			config: {
 				headers: {
 					'Accept': 'application/dicom+json'
@@ -337,7 +337,7 @@ export default {
 
 			this.copyFiles.forEach(async (file, index) => {
 				state.size += file.content.size
-				if (this.maxsize < state.size || (((index + state.tmpIndex) % this.maxsend === 0) && index !== 0)) {
+				if (this.maxsize < state.size || ((index-state.tmpIndex) >= this.maxsend)) {
 					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
