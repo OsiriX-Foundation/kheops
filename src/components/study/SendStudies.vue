@@ -1,8 +1,10 @@
 <i18n>
 {
 	"en": {
-		"filesSend": "{count} file has been sent. | {count} files have been sent.",
-		"filesErrors": "{count} file produced an error. | {count} files produced an error.",
+		"filesSend": "{count} file has been sent | {count} file has been sent | {count} files have been sent",
+		"locationSend": "in your inbox. | in an",
+		"album": "album.",
+		"filesErrors": "{count} file produced an error. | {count} file produced an error. | {count} files produced an error.",
 		"showError": "Show errors",
 		"hideError": "Hide errors",
 		"cancel": "Cancel",
@@ -10,7 +12,9 @@
 		"titleBoxSended": "File sended"
 	},
 	"fr": {
-		"filesSend": "{count} fichier a été envoyé. | {count} fichiers ont été envoyés.",
+		"filesSend": "{count} fichier a été envoyé | {count} fichiers ont été envoyés",
+		"locationSend": "dans votre boîte de réception. | dans un",
+		"album": "album.",
 		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
 		"showError": "Montrer les erreurs",
 		"hideError": "Cacher les erreurs",
@@ -149,6 +153,12 @@
             class="col-12 mt-2 mb-2"
           >
             {{ $tc("filesSend", sentFiles - error.length, {count: (sentFiles - error.length)}) }}
+            {{ $tc("locationSend", albumId !== '' ? 0 : 1) }}
+						<span
+							v-if="albumId !== ''"
+						>
+							<a href="#" @click="goToAlbum()">{{ $t("album") }}</a>.
+						</span>
             <div
               v-if="error.length > 0"
             >
@@ -274,6 +284,9 @@ export default {
 	destroyed () {
 	},
 	methods: {
+		goToAlbum () {
+			this.$router.push('/albums/' + this.albumId + '?view=studies')
+		},
 		setShow () {
 			this.show = !this.show
 			this.cancel = true
