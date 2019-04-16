@@ -27,25 +27,25 @@
 <template>
   <div>
     <div
-			v-if="show"
+      v-if="show"
       class="chat-popup container-fluid p-0"
     >
       <div
         class="closeBtn d-flex"
       >
         <div
+          v-if="sending === true"
           class="p-2"
-					v-if="sending === true"
         >
-					<clip-loader
-						:loading="sending"
-						:size="'20px'"
-						:color="'white'"
-					/>
-				</div>
-				<div
-					class="p-2"
-				>
+          <clip-loader
+            :loading="sending"
+            :size="'20px'"
+            :color="'white'"
+          />
+        </div>
+        <div
+          class="p-2"
+        >
           <span
             v-if="sending === true"
           >
@@ -337,7 +337,7 @@ export default {
 
 			this.copyFiles.forEach(async (file, index) => {
 				state.size += file.content.size
-				if (this.maxsize < state.size || ((index-state.tmpIndex) >= this.maxsend)) {
+				if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
 					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
