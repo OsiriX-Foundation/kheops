@@ -3,12 +3,14 @@
 	"en": {
 		"cantUpload": "You can't upload when files are sending",
 		"upload": "Drop your files / directories !",
-		"cantUploadAlbum": "You can't load files in this album."
+		"cantUploadAlbum": "You can't load files in this album.",
+		"cancel": "Cancel"
 	},
 	"fr": {
 		"cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
 		"upload": "Lâcher vos fichiers / dossiers !",
-		"cantUploadAlbum": "Vous ne pouvez pas charger des fichiers dans cet album."
+		"cantUploadAlbum": "Vous ne pouvez pas charger des fichiers dans cet album.",
+		"cancel": "Annuler"
 	}
 }
 </i18n>
@@ -82,7 +84,7 @@
           />
         </div>
         <div
-          :class="['dropzone-area', hover | loading ? 'dragenterClass' : '']"
+          :class="['dropzone-area', hover | loading ? 'dragenterClass' : 'dragNotEnterFormClass']"
         >
           <div
             v-if="scope === 'inbox'"
@@ -302,6 +304,9 @@ export default {
 	}
 	.dragenterFormClass {
 		border: 5px dotted green !important;
+	}
+	.dragNotEnterFormClass {
+		border: 5px dotted transparent !important;
 	}
 	.outPopUp {
 		position: fixed;
