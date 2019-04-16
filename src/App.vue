@@ -7,6 +7,7 @@
     <!-- content -->
     <router-view style="margin: 25px auto" />
 
+    <send-studies />
     <!-- footer -->
     <footer>
       <b-navbar
@@ -30,10 +31,11 @@
 
 import navHeader from '@/components/navheader'
 import navBar from '@/components/navbar'
+import SendStudies from '@/components/study/SendStudies'
 
 export default {
 	name: 'App',
-	components: { navHeader, navBar },
+	components: { navHeader, navBar, SendStudies },
 	computed: {
 		year () {
 			return new Date().getFullYear()

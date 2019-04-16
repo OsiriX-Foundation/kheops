@@ -4,6 +4,7 @@ import users from './modules/users'
 import studies from './modules/studies'
 import albums from './modules/albums'
 import album from './modules/album'
+import sending from './modules/sending'
 
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
 		users,
 		studies,
 		albums,
-		album
+		album,
+		sending
 	}
 })

@@ -1,140 +1,240 @@
 <i18n>
 {
 	"en": {
-		"filesSend": "{count} file has been send. | {count} files has been send.",
-		"filesErrors": "{count} file occur an error. | {count} files occur an error.",
+		"filesSend": "{count} file has been sent | {count} file has been sent | {count} files have been sent",
+		"locationSend": "in your inbox. | in an",
+		"album": "album.",
+		"filesErrors": "{count} file produced an error. | {count} file produced an error. | {count} files produced an error.",
 		"showError": "Show errors",
 		"hideError": "Hide errors",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"titleBoxSending": "{msg} files send",
+		"titleBoxSended": "{msg} files sended"
 	},
 	"fr": {
-		"filesSend": "{count} fichier a été envoyé. | {count} fichiers ont été envoyés.",
+		"filesSend": "{count} fichier a été envoyé | {count} fichiers ont été envoyés",
+		"locationSend": "dans votre boîte de réception. | dans un",
+		"album": "album.",
 		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
 		"showError": "Montrer les erreurs",
 		"hideError": "Cacher les erreurs",
-		"cancel": "Annuler"
+		"cancel": "Annuler",
+		"titleBoxSending": "{msg} fichiers envoyés",
+		"titleBoxSended": "{msg} fichiers ont été envoyés"
 	}
 }
 </i18n>
 <template>
-  <div class="container">
+  <div>
     <div
-      v-if="copyFiles.length > 0 && sendingFiles === true"
+      v-if="show"
+      class="chat-popup container-fluid p-0"
     >
       <div
-        v-if="cancel === false"
+        class="closeBtn d-flex"
       >
-        <div class="row">
+        <div
+          v-if="sending === true"
+          class="p-2"
+        >
+          <clip-loader
+            :loading="sending"
+            :size="'20px'"
+            :color="'white'"
+          />
+        </div>
+        <div
+          class="p-2"
+        >
+          <span
+            v-if="sending === true"
+          >
+            {{ $t("titleBoxSending", {msg: sentFiles}) }}
+          </span>
+          <span
+            v-else-if="sending === false"
+          >
+            {{ $t("titleBoxSended", {msg: sentFiles}) }}
+          </span>
+        </div>
+        <div
+          class="ml-auto p-1"
+        >
+          <!--
+						Reduce / Show icon
+					-->
+          <button
+            type="button"
+            class="btn btn-link btn-sm"
+            @click="hide=!hide"
+          >
+            <span
+              v-if="hide===false"
+            >
+              <remove-icon
+                :height="'16'"
+                :width="'16'"
+              />
+            </span>
+            <span
+              v-if="hide===true"
+            >
+              <add-icon
+                :height="'16'"
+                :width="'16'"
+              />
+            </span>
+          </button>
+          <!--
+						Close icon
+					-->
+          <button
+            type="button"
+            class="btn btn-link btn-sm"
+            @click="setShow()"
+          >
+            <close-icon
+              :height="'16'"
+              :width="'16'"
+            />
+          </button>
+        </div>
+      </div>
+      <div
+        v-if="hide === false"
+        class="p-2"
+      >
+        <!--
+					When sending
+				-->
+        <div
+          v-if="files.length > 0 && sending === true"
+        >
           <div
-            class="col-12"
+            v-if="cancel === false"
           >
             <b-progress-bar
-              :value="lengthFilesSended"
-              :max="copyFiles.length"
+              :value="sentFiles"
+              :max="totalSize"
               show-progress
               animated
               style="text-align:center"
             >
-              {{ lengthFilesSended }} / {{ copyFiles.length }}
+              {{ sentFiles }} / {{ totalSize }}
             </b-progress-bar>
+            <div
+              class="d-flex justify-content-center mt-1 mb-1"
+            >
+              <button
+                type="button"
+                class="btn btn-link btn-sm text-center"
+                style="color: red"
+                @click="setCancel()"
+              >
+                <span>
+                  {{ $t("cancel") }}
+                </span>
+                <block-icon
+                  :height="SVGheight"
+                  :width="SVGwidth"
+                  color="red"
+                />
+              </button>
+            </div>
           </div>
           <div
-            class="col-2"
+            v-else
           >
-            <button
-              type="button"
-              class="btn btn-link btn-sm text-center"
-              style="color: red"
-              @click="cancel=!cancel"
-            >
-              <span>
-                {{ $t("cancel") }}
-              </span>
-              <block-icon
-                :height="SVGheight"
-                :width="SVGwidth"
-                color="red"
-              />
-            </button>
+            <clip-loader
+              :loading="cancel"
+              :size="SpinnerCancelSize"
+              :color="'red'"
+            />
           </div>
         </div>
-      </div>
-      <div
-        v-else
-      >
-        <clip-loader
-          :loading="cancel"
-          :size="SpinnerCancelSize"
-          :color="'red'"
-        />
-      </div>
-    </div>
-    <div
-      v-else-if="copyFiles.length > 0 && (copyFiles.length === lengthFilesSended || sendingFiles === false)"
-    >
-      <div class="row">
+        <!--
+					When sending finish
+				-->
         <div
-          class="col-12"
+          v-else-if="(show === true) && (sentFiles === totalSize || sending === false)"
+          class="row"
         >
-          {{ $tc("filesSend", lengthFilesSended - errorFiles.length, {count: (lengthFilesSended - errorFiles.length)}) }}
           <div
-            v-if="errorFiles.length > 0"
+            class="col-12 mt-2 mb-2"
           >
-            {{ $tc("filesErrors", errorFiles.length, {count: errorFiles.length}) }}
-            <button
-              type="button"
-              class="btn btn-link btn-sm text-center"
-              style="color: red"
-              @click="showErrors=!showErrors"
+            {{ $tc("filesSend", sentFiles - error.length, {count: (sentFiles - error.length)}) }}
+            {{ $tc("locationSend", albumId !== '' ? 0 : 1) }}
+            <span
+              v-if="albumId !== ''"
             >
-              <span v-if="!showErrors">
-                {{ $t("showError") }}
-              </span>
-              <span v-else>
-                {{ $t("hideError") }}
-              </span>
-              <error-icon
-                :height="SVGheight"
-                :width="SVGwidth"
-                color="red"
-              />
-            </button>
+              <a
+                href="#"
+                @click="goToAlbum()"
+              >
+                {{ $t("album") }}
+              </a>
+            </span>
+            <div
+              v-if="error.length > 0"
+            >
+              {{ $tc("filesErrors", error.length, {count: error.length}) }}
+              <button
+                type="button"
+                class="btn btn-link btn-sm text-center"
+                style="color: red"
+                @click="showErrors=!showErrors"
+              >
+                <span v-if="!showErrors">
+                  {{ $t("showError") }}
+                </span>
+                <span v-else>
+                  {{ $t("hideError") }}
+                </span>
+                <error-icon
+                  :height="SVGheight"
+                  :width="SVGwidth"
+                  color="red"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--
+					Show the errors
+				-->
+        <div
+          v-if="error.length > 0 && showErrors"
+          class="row"
+        >
+          <div
+            class="col-12 mt-2 mb-2"
+          >
+            <list-error-files
+              :error-files="error"
+              @show-errors="setShowErrors"
+            />
           </div>
         </div>
       </div>
-    </div>
-    <div
-      v-if="errorFiles.length > 0 && showErrors"
-    >
-      <list-error-files
-        :error-files="errorFiles"
-        @show-errors="setShowErrors"
-      />
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { HTTP } from '@/router/http'
 import ListErrorFiles from '@/components/study/ListErrorFiles'
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import BlockIcon from '@/components/kheopsSVG/BlockIcon'
+import CloseIcon from '@/components/kheopsSVG/CloseIcon'
+import AddIcon from '@/components/kheopsSVG/AddIcon'
+import RemoveIcon from '@/components/kheopsSVG/RemoveIcon'
 
 export default {
 	name: 'SendStudies',
-	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon },
+	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon },
 	props: {
-		files: {
-			type: Array,
-			required: true,
-			default: () => []
-		},
-		sendingFiles: {
-			type: Boolean,
-			required: true,
-			default: false
-		}
 	},
 	data () {
 		return {
@@ -142,7 +242,7 @@ export default {
 			SVGwidth: '20',
 			SpinnerCancelSize: '30px',
 			maxsize: 10e6,
-			maxsend: 100,
+			maxsend: 99,
 			config: {
 				headers: {
 					'Accept': 'application/dicom+json'
@@ -156,15 +256,22 @@ export default {
 				'0008119A': '00041500',
 				'00081198': '00041500'
 			},
-			errorFiles: [],
 			copyFiles: [],
+			albumId: '',
 			showErrors: false,
 			cancel: false,
-			lengthFilesSended: 0,
-			albumId: ''
+			show: false,
+			hide: false
 		}
 	},
 	computed: {
+		...mapGetters({
+			sending: 'sending',
+			files: 'files',
+			totalSize: 'totalSize',
+			error: 'error',
+			sentFiles: 'sentFiles'
+		}),
 		totalSizeFiles () {
 			return this.files.reduce(function (total, currentValue) {
 				return total + currentValue.content.size
@@ -172,16 +279,16 @@ export default {
 		}
 	},
 	watch: {
-		sendingFiles () {
-			if (this.sendingFiles === true) {
-				this.cancel = false
+		sending () {
+			if (this.sending === true) {
 				this.sendFiles()
 			}
 		},
 		files () {
-			if (this.files.length === 0 && (this.copyFiles.length === this.lengthFilesSended || this.cancel === true)) {
+			if (this.files.length === 0 && (this.totalSize - this.files === this.totalSize || this.cancel === true)) {
 				this.cancel = false
 				this.$emit('files-sending', false)
+				this.$store.dispatch('setSending', { sending: false })
 			}
 		}
 	},
@@ -189,20 +296,36 @@ export default {
 	},
 	mounted () {
 	},
+	destroyed () {
+	},
 	methods: {
+		goToAlbum () {
+			this.$router.push('/albums/' + this.albumId + '?view=studies')
+		},
+		setShow () {
+			this.show = !this.show
+			this.cancel = true
+		},
+		setCancel () {
+			this.cancel = !this.cancel
+		},
 		sendFiles () {
-			this.initVariables()
+			this.initVariablesForSending()
 			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length < this.maxsend) {
 				this.sendFormDataPromise(this.copyFiles)
 			} else {
 				this.sendBySize()
 			}
 		},
-		initVariables () {
+		initVariablesForSending () {
+			this.show = true
+			this.cancel = false
 			this.albumId = this.$route.params.album_id ? this.$route.params.album_id : ''
-			this.errorFiles = []
 			this.copyFiles = _.cloneDeep(this.files)
-			this.lengthFilesSended = 0
+
+			this.$store.dispatch('setSending', { sending: true })
+			this.$store.dispatch('initErrorFiles')
+			this.$store.dispatch('initSentFiles')
 		},
 		sendBySize () {
 			let state = {
@@ -214,7 +337,7 @@ export default {
 
 			this.copyFiles.forEach(async (file, index) => {
 				state.size += file.content.size
-				if (this.maxsize < state.size || (((index + state.tmpIndex) % this.maxsend === 0) && index !== 0)) {
+				if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
 					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
@@ -241,10 +364,9 @@ export default {
 		},
 		sendFormDataPromise (files) {
 			return new Promise(resolve => {
-				if (!this.cancel) {
+				if (!this.cancel && this.files.length > 0) {
 					let formData = this.createFormData(files)
 					const request = `/studies${this.albumId ? '?album=' + this.albumId : ''}`
-
 					HTTP.post(request, formData, this.config).then(res => {
 						this.manageResult(files, res.data)
 						resolve(res)
@@ -252,16 +374,18 @@ export default {
 						this.manageResult(files, res)
 						resolve(res)
 					})
-				} else {
-					this.removeFilesId(files)
+				} else if (this.files.length > 0) {
+					this.$store.dispatch('initFiles')
 					resolve('removeFiles')
+				} else {
+					resolve('noFiles')
 				}
 			})
 		},
 		manageResult (files, data) {
 			this.getErrorsDicomFromResponse(data)
-			this.removeFilesId(files)
-			this.lengthFilesSended += files.length
+			this.$store.dispatch('removeFilesId', { files: files })
+			this.$store.dispatch('setSentFiles', { sentFiles: files.length })
 		},
 		createFormData (files) {
 			let formData = new FormData()
@@ -282,9 +406,7 @@ export default {
 			error.forEach((errorCode, id) => {
 				const fileError = this.copyFiles.find(file => { return file.id === id })
 				if (fileError) {
-					this.errorFiles.push(
-						this.createObjErrors(fileError.path, this.errorValues[errorCode])
-					)
+					this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, this.errorValues[errorCode]) })
 				}
 			})
 		},
@@ -303,15 +425,6 @@ export default {
 				'value': value
 			}
 		},
-		removeFilesId (files) {
-			files.forEach((val) => {
-				this.removeFileId(val.id)
-			})
-		},
-		removeFileId (id) {
-			let index = this.files.findIndex(x => x.id === id)
-			this.files.splice(index, 1)
-		},
 		setShowErrors (value) {
 			this.showErrors = value
 		}
@@ -320,26 +433,19 @@ export default {
 </script>
 
 <style scoped>
-.file-listing{
-    width: 380px;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+	.chat-popup {
+		position: fixed;
+		background: #303030;
+		bottom: 0;
+		right: 15px;
+		border: 3px solid #f1f1f1;
+		z-index: 9;
+		max-width: 400px;
+		opacity: 1;
+		display: block;
 	}
-  .files-listing{
-    width: 400px;
-    margin: auto;
-    max-height: 400px;
-    overflow: auto;
-  }
-  .container-btn{
-    padding: 10px;
-  }
-  .inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
+	.closeBtn {
+		position: relative;
+		border-bottom: 1px solid #f1f1f1;
+	}
 </style>

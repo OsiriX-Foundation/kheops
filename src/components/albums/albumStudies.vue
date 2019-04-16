@@ -24,7 +24,7 @@
         </div>
       </div>
     </div>
-    <manage-import-send
+    <component-import-study
       :scope="scope"
       :album="album"
     />
@@ -34,11 +34,11 @@
 <script>
 import { mapGetters } from 'vuex'
 import { AlbumRedirect } from '../../mixins/redirect.js'
-import ManageImportSend from '@/components/study/ManageImportSend'
+import ComponentImportStudy from '@/components/study/ComponentImportStudy'
 
 export default {
 	name: 'AlbumStudies',
-	components: { ManageImportSend },
+	components: { ComponentImportStudy },
 	mixins: [ AlbumRedirect ],
 	data () {
 		return {
