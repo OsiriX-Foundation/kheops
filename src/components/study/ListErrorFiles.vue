@@ -20,11 +20,14 @@
         class="file-listing"
       >
         <div
-          class="row align-items-center"
+          class="row"
         >
           <div
-            class="col"
+            class="col-12"
           >
+            <!--
+              https://css-tricks.com/almanac/properties/o/overflow-wrap/
+            -->
             {{ error.id }}
           </div>
           <div
@@ -87,12 +90,12 @@ export default {
 
 <style scoped>
   .file-listing{
-    width: 380px;
+    width: 350px;
     padding: 10px;
     border-bottom: 1px solid #ddd;
 	}
   .files-listing{
-    width: 400px;
+    width: 360px;
     margin: auto;
     max-height: 400px;
     overflow: auto;
