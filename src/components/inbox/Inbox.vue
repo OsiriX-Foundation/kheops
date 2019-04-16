@@ -1,17 +1,17 @@
 <template>
   <div>
-    <manage-import-send
+    <component-import-study
       :scope="scope"
     />
   </div>
 </template>
 
 <script>
-import ManageImportSend from '@/components/study/ManageImportSend'
+import ComponentImportStudy from '@/components/study/ComponentImportStudy'
 
 export default {
 	name: 'Inbox',
-	components: { ManageImportSend },
+	components: { ComponentImportStudy },
 	props: {
 	},
 	data () {

@@ -172,7 +172,7 @@
                 @click="goToAlbum()"
               >
                 {{ $t("album") }}
-              </a>.
+              </a>
             </span>
             <div
               v-if="error.length > 0"
