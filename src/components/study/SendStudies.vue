@@ -9,7 +9,9 @@
 		"hideError": "Hide errors",
 		"cancel": "Cancel",
 		"titleBoxSending": "{msg} files send",
-		"titleBoxSended": "{msg} files sended"
+		"titleBoxSended": "{msg} files sended",
+		"titleBoxSending2": "Files being sent",
+		"titleBoxSended2": "Files sended"
 	},
 	"fr": {
 		"filesSend": "{count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -20,7 +22,9 @@
 		"hideError": "Cacher les erreurs",
 		"cancel": "Annuler",
 		"titleBoxSending": "{msg} fichiers envoyés",
-		"titleBoxSended": "{msg} fichiers ont été envoyés"
+		"titleBoxSended": "{msg} fichiers ont été envoyés",
+		"titleBoxSending2": "Fichiers en cours d'envois",
+		"titleBoxSended2": "Fichiers envoyés"
 	}
 }
 </i18n>
@@ -30,7 +34,7 @@
       v-if="show"
       class="chat-popup container-fluid p-0"
     >
-      <div
+			<div
         class="closeBtn d-flex"
       >
         <div
@@ -44,17 +48,26 @@
           />
         </div>
         <div
+          v-if="sending === false"
+          class="p-2"
+        >
+          <done-icon
+						:height="'20'"
+						:width="'20'"
+					/>
+        </div>
+        <div
           class="p-2"
         >
           <span
             v-if="sending === true"
           >
-            {{ $t("titleBoxSending", {msg: sentFiles}) }}
+            {{ $t("titleBoxSending2") }}
           </span>
           <span
             v-else-if="sending === false"
           >
-            {{ $t("titleBoxSended", {msg: sentFiles}) }}
+            {{ $t("titleBoxSended2") }}
           </span>
         </div>
         <div
@@ -230,10 +243,11 @@ import BlockIcon from '@/components/kheopsSVG/BlockIcon'
 import CloseIcon from '@/components/kheopsSVG/CloseIcon'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 import RemoveIcon from '@/components/kheopsSVG/RemoveIcon'
+import DoneIcon from '@/components/kheopsSVG/DoneIcon'
 
 export default {
 	name: 'SendStudies',
-	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon },
+	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon },
 	props: {
 	},
 	data () {
