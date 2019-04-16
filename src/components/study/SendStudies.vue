@@ -8,8 +8,8 @@
 		"showError": "Show errors",
 		"hideError": "Hide errors",
 		"cancel": "Cancel",
-		"titleBoxSending": "Files sending",
-		"titleBoxSended": "File sended"
+		"titleBoxSending": "{msg} files send",
+		"titleBoxSended": "{msg} files sended"
 	},
 	"fr": {
 		"filesSend": "{count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -19,36 +19,46 @@
 		"showError": "Montrer les erreurs",
 		"hideError": "Cacher les erreurs",
 		"cancel": "Annuler",
-		"titleBoxSending": "Fichiers en cours d'envoi",
-		"titleBoxSended": "Fichiers envoyés"
+		"titleBoxSending": "{msg} fichiers envoyés",
+		"titleBoxSended": "{msg} fichiers ont été envoyés"
 	}
 }
 </i18n>
 <template>
   <div>
     <div
-      v-if="show"
+			v-if="show"
       class="chat-popup container-fluid p-0"
     >
       <div
-        class="closeBtn d-flex justify-content-between"
+        class="closeBtn d-flex"
       >
         <div
-          class="justify-content-start p-1"
+          class="p-2"
+					v-if="sending === true"
         >
+					<clip-loader
+						:loading="sending"
+						:size="'20px'"
+						:color="'white'"
+					/>
+				</div>
+				<div
+					class="p-2"
+				>
           <span
             v-if="sending === true"
           >
-            {{ $t("titleBoxSending") }}
+            {{ $t("titleBoxSending", {msg: sentFiles}) }}
           </span>
           <span
             v-else-if="sending === false"
           >
-            {{ $t("titleBoxSended") }}
+            {{ $t("titleBoxSended", {msg: sentFiles}) }}
           </span>
         </div>
         <div
-          class="justify-content-end"
+          class="ml-auto p-1"
         >
           <!--
 						Reduce / Show icon
@@ -154,11 +164,16 @@
           >
             {{ $tc("filesSend", sentFiles - error.length, {count: (sentFiles - error.length)}) }}
             {{ $tc("locationSend", albumId !== '' ? 0 : 1) }}
-						<span
-							v-if="albumId !== ''"
-						>
-							<a href="#" @click="goToAlbum()">{{ $t("album") }}</a>.
-						</span>
+            <span
+              v-if="albumId !== ''"
+            >
+              <a
+                href="#"
+                @click="goToAlbum()"
+              >
+                {{ $t("album") }}
+              </a>.
+            </span>
             <div
               v-if="error.length > 0"
             >
