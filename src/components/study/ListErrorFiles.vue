@@ -93,6 +93,7 @@ export default {
     width: 350px;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    overflow-wrap: break-word;
 	}
   .files-listing{
     width: 360px;
