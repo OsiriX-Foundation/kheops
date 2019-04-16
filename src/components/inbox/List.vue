@@ -710,7 +710,8 @@ export default {
 		...mapGetters({
 			studies: 'studies',
 			albums: 'albums',
-			user: 'currentUser'
+			user: 'currentUser',
+			sendingFiles: 'sending'
 		}),
 		totalRows () {
 			return this.studies.length
@@ -747,6 +748,11 @@ export default {
 	},
 
 	watch: {
+		sendingFiles () {
+			if (!this.sending) {
+				this.getStudies()
+			}
+		},
 		selectedStudiesNb: {
 			handler: function (selectedStudiesNb) {
 				if (selectedStudiesNb === 0) {

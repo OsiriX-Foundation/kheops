@@ -59,7 +59,7 @@
             {{ $t("cantUploadAlbum") }}
           </p>
           <p
-            v-else-if="sendingFiles"
+            v-else-if="sending"
           >
             <span>
               {{ $t("cantUpload") }}
@@ -106,6 +106,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import List from '@/components/inbox/List'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 
@@ -113,11 +114,6 @@ export default {
 	name: 'ComponentDragAndDrop',
 	components: { List, ClipLoader },
 	props: {
-		sendingFiles: {
-			type: Boolean,
-			required: true,
-			default: false
-		},
 		scope: {
 			type: String,
 			required: true,
@@ -140,16 +136,14 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters({
+			sending: 'sending'
+		}),
 		albumNoPermission () {
 			return !(this.album.is_admin || this.album.add_series) && this.scope === 'album'
 		}
 	},
 	watch: {
-		sendingFiles () {
-			if (!this.sendingFiles) {
-				this.$refs.list.getStudies()
-			}
-		}
 	},
 	created () {
 	},
@@ -167,7 +161,7 @@ export default {
 			// Capture the files from the drop event and add them to local files array
 			this.$refs.fileform.addEventListener('drop', async function (e) {
 				if (this.hover) this.hover = false
-				if (!this.sendingFiles && !this.loading && !this.albumNoPermission) {
+				if (!this.sending && !this.loading && !this.albumNoPermission) {
 					this.loading = true
 					this.manageDataTransfer(e.dataTransfer.items)
 				}
@@ -231,6 +225,8 @@ export default {
 				const filesSend = this.removeNonObjectFiles(this.arrayFlatten(res))
 				this.loading = false
 				this.emitFilesLoad(filesSend)
+				this.$store.dispatch('setSending', { sending: true })
+				this.$store.dispatch('setFiles', { files: filesSend })
 			})
 		},
 		removeNonObjectFiles (array) {
