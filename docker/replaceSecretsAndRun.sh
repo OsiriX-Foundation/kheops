@@ -99,7 +99,7 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         missing_env_var_secret=false
 
         if [[ -z $KHEOPS_AUTHORIZATION_ELASTIC_NAME ]]; then
-          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_NAME environment variable"
+          echo "Missing KHEOPS_AUTHORIZATION_ELASTIC_NAME environment variable"
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_AUTHORIZATION_ELASTIC_NAME \e[92mOK\e[0m"
@@ -107,7 +107,7 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         fi
 
         if [[ -z $KHEOPS_AUTHORIZATION_ELASTIC_TAGS ]]; then
-          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_TAGS environment variable"
+          echo "Missing KHEOPS_AUTHORIZATION_ELASTIC_TAGS environment variable"
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_AUTHORIZATION_ELASTIC_TAGS \e[92mOK\e[0m"
@@ -123,7 +123,7 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         fi
 
         if [[ -z $KHEOPS_AUTHORIZATION_KIBANA_URL ]]; then
-          echo "Missing KHEOPS_REVERSE_PROXY_KIBANA_URL environment variable"
+          echo "Missing KHEOPS_AUTHORIZATION_KIBANA_URL environment variable"
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_AUTHORIZATION_KIBANA_URL \e[92mOK\e[0m"
