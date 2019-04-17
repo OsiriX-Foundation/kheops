@@ -4,7 +4,7 @@
 <i18n>
 {
 	"en": {
-		"selectednbstudies": "{count} study is selected | {count} studies are selected",
+		"selectednbstudies": "{count} study is selected | {count} study is selected | {count} studies are selected",
 		"addalbum": "Add to an album",
 		"download": "Download",
 		"addfavorite": "Add to favorites",
@@ -34,7 +34,7 @@
     "cancel": "Cancel"
 	},
 	"fr": {
-		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
+		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
 		"addalbum": "Ajouter à un album",
 		"download": "Télécharger",
 		"addfavorite": "Ajouter aux favoris",
@@ -72,7 +72,6 @@
     <!--button Study selected -->
     <div class="container-fluid my-3 selection-button-container">
       <span
-        v-if="selectedStudiesNb"
         class="float-left"
       >
         <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
@@ -80,6 +79,7 @@
           v-if="!filters.album_id || (album.is_admin || album.send_series)"
           type="button"
           class="btn btn-link btn-sm text-center"
+          :disabled="disableBtnHeader"
           @click.stop="form_send_study=!form_send_study"
         >
           <span>
@@ -95,6 +95,7 @@
           variant="link"
           size="sm"
           no-caret
+          :disabled="disableBtnHeader"
         >
           <template slot="button-content">
             <span>
@@ -122,6 +123,7 @@
           v-if="filters.album_id && (album.send_series || album.is_admin)"
           type="button"
           class="btn btn-link btn-sm text-center"
+          :disabled="disableBtnHeader"
           @click="addToInbox()"
         >
           <span>
@@ -136,6 +138,7 @@
           v-if="!filters.album_id"
           type="button"
           class="btn btn-link btn-sm text-center"
+          :disabled="disableBtnHeader"
           @click="addSelectedStudiesFavorite()"
         >
           <span>
@@ -150,6 +153,7 @@
           v-if="!filters.album_id || (album.is_admin || album.delete_series)"
           type="button"
           class="btn btn-link btn-sm text-center"
+          :disabled="disableBtnHeader"
           @click="confirmDelete=!confirmDelete"
         >
           <span>
@@ -744,6 +748,9 @@ export default {
 		},
 		OS () {
 			return navigator.platform
+		},
+		disableBtnHeader () {
+			return !this.selectedSeriesNb
 		}
 	},
 
