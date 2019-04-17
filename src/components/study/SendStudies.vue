@@ -8,10 +8,8 @@
 		"showError": "Show errors",
 		"hideError": "Hide errors",
 		"cancel": "Cancel",
-		"titleBoxSending": "{msg} files send",
-		"titleBoxSended": "{msg} files sended",
-		"titleBoxSending2": "Files being sent",
-		"titleBoxSended2": "Files sended"
+		"titleBoxSending": "Sending files",
+		"titleBoxSended": "Files sent"
 	},
 	"fr": {
 		"filesSend": "{count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -21,10 +19,8 @@
 		"showError": "Montrer les erreurs",
 		"hideError": "Cacher les erreurs",
 		"cancel": "Annuler",
-		"titleBoxSending": "{msg} fichiers envoyés",
-		"titleBoxSended": "{msg} fichiers ont été envoyés",
-		"titleBoxSending2": "Fichiers en cours d'envois",
-		"titleBoxSended2": "Fichiers envoyés"
+		"titleBoxSending": "Fichiers en cours d'envois",
+		"titleBoxSended": "Fichiers envoyés"
 	}
 }
 </i18n>
@@ -34,7 +30,7 @@
       v-if="show"
       class="chat-popup container-fluid p-0"
     >
-			<div
+      <div
         class="closeBtn d-flex"
       >
         <div
@@ -52,9 +48,9 @@
           class="p-2"
         >
           <done-icon
-						:height="'20'"
-						:width="'20'"
-					/>
+            :height="'20'"
+            :width="'20'"
+          />
         </div>
         <div
           class="p-2"
@@ -62,12 +58,12 @@
           <span
             v-if="sending === true"
           >
-            {{ $t("titleBoxSending2") }}
+            {{ $t("titleBoxSending") }}
           </span>
           <span
             v-else-if="sending === false"
           >
-            {{ $t("titleBoxSended2") }}
+            {{ $t("titleBoxSended") }}
           </span>
         </div>
         <div
@@ -104,7 +100,7 @@
           <button
             type="button"
             class="btn btn-link btn-sm"
-            @click="setShow()"
+            @click="closeWindow()"
           >
             <close-icon
               :height="'16'"
@@ -127,13 +123,13 @@
             v-if="cancel === false"
           >
             <b-progress-bar
-              :value="sentFiles"
+              :value="countSentFiles+progress"
               :max="totalSize"
               show-progress
               animated
               style="text-align:center"
             >
-              {{ sentFiles }} / {{ totalSize }}
+              {{ countSentFiles }} / {{ totalSize }}
             </b-progress-bar>
             <div
               class="d-flex justify-content-center mt-1 mb-1"
@@ -169,13 +165,13 @@
 					When sending finish
 				-->
         <div
-          v-else-if="(show === true) && (sentFiles === totalSize || sending === false)"
+          v-else-if="(show === true) && (countSentFiles === totalSize || sending === false)"
           class="row"
         >
           <div
             class="col-12 mt-2 mb-2"
           >
-            {{ $tc("filesSend", sentFiles - error.length, {count: (sentFiles - error.length)}) }}
+            {{ $tc("filesSend", countSentFiles - error.length, {count: (countSentFiles - error.length)}) }}
             {{ $tc("locationSend", albumId !== '' ? 0 : 1) }}
             <span
               v-if="albumId !== ''"
@@ -260,6 +256,9 @@ export default {
 			config: {
 				headers: {
 					'Accept': 'application/dicom+json'
+				},
+				onUploadProgress: progressEvent => {
+					this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
 				}
 			},
 			errorValues: {
@@ -270,12 +269,14 @@ export default {
 				'0008119A': '00041500',
 				'00081198': '00041500'
 			},
-			copyFiles: [],
-			albumId: '',
 			showErrors: false,
 			cancel: false,
 			show: false,
-			hide: false
+			hide: false,
+			progress: 0,
+			copyFiles: [],
+			albumId: '',
+			countSentFiles: 0
 		}
 	},
 	computed: {
@@ -283,12 +284,11 @@ export default {
 			sending: 'sending',
 			files: 'files',
 			totalSize: 'totalSize',
-			error: 'error',
-			sentFiles: 'sentFiles'
+			error: 'error'
 		}),
 		totalSizeFiles () {
-			return this.files.reduce(function (total, currentValue) {
-				return total + currentValue.content.size
+			return this.copyFiles.reduce(function (total, file) {
+				return total + file.content.size
 			}, 0)
 		}
 	},
@@ -299,9 +299,8 @@ export default {
 			}
 		},
 		files () {
-			if (this.files.length === 0 && (this.totalSize - this.files === this.totalSize || this.cancel === true)) {
+			if (this.files.length === 0 && (this.countSentFiles === this.totalSize || this.cancel === true)) {
 				this.cancel = false
-				this.$emit('files-sending', false)
 				this.$store.dispatch('setSending', { sending: false })
 			}
 		}
@@ -316,7 +315,7 @@ export default {
 		goToAlbum () {
 			this.$router.push('/albums/' + this.albumId + '?view=studies')
 		},
-		setShow () {
+		closeWindow () {
 			this.show = !this.show
 			this.cancel = true
 		},
@@ -325,23 +324,24 @@ export default {
 		},
 		sendFiles () {
 			this.initVariablesForSending()
-			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length < this.maxsend) {
+			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length <= this.maxsend) {
 				this.sendFormDataPromise(this.copyFiles)
 			} else {
-				this.sendBySize()
+				this.sendBySize(this.copyFiles)
 			}
 		},
 		initVariablesForSending () {
 			this.show = true
 			this.cancel = false
 			this.albumId = this.$route.params.album_id ? this.$route.params.album_id : ''
+			this.countSentFiles = 0
 			this.copyFiles = _.cloneDeep(this.files)
+			this.progress = 0
 
 			this.$store.dispatch('setSending', { sending: true })
 			this.$store.dispatch('initErrorFiles')
-			this.$store.dispatch('initSentFiles')
 		},
-		sendBySize () {
+		sendBySize (files) {
 			let state = {
 				size: 0,
 				tmpIndex: 0
@@ -349,15 +349,15 @@ export default {
 			// https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
 			let promiseChain = Promise.resolve()
 
-			this.copyFiles.forEach(async (file, index) => {
+			files.forEach(async (file, index) => {
 				state.size += file.content.size
 				if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
 					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
 					state.size = 0
-				} else if (index === this.copyFiles.length - 1) {
-					const nextPromise = this.createNextPromise(state.tmpIndex, this.copyFiles.length)
+				} else if (index >= files.length - 1) {
+					const nextPromise = this.createNextPromise(state.tmpIndex, files.length)
 					promiseChain = promiseChain.then(nextPromise())
 				}
 			})
@@ -377,9 +377,10 @@ export default {
 			}
 		},
 		sendFormDataPromise (files) {
-			return new Promise(resolve => {
+			return new Promise((resolve) => {
 				if (!this.cancel && this.files.length > 0) {
 					let formData = this.createFormData(files)
+					this.currentFilesLength = files.length
 					const request = `/studies${this.albumId ? '?album=' + this.albumId : ''}`
 					HTTP.post(request, formData, this.config).then(res => {
 						this.manageResult(files, res.data)
@@ -399,7 +400,7 @@ export default {
 		manageResult (files, data) {
 			this.getErrorsDicomFromResponse(data)
 			this.$store.dispatch('removeFilesId', { files: files })
-			this.$store.dispatch('setSentFiles', { sentFiles: files.length })
+			this.countSentFiles += files.length
 		},
 		createFormData (files) {
 			let formData = new FormData()

@@ -32,12 +32,10 @@ const state = {
 // getters
 const getters = {
 	studies: state => state.all
-
 }
 
 // actions
 const actions = {
-
 	getStudies ({ commit, dispatch }, params) {
 		if (state.totalItems !== null && state.all.length >= state.totalItems && state.filterParams.sortBy === params.sortBy && state.filterParams.sortDesc === params.sortDesc && _.isEqual(state.filterParams.filters, params.filters)) {
 			return
