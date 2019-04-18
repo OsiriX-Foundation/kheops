@@ -31,7 +31,10 @@
 		"studiessend": "studies send to inbox",
     "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
     "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "importdir": "Import directory",
+    "importfiles": "Import files",
+    "draganddrop": "Or drag and drop"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -60,7 +63,10 @@
     "nostudy": "Aucne étude trouvée",
 		"studiessend": "études envoyées dans votre boîte de réception",
     "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "importdir": "Importer un dossier",
+    "importfiles": "Importer des fichiers",
+    "draganddrop": "Ou Drag and Drop"
 	}
 }
 </i18n>
@@ -165,7 +171,6 @@
           {{ $t("delete") }}
         </button>
       </span>
-
       <!--
 			<span style = 'margin-left: 30px;' v-if='!filters.album_id'>
 				<toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" />
@@ -183,6 +188,63 @@
           scale="2"
         />
       </button>
+      <span
+        class="float-right"
+      >
+        <input
+          id="file"
+          ref="inputfiles"
+          type="file"
+          name="file"
+          class="inputfile"
+          multiple
+          :disabled="sendingFiles"
+          @change="inputLoadFiles"
+        >
+
+        <input
+          id="directory"
+          ref="inputdir"
+          type="file"
+          name="file"
+          class="inputfile"
+          webkitdirectory
+          :disabled="sendingFiles"
+          @change="inputLoadDirectories"
+        >
+        <b-dropdown
+          id="dropdown-divider"
+          class="m-2"
+          variant="link"
+          right
+        >
+          <template slot="button-content">
+            <add-icon
+              width="30px"
+              height="30px"
+            />
+          </template>
+          <b-dropdown-item-button
+            :disabled="sendingFiles"
+          >
+            <label for="file">
+              {{ $t("importfiles") }}
+            </label>
+          </b-dropdown-item-button>
+          <b-dropdown-item-button
+            v-if="determineWebkitDirectory()"
+            :disabled="sendingFiles"
+          >
+            <label for="directory">
+              {{ $t("importdir") }}
+            </label>
+          </b-dropdown-item-button>
+          <b-dropdown-divider />
+          <b-dropdown-text class="m-3">
+            {{ $t("draganddrop") }}
+          </b-dropdown-text>
+        </b-dropdown>
+      </span>
     </div>
     <!--deleteSelectedStudies()-->
     <confirm-button
@@ -622,12 +684,13 @@ import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import { ViewerToken } from '@/mixins/tokens.js'
+import AddIcon from '@/components/kheopsSVG/AddIcon'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon, AddIcon },
 	mixins: [ ViewerToken ],
 	props: {
 		album: {
@@ -756,7 +819,7 @@ export default {
 
 	watch: {
 		sendingFiles () {
-			if (!this.sending) {
+			if (!this.sendingFiles) {
 				this.getStudies()
 			}
 		},
@@ -1037,6 +1100,21 @@ export default {
 		openOhif (StudyInstanceUID, token, queryparams, ohifWindow) {
 			let url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`
 			ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`
+		},
+		inputLoadFiles () {
+			const filesFromInput = this.$refs.inputfiles.files
+			this.$emit('loadfiles', filesFromInput)
+		},
+		inputLoadDirectories () {
+			const filesFromInput = this.$refs.inputdir.files
+			this.$emit('loaddirectories', filesFromInput)
+		},
+		determineWebkitDirectory () {
+			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+			var tmpInput = document.createElement('input')
+			if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true
+
+			return false
 		}
 	}
 }
@@ -1066,7 +1144,7 @@ export default {
 	}
 
 	.patientNameIcons{
-		visibility: hidden;
+		visibility:hidden;
 		display: inline;
 		cursor: pointer;
 	}
@@ -1115,4 +1193,12 @@ export default {
 	a.download:hover{
 		color: #fd7e14;
 	}
+  .inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
 </style>
