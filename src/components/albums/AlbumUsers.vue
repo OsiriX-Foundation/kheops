@@ -52,9 +52,10 @@ Props :
             >
               (Admin)
             </span>
+            <!-- on mobile -->
             <div class="d-sm-none">
               <div
-                v-if="confirmDelete!=user.user_name"
+                v-if="confirmDelete!=user.user_name && album.is_admin"
               >
                 <a
                   v-if="showChangeRole && !confirmResetAdmin"
@@ -84,7 +85,7 @@ Props :
                   </button><button
                     type="button"
                     class="btn btn-sm btn-secondary"
-                    @click.stop="confirmDelete=user.username"
+                    @click.stop="confirmDelete=''"
                   >
                     {{ $t('cancel') }}
                   </button>
@@ -111,6 +112,7 @@ Props :
                 </div>
               </div>
             </div>
+            <!-- end on mobile -->
           </td>
           <td
             v-if="album.is_admin"
