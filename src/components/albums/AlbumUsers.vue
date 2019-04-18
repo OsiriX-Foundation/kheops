@@ -52,29 +52,70 @@ Props :
             >
               (Admin)
             </span>
-						<div class="d-sm-none">
-              <a
-                v-if="showChangeRole && !confirmResetAdmin"
-                @click.stop="toggleAdmin(user)"
+            <div class="d-sm-none">
+              <div
+                v-if="confirmDelete!=user.user_name"
               >
-                {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
-                <v-icon	name="user" />
-              </a>
-							<br />
-							<a
-                v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
-                class="text-danger"
-                @click.stop="deleteUser(user)"
-              >
-                {{ $t('remove') }}
-                <v-icon name="trash" />
-              </a>
-						</div>
+                <a
+                  v-if="showChangeRole && !confirmResetAdmin"
+                  @click.stop="toggleAdmin(user)"
+                >
+                  {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                  <v-icon	name="user" />
+                </a>
+                <br>
+                <a
+                  v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
+                  class="text-danger"
+                  @click.stop="deleteUser(user)"
+                >
+                  {{ $t('remove') }}
+                  <v-icon name="trash" />
+                </a>
+              </div>
+              <div v-if="confirmDelete==user.user_name">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    @click.stop="deleteUser(user)"
+                  >
+                    {{ $t('confirm') }}
+                  </button><button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    @click.stop="confirmDelete=user.username"
+                  >
+                    {{ $t('cancel') }}
+                  </button>
+                </div>
+              </div>
+              <div v-if="confirmResetAdmin==user.user_name">
+                <span class="text-danger mr-2">
+                  {{ $t("warningtoggleadmin") }}
+                </span>
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    @click.stop="toggleAdmin(user)"
+                  >
+                    {{ $t('confirm') }}
+                  </button><button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    @click.stop="confirmResetAdmin=''"
+                  >
+                    {{ $t('cancel') }}
+                  </button>
+                </div>
+              </div>
+            </div>
           </td>
           <td
             v-if="album.is_admin"
             class="text-right d-none d-sm-table-cell"
-						:class="mobiledetect ? '' : 'showOnTrHover'"
+            :class="mobiledetect ? '' : 'showOnTrHover'"
           >
             <div
               v-if="confirmDelete!=user.user_name"
@@ -87,8 +128,8 @@ Props :
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
                 <v-icon	name="user" />
               </a>
-							<br />
-							<a
+              <br>
+              <a
                 v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
                 class="text-danger"
                 @click.stop="deleteUser(user)"
