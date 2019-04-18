@@ -190,6 +190,7 @@
       </button>
       <span
         class="float-right"
+        v-if="(!filters.album_id || (album.add_series || album.is_admin))"
       >
         <input
           id="file"
