@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
@@ -107,8 +108,10 @@ public class EventRessource {
         try {
             Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
+            LOG.log(Level.WARNING, "Not found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
+            LOG.log(Level.WARNING, "Bad request", e);
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
@@ -170,8 +173,10 @@ public class EventRessource {
         try {
             Events.studyPostComment(kheopsPrincipal.getUser(), studyInstanceUID, comment, user);
         } catch (UserNotFoundException | StudyNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
+            LOG.log(Level.WARNING, "Bad Request", e);
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 

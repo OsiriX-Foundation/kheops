@@ -16,6 +16,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.ID_PATTERN;
@@ -25,6 +27,7 @@ import static online.kheops.auth_server.util.Consts.ALBUM;
 
 @Path("/")
 public class CapabilitiesResource {
+    private static final Logger LOG = Logger.getLogger(CapabilitiesResource.class.getName());
 
     @Context
     private UriInfo uriInfo;
@@ -95,10 +98,13 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = generateCapability(capabilityParameters);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
+            LOG.log(Level.WARNING, "Bad Request", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
+            LOG.log(Level.WARNING, "Forbidden", e);
             return javax.ws.rs.core.Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (CapabilityBadRequestException e) {
+            LOG.log(Level.WARNING, "Bad Request", e);
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
@@ -119,6 +125,7 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
         } catch (CapabilityNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -161,6 +168,7 @@ public class CapabilitiesResource {
         try {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
         } catch (CapabilityNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();
@@ -180,6 +188,7 @@ public class CapabilitiesResource {
         try {
             capabilityResponses = Capabilities.getCapability(capabilityTokenID, callingUserPk);
         } catch (CapabilityNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();

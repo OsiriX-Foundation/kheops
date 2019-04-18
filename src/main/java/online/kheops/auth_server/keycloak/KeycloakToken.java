@@ -1,6 +1,7 @@
 package online.kheops.auth_server.keycloak;
 
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -61,7 +62,7 @@ public class KeycloakToken {
                 tokenResponse = CLIENT.target(tokenUri).request().header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED).post(Entity.form(form), TokenResponse.class);
                 accessToken = tokenResponse.accessToken;
                 renewTime = Instant.now().plusSeconds(tokenResponse.expiresIn - MINIMUM_VALIDITY);
-            } catch (ProcessingException e) {
+            } catch (ProcessingException | WebApplicationException e) {
                 throw new KeycloakException("Error getting an access token", e);
             }
         }
@@ -74,7 +75,7 @@ public class KeycloakToken {
         try {
             response = CLIENT.target(KeycloakContextListener.getKeycloakOIDCConfigurationURI()).request().get(ConfigurationResponse.class);
             return UriBuilder.fromUri(response.tokenEndpoint).build();
-        } catch (ProcessingException e) {
+        } catch (ProcessingException | WebApplicationException e) {
             throw new KeycloakException("Error during request OpenID Connect well-known", e);
         }
     }

@@ -2,7 +2,6 @@ package online.kheops.auth_server.keycloak;
 
 import online.kheops.auth_server.user.CacheUserName;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.json.Json;
