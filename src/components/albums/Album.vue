@@ -53,7 +53,7 @@
               {{ album.name }}
             </span>
             <v-icon
-              v-if="view=='studies' && album.is_favorite"
+              v-if="album.is_favorite"
               name="star"
               scale="2"
             />
@@ -87,6 +87,9 @@
         <!-- <div class = 'col-md'></div> -->
       </div>
     </div>
+    <!--
+			https://fr.vuejs.org/v2/guide/components-dynamic-async.html
+    -->
     <album-studies v-if="view=='studies'" />
     <album-comments
       v-if="view=='comments'"
