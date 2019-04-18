@@ -4,7 +4,6 @@ const state = {
 	loading: false,
 	files: [],
 	totalSize: 0,
-	sentFiles: 0,
 	error: []
 }
 
@@ -13,8 +12,7 @@ const getters = {
 	loading: state => state.loading,
 	files: state => state.files,
 	totalSize: state => state.totalSize,
-	error: state => state.error,
-	sentFiles: state => state.sentFiles
+	error: state => state.error
 }
 
 const actions = {
@@ -30,9 +28,6 @@ const actions = {
 	},
 	setErrorFiles ({ commit }, params) {
 		commit('SET_ERROR', params)
-	},
-	setSentFiles ({ commit }, params) {
-		commit('SET_SENTFILES', params)
 	},
 	initErrorFiles ({ commit }) {
 		commit('INIT_ERROR')
@@ -66,17 +61,11 @@ const mutations = {
 	SET_ERROR (state, params) {
 		state.error.push(params.error)
 	},
-	SET_SENTFILES (state, params) {
-		state.sentFiles += params.sentFiles
-	},
 	INIT_ERROR (state) {
 		state.error = []
 	},
 	INIT_FILES (state) {
 		state.files = []
-	},
-	INIT_SENTFILES (state) {
-		state.sentFiles = 0
 	},
 	REMOVE_FILE_ID (state, params) {
 		let index = state.files.findIndex(x => x.id === params.id)

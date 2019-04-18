@@ -21,7 +21,7 @@
     class="container"
   >
     <div class="row">
-      <div class="col-2">
+      <div class="d-none d-md-block col-md-2">
         <nav class="nav nav-pills nav-justified flex-column">
           <a
             v-for="(cat,idx) in categories"
@@ -34,7 +34,32 @@
           </a>
         </nav>
       </div>
-      <div class="col-10">
+      <div class="d-block d-sm-block d-md-none col-12 ">
+        <b-dropdown
+          id="dropdown-right"
+          :text="$t(view)"
+          variant="primary"
+          class="m-2 p-2 d-flex justify-content-center"
+          toggle-class="col-12"
+          menu-class="col-10"
+        >
+          <b-dropdown-item
+            v-for="(cat,idx) in categories"
+            :key="idx"
+            href="#"
+            :active="view===cat"
+          >
+            <a
+              class="nav-link"
+              :class="(view==cat)?'active':''"
+              @click="view=cat"
+            >
+              {{ $t(cat) }}
+            </a>
+          </b-dropdown-item>
+        </b-dropdown>
+      </div>
+      <div class="col-sm-12 col-md-10">
         <album-settings-general v-if="view=='general'" />
         <album-settings-user v-if="view=='user'" />
         <album-settings-token v-if="view=='token'" />

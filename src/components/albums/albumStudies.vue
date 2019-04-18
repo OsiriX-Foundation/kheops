@@ -25,7 +25,6 @@
       </div>
     </div>
     <component-import-study
-      :scope="scope"
       :album="album"
     />
   </div>
@@ -42,7 +41,6 @@ export default {
 	mixins: [ AlbumRedirect ],
 	data () {
 		return {
-			scope: 'album'
 		}
 	},
 	computed: {

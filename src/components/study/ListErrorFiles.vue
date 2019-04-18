@@ -90,13 +90,13 @@ export default {
 
 <style scoped>
   .file-listing{
-    width: 350px;
+    width: 250px;
     padding: 10px;
     border-bottom: 1px solid #ddd;
     overflow-wrap: break-word;
 	}
   .files-listing{
-    width: 360px;
+    width: 260px;
     margin: auto;
     max-height: 400px;
     overflow: auto;

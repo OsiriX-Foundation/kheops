@@ -1,8 +1,6 @@
 <template>
   <div>
-    <component-import-study
-      :scope="scope"
-    />
+    <component-import-study />
   </div>
 </template>
 
@@ -16,7 +14,6 @@ export default {
 	},
 	data () {
 		return {
-			scope: 'inbox'
 		}
 	},
 	computed: {

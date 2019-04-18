@@ -645,7 +645,12 @@ div.calendar-wrapper{
 	display: inline;
 	cursor: pointer;
 }
-
+@media (max-width:1024px) {
+  .nameIcons {
+    visibility: visible;
+    display: inline-block;
+  }
+}
 .name:hover .nameIcons {
 	visibility:visible;
 }

@@ -61,7 +61,7 @@
             {{ $t("cantUploadAlbum") }}
           </p>
           <p
-            v-else-if="sending"
+            v-else-if="sending && files.length > 0"
           >
             <span>
               {{ $t("cantUpload") }}
@@ -86,21 +86,12 @@
         <div
           :class="['dropzone-area', hover | loading ? 'dragenterClass' : 'dragNotEnterFormClass']"
         >
-          <div
-            v-if="scope === 'inbox'"
-          >
-            <list
-              ref="list"
-            />
-          </div>
-          <div
-            v-else-if="scope === 'album'"
-          >
-            <list
-              ref="list"
-              :album="album"
-            />
-          </div>
+          <list
+            ref="list"
+            :album="album"
+            @loadfiles="inputLoadFiles"
+            @loaddirectories="inputLoadFiles"
+          />
         </div>
       </div>
     </form>
@@ -116,11 +107,6 @@ export default {
 	name: 'ComponentDragAndDrop',
 	components: { List, ClipLoader },
 	props: {
-		scope: {
-			type: String,
-			required: true,
-			default: ''
-		},
 		album: {
 			type: Object,
 			required: false,
@@ -139,7 +125,8 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			sending: 'sending'
+			sending: 'sending',
+			files: 'files'
 		}),
 		albumNoPermission () {
 			return !(this.album.is_admin || this.album.add_series) && this.scope === 'album'
@@ -200,8 +187,7 @@ export default {
 				return objFile
 			}
 		},
-		inputLoadFiles () {
-			const filesFromInput = this.$refs.inputfiles.files
+		inputLoadFiles (filesFromInput) {
 			let arrayFiles = []
 			for (let i = 0; i < filesFromInput.length; i++) {
 				const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name
@@ -210,7 +196,8 @@ export default {
 					arrayFiles.push(objFile)
 				}
 			}
-			this.emitFilesLoad(arrayFiles)
+			this.$store.dispatch('setSending', { sending: true })
+			this.$store.dispatch('setFiles', { files: arrayFiles })
 		},
 		manageDataTransfer (dataTransferItems) {
 			const arrayPromises = []
@@ -226,7 +213,6 @@ export default {
 			Promise.all(arrayPromises).then(res => {
 				const filesSend = this.removeNonObjectFiles(this.arrayFlatten(res))
 				this.loading = false
-				this.emitFilesLoad(filesSend)
 				this.$store.dispatch('setSending', { sending: true })
 				this.$store.dispatch('setFiles', { files: filesSend })
 			})
@@ -269,9 +255,6 @@ export default {
 				})()
 			})
 		},
-		emitFilesLoad (files) {
-			this.$emit('files-loaded', files)
-		},
 		determineDragAndDropCapable () {
 			let div = document.createElement('div')
 			return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window
@@ -291,14 +274,6 @@ export default {
 </script>
 
 <style scoped>
-  .inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
 	.dragenterClass {
 		opacity: 0.5;
 	}
