@@ -63,7 +63,7 @@ public class KeycloakToken {
                 accessToken = tokenResponse.accessToken;
                 renewTime = Instant.now().plusSeconds(tokenResponse.expiresIn - MINIMUM_VALIDITY);
             } catch (ProcessingException | WebApplicationException e) {
-                throw new KeycloakException("Error getting an access token", e);
+                throw new KeycloakException("Error getting an access token from: " + tokenUri, e);
             }
         }
 
@@ -76,7 +76,7 @@ public class KeycloakToken {
             response = CLIENT.target(KeycloakContextListener.getKeycloakOIDCConfigurationURI()).request().get(ConfigurationResponse.class);
             return UriBuilder.fromUri(response.tokenEndpoint).build();
         } catch (ProcessingException | WebApplicationException e) {
-            throw new KeycloakException("Error during request OpenID Connect well-known", e);
+            throw new KeycloakException("Error during request OpenID Connect well-known from: " + KeycloakContextListener.getKeycloakOIDCConfigurationURI(), e);
         }
     }
 
