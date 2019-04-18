@@ -155,7 +155,7 @@ export default {
 		...mapGetters({
 			album: 'album',
 			users: 'users'
-		})
+    })
 	},
 	created () {
 		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })

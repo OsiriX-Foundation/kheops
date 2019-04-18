@@ -52,10 +52,29 @@ Props :
             >
               (Admin)
             </span>
+						<div class="d-sm-none">
+              <a
+                v-if="showChangeRole && !confirmResetAdmin"
+                @click.stop="toggleAdmin(user)"
+              >
+                {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                <v-icon	name="user" />
+              </a>
+							<br />
+							<a
+                v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
+                class="text-danger"
+                @click.stop="deleteUser(user)"
+              >
+                {{ $t('remove') }}
+                <v-icon name="trash" />
+              </a>
+						</div>
           </td>
           <td
             v-if="album.is_admin"
-            class="showOnTrHover text-right"
+            class="text-right d-none d-sm-table-cell"
+						:class="mobiledetect ? '' : 'showOnTrHover'"
           >
             <div
               v-if="confirmDelete!=user.user_name"
@@ -67,10 +86,11 @@ Props :
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
                 <v-icon	name="user" />
-              </a> <a
+              </a>
+							<br />
+							<a
                 v-if="album.is_admin && showDeleteUser && !confirmResetAdmin"
                 class="text-danger"
-                style="margin-left: 20px"
                 @click.stop="deleteUser(user)"
               >
                 {{ $t('remove') }}
@@ -122,6 +142,8 @@ Props :
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import mobiledetect from '@/mixins/mobiledetect.js'
+
 export default {
 	name: 'AlbumUsers',
 	props: {
@@ -155,7 +177,10 @@ export default {
 	computed: {
 		...mapGetters({
 			user: 'currentUser'
-		})
+		}),
+		mobiledetect () {
+			return mobiledetect.mobileAndTabletcheck()
+		}
 	},
 	watch: {
 		users: {
@@ -208,7 +233,7 @@ td.showOnTrHover div.user_actions{
 	visibility: hidden;
 }
 
-tr:hover  td.showOnTrHover div.user_actions{
+tr:hover  td.showOnTrHover div.user_actions {
 	visibility: visible;
 }
 </style>

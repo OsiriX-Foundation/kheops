@@ -300,7 +300,8 @@ export default {
 				{
 					key: 'expiration_time',
 					label: 'expiration date',
-					sortable: true
+					sortable: true,
+          class: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'issued_at_time',
@@ -317,7 +318,8 @@ export default {
 				{
 					key: 'permission',
 					label: 'permission',
-					sortable: true
+          sortable: true,
+          class: 'd-none d-sm-table-cell'
 				},
 				{
 					key: 'actions',
