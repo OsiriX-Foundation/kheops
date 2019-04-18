@@ -455,7 +455,7 @@ export default {
 		right: 15px;
 		border: 3px solid #f1f1f1;
 		z-index: 9;
-		max-width: 400px;
+		max-width: 300px;
 		opacity: 1;
 		display: block;
 	}
