@@ -53,9 +53,12 @@ Props :
               (Admin)
             </span>
             <!-- on mobile -->
-            <div class="d-sm-none">
+            <div
+              v-if="album.is_admin"
+              class="d-sm-none"
+            >
               <div
-                v-if="confirmDelete!=user.user_name && album.is_admin"
+                v-if="confirmDelete!=user.user_name"
               >
                 <a
                   v-if="showChangeRole && !confirmResetAdmin"
