@@ -27,7 +27,7 @@
 <template>
   <div>
     <div
-      v-if="show"
+      v-if="UI.show"
       class="chat-popup container-fluid p-0"
     >
       <div
@@ -75,22 +75,22 @@
           <button
             type="button"
             class="btn btn-link btn-sm"
-            @click="hide=!hide"
+            @click="UI.hide=!UI.hide"
           >
             <span
-              v-if="hide===false"
+              v-if="UI.hide===false"
             >
               <remove-icon
-                :height="'16'"
-                :width="'16'"
+                :height="UI.SVGHeaderHeight"
+                :width="UI.SVGHeaderWidth"
               />
             </span>
             <span
-              v-if="hide===true"
+              v-if="UI.hide===true"
             >
               <add-icon
-                :height="'16'"
-                :width="'16'"
+                :height="UI.SVGHeaderHeight"
+                :width="UI.SVGHeaderWidth"
               />
             </span>
           </button>
@@ -103,14 +103,14 @@
             @click="closeWindow()"
           >
             <close-icon
-              :height="'16'"
-              :width="'16'"
+              :height="UI.SVGHeaderHeight"
+              :width="UI.SVGHeaderWidth"
             />
           </button>
         </div>
       </div>
       <div
-        v-if="hide === false"
+        v-if="UI.hide === false"
         class="p-2"
       >
         <!--
@@ -120,7 +120,7 @@
           v-if="files.length > 0 && sending === true"
         >
           <div
-            v-if="cancel === false"
+            v-if="UI.cancel === false"
           >
             <b-progress-bar
               :value="countSentFiles+progress"
@@ -144,8 +144,8 @@
                   {{ $t("cancel") }}
                 </span>
                 <block-icon
-                  :height="SVGheight"
-                  :width="SVGwidth"
+                  :height="UI.SVGheight"
+                  :width="UI.SVGwidth"
                   color="red"
                 />
               </button>
@@ -155,8 +155,8 @@
             v-else
           >
             <clip-loader
-              :loading="cancel"
-              :size="SpinnerCancelSize"
+              :loading="UI.cancel"
+              :size="UI.SpinnerCancelSize"
               :color="'red'"
             />
           </div>
@@ -165,7 +165,7 @@
 					When sending finish
 				-->
         <div
-          v-else-if="(show === true) && (countSentFiles === totalSize || sending === false)"
+          v-else-if="(UI.show === true) && (countSentFiles === totalSize || sending === false)"
           class="row"
         >
           <div
@@ -191,17 +191,17 @@
                 type="button"
                 class="btn btn-link btn-sm text-center"
                 style="color: red"
-                @click="showErrors=!showErrors"
+                @click="UI.showErrors=!UI.showErrors"
               >
-                <span v-if="!showErrors">
+                <span v-if="!UI.showErrors">
                   {{ $t("showError") }}
                 </span>
                 <span v-else>
                   {{ $t("hideError") }}
                 </span>
                 <error-icon
-                  :height="SVGheight"
-                  :width="SVGwidth"
+                  :height="UI.SVGheight"
+                  :width="UI.SVGwidth"
                   color="red"
                 />
               </button>
@@ -212,7 +212,7 @@
 					Show the errors
 				-->
         <div
-          v-if="error.length > 0 && showErrors"
+          v-if="error.length > 0 && UI.showErrors"
           class="row"
         >
           <div
@@ -248,9 +248,17 @@ export default {
 	},
 	data () {
 		return {
-			SVGheight: '20',
-			SVGwidth: '20',
-			SpinnerCancelSize: '30px',
+			UI: {
+				show: false,
+				hide: false,
+				cancel: false,
+				showErrors: false,
+				SVGheight: '20',
+				SVGwidth: '20',
+				SVGHeaderHeight:'16',
+				SVGHeaderWidth:'16',
+				SpinnerCancelSize: '30px'
+			},
 			maxsize: 10e6,
 			maxsend: 99,
 			config: {
@@ -269,10 +277,6 @@ export default {
 				'0008119A': '00041500',
 				'00081198': '00041500'
 			},
-			showErrors: false,
-			cancel: false,
-			show: false,
-			hide: false,
 			progress: 0,
 			copyFiles: [],
 			albumId: '',
@@ -299,8 +303,8 @@ export default {
 			}
 		},
 		files () {
-			if (this.files.length === 0 && (this.countSentFiles === this.totalSize || this.cancel === true)) {
-				this.cancel = false
+			if (this.files.length === 0 && (this.countSentFiles === this.totalSize || this.UI.cancel === true)) {
+				this.UI.cancel = false
 				this.$store.dispatch('setSending', { sending: false })
 			}
 		}
@@ -313,14 +317,14 @@ export default {
 	},
 	methods: {
 		goToAlbum () {
-			this.$router.push('/albums/' + this.albumId + '?view=studies')
+			this.$router.push(`/albums/${this.albumId}?view=studies`)
 		},
 		closeWindow () {
-			this.show = !this.show
-			this.cancel = true
+			this.UI.show = !this.UI.show
+			this.UI.cancel = true
 		},
 		setCancel () {
-			this.cancel = !this.cancel
+			this.UI.cancel = !this.UI.cancel
 		},
 		sendFiles () {
 			this.initVariablesForSending()
@@ -331,8 +335,8 @@ export default {
 			}
 		},
 		initVariablesForSending () {
-			this.show = true
-			this.cancel = false
+			this.UI.show = true
+			this.UI.cancel = false
 			this.albumId = this.$route.params.album_id ? this.$route.params.album_id : ''
 			this.countSentFiles = 0
 			this.copyFiles = _.cloneDeep(this.files)
@@ -356,7 +360,7 @@ export default {
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
 					state.size = 0
-				} else if (index >= files.length - 1) {
+				} else if (index === files.length - 1) {
 					const nextPromise = this.createNextPromise(state.tmpIndex, files.length)
 					promiseChain = promiseChain.then(nextPromise())
 				}
@@ -378,7 +382,7 @@ export default {
 		},
 		sendFormDataPromise (files) {
 			return new Promise((resolve) => {
-				if (!this.cancel && this.files.length > 0) {
+				if (!this.UI.cancel && this.files.length > 0) {
 					let formData = this.createFormData(files)
 					this.currentFilesLength = files.length
 					const request = `/studies${this.albumId ? '?album=' + this.albumId : ''}`
@@ -441,7 +445,7 @@ export default {
 			}
 		},
 		setShowErrors (value) {
-			this.showErrors = value
+			this.UI.showErrors = value
 		}
 	}
 }

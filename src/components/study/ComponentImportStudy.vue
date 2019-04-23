@@ -21,24 +21,6 @@
     ref="filedragdrop"
   >
     <!--
-			<input
-				id="file"
-				ref="inputfiles"
-				type="file"
-				name="file"
-				class="inputfile"
-				allowdirs
-				multiple
-				@change="inputLoadFiles"
-			>
-      <label
-        ref="dragdrop"
-        class="drag-drop"
-        for="file"
-        :class="{'drag-drop-hover': hover }"
-      >
-        Load your files
-      </label>
 			https://stackoverflow.com/questions/34817656/add-class-in-drop-area-file-input-when-dragging-an-external-image-over-dragen
 		-->
     <form
