@@ -255,8 +255,8 @@ export default {
 				showErrors: false,
 				SVGheight: '20',
 				SVGwidth: '20',
-				SVGHeaderHeight:'16',
-				SVGHeaderWidth:'16',
+				SVGHeaderHeight: '16',
+				SVGHeaderWidth: '16',
 				SpinnerCancelSize: '30px'
 			},
 			maxsize: 10e6,

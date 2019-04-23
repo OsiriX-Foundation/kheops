@@ -73,7 +73,7 @@
 
           <div
             v-if="comment.event_type === 'Comment'"
-            class="card mt-3 ml-5 mr-5"
+            class="card mt-3 ml-sm-5 mr-sm-5"
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
             <div class="card-header">
@@ -104,7 +104,7 @@
 
           <div
             v-if="comment.event_type == 'Mutation'"
-            class="card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-5 mr-5"
+            class="card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-sm-5 mr-sm-5"
           >
             <div class="d-flex">
               <!-- IMPORT_STUDY, REMOVE_STUDY : -->
