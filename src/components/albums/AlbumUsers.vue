@@ -189,9 +189,11 @@ Props :
 <script>
 import { mapGetters } from 'vuex'
 import mobiledetect from '@/mixins/mobiledetect.js'
+import { AlbumRedirect } from '@/mixins/redirect.js'
 
 export default {
 	name: 'AlbumUsers',
+	mixins: [ AlbumRedirect ],
 	props: {
 		album: {
 			type: Object,
@@ -231,7 +233,7 @@ export default {
 	watch: {
 		users: {
 			handler: function () {
-				this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
+				this.getAlbum()
 			},
 			deep: true
 		}
@@ -275,6 +277,7 @@ div.user-table-container{
 a {
 	cursor: pointer;
 }
+/*
 td.showOnTrHover div.user_actions{
 	visibility: hidden;
 }
@@ -282,4 +285,5 @@ td.showOnTrHover div.user_actions{
 tr:hover  td.showOnTrHover div.user_actions {
 	visibility: visible;
 }
+*/
 </style>
