@@ -518,7 +518,7 @@
 
             <div
               v-if="row.item.view==&quot;comments&quot;"
-              class="col-md-10"
+              class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
             >
               <comments-and-notifications
                 :id="row.item.StudyInstanceUID[0]"
@@ -590,8 +590,9 @@
               </span>
               <a
                 v-if="!filters.album_id || (album.download_series || album.is_admin)"
-                :href="getURLDownload(row.item.StudyInstanceUID)"
+                href="#"
                 class="download"
+                @click="getURLDownload(row.item.StudyInstanceUID)"
               >
                 <v-icon
                   class="align-middle"
@@ -897,7 +898,13 @@ export default {
 			})
 		},
 		getURLDownload (StudyInstanceUID) {
-			return `${process.env.VUE_APP_URL_API}/link/${this.user.jwt}/studies/${StudyInstanceUID}?accept=application%2Fzip`
+			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
+			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
+				const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?accept=application%2Fzip&scope=${source}`
+				location.href = URL
+			}).catch(err => {
+				console.log(err)
+			})
 		},
 		scroll () {
 			window.onscroll = () => {
