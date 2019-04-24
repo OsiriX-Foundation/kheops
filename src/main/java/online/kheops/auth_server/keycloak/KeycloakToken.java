@@ -5,16 +5,21 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.time.Instant;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 
 public class KeycloakToken {
+    private static final Logger LOG = Logger.getLogger(KeycloakToken.class.getName());
+
     private static final long MINIMUM_VALIDITY = 60;
     private static Client CLIENT = ClientBuilder.newClient();
 
@@ -59,7 +64,9 @@ public class KeycloakToken {
         if (renewTime == null || renewTime.isBefore(Instant.now())) {
             final TokenResponse tokenResponse;
             try {
-                tokenResponse = CLIENT.target(tokenUri).request().header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED).post(Entity.form(form), TokenResponse.class);
+                Invocation.Builder builder = CLIENT.target(tokenUri).request().header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED);
+                LOG.log(Level.WARNING, "token builder: " + builder);
+                tokenResponse = builder.post(Entity.form(form), TokenResponse.class);
                 accessToken = tokenResponse.accessToken;
                 renewTime = Instant.now().plusSeconds(tokenResponse.expiresIn - MINIMUM_VALIDITY);
             } catch (ProcessingException | WebApplicationException e) {
