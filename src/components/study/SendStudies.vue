@@ -1,10 +1,10 @@
 <i18n>
 {
 	"en": {
-		"filesSend": "{count} file has been sent | {count} file has been sent | {count} files have been sent",
+		"filesSend": "{count} files have been sent | {count} file has been sent | {count} files have been sent",
 		"locationSend": "in your inbox. | in an",
 		"album": "album.",
-		"filesErrors": "{count} file produced an error. | {count} file produced an error. | {count} files produced an error.",
+		"filesErrors": "{count} files produced an error. | {count} file produced an error. | {count} files produced an error.",
 		"showError": "Show errors",
 		"hideError": "Hide errors",
 		"cancel": "Cancel",
@@ -12,10 +12,10 @@
 		"titleBoxSended": "Files sent"
 	},
 	"fr": {
-		"filesSend": "{count} fichier a été envoyé | {count} fichiers ont été envoyés",
+		"filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
 		"locationSend": "dans votre boîte de réception. | dans un",
 		"album": "album.",
-		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
+		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
 		"showError": "Montrer les erreurs",
 		"hideError": "Cacher les erreurs",
 		"cancel": "Annuler",
