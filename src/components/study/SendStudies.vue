@@ -94,9 +94,13 @@
               />
             </span>
           </button>
+				</div>
           <!--
 						Close icon
 					-->
+        <div
+          class="p-1"
+        >
           <button
             type="button"
             class="btn btn-link btn-sm"
