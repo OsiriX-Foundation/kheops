@@ -81,8 +81,10 @@ public class Keycloak {
             final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
             final Response response;
             try {
-                Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken());
-                LOG.log(Level.WARNING, "build is: ", builder);
+                String tokenString = token.getToken();
+                Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
+                LOG.log(Level.WARNING, "userUri: ", userUri);
+                LOG.log(Level.WARNING, "tokenString: ", tokenString);
                 response = builder.get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
