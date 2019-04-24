@@ -9,11 +9,13 @@ import javax.json.JsonArray;
 import javax.json.JsonReader;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Keycloak {
@@ -79,7 +81,9 @@ public class Keycloak {
             final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
             final Response response;
             try {
-                response = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken()).get();
+                Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken());
+                LOG.log(Level.WARNING, "build is: ", builder);
+                response = builder.get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
             }
