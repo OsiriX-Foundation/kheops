@@ -142,8 +142,7 @@ export default {
 						this.$snotify.error(this.$t('userunknown', { user: this.newUserName }))
 					} else if (!res.data[this.accessVar]) {
 						this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user: this.newUserName }) : this.$t('noaccessstudy', { user: this.newUserName }))
-					}
-					else if (res.status === 200 && res.data[this.accessVar]) {
+					} else if (res.status === 200 && res.data[this.accessVar]) {
 						this.setUser(res.data.email)
 					}
 				}).catch(() => {

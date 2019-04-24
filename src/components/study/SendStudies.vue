@@ -94,8 +94,8 @@
               />
             </span>
           </button>
-				</div>
-          <!--
+        </div>
+        <!--
 						Close icon
 					-->
         <div
