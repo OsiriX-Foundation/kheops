@@ -135,13 +135,14 @@ export default {
 		},
 		checkUser () {
 			if (this.newUserName.length > 0) {
-				const request = `users?reference=${this.newUserName}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
+				const username = this.newUserName.trim();
+				const request = `users?reference=${username}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
 
 				HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 					if (res.status === 204) {
-						this.$snotify.error(this.$t('userunknown', { user: this.newUserName }))
+						this.$snotify.error(this.$t('userunknown', { user: username }))
 					} else if (!res.data[this.accessVar]) {
-						this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user: this.newUserName }) : this.$t('noaccessstudy', { user: this.newUserName }))
+						this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user: username }) : this.$t('noaccessstudy', { user: username }))
 					} else if (res.status === 200 && res.data[this.accessVar]) {
 						this.setUser(res.data.email)
 					}
