@@ -900,8 +900,8 @@ export default {
 		getURLDownload (StudyInstanceUID) {
 			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
 			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
-        const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : 'album=' + source}`
-        const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`
+				const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : 'album=' + source}`
+				const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`
 				location.href = URL
 			}).catch(err => {
 				console.log(err)

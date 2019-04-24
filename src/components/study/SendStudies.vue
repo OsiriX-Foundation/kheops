@@ -176,9 +176,9 @@
             class="col-12 mt-2 mb-2"
           >
             {{ $tc("filesSend", countSentFiles - error.length, {count: (countSentFiles - error.length)}) }}
-            {{ $tc("locationSend", albumId !== '' ? 0 : 1) }}
+            {{ $tc("locationSend", source !== 'inbox' ? 0 : 1) }}
             <span
-              v-if="albumId !== ''"
+              v-if="source !== 'inbox'"
             >
               <a
                 href="#"
@@ -283,7 +283,6 @@ export default {
 			},
 			progress: 0,
 			copyFiles: [],
-			albumId: '',
 			countSentFiles: 0
 		}
 	},
@@ -292,7 +291,8 @@ export default {
 			sending: 'sending',
 			files: 'files',
 			totalSize: 'totalSize',
-			error: 'error'
+			error: 'error',
+			source: 'source'
 		}),
 		totalSizeFiles () {
 			return this.copyFiles.reduce(function (total, file) {
@@ -321,7 +321,7 @@ export default {
 	},
 	methods: {
 		goToAlbum () {
-			this.$router.push(`/albums/${this.albumId}?view=studies`)
+			this.$router.push(`/albums/${this.source}?view=studies`)
 		},
 		closeWindow () {
 			this.UI.show = !this.UI.show
@@ -341,7 +341,6 @@ export default {
 		initVariablesForSending () {
 			this.UI.show = true
 			this.UI.cancel = false
-			this.albumId = this.$route.params.album_id ? this.$route.params.album_id : ''
 			this.countSentFiles = 0
 			this.copyFiles = _.cloneDeep(this.files)
 			this.progress = 0
@@ -389,7 +388,7 @@ export default {
 				if (!this.UI.cancel && this.files.length > 0) {
 					let formData = this.createFormData(files)
 					this.currentFilesLength = files.length
-					const request = `/studies${this.albumId ? '?album=' + this.albumId : ''}`
+					const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
 					HTTP.post(request, formData, this.config).then(res => {
 						this.manageResult(files, res.data)
 						resolve(res)
