@@ -156,7 +156,7 @@ export default {
 		}),
 		formattedAlbumDescription () {
 			return this.album.description.split('\n')
-		}
+    }
 	},
 	created () {
 		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })

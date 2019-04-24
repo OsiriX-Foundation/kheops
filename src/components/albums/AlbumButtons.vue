@@ -41,7 +41,7 @@ Props :
       v-if="showQuit"
     >
       <div
-        v-if="album.is_admin && lastAdmin && confirmQuit"
+        v-if="album.is_admin && lastAdmin && confirmQuit && listUsers.length > 0"
       >
         <p
           style="color:red;"
@@ -50,7 +50,7 @@ Props :
         </p>
         <album-users
           :album="album"
-          :users="users"
+          :users="listUsers"
           :show-delete-user="false"
           :show-change-role="true"
         />
@@ -144,20 +144,29 @@ export default {
 	data () {
 		return {
 			confirmDeletion: false,
-			confirmQuit: false,
-			lastAdmin: false,
-			lastUser: false
+			confirmQuit: false
 		}
 	},
 	computed: {
 		...mapGetters({
 			user: 'currentUser'
-		})
+		}),
+		lastAdmin () {
+			let last = this.users.filter(user => user.is_admin && user.user_name !== this.user.email)
+			return !(last.length > 0)
+		},
+		lastUser () {
+			return !(this.users.length > 1)
+		},
+		listUsers () {
+			return this.users.filter(user => user.user_name !== this.user.email)
+		}
 	},
 	methods: {
 		deleteAlbum () {
-			if (!this.confirmDeletion) this.confirmDeletion = true
-			else {
+			if (!this.confirmDeletion) {
+				this.confirmDeletion = true
+			} else {
 				this.$store.dispatch('deleteAlbum').then(() => {
 					this.$snotify.success(this.$t('albumdeletesuccess'))
 					this.$router.push('/albums')
@@ -168,12 +177,6 @@ export default {
 		},
 		quitAlbum () {
 			if (!this.confirmQuit) {
-				if (this.album.is_admin) {
-					let last = this.users.filter(user => user.is_admin && user.user_name !== this.user.email)
-					this.lastAdmin = !(last.length > 0)
-				} else {
-					this.lastUser = !(this.users.length > 0)
-				}
 				this.confirmQuit = true
 			} else {
 				this.$store.dispatch('quitAlbum', this.user.sub).then(() => {
