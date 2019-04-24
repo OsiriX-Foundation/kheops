@@ -72,21 +72,21 @@ public class Keycloak {
         } else {
 
             String userEmail = cacheUserName.getCachedValue(user);
-            if(userEmail != null) {
-                 return new UserResponseBuilder().setEmail(userEmail).setSub(user);
+            if (userEmail != null) {
+                return new UserResponseBuilder().setEmail(userEmail).setSub(user);
             }
 
-            final URI userUri = UriBuilder.fromUri(usersUri).path("/"+user).build();
+            final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
             final Response response;
             try {
-                response =  ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+                response = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken()).get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
             }
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
-                output = "["+output+"]";
-                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                output = "[" + output + "]";
+                try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
                     JsonArray reply = jsonReader.readArray();
                     final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                     if (keycloakUser.size() == 1) {
@@ -98,6 +98,13 @@ public class Keycloak {
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
+            } else {
+                try {
+                    String responseString = response.readEntity(String.class);
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "\n" + responseString);
+                } catch (ProcessingException e) {
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus(), e);
+                }
             }
         }
         throw new KeycloakException("ERROR:");
