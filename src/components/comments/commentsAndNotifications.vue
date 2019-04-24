@@ -19,7 +19,8 @@
 		"addalbum": "add as favorite",
 		"removealbum": "remove as favorite",
     "to": "to",
-    "writecomment": "Write your comment here"
+    "writecomment": "Write your comment here",
+    "checkprivateuser": "Send private message to"
 	},
 	"fr" : {
 		"commentpostsuccess": "le commentaire a été posté avec succès",
@@ -38,7 +39,8 @@
 		"addalbum": "a mis en favori",
 		"removealbum": "a enlevé des favories",
     "to": "à",
-    "writecomment": "Ecrivez votre commentaire ici"
+    "writecomment": "Ecrivez votre commentaire ici",
+    "checkprivateuser": "Envoyer un message privé à"
 	}
 }
 </i18n>
@@ -224,12 +226,13 @@
           inline
           @change="SetEnabledVariables()"
         >
-          Send private message to
+          {{ $t("checkprivateuser") }}
         </b-form-checkbox>
       </div>
       <div class="col-sm-6 col-md-4">
         <add-user
           :id="id ? id : album.album_id"
+          ref="privateuser"
           :scope="scope"
           :enable-add="enablePrivate"
           @private-user="setPrivateUser"
@@ -250,8 +253,9 @@
               :placeholder="$t('writecomment')"
               rows="2"
               maxlength="1024"
-              :disabled="disabledText"
+              :readonly="disabledText"
               @keydown.enter.prevent="addComment"
+              @click="checkUserFromTextarea"
             />
             <div class="input-group-append">
               <button
@@ -334,6 +338,11 @@ export default {
 		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
 	methods: {
+		checkUserFromTextarea () {
+			if (this.disabledText) {
+				this.$refs.privateuser.checkUser()
+			}
+		},
 		SetEnabledVariables () {
 			this.enablePrivate = !this.enablePrivate
 			this.disabledText = !this.disabledText

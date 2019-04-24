@@ -17,6 +17,22 @@
 			- when user is add
 			- when Enable Add is set to false in parent component
 -->
+<i18n>
+{
+	"en": {
+		"userunknown": "User {user} unknown",
+		"nouser": "No user specified",
+		"noaccessalbum": "{user} has no access to this album",
+		"noaccessstudy": "{user} has no access to this study"
+	},
+	"fr" : {
+		"userunknown": "Utilisateur {user} inconnu",
+		"nouser": "Aucun utilisateur spécifié",
+		"noaccessalbum": "{user} n'a pas d'accès à cet album",
+		"noaccessstudy": "{user} n'a pas d'accès à cette étude"
+	}
+}
+</i18n>
 <template>
   <div>
     <h5
@@ -118,16 +134,24 @@ export default {
 			this.$emit('private-user', this.user)
 		},
 		checkUser () {
-			const request = `users?reference=${this.newUserName}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
+			if (this.newUserName.length > 0) {
+				const request = `users?reference=${this.newUserName}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
 
-			HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
-				if (res.status === 204 || !res.data[this.accessVar]) this.$snotify.error('User unknown')
-				else if (res.status === 200 && res.data[this.accessVar]) {
-					this.setUser(res.data.email)
-				}
-			}).catch(() => {
-				console.log('Sorry, an error occured')
-			})
+				HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
+					if (res.status === 204) {
+						this.$snotify.error(this.$t('userunknown', { user: this.newUserName }))
+					} else if (!res.data[this.accessVar]) {
+						this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user: this.newUserName }) : this.$t('noaccessstudy', { user: this.newUserName }))
+					}
+					else if (res.status === 200 && res.data[this.accessVar]) {
+						this.setUser(res.data.email)
+					}
+				}).catch(() => {
+					console.log('Sorry, an error occured')
+				})
+			} else {
+				this.$snotify.error(this.$t('nouser'))
+			}
 		},
 		setUser (user) {
 			this.user = user
