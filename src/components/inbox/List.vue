@@ -1091,7 +1091,10 @@ export default {
 		},
 		openViewer (StudyInstanceUID, viewer) {
 			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
-			let ohifWindow = window.open('', 'OHIFViewer')
+			let ohifWindow
+			if (viewer === 'Ohif') {
+				ohifWindow = window.open('', 'OHIFViewer')
+			}
 			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
 				if (viewer === 'Osirix') {
 					this.openOsiriX(StudyInstanceUID, res.data.access_token)
