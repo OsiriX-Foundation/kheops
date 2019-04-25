@@ -135,7 +135,7 @@ export default {
 		},
 		checkUser () {
 			if (this.newUserName.length > 0) {
-				const username = this.newUserName.trim();
+				const username = this.newUserName.trim()
 				const request = `users?reference=${username}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
 
 				HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
