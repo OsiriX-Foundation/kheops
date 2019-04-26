@@ -1,16 +1,30 @@
 package online.kheops.auth_server.event;
 
-import online.kheops.auth_server.capability.CapabilitiesResponse;
 import online.kheops.auth_server.entity.Comment;
 import online.kheops.auth_server.entity.Mutation;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import java.time.LocalDateTime;
 
 public class EventResponse {
 
     private Response response;
+
+    public static class SeriesResponse {
+        @XmlElement(name = "UID")
+        public String seriesUID;
+
+        @XmlElement(name = "description")
+        public String seriesDescription;
+    }
+
+    public static class StudyResponse {
+        @XmlElement(name = "UID")
+        public String studyUID;
+
+        @XmlElement(name = "description")
+        public String studyDescription;
+    }
 
     public static class Response {
         @XmlElement(name = "event_type")
@@ -30,9 +44,9 @@ public class EventResponse {
         @XmlElement(name = "mutation_type")
         public String mutationType;
         @XmlElement(name = "series")
-        public String series;
+        public SeriesResponse series;
         @XmlElement(name = "study")
-        public String study;
+        public StudyResponse study;
         @XmlElement(name = "capability")
         public CapabilityResponse capability;
     }
@@ -52,7 +66,7 @@ public class EventResponse {
         response.originName = comment.getUser().getEmail();
         response.comment = comment.getComment();
         response.postDate = comment.getEventTime();
-        if(comment.getPrivateTargetUser() != null) {
+        if (comment.getPrivateTargetUser() != null) {
             response.privateComment = true;
             response.targetName = comment.getPrivateTargetUser().getEmail();
         } else {
@@ -72,26 +86,36 @@ public class EventResponse {
                 mutation.getMutationType().equals(Events.MutationType.DEMOTE_ADMIN.toString()) ||
                 mutation.getMutationType().equals(Events.MutationType.ADD_USER.toString()) ||
                 mutation.getMutationType().equals(Events.MutationType.ADD_ADMIN.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_USER.toString()) ) {
+                mutation.getMutationType().equals(Events.MutationType.REMOVE_USER.toString())) {
             response.targetName = mutation.getToUser().getEmail();
         }
         if (mutation.getMutationType().equals(Events.MutationType.IMPORT_SERIES.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString()) ) {
-            response.series = mutation.getSeries().getSeriesInstanceUID();
-            response.study = mutation.getSeries().getStudy().getStudyInstanceUID();
+                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString())) {
+            response.series = new SeriesResponse();
+            response.study = new StudyResponse();
+            response.series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
+            response.series.seriesDescription = mutation.getSeries().getSeriesDescription();
+            response.study.studyUID = mutation.getStudy().getStudyInstanceUID();
+            response.study.studyDescription = mutation.getStudy().getStudyDescription();
         }
         if (mutation.getMutationType().equals(Events.MutationType.ADD_FAV.toString()) ||
                 mutation.getMutationType().equals(Events.MutationType.REMOVE_FAV.toString())) {
-            if(mutation.getSeries() != null) {
-                response.series = mutation.getSeries().getSeriesInstanceUID();
+            if (mutation.getSeries() != null) {
+                response.series = new SeriesResponse();
+                response.series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
+                response.series.seriesDescription = mutation.getSeries().getSeriesDescription();
             }
-            response.study = mutation.getStudy().getStudyInstanceUID();
+            response.study = new StudyResponse();
+            response.study.studyUID = mutation.getStudy().getStudyInstanceUID();
+            response.study.studyDescription = mutation.getStudy().getStudyDescription();
         }
         if (mutation.getMutationType().equals(Events.MutationType.IMPORT_STUDY.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_STUDY.toString()) ) {
-            response.study = mutation.getStudy().getStudyInstanceUID();
+                mutation.getMutationType().equals(Events.MutationType.REMOVE_STUDY.toString())) {
+            response.study = new StudyResponse();
+            response.study.studyUID = mutation.getStudy().getStudyInstanceUID();
+            response.study.studyDescription = mutation.getStudy().getStudyDescription();
         }
-        if(mutation.getCapability().isPresent()) {
+        if (mutation.getCapability().isPresent()) {
             final CapabilityResponse capabilityResponse = new CapabilityResponse();
             capabilityResponse.id = mutation.getCapability().get().getId();
             capabilityResponse.title = mutation.getCapability().get().getTitle();
