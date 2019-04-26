@@ -69,8 +69,8 @@ public class User {
     public String getEmail() {
         try {
             final Keycloak keycloak = Keycloak.getInstance();
-            final UserResponseBuilder userResponse = keycloak.getUser(keycloakId);
-            return userResponse.build().getEmail();
+            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
+            return userResponseBuilder.getEmail();
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.SEVERE, "Error getting email", e);
             return "UNKNOWN";//TODO

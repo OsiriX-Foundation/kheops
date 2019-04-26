@@ -8,88 +8,95 @@ import java.time.ZonedDateTime;
 
 public class CapabilitiesResponse {
 
-    private Response response = new Response();
-
     //TODO include directly an AlbumResponse
     public static class AlbumScope {
         @XmlElement(name = "id")
-        String id;
+        public String id;
         @XmlElement(name = "name")
-        String name;
+        public String name;
     }
 
-    public static class Response {
-        @XmlElement(name = "id")
-        String id;
+    @XmlElement(name = "id")
+    private String id;
 
-        @XmlElement(name = "secret")
-        String secret;
-        @XmlElement(name = "title")
-        String title;
+    @XmlElement(name = "secret")
+    private String secret;
+    @XmlElement(name = "title")
+    private String title;
 
-        @XmlElement(name = "issued_at_time")
-        String issuedAt;
-        @XmlElement(name = "not_before_time")
-        String notBeforeTime;
-        @XmlElement(name = "last_used")
-        String lastUsed;
-        @XmlElement(name = "expiration_time")
-        String expirationTime;
-        @XmlElement(name = "revoke_time")
-        String revokeTime;
+    @XmlElement(name = "issued_at_time")
+    private String issuedAt;
+    @XmlElement(name = "not_before_time")
+    private String notBeforeTime;
+    @XmlElement(name = "last_used")
+    private String lastUsed;
+    @XmlElement(name = "expiration_time")
+    private String expirationTime;
+    @XmlElement(name = "revoke_time")
+    private String revokeTime;
 
-        @XmlElement(name = "revoked")
-        boolean revoked;
+    @XmlElement(name = "revoked")
+    private boolean revoked;
 
-        @XmlElement(name = "read_permission")
-        Boolean readPermission;
-        @XmlElement(name = "write_permission")
-        Boolean writePermission;
-        @XmlElement(name = "download_permission")
-        Boolean downloadPermission;
-        @XmlElement(name = "appropriate_permission")
-        Boolean appropriatePermission;
+    @XmlElement(name = "read_permission")
+    private Boolean readPermission;
+    @XmlElement(name = "write_permission")
+    private Boolean writePermission;
+    @XmlElement(name = "download_permission")
+    private Boolean downloadPermission;
+    @XmlElement(name = "appropriate_permission")
+    private Boolean appropriatePermission;
 
-        @XmlElement(name = "scope_type")
-        String scopeType;
-        @XmlElement(name = "album")
-        AlbumScope albumScope;
-        @XmlElement(name = "scope_series")
-        String series;
-        @XmlElement(name = "scope_study")
-        String study;
-        @XmlElement(name = "created_by")
-        String createdBy;
-    }
+    @XmlElement(name = "scope_type")
+    private String scopeType;
+    @XmlElement(name = "album")
+    private AlbumScope albumScope;
+    @XmlElement(name = "scope_series")
+    private String series;
+    @XmlElement(name = "scope_study")
+    private String study;
+    @XmlElement(name = "created_by")
+    private String createdBy;
+
+    private CapabilitiesResponse() { /*empty*/ }
 
     public CapabilitiesResponse(Capability capability, boolean showSecret, boolean isIntrospect) {
 
-        if(!isIntrospect) {
-            response.id = capability.getId();
-            if(showSecret) {
-                response.secret = capability.getSecretBeforeHash();
+        if (!isIntrospect) {
+            id = capability.getId();
+            if (showSecret) {
+                secret = capability.getSecretBeforeHash();
             }
-            response.title = capability.getTitle();
-            response.issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
-            if(capability.getLastUsed() != null) {
-                response.lastUsed = ZonedDateTime.of(capability.getLastUsed(), ZoneOffset.UTC).toString();
+            title = capability.getTitle();
+            issuedAt = ZonedDateTime.of(capability.getIssuedAtTime(), ZoneOffset.UTC).toString();
+            if (capability.getLastUsed() != null) {
+                lastUsed = ZonedDateTime.of(capability.getLastUsed(), ZoneOffset.UTC).toString();
             }
-            response.createdBy = capability.getUser().getEmail();
+            createdBy = capability.getUser().getEmail();
         }
 
-        response.expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
-        response.revoked = capability.isRevoked();
+        expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
+        revoked = capability.isRevoked();
 
         if (capability.isActive()) {
-            response.notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
+            notBeforeTime = ZonedDateTime.of(capability.getNotBeforeTime(), ZoneOffset.UTC).toString();
         }
+
         if (capability.isRevoked()) {
-            response.revokeTime = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
+            revokeTime = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
         }
-        response = ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(response, capability);
+
+        ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(this, capability);
     }
 
-    public Response getResponse() {
-        return response;
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
+    public void setReadPermission(Boolean readPermission) { this.readPermission = readPermission; }
+    public void setWritePermission(Boolean writePermission) { this.writePermission = writePermission; }
+    public void setDownloadPermission(Boolean downloadPermission) { this.downloadPermission = downloadPermission; }
+    public void setAppropriatePermission(Boolean appropriatePermission) { this.appropriatePermission = appropriatePermission; }
+    public void setAlbumScope(AlbumScope albumScope) { this.albumScope = albumScope; }
+    public void setSeries(String series) { this.series = series; }
+    public void setStudy(String study) { this.study = study; }
 }

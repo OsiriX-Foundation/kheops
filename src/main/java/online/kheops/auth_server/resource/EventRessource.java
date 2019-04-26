@@ -58,7 +58,7 @@ public class EventRessource {
             types.add("comments");
         }
 
-        final PairListXTotalCount<EventResponse.Response> pair;
+        final PairListXTotalCount<EventResponse> pair;
 
         if( offset < 0 ) {
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
@@ -81,7 +81,7 @@ public class EventRessource {
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<EventResponse.Response>> genericEventsResponsesList = new GenericEntity<List<EventResponse.Response>>(pair.getAttributesList()) {};
+        final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         return javax.ws.rs.core.Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
@@ -133,7 +133,7 @@ public class EventRessource {
             return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
         }
 
-        final PairListXTotalCount<EventResponse.Response> pair;
+        final PairListXTotalCount<EventResponse> pair;
 
         if( offset < 0 ) {
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
@@ -145,7 +145,7 @@ public class EventRessource {
         pair = Events.getCommentsByStudyUID(kheopsPrincipal.getUser(), studyInstanceUID, offset, limit);
 
 
-        final GenericEntity<List<EventResponse.Response>> genericEventsResponsesList = new GenericEntity<List<EventResponse.Response>>(pair.getAttributesList()) {};
+        final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         return javax.ws.rs.core.Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();

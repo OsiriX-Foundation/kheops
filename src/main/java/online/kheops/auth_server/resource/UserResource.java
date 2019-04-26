@@ -47,14 +47,14 @@ public class UserResource {
             userResponseBuilder = keycloak.getUser(reference);
 
             if(albumId != null) {
-                userResponseBuilder.setAlbumAccess(Albums.isMemberOfAlbum(userResponseBuilder.build().getSub(), albumId));
+                userResponseBuilder.setAlbumAccess(Albums.isMemberOfAlbum(userResponseBuilder.getSub(), albumId));
             }
 
             if(studyInstanceUID != null) {
-                userResponseBuilder.setStudyAccess(Studies.canAccessStudy(userResponseBuilder.build().getSub(), studyInstanceUID));
+                userResponseBuilder.setStudyAccess(Studies.canAccessStudy(userResponseBuilder.getSub(), studyInstanceUID));
             }
 
-            return Response.status(OK).entity(userResponseBuilder.build().getResponse()).build();
+            return Response.status(OK).entity(userResponseBuilder.build()).build();
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(NO_CONTENT).build();

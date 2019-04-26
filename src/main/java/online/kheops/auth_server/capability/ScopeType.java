@@ -16,7 +16,7 @@ import static online.kheops.auth_server.capability.Capabilities.createUserCapabi
 public enum ScopeType {
     USER {
         @Override
-        public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
+        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
                 throws CapabilityBadRequestException {
             return createUserCapability(capabilityParameters);
         }
@@ -27,9 +27,8 @@ public enum ScopeType {
         }
 
         @Override
-        public CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability) {
-            capabilityResponse.scopeType = this.name().toLowerCase();
-            return capabilityResponse;
+        public void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability) {
+            capabilityResponse.setScopeType(this.name().toLowerCase());
         }
 
         @Override
@@ -40,7 +39,7 @@ public enum ScopeType {
     },
     ALBUM {
         @Override
-        public CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
+        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
                 throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
             return createAlbumCapability(capabilityParameters);
         }
@@ -48,23 +47,23 @@ public enum ScopeType {
         @Override
         public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
                 throws CapabilityBadRequestException {
-            if( albumId == null) {
+            if (albumId == null) {
                 throw new CapabilityBadRequestException("The {album} query parameter must be set");
             }
             return capabilityParametersBuilder.scope().albumScope(albumId);
         }
+
         @Override
-        public CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability) {
-            CapabilitiesResponse.AlbumScope albumScope =  new CapabilitiesResponse.AlbumScope();
+        public void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability) {
+            CapabilitiesResponse.AlbumScope albumScope = new CapabilitiesResponse.AlbumScope();
             albumScope.id = capability.getAlbum().getId();
             albumScope.name = capability.getAlbum().getName();
-            capabilityResponse.albumScope =  albumScope;
-            capabilityResponse.scopeType = this.name().toLowerCase();
-            capabilityResponse.appropriatePermission = capability.isAppropriatePermission();
-            capabilityResponse.downloadPermission = capability.isDownloadPermission();
-            capabilityResponse.readPermission = capability.isReadPermission();
-            capabilityResponse.writePermission = capability.isWritePermission();
-            return capabilityResponse;
+            capabilityResponse.setAlbumScope(albumScope);
+            capabilityResponse.setScopeType(this.name().toLowerCase());
+            capabilityResponse.setAppropriatePermission(capability.isAppropriatePermission());
+            capabilityResponse.setDownloadPermission(capability.isDownloadPermission());
+            capabilityResponse.setReadPermission(capability.isReadPermission());
+            capabilityResponse.setWritePermission(capability.isWritePermission());
         }
 
         @Override
@@ -78,7 +77,7 @@ public enum ScopeType {
         }
     };
 
-    public abstract CapabilitiesResponse.Response generateCapability(CapabilityParameters capabilityParameters)
+    public abstract CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
     /**
@@ -87,7 +86,7 @@ public enum ScopeType {
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
             throws CapabilityBadRequestException;
 
-    public abstract CapabilitiesResponse.Response setCapabilityResponse(CapabilitiesResponse.Response capabilityResponse, Capability capability);
+    public abstract void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability);
 
     public abstract void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException;
 

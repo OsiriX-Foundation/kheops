@@ -8,122 +8,115 @@ import java.time.LocalDateTime;
 
 public class EventResponse {
 
-    private Response response;
-
-    public static class SeriesResponse {
+    private static class SeriesResponse {
         @XmlElement(name = "UID")
-        public String seriesUID;
-
+        private String seriesUID;
         @XmlElement(name = "description")
-        public String seriesDescription;
+        private String seriesDescription;
     }
 
-    public static class StudyResponse {
+    private static class StudyResponse {
         @XmlElement(name = "UID")
-        public String studyUID;
-
+        private String studyUID;
         @XmlElement(name = "description")
-        public String studyDescription;
+        private String studyDescription;
     }
 
-    public static class Response {
-        @XmlElement(name = "event_type")
-        public String eventType;
-
-        @XmlElement(name = "origin_name")
-        public String originName;
-        @XmlElement(name = "comment")
-        public String comment;
-        @XmlElement(name = "post_date")
-        public LocalDateTime postDate;
-        @XmlElement(name = "is_private")
-        public Boolean privateComment;
-        @XmlElement(name = "target_name")
-        public String targetName;
-
-        @XmlElement(name = "mutation_type")
-        public String mutationType;
-        @XmlElement(name = "series")
-        public SeriesResponse series;
-        @XmlElement(name = "study")
-        public StudyResponse study;
-        @XmlElement(name = "capability")
-        public CapabilityResponse capability;
-    }
-
-    public static class CapabilityResponse {
+    private static class CapabilityResponse {
         @XmlElement(name = "title")
-        public String title;
+        private String title;
         @XmlElement(name = "id")
-        public String id;
+        private String id;
     }
 
+
+    @XmlElement(name = "event_type")
+    private String eventType;
+
+    //Comment
+    @XmlElement(name = "origin_name")
+    private String originName;
+    @XmlElement(name = "comment")
+    private String comment;
+    @XmlElement(name = "post_date")
+    private LocalDateTime postDate;
+    @XmlElement(name = "is_private")
+    private Boolean privateComment;
+    @XmlElement(name = "target_name")
+    private String targetName;
+
+    //Mutation
+    @XmlElement(name = "mutation_type")
+    private String mutationType;
+    @XmlElement(name = "series")
+    private SeriesResponse series;
+    @XmlElement(name = "study")
+    private StudyResponse study;
+    @XmlElement(name = "capability")
+    private CapabilityResponse capability;
+
+    private EventResponse() { /*empty*/ }
 
     public EventResponse(Comment comment) {
-        response = new Response();
 
-        response.eventType = "Comment";
-        response.originName = comment.getUser().getEmail();
-        response.comment = comment.getComment();
-        response.postDate = comment.getEventTime();
+        eventType = "Comment";
+        originName = comment.getUser().getEmail();
+        this.comment = comment.getComment();
+        postDate = comment.getEventTime();
         if (comment.getPrivateTargetUser() != null) {
-            response.privateComment = true;
-            response.targetName = comment.getPrivateTargetUser().getEmail();
+            privateComment = true;
+            targetName = comment.getPrivateTargetUser().getEmail();
         } else {
-            response.privateComment = false;
+            privateComment = false;
         }
     }
 
     public EventResponse(Mutation mutation) {
-        response = new Response();
 
-        response.eventType = "Mutation";
+        eventType = "Mutation";
 
-        response.originName = mutation.getUser().getEmail();
-        response.postDate = mutation.getEventTime();
-        response.mutationType = mutation.getMutationType();
-        if (mutation.getMutationType().equals(Events.MutationType.PROMOTE_ADMIN.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.DEMOTE_ADMIN.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.ADD_USER.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.ADD_ADMIN.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_USER.toString())) {
-            response.targetName = mutation.getToUser().getEmail();
+        originName = mutation.getUser().getEmail();
+        postDate = mutation.getEventTime();
+        mutationType = mutation.getMutationType();
+
+        if (mutationType.equals(Events.MutationType.PROMOTE_ADMIN.toString()) ||
+                mutationType.equals(Events.MutationType.DEMOTE_ADMIN.toString()) ||
+                mutationType.equals(Events.MutationType.ADD_USER.toString()) ||
+                mutationType.equals(Events.MutationType.ADD_ADMIN.toString()) ||
+                mutationType.equals(Events.MutationType.REMOVE_USER.toString())) {
+            targetName = mutation.getToUser().getEmail();
         }
-        if (mutation.getMutationType().equals(Events.MutationType.IMPORT_SERIES.toString()) ||
+        if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
                 mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString())) {
-            response.series = new SeriesResponse();
-            response.study = new StudyResponse();
-            response.series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
-            response.series.seriesDescription = mutation.getSeries().getSeriesDescription();
-            response.study.studyUID = mutation.getStudy().getStudyInstanceUID();
-            response.study.studyDescription = mutation.getStudy().getStudyDescription();
+            series = new SeriesResponse();
+            study = new StudyResponse();
+            series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
+            series.seriesDescription = mutation.getSeries().getSeriesDescription();
+            study.studyUID = mutation.getStudy().getStudyInstanceUID();
+            study.studyDescription = mutation.getStudy().getStudyDescription();
         }
-        if (mutation.getMutationType().equals(Events.MutationType.ADD_FAV.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_FAV.toString())) {
+        if (mutationType.equals(Events.MutationType.ADD_FAV.toString()) ||
+                mutationType.equals(Events.MutationType.REMOVE_FAV.toString())) {
             if (mutation.getSeries() != null) {
-                response.series = new SeriesResponse();
-                response.series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
-                response.series.seriesDescription = mutation.getSeries().getSeriesDescription();
+                series = new SeriesResponse();
+                series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
+                series.seriesDescription = mutation.getSeries().getSeriesDescription();
             }
-            response.study = new StudyResponse();
-            response.study.studyUID = mutation.getStudy().getStudyInstanceUID();
-            response.study.studyDescription = mutation.getStudy().getStudyDescription();
+            study = new StudyResponse();
+            study.studyUID = mutation.getStudy().getStudyInstanceUID();
+            study.studyDescription = mutation.getStudy().getStudyDescription();
         }
-        if (mutation.getMutationType().equals(Events.MutationType.IMPORT_STUDY.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_STUDY.toString())) {
-            response.study = new StudyResponse();
-            response.study.studyUID = mutation.getStudy().getStudyInstanceUID();
-            response.study.studyDescription = mutation.getStudy().getStudyDescription();
+        if (mutationType.equals(Events.MutationType.IMPORT_STUDY.toString()) ||
+                mutationType.equals(Events.MutationType.REMOVE_STUDY.toString())) {
+            study = new StudyResponse();
+            study.studyUID = mutation.getStudy().getStudyInstanceUID();
+            study.studyDescription = mutation.getStudy().getStudyDescription();
         }
         if (mutation.getCapability().isPresent()) {
             final CapabilityResponse capabilityResponse = new CapabilityResponse();
             capabilityResponse.id = mutation.getCapability().get().getId();
             capabilityResponse.title = mutation.getCapability().get().getTitle();
-            response.capability = capabilityResponse;
+            capability = capabilityResponse;
         }
-    }
-
-    public Response getResponse() {
-        return response;
     }
 }
