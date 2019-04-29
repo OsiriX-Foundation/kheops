@@ -68,10 +68,8 @@ public final class WadoRSSeries {
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("multipart/related")
     public Response wado(@PathParam("StudyInstanceUID") String studyInstanceUID,
-                         @QueryParam("album") Long fromAlbumPk,
+                         @QueryParam("album") String fromAlbumPk,
                          @QueryParam("inbox") Boolean fromInbox) {
-
-        LOG.log(WARNING, "inside get studies wado-rs");
 
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         final URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");

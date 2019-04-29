@@ -51,7 +51,7 @@ public final class WadoRSStudyInstance {
     public Response wado(@PathParam("StudyInstanceUID") final String studyInstanceUID,
                          @QueryParam("offset") final Integer offsetParam,
                          @QueryParam("limit") final Integer limitParam,
-                         @QueryParam("album") final Long fromAlbumPk,
+                         @QueryParam("album") final String fromAlbumPk,
                          @QueryParam("inbox") final Boolean fromInbox) {
 
         final int offset = offsetParam != null ? max(offsetParam, 0) : 0;
