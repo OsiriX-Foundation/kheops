@@ -182,12 +182,12 @@ public class QIDOResource {
         }
 
         //BEGIN kheopsPrincipal
-        if (fromInbox && !kheopsPrincipal.hasUserAccess()) {
+        if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
             return Response.status(FORBIDDEN).build();
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
+            if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
@@ -328,6 +328,10 @@ public class QIDOResource {
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
         catch (AlbumNotFoundException e) {
             return Response.status(FORBIDDEN).build();
+        }
+
+        if(securityContext.isUserInRole("tokenViewer")) {
+            fromInbox = kheopsPrincipal.hasInboxAccess();
         }
         //END kheopsPrincipal
 
