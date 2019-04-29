@@ -49,7 +49,7 @@ public final class ZipStudyResource {
     @Produces("application/zip")
     public Response streamStudy(@PathParam(STUDY_INSTANCE_UID) String studyInstanceUID,
                                 @HeaderParam(AUTHORIZATION) String authorizationHeader,
-                                @QueryParam(ALBUM) Long fromAlbum,
+                                @QueryParam(ALBUM) String fromAlbum,
                                 @QueryParam(INBOX) Boolean fromInbox) {
         checkValidUID(studyInstanceUID, STUDY_INSTANCE_UID);
 
@@ -80,7 +80,7 @@ public final class ZipStudyResource {
 
     private Set<Instance> getInstances(final AccessToken accessToken,
                                        final String studyInstanceUID,
-                                       final Long fromAlbum,
+                                       final String fromAlbum,
                                        final Boolean fromInbox) {
         final UriBuilder metadataUriBuilder = UriBuilder.fromUri(authorizationURI()).path("/studies/{studyInstanceUID}/metadata");
         if (fromAlbum != null) {
