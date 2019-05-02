@@ -65,6 +65,22 @@ public final class WadoRsResource {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.from(capabilityToken));
     }
 
+    @GET
+    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
+    public Response wadoInstance(@HeaderParam(AUTHORIZATION) String authorizationHeader,
+                         @PathParam("studyInstanceUID") String studyInstanceUID,
+                         @PathParam("seriesInstanceUID") String seriesInstanceUID) {
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+    }
+
+    @GET
+    @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
+    public Response wadoWithCapabilityInstance(@PathParam("capability") String capabilityToken,
+                                       @PathParam("studyInstanceUID") String studyInstanceUID,
+                                       @PathParam("seriesInstanceUID") String seriesInstanceUID) {
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.from(capabilityToken));
+    }
+
     private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");
