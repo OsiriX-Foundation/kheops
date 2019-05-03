@@ -83,6 +83,7 @@ public class Keys {
 
     public static final ForeignKey<AlbumSeriesRecord, AlbumsRecord> ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY = ForeignKeys0.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY;
     public static final ForeignKey<AlbumSeriesRecord, SeriesRecord> ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY = ForeignKeys0.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY;
+    public static final ForeignKey<AlbumSeriesRecord, UsersRecord> ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY = ForeignKeys0.ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY;
     public static final ForeignKey<AlbumUserRecord, AlbumsRecord> ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY = ForeignKeys0.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY;
     public static final ForeignKey<AlbumUserRecord, UsersRecord> ALBUM_USER__ALBUM_USER_USER_FK_FKEY = ForeignKeys0.ALBUM_USER__ALBUM_USER_USER_FK_FKEY;
     public static final ForeignKey<CapabilitiesRecord, UsersRecord> CAPABILITIES__CAPABILITIES_USER_FK_FKEY = ForeignKeys0.CAPABILITIES__CAPABILITIES_USER_FK_FKEY;
@@ -134,6 +135,7 @@ public class Keys {
     private static class ForeignKeys0 {
         public static final ForeignKey<AlbumSeriesRecord, AlbumsRecord> ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, AlbumSeries.ALBUM_SERIES, "album_series__album_series_album_fk_fkey", AlbumSeries.ALBUM_SERIES.ALBUM_FK);
         public static final ForeignKey<AlbumSeriesRecord, SeriesRecord> ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.SERIES_PK, AlbumSeries.ALBUM_SERIES, "album_series__album_series_series_fk_fkey", AlbumSeries.ALBUM_SERIES.SERIES_FK);
+        public static final ForeignKey<AlbumSeriesRecord, UsersRecord> ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, AlbumSeries.ALBUM_SERIES, "album_series__album_series_sharing_source_fkey", AlbumSeries.ALBUM_SERIES.SHARING_SOURCE);
         public static final ForeignKey<AlbumUserRecord, AlbumsRecord> ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, AlbumUser.ALBUM_USER, "album_user__album_user_album_fk_fkey", AlbumUser.ALBUM_USER.ALBUM_FK);
         public static final ForeignKey<AlbumUserRecord, UsersRecord> ALBUM_USER__ALBUM_USER_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, AlbumUser.ALBUM_USER, "album_user__album_user_user_fk_fkey", AlbumUser.ALBUM_USER.USER_FK);
         public static final ForeignKey<CapabilitiesRecord, UsersRecord> CAPABILITIES__CAPABILITIES_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Capabilities.CAPABILITIES, "capabilities__capabilities_user_fk_fkey", Capabilities.CAPABILITIES.USER_FK);

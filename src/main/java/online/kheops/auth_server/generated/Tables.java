@@ -14,6 +14,7 @@ import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.Version;
 
 
 /**
@@ -68,4 +69,9 @@ public class Tables {
      * The table <code>public.users</code>.
      */
     public static final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
+
+    /**
+     * The table <code>public.version</code>.
+     */
+    public static final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
 }

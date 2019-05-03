@@ -18,6 +18,7 @@ import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.Version;
 
 import org.jooq.Catalog;
 import org.jooq.Sequence;
@@ -38,7 +39,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1803600431;
+    private static final long serialVersionUID = -539157323;
 
     /**
      * The reference instance of <code>public</code>
@@ -84,6 +85,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.users</code>.
      */
     public final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
+
+    /**
+     * The table <code>public.version</code>.
+     */
+    public final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
 
     /**
      * No further instances allowed
@@ -136,6 +142,7 @@ public class Public extends SchemaImpl {
             Events.EVENTS,
             Series.SERIES,
             Studies.STUDIES,
-            Users.USERS);
+            Users.USERS,
+            Version.VERSION);
     }
 }
