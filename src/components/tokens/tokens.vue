@@ -217,7 +217,6 @@
             v-if="!data.item.revoked"
             type="button"
             class="btn btn-danger btn-xs"
-            :class="class_revoke_btn"
             @click.stop="revoke(data.item.id)"
           >
             {{ $t('revoke') }}
@@ -225,7 +224,6 @@
           <span
             v-if="data.item.revoked"
             class="text-danger"
-            :class="class_revoke_btn"
           >
             {{ $t('revoked') }}
           </span>
@@ -242,7 +240,6 @@ import { mapGetters } from 'vuex'
 import newToken from '@/components/tokens/newToken'
 import token from '@/components/tokens/token'
 import moment from 'moment'
-import mobiledetect from '@/mixins/mobiledetect.js'
 
 VueClipboard.config.autoSetContainer = true // add this line
 Vue.use(VueClipboard)
@@ -342,9 +339,6 @@ export default {
 				tokens = this.album.tokens
 			}
 			return tokens
-		},
-		class_revoke_btn () {
-			return mobiledetect.mobileAndTabletcheck() ? '' : 'revoke-btn'
 		}
 	},
 	created () {
@@ -417,11 +411,8 @@ vertical-align: top;
 dt{
 text-align: right;
 }
-.revoke-btn{
-visibility: hidden;
-}
 
-tr:hover .revoke-btn{
+tr:hover {
 visibility: visible;
 }
 
