@@ -19,7 +19,9 @@
 		"addalbum": "add as favorite",
 		"removealbum": "remove as favorite",
     "to": "to",
-    "writecomment": "Write your comment here"
+    "writecomment": "Write your comment here",
+    "checkprivateuser": "Send private message to",
+    "notificationof": "Notification of"
 	},
 	"fr" : {
 		"commentpostsuccess": "le commentaire a été posté avec succès",
@@ -38,7 +40,9 @@
 		"addalbum": "a mis en favori",
 		"removealbum": "a enlevé des favories",
     "to": "à",
-    "writecomment": "Ecrivez votre commentaire ici"
+    "writecomment": "Ecrivez votre commentaire ici",
+    "checkprivateuser": "Envoyer un message privé à",
+    "notificationof": "Notification du"
 	}
 }
 </i18n>
@@ -73,7 +77,7 @@
 
           <div
             v-if="comment.event_type === 'Comment'"
-            class="card mt-3 ml-5 mr-5"
+            class="card mt-3 ml-sm-5 mr-sm-5"
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
             <div class="card-header">
@@ -84,7 +88,7 @@
                 {{ $t('to') }} {{ comment.target_name }}
               </span>
               <span class="float-right">
-                {{ comment.post_date|formatDate }}
+                {{ comment.post_date | formatDate }}
               </span>
             </div>
             <div
@@ -104,73 +108,78 @@
 
           <div
             v-if="comment.event_type == 'Mutation'"
-            class="card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-5 mr-5"
+            class="card col-sm-10 offset-sm-2 bg-secondary mt-3 ml-sm-5 mr-sm-5"
           >
-            <div class="d-flex">
-              <!-- IMPORT_STUDY, REMOVE_STUDY : -->
+            <div class="card-header">
+              <div class="bd-highlight">
+                <i> {{ $t('notificationof') }} {{ comment.post_date | formatDate }} </i>
+              </div>
+            </div>
+            <!-- IMPORT_STUDY, REMOVE_STUDY : -->
+            <div class="card-body">
               <div
                 v-if="comment.mutation_type === 'IMPORT_STUDY'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class="flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('thestudy') }} {{ comment.study }}
+                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_STUDY'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class="flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('thestudy') }} {{ comment.study }}
+                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- IMPORT_SERIES, REMOVE_SERIES -->
               <div
                 v-if="comment.mutation_type === 'IMPORT_SERIES'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('theseries') }} {{ comment.series }} {{ $t('in') }} {{ $t('thestudy') }} {{ comment.study }}
+                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_SERIES'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theseries') }} {{ comment.series }} {{ $t('in') }} {{ $t('thestudy') }} {{ comment.study }}
+                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
               <div
                 v-if="comment.mutation_type === 'ADD_USER'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} {{ comment.target_name }}
+                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} <i>{{ comment.target_name }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'ADD_ADMIN'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} {{ comment.target_name }}
+                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} <i>{{ comment.target_name }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_USER'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theuser') }} {{ comment.target_name }}
+                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theuser') }} <i>{{ comment.target_name }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'PROMOTE_ADMIN'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} {{ comment.target_name }}
+                <i>{{ comment.origin_name }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ comment.target_name }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'DEMOTE_ADMIN'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} {{ comment.target_name }}
+                <i>{{ comment.origin_name }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ comment.target_name }}</i>
               </div>
 
               <!-- LEAVE_ALBUM -->
               <div
                 v-if="comment.mutation_type === 'LEAVE_ALBUM'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasleft') }}
               </div>
@@ -178,7 +187,7 @@
               <!-- CREATE_ALBUM -->
               <div
                 v-if="comment.mutation_type === 'CREATE_ALBUM'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
               </div>
@@ -186,7 +195,7 @@
               <!-- EDIT_ALBUM -->
               <div
                 v-if="comment.mutation_type === 'EDIT_ALBUM'"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
               </div>
@@ -194,23 +203,17 @@
               <!-- ADD STUDY IN FAVORITES -->
               <div
                 v-if="comment.mutation_type === 'ADD_FAV' && comment.study"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('addalbum') }} {{ $t('thestudy') }} {{ comment.study }}
+                <i>{{ comment.origin_name }}</i> {{ $t('addalbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- ADD STUDY IN FAVORITES -->
               <div
                 v-if="comment.mutation_type === 'REMOVE_FAV' && comment.study"
-                class="p-2 flex-grow-1 bd-highlight"
+                class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} {{ comment.study }}
-              </div>
-
-              <div class="bd-highlight">
-                <small style="white-space: nowrap">
-                  {{ comment.post_date|formatDate }}
-                </small>
+                <i>{{ comment.origin_name }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
             </div>
           </div>
@@ -224,12 +227,13 @@
           inline
           @change="SetEnabledVariables()"
         >
-          Send private message to
+          {{ $t("checkprivateuser") }}
         </b-form-checkbox>
       </div>
       <div class="col-sm-6 col-md-4">
         <add-user
           :id="id ? id : album.album_id"
+          ref="privateuser"
           :scope="scope"
           :enable-add="enablePrivate"
           @private-user="setPrivateUser"
@@ -250,8 +254,9 @@
               :placeholder="$t('writecomment')"
               rows="2"
               maxlength="1024"
-              :disabled="disabledText"
+              :readonly="disabledText"
               @keydown.enter.prevent="addComment"
+              @click="checkUserFromTextarea"
             />
             <div class="input-group-append">
               <button
@@ -334,6 +339,11 @@ export default {
 		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
 	methods: {
+		checkUserFromTextarea () {
+			if (this.disabledText) {
+				this.$refs.privateuser.checkUser()
+			}
+		},
 		SetEnabledVariables () {
 			this.enablePrivate = !this.enablePrivate
 			this.disabledText = !this.disabledText
@@ -406,4 +416,3 @@ export default {
 <style scoped>
 
 </style>
-

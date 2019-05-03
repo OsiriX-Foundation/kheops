@@ -21,24 +21,6 @@
     ref="filedragdrop"
   >
     <!--
-			<input
-				id="file"
-				ref="inputfiles"
-				type="file"
-				name="file"
-				class="inputfile"
-				allowdirs
-				multiple
-				@change="inputLoadFiles"
-			>
-      <label
-        ref="dragdrop"
-        class="drag-drop"
-        for="file"
-        :class="{'drag-drop-hover': hover }"
-      >
-        Load your files
-      </label>
 			https://stackoverflow.com/questions/34817656/add-class-in-drop-area-file-input-when-dragging-an-external-image-over-dragen
 		-->
     <form
@@ -175,6 +157,11 @@ export default {
 		}
 	},
 	methods: {
+		storeFiles (files) {
+			this.$store.dispatch('setSending', { sending: true })
+			this.$store.dispatch('setFiles', { files: files })
+			this.$store.dispatch('setSource', { source: this.album.album_id !== undefined ? this.album.album_id : 'inbox' })
+		},
 		createObjFiles (file, path, name) {
 			if (!this.excludeFileName(name)) {
 				const objFile = {
@@ -196,8 +183,7 @@ export default {
 					arrayFiles.push(objFile)
 				}
 			}
-			this.$store.dispatch('setSending', { sending: true })
-			this.$store.dispatch('setFiles', { files: arrayFiles })
+			this.storeFiles(arrayFiles)
 		},
 		manageDataTransfer (dataTransferItems) {
 			const arrayPromises = []
@@ -213,8 +199,7 @@ export default {
 			Promise.all(arrayPromises).then(res => {
 				const filesSend = this.removeNonObjectFiles(this.arrayFlatten(res))
 				this.loading = false
-				this.$store.dispatch('setSending', { sending: true })
-				this.$store.dispatch('setFiles', { files: filesSend })
+				this.storeFiles(filesSend)
 			})
 		},
 		removeNonObjectFiles (array) {
