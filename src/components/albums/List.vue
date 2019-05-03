@@ -34,7 +34,7 @@
 </i18n>
 
 <template>
-  <div class="container-fluid">
+  <div :class="containerFluidOnDesktop">
     <div
       class="my-3 selection-button-container"
       style=" position: relative;"
@@ -363,6 +363,7 @@
 import { mapGetters } from 'vuex'
 import Datepicker from 'vuejs-datepicker'
 import formGetUser from '@/components/user/getUser'
+import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'Albums',
@@ -479,8 +480,10 @@ export default {
 			return {
 				from: new Date()
 			}
+		},
+		containerFluidOnDesktop () {
+			return mobiledetect.mobileAndTabletcheck() ? 'container' : 'container-fluid'
 		}
-
 	},
 	watch: {
 		filters: {
