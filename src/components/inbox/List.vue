@@ -241,9 +241,12 @@
             </label>
           </b-dropdown-item-button>
           <b-dropdown-divider />
-          <b-dropdown-text class="m-3">
+          <b-dropdown-item-button
+            v-if="determineWebkitDirectory()"
+            @click="showDragAndDrop"
+          >
             {{ $t("draganddrop") }}
-          </b-dropdown-text>
+          </b-dropdown-item-button>
         </b-dropdown>
       </span>
     </div>
@@ -1127,7 +1130,10 @@ export default {
 			if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true
 
 			return false
-		}
+    },
+    showDragAndDrop() {
+      this.$emit('demohover')
+    }
 	}
 }
 
