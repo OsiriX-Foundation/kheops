@@ -266,7 +266,7 @@
       @cancel-user="form_send_study=false"
     />
     <b-table
-      :class="containerFluidOnDesktop"
+      class="container-fluid"
       responsive
       striped
       :items="studies"
@@ -690,7 +690,6 @@ import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import { ViewerToken } from '@/mixins/tokens.js'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
-import mobiledetect from '@/mixins/mobiledetect.js'
 
 Vue.use(ToggleButton)
 
@@ -820,9 +819,6 @@ export default {
 		},
 		disableBtnHeader () {
 			return !this.selectedSeriesNb
-		},
-		containerFluidOnDesktop () {
-			return mobiledetect.mobileAndTabletcheck() ? 'container' : 'container-fluid'
 		}
 	},
 
