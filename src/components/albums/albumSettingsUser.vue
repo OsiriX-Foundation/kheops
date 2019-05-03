@@ -33,12 +33,17 @@
   <div class="container">
     <h3
       v-if="!form_add_user"
-      class="pointer"
+      class="pointer d-sm-inline-flex"
       style="width: 100%"
     >
-      {{ $t('userlist') }}<button
+      <div
+        class="mr-auto"
+      >
+        {{ $t('userlist') }}
+      </div>
+      <button
         v-if="album.add_user||album.is_admin"
-        class="btn btn-secondary float-right"
+        class="btn btn-secondary"
         @click="addUser()"
       >
         <v-icon
