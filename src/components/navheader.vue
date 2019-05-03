@@ -10,7 +10,10 @@
 </i18n>
 
 <template>
-  <!-- Navbar -->
+  <!--
+    Navbar
+    https://bootstrap-vue.js.org/docs/components/navbar/
+  -->
   <b-navbar
     toggleable="md"
     type="light"
@@ -40,11 +43,6 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav right>
-          <b-nav-item v-access="'admin'">
-            <router-link to="/admin">
-              Admin
-            </router-link>
-          </b-nav-item>
           <b-nav-item v-access="'active'">
             {{ $t('welcome') }} <router-link to="/user">
               {{ user.fullname }}
