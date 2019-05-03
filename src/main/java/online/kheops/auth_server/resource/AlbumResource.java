@@ -76,8 +76,8 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "New album id:"+albumResponse.getResponse().id+" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
-        return Response.status(CREATED).entity(albumResponse.getResponse()).build();
+        LOG.info(() -> "New album id:"+albumResponse.getId() +" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
+        return Response.status(CREATED).entity(albumResponse).build();
     }
 
     @GET
@@ -89,7 +89,7 @@ public class AlbumResource {
     public Response getAlbums() {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final PairListXTotalCount<AlbumResponse.Response> pairAlbumsTotalAlbum;
+        final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
             final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
@@ -102,7 +102,7 @@ public class AlbumResource {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<AlbumResponse.Response>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse.Response>>(pairAlbumsTotalAlbum.getAttributesList()) {};
+        final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
         return Response.ok(genericAlbumResponsesList)
                 .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
                 .build();
@@ -134,10 +134,12 @@ public class AlbumResource {
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        } catch (AlbumNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
 
-        return Response.status(OK).entity(albumResponse.getResponse()).build();
+        return Response.status(OK).entity(albumResponse).build();
     }
 
     @PATCH
@@ -188,7 +190,7 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        return Response.status(OK).entity(albumResponse.getResponse()).build();
+        return Response.status(OK).entity(albumResponse).build();
     }
 
     @DELETE
@@ -225,16 +227,16 @@ public class AlbumResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final AlbumResponse albumResponse;
+        final List<UserAlbumResponse> userAlbumResponse;
 
         try {
-            albumResponse = Albums.getUsers(albumId);
+            userAlbumResponse = Albums.getUsers(albumId);
         } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Get users list for album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<AlbumResponse.UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<AlbumResponse.UserAlbumResponse>>(albumResponse.getUsersResponse()) {};
+        final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(userAlbumResponse) {};
         return Response.status(OK).entity(genericUsersAlbumResponsesList).build();
     }
 

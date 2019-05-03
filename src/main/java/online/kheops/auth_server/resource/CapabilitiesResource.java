@@ -4,7 +4,6 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.*;
-import online.kheops.auth_server.capability.CapabilitiesResponse.Response;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
@@ -16,6 +15,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.ID_PATTERN;
@@ -25,6 +26,7 @@ import static online.kheops.auth_server.util.Consts.ALBUM;
 
 @Path("/")
 public class CapabilitiesResource {
+    private static final Logger LOG = Logger.getLogger(CapabilitiesResource.class.getName());
 
     @Context
     private UriInfo uriInfo;
@@ -54,7 +56,7 @@ public class CapabilitiesResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface) securityContext.getUserPrincipal();
-        final Response capabilityResponse;
+        final CapabilitiesResponse capabilityResponse;
 
         final CapabilityParametersBuilder capabilityParametersBuilder = new CapabilityParametersBuilder()
                 .callingUser(kheopsPrincipal.getUser())
@@ -95,10 +97,13 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = generateCapability(capabilityParameters);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
+            LOG.log(Level.WARNING, "Bad Request", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
+            LOG.log(Level.WARNING, "Forbidden", e);
             return javax.ws.rs.core.Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (CapabilityBadRequestException e) {
+            LOG.log(Level.WARNING, "Bad Request", e);
             return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
@@ -114,11 +119,12 @@ public class CapabilitiesResource {
     public javax.ws.rs.core.Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
-        final Response capabilityResponse;
+        final CapabilitiesResponse capabilityResponse;
 
         try {
             capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
         } catch (CapabilityNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -136,7 +142,7 @@ public class CapabilitiesResource {
     public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
                                                      @QueryParam(ALBUM) String albumId) {
 
-        final List<Response> capabilityResponses;
+        final List<CapabilitiesResponse> capabilityResponses;
 
         if(albumId != null) {
             capabilityResponses = Capabilities.getCapabilities(albumId, valid);
@@ -145,7 +151,7 @@ public class CapabilitiesResource {
             capabilityResponses = Capabilities.getCapabilities(kheopsPrincipal.getUser(), valid);
         }
 
-        GenericEntity<List<Response>> genericCapabilityResponsesList = new GenericEntity<List<Response>>(capabilityResponses) {};
+        GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(capabilityResponses) {};
         return javax.ws.rs.core.Response.status(OK).entity(genericCapabilityResponsesList).build();
     }
 
@@ -156,11 +162,12 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
 
-        final Response capabilityResponses;
+        final CapabilitiesResponse capabilityResponses;
 
         try {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
         } catch (CapabilityNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();
@@ -174,12 +181,13 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
 
-        final Response capabilityResponses;
+        final CapabilitiesResponse capabilityResponses;
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
             capabilityResponses = Capabilities.getCapability(capabilityTokenID, callingUserPk);
         } catch (CapabilityNotFoundException e) {
+            LOG.log(Level.WARNING, "Not Found", e);
             return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();

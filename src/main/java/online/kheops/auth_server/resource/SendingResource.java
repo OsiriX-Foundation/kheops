@@ -63,8 +63,10 @@ public class SendingResource
         try {
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox);
         } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
+            LOG.log(WARNING, "not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadRequestException e) {
+            LOG.log(WARNING, "bad request", e);
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
@@ -93,6 +95,7 @@ public class SendingResource
         try {
             Sending.shareSeriesWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, seriesInstanceUID);
         } catch (UserNotFoundException | SeriesNotFoundException e) {
+            LOG.log(WARNING, "not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -236,9 +239,11 @@ public class SendingResource
                     return Response.status(FORBIDDEN).build();
                 }
             } catch (NotAlbumScopeTypeException e) {
+                LOG.log(WARNING, "bad scope type", e);
                 return Response.status(BAD_REQUEST).build();
             } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+                LOG.log(WARNING, "not found", e);
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
             }
         }
 
