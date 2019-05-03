@@ -128,7 +128,7 @@ setup.kibana:
   # the Default Space will be used.
   #space.id:
 output.elasticsearch:
-  enabled: true
+  enabled: false
   hosts: ["${elastic_url}"]
   username: "${elastic_user}"
   password: "${ES_PWD}"
@@ -153,9 +153,9 @@ output.elasticsearch:
 # Configure what output to use when sending the data collected by the beat.
 
 #--------------------------- Logstash output --------------------------------
-#output.logstash:
+output.logstash:
   # The Logstash hosts
-  #hosts: ["localhost:5044"]
+  hosts: ["10.5.7.8:5044"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
