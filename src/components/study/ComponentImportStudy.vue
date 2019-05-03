@@ -73,7 +73,7 @@
             :album="album"
             @loadfiles="inputLoadFiles"
             @loaddirectories="inputLoadFiles"
-						@demohover="demoHover"
+            @demohover="demoHover"
           />
         </div>
       </div>
@@ -158,7 +158,7 @@ export default {
 		}
 	},
 	methods: {
-		demoHover() {
+		demoHover () {
 			this.hover = true
 			setTimeout(() => this.hover = false, 1500)
 		},

@@ -1130,10 +1130,10 @@ export default {
 			if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true
 
 			return false
-    },
-    showDragAndDrop() {
-      this.$emit('demohover')
-    }
+		},
+		showDragAndDrop () {
+			this.$emit('demohover')
+		}
 	}
 }
 
