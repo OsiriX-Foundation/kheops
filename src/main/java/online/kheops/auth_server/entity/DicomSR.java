@@ -15,7 +15,7 @@ public class DicomSR {
 
     @Basic(optional = false)
     @Column(name = "creation_time")
-    private LocalDateTime sharingDate;
+    private LocalDateTime creationTime;
 
     @Basic(optional = false)
     @Column(name = "client_id")
@@ -44,4 +44,36 @@ public class DicomSR {
     @ManyToOne
     @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
     private User user;
+
+    public LocalDateTime getCreationTime() {
+        return creationTime;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public Boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Album getAlbum() {
+        return album;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

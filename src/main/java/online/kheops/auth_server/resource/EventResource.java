@@ -28,9 +28,9 @@ import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
-public class EventRessource {
+public class EventResource {
 
-    private static final Logger LOG = Logger.getLogger(EventRessource.class.getName());
+    private static final Logger LOG = Logger.getLogger(EventResource.class.getName());
 
     @Context
     ServletContext context;

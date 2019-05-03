@@ -140,7 +140,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
                     throw new AlbumNotFoundException("Album id : " + albumId + " not found");
                 }
                 if (albumUser.isAdmin()) {
-                    return true;
+                    return true;//TODO un viewer token ne devrait jamais avoir de permission autre que read sur un album!!!!!!
                 }
 
                 return usersPermission.hasViewerPermission(album);
