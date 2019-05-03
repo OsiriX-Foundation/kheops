@@ -66,7 +66,7 @@
           />
         </div>
         <div
-          :class="['dropzone-area', hover | loading ? 'dragenterClass' : 'dragNotEnterFormClass']"
+          :class="['dropzone-area', classDragIn]"
         >
           <list
             ref="list"
@@ -85,6 +85,7 @@
 import { mapGetters } from 'vuex'
 import List from '@/components/inbox/List'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
+import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'ComponentDragAndDrop',
@@ -113,6 +114,17 @@ export default {
 		}),
 		albumNoPermission () {
 			return !(this.album.is_admin || this.album.add_series) && this.scope === 'album'
+		},
+		classDragIn () {
+			if (!mobiledetect.mobileAndTabletcheck()) {
+				if (this.hover || this.loading) {
+					return 'dragenterClass'
+				} else {
+					return 'dragNotEnterFormClass'
+				}
+			} else {
+				return ''
+			}
 		}
 	},
 	watch: {
