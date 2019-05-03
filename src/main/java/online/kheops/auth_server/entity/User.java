@@ -48,6 +48,14 @@ public class User {
     @JoinColumn (name = "to_user_fk", nullable=true)
     private Set<Mutation> mutations = new HashSet<>();
 
+    @OneToMany
+    @JoinColumn (name = "sharing_source", nullable=true)
+    private Set<AlbumSeries> albumSeries = new HashSet<>();
+
+    @OneToMany
+    @JoinColumn (name = "user_fk", nullable=true)
+    private Set<DicomSR> dicomSR = new HashSet<>();
+
     @OneToOne
     @JoinColumn(name = "inbox_fk", unique = true, nullable = false, updatable = false)
     private Album inbox;

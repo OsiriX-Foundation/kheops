@@ -81,6 +81,10 @@ public class Album {
     @JoinColumn (name = "album_fk")
     private Set<Capability> capabilities = new HashSet<>();
 
+    @OneToMany
+    @JoinColumn (name = "album_fk")
+    private Set<DicomSR> dicomSR = new HashSet<>();
+
     @PrePersist
     public void onPrePersist() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -193,4 +197,8 @@ public class Album {
     public void addCapability(Capability capability) { this.capabilities.add(capability); }
 
     public Set<Capability> getCapabilities() { return capabilities; }
+
+    public void addDicomSR(DicomSR dicomSR) { this.dicomSR.add(dicomSR); }
+
+    public Set<DicomSR> getDicomSR() { return dicomSR; }
 }

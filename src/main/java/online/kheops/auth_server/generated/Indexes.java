@@ -10,6 +10,7 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.DicomSr;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
@@ -48,6 +49,9 @@ public class Indexes {
     public static final Index CAPABILITIES_SECRET_INDEX = Indexes0.CAPABILITIES_SECRET_INDEX;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
     public static final Index CAPABILITIES_USER_FK_INDEX = Indexes0.CAPABILITIES_USER_FK_INDEX;
+    public static final Index DICOM_SR_CLIENT_ID_UNIQUE = Indexes0.DICOM_SR_CLIENT_ID_UNIQUE;
+    public static final Index DICOM_SR_PK = Indexes0.DICOM_SR_PK;
+    public static final Index INDUNIQUE = Indexes0.INDUNIQUE;
     public static final Index EVENT_PK = Indexes0.EVENT_PK;
     public static final Index SERIES_PK = Indexes0.SERIES_PK;
     public static final Index SERIES_POPULATED_INDEX = Indexes0.SERIES_POPULATED_INDEX;
@@ -82,6 +86,9 @@ public class Indexes {
         public static Index CAPABILITIES_SECRET_INDEX = Internal.createIndex("capabilities_secret_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, false);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("capabilities_secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("capabilities_user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
+        public static Index DICOM_SR_CLIENT_ID_UNIQUE = Internal.createIndex("dicom_sr_client_id_unique", DicomSr.DICOM_SR, new OrderField[] { DicomSr.DICOM_SR.CLIENT_ID }, true);
+        public static Index DICOM_SR_PK = Internal.createIndex("dicom_sr_pk", DicomSr.DICOM_SR, new OrderField[] { DicomSr.DICOM_SR.PK }, true);
+        public static Index INDUNIQUE = Internal.createIndex("indunique", DicomSr.DICOM_SR, new OrderField[] { DicomSr.DICOM_SR.CLIENT_SECRET }, true);
         public static Index EVENT_PK = Internal.createIndex("event_pk", Events.EVENTS, new OrderField[] { Events.EVENTS.PK }, true);
         public static Index SERIES_PK = Internal.createIndex("series_pk", Series.SERIES, new OrderField[] { Series.SERIES.PK }, true);
         public static Index SERIES_POPULATED_INDEX = Internal.createIndex("series_populated_index", Series.SERIES, new OrderField[] { Series.SERIES.POPULATED }, false);

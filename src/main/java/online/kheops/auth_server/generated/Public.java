@@ -14,6 +14,7 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.DicomSr;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
@@ -39,7 +40,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = -539157323;
+    private static final long serialVersionUID = -2101446317;
 
     /**
      * The reference instance of <code>public</code>
@@ -65,6 +66,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.capabilities</code>.
      */
     public final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+
+    /**
+     * The table <code>public.dicom_sr</code>.
+     */
+    public final DicomSr DICOM_SR = online.kheops.auth_server.generated.tables.DicomSr.DICOM_SR;
 
     /**
      * The table <code>public.events</code>.
@@ -120,6 +126,7 @@ public class Public extends SchemaImpl {
             Sequences.ALBUM_SERIES_PK_SEQ,
             Sequences.ALBUM_USER_PK_SEQ,
             Sequences.CAPABILITIES_PK_SEQ,
+            Sequences.DICOM_SR_PK_SEQ,
             Sequences.EVENT_PK_SEQ,
             Sequences.SERIES_PK_SEQ,
             Sequences.STUDIES_PK_SEQ,
@@ -139,6 +146,7 @@ public class Public extends SchemaImpl {
             AlbumUser.ALBUM_USER,
             Albums.ALBUMS,
             Capabilities.CAPABILITIES,
+            DicomSr.DICOM_SR,
             Events.EVENTS,
             Series.SERIES,
             Studies.STUDIES,
