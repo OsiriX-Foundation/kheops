@@ -83,7 +83,7 @@ public class Album {
 
     @OneToMany
     @JoinColumn (name = "album_fk")
-    private Set<DicomSR> dicomSR = new HashSet<>();
+    private Set<DicomSr> dicomSr = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -198,7 +198,7 @@ public class Album {
 
     public Set<Capability> getCapabilities() { return capabilities; }
 
-    public void addDicomSR(DicomSR dicomSR) { this.dicomSR.add(dicomSR); }
+    public void addDicomSr(DicomSr dicomSr) { this.dicomSr.add(dicomSr); }
 
-    public Set<DicomSR> getDicomSR() { return dicomSR; }
+    public Set<DicomSr> getDicomSr() { return dicomSr; }
 }

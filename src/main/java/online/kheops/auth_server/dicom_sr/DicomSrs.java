@@ -1,20 +1,22 @@
-package online.kheops.auth_server.dicomSr;
+package online.kheops.auth_server.dicom_sr;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.capability.CapabilityNotFoundException;
-import online.kheops.auth_server.entity.DicomSR;
+import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.DicomSr;
 import online.kheops.auth_server.entity.User;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.regex.Pattern;
 
-import static online.kheops.auth_server.dicomSr.DicomSrQueries.getDicomSrWithClientId;
-import static online.kheops.auth_server.dicomSr.DicomSrQueries.getDicomSrWithClientSecret;
+import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.dicom_sr.DicomSrQueries.getDicomSrWithClientId;
+import static online.kheops.auth_server.dicom_sr.DicomSrQueries.getDicomSrWithClientSecret;
 
-public class DicomSr {
+public class DicomSrs {
 
     private static final String CLIENT_ID_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int CLIENT_ID_LENGTH = 22;
@@ -28,7 +30,7 @@ public class DicomSr {
 
     private static final Random rdm = new SecureRandom();
 
-    private DicomSr() {
+    private DicomSrs() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -56,6 +58,44 @@ public class DicomSr {
         return idBuilder.toString();
     }
 
+    public static DicomSrResponse newDicomSr (User callingUser, String albumId, String name, String url, boolean isPrivate)
+            throws AlbumNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final DicomSr dicomSr;
+
+        try {
+            tx.begin();
+
+            callingUser = em.merge(callingUser);
+            final String clientId = newClientId();
+
+            final Album album = getAlbum(albumId, em);
+
+            final String clientSecret;
+            if(isPrivate) {
+                clientSecret = newClientSecret();
+                dicomSr = new online.kheops.auth_server.entity.DicomSr(clientId, clientSecret, url, name, album, callingUser);
+            } else {
+                dicomSr = new online.kheops.auth_server.entity.DicomSr(clientId, url, name, album, callingUser);
+                //TODO dicomSRBuilder
+            }
+
+            em.persist(dicomSr);
+
+            tx.commit();
+
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+
+        return new DicomSrResponse(dicomSr);
+    }
+
     private static boolean clientIdExist(String clientId) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -81,13 +121,5 @@ public class DicomSr {
         } finally {
             em.close();
         }
-    }
-
-    public static DicomSrResponse newDicomSr (User callingUser, String albumId, String name, String url, boolean isPrivate) {
-        DicomSR dicomSR;
-
-        //TODO
-
-        return new DicomSrResponse(dicomSR);
     }
 }

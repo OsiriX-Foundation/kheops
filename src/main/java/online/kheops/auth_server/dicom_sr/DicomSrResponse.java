@@ -1,15 +1,12 @@
-package online.kheops.auth_server.dicomSr;
+package online.kheops.auth_server.dicom_sr;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
-import online.kheops.auth_server.album.AlbumResponseBuilder;
-import online.kheops.auth_server.album.UserAlbumResponse;
-import online.kheops.auth_server.entity.DicomSR;
+
+import online.kheops.auth_server.entity.DicomSr;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class DicomSrResponse {
 
@@ -30,17 +27,17 @@ public class DicomSrResponse {
 
     private DicomSrResponse() { /*empty*/ }
 
-    protected DicomSrResponse(DicomSR dicomSR) {
-        name = dicomSR.getName();
-        url = dicomSR.getUrl();
-        clientId = dicomSR.getClientId();
-        isPrivate = dicomSR.isPrivate();
-        if(dicomSR.isPrivate()) {
-            clientSecret = dicomSR.getClientSecret();
+    protected DicomSrResponse(DicomSr dicomSr) {
+        name = dicomSr.getName();
+        url = dicomSr.getUrl();
+        clientId = dicomSr.getClientId();
+        isPrivate = dicomSr.isPrivate();
+        if(dicomSr.isPrivate()) {
+            clientSecret = dicomSr.getClientSecret();
         }
         final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
-        user = userResponseBuilder.setSub(dicomSR.getUser().getKeycloakId()).setEmail(dicomSR.getUser().getEmail()).build();
+        user = userResponseBuilder.setSub(dicomSr.getUser().getKeycloakId()).setEmail(dicomSr.getUser().getEmail()).build();
 
-        createdTime = dicomSR.getCreationTime();
+        createdTime = dicomSr.getCreationTime();
     }
 }

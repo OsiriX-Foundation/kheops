@@ -54,7 +54,7 @@ public class User {
 
     @OneToMany
     @JoinColumn (name = "user_fk", nullable=true)
-    private Set<DicomSR> dicomSR = new HashSet<>();
+    private Set<DicomSr> dicomSr = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "inbox_fk", unique = true, nullable = false, updatable = false)
@@ -110,6 +110,8 @@ public class User {
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
 
     public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
+
+    public void addDicomSr(DicomSr dicomSr) { this.dicomSr.add(dicomSr); }
 
     public Album getInbox() { return inbox; }
 

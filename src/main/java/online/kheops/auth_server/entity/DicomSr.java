@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "dicom_sr")
 
-public class DicomSR {
+public class DicomSr {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "pk")
@@ -44,6 +45,27 @@ public class DicomSR {
     @ManyToOne
     @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
     private User user;
+
+    public DicomSr(String clientId, String clientSecret, String url, String name, Album album, User user) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.url = url;
+        this.name = name;
+        this.album = album;
+        this.user = user;
+        album.addDicomSr(this);
+        user.addDicomSr(this);
+    }
+
+    public DicomSr(String clientId, String url, String name, Album album, User user) {
+        this.clientId = clientId;
+        this.url = url;
+        this.name = name;
+        this.album = album;
+        this.user = user;
+        album.addDicomSr(this);
+        user.addDicomSr(this);
+    }
 
     public LocalDateTime getCreationTime() {
         return creationTime;
