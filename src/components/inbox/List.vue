@@ -944,7 +944,7 @@ export default {
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
 				let sticky = _this.$refs.myHeader.offsetTop
-				let studiesList = _this.$refs.studiesList.offsetTop
+        let studiesList = _this.$refs.studiesList.offsetTop
 				if ((window.pageYOffset) > sticky && !this.isActive) {
 					this.isActive = true
 				} else if (window.pageYOffset < studiesList) {
@@ -1261,7 +1261,7 @@ export default {
     color: #f1f1f1;
   }
   .sticky + .content {
-    padding-top: 115px;
+    padding-top: 70px;
   }
   .table-wrapper-scroll-y {
     width: 5px;
