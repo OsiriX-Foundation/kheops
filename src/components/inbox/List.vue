@@ -265,391 +265,394 @@
       @get-user="sendToUser"
       @cancel-user="form_send_study=false"
     />
-    <b-table
-      class="container-fluid"
-      responsive
-      striped
-      :items="studies"
-      :fields="fields"
-      :sort-desc="true"
-      :sort-by.sync="sortBy"
-      :no-local-sorting="true"
-      :no-sort-reset="true"
-      @sort-changed="sortingChanged"
+    <div
+      class="content"
     >
-      <template
-        slot="HEAD_is_selected"
-        slot-scope="data"
+      <b-table
+        class="container-fluid"
+        striped
+        :items="studies"
+        :fields="fields"
+        :sort-desc="true"
+        :sort-by.sync="sortBy"
+        :no-local-sorting="true"
+        :no-sort-reset="true"
+        @sort-changed="sortingChanged"
       >
-        {{ $t(data.label) }}
-        <!--
-        <b-button
-          variant="link"
-          size="sm"
-          class="mr-2"
+        <template
+          slot="HEAD_is_selected"
+          slot-scope="data"
         >
-          <v-icon
-            class="align-middle"
-            name="chevron-down"
-            style="visibility: hidden"
-          />
-        </b-button>
-
-        <b-form-checkbox
-          v-model="studies.allSelected"
-          name="allSelected"
-          @click.native.stop
-          @change="selectAll(studies.allSelected)"
-        />
-				-->
-      </template>
-
-      <template
-        slot="HEAD_PatientName"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.PatientName"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
-        {{ $t(data.label) }}
-      </template>
-
-      <template
-        slot="HEAD_PatientID"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.PatientID"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
-        {{ $t(data.label) }}
-      </template>
-
-      <template
-        slot="HEAD_StudyDescription"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.StudyDescription"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
-        {{ $t(data.label) }}
-      </template>
-
-      <template
-        slot="HEAD_StudyDate"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          class="form-row"
-          @click.stop=""
-        >
-          <div class="col form-inline">
-            <div class="form-group">
-              <datepicker
-                v-model="filters.StudyDateFrom"
-                :bootstrap-styling="false"
-                :disabled-dates="disabledFromDates"
-                input-class="form-control form-control-sm  search-calendar"
-                :calendar-button="false"
-                calendar-button-icon=""
-                wrapper-class="calendar-wrapper"
-                :placeholder="$t('fromDate')"
-                :clear-button="true"
-                clear-button-icon="fa fa-times"
-              />
-            </div>
-          </div>
-
-          <div class="col form-inline">
-            <div class="form-group">
-              <datepicker
-                v-model="filters.StudyDateTo"
-                :bootstrap-styling="false"
-                :disabled-dates="disabledToDates"
-                input-class="form-control form-control-sm search-calendar"
-                :calendar-button="false"
-                calendar-button-icon=""
-                wrapper-class="calendar-wrapper"
-                :placeholder="$t('toDate')"
-                :clear-button="true"
-                clear-button-icon="fa fa-times"
-              />
-            </div>
-          </div>
-          <!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br/> -->
-        </div>
-        <br v-if="showFilters">
-        {{ $t(data.label) }}
-      </template>
-
-      <template
-        slot="HEAD_ModalitiesInStudy"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.ModalitiesInStudy"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          ><br>
-        </div>
-        {{ $t(data.label) }}
-      </template>
-
-      <template
-        slot="ModalitiesInStudy"
-        slot-scope="data"
-      >
-        {{ data.item.ModalitiesInStudy[0] | formatModality }}
-      </template>
-
-      <template
-        slot="is_selected"
-        slot-scope="row"
-      >
-        <b-form-group>
+          {{ $t(data.label) }}
+          <!--
           <b-button
             variant="link"
             size="sm"
             class="mr-2"
-            @click.stop="showSeries(row)"
           >
             <v-icon
-              v-if="row.detailsShowing"
               class="align-middle"
               name="chevron-down"
-              @click.stop="row.toggleDetails"
-            />
-            <v-icon
-              v-else
-              class="align-middle"
-              name="chevron-right"
-              @click.stop="row.toggleDetails"
+              style="visibility: hidden"
             />
           </b-button>
-          <b-form-checkbox
-            v-model="row.item.is_selected"
-            class="pt-2"
-            inline
-            @click.native.stop
-            @change="toggleSelected(row.item,'study',!row.item.is_selected)"
-          />
-        </b-form-group>
-      </template>
 
-      <!--Infos study (Series / Comments / Study Metadata) -->
-      <template
-        slot="row-details"
-        slot-scope="row"
-      >
-        <b-card>
-          <div class="row">
-            <div class="col-xl-auto mb-4">
-              <nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
-                <a
-                  class="nav-link"
-                  :class="(row.item.view=='series')?'active':''"
-                  @click="row.item.view='series'"
-                >
-                  {{ $t('series') }}
-                </a>
-                <a
-                  class="nav-link"
-                  :class="(row.item.view=='comments')?'active':''"
-                  @click="loadStudiesComments(row.item)"
-                >
-                  {{ $t('comments') }}
-                </a>
-                <a
-                  class="nav-link"
-                  :class="(row.item.view=='study')?'active':''"
-                  @click="loadStudiesMetadata(row.item)"
-                >
-                  {{ $t('study') }}
-                </a>
-              </nav>
-            </div>
-            <div
-              v-if="row.item.view==&quot;series&quot;"
-              class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
-            >
-              <div class="row">
-                <div
-                  v-for="serie in row.item.series"
-                  :key="serie.id"
-                  class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
-                >
-                  <series-summary
-                    :key="serie.SeriesInstanceUID[0]"
-                    :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
-                    :selected="serie.is_selected"
-                    :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
-                    :source="$route.params.album_id ? $route.params.album_id : 'inbox'"
-                    @selectedSeries="countSelectedSeries"
-                  />
-                </div>
+          <b-form-checkbox
+            v-model="studies.allSelected"
+            name="allSelected"
+            @click.native.stop
+            @change="selectAll(studies.allSelected)"
+          />
+          -->
+        </template>
+
+        <template
+          slot="HEAD_PatientName"
+          slot-scope="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <input
+              v-model="filters.PatientName"
+              type="search"
+              class="form-control form-control-sm"
+              :placeholder="$t('filter')"
+            > <br>
+          </div>
+          {{ $t(data.label) }}
+        </template>
+
+        <template
+          slot="HEAD_PatientID"
+          slot-scope="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <input
+              v-model="filters.PatientID"
+              type="search"
+              class="form-control form-control-sm"
+              :placeholder="$t('filter')"
+            > <br>
+          </div>
+          {{ $t(data.label) }}
+        </template>
+
+        <template
+          slot="HEAD_StudyDescription"
+          slot-scope="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <input
+              v-model="filters.StudyDescription"
+              type="search"
+              class="form-control form-control-sm"
+              :placeholder="$t('filter')"
+            > <br>
+          </div>
+          {{ $t(data.label) }}
+        </template>
+
+        <template
+          slot="HEAD_StudyDate"
+          slot-scope="data"
+        >
+          <div
+            v-if="showFilters"
+            class="form-row"
+            @click.stop=""
+          >
+            <div class="col form-inline">
+              <div class="form-group">
+                <datepicker
+                  v-model="filters.StudyDateFrom"
+                  :bootstrap-styling="false"
+                  :disabled-dates="disabledFromDates"
+                  input-class="form-control form-control-sm  search-calendar"
+                  :calendar-button="false"
+                  calendar-button-icon=""
+                  wrapper-class="calendar-wrapper"
+                  :placeholder="$t('fromDate')"
+                  :clear-button="true"
+                  clear-button-icon="fa fa-times"
+                />
               </div>
             </div>
 
-            <div
-              v-if="row.item.view==&quot;comments&quot;"
-              class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
-            >
-              <comments-and-notifications
-                :id="row.item.StudyInstanceUID[0]"
-                scope="studies"
-              />
+            <div class="col form-inline">
+              <div class="form-group">
+                <datepicker
+                  v-model="filters.StudyDateTo"
+                  :bootstrap-styling="false"
+                  :disabled-dates="disabledToDates"
+                  input-class="form-control form-control-sm search-calendar"
+                  :calendar-button="false"
+                  calendar-button-icon=""
+                  wrapper-class="calendar-wrapper"
+                  :placeholder="$t('toDate')"
+                  :clear-button="true"
+                  clear-button-icon="fa fa-times"
+                />
+              </div>
             </div>
+            <!-- <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateFrom' placeholder="From"> - <input type = 'search' class = 'form-control form-control-sm' v-model='filters.StudyDateTo' placeholder="To"> <br/> -->
+          </div>
+          <br v-if="showFilters">
+          {{ $t(data.label) }}
+        </template>
 
-            <div
-              v-if="row.item.view==&quot;study&quot;"
-              class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+        <template
+          slot="HEAD_ModalitiesInStudy"
+          slot-scope="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <input
+              v-model="filters.ModalitiesInStudy"
+              type="search"
+              class="form-control form-control-sm"
+              :placeholder="$t('filter')"
+            ><br>
+          </div>
+          {{ $t(data.label) }}
+        </template>
+
+        <template
+          slot="ModalitiesInStudy"
+          slot-scope="data"
+        >
+          {{ data.item.ModalitiesInStudy[0] | formatModality }}
+        </template>
+
+        <template
+          slot="is_selected"
+          slot-scope="row"
+        >
+          <b-form-group>
+            <b-button
+              variant="link"
+              size="sm"
+              class="mr-2"
+              @click.stop="showSeries(row)"
             >
-              <study-metadata
-                :id="row.item.StudyInstanceUID[0]"
-                scope="studies"
+              <v-icon
+                v-if="row.detailsShowing"
+                class="align-middle"
+                name="chevron-down"
+                @click.stop="row.toggleDetails"
               />
+              <v-icon
+                v-else
+                class="align-middle"
+                name="chevron-right"
+                @click.stop="row.toggleDetails"
+              />
+            </b-button>
+            <b-form-checkbox
+              v-model="row.item.is_selected"
+              class="pt-2"
+              inline
+              @click.native.stop
+              @change="toggleSelected(row.item,'study',!row.item.is_selected)"
+            />
+          </b-form-group>
+        </template>
+
+        <!--Infos study (Series / Comments / Study Metadata) -->
+        <template
+          slot="row-details"
+          slot-scope="row"
+        >
+          <b-card>
+            <div class="row">
+              <div class="col-xl-auto mb-4">
+                <nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
+                  <a
+                    class="nav-link"
+                    :class="(row.item.view=='series')?'active':''"
+                    @click="row.item.view='series'"
+                  >
+                    {{ $t('series') }}
+                  </a>
+                  <a
+                    class="nav-link"
+                    :class="(row.item.view=='comments')?'active':''"
+                    @click="loadStudiesComments(row.item)"
+                  >
+                    {{ $t('comments') }}
+                  </a>
+                  <a
+                    class="nav-link"
+                    :class="(row.item.view=='study')?'active':''"
+                    @click="loadStudiesMetadata(row.item)"
+                  >
+                    {{ $t('study') }}
+                  </a>
+                </nav>
+              </div>
+              <div
+                v-if="row.item.view==&quot;series&quot;"
+                class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+              >
+                <div class="row">
+                  <div
+                    v-for="serie in row.item.series"
+                    :key="serie.id"
+                    class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
+                  >
+                    <series-summary
+                      :key="serie.SeriesInstanceUID[0]"
+                      :series-instance-u-i-d="serie.SeriesInstanceUID[0]"
+                      :selected="serie.is_selected"
+                      :study-instance-u-i-d="row.item.StudyInstanceUID[0]"
+                      :source="$route.params.album_id ? $route.params.album_id : 'inbox'"
+                      @selectedSeries="countSelectedSeries"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="row.item.view==&quot;comments&quot;"
+                class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+              >
+                <comments-and-notifications
+                  :id="row.item.StudyInstanceUID[0]"
+                  scope="studies"
+                />
+              </div>
+
+              <div
+                v-if="row.item.view==&quot;study&quot;"
+                class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+              >
+                <study-metadata
+                  :id="row.item.StudyInstanceUID[0]"
+                  scope="studies"
+                />
+              </div>
+            </div>
+          </b-card>
+        </template>
+        <!-- Button next to patient name -->
+        <template
+          slot="PatientName"
+          slot-scope="row"
+        >
+          <div class="patientNameContainer">
+            <div class="row">
+              <div class="patientName col-md-auto">
+                {{ row.item.PatientName }}
+              </div>
+              <div class="patientName_ct col-md-auto d-block d-sm-none">
+                {{ row.item.ModalitiesInStudy [0] | formatModality }}
+              </div>
+              <div class="patientNameIcons col-md-auto">
+                <span
+                  :class="row.item.is_favorite?'selected':''"
+                  @click="toggleFavorite(row.item)"
+                >
+                  <v-icon
+                    v-if="row.item.is_favorite"
+                    class="align-middle"
+                    style="margin-right:1"
+                    name="star"
+                  />
+                  <v-icon
+                    v-else-if="Object.keys(album).length === 0 || (album.add_series || album.is_admin)"
+                    class="align-middle"
+                    style="margin-right:1"
+                    name="star"
+                    color="grey"
+                  />
+                </span>
+                <span
+                  :class="row.item.SumComments[0]?'selected':''"
+                  @click="handleComments(row)"
+                >
+                  <v-icon
+                    v-if="row.item.SumComments[0]"
+                    class="align-middle"
+                    style="margin-right:1"
+                    name="comment-dots"
+                  />
+                  <v-icon
+                    v-else
+                    class="align-middle"
+                    style="margin-right:1"
+                    name="comment"
+                    color="grey"
+                  />
+                </span>
+                <a
+                  v-if="!filters.album_id || (album.download_series || album.is_admin)"
+                  href="#"
+                  class="download"
+                  @click="getURLDownload(row.item.StudyInstanceUID)"
+                >
+                  <v-icon
+                    class="align-middle"
+                    style="margin-right:1"
+                    name="download"
+                  />
+                </a>
+                <span
+                  v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
+                  @click="openViewer(row.item.StudyInstanceUID, 'Osirix')"
+                >
+                  <osirix-icon
+                    width="22px"
+                    height="22px"
+                  />
+                </span>
+                <span
+                  v-if="row.item.ModalitiesInStudy[0] !== 'SR'"
+                  @click="openViewer(row.item.StudyInstanceUID, 'Ohif')"
+                >
+                  <visibility-icon
+                    width="24px"
+                    height="24px"
+                  />
+                </span>
+                <!--
+                <span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
+                -->
+              </div>
             </div>
           </div>
-        </b-card>
-      </template>
-      <!-- Button next to patient name -->
-      <template
-        slot="PatientName"
-        slot-scope="row"
-      >
-        <div class="patientNameContainer">
-          <div class="row">
-            <div class="patientName col-md-auto">
-              {{ row.item.PatientName }}
-            </div>
-            <div class="patientName_ct col-md-auto d-block d-sm-none">
-              {{ row.item.ModalitiesInStudy [0] | formatModality }}
-            </div>
-            <div class="patientNameIcons col-md-auto">
-              <span
-                :class="row.item.is_favorite?'selected':''"
-                @click="toggleFavorite(row.item)"
-              >
-                <v-icon
-                  v-if="row.item.is_favorite"
-                  class="align-middle"
-                  style="margin-right:1"
-                  name="star"
-                />
-                <v-icon
-                  v-else-if="Object.keys(album).length === 0 || (album.add_series || album.is_admin)"
-                  class="align-middle"
-                  style="margin-right:1"
-                  name="star"
-                  color="grey"
-                />
-              </span>
-              <span
-                :class="row.item.SumComments[0]?'selected':''"
-                @click="handleComments(row)"
-              >
-                <v-icon
-                  v-if="row.item.SumComments[0]"
-                  class="align-middle"
-                  style="margin-right:1"
-                  name="comment-dots"
-                />
-                <v-icon
-                  v-else
-                  class="align-middle"
-                  style="margin-right:1"
-                  name="comment"
-                  color="grey"
-                />
-              </span>
-              <a
-                v-if="!filters.album_id || (album.download_series || album.is_admin)"
-                href="#"
-                class="download"
-                @click="getURLDownload(row.item.StudyInstanceUID)"
-              >
-                <v-icon
-                  class="align-middle"
-                  style="margin-right:1"
-                  name="download"
-                />
-              </a>
-              <span
-                v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
-                @click="openViewer(row.item.StudyInstanceUID, 'Osirix')"
-              >
-                <osirix-icon
-                  width="22px"
-                  height="22px"
-                />
-              </span>
-              <span
-                v-if="row.item.ModalitiesInStudy[0] !== 'SR'"
-                @click="openViewer(row.item.StudyInstanceUID, 'Ohif')"
-              >
-                <visibility-icon
-                  width="24px"
-                  height="24px"
-                />
-              </span>
-              <!--
-							<span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
-							-->
-            </div>
-          </div>
-        </div>
-      </template>
+        </template>
 
-      <template
-        slot="StudyDate"
-        slot-scope="data"
-      >
-        {{ data.item.StudyDate[0] | formatDate }}
-      </template>
+        <template
+          slot="StudyDate"
+          slot-scope="data"
+        >
+          {{ data.item.StudyDate[0] | formatDate }}
+        </template>
 
-      <template
-        slot="PatientID"
-        slot-scope="data"
-      >
-        {{ data.item.PatientID[0] }}
-      </template>
+        <template
+          slot="PatientID"
+          slot-scope="data"
+        >
+          {{ data.item.PatientID[0] }}
+        </template>
 
-      <template
-        slot="StudyDescription"
-        slot-scope="data"
-      >
-        {{ data.item.StudyDescription[0] }}
-      </template>
-    </b-table>
+        <template
+          slot="StudyDescription"
+          slot-scope="data"
+        >
+          {{ data.item.StudyDescription[0] }}
+        </template>
+      </b-table>
+    </div>
     <div
       v-if="studies.length===0"
       style="text-align:center;"
