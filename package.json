@@ -11,7 +11,7 @@
     "@dsb-norge/vue-keycloak-js": "^1.0.6",
     "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.14",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "mavon-editor": "^2.6.17",
     "moment": "^2.24.0",
     "vee-validate": "^2.1.7",
