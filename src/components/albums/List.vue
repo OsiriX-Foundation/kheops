@@ -13,7 +13,7 @@
 		"selectednbalbums": "{count} album is selected | {count} albums are selected",
 		"share": "Invite user",
 		"permissionsfailed": "You can't send this albums : ",
-    "send": "send",
+    "send": "The album {albumName} has been shared.",
     "nomodality": "No modality"
 	},
 	"fr": {
@@ -27,7 +27,7 @@
 		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
 		"share": "Inviter un utilisateur",
 		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
-		"send": "envoyés",
+		"send": "L'album {albumName} a été partagé.",
     "nomodality": "Aucune modalité"
 	}
 }
@@ -585,7 +585,7 @@ export default {
 				albumsSelected.forEach(album => {
 					this.$store.dispatch('add_user_to_album', { album_id: album.album_id, user_name: userSub })
 						.then(() => {
-							this.$snotify.success(`${album.name} ${this.$t('send')}`)
+							this.$snotify.success(`${this.$t('send', {albumName: album.name})}`)
 						})
 						.catch(res => {
 							this.$snotify.error(this.$t(res))
