@@ -4,16 +4,14 @@ package online.kheops.auth_server.resource;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.ViewerTokenAccess;
 import online.kheops.auth_server.assertion.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.principal.UserPrincipal;
-import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
@@ -115,7 +113,6 @@ public class TokenResource
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-        boolean pepScope = false;
         errorResponse.error = "Bad Request";
 
         if(scope != null) {
@@ -132,7 +129,6 @@ public class TokenResource
                     errorResponse.errorDescription = "'series_instance_uid' is not a valid UID";
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
-                pepScope = true;
             } else if (scope.equals("viewer")) {
                 if (studyInstanceUID == null || sourceType == null) {
                     errorResponse.errorDescription = "With the scope: 'viewer', 'study_instance_uid' and 'source_type' must be set";
@@ -174,7 +170,7 @@ public class TokenResource
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-        
+
         final String token;
         final long expiresIn;
 
@@ -203,7 +199,7 @@ public class TokenResource
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        if (pepScope) {
+        if (scope.equals("pep")) {
 
             if (assertion.getTokenType() == Assertion.TokenType.PEP_TOKEN ) {
                 errorResponse.error = "Unauthorized";
@@ -253,7 +249,7 @@ public class TokenResource
             token = jwtBuilder.sign(algorithmHMAC);
             expiresIn = 3600L;
 
-        } else { //viewerScope
+        } else if (scope.equals("viewer")) { //viewerScope
             // Generate a new Viewer token (JWE)
 
             if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ||
@@ -285,6 +281,41 @@ public class TokenResource
                 LOG.log(Level.SEVERE, "JoseException", e);
                 return Response.status(INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();//TODO
             }
+        } else if (scope.equals("report_provider_code")) {
+            //vérifier la permission de créer report_provider_code (user) pas capability token
+            if (assertion.getTokenType() == Assertion.TokenType.KEYCLOAK_TOKEN  ||
+                    assertion.getTokenType() == Assertion.TokenType.SUPER_USER_TOKEN) {
+                final User callingUser;
+                try {
+                    callingUser = getOrCreateUser(assertion.getSub());
+                } catch (UserNotFoundException e) {
+                    LOG.log(Level.WARNING, "User not found", e);
+                    errorResponse.errorDescription = "Unknown user";
+                    return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+                }
+                //vérifier l'acces a l'album
+                final KheopsPrincipalInterface principal = assertion.newPrincipal(callingUser);
+                try {
+                    if (principal.hasUserAccess() && principal.hasAlbumAccess(sourceId)) {
+                        //TODO vérifier que la study est dans l'album
+                        //générer le jwt
+                        token = "token";
+                        expiresIn = 120L; // 2minutes
+                    } else {
+                        return Response.status(FORBIDDEN).build();
+                    }
+                } catch (AlbumNotFoundException e) {
+                    errorResponse.error = "Not found";
+                    errorResponse.errorDescription = "Album : "+sourceId+" Not found";
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
+                }
+
+            } else {
+                return Response.status(FORBIDDEN).build();
+            }
+
+        } else {
+            return Response.status(BAD_REQUEST).build();
         }
 
         TokenResponse tokenResponse = new TokenResponse();
@@ -294,9 +325,11 @@ public class TokenResource
         if (returnUser) {
             tokenResponse.user = assertion.getSub();
         }
-        if(pepScope) {
+        if(scope.equals("pep")) {
             LOG.info(() -> "Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        } else { //viewerScope
+        } else if (scope.equals("viewer")) { //viewerScope
+            LOG.info(() ->"Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
+        } else if (scope.equals("report_provider_code")) { //viewerScope
             LOG.info(() ->"Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
         }
         return Response.status(OK).entity(tokenResponse).build();
