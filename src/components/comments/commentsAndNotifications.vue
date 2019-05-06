@@ -220,56 +220,59 @@
         </div>
       </div>
     </div>
-    <div class="row mt-4 justify-content-center">
-      <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
-        <b-form-checkbox
-          class="pt-1"
-          inline
-          @change="SetEnabledVariables()"
-        >
-          {{ $t("checkprivateuser") }}
-        </b-form-checkbox>
+    <div
+      v-if="scope === 'studies' || album.is_admin || album.write_comments"
+    >
+      <div class="row mt-4 justify-content-center">
+        <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
+          <b-form-checkbox
+            class="pt-1"
+            inline
+            @change="SetEnabledVariables()"
+          >
+            {{ $t("checkprivateuser") }}
+          </b-form-checkbox>
+        </div>
+        <div class="col-sm-6 col-md-4">
+          <add-user
+            :id="id ? id : album.album_id"
+            ref="privateuser"
+            :scope="scope"
+            :enable-add="enablePrivate"
+            @private-user="setPrivateUser"
+          />
+        </div>
       </div>
-      <div class="col-sm-6 col-md-4">
-        <add-user
-          :id="id ? id : album.album_id"
-          ref="privateuser"
-          :scope="scope"
-          :enable-add="enablePrivate"
-          @private-user="setPrivateUser"
-        />
-      </div>
-    </div>
-    <div class="row mt-2 justify-content-center">
-      <div class="col-sm-12 col-md-10 offset-md-1">
-        <form
-          v-if="scope === 'studies' || album.is_admin || album.write_comments"
-          @submit.prevent="addComment"
-        >
-          <div class="input-group mb-3">
-            <textarea
-              ref="textcomment"
-              v-model="newComment.comment"
-              class="form-control form-control-sm"
-              :placeholder="$t('writecomment')"
-              rows="2"
-              maxlength="1024"
-              :readonly="disabledText"
-              @keydown.enter.prevent="addComment"
-              @click="checkUserFromTextarea"
-            />
-            <div class="input-group-append">
-              <button
-                title="send comment"
-                type="submit"
-                class="btn btn-primary"
-                :disabled="newComment.comment.length < 2 || disabledText"
-              >
-                <v-icon name="paper-plane" />
-              </button>
+      <div class="row mt-2 justify-content-center">
+        <div class="col-sm-12 col-md-10 offset-md-1">
+          <form
+            @submit.prevent="addComment"
+          >
+            <div class="input-group mb-3">
+              <textarea
+                ref="textcomment"
+                v-model="newComment.comment"
+                class="form-control form-control-sm"
+                :placeholder="$t('writecomment')"
+                rows="2"
+                maxlength="1024"
+                :readonly="disabledText"
+                @keydown.enter.prevent="addComment"
+                @click="checkUserFromTextarea"
+              />
+              <div class="input-group-append">
+                <button
+                  title="send comment"
+                  type="submit"
+                  class="btn btn-primary"
+                  :disabled="newComment.comment.length < 2 || disabledText"
+                >
+                  <v-icon name="paper-plane" />
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
