@@ -166,7 +166,7 @@ public class TokenResource
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         } else {
-            errorResponse.errorDescription = "scope: must be 'pep' or 'viewer' not " + scope;
+            errorResponse.errorDescription = "scope: must be 'pep', 'viewer' or 'report_provider_code' not " + scope;
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
