@@ -82,17 +82,18 @@
     <div
       id="myHeader"
       ref="myHeader"
-      class=""
       :class="isActive ? 'sticky' : ''"
     >
-      <!--button Study selected -->
-      <div class="container-fluid my-3 selection-button-container">
-        <span
-          class="float-left"
-        >
+      <div
+        class="d-flex flex-wrap"
+      >
+        <div class="p-2">
           <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
+        </div>
+        <div
+          v-if="!filters.album_id || (album.is_admin || album.send_series)"
+        >
           <button
-            v-if="!filters.album_id || (album.is_admin || album.send_series)"
             type="button"
             class="btn btn-link btn-sm text-center"
             :disabled="disableBtnHeader"
@@ -106,8 +107,11 @@
             </span><br>
             {{ $t("send") }}
           </button>
+        </div>
+        <div
+          v-if="(!filters.album_id || (album.send_series || album.is_admin)) && allowedAlbums.length > 0"
+        >
           <b-dropdown
-            v-if="(!filters.album_id || (album.send_series || album.is_admin)) && allowedAlbums.length > 0"
             variant="link"
             size="sm"
             no-caret
@@ -129,14 +133,12 @@
               {{ allowedAlbum.name }}
             </b-dropdown-item>
           </b-dropdown>
-          <!--
-          <button type="button" class="btn btn-link btn-sm text-center" @click = "downloadSelectedStudies()">
-            <span><v-icon class="align-middle" name="download"></v-icon></span><br/>
-            {{ $t("download") }}
-          </button>
-          -->
+        </div>
+
+        <div
+          v-if="filters.album_id && (album.send_series || album.is_admin)"
+        >
           <button
-            v-if="filters.album_id && (album.send_series || album.is_admin)"
             type="button"
             class="btn btn-link btn-sm text-center"
             :disabled="disableBtnHeader"
@@ -150,8 +152,11 @@
             </span><br>
             {{ $t("addInbox") }}
           </button>
+        </div>
+        <div
+          v-if="!filters.album_id"
+        >
           <button
-            v-if="!filters.album_id"
             type="button"
             class="btn btn-link btn-sm text-center"
             :disabled="disableBtnHeader"
@@ -165,8 +170,11 @@
             </span><br>
             {{ $t(infoFavorites) }}
           </button>
+        </div>
+        <div
+          v-if="!filters.album_id || (album.is_admin || album.delete_series)"
+        >
           <button
-            v-if="!filters.album_id || (album.is_admin || album.delete_series)"
             type="button"
             class="btn btn-link btn-sm text-center"
             :disabled="disableBtnHeader"
@@ -180,27 +188,10 @@
             </span><br>
             {{ $t("delete") }}
           </button>
-        </span>
-        <!--
-        <span style = 'margin-left: 30px;' v-if='!filters.album_id'>
-          <toggle-button v-model="filters.inbox_and_albums" :labels="{checked: 'Yes', unchecked: 'No'}" />
-          <label class = 'ml-3'>{{$t('includeseriesfromalbum')}}</label>
-        </span>
-        -->
-
-        <button
-          type="button"
-          class="d-none d-sm-block btn btn-link btn-lg float-right"
-          @click="showFilters=!showFilters"
-        >
-          <v-icon
-            name="search"
-            scale="2"
-          />
-        </button>
-        <span
+        </div>
+        <div
           v-if="(!filters.album_id || (album.add_series || album.is_admin))"
-          class="float-right"
+          class="ml-auto"
         >
           <input
             id="file"
@@ -255,9 +246,23 @@
               {{ $t("draganddrop") }}
             </b-dropdown-text>
           </b-dropdown>
-        </span>
+        </div>
+
+        <div
+          class="d-none d-sm-block"
+        >
+          <button
+            type="button"
+            class=" btn btn-link btn-lg"
+            @click="showFilters=!showFilters"
+          >
+            <v-icon
+              name="search"
+              scale="2"
+            />
+          </button>
+        </div>
       </div>
-      <!--deleteSelectedStudies()-->
       <confirm-button
         v-if="confirmDelete && selectedStudiesNb"
         :btn-primary-text="$t('delete')"
@@ -273,6 +278,7 @@
         @cancel-user="form_send_study=false"
       />
     </div>
+
     <div class="content">
       <b-table
         class="container-fluid"
@@ -931,11 +937,10 @@ export default {
 					this.pageNb++
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
-				let sticky = _this.$refs.myHeader.offsetTop
-				console.log(window.pageYOffset)
-				if ((window.pageYOffset + 69) > sticky && !this.isActive) {
+        let sticky = _this.$refs.myHeader.offsetTop
+				if ((window.pageYOffset) > sticky && !this.isActive) {
 					this.isActive = true
-				} else if (window.pageYOffset < 145) {
+				} else if (window.pageYOffset < 194) {
 					this.isActive = false
 				}
 			}
@@ -1241,6 +1246,7 @@ export default {
     width: 100%;
     background: #555;
     z-index: 5;
+    opacity: 0.95;
   }
   .header {
     padding: 10px 16px;
