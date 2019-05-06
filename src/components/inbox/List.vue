@@ -244,9 +244,12 @@
                 </label>
               </b-dropdown-item-button>
               <b-dropdown-divider />
-              <b-dropdown-text class="m-3">
+              <b-dropdown-item-button
+                v-if="determineWebkitDirectory()"
+                @click="showDragAndDrop"
+              >
                 {{ $t("draganddrop") }}
-              </b-dropdown-text>
+              </b-dropdown-item-button>
             </b-dropdown>
           </div>
         </div>
@@ -944,7 +947,7 @@ export default {
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
 				let sticky = _this.$refs.myHeader.offsetTop
-        let studiesList = _this.$refs.studiesList.offsetTop
+				let studiesList = _this.$refs.studiesList.offsetTop
 				if ((window.pageYOffset) > sticky && !this.isActive) {
 					this.isActive = true
 				} else if (window.pageYOffset < studiesList) {
