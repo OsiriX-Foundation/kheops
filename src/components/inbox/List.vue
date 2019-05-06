@@ -269,8 +269,8 @@
       class="content"
     >
       <b-table
-        class="container-fluid"
         striped
+        responsive
         :items="studies"
         :fields="fields"
         :sort-desc="true"
