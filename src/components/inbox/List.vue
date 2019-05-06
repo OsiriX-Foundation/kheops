@@ -190,62 +190,65 @@
           </button>
         </div>
         <div
-          v-if="(!filters.album_id || (album.add_series || album.is_admin))"
           class="ml-auto"
         >
-          <input
-            id="file"
-            ref="inputfiles"
-            type="file"
-            name="file"
-            class="inputfile"
-            multiple
-            :disabled="sendingFiles"
-            @change="inputLoadFiles"
+          <div
+            v-if="(!filters.album_id || (album.add_series || album.is_admin))"
           >
+            <input
+              id="file"
+              ref="inputfiles"
+              type="file"
+              name="file"
+              class="inputfile"
+              multiple
+              :disabled="sendingFiles"
+              @change="inputLoadFiles"
+            >
 
-          <input
-            id="directory"
-            ref="inputdir"
-            type="file"
-            name="file"
-            class="inputfile"
-            webkitdirectory
-            :disabled="sendingFiles"
-            @change="inputLoadDirectories"
-          >
-          <b-dropdown
-            id="dropdown-divider"
-            class="m-2"
-            variant="link"
-            right
-          >
-            <template slot="button-content">
-              <add-icon
-                width="30px"
-                height="30px"
-              />
-            </template>
-            <b-dropdown-item-button
+            <input
+              id="directory"
+              ref="inputdir"
+              type="file"
+              name="file"
+              class="inputfile"
+              webkitdirectory
               :disabled="sendingFiles"
+              @change="inputLoadDirectories"
             >
-              <label for="file">
-                {{ $t("importfiles") }}
-              </label>
-            </b-dropdown-item-button>
-            <b-dropdown-item-button
-              v-if="determineWebkitDirectory()"
-              :disabled="sendingFiles"
+            <b-dropdown
+              id="dropdown-divider"
+              class="m-2"
+              variant="link"
+              right
             >
-              <label for="directory">
-                {{ $t("importdir") }}
-              </label>
-            </b-dropdown-item-button>
-            <b-dropdown-divider />
-            <b-dropdown-text class="m-3">
-              {{ $t("draganddrop") }}
-            </b-dropdown-text>
-          </b-dropdown>
+              <template slot="button-content">
+                <add-icon
+                  width="30px"
+                  height="30px"
+                />
+              </template>
+              <b-dropdown-item-button
+                :disabled="sendingFiles"
+              >
+                <label for="file">
+                  {{ $t("importfiles") }}
+                </label>
+              </b-dropdown-item-button>
+              <b-dropdown-item-button
+                v-if="determineWebkitDirectory()"
+                :disabled="sendingFiles"
+              >
+                <label for="directory">
+                  {{ $t("importdir") }}
+                </label>
+              </b-dropdown-item-button>
+              <b-dropdown-divider />
+              <b-dropdown-text class="m-3">
+                {{ $t("draganddrop") }}
+              </b-dropdown-text>
+            </b-dropdown>
+          </div>
         </div>
 
         <div
@@ -279,7 +282,10 @@
       />
     </div>
 
-    <div class="content">
+    <div
+      ref="studiesList"
+      class="content"
+    >
       <b-table
         class="container-fluid"
         striped
@@ -937,10 +943,11 @@ export default {
 					this.pageNb++
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
-        let sticky = _this.$refs.myHeader.offsetTop
+				let sticky = _this.$refs.myHeader.offsetTop
+				let studiesList = _this.$refs.studiesList.offsetTop
 				if ((window.pageYOffset) > sticky && !this.isActive) {
 					this.isActive = true
-				} else if (window.pageYOffset < 194) {
+				} else if (window.pageYOffset < studiesList) {
 					this.isActive = false
 				}
 			}
