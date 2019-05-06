@@ -18,10 +18,6 @@ public class AlbumSeries {
     @Column(name = "favorite")
     private boolean favorite   = true;
 
-    @Basic(optional = false)
-    @Column(name = "sharing_date")
-    private LocalDateTime sharingDate;
-
     @ManyToOne
     @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
     private Album album;
@@ -30,30 +26,12 @@ public class AlbumSeries {
     @JoinColumn (name = "series_fk", nullable=false, insertable = false, updatable = false)
     private Series series;
 
-    @ManyToOne
-    @JoinColumn (name = "sharing_source", nullable=true, insertable = false, updatable = false)
-    private User sharingSource;
-
     public AlbumSeries() {}
 
     public AlbumSeries(Album album, Series series) {
         this.album = album;
         this.series = series;
         favorite = false;
-    }
-
-    public AlbumSeries(Album album, Series series, User user) {
-        this.album = album;
-        this.series = series;
-        favorite = false;
-        sharingSource = user;
-        //user.set sharingsource TODO
-    }
-
-    @PrePersist
-    public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        sharingDate = now;
     }
 
     public void setFavorite(boolean favorite) { this.favorite = favorite; }

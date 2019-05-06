@@ -150,6 +150,21 @@ public class TokenResource
                     errorResponse.errorDescription = "'source_id' must be set when 'source_type'=" + ALBUM;
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
+
+            } else if (scope.equals("report_provider_code")) {
+                if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
+                    errorResponse.errorDescription = "With the scope: 'report_provider_code', 'study_instance_uid' must be set";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+                if (!checkValidUID(studyInstanceUID)) {
+                    errorResponse.errorDescription = "'study_instance_uid' is not a valid UID";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
+
+                if (sourceId.isEmpty() || sourceId == null) {
+                    errorResponse.errorDescription = "'source_id' must be set with the album id ";
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                }
             } else {
                 errorResponse.errorDescription = "scope: must be 'pep' or 'viewer' not " + scope;
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -159,8 +174,7 @@ public class TokenResource
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-
-        Response.Status responseStatus = OK;
+        
         final String token;
         final long expiresIn;
 
@@ -285,7 +299,7 @@ public class TokenResource
         } else { //viewerScope
             LOG.info(() ->"Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
         }
-        return Response.status(responseStatus).entity(tokenResponse).build();
+        return Response.status(OK).entity(tokenResponse).build();
     }
 
     @POST

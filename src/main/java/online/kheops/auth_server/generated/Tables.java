@@ -10,8 +10,8 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.DicomSr;
 import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
@@ -52,14 +52,14 @@ public class Tables {
     public static final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
 
     /**
-     * The table <code>public.dicom_sr</code>.
-     */
-    public static final DicomSr DICOM_SR = online.kheops.auth_server.generated.tables.DicomSr.DICOM_SR;
-
-    /**
      * The table <code>public.events</code>.
      */
     public static final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
+
+    /**
+     * The table <code>public.report_providers</code>.
+     */
+    public static final ReportProviders REPORT_PROVIDERS = online.kheops.auth_server.generated.tables.ReportProviders.REPORT_PROVIDERS;
 
     /**
      * The table <code>public.series</code>.

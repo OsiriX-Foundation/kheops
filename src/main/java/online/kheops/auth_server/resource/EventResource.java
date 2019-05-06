@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.album.BadQueryParametersException;
@@ -41,7 +42,7 @@ public class EventResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/events")
+    @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -92,7 +93,7 @@ public class EventResource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/comments")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,

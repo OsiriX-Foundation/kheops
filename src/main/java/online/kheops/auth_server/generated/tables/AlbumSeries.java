@@ -4,7 +4,6 @@
 package online.kheops.auth_server.generated.tables;
 
 
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
-    private static final long serialVersionUID = -1491896210;
+    private static final long serialVersionUID = -1898231029;
 
     /**
      * The reference instance of <code>public.album_series</code>
@@ -76,16 +75,6 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      * The column <code>public.album_series.favorite</code>.
      */
     public final TableField<AlbumSeriesRecord, Boolean> FAVORITE = createField("favorite", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
-
-    /**
-     * The column <code>public.album_series.sharing_date</code>.
-     */
-    public final TableField<AlbumSeriesRecord, Timestamp> SHARING_DATE = createField("sharing_date", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
-
-    /**
-     * The column <code>public.album_series.sharing_source</code>.
-     */
-    public final TableField<AlbumSeriesRecord, Long> SHARING_SOURCE = createField("sharing_source", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * Create a <code>public.album_series</code> table reference
@@ -165,7 +154,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
      */
     @Override
     public List<ForeignKey<AlbumSeriesRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AlbumSeriesRecord, ?>>asList(Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY, Keys.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY, Keys.ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY);
+        return Arrays.<ForeignKey<AlbumSeriesRecord, ?>>asList(Keys.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY, Keys.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY);
     }
 
     public Albums albums() {
@@ -174,10 +163,6 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
     public Series series() {
         return new Series(this, Keys.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY);
-    }
-
-    public Users users() {
-        return new Users(this, Keys.ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY);
     }
 
     /**

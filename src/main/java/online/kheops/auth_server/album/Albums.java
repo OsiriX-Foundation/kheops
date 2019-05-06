@@ -21,26 +21,8 @@ import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Albums {
 
-    private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    private static final int ID_LENGTH = 10;
-    public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-    private static final Random rdm = new SecureRandom();
-
     private Albums() {
         throw new IllegalStateException("Utility class");
-    }
-
-    public static String newAlbumID() {
-        final StringBuilder idBuilder = new StringBuilder();
-
-        do {
-            idBuilder.setLength(0);
-            while (idBuilder.length() < ID_LENGTH) {
-                int index = rdm.nextInt(DICT.length());
-                idBuilder.append(DICT.charAt(index));
-            }
-        } while (albumExist(idBuilder.toString()));
-        return idBuilder.toString();
     }
 
     public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)

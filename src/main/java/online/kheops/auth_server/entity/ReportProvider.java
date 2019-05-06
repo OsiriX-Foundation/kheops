@@ -1,13 +1,16 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.report_provider.ClientId;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "dicom_sr")
+@Table(name = "report_providers")
 
-public class DicomSr {
+public class ReportProvider {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -22,14 +25,6 @@ public class DicomSr {
     @Column(name = "client_id")
     private String clientId;
 
-    @Basic(optional = true)
-    @Column(name = "client_secret")
-    private String clientSecret;
-
-    @Basic(optional = false)
-    @Column(name = "private")
-    private Boolean isPrivate;
-
     @Basic(optional = false)
     @Column(name = "url")
     private String url;
@@ -39,32 +34,29 @@ public class DicomSr {
     private String name;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
-    public DicomSr(String clientId, String clientSecret, String url, String name, Album album, User user) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.url = url;
-        this.name = name;
-        this.album = album;
-        this.user = user;
-        album.addDicomSr(this);
-        user.addDicomSr(this);
+    @PrePersist
+    public void onPrePersist() {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        creationTime = now;
     }
 
-    public DicomSr(String clientId, String url, String name, Album album, User user) {
-        this.clientId = clientId;
+    public ReportProvider() {}
+
+    public ReportProvider(String url, String name, Album album, User user) {
+        this.clientId = new ClientId().getClientId();
         this.url = url;
         this.name = name;
         this.album = album;
         this.user = user;
-        album.addDicomSr(this);
-        user.addDicomSr(this);
+        album.addReportProvider(this);
+        user.addReportProvider(this);
     }
 
     public LocalDateTime getCreationTime() {
@@ -73,14 +65,6 @@ public class DicomSr {
 
     public String getClientId() {
         return clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
-    public Boolean isPrivate() {
-        return isPrivate;
     }
 
     public String getUrl() {

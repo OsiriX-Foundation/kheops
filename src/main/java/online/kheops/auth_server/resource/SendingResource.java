@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
@@ -261,7 +262,7 @@ public class SendingResource
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.ADD_SERIES)
-    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response putSeriesInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
@@ -291,7 +292,7 @@ public class SendingResource
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ Albums.ID_PATTERN+"}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}")
     public Response putStudyInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) String fromAlbumId,
@@ -335,7 +336,7 @@ public class SendingResource
     @Secured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.DELETE_SERIES)
-    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteStudyFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
 
@@ -355,7 +356,7 @@ public class SendingResource
     @Secured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.DELETE_SERIES)
-    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}")
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteSeriesFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                           @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {

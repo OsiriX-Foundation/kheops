@@ -10,8 +10,8 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.DicomSr;
 import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
@@ -19,8 +19,8 @@ import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
 import online.kheops.auth_server.generated.tables.records.CapabilitiesRecord;
-import online.kheops.auth_server.generated.tables.records.DicomSrRecord;
 import online.kheops.auth_server.generated.tables.records.EventsRecord;
+import online.kheops.auth_server.generated.tables.records.ReportProvidersRecord;
 import online.kheops.auth_server.generated.tables.records.SeriesRecord;
 import online.kheops.auth_server.generated.tables.records.StudiesRecord;
 import online.kheops.auth_server.generated.tables.records.UsersRecord;
@@ -53,8 +53,8 @@ public class Keys {
     public static final Identity<AlbumUserRecord, Long> IDENTITY_ALBUM_USER = Identities0.IDENTITY_ALBUM_USER;
     public static final Identity<AlbumsRecord, Long> IDENTITY_ALBUMS = Identities0.IDENTITY_ALBUMS;
     public static final Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Identities0.IDENTITY_CAPABILITIES;
-    public static final Identity<DicomSrRecord, Long> IDENTITY_DICOM_SR = Identities0.IDENTITY_DICOM_SR;
     public static final Identity<EventsRecord, Long> IDENTITY_EVENTS = Identities0.IDENTITY_EVENTS;
+    public static final Identity<ReportProvidersRecord, Long> IDENTITY_REPORT_PROVIDERS = Identities0.IDENTITY_REPORT_PROVIDERS;
     public static final Identity<SeriesRecord, Long> IDENTITY_SERIES = Identities0.IDENTITY_SERIES;
     public static final Identity<StudiesRecord, Long> IDENTITY_STUDIES = Identities0.IDENTITY_STUDIES;
     public static final Identity<UsersRecord, Long> IDENTITY_USERS = Identities0.IDENTITY_USERS;
@@ -72,9 +72,9 @@ public class Keys {
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = UniqueKeys0.CAPABILITIES_PK;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = UniqueKeys0.CAPABILITIES_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = UniqueKeys0.CAPABILITIES_SECRET_UNIQUE;
-    public static final UniqueKey<DicomSrRecord> DICOM_SR_PK = UniqueKeys0.DICOM_SR_PK;
-    public static final UniqueKey<DicomSrRecord> DICOM_SR_CLIENT_ID_UNIQUE = UniqueKeys0.DICOM_SR_CLIENT_ID_UNIQUE;
     public static final UniqueKey<EventsRecord> EVENT_PK = UniqueKeys0.EVENT_PK;
+    public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = UniqueKeys0.REPORT_PROVIDERS_PK;
+    public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = UniqueKeys0.REPORT_PROVIDERS_CLIENT_ID_UNIQUE;
     public static final UniqueKey<SeriesRecord> SERIES_PK = UniqueKeys0.SERIES_PK;
     public static final UniqueKey<SeriesRecord> SERIES_UID_UNIQUE = UniqueKeys0.SERIES_UID_UNIQUE;
     public static final UniqueKey<StudiesRecord> STUDIES_PK = UniqueKeys0.STUDIES_PK;
@@ -88,13 +88,10 @@ public class Keys {
 
     public static final ForeignKey<AlbumSeriesRecord, AlbumsRecord> ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY = ForeignKeys0.ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY;
     public static final ForeignKey<AlbumSeriesRecord, SeriesRecord> ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY = ForeignKeys0.ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY;
-    public static final ForeignKey<AlbumSeriesRecord, UsersRecord> ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY = ForeignKeys0.ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY;
     public static final ForeignKey<AlbumUserRecord, AlbumsRecord> ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY = ForeignKeys0.ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY;
     public static final ForeignKey<AlbumUserRecord, UsersRecord> ALBUM_USER__ALBUM_USER_USER_FK_FKEY = ForeignKeys0.ALBUM_USER__ALBUM_USER_USER_FK_FKEY;
     public static final ForeignKey<CapabilitiesRecord, UsersRecord> CAPABILITIES__CAPABILITIES_USER_FK_FKEY = ForeignKeys0.CAPABILITIES__CAPABILITIES_USER_FK_FKEY;
     public static final ForeignKey<CapabilitiesRecord, AlbumsRecord> CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY = ForeignKeys0.CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY;
-    public static final ForeignKey<DicomSrRecord, AlbumsRecord> DICOM_SR__DICOM_SR_ALBUM_FK_FKEY = ForeignKeys0.DICOM_SR__DICOM_SR_ALBUM_FK_FKEY;
-    public static final ForeignKey<DicomSrRecord, UsersRecord> DICOM_SR__DICOM_SR_USER_FK_FKEY = ForeignKeys0.DICOM_SR__DICOM_SR_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, AlbumsRecord> EVENTS__EVENT_ALBUM_FK_FKEY = ForeignKeys0.EVENTS__EVENT_ALBUM_FK_FKEY;
     public static final ForeignKey<EventsRecord, StudiesRecord> EVENTS__EVENT_STUDY_FK_FKEY = ForeignKeys0.EVENTS__EVENT_STUDY_FK_FKEY;
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_USER_FK_FKEY;
@@ -102,6 +99,8 @@ public class Keys {
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_TO_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_TO_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, SeriesRecord> EVENTS__EVENT_SERIES_FK_FKEY = ForeignKeys0.EVENTS__EVENT_SERIES_FK_FKEY;
+    public static final ForeignKey<ReportProvidersRecord, AlbumsRecord> REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY = ForeignKeys0.REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY;
+    public static final ForeignKey<ReportProvidersRecord, UsersRecord> REPORT_PROVIDERS__REPORT_PROVIDERS_USER_FK_FKEY = ForeignKeys0.REPORT_PROVIDERS__REPORT_PROVIDERS_USER_FK_FKEY;
     public static final ForeignKey<SeriesRecord, StudiesRecord> SERIES__SERIES_STUDY_FK_FKEY = ForeignKeys0.SERIES__SERIES_STUDY_FK_FKEY;
     public static final ForeignKey<UsersRecord, AlbumsRecord> USERS__USERS_INBOX_FK_FKEY = ForeignKeys0.USERS__USERS_INBOX_FK_FKEY;
 
@@ -114,8 +113,8 @@ public class Keys {
         public static Identity<AlbumUserRecord, Long> IDENTITY_ALBUM_USER = Internal.createIdentity(AlbumUser.ALBUM_USER, AlbumUser.ALBUM_USER.PK);
         public static Identity<AlbumsRecord, Long> IDENTITY_ALBUMS = Internal.createIdentity(Albums.ALBUMS, Albums.ALBUMS.PK);
         public static Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Internal.createIdentity(Capabilities.CAPABILITIES, Capabilities.CAPABILITIES.PK);
-        public static Identity<DicomSrRecord, Long> IDENTITY_DICOM_SR = Internal.createIdentity(DicomSr.DICOM_SR, DicomSr.DICOM_SR.PK);
         public static Identity<EventsRecord, Long> IDENTITY_EVENTS = Internal.createIdentity(Events.EVENTS, Events.EVENTS.PK);
+        public static Identity<ReportProvidersRecord, Long> IDENTITY_REPORT_PROVIDERS = Internal.createIdentity(ReportProviders.REPORT_PROVIDERS, ReportProviders.REPORT_PROVIDERS.PK);
         public static Identity<SeriesRecord, Long> IDENTITY_SERIES = Internal.createIdentity(Series.SERIES, Series.SERIES.PK);
         public static Identity<StudiesRecord, Long> IDENTITY_STUDIES = Internal.createIdentity(Studies.STUDIES, Studies.STUDIES.PK);
         public static Identity<UsersRecord, Long> IDENTITY_USERS = Internal.createIdentity(Users.USERS, Users.USERS.PK);
@@ -131,9 +130,9 @@ public class Keys {
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_pk", Capabilities.CAPABILITIES.PK);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_id_unique", Capabilities.CAPABILITIES.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_secret_unique", Capabilities.CAPABILITIES.SECRET);
-        public static final UniqueKey<DicomSrRecord> DICOM_SR_PK = Internal.createUniqueKey(DicomSr.DICOM_SR, "dicom_sr_pk", DicomSr.DICOM_SR.PK);
-        public static final UniqueKey<DicomSrRecord> DICOM_SR_CLIENT_ID_UNIQUE = Internal.createUniqueKey(DicomSr.DICOM_SR, "dicom_sr_client_id_unique", DicomSr.DICOM_SR.CLIENT_ID);
         public static final UniqueKey<EventsRecord> EVENT_PK = Internal.createUniqueKey(Events.EVENTS, "event_pk", Events.EVENTS.PK);
+        public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_pk", ReportProviders.REPORT_PROVIDERS.PK);
+        public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_client_id_unique", ReportProviders.REPORT_PROVIDERS.CLIENT_ID);
         public static final UniqueKey<SeriesRecord> SERIES_PK = Internal.createUniqueKey(Series.SERIES, "series_pk", Series.SERIES.PK);
         public static final UniqueKey<SeriesRecord> SERIES_UID_UNIQUE = Internal.createUniqueKey(Series.SERIES, "series_uid_unique", Series.SERIES.SERIES_UID);
         public static final UniqueKey<StudiesRecord> STUDIES_PK = Internal.createUniqueKey(Studies.STUDIES, "studies_pk", Studies.STUDIES.PK);
@@ -145,13 +144,10 @@ public class Keys {
     private static class ForeignKeys0 {
         public static final ForeignKey<AlbumSeriesRecord, AlbumsRecord> ALBUM_SERIES__ALBUM_SERIES_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, AlbumSeries.ALBUM_SERIES, "album_series__album_series_album_fk_fkey", AlbumSeries.ALBUM_SERIES.ALBUM_FK);
         public static final ForeignKey<AlbumSeriesRecord, SeriesRecord> ALBUM_SERIES__ALBUM_SERIES_SERIES_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.SERIES_PK, AlbumSeries.ALBUM_SERIES, "album_series__album_series_series_fk_fkey", AlbumSeries.ALBUM_SERIES.SERIES_FK);
-        public static final ForeignKey<AlbumSeriesRecord, UsersRecord> ALBUM_SERIES__ALBUM_SERIES_SHARING_SOURCE_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, AlbumSeries.ALBUM_SERIES, "album_series__album_series_sharing_source_fkey", AlbumSeries.ALBUM_SERIES.SHARING_SOURCE);
         public static final ForeignKey<AlbumUserRecord, AlbumsRecord> ALBUM_USER__ALBUM_USER_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, AlbumUser.ALBUM_USER, "album_user__album_user_album_fk_fkey", AlbumUser.ALBUM_USER.ALBUM_FK);
         public static final ForeignKey<AlbumUserRecord, UsersRecord> ALBUM_USER__ALBUM_USER_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, AlbumUser.ALBUM_USER, "album_user__album_user_user_fk_fkey", AlbumUser.ALBUM_USER.USER_FK);
         public static final ForeignKey<CapabilitiesRecord, UsersRecord> CAPABILITIES__CAPABILITIES_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Capabilities.CAPABILITIES, "capabilities__capabilities_user_fk_fkey", Capabilities.CAPABILITIES.USER_FK);
         public static final ForeignKey<CapabilitiesRecord, AlbumsRecord> CAPABILITIES__CAPABILITIES_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, Capabilities.CAPABILITIES, "capabilities__capabilities_album_fk_fkey", Capabilities.CAPABILITIES.ALBUM_FK);
-        public static final ForeignKey<DicomSrRecord, AlbumsRecord> DICOM_SR__DICOM_SR_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, DicomSr.DICOM_SR, "dicom_sr__dicom_sr_album_fk_fkey", DicomSr.DICOM_SR.ALBUM_FK);
-        public static final ForeignKey<DicomSrRecord, UsersRecord> DICOM_SR__DICOM_SR_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, DicomSr.DICOM_SR, "dicom_sr__dicom_sr_user_fk_fkey", DicomSr.DICOM_SR.USER_FK);
         public static final ForeignKey<EventsRecord, AlbumsRecord> EVENTS__EVENT_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, Events.EVENTS, "events__event_album_fk_fkey", Events.EVENTS.ALBUM_FK);
         public static final ForeignKey<EventsRecord, StudiesRecord> EVENTS__EVENT_STUDY_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.STUDIES_PK, Events.EVENTS, "events__event_study_fk_fkey", Events.EVENTS.STUDY_FK);
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_user_fk_fkey", Events.EVENTS.USER_FK);
@@ -159,6 +155,8 @@ public class Keys {
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_private_target_user_fk_fkey", Events.EVENTS.PRIVATE_TARGET_USER_FK);
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_TO_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_to_user_fk_fkey", Events.EVENTS.TO_USER_FK);
         public static final ForeignKey<EventsRecord, SeriesRecord> EVENTS__EVENT_SERIES_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.SERIES_PK, Events.EVENTS, "events__event_series_fk_fkey", Events.EVENTS.SERIES_FK);
+        public static final ForeignKey<ReportProvidersRecord, AlbumsRecord> REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, ReportProviders.REPORT_PROVIDERS, "report_providers__report_providers_album_fk_fkey", ReportProviders.REPORT_PROVIDERS.ALBUM_FK);
+        public static final ForeignKey<ReportProvidersRecord, UsersRecord> REPORT_PROVIDERS__REPORT_PROVIDERS_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, ReportProviders.REPORT_PROVIDERS, "report_providers__report_providers_user_fk_fkey", ReportProviders.REPORT_PROVIDERS.USER_FK);
         public static final ForeignKey<SeriesRecord, StudiesRecord> SERIES__SERIES_STUDY_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.STUDIES_PK, Series.SERIES, "series__series_study_fk_fkey", Series.SERIES.STUDY_FK);
         public static final ForeignKey<UsersRecord, AlbumsRecord> USERS__USERS_INBOX_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, Users.USERS, "users__users_inbox_fk_fkey", Users.USERS.INBOX_FK);
     }

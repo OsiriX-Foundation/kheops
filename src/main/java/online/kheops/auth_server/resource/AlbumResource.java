@@ -111,7 +111,7 @@ public class AlbumResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -146,7 +146,7 @@ public class AlbumResource {
     @Secured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.EDIT_ALBUM)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response editAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -197,7 +197,7 @@ public class AlbumResource {
     @Secured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.DELETE_ALBUM)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
 
@@ -219,7 +219,7 @@ public class AlbumResource {
     @AlbumAccessSecured
     @UserAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.LIST_USERS)
-    @Path("albums/{album:"+Albums.ID_PATTERN+"}/users")
+    @Path("albums/{album:"+AlbumId.ID_PATTERN+"}/users")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsersAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
@@ -245,7 +245,7 @@ public class AlbumResource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.ADD_USER)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/users/{user}")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                             @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
@@ -270,7 +270,7 @@ public class AlbumResource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.ADD_ADMIN)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/users/{user}/admin")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                              @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
@@ -295,7 +295,7 @@ public class AlbumResource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.REMOVE_ADMIN)
-    @Path("albums/{album:"+Albums.ID_PATTERN+"}/users/{user}/admin")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                 @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
@@ -317,7 +317,7 @@ public class AlbumResource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.REMOVE_USER)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/users/{user}")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
@@ -341,7 +341,7 @@ public class AlbumResource {
     @Secured
     @AlbumAccessSecured
     @UserAccessSecured
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/favorites")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addFavorites(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
 
@@ -362,7 +362,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/favorites")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteFavorites(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
 

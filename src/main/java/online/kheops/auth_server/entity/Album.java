@@ -1,5 +1,6 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.*;
@@ -7,8 +8,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
-
-import static online.kheops.auth_server.album.Albums.newAlbumID;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
@@ -82,15 +81,15 @@ public class Album {
     private Set<Capability> capabilities = new HashSet<>();
 
     @OneToMany
-    @JoinColumn (name = "album_fk")
-    private Set<DicomSr> dicomSr = new HashSet<>();
+    @JoinColumn (name = "album_fk", nullable=true)
+    private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         lastEventTime = now;
-        id = newAlbumID();
+        id = new AlbumId().getId();
     }
 
     public Album() {}
@@ -198,7 +197,10 @@ public class Album {
 
     public Set<Capability> getCapabilities() { return capabilities; }
 
-    public void addDicomSr(DicomSr dicomSr) { this.dicomSr.add(dicomSr); }
+    public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
-    public Set<DicomSr> getDicomSr() { return dicomSr; }
+    @Override
+    public String toString() {
+        return "[Album_id:"+id+"]";
+    }
 }
