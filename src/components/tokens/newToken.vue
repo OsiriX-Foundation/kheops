@@ -254,7 +254,7 @@ export default {
 				appropriate_permission: false,
 				download_permission: false,
 				not_before_time: moment().toDate(),
-				expiration_time: moment().add(7, 'days').toDate()
+				expiration_time: moment().add(1, 'months').toDate()
 			},
 			scopes: ['user', 'album']
 		}
