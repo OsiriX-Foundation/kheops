@@ -39,8 +39,8 @@ import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 @Path("/")
-public final class WadoRSSeries {
-    private static final Logger LOG = Logger.getLogger(WadoRSSeries.class.getName());
+public final class WadoRSStudy {
+    private static final Logger LOG = Logger.getLogger(WadoRSStudy.class.getName());
     private static final Client CLIENT = newClient();
 
     private static Client newClient() {
