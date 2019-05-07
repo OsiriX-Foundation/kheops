@@ -44,24 +44,20 @@
       <h4>
         Report Providers
       </h4>
-      <!--
       <b-table
         stacked="sm"
         striped
         hover
         :items="providers"
-        :fields="fields"
         :sort-desc="true"
-        :sort-by.sync="sortBy"
         tbody-tr-class="link"
-      >
-      </b-table>
-      -->
+      />
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import NewProvider from '@/components/providers/NewProvider'
 
 export default {
@@ -80,6 +76,9 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters({
+			providers: 'providers'
+		})
 	}
 }
 </script>
