@@ -1,0 +1,28 @@
+<template>
+  <div
+    class="container"
+  >
+    <providers
+      :album-i-d="album.album_id"
+    />
+  </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+import Providers from '@/components/providers/Providers'
+
+export default {
+	name: 'AlbumSettingsReportProvider',
+	components: { Providers },
+	data () {
+		return {
+		}
+	},
+	computed: {
+		...mapGetters({
+			album: 'album'
+		})
+	}
+}
+</script>
