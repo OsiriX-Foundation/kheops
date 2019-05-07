@@ -28,7 +28,7 @@
     <context-param>
         <description>Root url of the Kheops service</description>
         <param-name>online.kheops.root.uri</param-name>
-        <param-value>http://localhost:8042/api</param-value>
+        <param-value>http://localhost:8042</param-value>
     </context-param>
     <context-param>
         <description>HMAC shared secret used to sign tokens used for post</description>

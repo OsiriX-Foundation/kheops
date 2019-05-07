@@ -72,7 +72,8 @@ public class WadoRSSeriesInstances {
 
         WebTarget webTarget = CLIENT.target(instanceQidoServiceURI)
                 .path("/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances")
-                .resolveTemplate("StudyInstanceUID", studyInstanceUID);
+                .resolveTemplate("StudyInstanceUID", studyInstanceUID)
+                .resolveTemplate("SeriesInstanceUID", seriesInstanceUID);
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
             webTarget = webTarget.queryParam(parameter.getKey(), parameter.getValue().toArray());
         }
@@ -109,7 +110,8 @@ public class WadoRSSeriesInstances {
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        return Response.ok(attributes)
+        GenericEntity<List<Attributes>> list = new GenericEntity<List<Attributes>>(attributes) {};
+        return Response.ok(list)
                 .cacheControl(cacheControl)
                 .build();
     }
