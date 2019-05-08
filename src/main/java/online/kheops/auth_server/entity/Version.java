@@ -1,9 +1,6 @@
 package online.kheops.auth_server.entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @SuppressWarnings("unused")
 @Entity
@@ -11,6 +8,7 @@ import javax.persistence.Table;
 
 public class Version {
 
+    @Id
     @Basic(optional = false)
     @Column(name = "version")
     private String version;
