@@ -9,6 +9,7 @@ import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.ViewerTokenAccess;
 import online.kheops.auth_server.assertion.*;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
@@ -39,6 +40,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -296,11 +299,18 @@ public class TokenResource
                 //vérifier l'acces a l'album
                 final KheopsPrincipalInterface principal = assertion.newPrincipal(callingUser);
                 try {
-                    if (principal.hasUserAccess() && principal.hasAlbumAccess(sourceId)) {
-                        //TODO vérifier que la study est dans l'album
-                        //générer le jwt
-                        token = "token";
-                        expiresIn = 120L; // 2minutes
+                    if (principal.hasUserAccess() && principal.hasAlbumAccess(sourceId) ) {
+                        final Album album = getAlbum(sourceId);
+                        if (canAccessStudy(album, studyInstanceUID)) {
+                            //TODO vérifier que la study est dans l'album
+
+                            //générer le jwt
+                            token = "token";
+                            expiresIn = 120L; // 2minutes
+                        } else {
+                            return Response.status(FORBIDDEN).build();
+                        }
+
                     } else {
                         return Response.status(FORBIDDEN).build();
                     }

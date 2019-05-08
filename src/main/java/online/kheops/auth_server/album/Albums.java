@@ -362,7 +362,18 @@ public class Albums {
     public static Album getAlbum(String albumId, EntityManager em)
             throws AlbumNotFoundException {
 
-            return findAlbumById(albumId, em);
+        return findAlbumById(albumId, em);
+    }
+
+    public static Album getAlbum(String albumId)
+            throws AlbumNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            return getAlbum(albumId, em);
+        } finally {
+            em.close();
+        }
     }
 
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)

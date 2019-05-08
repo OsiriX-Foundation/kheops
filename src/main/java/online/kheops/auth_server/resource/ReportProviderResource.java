@@ -2,10 +2,7 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.annotation.AlbumAccessSecured;
-import online.kheops.auth_server.annotation.AlbumPermissionSecured;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UserAccessSecured;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserPermissionEnum;
@@ -19,6 +16,7 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.report_provider.ReportProviders.newReportProvider;
 import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 
 
 @Path("/")
@@ -68,6 +66,20 @@ public class ReportProviderResource {
         return Response.status(OK).entity(dicomSrResponse).build();
     }
 
+
+    @POST
+    @Path("reportprovider")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response reportProvider(@FormParam("access_token") final String accessToken,
+                                   @FormParam("clientId") final String clientId,
+                                   @FormParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
+
+
+
+
+
+        return Response.status(FOUND).build();
+    }
 
     /*
     TODO

@@ -423,6 +423,36 @@ public class Studies {
         }
     }
 
+    public static boolean canAccessStudy(Album album, Study study) {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            StudyQueries.findStudyByStudyandAlbum(study, album, em);
+            return true;
+
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static boolean canAccessStudy(Album album, String studyUID) {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            StudyQueries.findStudyByStudyandAlbum(studyUID, album, em);
+            return true;
+
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
     public static void editFavorites(User callingUser, String studyInstanceUID, String fromAlbumId, boolean favorite)
             throws AlbumNotFoundException, StudyNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
