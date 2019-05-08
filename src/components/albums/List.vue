@@ -585,7 +585,7 @@ export default {
 				albumsSelected.forEach(album => {
 					this.$store.dispatch('add_user_to_album', { album_id: album.album_id, user_name: userSub })
 						.then(() => {
-							this.$snotify.success(`${this.$t('send', {albumName: album.name})}`)
+							this.$snotify.success(`${this.$t('send', { albumName: album.name })}`)
 						})
 						.catch(res => {
 							this.$snotify.error(this.$t(res))
