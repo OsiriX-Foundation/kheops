@@ -95,7 +95,15 @@ export default {
 	},
 	methods: {
 		createProvider () {
-			this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID })
+			this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then(res => {
+				if (res.status !== 200) {
+					this.$snotify.error('Sorry, an error occured')
+				} else {
+					this.$emit('done')
+				}
+			}).catch(err => {
+				console.log(err)
+			})
 		},
 		cancel () {
 			this.$emit('done')

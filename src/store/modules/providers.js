@@ -12,6 +12,8 @@ const getters = {
 
 const actions = {
 	getProviders ({ commit }, params) {
+		console.log('hello !!')
+		params.providers = []
 		commit('SET_PROVIDERS', params)
 	},
 	getProvider ({ commit }, params) {
@@ -27,9 +29,12 @@ const actions = {
 			queries += `${key}=${params.query[key]}&`
 		}
 		return HTTP.post('/albums/' + albumID + '/reportprovider', queries, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
-			console.log(res)
-		}).catch(res => {
-			console.log(res)
+			if (res.status === 200) {
+				dispatch('getProviders', { albumID: albumID })
+			}
+			return res
+		}).catch(err => {
+			return err
 		})
 	}
 }
