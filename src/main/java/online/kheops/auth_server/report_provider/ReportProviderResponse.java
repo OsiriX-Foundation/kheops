@@ -5,6 +5,7 @@ import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
+import javax.json.JsonObject;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 
@@ -20,10 +21,24 @@ public class ReportProviderResponse {
     private UserResponse user;
     @XmlElement(name = "created_time")
     private LocalDateTime createdTime;
+    @XmlElement(name = "config")
+    private JsonObject config;
 
     private ReportProviderResponse() { /*empty*/ }
 
     protected ReportProviderResponse(ReportProvider reportProvider) {
+        name = reportProvider.getName();
+        url = reportProvider.getUrl();
+        clientId = reportProvider.getClientId();
+
+        final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
+        user = userResponseBuilder.setSub(reportProvider.getUser().getKeycloakId()).setEmail(reportProvider.getUser().getEmail()).build();
+
+        createdTime = reportProvider.getCreationTime();
+    }
+
+    protected ReportProviderResponse(ReportProvider reportProvider, JsonObject config) {
+        this.config = config;
         name = reportProvider.getName();
         url = reportProvider.getUrl();
         clientId = reportProvider.getClientId();

@@ -9,11 +9,9 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;

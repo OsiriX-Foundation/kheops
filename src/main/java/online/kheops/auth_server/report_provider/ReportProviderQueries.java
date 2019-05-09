@@ -4,6 +4,7 @@ package online.kheops.auth_server.report_provider;
 import online.kheops.auth_server.entity.ReportProvider;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 public class ReportProviderQueries {
 
@@ -18,10 +19,10 @@ public class ReportProviderQueries {
                 .getSingleResult();
     }
 
-    public static ReportProvider getReportProviderWithClientSecret(String clientSecret, EntityManager em) {
+    public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, EntityManager em) {
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr where :clientSecret = dsr.clientSecret", ReportProvider.class)
-                .setParameter("clientSecret", clientSecret)
-                .getSingleResult();
+        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id", ReportProvider.class)
+                .setParameter("albumId", albumId)
+                .getResultList();
     }
 }

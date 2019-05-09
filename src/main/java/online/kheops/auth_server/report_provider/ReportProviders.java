@@ -6,10 +6,24 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
+
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProvidersWithAlbumId;
 
 public class ReportProviders {
 
@@ -44,5 +58,120 @@ public class ReportProviders {
         }
 
         return new ReportProviderResponse(reportProvider);
+    }
+
+    public static JsonObject callConfigURL(ReportProvider reportProvider) {
+        final Response response = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            String output = response.readEntity(String.class);
+            try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                JsonObject reply = jsonReader.readObject();
+                return reply;
+            }
+        }
+        return null;//TODO throws exception
+
+    }
+
+    public static String getRedirectUri(ReportProvider reportProvider) {
+        JsonObject reply = callConfigURL(reportProvider);
+        return reply.getString("redirect_uri");
+    }
+
+    public static String getJwksUri(ReportProvider reportProvider) {
+        JsonObject reply = callConfigURL(reportProvider);
+        return reply.getString("jwks_uri");
+    }
+
+    public static boolean isValidConfigUrl(String configUrl) {
+
+        try {
+            new URI(configUrl);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+
+        final Response response = ClientBuilder.newClient().target(configUrl).request().get();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            String output = response.readEntity(String.class);
+            try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                final JsonObject reply = jsonReader.readObject();
+                return reply.containsKey("redirect_uri") && reply.containsKey("token_endpoint_auth_method") && reply.containsKey("jwks_uri");
+            }
+        }
+        return false;
+    }
+
+
+    public static List<ReportProviderResponse> getReportProviders(String albumId) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final List<ReportProviderResponse> reportProviders = new ArrayList<>();
+        final List<ReportProvider> reportProvidersEntity;
+
+        try {
+            tx.begin();
+            reportProvidersEntity = getReportProvidersWithAlbumId(albumId, em);
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+
+        for (ReportProvider reportProvider : reportProvidersEntity) {
+            reportProviders.add(new ReportProviderResponse(reportProvider));
+        }
+        return reportProviders;
+    }
+
+    public static ReportProviderResponse getReportProvider(String albumId, String clientId)
+            throws ClientIdNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final ReportProvider reportProvider;
+        final JsonObject config;
+
+        try {
+            tx.begin();
+
+            reportProvider = getReportProviderWithClientId(clientId, em);
+            config = callConfigURL(reportProvider);
+
+            tx.commit();
+        } catch (NoResultException e) {
+            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+
+        return new ReportProviderResponse(reportProvider, config);
+    }
+
+    public static void deleteReportProvider(String albumId, String clientId)
+            throws ClientIdNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final ReportProvider reportProvider;
+
+        try {
+            tx.begin();
+
+            reportProvider = getReportProviderWithClientId(clientId, em);
+            em.remove(reportProvider);
+
+            tx.commit();
+        } catch (NoResultException e) {
+            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
     }
 }

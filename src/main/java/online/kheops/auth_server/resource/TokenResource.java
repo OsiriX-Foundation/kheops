@@ -45,6 +45,7 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
+import static online.kheops.auth_server.util.Tools.checkValidUID;
 
 @Path("/")
 public class TokenResource
@@ -413,15 +414,6 @@ public class TokenResource
 
         intreospectResponse.active = true;
         return Response.status(OK).entity(intreospectResponse).build();
-    }
-
-    private boolean checkValidUID(String uid) {
-        try {
-            new Oid(uid);
-            return true;
-        } catch (GSSException exception) {
-            return false;
-        }
     }
 }
 

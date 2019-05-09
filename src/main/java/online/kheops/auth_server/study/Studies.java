@@ -441,14 +441,19 @@ public class Studies {
     public static boolean canAccessStudy(Album album, String studyUID) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
+            tx.begin();
             StudyQueries.findStudyByStudyandAlbum(studyUID, album, em);
             return true;
 
         } catch (StudyNotFoundException e) {
             return false;
         } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
     }

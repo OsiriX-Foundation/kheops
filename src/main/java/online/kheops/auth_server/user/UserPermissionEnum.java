@@ -212,9 +212,17 @@ public enum UserPermissionEnum {
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
     },
-    CREATE_DICOM_SR {
+    MANAGE_DICOM_SR {
         @Override
         public boolean hasUserPermission(Album album) { return false; }
+        @Override
+        public boolean hasCapabilityPermission(Capability capability) { return false; }
+        @Override
+        public boolean hasViewerPermission(Album album) { return false; }
+    },
+    GET_DICOM_SR {
+        @Override
+        public boolean hasUserPermission(Album album) { return true; }
         @Override
         public boolean hasCapabilityPermission(Capability capability) { return false; }
         @Override
