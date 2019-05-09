@@ -60,6 +60,7 @@ public class WadoRSSeriesInstances {
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
         LOG.log(WARNING, "linkAuthorizationHeader: " + linkAuthorizationHeader);
+        LOG.log(WARNING, "a test warning");
 
         final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
 
