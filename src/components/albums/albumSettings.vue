@@ -98,7 +98,7 @@ export default {
 			this.$router.push({ query: { view: 'settings', cat: this.view } })
 		},
 		'$route.query' () {
-      this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
+			this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
 		}
 	},
 	created () {
