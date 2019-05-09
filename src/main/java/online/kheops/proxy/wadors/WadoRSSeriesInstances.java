@@ -33,6 +33,8 @@ public class WadoRSSeriesInstances {
     private static final Logger LOG = Logger.getLogger(WadoRSSeriesInstances.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
+    private static final String LINK_AUTHORIZATION = "X-Link-Authorization";
+
     @Context
     UriInfo uriInfo;
 
@@ -50,11 +52,14 @@ public class WadoRSSeriesInstances {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response wadoInstances(@PathParam("StudyInstanceUID") String studyInstanceUID,
                                   @PathParam("SeriesInstanceUID") String seriesInstanceUID,
-                                  @HeaderParam(AUTHORIZATION) String authorizationHeader) {
+                                  @HeaderParam(AUTHORIZATION) String authorizationHeader,
+                                  @HeaderParam(LINK_AUTHORIZATION) String linkAuthorizationHeader) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         final URI instanceQidoServiceURI = getParameterURI("online.kheops.pacs.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+
+        final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
 
         final AccessToken accessToken;
         try {
@@ -99,7 +104,12 @@ public class WadoRSSeriesInstances {
             throw new InternalServerErrorException("unknown error while getting from upstream");
         }
 
-        UriBuilder retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
+        final UriBuilder retrieveULRBuilder;
+//        if (linkAuthorization) {
+//            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
+//        } else {
+            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/link/" + accessToken.getToken() + "/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
+//        }
 
         for (final Attributes instanceAttributes: attributes) {
             instanceAttributes.remove(Tag.RetrieveURL);
