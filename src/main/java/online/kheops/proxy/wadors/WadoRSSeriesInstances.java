@@ -47,9 +47,6 @@ public class WadoRSSeriesInstances {
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
 
-    @Context
-    HttpHeaders httpHeaders;
-
     @GET
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
@@ -61,17 +58,6 @@ public class WadoRSSeriesInstances {
         final URI instanceQidoServiceURI = getParameterURI("online.kheops.pacs.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-
-        LOG.log(WARNING, "linkAuthorizationHeader: " + linkAuthorizationHeader);
-        LOG.log(WARNING, "a test warning");
-
-        for (Map.Entry<String, List<String>> entry: httpHeaders.getRequestHeaders().entrySet()) {
-            StringBuilder stringBuilder = new StringBuilder(entry.getKey() + ": ");
-            for (String headerValue: entry.getValue()) {
-                stringBuilder.append(headerValue);
-            }
-            LOG.log(WARNING, stringBuilder.toString());
-        }
 
         final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
 
@@ -88,8 +74,6 @@ public class WadoRSSeriesInstances {
             LOG.log(SEVERE, "unknown error while getting an access token", e);
             throw new InternalServerErrorException("unknown error while getting an access token");
         }
-
-
 
         WebTarget webTarget = CLIENT.target(instanceQidoServiceURI)
                 .path("/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances")
@@ -122,9 +106,9 @@ public class WadoRSSeriesInstances {
 
         final UriBuilder retrieveULRBuilder;
         if (linkAuthorization) {
-            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
-        } else {
             retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/link/" + AuthorizationToken.fromAuthorizationHeader(authorizationHeader).getToken() + "/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
+        } else {
+            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
         }
 
         for (final Attributes instanceAttributes: attributes) {
