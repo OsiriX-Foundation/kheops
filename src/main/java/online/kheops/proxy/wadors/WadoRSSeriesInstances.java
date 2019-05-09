@@ -107,11 +107,11 @@ public class WadoRSSeriesInstances {
         }
 
         final UriBuilder retrieveULRBuilder;
-//        if (linkAuthorization) {
-//            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
-//        } else {
+        if (linkAuthorization) {
+            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
+        } else {
             retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/link/" + AuthorizationToken.fromAuthorizationHeader(authorizationHeader).getToken() + "/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
-//        }
+        }
 
         for (final Attributes instanceAttributes: attributes) {
             instanceAttributes.remove(Tag.RetrieveURL);
