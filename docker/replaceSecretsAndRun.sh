@@ -73,7 +73,7 @@ sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS
 if [[$KHEOPS_ROOT_SCHEME == "http"] && [KHEOPS_ROOT_PORT == "80"]] || [[$KHEOPS_ROOT_SCHEME == "https"] && [KHEOPS_ROOT_PORT == "443"]]; then
     sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST|" ${REPLACE_FILE_PATH}
 else
-    sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
+    sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:$KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
 fi
 echo "Ending setup NGINX secrets and env var"
 
