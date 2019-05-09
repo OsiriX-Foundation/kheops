@@ -47,6 +47,9 @@ public class WadoRSSeriesInstances {
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
 
+    @Context
+    HttpHeaders httpHeaders;
+
     @GET
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
@@ -61,6 +64,14 @@ public class WadoRSSeriesInstances {
 
         LOG.log(WARNING, "linkAuthorizationHeader: " + linkAuthorizationHeader);
         LOG.log(WARNING, "a test warning");
+
+        for (Map.Entry<String, List<String>> entry: httpHeaders.getRequestHeaders().entrySet()) {
+            StringBuilder stringBuilder = new StringBuilder(entry.getKey() + ": ");
+            for (String headerValue: entry.getValue()) {
+                stringBuilder.append(headerValue);
+            }
+            LOG.log(WARNING, stringBuilder.toString());
+        }
 
         final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
 
