@@ -59,6 +59,8 @@ public class WadoRSSeriesInstances {
         final URI rootURI = getParameterURI("online.kheops.root.uri");
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
+        LOG.log(WARNING, "linkAuthorizationHeader: " + linkAuthorizationHeader);
+
         final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
 
         final AccessToken accessToken;
