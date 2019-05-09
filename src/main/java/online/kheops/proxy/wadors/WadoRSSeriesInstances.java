@@ -75,6 +75,8 @@ public class WadoRSSeriesInstances {
             throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
+
+
         WebTarget webTarget = CLIENT.target(instanceQidoServiceURI)
                 .path("/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances")
                 .resolveTemplate("StudyInstanceUID", studyInstanceUID)
@@ -108,7 +110,7 @@ public class WadoRSSeriesInstances {
 //        if (linkAuthorization) {
 //            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
 //        } else {
-            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/link/" + accessToken.getToken() + "/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
+            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/link/" + AuthorizationToken.fromAuthorizationHeader(authorizationHeader).getToken() + "/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/instances/{SOPInstanceUID}");
 //        }
 
         for (final Attributes instanceAttributes: attributes) {
