@@ -305,7 +305,7 @@ public class ReportProviderResource {
 
         if(!(url == null || url.isEmpty() )) {
             if(isValidConfigUrl(url)) {
-                return Response.status(BAD_REQUEST).entity("url not valide").build();
+                return Response.status(BAD_REQUEST).entity("url not valid").build();
             }
         }
 
@@ -319,10 +319,17 @@ public class ReportProviderResource {
         return  Response.status(OK).entity(reportProvider).build();
     }
 
+    @POST
+    @Secured
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("reportproviders/testuri")
+    public Response testUri(@FormParam("url") final String url) {
 
-    /*
-    TODO
-     /reportprovider/test
-    */
+        if (url == null || url.isEmpty() || !isValidConfigUrl(url)) {
+            return Response.status(BAD_REQUEST).entity("url not valid").build();
+        }
+        return  Response.status(OK).build();
+    }
+
 
 }

@@ -95,15 +95,19 @@ public class ReportProviders {
             return false;
         }
 
-        final Response response = ClientBuilder.newClient().target(configUrl).request().get();
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            String output = response.readEntity(String.class);
-            try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
-                final JsonObject reply = jsonReader.readObject();
-                return reply.containsKey("redirect_uri") && reply.containsKey("token_endpoint_auth_method") && reply.containsKey("jwks_uri");
+        try {
+            final Response response = ClientBuilder.newClient().target(configUrl).request().get();
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                String output = response.readEntity(String.class);
+                try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                    final JsonObject reply = jsonReader.readObject();
+                    return reply.containsKey("redirect_uri") && reply.containsKey("token_endpoint_auth_method") && reply.containsKey("jwks_uri");
+                }
             }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
 
