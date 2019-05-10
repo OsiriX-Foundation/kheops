@@ -88,15 +88,15 @@ export default {
 	data () {
 		return {
 			provider: {
-				name: '',
-				url: ''
+				name: 'test',
+				url: 'http://129.194.108.70/.well-known/kheops-report-configuration'
 			}
 		}
 	},
 	methods: {
 		createProvider () {
 			this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then(res => {
-				if (res.status !== 200) {
+				if (res.status !== 201) {
 					this.$snotify.error('Sorry, an error occured')
 				} else {
 					this.$emit('done')

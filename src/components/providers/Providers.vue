@@ -32,37 +32,41 @@
     </div>
 
     <new-provider
-      v-if="view=='new'"
+      v-if="view === 'new'"
       :album-i-d="albumID"
       @done="view='list'"
     />
-
-    <div
-      v-if="view=='list'"
-      class="tokens"
-    >
-      <h4>
-        Report Providers
-      </h4>
-      <b-table
-        stacked="sm"
-        striped
-        hover
-        :items="providers"
-        :sort-desc="true"
-        tbody-tr-class="link"
-      />
-    </div>
+    <provider
+      v-if="view === 'provider'"
+      :album-i-d="albumID"
+      :client-i-d="clientIdSelected"
+      @done="view='list'"
+      @providerselectededit="editProvider"
+    />
+    <edit-provider
+      v-if="view === 'edit'"
+      :album-i-d="albumID"
+      :client-i-d="clientIdSelected"
+      @done="view='list'"
+    />
+    <list-providers
+      v-if="view === 'list'"
+      :album-i-d="albumID"
+      @providerselectedshow="showProvider"
+      @providerselectededit="editProvider"
+    />
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import NewProvider from '@/components/providers/NewProvider'
+import Provider from '@/components/providers/Provider'
+import ListProviders from '@/components/providers/ListProviders'
+import EditProvider from '@/components/providers/EditProvider'
 
 export default {
 	name: 'Providers',
-	components: { NewProvider },
+	components: { NewProvider, Provider, ListProviders, EditProvider },
 	props: {
 		albumID: {
 			type: String,
@@ -72,13 +76,27 @@ export default {
 	},
 	data () {
 		return {
-			view: 'list'
+			view: 'list',
+			clientIdSelected: ''
 		}
 	},
-	computed: {
-		...mapGetters({
-			providers: 'providers'
-		})
+	methods: {
+		showProvider (clientId) {
+      this.$store.dispatch('initProvider')
+			this.clientIdSelected = clientId
+			this.view = 'provider'
+    },
+		editProvider (clientId) {
+      this.$store.dispatch('initProvider')
+			this.clientIdSelected = clientId
+			this.view = 'edit'
+		}
 	}
 }
 </script>
+
+<style scoped>
+.selection-button-container{
+  height: 60px;
+}
+</style>
