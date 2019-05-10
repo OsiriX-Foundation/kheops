@@ -172,7 +172,7 @@ export default {
 	methods: {
 		demoHover () {
 			this.hover = true
-			setTimeout(() => this.hover = false, 1500)
+			setTimeout(() => { this.hover = false }, 1500)
 		},
 		storeFiles (files) {
 			this.$store.dispatch('setSending', { sending: true })

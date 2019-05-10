@@ -102,10 +102,7 @@ export default {
 			this.$router.push({ query: { view: 'settings', cat: this.view } })
 		},
 		'$route.query' () {
-			if (!this.$route.query.cat && this.$route.query.view === 'settings') {
-				this.$router.push({ query: { view: 'settings', cat: 'general' } })
-			}
-			this.view = this.$route.query.cat
+			this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
 		}
 	},
 	created () {

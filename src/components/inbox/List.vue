@@ -87,11 +87,12 @@
       <div
         class="d-flex flex-wrap"
       >
-        <div class="p-2">
+        <div class="p-2 align-self-center">
           <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
         </div>
         <div
           v-if="!filters.album_id || (album.is_admin || album.send_series)"
+          class="align-self-center"
         >
           <button
             type="button"
@@ -110,6 +111,7 @@
         </div>
         <div
           v-if="(!filters.album_id || (album.send_series || album.is_admin)) && allowedAlbums.length > 0"
+          class="align-self-center"
         >
           <b-dropdown
             variant="link"
@@ -137,6 +139,7 @@
 
         <div
           v-if="filters.album_id && (album.send_series || album.is_admin)"
+          class="align-self-center"
         >
           <button
             type="button"
@@ -155,6 +158,7 @@
         </div>
         <div
           v-if="!filters.album_id"
+          class="align-self-center"
         >
           <button
             type="button"
@@ -173,6 +177,7 @@
         </div>
         <div
           v-if="!filters.album_id || (album.is_admin || album.delete_series)"
+          class="align-self-center"
         >
           <button
             type="button"
@@ -190,7 +195,7 @@
           </button>
         </div>
         <div
-          class="ml-auto"
+          class="ml-auto align-self-center"
         >
           <div
             v-if="(!filters.album_id || (album.add_series || album.is_admin))"
@@ -255,7 +260,7 @@
         </div>
 
         <div
-          class="d-none d-sm-block"
+          class="d-none d-sm-block align-self-center"
         >
           <button
             type="button"
@@ -946,11 +951,13 @@ export default {
 					this.pageNb++
 					this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
 				}
+
 				let sticky = _this.$refs.myHeader.offsetTop
+				let heightSticky = _this.$refs.myHeader.clientHeight
 				let studiesList = _this.$refs.studiesList.offsetTop
-				if ((window.pageYOffset) > sticky && !this.isActive) {
+				if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
 					this.isActive = true
-				} else if (window.pageYOffset < studiesList) {
+				} else if (window.pageYOffset < studiesList - heightSticky) {
 					this.isActive = false
 				}
 			}
@@ -1260,11 +1267,6 @@ export default {
     background: #555;
     z-index: 5;
     opacity: 0.95;
-  }
-  .header {
-    padding: 10px 16px;
-    background: #555;
-    color: #f1f1f1;
   }
   .sticky + .content {
     padding-top: 70px;

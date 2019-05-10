@@ -9,7 +9,8 @@
 		"hideError": "Hide errors",
 		"cancel": "Cancel",
 		"titleBoxSending": "Sending files",
-		"titleBoxSended": "Files sent"
+		"titleBoxSended": "Files sent",
+		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :"
 	},
 	"fr": {
 		"filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -20,7 +21,8 @@
 		"hideError": "Cacher les erreurs",
 		"cancel": "Annuler",
 		"titleBoxSending": "Fichiers en cours d'envois",
-		"titleBoxSended": "Fichiers envoyés"
+		"titleBoxSended": "Fichiers envoyés",
+		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :"
 	}
 }
 </i18n>
@@ -175,7 +177,7 @@
           <div
             class="col-12 mt-2 mb-2"
           >
-            {{ $tc("filesSend", countSentFiles - error.length, {count: (countSentFiles - error.length)}) }}
+            {{ $tc("filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
             {{ $tc("locationSend", source !== 'inbox' ? 0 : 1) }}
             <span
               v-if="source !== 'inbox'"
@@ -187,6 +189,20 @@
                 {{ $t("album") }}
               </a>
             </span>
+            <div
+              v-if="Object.keys(listErrorUnknownFiles).length > 0"
+            >
+              <div
+                v-for="(item, key) in listErrorUnknownFiles"
+                :key="item.key"
+              >
+                {{ $tc("unknownError", item, {count: item }) }} <br>
+                <span style="color: red">
+                  {{ errorValues[key] }}
+                </span>
+              </div>
+            </div>
+
             <div
               v-if="error.length > 0"
             >
@@ -212,6 +228,10 @@
             </div>
           </div>
         </div>
+        <!--
+					Unknow files error
+				-->
+
         <!--
 					Show the errors
 				-->
@@ -281,6 +301,9 @@ export default {
 				'0008119A': '00041500',
 				'00081198': '00041500'
 			},
+			dicomTagError: '00081197',
+			listErrorUnknownFiles: {},
+			totalUnknownFilesError: 0,
 			progress: 0,
 			copyFiles: [],
 			countSentFiles: 0
@@ -344,6 +367,8 @@ export default {
 			this.countSentFiles = 0
 			this.copyFiles = _.cloneDeep(this.files)
 			this.progress = 0
+			this.listErrorUnknownFiles = {}
+			this.totalUnknownFilesError = 0
 
 			this.$store.dispatch('setSending', { sending: true })
 			this.$store.dispatch('initErrorFiles')
@@ -420,6 +445,7 @@ export default {
 			for (var key in this.errorDicom) {
 				if (res.hasOwnProperty(key)) {
 					const errorInResponse = this.dicom2map(res[key].Value, this.errorDicom[key])
+					this.generateListError(res[key].Value, this.errorDicom[key])
 					this.createListError(errorInResponse)
 				}
 			}
@@ -432,11 +458,26 @@ export default {
 				}
 			})
 		},
-		dicom2map (dicom, id) {
+		generateListError (dicom, dicomTagFile) {
+			dicom.forEach(x => {
+				if (!x.hasOwnProperty(dicomTagFile)) {
+					let errorCode = x[this.dicomTagError].Value[0]
+					if (this.listErrorUnknownFiles.hasOwnProperty(errorCode)) {
+						this.listErrorUnknownFiles[errorCode] += 1
+					} else {
+						this.listErrorUnknownFiles[errorCode] = 1
+					}
+					this.totalUnknownFilesError += 1
+				}
+			})
+		},
+		dicom2map (dicom, dicomTagFile) {
 			let map = new Map()
 			dicom.forEach(x => {
-				if (x.hasOwnProperty(id)) {
-					map.set(x[id].Value[0], x['00081197'].Value[0])
+				if (x.hasOwnProperty(dicomTagFile)) {
+					let errorCode = x[this.dicomTagError].Value[0]
+					let idFile = x[dicomTagFile].Value[0]
+					map.set(idFile, errorCode)
 				}
 			})
 			return map

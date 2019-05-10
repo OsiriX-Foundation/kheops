@@ -127,7 +127,7 @@ export default {
 			this.$router.push({ query: queryParams })
 		},
 		'$route.query' () {
-			this.view = this.$route.query.view
+			this.view = this.$route.query.view !== undefined ? this.$route.query.view : 'studies'
 		}
 	},
 	created () {
