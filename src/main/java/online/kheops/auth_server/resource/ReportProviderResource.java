@@ -326,7 +326,7 @@ public class ReportProviderResource {
     public Response testUri(@FormParam("url") final String url) {
 
         if (url == null || url.isEmpty() || !isValidConfigUrl(url)) {
-            return Response.status(BAD_REQUEST).entity("url not valid").build();
+            return Response.status(BAD_REQUEST).build();
         }
         return  Response.status(OK).build();
     }
