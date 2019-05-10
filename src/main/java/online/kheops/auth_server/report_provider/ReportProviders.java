@@ -60,7 +60,9 @@ public class ReportProviders {
         return new ReportProviderResponse(reportProvider);
     }
 
-    public static JsonObject callConfigURL(ReportProvider reportProvider) {
+    public static JsonObject callConfigURL(ReportProvider reportProvider)
+            throws ReportProviderUriNotValidException{
+
         final Response response = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get();
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
@@ -69,16 +71,18 @@ public class ReportProviders {
                 return reply;
             }
         }
-        return null;//TODO throws exception
+        throw new ReportProviderUriNotValidException("report provider uri not valid");
 
     }
 
-    public static String getRedirectUri(ReportProvider reportProvider) {
+    public static String getRedirectUri(ReportProvider reportProvider)
+            throws ReportProviderUriNotValidException {
         JsonObject reply = callConfigURL(reportProvider);
         return reply.getString("redirect_uri");
     }
 
-    public static String getJwksUri(ReportProvider reportProvider) {
+    public static String getJwksUri(ReportProvider reportProvider)
+            throws ReportProviderUriNotValidException {
         JsonObject reply = callConfigURL(reportProvider);
         return reply.getString("jwks_uri");
     }
@@ -131,13 +135,17 @@ public class ReportProviders {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         final ReportProvider reportProvider;
-        final JsonObject config;
+        JsonObject config = null;
 
         try {
             tx.begin();
 
             reportProvider = getReportProviderWithClientId(clientId, em);
-            config = callConfigURL(reportProvider);
+            try {
+                config = callConfigURL(reportProvider);
+            } catch (ReportProviderUriNotValidException e) {
+                config = null;
+            }
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
                 throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);

@@ -203,8 +203,8 @@ public class ReportProviderResource {
         final String token = jwtBuilder.sign(algorithmHMAC);
 
         try {
-            final String kheopsConfigUrl = context.getInitParameter("online.kheops.root.uri") + "/reportprovider/" + albumId + "/configuration";
-            final String StandardCharsetsUTF8=java.nio.charset.StandardCharsets.UTF_8.toString();
+            final String kheopsConfigUrl = context.getInitParameter("online.kheops.root.uri") + "/reportproviders/" + clientId + "/configuration";
+            final String StandardCharsetsUTF8 = java.nio.charset.StandardCharsets.UTF_8.toString();
 
             final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
             final String reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
@@ -213,8 +213,9 @@ public class ReportProviderResource {
                     .toString();
 
             return Response.status(FOUND).header("Location", reportProviderUrl).build();
-
-        }catch (UnsupportedEncodingException e) {
+        } catch (ReportProviderUriNotValidException e) {
+            return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
+        } catch (UnsupportedEncodingException e) {
             return Response.status(FORBIDDEN).entity("ERROR").build();
         }
     }
@@ -293,6 +294,8 @@ public class ReportProviderResource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     public Response editReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                         @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId,

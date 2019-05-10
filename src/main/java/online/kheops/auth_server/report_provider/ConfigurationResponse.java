@@ -54,7 +54,7 @@ public class ConfigurationResponse {
 
         this.clientId = clientId;
         issuer = kheopsRootUri;
-        returnUri = kheopsRootUri + "albums/" + albumId;
+        returnUri = kheopsRootUri + "/albums/" + albumId;
         dicomwebUri = kheopsRootUri + "/api";
         wadoUri = kheopsRootUri + "/api";
         tokenUri = kheopsRootUri + "/api/token";
