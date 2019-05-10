@@ -239,6 +239,6 @@ public class ReportProviders {
             }
             em.close();
         }
-        return  null;
+        return  new ReportProviderResponse(reportProvider);
     }
 }
