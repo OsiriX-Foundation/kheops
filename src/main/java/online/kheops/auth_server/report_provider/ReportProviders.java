@@ -139,6 +139,10 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
             config = callConfigURL(reportProvider);
 
+            if (!reportProvider.getAlbum().getId().equals(albumId)) {
+                throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
+            }
+
             tx.commit();
         } catch (NoResultException e) {
             throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
@@ -162,6 +166,11 @@ public class ReportProviders {
             tx.begin();
 
             reportProvider = getReportProviderWithClientId(clientId, em);
+
+            if (!reportProvider.getAlbum().getId().equals(albumId)) {
+                throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
+            }
+
             em.remove(reportProvider);
 
             tx.commit();
@@ -173,5 +182,44 @@ public class ReportProviders {
             }
             em.close();
         }
+    }
+
+    public static ReportProviderResponse editReportProvider(String albumId, String clientId, String url, String name, boolean newClientId)
+            throws ClientIdNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final ReportProvider reportProvider;
+
+        try {
+            tx.begin();
+
+            reportProvider = getReportProviderWithClientId(clientId, em);
+
+            if (!reportProvider.getAlbum().getId().equals(albumId)) {
+                throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
+            }
+
+            if(!(url == null || url.isEmpty() )) {
+                reportProvider.setUrl(url);
+            }
+
+            if(!(name == null || name.isEmpty() )) {
+                reportProvider.setName(name);
+            }
+
+            if (newClientId) {
+                reportProvider.setClientId(new ClientId().getClientId());
+            }
+
+            tx.commit();
+        } catch (NoResultException e) {
+            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+        return  null;
     }
 }

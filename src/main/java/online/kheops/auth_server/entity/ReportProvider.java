@@ -82,4 +82,10 @@ public class ReportProvider {
     public User getUser() {
         return user;
     }
+
+    public void setClientId(String clientId) { this.clientId = clientId; }
+
+    public void setUrl(String url) { this.url = url; }
+
+    public void setName(String name) { this.name = name; }
 }

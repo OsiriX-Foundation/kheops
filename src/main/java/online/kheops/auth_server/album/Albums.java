@@ -146,6 +146,10 @@ public class Albums {
                 em.remove(capability);
             }
 
+            for (ReportProvider reportProvider:album.getReportProvider()) {
+                em.remove(reportProvider);
+            }
+
             for (AlbumSeries albumSeries:album.getAlbumSeries()) {
                 em.remove(albumSeries);
             }

@@ -62,7 +62,7 @@ public class ReportProviderResource {
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+    public Response newReportProvider(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                             @FormParam("url") final String url,
                             @FormParam("name") final String name) {
 
@@ -80,7 +80,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse dicomSrResponse;
         try {
-            dicomSrResponse = newReportProvider(kheopsPrincipal.getUser(), albumId, name, url);
+            dicomSrResponse = ReportProviders.newReportProvider(kheopsPrincipal.getUser(), albumId, name, url);
         } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).build();
         }
@@ -288,10 +288,37 @@ public class ReportProviderResource {
         return  Response.status(NO_CONTENT).build();
     }
 
+    @PATCH
+    @Secured
+    @UserAccessSecured
+    @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
+    public Response editReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                        @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId,
+                                        @FormParam("url") final String url,
+                                        @FormParam("name") final String name,
+                                        @FormParam("new_client_id") final boolean newClientId) {
+
+        if(!(url == null || url.isEmpty() )) {
+            if(isValidConfigUrl(url)) {
+                return Response.status(BAD_REQUEST).entity("url not valide").build();
+            }
+        }
+
+        final ReportProviderResponse reportProvider;
+        try {
+            reportProvider = editReportProvider(albumId, clientId, url, name, newClientId);
+        } catch (ClientIdNotFoundException e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        }
+
+        return  Response.status(OK).entity(reportProvider).build();
+    }
+
 
     /*
     TODO
-    PATCH  /api/albums/{album_id}/reportproviders/{client_id}
      /reportprovider/test
     */
 

@@ -199,6 +199,8 @@ public class Album {
 
     public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
+    public Set <ReportProvider> getReportProvider() {return reportProviders; }
+
     @Override
     public String toString() {
         return "[Album_id:"+id+"]";
