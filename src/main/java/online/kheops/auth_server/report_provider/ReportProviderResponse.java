@@ -38,14 +38,8 @@ public class ReportProviderResponse {
     }
 
     protected ReportProviderResponse(ReportProvider reportProvider, JsonObject config) {
+        this(reportProvider);
         this.config = config;
-        name = reportProvider.getName();
-        url = reportProvider.getUrl();
-        clientId = reportProvider.getClientId();
 
-        final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
-        user = userResponseBuilder.setSub(reportProvider.getUser().getKeycloakId()).setEmail(reportProvider.getUser().getEmail()).build();
-
-        createdTime = reportProvider.getCreationTime();
     }
 }

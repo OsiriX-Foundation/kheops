@@ -303,10 +303,8 @@ public class ReportProviderResource {
                                         @FormParam("name") final String name,
                                         @FormParam("new_client_id") final boolean newClientId) {
 
-        if(!(url == null || url.isEmpty() )) {
-            if(isValidConfigUrl(url)) {
-                return Response.status(BAD_REQUEST).entity("url not valid").build();
-            }
+        if (url == null || url.isEmpty() || !isValidConfigUrl(url)) {
+            return Response.status(BAD_REQUEST).entity("url not valid").build();
         }
 
         final ReportProviderResponse reportProvider;

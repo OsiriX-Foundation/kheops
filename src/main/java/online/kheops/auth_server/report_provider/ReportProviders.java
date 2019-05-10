@@ -5,6 +5,7 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
+import org.jooq.tools.json.JSONObject;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -61,9 +62,15 @@ public class ReportProviders {
     }
 
     public static JsonObject callConfigURL(ReportProvider reportProvider)
-            throws ReportProviderUriNotValidException{
+            throws ReportProviderUriNotValidException {
 
-        final Response response = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get();
+        final Response response;
+
+        try {
+            response = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get();
+        } catch (Exception e) {
+            throw new ReportProviderUriNotValidException("report provider uri not valid");
+        }
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
             try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
