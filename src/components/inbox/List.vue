@@ -912,7 +912,7 @@ export default {
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'], resetDisplay: true })
 				.then(() => {
-					setTimeout(() => this.setLoading(false), 300)
+          this.setLoading(false)
 				})
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
@@ -1038,7 +1038,9 @@ export default {
 		},
 		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
-				.then(() => { setTimeout(() => this.setLoading(false), 50) })
+				.then(res => { 
+          this.setLoading(false)
+        })
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
