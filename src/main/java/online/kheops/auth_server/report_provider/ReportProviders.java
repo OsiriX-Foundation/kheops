@@ -153,17 +153,11 @@ public class ReportProviders {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         final ReportProvider reportProvider;
-        JsonObject config = null;
 
         try {
             tx.begin();
 
             reportProvider = getReportProviderWithClientId(clientId, em);
-            try {
-                config = callConfigURL(reportProvider);
-            } catch (ReportProviderUriNotValidException e) {
-                config = null;
-            }
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
                 throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
@@ -179,7 +173,7 @@ public class ReportProviders {
             em.close();
         }
 
-        return new ReportProviderResponse(reportProvider, config);
+        return new ReportProviderResponse(reportProvider);
     }
 
     public static void deleteReportProvider(String albumId, String clientId)
@@ -247,5 +241,31 @@ public class ReportProviders {
             em.close();
         }
         return  new ReportProviderResponse(reportProvider);
+    }
+
+    public static ReportProvider getReportProvider(String clientId)
+            throws ClientIdNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+        final ReportProvider reportProvider;
+
+        try {
+            tx.begin();
+
+            reportProvider = getReportProviderWithClientId(clientId, em);
+
+            tx.commit();
+        } catch (NoResultException e) {
+            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+
+        return reportProvider;
+
     }
 }
