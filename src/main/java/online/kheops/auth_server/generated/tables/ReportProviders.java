@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReportProviders extends TableImpl<ReportProvidersRecord> {
 
-    private static final long serialVersionUID = -80009580;
+    private static final long serialVersionUID = -328307121;
 
     /**
      * The reference instance of <code>public.report_providers</code>
@@ -71,11 +71,6 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
      * The column <code>public.report_providers.creation_time</code>.
      */
     public final TableField<ReportProvidersRecord, Timestamp> CREATION_TIME = createField("creation_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
-
-    /**
-     * The column <code>public.report_providers.user_fk</code>.
-     */
-    public final TableField<ReportProvidersRecord, Long> USER_FK = createField("user_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.name</code>.
@@ -170,15 +165,11 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
      */
     @Override
     public List<ForeignKey<ReportProvidersRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<ReportProvidersRecord, ?>>asList(Keys.REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY, Keys.REPORT_PROVIDERS__REPORT_PROVIDERS_USER_FK_FKEY);
+        return Arrays.<ForeignKey<ReportProvidersRecord, ?>>asList(Keys.REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY);
     }
 
     public Albums albums() {
         return new Albums(this, Keys.REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY);
-    }
-
-    public Users users() {
-        return new Users(this, Keys.REPORT_PROVIDERS__REPORT_PROVIDERS_USER_FK_FKEY);
     }
 
     /**

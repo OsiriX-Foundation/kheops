@@ -48,10 +48,6 @@ public class User {
     @JoinColumn (name = "to_user_fk", nullable=true)
     private Set<Mutation> mutations = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=true)
-    private Set<ReportProvider> reportProviders = new HashSet<>();
-
     @OneToOne
     @JoinColumn(name = "inbox_fk", unique = true, nullable = false, updatable = false)
     private Album inbox;
@@ -106,8 +102,6 @@ public class User {
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
 
     public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
-
-    public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
     public Album getInbox() { return inbox; }
 

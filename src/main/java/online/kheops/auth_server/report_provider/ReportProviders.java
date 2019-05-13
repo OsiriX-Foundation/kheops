@@ -47,9 +47,8 @@ public class ReportProviders {
         try {
             tx.begin();
 
-            callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
-            reportProvider = new ReportProvider(url, name, album, callingUser);
+            reportProvider = new ReportProvider(url, name, album);
 
             em.persist(reportProvider);
             tx.commit();

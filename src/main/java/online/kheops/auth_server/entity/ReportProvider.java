@@ -5,6 +5,8 @@ import online.kheops.auth_server.report_provider.ClientId;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 @Entity
@@ -37,26 +39,23 @@ public class ReportProvider {
     @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
-    @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
-    private User user;
+    @OneToMany
+    @JoinColumn (name = "report_provider_fk", nullable=true)
+    private Set<Mutation> mutations = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        creationTime = now;
+        creationTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     public ReportProvider() {}
 
-    public ReportProvider(String url, String name, Album album, User user) {
+    public ReportProvider(String url, String name, Album album) {
         this.clientId = new ClientId().getClientId();
         this.url = url;
         this.name = name;
         this.album = album;
-        this.user = user;
         album.addReportProvider(this);
-        user.addReportProvider(this);
     }
 
     public LocalDateTime getCreationTime() {
@@ -77,10 +76,6 @@ public class ReportProvider {
 
     public Album getAlbum() {
         return album;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public void setClientId(String clientId) { this.clientId = clientId; }

@@ -86,7 +86,7 @@ public class Album {
 
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         lastEventTime = now;
         id = new AlbumId().getId();

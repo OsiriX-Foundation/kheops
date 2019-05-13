@@ -17,8 +17,6 @@ public class ReportProviderResponse {
     private String url;
     @XmlElement(name = "client_id")
     private String clientId;
-    @XmlElement(name = "user")
-    private UserResponse user;
     @XmlElement(name = "created_time")
     private LocalDateTime createdTime;
     @XmlElement(name = "config")
@@ -30,9 +28,6 @@ public class ReportProviderResponse {
         name = reportProvider.getName();
         url = reportProvider.getUrl();
         clientId = reportProvider.getClientId();
-
-        final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
-        user = userResponseBuilder.setSub(reportProvider.getUser().getKeycloakId()).setEmail(reportProvider.getUser().getEmail()).build();
 
         createdTime = reportProvider.getCreationTime();
     }
