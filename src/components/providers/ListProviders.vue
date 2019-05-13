@@ -91,17 +91,19 @@ export default {
 				name: {
 					label: this.$t('name_provider'),
 					sortable: true,
-					class: 'breakwork'
+					tdClass: 'breakwork'
 				},
 				'user.email': {
 					label: this.$t('user'),
 					sortable: true,
-					class: 'd-none d-sm-table-cell breakwork'
+					tdClass: 'breakwork',
+					class: 'd-none d-sm-table-cell'
 				},
 				created_time: {
 					label: this.$t('created_time'),
 					sortable: true,
-					class: 'd-none d-md-table-cell breakwork'
+					tdClass: 'breakwork',
+					class: 'd-none d-md-table-cell'
 				},
 				btn_edit: {
 					label: '',
