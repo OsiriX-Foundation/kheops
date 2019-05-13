@@ -54,7 +54,7 @@
         <state-provider
           :loading="data.item.stateURL.loading"
           :check-u-r-l="data.item.stateURL.checkURL"
-          :class-icon="'ml-2 mt-2'"
+          :class-icon="'ml-2 mt-1'"
         />
       </template>
       <template
@@ -62,7 +62,7 @@
         slot-scope="data"
       >
         <button
-          class="btn btn-primary"
+          class="btn btn-sm btn-primary"
           @click.stop="edit(data.item.client_id)"
         >
           {{ $t('edit') }}
