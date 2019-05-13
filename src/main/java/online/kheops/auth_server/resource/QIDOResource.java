@@ -24,6 +24,7 @@ import org.dcm4che3.json.JSONWriter;
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
+import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
@@ -65,12 +66,12 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
+    @ViewerTokenAccess
     @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
-                               @QueryParam(INBOX) Boolean fromInbox,
-                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset) {
+                               @QueryParam(INBOX) Boolean fromInbox) {
 
         if (fromAlbumId != null && fromInbox != null) {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
@@ -100,6 +101,8 @@ public class QIDOResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (AlbumForbiddenException e) {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+        } catch (NoResultException e) {
+            return Response.status(OK).entity("[]").build();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();

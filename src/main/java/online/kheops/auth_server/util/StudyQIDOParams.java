@@ -6,9 +6,11 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import org.dcm4che3.data.Tag;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
@@ -39,14 +41,16 @@ public final class StudyQIDOParams {
     private final Optional<String> referringPhysicianNameFilter;
     private final Optional<String> patientNameFilter;
     private final Optional<String> patientIDFilter;
-    private final Optional<String> studyInstanceUIDFilter;
     private final Optional<String> studyIDFilter;
     private final Optional<Boolean> favoriteFilter;
+    private List<String> studyInstanceUIDFilter;
+
     private final boolean favoriteField;
     private final boolean commentField;
     private final boolean studyDescriptionField;
 
-    public StudyQIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
+    public StudyQIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
+            throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException , NoResultException {
 
         String albumIDLocal = null;
         boolean fromInboxLocal = false;
@@ -109,12 +113,30 @@ public final class StudyQIDOParams {
         referringPhysicianNameFilter = getFilter(Tag.ReferringPhysicianName, queryParameters);
         patientNameFilter = getFilter(Tag.PatientName, queryParameters);
         patientIDFilter = getFilter(Tag.PatientID, queryParameters);
-        studyInstanceUIDFilter = getFilter(Tag.StudyInstanceUID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
+
+        List<String> studyInstanceUIDFilterTmp1 = getFilterList(Tag.StudyInstanceUID, queryParameters);
+        List<String> studyInstanceUIDFilterTmp2 = kheopsPrincipal.getStudyList().orElse(new ArrayList<>());
+
+        if(studyInstanceUIDFilterTmp1.isEmpty() || studyInstanceUIDFilterTmp2.isEmpty()) {
+            studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmp2);
+            studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmp1);
+        } else {
+            for (String studyUid: studyInstanceUIDFilterTmp1 ) {
+                if (studyInstanceUIDFilterTmp2.contains(studyUid)) {
+                    studyInstanceUIDFilter.add(studyUid);
+                }
+            }
+            if (studyInstanceUIDFilter.isEmpty()) {
+                throw new NoResultException();
+            }
+        }
+
         favoriteField = getFavoriteField(queryParameters);
         commentField = getCommentField(queryParameters);
         favoriteFilter = getFavoriteFilter(queryParameters);
         studyDescriptionField = getStudyDescriptionField(queryParameters);
+
 
         if(!albumID.isPresent() && !fromInbox) {
             if(favoriteField) {
@@ -185,7 +207,7 @@ public final class StudyQIDOParams {
         return patientIDFilter;
     }
 
-    public Optional<String> getStudyInstanceUIDFilter() {
+    public List<String> getStudyInstanceUIDFilter() {
         return studyInstanceUIDFilter;
     }
 
@@ -213,6 +235,16 @@ public final class StudyQIDOParams {
         } else {
             return Optional.empty();
         }
+    }
+
+    private static List<String> getFilterList(int tag, MultivaluedMap<String, String> queryParameters) {
+        List<String> filterList = new ArrayList<>();
+        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
+            filterList.add(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0));
+        } else if (queryParameters.containsKey(String.format("%08X", tag))) {
+            filterList.add(queryParameters.get(String.format("%08X", tag)).get(0));
+        }
+        return filterList;
     }
 
     private static boolean getFavoriteField(MultivaluedMap<String, String> queryParameters) {

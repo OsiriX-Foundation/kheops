@@ -83,9 +83,16 @@ public class Studies {
         applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.REFERRING_PHYSICIAN_NAME, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getPatientNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_NAME, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getPatientIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching())));
-        applyIfPresent(qidoParams::getStudyInstanceUIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_UID, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getStudyIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_ID, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getFavoriteFilter, filter -> conditionArrayList.add(ALBUM_SERIES.FAVORITE.eq(filter)));
+
+        if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
+            Condition condition = condition(false);
+            for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
+                condition.or(STUDIES.STUDY_UID.eq(studyInstanceUID));
+            }
+            conditionArrayList.add(condition);
+        }
 
         qidoParams.getModalityFilter().ifPresent(filter -> conditionArrayList.add(createConditionModality(filter)));
 
