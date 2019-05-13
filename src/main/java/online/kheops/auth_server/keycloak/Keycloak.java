@@ -2,7 +2,6 @@ package online.kheops.auth_server.keycloak;
 
 import online.kheops.auth_server.user.CacheUserName;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.json.Json;
@@ -10,11 +9,13 @@ import javax.json.JsonArray;
 import javax.json.JsonReader;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Keycloak {
@@ -73,21 +74,25 @@ public class Keycloak {
         } else {
 
             String userEmail = cacheUserName.getCachedValue(user);
-            if(userEmail != null) {
-                 return new UserResponseBuilder().setEmail(userEmail).setSub(user);
+            if (userEmail != null) {
+                return new UserResponseBuilder().setEmail(userEmail).setSub(user);
             }
 
-            final URI userUri = UriBuilder.fromUri(usersUri).path("/"+user).build();
+            final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
             final Response response;
             try {
-                response =  ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+                String tokenString = token.getToken();
+                Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
+                LOG.log(Level.WARNING, "userUri: ", userUri);
+                LOG.log(Level.WARNING, "tokenString: ", tokenString);
+                response = builder.get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
             }
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
-                output = "["+output+"]";
-                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                output = "[" + output + "]";
+                try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
                     JsonArray reply = jsonReader.readArray();
                     final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                     if (keycloakUser.size() == 1) {
@@ -99,6 +104,13 @@ public class Keycloak {
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
+            } else {
+                try {
+                    String responseString = response.readEntity(String.class);
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "\n" + responseString);
+                } catch (ProcessingException e) {
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus(), e);
+                }
             }
         }
         throw new KeycloakException("ERROR:");

@@ -3,7 +3,6 @@ package online.kheops.auth_server.entity;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.persistence.*;
@@ -70,8 +69,8 @@ public class User {
     public String getEmail() {
         try {
             final Keycloak keycloak = Keycloak.getInstance();
-            final UserResponseBuilder userResponse = keycloak.getUser(keycloakId);
-            return userResponse.build().getEmail();
+            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
+            return userResponseBuilder.getEmail();
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.SEVERE, "Error getting email", e);
             return "UNKNOWN";//TODO

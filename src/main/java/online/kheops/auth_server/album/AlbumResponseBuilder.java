@@ -19,7 +19,7 @@ public class AlbumResponseBuilder {
     private LocalDateTime createdTime;
     private LocalDateTime lastEventTime;
     private Integer numberOfUsers;
-    private List<AlbumResponse.UserAlbumResponse> users;
+    private List<UserAlbumResponse> users;
     private Integer numberOfComments;
     private Integer numberOfStudies;
     private Boolean addUser;
@@ -80,10 +80,7 @@ public class AlbumResponseBuilder {
     }
 
     public AlbumResponseBuilder addUser(AlbumUser albumUser) {
-        AlbumResponse.UserAlbumResponse userAlbumResponse = new AlbumResponse.UserAlbumResponse();
-        userAlbumResponse.userName = albumUser.getUser().getEmail();
-        userAlbumResponse.isAdmin = albumUser.isAdmin();
-        userAlbumResponse.userId = albumUser.getUser().getKeycloakId();
+        UserAlbumResponse userAlbumResponse = new UserAlbumResponse(albumUser);
         users.add(userAlbumResponse);
         return this;
     }
@@ -118,7 +115,7 @@ public class AlbumResponseBuilder {
         return numberOfUsers;
     }
 
-    public List<AlbumResponse.UserAlbumResponse> getUsers() {
+    public List<UserAlbumResponse> getUsers() {
         return users;
     }
 

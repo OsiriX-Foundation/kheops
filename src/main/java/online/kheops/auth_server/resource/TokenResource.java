@@ -185,6 +185,7 @@ public class TokenResource
         try {
             getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
+            LOG.log(Level.WARNING, "User not found", e);
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -200,6 +201,7 @@ public class TokenResource
             try {
                 callingUser = getOrCreateUser(assertion.getSub());
             } catch (UserNotFoundException e) {
+                LOG.log(Level.WARNING, "User not found", e);
                 errorResponse.errorDescription = "Unknown user";
                 return Response.status(UNAUTHORIZED).entity(errorResponse).build();
             }
@@ -324,6 +326,7 @@ public class TokenResource
         try {
             callingUser = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
+            LOG.log(Level.WARNING, "user not found", e);
             errorResponse.error = "unknown_user";
             errorResponse.errorDescription = "The user was not found in the DB";
             intreospectResponse.error = errorResponse;

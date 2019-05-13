@@ -1,7 +1,5 @@
 package online.kheops.auth_server.user;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 public class UserResponseBuilder {
     private String email;
     private String sub;
@@ -34,9 +32,9 @@ public class UserResponseBuilder {
         return new UserResponse(this);
     }
 
-    protected String getEmail() { return email; }
+    public String getEmail() { return email; }
 
-    protected String getSub() { return sub; }
+    public String getSub() { return sub; }
 
     protected Boolean getAlbumAccess() { return albumAccess; }
 

@@ -10,6 +10,9 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
@@ -128,7 +131,7 @@ public class Albums {
         return albumResponse;
     }
 
-    public static PairListXTotalCount<AlbumResponse.Response> getAlbumList(AlbumQueryParams albumQueryParams)
+    public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
 
         return findAlbumsByUserPk(albumQueryParams);
@@ -179,12 +182,12 @@ public class Albums {
     }
 
     public static AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess, boolean withUsersList)
-           throws JOOQException {
+           throws JOOQException, AlbumNotFoundException {
         AlbumResponse albumResponse;
         if (withUserAccess) {
             albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
             if(withUsersList) {
-                albumResponse.addUsersList();
+                albumResponse.setUsers(getUsers(albumId));
             }
             return albumResponse;
         } else {
@@ -192,21 +195,22 @@ public class Albums {
         }
     }
 
-    public static AlbumResponse getUsers(String albumId)
+    public static List<UserAlbumResponse> getUsers(String albumId)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final AlbumResponseBuilder albumResponseBuilder = new AlbumResponseBuilder();
+        final List<UserAlbumResponse> listUserAlbumResponse = new ArrayList<>();
         try {
             final Album album = getAlbum(albumId, em);
 
             for (AlbumUser albumUser : album.getAlbumUser()) {
-                albumResponseBuilder.addUser(albumUser);
+                listUserAlbumResponse.add(new UserAlbumResponse(albumUser));
             }
         } finally {
             em.close();
         }
-        return albumResponseBuilder.build();
+        Collections.sort(listUserAlbumResponse);
+        return listUserAlbumResponse;
     }
 
     public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)

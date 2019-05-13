@@ -182,12 +182,12 @@ public class QIDOResource {
         }
 
         //BEGIN kheopsPrincipal
-        if (fromInbox && !kheopsPrincipal.hasUserAccess()) {
+        if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
             return Response.status(FORBIDDEN).build();
         }
 
         try {
-            if (fromAlbumId != null && fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
+            if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 return Response.status(FORBIDDEN).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
@@ -329,6 +329,10 @@ public class QIDOResource {
         catch (AlbumNotFoundException e) {
             return Response.status(FORBIDDEN).build();
         }
+
+        if(securityContext.isUserInRole("tokenViewer")) {
+            fromInbox = kheopsPrincipal.hasInboxAccess();
+        }
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
@@ -354,7 +358,8 @@ public class QIDOResource {
         }
 
         final StreamingOutput stream = os -> {
-            try (final JsonParser parser = Json.createParser(upstreamResponse.readEntity(InputStream.class));
+            try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);
+                 final JsonParser parser = Json.createParser(inputStream);
                  final JsonGenerator generator = Json.createGenerator(os)){
 
                 final JSONReader jsonReader = new JSONReader(parser);

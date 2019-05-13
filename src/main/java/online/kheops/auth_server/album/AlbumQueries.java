@@ -84,7 +84,7 @@ public class AlbumQueries {
         }
     }
 
-    public static PairListXTotalCount<AlbumResponse.Response> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
+    public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = getDataSource().getConnection()) {
 
@@ -185,10 +185,10 @@ public class AlbumQueries {
                 result = query.fetch();
             }
 
-            final List<AlbumResponse.Response> albumResponses = new ArrayList<>();
+            final List<AlbumResponse> albumResponses = new ArrayList<>();
 
             for(Record r : result) {
-                albumResponses.add(new AlbumResponseBuilder().setAlbumFromUser(r).build().getResponse());
+                albumResponses.add(new AlbumResponseBuilder().setAlbumFromUser(r).build());
             }
 
             final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getUser().getPk(), conditionArrayList, connection);
