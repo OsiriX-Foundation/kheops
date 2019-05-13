@@ -1,11 +1,11 @@
 <i18n>
 	{
 		"en": {
-			"newprovider": "New report provider"
+			"newprovider": "New provider"
 
 		},
 		"fr": {
-			"newprovider": "Nouveau report provider"
+			"newprovider": "Nouveau provider"
 		}
 	}
 </i18n>
@@ -82,12 +82,12 @@ export default {
 	},
 	methods: {
 		showProvider (clientId) {
-      this.$store.dispatch('initProvider')
+			this.$store.dispatch('initProvider')
 			this.clientIdSelected = clientId
 			this.view = 'provider'
-    },
+		},
 		editProvider (clientId) {
-      this.$store.dispatch('initProvider')
+			this.$store.dispatch('initProvider')
 			this.clientIdSelected = clientId
 			this.view = 'edit'
 		}

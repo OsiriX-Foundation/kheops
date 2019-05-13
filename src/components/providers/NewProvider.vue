@@ -45,14 +45,25 @@
           <b>{{ $t('urlProvider') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9 mb-3">
-          <input
-            v-model="provider.url"
-            type="text"
-            :placeholder="$t('urlProvider')"
-            class="form-control"
-            required
-            maxlength="1024"
-          >
+          <div class="input-group mb-3">
+            <input
+              v-model="provider.url"
+              type="text"
+              class="form-control"
+              required
+              maxlength="1024"
+            >
+            <div
+              v-if="show"
+              class="input-group-append"
+            >
+              <state-provider
+                :loading="loading"
+                :check-u-r-l="checkURL"
+                :class-icon="'ml-2 mt-2'"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -60,6 +71,7 @@
           <button
             type="submit"
             class="btn btn-primary"
+            :disabled="loading"
           >
             {{ $t('create') }}
           </button><button
@@ -76,8 +88,10 @@
 </template>
 
 <script>
+import StateProvider from '@/components/providers/StateProvider'
 export default {
 	name: 'NewProvider',
+	components: { StateProvider },
 	props: {
 		albumID: {
 			type: String,
@@ -90,20 +104,30 @@ export default {
 			provider: {
 				name: 'test',
 				url: 'http://129.194.108.70/.well-known/kheops-report-configuration'
-			}
+			},
+			show: false,
+			loading: false,
+			checkURL: false
 		}
 	},
 	methods: {
 		createProvider () {
+			this.setStateProvider(false, true, true)
 			this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then(res => {
 				if (res.status !== 201) {
-					this.$snotify.error('Sorry, an error occured')
+					this.setStateProvider(false, false, true)
 				} else {
 					this.$emit('done')
 				}
 			}).catch(err => {
+				this.setStateProvider(false, false, true)
 				console.log(err)
 			})
+		},
+		setStateProvider (checkURL, loading, show) {
+			this.checkURL = checkURL
+			this.loading = loading
+			this.show = show
 		},
 		cancel () {
 			this.$emit('done')

@@ -1,3 +1,27 @@
+<i18n>
+	{
+		"en": {
+			"url": "URL provider",
+      "stateurl": "Access provider",
+      "user": "User",
+      "clientid": "Client ID",
+      "created_time": "Created time",
+      "edit": "Edit",
+      "remove": "Remove",
+      "back": "Back"
+		},
+		"fr": {
+			"url": "URL de configuration",
+      "stateurl": "Etat du provider",
+      "user": "Utilisateur",
+      "clientid": "Identifiant du provider",
+      "created_time": "Date de création",
+      "edit": "Editer",
+      "remove": "Supprimer",
+      "back": "Retour"
+		}
+	}
+</i18n>
 <template>
   <div v-if="Object.keys(provider).length > 0">
     <div
@@ -5,10 +29,14 @@
       style=" position: relative;"
     >
       <h4>
-        {{ provider.name }}
+        <span
+          class="breakwork"
+        >
+          {{ provider.name }}
+        </span>
       </h4>
 
-      <div class="row">
+      <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
           <dt>{{ $t('url') }}</dt>
         </div>
@@ -18,7 +46,20 @@
           </dd>
         </div>
       </div>
-      <div class="row">
+      <div class="row mb-2">
+        <div class="col-xs-12 col-sm-3">
+          <dt>{{ $t('stateurl') }}</dt>
+        </div>
+        <div class="col-xs-12 col-sm-9">
+          <div class="d-inline-flex">
+            <state-provider
+              :loading="provider.stateURL.loading"
+              :check-u-r-l="provider.stateURL.checkURL"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
           <dt>{{ $t('user') }}</dt>
         </div>
@@ -28,7 +69,7 @@
           </dd>
         </div>
       </div>
-      <div class="row">
+      <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
           <dt>{{ $t('clientid') }}</dt>
         </div>
@@ -38,7 +79,7 @@
           </dd>
         </div>
       </div>
-      <div class="row">
+      <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
           <dt>{{ $t('created_time') }}</dt>
         </div>
@@ -49,27 +90,27 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-2">
       <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
         <button
           class="btn btn-primary"
           @click.stop="edit()"
         >
-          Edit
+          {{ $t('edit') }}
         </button>
         <button
           type="button"
           class="btn btn-danger ml-3"
           @click="deleteProvider"
         >
-          Remove
+          {{ $t('remove') }}
         </button>
         <button
           type="submit"
           class="btn btn-secondary ml-3"
           @click="back"
         >
-          Back
+          {{ $t('back') }}
         </button>
       </div>
     </div>
@@ -78,8 +119,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import StateProvider from '@/components/providers/StateProvider'
 export default {
 	name: 'Provider',
+	components: { StateProvider },
 	props: {
 		albumID: {
 			type: String,
@@ -102,33 +145,38 @@ export default {
 		})
 	},
 	created: function () {
-    this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-      if (res.status !== 200) {
-        this.$snotify.error('Sorry, an error occured')
-      }
-    }).catch(err => {
-      console.log(err)
-    })
+		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
+			if (res.status !== 200) {
+				this.$snotify.error('Sorry, an error occured')
+			}
+		}).catch(err => {
+			console.log(err)
+		})
 	},
 	methods: {
 		back () {
 			this.$emit('done')
-    },
-    edit() {
-      this.$emit('providerselectededit', this.clientID)
-    },
-    deleteProvider () {
-      this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-        if (res.status !== 204) {
-          this.$snotify.error('Sorry, an error occured')
-        } else {
-          this.$snotify.success('Provider remove')
-			    this.$emit('done')
-        }
-      }).catch(err => {
-        console.log(err)
-      })
-    }
+		},
+		edit () {
+			this.$emit('providerselectededit', this.clientID)
+		},
+		deleteProvider () {
+			this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
+				if (res.status !== 204) {
+					this.$snotify.error('Sorry, an error occured')
+				} else {
+					this.$snotify.success('Provider remove')
+					this.$emit('done')
+				}
+			}).catch(err => {
+				console.log(err)
+			})
+		}
 	}
 }
 </script>
+<style>
+	.breakwork {
+		word-break: break-word;
+	}
+</style>

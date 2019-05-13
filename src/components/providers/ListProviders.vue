@@ -1,18 +1,42 @@
 <i18n>
 {
 	"en": {
-    "edit": "Edit"
+    "edit": "Edit",
+    "urlWorking": "This provider is on",
+    "urlNotWorking": "This provider is off",
+		"refresh": "Refresh",
+		"created_time": "Created time",
+		"name_provider": "Name of provider",
+		"user": "User"
 	},
 	"fr": {
-    "edit": "Editer"
+    "edit": "Editer",
+    "urlWorking": "Ce provider est accessible",
+    "urlNotWorking": "Ce provider n'est pas accessible",
+		"refresh": "Rafraîchir",
+		"created_time": "Date de création",
+		"name_provider": "Nom du provider",
+		"user": "Utilisateur"
 	}
 }
 </i18n>
 <template>
   <div>
-    <h4>
-    Report Providers
-    </h4>
+    <div class="d-flex">
+      <div>
+        <h4>
+          Providers
+        </h4>
+      </div>
+      <div class="ml-auto">
+        <button
+          class="btn btn-sm btn-primary"
+          @click.stop="refresh()"
+        >
+          {{ $t('refresh') }}
+        </button>
+      </div>
+    </div>
     <b-table
       stacked="sm"
       striped
@@ -27,26 +51,11 @@
         slot="url_check"
         slot-scope="data"
       >
-        <div
-          v-if="true"
-          class="text-success"
-        >
-          <span class="nowrap">
-            <v-icon
-              name="check-circle"
-              class="mr-2"
-            />
-          </span>
-        </div>
-        <div
-          class="text-danger"
-          v-else
-        >
-          <v-icon
-            name="ban"
-            class="mr-2"
-          />
-        </div>
+        <state-provider
+          :loading="data.item.stateURL.loading"
+          :check-u-r-l="data.item.stateURL.checkURL"
+          :class-icon="'ml-2 mt-2'"
+        />
       </template>
       <template
         slot="btn_edit"
@@ -65,8 +74,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import StateProvider from '@/components/providers/StateProvider'
 export default {
-	name: 'NewProvider',
+	name: 'ListProviders',
+	components: { StateProvider },
 	props: {
 		albumID: {
 			type: String,
@@ -76,35 +87,31 @@ export default {
 	},
 	data () {
 		return {
-      fields: {
-        name: {
-          label: 'Name of provider',
-          sortable: true
-        },
-        client_id: {
-          label: 'Id du client',
-          sortable: true,
-					class: 'd-none d-lg-table-cell'
-        },
-        'user.email': {
-          label: 'User',
-          sortable: true,
-					class: 'd-none d-sm-table-cell'
-        },
-        created_time: {
-          label: 'Created time',
-          sortable: true,
-					class: 'd-none d-md-table-cell'
-        },
-        btn_edit : {
-          label: '',
-          sortable: false
-        },
-        url_check : {
-          label: '',
-          sortable: false
-        }
-      }
+			fields: {
+				name: {
+					label: this.$t('name_provider'),
+					sortable: true,
+					class: 'breakwork'
+				},
+				'user.email': {
+					label: this.$t('user'),
+					sortable: true,
+					class: 'd-none d-sm-table-cell breakwork'
+				},
+				created_time: {
+					label: this.$t('created_time'),
+					sortable: true,
+					class: 'd-none d-md-table-cell breakwork'
+				},
+				btn_edit: {
+					label: '',
+					sortable: false
+				},
+				url_check: {
+					label: '',
+					sortable: false
+				}
+			}
 		}
 	},
 	computed: {
@@ -123,21 +130,27 @@ export default {
 	},
 	methods: {
 		selectProvider (rowSelected) {
-      this.$emit('providerselectedshow', rowSelected.client_id)
-    },
-    edit(clientId) {
-      this.$emit('providerselectededit', clientId)
-    },
-    checkURL(url) {
-      this.$store.dispatch('testURLProvider', { url: url }).then(res => {
-        if (res.status !== 200) {
-          return false
-        }
-        return true
-      }).catch(err => {
-        return false
-      })
-    }
+			this.$emit('providerselectedshow', rowSelected.client_id)
+		},
+		edit (clientId) {
+			this.$emit('providerselectededit', clientId)
+		},
+		refresh () {
+			this.$store.dispatch('getProviders', { albumID: this.albumID }).then(res => {
+				if (res.status !== 200) {
+					this.$snotify.error('Sorry, an error occured')
+				}
+			}).catch(err => {
+				console.log(err)
+			})
+		}
 	}
 }
 </script>
+
+<style>
+	.breakwork {
+		word-break: break-word;
+	}
+</style>
+
