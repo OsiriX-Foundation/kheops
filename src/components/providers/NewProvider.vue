@@ -102,8 +102,8 @@ export default {
 	data () {
 		return {
 			provider: {
-				name: 'test',
-				url: 'http://129.194.108.70/.well-known/kheops-report-configuration'
+				name: '',
+				url: ''
 			},
 			show: false,
 			loading: false,
