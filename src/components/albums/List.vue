@@ -271,23 +271,6 @@
         slot-scope="row"
       >
         <b-button-group>
-          <b-button
-            variant="link"
-            size="sm"
-            class="mr-1 pt-0"
-            @click.stop="toggleDetails(row)"
-          >
-            <v-icon
-              v-if="row.detailsShowing"
-              class="align-middle"
-              name="chevron-down"
-            />
-            <v-icon
-              v-else
-              class="align-middle"
-              name="chevron-right"
-            />
-          </b-button>
           <b-form-checkbox
             v-if="row.item.is_admin || row.item.add_user"
             v-model="row.item.is_selected"
