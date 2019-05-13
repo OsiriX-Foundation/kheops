@@ -6,13 +6,13 @@
 		"general": "General",
 		"user": "User",
 		"token": "Token",
-    "providerSR": "Report provider"
+    "providerSR": "Providers"
 	},
 	"fr": {
 		"general": "Général",
 		"user": "Utilisateur",
     "token": "Token",
-    "providerSR": "Report provider"
+    "providerSR": "Providers"
 	}
 }
 </i18n>

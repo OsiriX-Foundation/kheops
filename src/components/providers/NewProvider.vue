@@ -1,15 +1,15 @@
 <i18n>
 {
 	"en": {
-    "newprovider": "New report provider",
+    "newprovider": "New provider",
     "nameProvider": "Name of the provider",
     "urlProvider": "Configuration URL of the provider"
 
 	},
 	"fr": {
-		"newprovider": "Nouveau report provider",
+		"newprovider": "Nouveau provider",
     "nameProvider": "Nom du provider",
-    "urlProvider": "Configuration URL of the provider"
+    "urlProvider": "URL de configuration"
 	}
 }
 </i18n>
@@ -49,6 +49,7 @@
             <input
               v-model="provider.url"
               type="text"
+              :placeholder="$t('urlProvider')"
               class="form-control"
               required
               maxlength="1024"
