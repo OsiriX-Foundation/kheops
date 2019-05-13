@@ -464,11 +464,11 @@
           slot="is_selected"
           slot-scope="row"
         >
-          <b-form-group>
+          <b-button-group>
             <b-button
               variant="link"
               size="sm"
-              class="mr-2"
+              class="mr-1"
               @click.stop="showSeries(row)"
             >
               <v-icon
@@ -486,12 +486,12 @@
             </b-button>
             <b-form-checkbox
               v-model="row.item.is_selected"
-              class="pt-2"
+              class="pt-1"
               inline
               @click.native.stop
               @change="toggleSelected(row.item,'study',!row.item.is_selected)"
             />
-          </b-form-group>
+          </b-button-group>
         </template>
 
         <!--Infos study (Series / Comments / Study Metadata) -->
