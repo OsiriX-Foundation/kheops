@@ -34,7 +34,8 @@
     "cancel": "Cancel",
     "importdir": "Import directory",
     "importfiles": "Import files",
-    "draganddrop": "Or drag and drop"
+    "draganddrop": "Or drag and drop",
+    "favorites": "Favorites"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -66,7 +67,8 @@
     "cancel": "Annuler",
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
-    "draganddrop": "Ou Drag and Drop"
+    "draganddrop": "Ou Drag and Drop",
+    "favorites": "Favorites"
 	}
 }
 </i18n>
@@ -83,11 +85,12 @@
       id="myHeader"
       ref="myHeader"
       :class="isActive ? 'sticky' : ''"
+      class="pt-2"
     >
       <div
         class="d-flex flex-wrap"
       >
-        <div class="p-2 align-self-center">
+        <div class="p-2 align-self-center d-none d-sm-block">
           <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
         </div>
         <div
@@ -305,6 +308,7 @@
         :no-sort-reset="true"
         :tbody-class="'table-wrapper-scroll-y'"
         @sort-changed="sortingChanged"
+        @row-clicked="showDetailsOnRow"
       >
         <template
           slot="HEAD_is_selected"
@@ -743,38 +747,38 @@ export default {
 					key: 'is_selected',
 					label: '',
 					sortable: false,
-					class: 'td_checkbox breakwork'
+					class: 'td_checkbox breakword'
 				},
 				{
 					key: 'PatientName',
 					label: 'PatientName',
 					tdClass: 'patientName',
 					sortable: true,
-					class: 'breakwork'
+					class: 'breakword'
 				},
 				{
 					key: 'PatientID',
 					label: 'PatientID',
 					sortable: true,
-					class: 'breakwork d-none d-md-table-cell d-lg-table-cell'
+					class: 'breakword d-none d-md-table-cell d-lg-table-cell'
 				},
 				{
 					key: 'StudyDescription',
 					label: 'StudyDescription',
 					sortable: false,
-					class: 'breakwork d-none d-lg-table-cell'
+					class: 'breakword d-none d-lg-table-cell'
 				},
 				{
 					key: 'StudyDate',
 					label: 'StudyDate',
 					sortable: true,
-					class: 'breakwork d-none d-sm-table-cell d-md-table-cell d-lg-table-cell'
+					class: 'breakword d-none d-sm-table-cell d-md-table-cell d-lg-table-cell'
 				},
 				{
 					key: 'ModalitiesInStudy',
 					label: 'Modality',
 					sortable: false,
-					class: 'breakwork d-none d-sm-table-cell'
+					class: 'breakword d-none d-sm-table-cell'
 				}
 			],
 			sortBy: 'StudyDate',
@@ -818,11 +822,14 @@ export default {
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
 		infoFavorites () {
-			if (this.studies.filter(s => { return s.is_selected }).every(s => { return s.is_favorite === true })) {
+      /*
+      if (this.studies.filter(s => { return s.is_selected }).every(s => { return s.is_favorite === true })) {
 				return 'removefavorite'
 			} else {
 				return 'addfavorite'
-			}
+      }
+      */
+      return 'favorites'
 		},
 		disabledToDates: function () {
 			let vm = this
@@ -975,7 +982,14 @@ export default {
 		toggleDetails (row) {
 			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.item.StudyInstanceUID[0] })
 			row.toggleDetails()
-		},
+    },
+    showDetailsOnRow (row) {
+      if (!row._showDetails) {
+        this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id })
+      }
+			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.StudyInstanceUID[0] })
+      row._showDetails = !row._showDetails
+    },
 		toggleFavorite (study) {
 			var vm = this
 			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
@@ -1271,7 +1285,7 @@ export default {
     overflow: scroll;
     display: block;
   }
-  .breakwork {
+  .breakword {
 		word-break: break-word;
 	}
 </style>
