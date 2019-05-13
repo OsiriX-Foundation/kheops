@@ -743,43 +743,38 @@ export default {
 					key: 'is_selected',
 					label: '',
 					sortable: false,
-					class: 'td_checkbox'
-					// thClass: 'd-none d-sm-table-cell'
+					class: 'td_checkbox breakwork'
 				},
 				{
 					key: 'PatientName',
 					label: 'PatientName',
-					// thClass: 'd-none d-sm-table-cell',
 					tdClass: 'patientName',
-					sortable: true
+					sortable: true,
+					class: 'breakwork'
 				},
 				{
 					key: 'PatientID',
 					label: 'PatientID',
 					sortable: true,
-					thClass: 'd-none d-md-table-cell d-lg-table-cell',
-					tdClass: 'd-none d-md-table-cell d-lg-table-cell'
+					class: 'breakwork d-none d-md-table-cell d-lg-table-cell'
 				},
 				{
 					key: 'StudyDescription',
 					label: 'StudyDescription',
 					sortable: false,
-					thClass: 'd-none d-lg-table-cell',
-					tdClass: 'd-none d-lg-table-cell'
+					class: 'breakwork d-none d-lg-table-cell'
 				},
 				{
 					key: 'StudyDate',
 					label: 'StudyDate',
-					thClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
-					tdClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
-					sortable: true
+					sortable: true,
+					class: 'breakwork d-none d-sm-table-cell d-md-table-cell d-lg-table-cell'
 				},
 				{
 					key: 'ModalitiesInStudy',
-					thClass: 'd-none d-sm-table-cell',
-					tdClass: 'd-none d-sm-table-cell',
 					label: 'Modality',
-					sortable: false
+					sortable: false,
+					class: 'breakwork d-none d-sm-table-cell'
 				}
 			],
 			sortBy: 'StudyDate',
@@ -1276,4 +1271,7 @@ export default {
     overflow: scroll;
     display: block;
   }
+  .breakwork {
+		word-break: break-word;
+	}
 </style>

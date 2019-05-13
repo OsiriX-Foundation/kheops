@@ -39,8 +39,9 @@
         </b-form-checkbox>
       </div>
     </div>
+
     <div class="row justify-content-center">
-      <div class="preview">
+      <div class="mb-2 preview">
         <img
           v-if="!series.Modality.includes('SR')"
           class="cursor-img"
@@ -56,10 +57,6 @@
           height="250"
         >
       </div>
-      <!--
-				div - col col-mb-2 col-md-auto description
-				table - table table-striped col-md-auto
-			-->
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
         <table class="table table-striped">
           <tbody>
