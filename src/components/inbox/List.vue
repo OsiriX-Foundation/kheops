@@ -468,7 +468,7 @@
             <b-button
               variant="link"
               size="sm"
-              class="mr-1"
+              class="mr-1 pt-0"
               @click.stop="showSeries(row)"
             >
               <v-icon
@@ -486,7 +486,6 @@
             </b-button>
             <b-form-checkbox
               v-model="row.item.is_selected"
-              class="pt-1"
               inline
               @click.native.stop
               @change="toggleSelected(row.item,'study',!row.item.is_selected)"

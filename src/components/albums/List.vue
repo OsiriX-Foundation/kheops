@@ -270,11 +270,11 @@
         slot="is_selected"
         slot-scope="row"
       >
-        <b-form-group>
+        <b-button-group>
           <b-button
             variant="link"
             size="sm"
-            class="mr-2"
+            class="mr-1 pt-0"
             @click.stop="toggleDetails(row)"
           >
             <v-icon
@@ -291,12 +291,11 @@
           <b-form-checkbox
             v-if="row.item.is_admin || row.item.add_user"
             v-model="row.item.is_selected"
-            class="pt-2"
             inline
             @click.native.stop
             @change="toggleSelected(row.item,'album',!row.item.is_selected)"
           />
-        </b-form-group>
+        </b-button-group>
       </template>
       <template
         slot="name"
