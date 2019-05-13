@@ -20,7 +20,9 @@ import online.kheops.auth_server.util.Consts;
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
@@ -77,7 +79,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         try {
             tx.begin();
 
-            List<Series> seriesList;
+            final List<Series> seriesList;
             if(jwe.getBoolean(Consts.JWE.IS_INBOX)) {
                 seriesList = findSeriesListByStudyUIDFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, em);
             } else {
@@ -203,5 +205,12 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     @Override
     public String toString() {
         return "[ViewerPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
+
+    @Override
+    public Optional<List<String>> getStudyList() {
+        final List<String> studyList = new ArrayList();
+        studyList.add(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID));
+        return Optional.of(studyList);
     }
 }

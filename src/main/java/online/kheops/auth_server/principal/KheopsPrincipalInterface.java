@@ -8,6 +8,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -30,6 +31,8 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException;
 
     default Optional<Capability> getCapability() {return Optional.empty();}
+
+    default Optional<List<String>> getStudyList() {return Optional.empty();}
 
     User getUser();
 

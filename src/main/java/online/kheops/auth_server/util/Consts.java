@@ -23,6 +23,7 @@ public class Consts {
     public static class USER_IN_ROLE {
         public static final String CAPABILITY = "capability";
         public static final String VIEWER_TOKEN = "viewerToken";
+        public static final String RP_TOKEN = "reportProviderToken";
     }
 
 
