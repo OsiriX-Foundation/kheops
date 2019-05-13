@@ -19,8 +19,12 @@ public class CapabilitiesResponse {
     @XmlElement(name = "id")
     private String id;
 
-    @XmlElement(name = "secret")
+    @XmlElement(name = "secret") // secret is deprecated
     private String secret;
+    @XmlElement(name = "access_token") // prefer this to secret
+    private String getAccessToken() {return secret;}
+    @XmlElement(name = "token_type")
+    private String tokenType = "Bearer";
     @XmlElement(name = "title")
     private String title;
 
