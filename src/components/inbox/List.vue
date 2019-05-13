@@ -822,14 +822,14 @@ export default {
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
 		infoFavorites () {
-      /*
+			/*
       if (this.studies.filter(s => { return s.is_selected }).every(s => { return s.is_favorite === true })) {
 				return 'removefavorite'
 			} else {
 				return 'addfavorite'
       }
       */
-      return 'favorites'
+			return 'favorites'
 		},
 		disabledToDates: function () {
 			let vm = this
@@ -912,7 +912,7 @@ export default {
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'], resetDisplay: true })
 				.then(() => {
-          this.setLoading(false)
+					this.setLoading(false)
 				})
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
@@ -982,14 +982,14 @@ export default {
 		toggleDetails (row) {
 			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.item.StudyInstanceUID[0] })
 			row.toggleDetails()
-    },
-    showDetailsOnRow (row) {
-      if (!row._showDetails) {
-        this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id })
-      }
+		},
+		showDetailsOnRow (row) {
+			if (!row._showDetails) {
+				this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id })
+			}
 			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.StudyInstanceUID[0] })
-      row._showDetails = !row._showDetails
-    },
+			row._showDetails = !row._showDetails
+		},
 		toggleFavorite (study) {
 			var vm = this
 			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
@@ -1038,9 +1038,9 @@ export default {
 		},
 		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
-				.then(res => { 
-          this.setLoading(false)
-        })
+				.then(res => {
+					this.setLoading(false)
+				})
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
