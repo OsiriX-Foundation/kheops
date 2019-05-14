@@ -8,6 +8,7 @@ import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
+import static online.kheops.auth_server.capability.CapabilitiesQueries.findAllCapabilitiesByAlbum;
 import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 
 public class Capabilities {
@@ -204,9 +206,10 @@ public class Capabilities {
         return  capabilityResponse;
     }
 
-    public static List<CapabilitiesResponse> getCapabilities(User callingUser, boolean valid) {
+    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(User callingUser, boolean valid, Integer limit, Integer offset) {
 
         final List<CapabilitiesResponse> capabilityResponses = new ArrayList<>();
+        final long totalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -218,9 +221,11 @@ public class Capabilities {
 
             final List<Capability> capabilities;
             if(valid) {
-                capabilities = findCapabilitiesByUserValidOnly(callingUser, em);
+                capabilities = findCapabilitiesByUserValidOnly(callingUser, limit, offset, em);
+                totalCount = countCapabilitiesByUserValidOnly(callingUser, em);
             } else {
-                capabilities = findAllCapabilitiesByUser(callingUser, em);
+                capabilities = findAllCapabilitiesByUser(callingUser, limit, offset, em);
+                totalCount = countAllCapabilitiesByUser(callingUser, em);
             }
 
             for (Capability capability: capabilities) {
@@ -234,12 +239,13 @@ public class Capabilities {
             }
             em.close();
         }
-        return capabilityResponses;
+        return new PairListXTotalCount<>(totalCount, capabilityResponses);
     }
 
-    public static List<CapabilitiesResponse> getCapabilities(String albumId, boolean valid) {
+    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(String albumId, boolean valid, Integer limit, Integer offset) {
 
         final List<CapabilitiesResponse> capabilityResponses = new ArrayList<>();
+        final long totalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -249,9 +255,11 @@ public class Capabilities {
 
             final List<Capability> capabilities;
             if(valid) {
-                capabilities = findCapabilitiesByAlbumValidOnly(albumId, em);
+                capabilities = findCapabilitiesByAlbumValidOnly(albumId, limit, offset, em);
+                totalCount = countCapabilitiesByAlbumValidOnly(albumId, em);
             } else {
-                capabilities = findAllCapabilitiesByAlbum(albumId, em);
+                capabilities = findAllCapabilitiesByAlbum(albumId, limit, offset, em);
+                totalCount = countAllCapabilitiesByAlbum(albumId, em);
             }
 
             for (Capability capability: capabilities) {
@@ -265,7 +273,8 @@ public class Capabilities {
             }
             em.close();
         }
-        return capabilityResponses;
+        return new PairListXTotalCount<>(totalCount, capabilityResponses);
+
     }
 
     public static CapabilitiesResponse getCapabilityInfo(String capabilityToken)

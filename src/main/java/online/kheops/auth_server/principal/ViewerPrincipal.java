@@ -198,7 +198,6 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         } else {
             throw new AlbumNotFoundException("");
         }
-
     }
 
     @Override
