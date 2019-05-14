@@ -53,7 +53,10 @@ public class FetchRequester {
                     .header(AUTHORIZATION, bearerToken.getHeaderValue())
                     .post(Entity.text(""))) {
             if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
-                LOG.log(SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID + "status code:" + response.getStatus());
+                final String responseString = response.readEntity(String.class);
+                LOG.log(SEVERE, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID +
+                        " status code:" + response.getStatus() +
+                        " response:" + responseString);
             }
         } catch (ProcessingException | WebApplicationException e) {
             LOG.log(SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID, e);
