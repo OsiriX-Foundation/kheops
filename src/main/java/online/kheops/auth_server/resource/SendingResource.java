@@ -3,7 +3,6 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;

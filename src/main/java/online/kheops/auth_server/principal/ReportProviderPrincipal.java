@@ -129,7 +129,6 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         try {
             tx.begin();
 
-            final User userMerge = em.merge(user);
              album = em.merge(album);
 
              if(!album.getId().equals(albumId))  {

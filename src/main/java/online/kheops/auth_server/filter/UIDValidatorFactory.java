@@ -5,7 +5,6 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
 import javax.annotation.Priority;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;

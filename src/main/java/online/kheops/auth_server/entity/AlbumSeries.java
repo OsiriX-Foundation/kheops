@@ -2,8 +2,6 @@ package online.kheops.auth_server.entity;
 
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity

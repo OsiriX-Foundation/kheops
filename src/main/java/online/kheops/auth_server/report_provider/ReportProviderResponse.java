@@ -2,8 +2,6 @@ package online.kheops.auth_server.report_provider;
 
 
 import online.kheops.auth_server.entity.ReportProvider;
-import online.kheops.auth_server.user.UserResponse;
-import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.json.JsonObject;
 import javax.xml.bind.annotation.XmlElement;

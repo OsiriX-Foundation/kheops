@@ -80,8 +80,7 @@ public class ReportProviders {
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
             String output = response.readEntity(String.class);
             try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
-                JsonObject reply = jsonReader.readObject();
-                return reply;
+                return jsonReader.readObject();
             }
         }
         throw new ReportProviderUriNotValidException("report provider uri not valid");

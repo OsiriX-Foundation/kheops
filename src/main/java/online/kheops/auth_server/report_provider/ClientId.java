@@ -15,8 +15,6 @@ public class ClientId {
     private static final String CLIENT_ID_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private static final int CLIENT_ID_LENGTH = 22;
     public static final String CLIENT_ID_PATTERN = "[A-Za-z0-9]{" + CLIENT_ID_LENGTH + "}";
-//    private static final String CLIENT_ID_PATTERN_STRICT = "^" + CLIENT_ID_PATTERN + "$";
-//    private static final Pattern clientIdPattern = Pattern.compile(CLIENT_ID_PATTERN_STRICT);
 
     private String id;
 
