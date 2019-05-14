@@ -8,7 +8,9 @@ import org.dcm4che3.json.JSONWriter;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonLocation;
 import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParsingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -47,6 +49,11 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List>, Me
         try (final JsonParser parser = Json.createParser(new CloseShieldInputStream(inputStream))) {
             final JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
+        } catch (JsonParsingException e) {
+            final JsonLocation jsonLocation = e.getLocation();
+            throw new IOException("Error while reading JSON datasets, (line:" + jsonLocation.getLineNumber() +
+                    ", column:" + jsonLocation.getColumnNumber() +
+                    ", stream offset:" + jsonLocation.getStreamOffset() + ")", e);
         } catch (Exception e){
             throw new IOException("Error while reading JSON datasets", e);
         }
