@@ -20,14 +20,18 @@ public class ConfigurationResponse {
     private String issuer;
     @XmlElement(name = "return_uri")
     private String returnUri;
-    @XmlElement(name = "dicomweb_uri")
-    private String dicomwebUri;
-    @XmlElement(name = "wado_uri")
-    private String wadoUri;
-    @XmlElement(name = "token_uri")
-    private String tokenUri;
+    @XmlElement(name = "dicomweb_endpoint")
+    private String dicomwebEndpoint;
+    @XmlElement(name = "wado_endpoint")
+    private String wadoEndpoint;
+    @XmlElement(name = "token_endpoint")
+    private String tokenEndpoint;
     @XmlElement(name = "introspect_uri")
     private String introspectUri;
+    @XmlElement(name = "userinfo_endpoint")
+    private String userInfoEndpoint;
+    @XmlElement(name = "jwks_uri")
+    private String jwksUri;
 
 
     private ConfigurationResponse() { /*empty*/ }
@@ -55,9 +59,9 @@ public class ConfigurationResponse {
         this.clientId = clientId;
         issuer = kheopsRootUri;
         returnUri = kheopsRootUri + "/albums/" + albumId;
-        dicomwebUri = kheopsRootUri + "/api";
-        wadoUri = kheopsRootUri + "/api";
-        tokenUri = kheopsRootUri + "/api/token";
+        dicomwebEndpoint = kheopsRootUri + "/api";
+        wadoEndpoint = kheopsRootUri + "/api";
+        tokenEndpoint = kheopsRootUri + "/api/token";
         introspectUri = kheopsRootUri + "/api/token/introspect";
 
     }
