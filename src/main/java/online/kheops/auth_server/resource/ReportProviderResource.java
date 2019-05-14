@@ -280,10 +280,14 @@ public class ReportProviderResource {
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
 
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final User callingUser = kheopsPrincipal.getUser();
         try {
-            deleteReportProvider(albumId, clientId);
+            deleteReportProvider(callingUser, albumId, clientId);
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (AlbumNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         return  Response.status(NO_CONTENT).build();
@@ -303,17 +307,23 @@ public class ReportProviderResource {
                                         @FormParam("name") final String name,
                                         @FormParam("new_client_id") final boolean newClientId) {
 
+
         if(!(url == null || url.isEmpty() )) {
             if(!isValidConfigUrl(url)) {
                 return Response.status(BAD_REQUEST).entity("url not valid").build();
             }
         }
 
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final User callingUser = kheopsPrincipal.getUser();
+
         final ReportProviderResponse reportProvider;
         try {
-            reportProvider = editReportProvider(albumId, clientId, url, name, newClientId);
+            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, newClientId);
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (AlbumNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         return  Response.status(OK).entity(reportProvider).build();

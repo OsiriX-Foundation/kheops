@@ -9,7 +9,6 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
-import org.jooq.tools.json.JSONObject;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -17,7 +16,6 @@ import javax.json.JsonReader;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
@@ -181,8 +179,8 @@ public class ReportProviders {
         return new ReportProviderResponse(reportProvider);
     }
 
-    public static void deleteReportProvider(String albumId, String clientId)
-            throws ClientIdNotFoundException {
+    public static void deleteReportProvider(User callingUser, String albumId, String clientId)
+            throws ClientIdNotFoundException, AlbumNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         final ReportProvider reportProvider;
@@ -196,7 +194,12 @@ public class ReportProviders {
                 throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
             }
 
-            em.remove(reportProvider);
+            reportProvider.setAsRemoved();
+
+            callingUser = em.merge(callingUser);
+            final Album album = getAlbum(albumId, em);
+            final Mutation mutation = new Mutation(callingUser, album, reportProvider, Events.MutationType.DELETE_REPORT_PROVIDER);
+            em.persist(mutation);
 
             tx.commit();
         } catch (NoResultException e) {
@@ -209,8 +212,8 @@ public class ReportProviders {
         }
     }
 
-    public static ReportProviderResponse editReportProvider(String albumId, String clientId, String url, String name, boolean newClientId)
-            throws ClientIdNotFoundException {
+    public static ReportProviderResponse editReportProvider(User callingUser, String albumId, String clientId, String url, String name, boolean newClientId)
+            throws ClientIdNotFoundException, AlbumNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         final ReportProvider reportProvider;
@@ -235,6 +238,11 @@ public class ReportProviders {
             if (newClientId) {
                 reportProvider.setClientId(new ClientId().getClientId());
             }
+
+            callingUser = em.merge(callingUser);
+            final Album album = getAlbum(albumId, em);
+            final Mutation mutation = new Mutation(callingUser, album, reportProvider, Events.MutationType.EDIT_REPORT_PROVIDER);
+            em.persist(mutation);
 
             tx.commit();
         } catch (NoResultException e) {

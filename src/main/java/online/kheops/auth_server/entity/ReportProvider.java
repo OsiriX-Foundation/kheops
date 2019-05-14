@@ -35,8 +35,12 @@ public class ReportProvider {
     @Column(name = "name")
     private String name;
 
+    @Basic(optional = false)
+    @Column(name = "removed")
+    private boolean removed;
+
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
     private Album album;
 
     @OneToMany
@@ -46,7 +50,9 @@ public class ReportProvider {
     @PrePersist
     public void onPrePersist() {
         creationTime = LocalDateTime.now(ZoneOffset.UTC);
+        this.removed = false;
     }
+
 
     public ReportProvider() {}
 
@@ -55,6 +61,7 @@ public class ReportProvider {
         this.url = url;
         this.name = name;
         this.album = album;
+
         album.addReportProvider(this);
     }
 
@@ -74,9 +81,7 @@ public class ReportProvider {
         return name;
     }
 
-    public Album getAlbum() {
-        return album;
-    }
+    public Album getAlbum() { return album; }
 
     public void addMutation(Mutation mutation) { mutations.add(mutation); }
 
@@ -85,4 +90,8 @@ public class ReportProvider {
     public void setUrl(String url) { this.url = url; }
 
     public void setName(String name) { this.name = name; }
+
+    public boolean isRemoved() { return removed; }
+
+    public void setAsRemoved() { this.removed = true; }
 }

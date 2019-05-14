@@ -34,6 +34,9 @@ public class EventResponse {
         private String name;
         @XmlElement(name = "id")
         private String id;
+        @XmlElement(name = "is_removed")
+        private boolean removed;
+
     }
 
 
@@ -123,7 +126,13 @@ public class EventResponse {
         }
         if (mutation.getReportProvider().isPresent()) {
             reportProvider = new ReportProviderResponse();
-            reportProvider.id = mutation.getReportProvider().get().getClientId();
+            if(mutation.getReportProvider().get().isRemoved()) {
+                reportProvider.removed = true;
+            } else {
+                reportProvider.removed = false;
+                reportProvider.id = mutation.getReportProvider().get().getClientId();
+            }
+
             reportProvider.name = mutation.getReportProvider().get().getName();
         }
         if (mutation.getCapability().isPresent()) {

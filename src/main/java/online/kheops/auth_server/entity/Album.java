@@ -66,11 +66,11 @@ public class Album {
     private Set<AlbumSeries> albumSeries = new HashSet<>();
 
     @OneToMany
-    @JoinColumn (name = "album_fk", nullable=false)
+    @JoinColumn (name = "album_fk", nullable = false)
     private Set<AlbumUser> albumUser = new HashSet<>();
 
     @OneToMany
-    @JoinColumn (name = "album_fk", nullable=true)
+    @JoinColumn (name = "album_fk", nullable = true)
     private Set<Event> events = new HashSet<>();
 
     @OneToOne(mappedBy = "inbox")
@@ -80,8 +80,8 @@ public class Album {
     @JoinColumn (name = "album_fk")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "album_fk", nullable=true)
+    @OneToMany()
+    @JoinColumn (name = "album_fk", nullable = false)
     private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist
@@ -199,7 +199,7 @@ public class Album {
 
     public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
-    public Set <ReportProvider> getReportProvider() {return reportProviders; }
+    public Set<ReportProvider> getReportProviders() {return reportProviders; }
 
     @Override
     public String toString() {

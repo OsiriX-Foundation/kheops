@@ -14,14 +14,14 @@ public class ReportProviderQueries {
 
     public static ReportProvider getReportProviderWithClientId(String clientId, EntityManager em) {
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr where :clientId = dsr.clientId", ReportProvider.class)
+        return em.createQuery("SELECT dsr from ReportProvider dsr where :clientId = dsr.clientId and dsr.removed = false", ReportProvider.class)
                 .setParameter("clientId", clientId)
                 .getSingleResult();
     }
 
     public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, EntityManager em) {
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id", ReportProvider.class)
+        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false", ReportProvider.class)
                 .setParameter("albumId", albumId)
                 .getResultList();
     }

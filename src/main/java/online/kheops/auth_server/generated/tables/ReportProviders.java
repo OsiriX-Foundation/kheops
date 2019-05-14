@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReportProviders extends TableImpl<ReportProvidersRecord> {
 
-    private static final long serialVersionUID = -328307121;
+    private static final long serialVersionUID = -793984388;
 
     /**
      * The reference instance of <code>public.report_providers</code>
@@ -86,6 +86,11 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
      * The column <code>public.report_providers.client_id</code>.
      */
     public final TableField<ReportProvidersRecord, String> CLIENT_ID = createField("client_id", org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false), this, "");
+
+    /**
+     * The column <code>public.report_providers.removed</code>.
+     */
+    public final TableField<ReportProvidersRecord, Boolean> REMOVED = createField("removed", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * Create a <code>public.report_providers</code> table reference
