@@ -39,8 +39,6 @@ public class Mutation extends Event{
 
     public Optional<ReportProvider> getReportProvider() { return Optional.ofNullable(reportProvider); }
 
-
-
     public Mutation(){}
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, User targetUser) {

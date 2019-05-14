@@ -80,7 +80,7 @@ public class Album {
     @JoinColumn (name = "album_fk")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany()
+    @OneToMany
     @JoinColumn (name = "album_fk", nullable = false)
     private Set<ReportProvider> reportProviders = new HashSet<>();
 
