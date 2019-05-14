@@ -182,6 +182,10 @@ public final class AuthorizationManager {
                 authorizedSeriesIDs.add(seriesID);
                 return true;
             } else {
+                String responseValue = response.readEntity(String.class);
+                LOG.log(WARNING, () -> "Authorization server rejected authorization for series:" + seriesID +
+                        " status:" + response.getStatus() + 
+                        " response:" + responseValue);
                 forbiddenSeriesIDs.add(seriesID);
                 forbiddenInstanceIDs.add(instanceID);
                 return false;
