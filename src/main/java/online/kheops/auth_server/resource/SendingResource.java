@@ -129,7 +129,7 @@ public class SendingResource
                     Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
                     LOG.warning(() -> "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
-                    return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
+                    return Response.status(FORBIDDEN).entity("No write access with this credential").build();
                 }
             } else {
                 Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
@@ -161,7 +161,7 @@ public class SendingResource
                 if (kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.ADD_SERIES, albumID)) {
                     Sending.putStudyInAlbum(kheopsPrincipal, albumID, studyInstanceUID, albumId, false);
                 } else {
-                    return Response.status(FORBIDDEN).entity("todo write a good forbidden message").build();//TODO
+                    return Response.status(FORBIDDEN).entity("No write access with this credential").build();
                 }
             } else {
                 Sending.appropriateStudy(kheopsPrincipal.getUser(), studyInstanceUID, albumId);

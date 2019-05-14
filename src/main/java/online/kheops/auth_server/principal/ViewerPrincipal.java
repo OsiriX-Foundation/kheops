@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
@@ -125,7 +124,9 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     public boolean hasStudyWriteAccess(String study) { return false; }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)
+            throws AlbumNotFoundException {
+
         if (!kheopsPrincipal.hasAlbumPermission(usersPermission, albumId)) {
             return false;
         } else {
@@ -136,18 +137,18 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
                 final User userMerge = em.merge(kheopsPrincipal.getUser());
                 final Album album = getAlbum(albumId, em);
-                final AlbumUser albumUser = getAlbumUser(album, userMerge, em);
+
+                if(!isMemberOfAlbum(userMerge, album, em)) {
+                    throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                }
 
                 if(userMerge.getInbox() == album) {
                     throw new AlbumNotFoundException("Album id : " + albumId + " not found");
                 }
-                if (albumUser.isAdmin()) {
-                    return true;//TODO un viewer token ne devrait jamais avoir de permission autre que read sur un album!!!!!!
-                }
 
                 return usersPermission.hasViewerPermission(album);
 
-            } catch (AlbumNotFoundException | UserNotMemberException e) {
+            } catch (AlbumNotFoundException e) {
                 throw new AlbumNotFoundException("Album id : " + albumId + " not found");
             } finally {
                 if (tx.isActive()) {
