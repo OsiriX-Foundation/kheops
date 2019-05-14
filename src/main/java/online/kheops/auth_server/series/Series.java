@@ -35,6 +35,17 @@ public class Series {
         return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
     }
 
+    public static boolean seriesExist(String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
+        try {
+            getSeries(studyInstanceUID,  seriesInstanceUID, em);
+        } catch (SeriesNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+
+
     public static boolean canAccessSeries(User user, String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
         try {
             findSeriesByStudyUIDandSeriesUID(user, studyInstanceUID,  seriesInstanceUID, em);

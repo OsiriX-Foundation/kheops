@@ -6,6 +6,7 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -133,7 +134,7 @@ public class SendingResource
             } else {
                 Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
             }
-        } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException e) {
+        } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException | ClientIdNotFoundException e) {
             LOG.log(WARNING, "Unable to add series", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -278,7 +279,7 @@ public class SendingResource
 
         try {
             Sending.putSeriesInAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID);
-        } catch (AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

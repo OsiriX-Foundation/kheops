@@ -99,7 +99,8 @@ public class EventResponse {
             targetName = mutation.getToUser().getEmail();
         }
         if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString())) {
+                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString()) ||
+                mutation.getMutationType().equals(Events.MutationType.NEW_REPORT.toString())) {
             series = new SeriesResponse();
             study = new StudyResponse();
             series.seriesUID = mutation.getSeries().getSeriesInstanceUID();

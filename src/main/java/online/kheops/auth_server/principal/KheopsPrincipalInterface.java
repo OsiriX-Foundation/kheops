@@ -23,7 +23,8 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     boolean hasUserAccess();
     boolean hasInboxAccess();
 
-    boolean hasSeriesWriteAccess(String study, String series)throws SeriesNotFoundException;
+    boolean hasSeriesWriteAccess(String study, String series) throws SeriesNotFoundException;
+
     boolean hasStudyWriteAccess(String study);
 
     boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)throws AlbumNotFoundException;
@@ -33,6 +34,8 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
     default Optional<Capability> getCapability() {return Optional.empty();}
 
     default Optional<List<String>> getStudyList() {return Optional.empty();}
+
+    default Optional<String> getClientId() {return Optional.empty();}
 
     User getUser();
 

@@ -64,6 +64,13 @@ public class Mutation extends Event{
         reportProvider.addMutation(this);
     }
 
+    public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType, Series series) {
+        this(callingUser, album, mutationType, series);
+        this.reportProvider = reportProvider;
+
+        reportProvider.addMutation(this);
+    }
+
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Series series) {
         super(callingUser, album, series.getStudy());
         this.mutationType = mutationType.toString();

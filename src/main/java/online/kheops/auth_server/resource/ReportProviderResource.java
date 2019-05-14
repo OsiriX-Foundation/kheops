@@ -95,9 +95,9 @@ public class ReportProviderResource {
     @Path("report")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reportProvider(@FormParam("access_token") final String accessToken,
-                                   @FormParam("clientId") final String clientId,
-                                   @FormParam(StudyInstanceUID) List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
+    public Response newReport(@FormParam("access_token") final String accessToken,
+                              @FormParam("clientId") final String clientId,
+                              @FormParam(StudyInstanceUID) List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
 
         if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
             return Response.status(BAD_REQUEST).entity("ERROR").build();

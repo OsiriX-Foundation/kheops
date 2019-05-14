@@ -6,6 +6,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -18,6 +19,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
+import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.Series.isSeriesInInbox;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
@@ -159,7 +162,7 @@ public class Sending {
     }
 
     public static void putSeriesInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID)
-            throws AlbumNotFoundException {
+            throws AlbumNotFoundException, ClientIdNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -172,7 +175,7 @@ public class Sending {
 
             Series availableSeries;
             try {
-                availableSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                availableSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
                 //Todo series already exist ?? if upload with capability token => verify if orphelin => if not => return forbidden
             } catch (SeriesNotFoundException e2) {
@@ -199,6 +202,9 @@ public class Sending {
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().get());
                 mutation = Events.albumPostSeriesMutation(capability, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
+            } else if(kheopsPrincipal.getClientId().isPresent()) {
+                final ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().get());
+                mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             }
@@ -314,7 +320,7 @@ public class Sending {
                 appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID);
             }
 
-            final Series series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+            final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             final Album inbox = targetUser.getInbox();
             if(inbox.containsSeries(series, em)) {
                 //target user has already access to the series
@@ -347,7 +353,7 @@ public class Sending {
             callingUser = em.merge(callingUser);
 
             try {
-                final Series storedSeries = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
                 if(isOrphan(storedSeries, em)) {
                     //here the series exists but she is orphan

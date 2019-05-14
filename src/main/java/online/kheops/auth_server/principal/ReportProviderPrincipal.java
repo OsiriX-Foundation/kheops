@@ -6,12 +6,15 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.util.Consts;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.ws.rs.ForbiddenException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
@@ -72,7 +75,6 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
             }
             em.close();
         }
-        //return false;
     }
 
     @Override
@@ -97,24 +99,17 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
             album = em.merge(album);
             tx.commit();
 
-            if (canAccessStudy(album, studyInstanceUID)) {
-                final Series series;
-                try {
-                    series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
-                } catch (SeriesNotFoundException e) {
-                    //if the series does not exist
-                    return true;
-                }
+            if (canAccessStudy(album, studyInstanceUID) && seriesExist(studyInstanceUID, seriesInstanceUID, em)) {
+                return false;
+            } else {
+                return true;
             }
-            return false;
-
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        //return false;
     }
 
     @Override
@@ -167,6 +162,16 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         return "[ReportProviderPrincipal user:" + getUser() + " dbid:" + getDBID() + " albumId:" + album.getId() + " clientID:" + clientId + "]";
     }
 
+    @Override
+    public Optional<String> getClientId() {
+        return Optional.of(clientId);
+    }
+
+    @Override
+    public Optional<List<String>> getStudyList() {
+        return Optional.of(studyUids);
+    }
+
     private boolean hasStudyAccess(String studyInstanceUID) {
         if (!studyUids.contains(studyInstanceUID)) {
             return false;
@@ -187,6 +192,5 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
             }
             em.close();
         }
-        //return false;
     }
 }

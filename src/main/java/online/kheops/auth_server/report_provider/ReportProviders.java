@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.event.Events.reportProviderMutation;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProvidersWithAlbumId;
 
@@ -51,7 +52,7 @@ public class ReportProviders {
             reportProvider = new ReportProvider(url, name, album);
 
             callingUser = em.merge(callingUser);
-            final Mutation mutation = new Mutation(callingUser, album, reportProvider, Events.MutationType.CREATE_REPORT_PROVIDER);
+            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.CREATE_REPORT_PROVIDER);
 
             em.persist(mutation);
             em.persist(reportProvider);
@@ -197,7 +198,7 @@ public class ReportProviders {
 
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
-            final Mutation mutation = new Mutation(callingUser, album, reportProvider, Events.MutationType.DELETE_REPORT_PROVIDER);
+            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.DELETE_REPORT_PROVIDER);
             em.persist(mutation);
 
             tx.commit();
@@ -240,7 +241,7 @@ public class ReportProviders {
 
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
-            final Mutation mutation = new Mutation(callingUser, album, reportProvider, Events.MutationType.EDIT_REPORT_PROVIDER);
+            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.EDIT_REPORT_PROVIDER);
             em.persist(mutation);
 
             tx.commit();
