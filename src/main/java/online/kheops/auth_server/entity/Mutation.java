@@ -37,6 +37,10 @@ public class Mutation extends Event{
 
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
 
+    public Optional<ReportProvider> getReportProvider() { return Optional.ofNullable(reportProvider); }
+
+
+
     public Mutation(){}
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, User targetUser) {
@@ -50,6 +54,14 @@ public class Mutation extends Event{
     public Mutation(User callingUser, Album album, Events.MutationType mutationType) {
         super(callingUser, album);
         this.mutationType = mutationType.toString();
+    }
+
+    public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
+        super(callingUser, album);
+        this.mutationType = mutationType.toString();
+        this.reportProvider = reportProvider;
+
+        reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Series series) {

@@ -3,8 +3,10 @@ package online.kheops.auth_server.report_provider;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.event.Events;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.jooq.tools.json.JSONObject;
@@ -50,6 +52,10 @@ public class ReportProviders {
             final Album album = getAlbum(albumId, em);
             reportProvider = new ReportProvider(url, name, album);
 
+            callingUser = em.merge(callingUser);
+            final Mutation mutation = new Mutation(callingUser, album, reportProvider, Events.MutationType.CREATE_REPORT_PROVIDER);
+
+            em.persist(mutation);
             em.persist(reportProvider);
             tx.commit();
 

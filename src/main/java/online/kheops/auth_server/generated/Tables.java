@@ -10,6 +10,7 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
@@ -49,6 +50,11 @@ public class Tables {
      * The table <code>public.capabilities</code>.
      */
     public static final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+
+    /**
+     * The table <code>public.events</code>.
+     */
+    public static final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
 
     /**
      * The table <code>public.report_providers</code>.

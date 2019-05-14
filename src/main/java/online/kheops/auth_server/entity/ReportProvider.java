@@ -78,6 +78,8 @@ public class ReportProvider {
         return album;
     }
 
+    public void addMutation(Mutation mutation) { mutations.add(mutation); }
+
     public void setClientId(String clientId) { this.clientId = clientId; }
 
     public void setUrl(String url) { this.url = url; }
