@@ -37,6 +37,7 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
@@ -103,12 +104,12 @@ public class ReportProviderResource {
                               @FormParam(StudyInstanceUID) List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
 
         if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("ERROR").build();
+            return Response.status(BAD_REQUEST).entity(StudyInstanceUID +" param must be set").build();
         }
 
         for (String uid: studyInstanceUID) {
             if (!checkValidUID(uid)) {
-                return Response.status(BAD_REQUEST).entity("ERROR").build();
+                return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
             }
         }
 
@@ -117,13 +118,13 @@ public class ReportProviderResource {
             assertion = AssertionVerifier.createAssertion(accessToken, UNKNOWN_BEARER_URN);
         } catch (UnknownGrantTypeException e) {
             LOG.log(Level.WARNING, "Unknown grant type", e);
-            return Response.status(BAD_REQUEST).entity("ERROR").build();
+            return Response.status(BAD_REQUEST).entity("error with the grant_type param").build();
         } catch (BadAssertionException e) {
             LOG.log(Level.WARNING, "Error validating a token", e);
-            return Response.status(UNAUTHORIZED).entity("ERROR").build();
+            return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
-            return Response.status(BAD_GATEWAY).entity("ERROR").build();
+            return Response.status(BAD_GATEWAY).entity("Error downloading the public key").build();
         }
 
         try {
@@ -145,7 +146,7 @@ public class ReportProviderResource {
             callingUser = getOrCreateUser(assertion.getSub());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(UNAUTHORIZED).entity("ERROR").build();
+            return Response.status(UNAUTHORIZED).entity("User not found").build();
         }
 
         //vérifier l'acces a l'album
@@ -161,7 +162,7 @@ public class ReportProviderResource {
             reportProvider = getReportProviderWithClientId(clientId, em);
             albumId = reportProvider.getAlbum().getId();
         } catch (NoResultException e){
-            return Response.status(BAD_REQUEST).entity("ERROR").build();
+            return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -176,13 +177,13 @@ public class ReportProviderResource {
             }
 
             album = getAlbum(albumId);
-            for (String uid : studyInstanceUID) {
-            /*if (!canAccessStudy(album, uid)) {
-                return Response.status(FORBIDDEN).build();
-            }*/
+                for (String uid : studyInstanceUID) {
+                if (!canAccessStudy(album, uid)) {
+                    return Response.status(NOT_FOUND).entity("Study uid: " + uid + "not found").build();
+                }
             }
         } catch (AlbumNotFoundException e) {
-            return Response.status(FORBIDDEN).entity("ERROR").build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         //générer le jwt
@@ -345,6 +346,4 @@ public class ReportProviderResource {
         }
         return  Response.status(OK).build();
     }
-
-
 }

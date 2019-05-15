@@ -145,9 +145,6 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
                 }
 
                 return usersPermission.hasViewerPermission(album);
-
-            } catch (AlbumNotFoundException e) {
-                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
