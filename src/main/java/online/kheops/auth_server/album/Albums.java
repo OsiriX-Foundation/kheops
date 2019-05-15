@@ -171,7 +171,7 @@ public class Albums {
         if (withUserAccess) {
             albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
             if(withUsersList) {
-                albumResponse.setUsers(getUsers(albumId));
+                albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
             }
             return albumResponse;
         } else {
@@ -179,22 +179,27 @@ public class Albums {
         }
     }
 
-    public static List<UserAlbumResponse> getUsers(String albumId)
+    public static PairListXTotalCount<UserAlbumResponse> getUsers(String albumId, Integer limit , Integer offset)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final List<UserAlbumResponse> listUserAlbumResponse = new ArrayList<>();
+        final long totalCount;
         try {
             final Album album = getAlbum(albumId, em);
+            totalCount = album.getAlbumUser().size();
 
+            int i = 0;
             for (AlbumUser albumUser : album.getAlbumUser()) {
+                if (i++ < offset) continue;
+                if (i > offset + limit) break;
                 listUserAlbumResponse.add(new UserAlbumResponse(albumUser));
             }
         } finally {
             em.close();
         }
         Collections.sort(listUserAlbumResponse);
-        return listUserAlbumResponse;
+        return new PairListXTotalCount<>(totalCount, listUserAlbumResponse);
     }
 
     public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)

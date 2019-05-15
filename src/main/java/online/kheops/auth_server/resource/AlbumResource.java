@@ -12,6 +12,7 @@ import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
+import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 
@@ -222,22 +223,24 @@ public class AlbumResource {
     @Path("albums/{album:"+AlbumId.ID_PATTERN+"}/users")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsersAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
+    public Response getUsersAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                  @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                  @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final List<UserAlbumResponse> userAlbumResponse;
+        final PairListXTotalCount<UserAlbumResponse> pair;
 
         try {
-            userAlbumResponse = Albums.getUsers(albumId);
+            pair = Albums.getUsers(albumId, limit, offset);
         } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Get users list for album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(userAlbumResponse) {};
-        return Response.status(OK).entity(genericUsersAlbumResponsesList).build();
+        final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(pair.getAttributesList()) {};
+        return Response.status(OK).entity(genericUsersAlbumResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
     @PUT

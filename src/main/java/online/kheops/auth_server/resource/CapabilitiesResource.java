@@ -11,6 +11,7 @@ import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -143,8 +144,8 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapabilities(@QueryParam("valid") boolean valid,
                                     @QueryParam(ALBUM) String albumId,
-                                    @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                    @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
+                                    @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                    @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
         final PairListXTotalCount<CapabilitiesResponse> pair;
 

@@ -2,11 +2,13 @@ package online.kheops.auth_server.report_provider;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.capability.CapabilitiesResponse;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.util.PairListXTotalCount;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
@@ -27,8 +29,7 @@ import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.event.Events.reportProviderMutation;
-import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
-import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProvidersWithAlbumId;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.*;
 
 public class ReportProviders {
 
@@ -128,15 +129,19 @@ public class ReportProviders {
     }
 
 
-    public static List<ReportProviderResponse> getReportProviders(String albumId) {
+    public static PairListXTotalCount<ReportProviderResponse> getReportProviders(String albumId, Integer limit, Integer offset) {
+
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
+
         final List<ReportProviderResponse> reportProviders = new ArrayList<>();
+        final long totalCount;
         final List<ReportProvider> reportProvidersEntity;
 
         try {
             tx.begin();
-            reportProvidersEntity = getReportProvidersWithAlbumId(albumId, em);
+            reportProvidersEntity = getReportProvidersWithAlbumId(albumId,limit, offset, em);
+            totalCount = countReportProviderWithAlbumId(albumId, em);
             tx.commit();
         } finally {
             if (tx.isActive()) {
@@ -148,7 +153,7 @@ public class ReportProviders {
         for (ReportProvider reportProvider : reportProvidersEntity) {
             reportProviders.add(new ReportProviderResponse(reportProvider));
         }
-        return reportProviders;
+        return new PairListXTotalCount<>(totalCount, reportProviders);
     }
 
     public static ReportProviderResponse getReportProvider(String albumId, String clientId)

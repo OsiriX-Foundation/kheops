@@ -15,11 +15,13 @@ import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
+import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.UnsupportedEncodingException;
@@ -36,8 +38,9 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
-import static online.kheops.auth_server.util.Consts.ALBUM;
-import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
+import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
+import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.Tools.checkValidUID;
 
 
@@ -241,14 +244,16 @@ public class ReportProviderResource {
     @AlbumPermissionSecured(UserPermissionEnum.GET_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
+    public Response getAllReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                          @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                          @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
-        final List<ReportProviderResponse> reportProviders;
+        final PairListXTotalCount<ReportProviderResponse> pair;
 
-        reportProviders = ReportProviders.getReportProviders(albumId);
+        pair = ReportProviders.getReportProviders(albumId, limit, offset);
 
-        final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<List<ReportProviderResponse>>(reportProviders) {};
-        return  Response.status(OK).entity(genericReportProvidersResponsesList).build();
+        final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<List<ReportProviderResponse>>(pair.getAttributesList()) {};
+        return  Response.status(OK).entity(genericReportProvidersResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
     @GET
