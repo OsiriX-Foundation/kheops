@@ -61,16 +61,6 @@
       </div>
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
-          <dt>{{ $t('user') }}</dt>
-        </div>
-        <div class="col-xs-12 col-sm-9">
-          <dd>
-            {{ provider.user.email }}
-          </dd>
-        </div>
-      </div>
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-3">
           <dt>{{ $t('clientid') }}</dt>
         </div>
         <div class="col-xs-12 col-sm-9">

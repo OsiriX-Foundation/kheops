@@ -7,7 +7,7 @@
 		"refresh": "Refresh",
 		"created_time": "Created time",
 		"name_provider": "Name of provider",
-		"user": "User"
+		"url": "Configuration URL"
 	},
 	"fr": {
     "edit": "Editer",
@@ -16,7 +16,7 @@
 		"refresh": "Rafraîchir",
 		"created_time": "Date de création",
 		"name_provider": "Nom du provider",
-		"user": "Utilisateur"
+		"url": "URL de configuration"
 	}
 }
 </i18n>
@@ -93,8 +93,8 @@ export default {
 					sortable: true,
 					tdClass: 'breakwork'
 				},
-				'user.email': {
-					label: this.$t('user'),
+				url: {
+					label: this.$t('url'),
 					sortable: true,
 					tdClass: 'breakwork',
 					class: 'd-none d-sm-table-cell'
