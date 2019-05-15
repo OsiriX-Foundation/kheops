@@ -6,7 +6,6 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.principal.ViewerPrincipal;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import org.dcm4che3.data.Tag;
 
