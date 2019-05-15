@@ -131,7 +131,7 @@ public class Studies {
                 isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
                 isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
                 countDistinct(SERIES.PK).as("count:" + SERIES.PK.getName()),
-                sumDistinct(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
                 countDistinct(when(ALBUM_SERIES.FAVORITE.eq(true), ALBUM_SERIES.PK)).as("sum_fav"),
                 countDistinct(EVENTS).as("sum_comments"));
