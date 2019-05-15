@@ -13,9 +13,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -57,7 +59,10 @@ public abstract class Fetcher {
                 throw new WebApplicationException("GET to fetch study returned nothing");
             }
             attributes = studyList.get(0);
-        } catch (WebApplicationException e) {
+        } catch (ResponseProcessingException e) {
+            logResponseProcessingException(e, studyInstanceUID);
+            return;
+        } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
             return;
         }
@@ -88,20 +93,24 @@ public abstract class Fetcher {
         }
     }
 
-    private static boolean fetchSeries(String studyUID, String seriesUID) {
+    private static void fetchSeries(String studyUID, String seriesUID) {
         final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
         try {
             String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyUID).withSeriesUID(seriesUID).build();
-            List<Attributes> seriesList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer " + authToken).get(new GenericType<List<Attributes>>() {});
+            List<Attributes> seriesList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer " + authToken).get(new GenericType<List<Attributes>>() {
+            });
             if (seriesList == null || seriesList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch series returned nothing");
             }
             attributes = seriesList.get(0);
-        } catch (WebApplicationException e) {
+        } catch (ResponseProcessingException e) {
+            logResponseProcessingException(e, studyUID, seriesUID);
+            return;
+        } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID, e);
-            return false;
+            return;
         }
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -126,7 +135,27 @@ public abstract class Fetcher {
             }
             em.close();
         }
+    }
 
-        return true;
+    private static void logResponseProcessingException(ResponseProcessingException e, String studyUID) {
+        try {
+            String responseString = e.getResponse().readEntity(String.class);
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID +
+                    " response:\n" + responseString, e);
+        } catch (ProcessingException | IllegalStateException exception) {
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID, e);
+            LOG.log(Level.SEVERE, "Error while getting the response string", exception);
+        }
+    }
+
+    private static void logResponseProcessingException(ResponseProcessingException e, String studyUID, String seriesUID) {
+        try {
+            String responseString = e.getResponse().readEntity(String.class);
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID +
+                    " response:\n" + responseString, e);
+        } catch (ProcessingException | IllegalStateException exception) {
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID, e);
+            LOG.log(Level.SEVERE, "Error while getting the response string", exception);
+        }
     }
 }
