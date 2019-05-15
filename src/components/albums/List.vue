@@ -270,33 +270,15 @@
         slot="is_selected"
         slot-scope="row"
       >
-        <b-form-group>
-          <b-button
-            variant="link"
-            size="sm"
-            class="mr-2"
-            @click.stop="toggleDetails(row)"
-          >
-            <v-icon
-              v-if="row.detailsShowing"
-              class="align-middle"
-              name="chevron-down"
-            />
-            <v-icon
-              v-else
-              class="align-middle"
-              name="chevron-right"
-            />
-          </b-button>
+        <b-button-group>
           <b-form-checkbox
             v-if="row.item.is_admin || row.item.add_user"
             v-model="row.item.is_selected"
-            class="pt-2"
             inline
             @click.native.stop
             @change="toggleSelected(row.item,'album',!row.item.is_selected)"
           />
-        </b-form-group>
+        </b-button-group>
       </template>
       <template
         slot="name"

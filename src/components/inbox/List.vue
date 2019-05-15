@@ -34,7 +34,8 @@
     "cancel": "Cancel",
     "importdir": "Import directory",
     "importfiles": "Import files",
-    "draganddrop": "Or drag and drop"
+    "draganddrop": "Or drag and drop",
+    "favorites": "Favorites"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -66,7 +67,8 @@
     "cancel": "Annuler",
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
-    "draganddrop": "Ou Drag and Drop"
+    "draganddrop": "Ou Drag and Drop",
+    "favorites": "Favorites"
 	}
 }
 </i18n>
@@ -83,11 +85,12 @@
       id="myHeader"
       ref="myHeader"
       :class="isActive ? 'sticky' : ''"
+      class="pt-2"
     >
       <div
         class="d-flex flex-wrap"
       >
-        <div class="p-2 align-self-center">
+        <div class="p-2 align-self-center d-none d-sm-block">
           <span>{{ $tc("selectednbstudies",selectedStudiesNb,{count: selectedStudiesNb}) }}</span>
         </div>
         <div
@@ -305,6 +308,7 @@
         :no-sort-reset="true"
         :tbody-class="'table-wrapper-scroll-y'"
         @sort-changed="sortingChanged"
+        @row-clicked="showDetailsOnRow"
       >
         <template
           slot="HEAD_is_selected"
@@ -464,11 +468,11 @@
           slot="is_selected"
           slot-scope="row"
         >
-          <b-form-group>
+          <b-button-group>
             <b-button
               variant="link"
               size="sm"
-              class="mr-2"
+              class="mr-1 pt-0"
               @click.stop="showSeries(row)"
             >
               <v-icon
@@ -486,12 +490,11 @@
             </b-button>
             <b-form-checkbox
               v-model="row.item.is_selected"
-              class="pt-2"
               inline
               @click.native.stop
               @change="toggleSelected(row.item,'study',!row.item.is_selected)"
             />
-          </b-form-group>
+          </b-button-group>
         </template>
 
         <!--Infos study (Series / Comments / Study Metadata) -->
@@ -744,43 +747,38 @@ export default {
 					key: 'is_selected',
 					label: '',
 					sortable: false,
-					class: 'td_checkbox'
-					// thClass: 'd-none d-sm-table-cell'
+					class: 'td_checkbox breakword'
 				},
 				{
 					key: 'PatientName',
 					label: 'PatientName',
-					// thClass: 'd-none d-sm-table-cell',
 					tdClass: 'patientName',
-					sortable: true
+					sortable: true,
+					class: 'breakword'
 				},
 				{
 					key: 'PatientID',
 					label: 'PatientID',
 					sortable: true,
-					thClass: 'd-none d-md-table-cell d-lg-table-cell',
-					tdClass: 'd-none d-md-table-cell d-lg-table-cell'
+					class: 'breakword d-none d-md-table-cell d-lg-table-cell'
 				},
 				{
 					key: 'StudyDescription',
 					label: 'StudyDescription',
 					sortable: false,
-					thClass: 'd-none d-lg-table-cell',
-					tdClass: 'd-none d-lg-table-cell'
+					class: 'breakword d-none d-lg-table-cell'
 				},
 				{
 					key: 'StudyDate',
 					label: 'StudyDate',
-					thClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
-					tdClass: 'd-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
-					sortable: true
+					sortable: true,
+					class: 'breakword d-none d-sm-table-cell d-md-table-cell d-lg-table-cell'
 				},
 				{
 					key: 'ModalitiesInStudy',
-					thClass: 'd-none d-sm-table-cell',
-					tdClass: 'd-none d-sm-table-cell',
 					label: 'Modality',
-					sortable: false
+					sortable: false,
+					class: 'breakword d-none d-sm-table-cell'
 				}
 			],
 			sortBy: 'StudyDate',
@@ -824,11 +822,14 @@ export default {
 			return _.filter(this.studies, s => { return s.is_selected === true }).length
 		},
 		infoFavorites () {
-			if (this.studies.filter(s => { return s.is_selected }).every(s => { return s.is_favorite === true })) {
+			/*
+      if (this.studies.filter(s => { return s.is_selected }).every(s => { return s.is_favorite === true })) {
 				return 'removefavorite'
 			} else {
 				return 'addfavorite'
-			}
+      }
+      */
+			return 'favorites'
 		},
 		disabledToDates: function () {
 			let vm = this
@@ -911,7 +912,7 @@ export default {
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'], resetDisplay: true })
 				.then(() => {
-					setTimeout(() => this.setLoading(false), 300)
+					this.setLoading(false)
 				})
 			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
 		}
@@ -982,6 +983,13 @@ export default {
 			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.item.StudyInstanceUID[0] })
 			row.toggleDetails()
 		},
+		showDetailsOnRow (row) {
+			if (!row._showDetails) {
+				this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id })
+			}
+			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.StudyInstanceUID[0] })
+			row._showDetails = !row._showDetails
+		},
 		toggleFavorite (study) {
 			var vm = this
 			let params = this.$route.params.album_id === undefined ? { inbox: 'true' } : { album: this.$route.params.album_id }
@@ -1030,7 +1038,9 @@ export default {
 		},
 		searchOnline () {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'] })
-				.then(() => { setTimeout(() => this.setLoading(false), 50) })
+				.then(res => {
+					this.setLoading(false)
+				})
 		},
 		addToAlbum (albumId) {
 			let studies = _.filter(this.studies, s => { return s.is_selected })
@@ -1277,4 +1287,7 @@ export default {
     overflow: scroll;
     display: block;
   }
+  .breakword {
+		word-break: break-word;
+	}
 </style>
