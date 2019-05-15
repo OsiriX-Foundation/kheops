@@ -140,6 +140,7 @@ public class EventResponse {
             capability = new CapabilityResponse();
             capability.id = mutation.getCapability().get().getId();
             capability.title = mutation.getCapability().get().getTitle();
+            //originName = null; TODO
         }
     }
 }
