@@ -87,9 +87,15 @@ public class Studies {
         applyIfPresent(qidoParams::getFavoriteFilter, filter -> conditionArrayList.add(ALBUM_SERIES.FAVORITE.eq(filter)));
 
         if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
-            Condition condition = condition(false);
+            Condition condition = trueCondition();
+            boolean conditionIsInitialised = false;
             for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
-                condition.or(STUDIES.STUDY_UID.eq(studyInstanceUID));
+                if(!conditionIsInitialised) {
+                    condition = STUDIES.STUDY_UID.eq(studyInstanceUID);
+                    conditionIsInitialised = true;
+                } else {
+                    condition = condition.or(STUDIES.STUDY_UID.eq(studyInstanceUID));
+                }
             }
             conditionArrayList.add(condition);
         }
