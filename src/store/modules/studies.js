@@ -83,7 +83,7 @@ const actions = {
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
 		var request = 'studies?limit=' + params.limit + '&offset=' + offset + (params.sortBy ? '&sort=' + sortSense + params.sortBy : '') + requestParams
-		HTTP.get(request, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
+		return HTTP.get(request, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
 			let data = []
 			_.forEach(res.data, d => {
@@ -117,6 +117,7 @@ const actions = {
 					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null })
 				}
 			})
+			return res
 		})
 	},
 
