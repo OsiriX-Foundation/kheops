@@ -119,8 +119,12 @@ public final class StudyQIDOParams {
         studyInstanceUIDFilter = new ArrayList<>();
 
         if(studyInstanceUIDFilterTmpLst.isEmpty() || studyInstanceUIDFilterTmp == null) {
-            studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmpLst);
-            studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
+            if(!studyInstanceUIDFilterTmpLst.isEmpty()) {
+                studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmpLst);
+            }
+            if(studyInstanceUIDFilterTmp != null) {
+                studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
+            }
         } else {
             if(studyInstanceUIDFilterTmpLst.contains(studyInstanceUIDFilterTmp)) {
                 studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
