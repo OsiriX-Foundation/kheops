@@ -19,6 +19,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
@@ -138,23 +139,26 @@ public abstract class Fetcher {
     }
 
     private static void logResponseProcessingException(ResponseProcessingException e, String studyUID) {
+        final Response response = e.getResponse();
         try {
             String responseString = e.getResponse().readEntity(String.class);
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID +
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " status:" + response.getStatus() +
                     " response:\n" + responseString, e);
         } catch (ProcessingException | IllegalStateException exception) {
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID, e);
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " status:" + response.getStatus(), e);
             LOG.log(Level.SEVERE, "Error while getting the response string", exception);
         }
     }
 
     private static void logResponseProcessingException(ResponseProcessingException e, String studyUID, String seriesUID) {
+        final Response response = e.getResponse();
         try {
             String responseString = e.getResponse().readEntity(String.class);
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID +
-                    " response:\n" + responseString, e);
+                    " status:" + response.getStatus() + " response:\n" + responseString, e);
         } catch (ProcessingException | IllegalStateException exception) {
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID, e);
+            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID +
+                    " status:" + response.getStatus(), e);
             LOG.log(Level.SEVERE, "Error while getting the response string", exception);
         }
     }
