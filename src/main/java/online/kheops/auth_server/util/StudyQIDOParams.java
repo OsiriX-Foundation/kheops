@@ -114,17 +114,16 @@ public final class StudyQIDOParams {
         patientIDFilter = getFilter(Tag.PatientID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
 
-        List<String> studyInstanceUIDFilterTmp1 = getFilterList(Tag.StudyInstanceUID, queryParameters);
-        List<String> studyInstanceUIDFilterTmp2 = kheopsPrincipal.getStudyList().orElse(new ArrayList<>());
+        String studyInstanceUIDFilterTmp = getFilter(Tag.StudyInstanceUID, queryParameters).orElse(null);
+        List<String> studyInstanceUIDFilterTmpLst = kheopsPrincipal.getStudyList().orElse(new ArrayList<>());
+        studyInstanceUIDFilter = new ArrayList<>();
 
-        if(studyInstanceUIDFilterTmp1.isEmpty() || studyInstanceUIDFilterTmp2.isEmpty()) {
-            studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmp2);
-            studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmp1);
+        if(studyInstanceUIDFilterTmpLst.isEmpty() || studyInstanceUIDFilterTmp == null) {
+            studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmpLst);
+            studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
         } else {
-            for (String studyUid: studyInstanceUIDFilterTmp1 ) {
-                if (studyInstanceUIDFilterTmp2.contains(studyUid)) {
-                    studyInstanceUIDFilter.add(studyUid);
-                }
+            if(studyInstanceUIDFilterTmpLst.contains(studyInstanceUIDFilterTmp)) {
+                studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
             }
             if (studyInstanceUIDFilter.isEmpty()) {
                 throw new NoResultException();
@@ -234,16 +233,6 @@ public final class StudyQIDOParams {
         } else {
             return Optional.empty();
         }
-    }
-
-    private static List<String> getFilterList(int tag, MultivaluedMap<String, String> queryParameters) {
-        List<String> filterList = new ArrayList<>();
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
-            filterList.add(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0));
-        } else if (queryParameters.containsKey(String.format("%08X", tag))) {
-            filterList.add(queryParameters.get(String.format("%08X", tag)).get(0));
-        }
-        return filterList;
     }
 
     private static boolean getFavoriteField(MultivaluedMap<String, String> queryParameters) {
