@@ -1,11 +1,11 @@
 <i18n>
 	{
 		"en": {
-			"newprovider": "New provider"
+			"newprovider": "New report provider"
 
 		},
 		"fr": {
-			"newprovider": "Nouveau provider"
+			"newprovider": "Nouveau report provider"
 		}
 	}
 </i18n>
