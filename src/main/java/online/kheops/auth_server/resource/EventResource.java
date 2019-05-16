@@ -60,10 +60,10 @@ public class EventResource {
         final PairListXTotalCount<EventResponse> pair;
 
         if( offset < 0 ) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
+            return Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
         }
         if( limit < 0 ) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
+            return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
         }
 
         try {
@@ -77,11 +77,11 @@ public class EventResource {
                 pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
             }
         } catch (AlbumNotFoundException e) {
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
-        return javax.ws.rs.core.Response.ok(genericEventsResponsesList)
+        return Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
     }
@@ -108,13 +108,13 @@ public class EventResource {
             Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.WARNING, "Not found", e);
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
             LOG.log(Level.WARNING, "Bad request", e);
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return javax.ws.rs.core.Response.status(NO_CONTENT).build();
+        return Response.status(NO_CONTENT).build();
     }
 
     @GET
@@ -129,23 +129,23 @@ public class EventResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
+            return Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
         }
 
         final PairListXTotalCount<EventResponse> pair;
 
         if( offset < 0 ) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
+            return Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
         }
         if( limit < 0 ) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
+            return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
         }
 
         pair = Events.getCommentsByStudyUID(kheopsPrincipal.getUser(), studyInstanceUID, offset, limit);
 
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
-        return javax.ws.rs.core.Response.ok(genericEventsResponsesList)
+        return Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
     }
@@ -162,7 +162,7 @@ public class EventResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
 
         if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return javax.ws.rs.core.Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
+            return Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
         }
 
         if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
@@ -173,12 +173,12 @@ public class EventResource {
             Events.studyPostComment(kheopsPrincipal.getUser(), studyInstanceUID, comment, user);
         } catch (UserNotFoundException | StudyNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadQueryParametersException e) {
             LOG.log(Level.WARNING, "Bad Request", e);
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return javax.ws.rs.core.Response.status(NO_CONTENT).build();
+        return Response.status(NO_CONTENT).build();
     }
 }
