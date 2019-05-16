@@ -1,5 +1,6 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.user.UsersPermission;
 
 import javax.persistence.*;
@@ -7,8 +8,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
-
-import static online.kheops.auth_server.album.Albums.newAlbumID;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Entity
@@ -67,11 +66,11 @@ public class Album {
     private Set<AlbumSeries> albumSeries = new HashSet<>();
 
     @OneToMany
-    @JoinColumn (name = "album_fk", nullable=false)
+    @JoinColumn (name = "album_fk", nullable = false)
     private Set<AlbumUser> albumUser = new HashSet<>();
 
     @OneToMany
-    @JoinColumn (name = "album_fk", nullable=true)
+    @JoinColumn (name = "album_fk", nullable = true)
     private Set<Event> events = new HashSet<>();
 
     @OneToOne(mappedBy = "inbox")
@@ -81,12 +80,16 @@ public class Album {
     @JoinColumn (name = "album_fk")
     private Set<Capability> capabilities = new HashSet<>();
 
+    @OneToMany
+    @JoinColumn (name = "album_fk", nullable = false)
+    private Set<ReportProvider> reportProviders = new HashSet<>();
+
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         lastEventTime = now;
-        id = newAlbumID();
+        id = new AlbumId().getId();
     }
 
     public Album() {}
@@ -193,4 +196,13 @@ public class Album {
     public void addCapability(Capability capability) { this.capabilities.add(capability); }
 
     public Set<Capability> getCapabilities() { return capabilities; }
+
+    public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
+
+    public Set<ReportProvider> getReportProviders() {return reportProviders; }
+
+    @Override
+    public String toString() {
+        return "[Album_id:"+id+"]";
+    }
 }

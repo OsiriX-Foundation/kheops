@@ -49,6 +49,11 @@ public class Sequences {
     public static final Sequence<Long> EVENT_PK_SEQ = new SequenceImpl<Long>("event_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
+     * The sequence <code>public.report_providers_pk_seq</code>
+     */
+    public static final Sequence<Long> REPORT_PROVIDERS_PK_SEQ = new SequenceImpl<Long>("report_providers_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
      * The sequence <code>public.series_pk_seq</code>
      */
     public static final Sequence<Long> SERIES_PK_SEQ = new SequenceImpl<Long>("series_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

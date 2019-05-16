@@ -96,7 +96,7 @@ public class Capability {
 
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         issuedAtTime = now;
         updatedTime = now;
         id = newCapabilityID();

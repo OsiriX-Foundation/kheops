@@ -13,6 +13,8 @@
         <class>online.kheops.auth_server.entity.Event</class>
         <class>online.kheops.auth_server.entity.Comment</class>
         <class>online.kheops.auth_server.entity.Mutation</class>
+        <class>online.kheops.auth_server.entity.ReportProvider</class>
+        <class>online.kheops.auth_server.entity.Version</class>
         <properties>
             <property name="javax.persistence.lock.timeout" value="2000"/>
 

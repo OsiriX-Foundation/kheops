@@ -43,7 +43,7 @@ public class AlbumQueries {
                     .setParameter("albumId", albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new AlbumNotFoundException("Album albumId:" + albumId + " not found", e);
+            throw new AlbumNotFoundException("Album id:" + albumId + " not found", e);
         }
     }
 

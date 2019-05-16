@@ -75,7 +75,7 @@ public class Series {
 
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         updatedTime = now;
     }

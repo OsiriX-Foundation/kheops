@@ -9,11 +9,9 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
@@ -21,26 +19,8 @@ import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Albums {
 
-    private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    private static final int ID_LENGTH = 10;
-    public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-    private static final Random rdm = new SecureRandom();
-
     private Albums() {
         throw new IllegalStateException("Utility class");
-    }
-
-    public static String newAlbumID() {
-        final StringBuilder idBuilder = new StringBuilder();
-
-        do {
-            idBuilder.setLength(0);
-            while (idBuilder.length() < ID_LENGTH) {
-                int index = rdm.nextInt(DICT.length());
-                idBuilder.append(DICT.charAt(index));
-            }
-        } while (albumExist(idBuilder.toString()));
-        return idBuilder.toString();
     }
 
     public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
@@ -153,6 +133,10 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
+            for (ReportProvider reportProvider:album.getReportProviders()) {
+                em.remove(reportProvider);
+            }
+
             for (AlbumUser albumUser:album.getAlbumUser()) {
                 em.remove(albumUser);
             }
@@ -187,7 +171,7 @@ public class Albums {
         if (withUserAccess) {
             albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
             if(withUsersList) {
-                albumResponse.setUsers(getUsers(albumId));
+                albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
             }
             return albumResponse;
         } else {
@@ -195,22 +179,27 @@ public class Albums {
         }
     }
 
-    public static List<UserAlbumResponse> getUsers(String albumId)
+    public static PairListXTotalCount<UserAlbumResponse> getUsers(String albumId, Integer limit , Integer offset)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final List<UserAlbumResponse> listUserAlbumResponse = new ArrayList<>();
+        final long totalCount;
         try {
             final Album album = getAlbum(albumId, em);
+            totalCount = album.getAlbumUser().size();
 
+            int i = 0;
             for (AlbumUser albumUser : album.getAlbumUser()) {
+                if (i++ < offset) continue;
+                if (i > offset + limit) break;
                 listUserAlbumResponse.add(new UserAlbumResponse(albumUser));
             }
         } finally {
             em.close();
         }
         Collections.sort(listUserAlbumResponse);
-        return listUserAlbumResponse;
+        return new PairListXTotalCount<>(totalCount, listUserAlbumResponse);
     }
 
     public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
@@ -380,7 +369,18 @@ public class Albums {
     public static Album getAlbum(String albumId, EntityManager em)
             throws AlbumNotFoundException {
 
-            return findAlbumById(albumId, em);
+        return findAlbumById(albumId, em);
+    }
+
+    public static Album getAlbum(String albumId)
+            throws AlbumNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            return getAlbum(albumId, em);
+        } finally {
+            em.close();
+        }
     }
 
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)

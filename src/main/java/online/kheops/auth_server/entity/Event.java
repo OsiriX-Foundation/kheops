@@ -36,8 +36,7 @@ public abstract class Event {
 
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        eventTime = now;
+        eventTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     protected Event() {}

@@ -1,8 +1,6 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.album.AlbumResponse;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;

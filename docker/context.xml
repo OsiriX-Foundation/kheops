@@ -19,5 +19,7 @@
                override="false"/>
     <Parameter name="online.kheops.keycloak.realms" value="${kheops_keycloak_realms}"
                override="false"/>
+    <Parameter name="online.kheops.root.uri" value="${kheops_root_uri}"
+               override="false"/>
 
 </Context>

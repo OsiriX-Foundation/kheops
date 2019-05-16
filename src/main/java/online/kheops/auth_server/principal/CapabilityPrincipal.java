@@ -16,8 +16,7 @@ import javax.persistence.EntityTransaction;
 import java.util.Optional;
 
 import static online.kheops.auth_server.album.Albums.*;
-import static online.kheops.auth_server.series.Series.canAccessSeries;
-import static online.kheops.auth_server.series.Series.isSeriesInInbox;
+import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
@@ -119,7 +118,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 tx.begin();
                 final Series series;
                 try {
-                    series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                    series = getSeries(studyInstanceUID, seriesInstanceUID, em);
                 } catch (SeriesNotFoundException e) {
                     //if the series not exist
                     return true;
@@ -161,7 +160,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 }
                 final Series series;
                 try {
-                    series = findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+                    series = getSeries(studyInstanceUID, seriesInstanceUID, em);
                 } catch (SeriesNotFoundException e) {
                     //if the series not exist
                     return true;

@@ -1,8 +1,8 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
@@ -28,9 +28,9 @@ import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
-public class EventRessource {
+public class EventResource {
 
-    private static final Logger LOG = Logger.getLogger(EventRessource.class.getName());
+    private static final Logger LOG = Logger.getLogger(EventResource.class.getName());
 
     @Context
     ServletContext context;
@@ -41,7 +41,7 @@ public class EventRessource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/events")
+    @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -92,7 +92,7 @@ public class EventRessource {
     @UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
-    @Path("albums/{"+ALBUM+":"+Albums.ID_PATTERN+"}/comments")
+    @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,

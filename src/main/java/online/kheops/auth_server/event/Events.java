@@ -27,7 +27,11 @@ public class Events {
         throw new IllegalStateException("Utility class");
     }
 
-    public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN, CREATE_ALBUM, LEAVE_ALBUM, IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES, EDIT_ALBUM, ADD_FAV, REMOVE_FAV}
+    public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN,
+        CREATE_ALBUM, LEAVE_ALBUM,
+        IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES,
+        EDIT_ALBUM, ADD_FAV, REMOVE_FAV,
+        CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT}
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
@@ -75,6 +79,14 @@ public class Events {
 
     public static Mutation albumPostUserMutation(User callingUser, Album album, MutationType mutationType, User targetUser) {
         return new Mutation(callingUser, album, mutationType, targetUser);
+    }
+
+    public static Mutation reportProviderMutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
+        return new Mutation(callingUser, album, reportProvider, mutationType);
+    }
+
+    public static Mutation newReport(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType, Series series) {
+        return new Mutation(callingUser, album, reportProvider, mutationType, series);
     }
 
     public static Mutation albumPostNewAlbumMutation(User callingUser, Album album) {

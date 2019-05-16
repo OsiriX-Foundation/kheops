@@ -3,13 +3,11 @@ package online.kheops.auth_server.principal;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.assertion.Assertion;
 import online.kheops.auth_server.assertion.AssertionVerifier;
 import online.kheops.auth_server.assertion.BadAssertionException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
@@ -20,10 +18,11 @@ import online.kheops.auth_server.util.Consts;
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
@@ -77,7 +76,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         try {
             tx.begin();
 
-            List<Series> seriesList;
+            final List<Series> seriesList;
             if(jwe.getBoolean(Consts.JWE.IS_INBOX)) {
                 seriesList = findSeriesListByStudyUIDFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, em);
             } else {
@@ -123,7 +122,9 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     public boolean hasStudyWriteAccess(String study) { return false; }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)
+            throws AlbumNotFoundException {
+
         if (!kheopsPrincipal.hasAlbumPermission(usersPermission, albumId)) {
             return false;
         } else {
@@ -134,19 +135,16 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
                 final User userMerge = em.merge(kheopsPrincipal.getUser());
                 final Album album = getAlbum(albumId, em);
-                final AlbumUser albumUser = getAlbumUser(album, userMerge, em);
+
+                if(!isMemberOfAlbum(userMerge, album, em)) {
+                    throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                }
 
                 if(userMerge.getInbox() == album) {
                     throw new AlbumNotFoundException("Album id : " + albumId + " not found");
                 }
-                if (albumUser.isAdmin()) {
-                    return true;
-                }
 
                 return usersPermission.hasViewerPermission(album);
-
-            } catch (AlbumNotFoundException | UserNotMemberException e) {
-                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -197,11 +195,17 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         } else {
             throw new AlbumNotFoundException("");
         }
-
     }
 
     @Override
     public String toString() {
         return "[ViewerPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
+
+    @Override
+    public Optional<List<String>> getStudyList() {
+        final List<String> studyList = new ArrayList();
+        studyList.add(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID));
+        return Optional.of(studyList);
     }
 }

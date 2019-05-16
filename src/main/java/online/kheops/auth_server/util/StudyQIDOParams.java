@@ -9,6 +9,7 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import org.dcm4che3.data.Tag;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
@@ -39,14 +40,16 @@ public final class StudyQIDOParams {
     private final Optional<String> referringPhysicianNameFilter;
     private final Optional<String> patientNameFilter;
     private final Optional<String> patientIDFilter;
-    private final Optional<String> studyInstanceUIDFilter;
     private final Optional<String> studyIDFilter;
     private final Optional<Boolean> favoriteFilter;
+    private List<String> studyInstanceUIDFilter;
+
     private final boolean favoriteField;
     private final boolean commentField;
     private final boolean studyDescriptionField;
 
-    public StudyQIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException {
+    public StudyQIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
+            throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException , NoResultException {
 
         String albumIDLocal = null;
         boolean fromInboxLocal = false;
@@ -109,12 +112,33 @@ public final class StudyQIDOParams {
         referringPhysicianNameFilter = getFilter(Tag.ReferringPhysicianName, queryParameters);
         patientNameFilter = getFilter(Tag.PatientName, queryParameters);
         patientIDFilter = getFilter(Tag.PatientID, queryParameters);
-        studyInstanceUIDFilter = getFilter(Tag.StudyInstanceUID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
+
+        String studyInstanceUIDFilterTmp = getFilter(Tag.StudyInstanceUID, queryParameters).orElse(null);
+        List<String> studyInstanceUIDFilterTmpLst = kheopsPrincipal.getStudyList().orElse(new ArrayList<>());
+        studyInstanceUIDFilter = new ArrayList<>();
+
+        if(studyInstanceUIDFilterTmpLst.isEmpty() || studyInstanceUIDFilterTmp == null) {
+            if(!studyInstanceUIDFilterTmpLst.isEmpty()) {
+                studyInstanceUIDFilter.addAll(studyInstanceUIDFilterTmpLst);
+            }
+            if(studyInstanceUIDFilterTmp != null) {
+                studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
+            }
+        } else {
+            if(studyInstanceUIDFilterTmpLst.contains(studyInstanceUIDFilterTmp)) {
+                studyInstanceUIDFilter.add(studyInstanceUIDFilterTmp);
+            }
+            if (studyInstanceUIDFilter.isEmpty()) {
+                throw new NoResultException();
+            }
+        }
+
         favoriteField = getFavoriteField(queryParameters);
         commentField = getCommentField(queryParameters);
         favoriteFilter = getFavoriteFilter(queryParameters);
         studyDescriptionField = getStudyDescriptionField(queryParameters);
+
 
         if(!albumID.isPresent() && !fromInbox) {
             if(favoriteField) {
@@ -185,7 +209,7 @@ public final class StudyQIDOParams {
         return patientIDFilter;
     }
 
-    public Optional<String> getStudyInstanceUIDFilter() {
+    public List<String> getStudyInstanceUIDFilter() {
         return studyInstanceUIDFilter;
     }
 

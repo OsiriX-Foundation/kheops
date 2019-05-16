@@ -15,9 +15,11 @@ import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
 import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.Version;
 
 import org.jooq.Catalog;
 import org.jooq.Sequence;
@@ -38,7 +40,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1803600431;
+    private static final long serialVersionUID = -670485852;
 
     /**
      * The reference instance of <code>public</code>
@@ -71,6 +73,11 @@ public class Public extends SchemaImpl {
     public final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
 
     /**
+     * The table <code>public.report_providers</code>.
+     */
+    public final ReportProviders REPORT_PROVIDERS = online.kheops.auth_server.generated.tables.ReportProviders.REPORT_PROVIDERS;
+
+    /**
      * The table <code>public.series</code>.
      */
     public final Series SERIES = online.kheops.auth_server.generated.tables.Series.SERIES;
@@ -84,6 +91,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.users</code>.
      */
     public final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
+
+    /**
+     * The table <code>public.version</code>.
+     */
+    public final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
 
     /**
      * No further instances allowed
@@ -115,6 +127,7 @@ public class Public extends SchemaImpl {
             Sequences.ALBUM_USER_PK_SEQ,
             Sequences.CAPABILITIES_PK_SEQ,
             Sequences.EVENT_PK_SEQ,
+            Sequences.REPORT_PROVIDERS_PK_SEQ,
             Sequences.SERIES_PK_SEQ,
             Sequences.STUDIES_PK_SEQ,
             Sequences.USERS_PK_SEQ);
@@ -134,8 +147,10 @@ public class Public extends SchemaImpl {
             Albums.ALBUMS,
             Capabilities.CAPABILITIES,
             Events.EVENTS,
+            ReportProviders.REPORT_PROVIDERS,
             Series.SERIES,
             Studies.STUDIES,
-            Users.USERS);
+            Users.USERS,
+            Version.VERSION);
     }
 }
