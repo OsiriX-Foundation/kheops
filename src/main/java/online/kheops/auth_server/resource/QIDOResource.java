@@ -66,7 +66,6 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @ViewerTokenAccess
     @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
@@ -133,7 +132,6 @@ public class QIDOResource {
 
     @GET
     @Secured
-    @ViewerTokenAccess
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
@@ -296,7 +294,6 @@ public class QIDOResource {
 
     @GET
     @Secured
-    @ViewerTokenAccess
     @AlbumAccessSecured
     @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")

@@ -5,7 +5,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
-import online.kheops.auth_server.annotation.ViewerTokenAccess;
 import online.kheops.auth_server.assertion.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
@@ -87,7 +86,6 @@ public class TokenResource
 
     @POST
     @FormURLEncodedContentType
-    @ViewerTokenAccess
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -411,7 +409,6 @@ public class TokenResource
 
     @POST
     @FormURLEncodedContentType
-    @ViewerTokenAccess
     @Path("/token/introspect")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
