@@ -221,8 +221,6 @@ public class ReportProviderResource {
 
             final String reportProviderUrl = reportProviderUrlBuilder.toString();
 
-            LOG.log(Level.WARNING, reportProviderUrl);
-
             return Response.status(FOUND).header("Location", reportProviderUrl).build();
         } catch (ReportProviderUriNotValidException e) {
             return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
