@@ -107,11 +107,11 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity(StudyInstanceUID +" param must be set").build();
         }
 
-        /*for (String uid: studyInstanceUID) {
+        for (String uid: studyInstanceUID) {
             if (!checkValidUID(uid)) {
                 return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
             }
-        }*/
+        }
 
         final Assertion assertion;
         try {
@@ -177,11 +177,11 @@ public class ReportProviderResource {
             }
 
             album = getAlbum(albumId);
-            /*for (String uid : studyInstanceUID) {
+            for (String uid : studyInstanceUID) {
                 if (!canAccessStudy(album, uid)) {
                     return Response.status(NOT_FOUND).entity("Study uid: " + uid + "not found").build();
                 }
-            }*/
+            }
         } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -218,7 +218,11 @@ public class ReportProviderResource {
             for (String uid: studyInstanceUID) {
                 reportProviderUrlBuilder.queryParam(StudyInstanceUID, URLEncoder.encode(uid, StandardCharsetsUTF8));
             }
+
             final String reportProviderUrl = reportProviderUrlBuilder.toString();
+
+            LOG.log(Level.WARNING, reportProviderUrl);
+
             return Response.status(FOUND).header("Location", reportProviderUrl).build();
         } catch (ReportProviderUriNotValidException e) {
             return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
