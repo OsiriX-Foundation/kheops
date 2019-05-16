@@ -211,11 +211,14 @@ public class ReportProviderResource {
             final String StandardCharsetsUTF8 = java.nio.charset.StandardCharsets.UTF_8.toString();
 
             final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
-            final String reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
+            final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
                     .queryParam("code", token)
-                    .queryParam("conf_uri", confUri)
-                    .toString();
+                    .queryParam("conf_uri", confUri);
 
+            for (String uid: studyInstanceUID) {
+                reportProviderUrlBuilder.queryParam(StudyInstanceUID, uid);
+            }
+            final String reportProviderUrl = reportProviderUrlBuilder.toString();
             return Response.status(FOUND).header("Location", reportProviderUrl).build();
         } catch (ReportProviderUriNotValidException e) {
             return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
