@@ -207,7 +207,7 @@ public class ReportProviderResource {
         final String token = jwtBuilder.sign(algorithmHMAC);
 
         try {
-            final String kheopsConfigUrl = context.getInitParameter("online.kheops.root.uri") + "/reportproviders/" + clientId + "/configuration";
+            final String kheopsConfigUrl = context.getInitParameter("online.kheops.root.uri") + "/api/reportproviders/" + clientId + "/configuration";
             final String StandardCharsetsUTF8 = java.nio.charset.StandardCharsets.UTF_8.toString();
 
             final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
@@ -265,7 +265,7 @@ public class ReportProviderResource {
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                          @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
+                                       @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
 
         final ReportProviderResponse reportProvider;
         try {

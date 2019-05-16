@@ -177,7 +177,6 @@ public class Capability {
         if (ZonedDateTime.of(getNotBeforeTime().minusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
             throw new CapabilityNotValidException("Capability token is not yet valid");
         }
-
         if (ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
             throw new CapabilityNotValidException("Capability token is expired");
         }
