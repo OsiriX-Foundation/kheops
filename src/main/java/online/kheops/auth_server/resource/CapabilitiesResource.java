@@ -21,8 +21,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.capability.Capabilities.ID_PATTERN;
 import static online.kheops.auth_server.capability.Capabilities.generateCapability;
+import static online.kheops.auth_server.capability.CapabilityId.ID_PATTERN;
+import static online.kheops.auth_server.capability.CapabilityToken.TOKEN_PATTERN;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -116,7 +117,7 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
-    @Path("capabilities/{capability_id:"+Capabilities.ID_PATTERN+"}/revoke")
+    @Path("capabilities/{capability_id:"+ID_PATTERN+"}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
@@ -162,7 +163,7 @@ public class CapabilitiesResource {
 
 
     @GET
-    @Path("capabilities/{capability_token:"+Capabilities.TOKEN_PATTERN+"}")
+    @Path("capabilities/{capability_token:" + TOKEN_PATTERN + "}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
@@ -181,7 +182,7 @@ public class CapabilitiesResource {
     @GET
     @Secured
     @UserAccessSecured
-    @Path("capabilities/{capability_token_id:"+ ID_PATTERN+"}")
+    @Path("capabilities/{capability_token_id:" + ID_PATTERN + "}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {

@@ -4,6 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.Capabilities;
 import online.kheops.auth_server.capability.CapabilityNotFoundException;
 import online.kheops.auth_server.capability.CapabilityNotValidException;
+import online.kheops.auth_server.capability.CapabilityToken;
 import online.kheops.auth_server.entity.Capability;
 
 import javax.persistence.EntityManager;
@@ -19,7 +20,7 @@ final class CapabilityAssertion implements Assertion {
 
     static final class Builder {
         CapabilityAssertion build(String capabilityToken) throws BadAssertionException {
-            if (!Capabilities.isValidFormat(capabilityToken)) {
+            if (!CapabilityToken.isValidFormat(capabilityToken)) {
                 throw new BadAssertionException("Bad capability token format");
             }
 
