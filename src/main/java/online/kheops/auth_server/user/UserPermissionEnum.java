@@ -164,6 +164,20 @@ public enum UserPermissionEnum {
 
 
     },
+    READ_COMMENT {
+        @Override
+        public boolean hasUserPermission(Album album) { return true; }
+        @Override
+        public boolean hasCapabilityPermission(Capability capability) {
+            return false;
+        }
+        @Override
+        public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
+
+
+    },
     EDIT_ALBUM {
         @Override
         public boolean hasUserPermission(Album album) {
@@ -266,7 +280,6 @@ public enum UserPermissionEnum {
 
     }
     ;
-
 
     public abstract boolean hasUserPermission(Album album);
     public abstract boolean hasCapabilityPermission(Capability capability);

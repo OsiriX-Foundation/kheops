@@ -41,6 +41,7 @@ public class EventResource {
     @GET
     @Secured
     @AlbumAccessSecured
+    @AlbumPermissionSecured(UserPermissionEnum.READ_COMMENT)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,8 +51,6 @@ public class EventResource {
                               @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-
-        //TODO check if permission read comments
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutation")) {
             types.remove("mutation");
