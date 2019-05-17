@@ -45,7 +45,7 @@
         <b-navbar-nav right>
           <b-nav-item v-access="'active'">
             {{ $t('welcome') }} <router-link to="/user">
-              {{ user.fullname }}
+              {{ fullName }}
             </router-link>
           </b-nav-item>
           <b-nav-item v-access="'active'">
@@ -90,6 +90,9 @@ export default {
 		}),
 		lang () {
 			return this.$i18n.locale
+		},
+		fullName () {
+			return Vue.prototype.$keycloak.fullName
 		}
 	},
 	methods: {
