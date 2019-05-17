@@ -112,6 +112,24 @@ const actions = {
 		}).catch(err => {
 			return err
 		})
+	},
+	postRedirectProvider ({ dispatch }, params) {
+		let queries = ''
+		for (var key in params.queries) {
+			let value = params.queries[key]
+			if (Array.isArray(value)) {
+				value.forEach(val => {
+					queries += `${key}=${value}&`
+				})
+			} else {
+				queries += `${key}=${value}&`
+			}
+		}
+		return HTTP.post('/report', queries, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
 	}
 }
 
