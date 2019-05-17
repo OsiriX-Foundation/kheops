@@ -60,7 +60,7 @@ const actions = {
 				email: jwtInfo.email,
 				sub: jwtInfo.sub
 			}
-			HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
+			// HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
 			localStorage.setItem('currentUser', JSON.stringify(loggedUser))
 			commit('LOGIN', loggedUser)
 			resolve(userData)
@@ -74,9 +74,11 @@ const actions = {
 			let user = localStorage.getItem('currentUser')
 			if (user) {
 				user = JSON.parse(user)
+				/*
 				if (user.jwt) {
 					HTTP.defaults.headers.common['authorization'] = 'Bearer ' + user.jwt
 				}
+				*/
 				commit('LOGIN', user)
 				return true
 			} else {
