@@ -573,7 +573,11 @@
             </div>
           </b-card>
         </template>
-        <!-- Button next to patient name -->
+        <!--
+          Button next to patient name
+          https://github.com/Justineo/vue-awesome#more-advanced-cases
+          https://justineo.github.io/vue-awesome/demo/
+        -->
         <template
           slot="PatientName"
           slot-scope="row"
@@ -653,6 +657,56 @@
                     height="24px"
                   />
                 </span>
+
+                <b-dropdown
+                  v-if="providersEnable.length > 0"
+                  variant="link"
+                  size="sm"
+                  no-caret
+                >
+                  <template slot="button-content">
+                    <span>
+                      <build-icon
+                        width="22px"
+                        height="22px"
+                      />
+                    </span>
+                  </template>
+                  <!-- "redirectProvider(provider.client_id, row.item.StudyInstanceUID[0])" -->
+                  <b-dropdown-form
+                    v-for="provider in providersEnable"
+                    :id="row.item.StudyInstanceUID[0]"
+                    :key="provider.id"
+                    action="https://test2.kheops.online/api/report"
+                    method="post"
+                    class="m-2"
+                    variant="link"
+                  >
+                    <input
+                      type="text"
+                      hidden
+                      name="access_token"
+                      :value="user.jwt"
+                    >
+                    <input
+                      type="text"
+                      hidden
+                      name="clientId"
+                      :value="provider.client_id"
+                    >
+                    <input
+                      type="text"
+                      hidden
+                      name="StudyInstanceUID"
+                      :value="row.item.StudyInstanceUID[0]"
+                    >
+                    <input
+                      :id="provider.name"
+                      type="submit"
+                      :value="provider.name"
+                    >
+                  </b-dropdown-form>
+                </b-dropdown>
                 <!--
                 <span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
                 -->
@@ -723,12 +777,13 @@ import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import { ViewerToken } from '@/mixins/tokens.js'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
+import BuildIcon from '@/components/kheopsSVG/BuildIcon'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon, AddIcon },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon, AddIcon, BuildIcon },
 	mixins: [ ViewerToken ],
 	props: {
 		album: {
@@ -812,7 +867,8 @@ export default {
 			studies: 'studies',
 			albums: 'albums',
 			user: 'currentUser',
-			sendingFiles: 'sending'
+			sendingFiles: 'sending',
+			providers: 'providers'
 		}),
 		totalRows () {
 			return this.studies.length
@@ -851,6 +907,11 @@ export default {
 		},
 		disableBtnHeader () {
 			return !this.selectedSeriesNb
+		},
+		providersEnable () {
+			return this.providers.filter(function (provider) {
+				return provider.stateURL['checkURL'] === true
+			})
 		}
 	},
 
@@ -906,9 +967,19 @@ export default {
 
 	created () {
 		this.setLoading(true)
+		this.$store.commit('INIT_PROVIDERS')
+
 		if (this.$route.params.album_id) {
 			this.$store.commit('RESET_FLAGS')
 			this.filters.album_id = this.$route.params.album_id
+
+			this.$store.dispatch('getProviders', { albumID: this.filters.album_id }).then(res => {
+				if (res.status !== 200) {
+					this.$snotify.error('Sorry, an error occured')
+				}
+			}).catch(err => {
+				console.log(err)
+			})
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'], resetDisplay: true })
 				.then(() => {
@@ -1184,6 +1255,20 @@ export default {
 		},
 		showDragAndDrop () {
 			this.$emit('demohover')
+		},
+		openProvider (clientID, StudyInstanceUID) {
+			let url = `https://test2.kheops.online:443/api/reportproviders/${clientID}/configuration`
+			window.open(`http://IP_ADDR/report.html?code=${this.user.jwt}&conf_uri=${url}`, '_self')
+		},
+		redirectProvider (clientID, StudyInstanceUID) {
+			const queries = {
+				'access_token': this.user.jwt,
+				'clientId': clientID,
+				'StudyInstanceUID': StudyInstanceUID
+			}
+			this.$store.dispatch('postRedirectProvider', { queries }).then(res => {
+				console.log(res)
+			})
 		}
 	}
 }
