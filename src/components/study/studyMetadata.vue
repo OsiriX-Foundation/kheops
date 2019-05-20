@@ -109,8 +109,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studies',
-			user: 'currentUser'
+			studies: 'studies'
 		}),
 		metadata () {
 			let studyIdx = _.findIndex(this.studies, s => {

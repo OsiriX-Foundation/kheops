@@ -811,7 +811,6 @@ export default {
 		...mapGetters({
 			studies: 'studies',
 			albums: 'albums',
-			user: 'currentUser',
 			sendingFiles: 'sending'
 		}),
 		totalRows () {

@@ -204,13 +204,13 @@ Props :
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import mobiledetect from '@/mixins/mobiledetect.js'
 import { AlbumRedirect } from '@/mixins/redirect.js'
+import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'AlbumUsers',
-	mixins: [ AlbumRedirect ],
+	mixins: [ AlbumRedirect, CurrentUser ],
 	props: {
 		album: {
 			type: Object,
@@ -240,9 +240,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters({
-			user: 'currentUser'
-		}),
 		mobiledetect () {
 			return mobiledetect.mobileAndTabletcheck()
 		}
@@ -259,7 +256,7 @@ export default {
 	},
 	methods: {
 		toggleAdmin (user) {
-			if (this.user.sub === user.user_id && !this.confirmResetAdmin) {
+			if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
 				this.confirmResetAdmin = user.user_name
 				return
 			}
