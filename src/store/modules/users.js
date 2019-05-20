@@ -22,45 +22,10 @@ const getters = {
 const actions = {
 	login ({ commit }, userData) {
 		return new Promise((resolve) => {
-			function decodeToken (str) {
-				str = str.split('.')[1]
-
-				str = str.replace('/-/g', '+')
-				str = str.replace('/_/g', '/')
-				switch (str.length % 4) {
-				case 0:
-					break
-				case 2:
-					str += '=='
-					break
-				case 3:
-					str += '='
-					break
-				default:
-					throw new Error('Invalid token')
-				}
-
-				str = (str + '===').slice(0, str.length + (str.length % 4))
-				str = str.replace(/-/g, '+').replace(/_/g, '/')
-
-				str = decodeURIComponent(escape(atob(str)))
-
-				str = JSON.parse(str)
-				return str
-			}
-
-			let jwtInfo = decodeToken(userData.jwt)
-			// JSON.parse(atob(userData.jwt.split('.')[1]))
 			var loggedUser = {
-				username: userData.login,
-				jwt: userData.jwt,
-				fullname: userData.fullname,
 				permissions: userData.permissions,
-				tokens: [],
-				email: jwtInfo.email,
-				sub: jwtInfo.sub
+				tokens: []
 			}
-			// HTTP.defaults.headers.common['authorization'] = 'Bearer ' + userData.jwt
 			localStorage.setItem('currentUser', JSON.stringify(loggedUser))
 			commit('LOGIN', loggedUser)
 			resolve(userData)
@@ -74,11 +39,6 @@ const actions = {
 			let user = localStorage.getItem('currentUser')
 			if (user) {
 				user = JSON.parse(user)
-				/*
-				if (user.jwt) {
-					HTTP.defaults.headers.common['authorization'] = 'Bearer ' + user.jwt
-				}
-				*/
 				commit('LOGIN', user)
 				return true
 			} else {
@@ -97,7 +57,6 @@ const actions = {
 	},
 	logout ({ commit }) {
 		localStorage.removeItem('currentUser')
-		HTTP.defaults.auth = {}
 		commit('LOGOUT')
 	},
 	checkUser (context, user) {

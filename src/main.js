@@ -49,9 +49,6 @@ const keycloakconfig = {
 
 function tokenInterceptor () {
 	let user = {
-		login: `${Vue.prototype.$keycloak.userName}`,
-		jwt: `${Vue.prototype.$keycloak.token}`,
-		fullname: `${Vue.prototype.$keycloak.fullName}`,
 		permissions: ['active']
 	}
 	store.dispatch('login', user)
