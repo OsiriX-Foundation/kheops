@@ -660,7 +660,6 @@
 
                 <b-dropdown
                   v-if="providersEnable.length > 0"
-                  variant="link"
                   size="sm"
                   no-caret
                 >
@@ -679,8 +678,6 @@
                     :key="provider.id"
                     action="https://test2.kheops.online/api/report"
                     method="post"
-                    class="m-2"
-                    variant="link"
                   >
                     <input
                       type="text"
@@ -700,11 +697,12 @@
                       name="StudyInstanceUID"
                       :value="row.item.StudyInstanceUID[0]"
                     >
-                    <input
-                      :id="provider.name"
+                    <b-dropdown-item-button
+                      style="cursor: pointer"
                       type="submit"
-                      :value="provider.name"
                     >
+                      {{ provider.name }}
+                    </b-dropdown-item-button>
                   </b-dropdown-form>
                 </b-dropdown>
                 <!--

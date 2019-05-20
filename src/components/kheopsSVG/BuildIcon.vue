@@ -39,8 +39,4 @@ export default {
   .icon{
 		fill: #fff;
 	}
-
-	.icon:hover{
-		fill: #fd7e14;
-	}
 </style>
