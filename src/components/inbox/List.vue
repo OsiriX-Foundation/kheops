@@ -686,7 +686,7 @@
                       type="text"
                       hidden
                       name="access_token"
-                      :value="user.jwt"
+                      :value="access_token"
                     >
                     <input
                       type="text"
@@ -910,8 +910,8 @@ export default {
 		providersEnable () {
 			return this.providers.filter(function (provider) {
 				return provider.stateURL['checkURL'] === true
-      })
-    },
+			})
+		},
 		access_token () {
 			return Vue.prototype.$keycloak.token
 		}
@@ -1260,11 +1260,11 @@ export default {
 		},
 		openProvider (clientID, StudyInstanceUID) {
 			let url = `https://test2.kheops.online:443/api/reportproviders/${clientID}/configuration`
-			window.open(`http://IP_ADDR/report.html?code=${this.user.jwt}&conf_uri=${url}`, '_self')
+			window.open(`http://IP_ADDR/report.html?code=${this.access_token}&conf_uri=${url}`, '_self')
 		},
 		redirectProvider (clientID, StudyInstanceUID) {
 			const queries = {
-				'access_token': this.user.jwt,
+				'access_token': this.access_token,
 				'clientId': clientID,
 				'StudyInstanceUID': StudyInstanceUID
 			}

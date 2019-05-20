@@ -83,12 +83,14 @@
     <div class="row mb-2">
       <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
         <button
+          v-if="writePermission"
           class="btn btn-primary"
           @click.stop="edit()"
         >
           {{ $t('edit') }}
         </button>
         <button
+          v-if="writePermission"
           type="button"
           class="btn btn-danger ml-3"
           @click="deleteProvider"
@@ -97,7 +99,8 @@
         </button>
         <button
           type="submit"
-          class="btn btn-secondary ml-3"
+          class="btn btn-secondary"
+          :class="writePermission ? 'ml-3': ''"
           @click="back"
         >
           {{ $t('back') }}
@@ -123,6 +126,11 @@ export default {
 			type: String,
 			required: true,
 			default: ''
+		},
+		writePermission: {
+			type: Boolean,
+			required: true,
+			default: false
 		}
 	},
 	data () {

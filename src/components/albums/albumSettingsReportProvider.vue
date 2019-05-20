@@ -4,6 +4,7 @@
   >
     <providers
       :album-i-d="album.album_id"
+      :write-permission="album.is_admin"
     />
   </div>
 </template>

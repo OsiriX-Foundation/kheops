@@ -13,7 +13,7 @@
 <template>
   <div>
     <div
-      v-if="view=='list'"
+      v-if="view=='list' && writePermission"
       class="my-3 selection-button-container"
       style=" position: relative;"
     >
@@ -32,7 +32,7 @@
     </div>
 
     <new-provider
-      v-if="view === 'new'"
+      v-if="view === 'new' && writePermission"
       :album-i-d="albumID"
       @done="view='list'"
     />
@@ -40,11 +40,12 @@
       v-if="view === 'provider'"
       :album-i-d="albumID"
       :client-i-d="clientIdSelected"
+      :write-permission="writePermission"
       @done="view='list'"
       @providerselectededit="editProvider"
     />
     <edit-provider
-      v-if="view === 'edit'"
+      v-if="view === 'edit' && writePermission"
       :album-i-d="albumID"
       :client-i-d="clientIdSelected"
       @done="view='list'"
@@ -52,6 +53,7 @@
     <list-providers
       v-if="view === 'list'"
       :album-i-d="albumID"
+      :write-permission="writePermission"
       @providerselectedshow="showProvider"
       @providerselectededit="editProvider"
     />
@@ -72,6 +74,11 @@ export default {
 			type: String,
 			required: true,
 			default: ''
+		},
+		writePermission: {
+			type: Boolean,
+			required: true,
+			default: false
 		}
 	},
 	data () {

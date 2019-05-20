@@ -58,6 +58,7 @@
         />
       </template>
       <template
+        v-if="writePermission"
         slot="btn_edit"
         slot-scope="data"
       >
@@ -83,6 +84,11 @@ export default {
 			type: String,
 			required: true,
 			default: ''
+		},
+		writePermission: {
+			type: Boolean,
+			required: true,
+			default: false
 		}
 	},
 	data () {

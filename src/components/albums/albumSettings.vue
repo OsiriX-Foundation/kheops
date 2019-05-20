@@ -86,7 +86,7 @@ export default {
 	data () {
 		return {
 			view: 'general',
-			basicCategories: ['general', 'user']
+			basicCategories: ['general', 'user', 'providerSR']
 		}
 	},
 	computed: {
@@ -94,7 +94,7 @@ export default {
 			album: 'album'
 		}),
 		categories () {
-			return (this.album.is_admin) ? this.basicCategories.concat('token', 'providerSR') : this.basicCategories
+			return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories
 		}
 	},
 	watch: {
