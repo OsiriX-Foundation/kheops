@@ -589,7 +589,7 @@
               <div class="patientNameIcons col-md-auto">
                 <span
                   :class="row.item.is_favorite?'selected':''"
-                  @click="toggleFavorite(row.item)"
+                  @click.stop="toggleFavorite(row.item)"
                 >
                   <v-icon
                     v-if="row.item.is_favorite"
@@ -607,7 +607,7 @@
                 </span>
                 <span
                   :class="row.item.SumComments[0]?'selected':''"
-                  @click="handleComments(row)"
+                  @click.stop="handleComments(row)"
                 >
                   <v-icon
                     v-if="row.item.SumComments[0]"
@@ -627,7 +627,7 @@
                   v-if="!filters.album_id || (album.download_series || album.is_admin)"
                   href="#"
                   class="download"
-                  @click="getURLDownload(row.item.StudyInstanceUID)"
+                  @click.stop="getURLDownload(row.item.StudyInstanceUID)"
                 >
                   <v-icon
                     class="align-middle"
@@ -637,7 +637,7 @@
                 </a>
                 <span
                   v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
-                  @click="openViewer(row.item.StudyInstanceUID, 'Osirix')"
+                  @click.stop="openViewer(row.item.StudyInstanceUID, 'Osirix')"
                 >
                   <osirix-icon
                     width="22px"
@@ -646,7 +646,7 @@
                 </span>
                 <span
                   v-if="row.item.ModalitiesInStudy[0] !== 'SR'"
-                  @click="openViewer(row.item.StudyInstanceUID, 'Ohif')"
+                  @click.stop="openViewer(row.item.StudyInstanceUID, 'Ohif')"
                 >
                   <visibility-icon
                     width="24px"
@@ -851,6 +851,9 @@ export default {
 		},
 		disableBtnHeader () {
 			return !this.selectedSeriesNb
+		},
+		access_token () {
+			return Vue.prototype.$keycloak.token
 		}
 	},
 
@@ -934,7 +937,7 @@ export default {
 		},
 		getURLDownload (StudyInstanceUID) {
 			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
-			this.getViewerToken(Vue.prototype.$keycloak.token, StudyInstanceUID, source).then(res => {
+			this.getViewerToken(this.access_token, StudyInstanceUID, source).then(res => {
 				const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : 'album=' + source}`
 				const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`
 				location.href = URL
@@ -1149,7 +1152,7 @@ export default {
 			if (viewer === 'Ohif') {
 				ohifWindow = window.open('', 'OHIFViewer')
 			}
-			this.getViewerToken(Vue.prototype.$keycloak.token, StudyInstanceUID, source).then(res => {
+			this.getViewerToken(this.access_token, StudyInstanceUID, source).then(res => {
 				if (viewer === 'Osirix') {
 					this.openOsiriX(StudyInstanceUID, res.data.access_token)
 				} else if (viewer === 'Ohif') {
