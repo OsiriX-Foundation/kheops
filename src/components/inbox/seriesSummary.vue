@@ -94,10 +94,11 @@
 <script>
 import { mapGetters } from 'vuex'
 import { ViewerToken } from '../../mixins/tokens.js'
+import { CurrentUser } from '../../mixins/currentuser.js'
 
 export default {
 	name: 'SeriesSummary',
-	mixins: [ ViewerToken ],
+	mixins: [ ViewerToken, CurrentUser ],
 	props: {
 		seriesInstanceUID: {
 			type: String,
@@ -122,8 +123,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studies',
-			user: 'currentUser'
+			studies: 'studies'
 		}),
 		series () {
 			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
@@ -158,7 +158,7 @@ export default {
 		},
 		openViewer () {
 			let ohifWindow = window.open('', 'OHIFViewer')
-			this.getViewerToken(this.user.jwt, this.studyInstanceUID, this.source).then(res => {
+			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
 				let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
 				ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`
 			}).catch(err => {

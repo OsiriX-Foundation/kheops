@@ -45,7 +45,7 @@
         <b-navbar-nav right>
           <b-nav-item v-access="'active'">
             {{ $t('welcome') }} <router-link to="/user">
-              {{ user.fullname }}
+              {{ currentuserFullname }}
             </router-link>
           </b-nav-item>
           <b-nav-item v-access="'active'">
@@ -74,20 +74,18 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import store from '@/store'
 import Vue from 'vue'
+import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'NavHeader',
+	mixins: [ CurrentUser ],
 	data () {
 		return {
 		}
 	},
 	computed: {
-		...mapGetters({
-			user: 'currentUser'
-		}),
 		lang () {
 			return this.$i18n.locale
 		}
