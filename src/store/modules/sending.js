@@ -5,7 +5,8 @@ const state = {
 	files: [],
 	totalSize: 0,
 	error: [],
-	source: ''
+	source: '',
+	studyUIDToSend: ''
 }
 
 const getters = {
@@ -14,7 +15,8 @@ const getters = {
 	files: state => state.files,
 	totalSize: state => state.totalSize,
 	error: state => state.error,
-	source: state => state.source
+	source: state => state.source,
+	studyUIDToSend: state => state.studyUIDToSend
 }
 
 const actions = {
@@ -33,6 +35,9 @@ const actions = {
 	},
 	setSource ({ commit }, params) {
 		commit('SET_SOURCE', params)
+	},
+	setStudyUIDtoSend ({ commit }, params) {
+		commit('SET_STUDYUID', params)
 	},
 	initErrorFiles ({ commit }) {
 		commit('INIT_ERROR')
@@ -71,6 +76,9 @@ const mutations = {
 	},
 	SET_SOURCE (state, params) {
 		state.source = params.source
+	},
+	SET_STUDYUID (state, params) {
+		state.studyUIDToSend = params.studyUID
 	},
 	INIT_ERROR (state) {
 		state.error = []
