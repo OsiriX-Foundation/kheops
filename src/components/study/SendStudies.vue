@@ -119,6 +119,16 @@
         v-if="UI.hide === false"
         class="p-2"
       >
+        <div
+          v-if="UI.getInfo"
+          class="mb-2"
+        >
+          <input-dicomize
+            :files-to-dicomize="filesToDicomize"
+            :create-study="studyUIDToSend === '' ? true : false"
+            @valid-dicom-value="validDicomValue"
+          />
+        </div>
         <!--
 					When sending
 				-->
@@ -257,6 +267,7 @@
 import { mapGetters } from 'vuex'
 import { HTTP } from '@/router/http'
 import ListErrorFiles from '@/components/study/ListErrorFiles'
+import InputDicomize from '@/components/study/InputDicomize'
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import BlockIcon from '@/components/kheopsSVG/BlockIcon'
@@ -264,10 +275,12 @@ import CloseIcon from '@/components/kheopsSVG/CloseIcon'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 import RemoveIcon from '@/components/kheopsSVG/RemoveIcon'
 import DoneIcon from '@/components/kheopsSVG/DoneIcon'
+import { DicomOperations } from '@/mixins/dicomoperations'
 
 export default {
 	name: 'SendStudies',
-	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon },
+	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize },
+	mixins: [ DicomOperations ],
 	props: {
 	},
 	data () {
@@ -281,16 +294,26 @@ export default {
 				SVGwidth: '20',
 				SVGHeaderHeight: '16',
 				SVGHeaderWidth: '16',
-				SpinnerCancelSize: '30px'
+				SpinnerCancelSize: '30px',
+				getInfo: false
 			},
 			maxsize: 10e6,
 			maxsend: 99,
 			config: {
-				headers: {
-					'Accept': 'application/dicom+json'
+				formData: {
+					headers: {
+						'Accept': 'application/dicom+json'
+					},
+					onUploadProgress: progressEvent => {
+						if ((this.progress + this.currentFiles) > this.totalSize) {
+							this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
+						}
+					}
 				},
-				onUploadProgress: progressEvent => {
-					this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
+				dicomizeData: {
+					headers: {
+						'Content-Type': 'multipart/related; type=\"application/dicom+json\"; boundary=myboundary'
+					}
 				}
 			},
 			errorValues: {
@@ -306,7 +329,8 @@ export default {
 			totalUnknownFilesError: 0,
 			progress: 0,
 			copyFiles: [],
-			countSentFiles: 0
+			countSentFiles: 0,
+			filesToDicomize: []
 		}
 	},
 	computed: {
@@ -315,7 +339,8 @@ export default {
 			files: 'files',
 			totalSize: 'totalSize',
 			error: 'error',
-			source: 'source'
+			source: 'source',
+			studyUIDToSend: 'studyUIDToSend'
 		}),
 		totalSizeFiles () {
 			return this.copyFiles.reduce(function (total, file) {
@@ -349,16 +374,78 @@ export default {
 		closeWindow () {
 			this.UI.show = !this.UI.show
 			this.UI.cancel = true
+			this.initFiles()
 		},
 		setCancel () {
 			this.UI.cancel = !this.UI.cancel
+			this.initFiles()
+		},
+		initFiles () {
+			if (this.UI.getInfo) {
+				this.UI.getInfo = false
+			}
+			if (this.files.length > 0) {
+				this.$store.dispatch('initFiles')
+			}
 		},
 		sendFiles () {
 			this.initVariablesForSending()
-			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length <= this.maxsend) {
-				this.sendFormDataPromise(this.copyFiles)
-			} else {
-				this.sendBySize(this.copyFiles)
+
+			this.filesToDicomize = this.copyFiles.filter(file => { return file.type.includes('image/jpeg') || file.type.includes('application/pdf') })
+			const filesFiltered = this.copyFiles.filter(file => {
+				return !file.type.includes('image/jpeg') && !file.type.includes('application/pdf')
+			})
+
+			if (this.filesToDicomize.length > 0) {
+				this.UI.getInfo = true
+				this.UI.show = true
+			}
+
+			if (filesFiltered.length > 0) {
+				this.sendFormData(filesFiltered)
+			}
+		},
+		validDicomValue (dicomValue) {
+			this.UI.getInfo = false
+			this.sendDicomizeFiles(this.filesToDicomize, dicomValue)
+		},
+		sendDicomizeFiles (files, dicomValue) {
+			files.forEach(file => {
+				this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then(res => {
+					if (res !== -1) {
+						let data = res
+						this.sendDicomizeDataPromise(file.id, data).then(res => {
+							this.$store.dispatch('removeFileId', { id: file.id })
+							this.countSentFiles++
+						}).catch(err => {
+							console.log(err)
+						})
+					} else {
+						this.$store.dispatch('removeFileId', { id: file.id })
+						this.countSentFiles++
+					}
+				})
+			})
+		},
+		sendDicomizeDataPromise (idFile, data) {
+			return new Promise((resolve) => {
+				let formData = new FormData()
+				formData.append(idFile, data)
+
+				const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
+
+				HTTP.post(request, data, this.config['dicomizeData']).then(res => {
+					resolve(res)
+				}).catch(res => {
+					resolve(res)
+				})
+			})
+		},
+		sendFormData (files) {
+			if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
+				this.sendFormDataPromise(files)
+			} else if (files.length > 0) {
+				this.sendBySize(files)
 			}
 		},
 		initVariablesForSending () {
@@ -414,7 +501,7 @@ export default {
 					let formData = this.createFormData(files)
 					this.currentFilesLength = files.length
 					const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
-					HTTP.post(request, formData, this.config).then(res => {
+					HTTP.post(request, formData, this.config['formData']).then(res => {
 						this.manageResult(files, res.data)
 						resolve(res)
 					}).catch(res => {
