@@ -55,6 +55,9 @@ const actions = {
 		params.files.forEach((val) => {
 			commit('REMOVE_FILE_ID', { id: val.id })
 		})
+	},
+	removeFileId ({ commit }, params) {
+		commit('REMOVE_FILE_ID', { id: params.id })
 	}
 }
 
