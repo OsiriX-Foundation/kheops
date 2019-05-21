@@ -653,6 +653,17 @@
                     height="24px"
                   />
                 </span>
+
+                <label
+                  for="file"
+                  style="cursor:pointer"
+                  @click="studyUIDadd=row.item.StudyInstanceUID[0]"
+                >
+                  <add-icon
+                    width="30px"
+                    height="30px"
+                  />
+                </label>
                 <!--
                 <span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
                 -->
@@ -804,7 +815,8 @@ export default {
 			},
 			confirmDelete: false,
 			selectedSeriesNb: 0,
-			isActive: false
+			isActive: false,
+			studyUIDadd: ''
 		}
 	},
 	computed: {
@@ -1171,11 +1183,13 @@ export default {
 		},
 		inputLoadFiles () {
 			const filesFromInput = this.$refs.inputfiles.files
-			this.$emit('loadfiles', filesFromInput)
+			this.$emit('loadfiles', filesFromInput, this.studyUIDadd)
+			this.initStudyUIDadd()
 		},
 		inputLoadDirectories () {
 			const filesFromInput = this.$refs.inputdir.files
-			this.$emit('loaddirectories', filesFromInput)
+			this.$emit('loaddirectories', filesFromInput, this.studyUIDadd)
+			this.initStudyUIDadd()
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -1186,6 +1200,9 @@ export default {
 		},
 		showDragAndDrop () {
 			this.$emit('demohover')
+		},
+		initStudyUIDadd () {
+			this.studyUIDadd = ''
 		}
 	}
 }
