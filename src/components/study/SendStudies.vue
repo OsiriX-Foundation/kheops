@@ -329,9 +329,7 @@ export default {
 						'Accept': 'application/dicom+json'
 					},
 					onUploadProgress: progressEvent => {
-						if ((this.progress + this.currentFiles) > this.totalSize) {
-							this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
-						}
+						this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
 					}
 				},
 				dicomizeData: {
