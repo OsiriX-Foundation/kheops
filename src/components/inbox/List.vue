@@ -660,15 +660,15 @@
                 <b-dropdown
                   v-if="providersEnable.length > 0"
                   size="sm"
+                  variant="link"
                   no-caret
+                  right
                 >
                   <template slot="button-content">
-                    <span>
-                      <build-icon
-                        width="22px"
-                        height="22px"
-                      />
-                    </span>
+                    <build-icon
+                      width="22px"
+                      height="22px"
+                    />
                   </template>
                   <!-- "redirectProvider(provider.client_id, row.item.StudyInstanceUID[0])" -->
                   <b-dropdown-form
@@ -1284,8 +1284,8 @@ export default {
 			}
 			this.$store.dispatch('postRedirectProvider', { queries }).then(res => {
 				console.log(res)
-      })
-    },
+			})
+		},
 		initStudyUIDadd () {
 			this.studyUIDadd = ''
 		}
