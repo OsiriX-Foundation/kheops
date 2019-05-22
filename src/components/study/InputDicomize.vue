@@ -2,11 +2,11 @@
 {
 	"en": {
 		"description": "Description",
-		"upload": "Upload"
+		"upload": "Send"
 	},
 	"fr": {
 		"description": "Description",
-		"upload": "Charger"
+		"upload": "Envoyer"
 	}
 }
 </i18n>

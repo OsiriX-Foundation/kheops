@@ -10,6 +10,7 @@
 		"cancel": "Cancel",
 		"titleBoxSending": "Sending files",
 		"titleBoxSended": "Files sent",
+		"titleBoxDicomize": "Waiting for your input",
 		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :"
 	},
 	"fr": {
@@ -22,6 +23,7 @@
 		"cancel": "Annuler",
 		"titleBoxSending": "Fichiers en cours d'envois",
 		"titleBoxSended": "Fichiers envoyés",
+		"titleBoxDicomize": "En attente d'informations",
 		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :"
 	}
 }
@@ -79,7 +81,7 @@
           <span
             v-else-if="UI.getInfo === true"
           >
-            Wait for your input
+            {{ $t("titleBoxDicomize") }}
           </span>
         </div>
         <div
