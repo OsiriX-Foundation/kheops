@@ -653,10 +653,9 @@
                     height="24px"
                   />
                 </span>
-
                 <label
                   for="file"
-                  style="cursor:pointer"
+                  style="cursor:pointer; display: inline;"
                   @click="studyUIDadd=row.item.StudyInstanceUID[0]"
                 >
                   <add-icon
