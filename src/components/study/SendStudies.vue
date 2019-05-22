@@ -46,12 +46,21 @@
           />
         </div>
         <div
-          v-if="sending === false"
+          v-else-if="sending === false && UI.getInfo === false"
           class="p-2"
         >
           <done-icon
             :height="'20'"
             :width="'20'"
+          />
+        </div>
+        <div
+          v-else-if="UI.getInfo === true"
+          class="p-2 text-danger"
+        >
+          <v-icon
+            class="align-middle"
+            name="baidu"
           />
         </div>
         <div
@@ -203,6 +212,14 @@
               >
                 {{ $t("album") }}
               </a>
+            </span>
+
+            <span
+              v-if="studyUIDToSend!== ''"
+            >
+              <!--
+								{{ studyUIDToSend }}
+							-->
             </span>
             <div
               v-if="Object.keys(listErrorUnknownFiles).length > 0"
