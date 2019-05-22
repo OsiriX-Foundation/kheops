@@ -36,7 +36,7 @@
         class="closeBtn d-flex"
       >
         <div
-          v-if="sending === true"
+          v-if="sending === true && UI.getInfo === false"
           class="p-2"
         >
           <clip-loader
@@ -58,14 +58,19 @@
           class="p-2"
         >
           <span
-            v-if="sending === true"
+            v-if="sending === true && UI.getInfo === false"
           >
             {{ $t("titleBoxSending") }}
           </span>
           <span
-            v-else-if="sending === false"
+            v-else-if="sending === false && UI.getInfo === false"
           >
             {{ $t("titleBoxSended") }}
+          </span>
+          <span
+            v-else-if="UI.getInfo === true"
+          >
+            Wait for your input
           </span>
         </div>
         <div
@@ -312,7 +317,7 @@ export default {
 				},
 				dicomizeData: {
 					headers: {
-						'Content-Type': 'multipart/related; type=\"application/dicom+json\"; boundary=myboundary'
+						'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary'
 					}
 				}
 			},
@@ -330,7 +335,8 @@ export default {
 			progress: 0,
 			copyFiles: [],
 			countSentFiles: 0,
-			filesToDicomize: []
+			filesToDicomize: [],
+			filesFiltered: []
 		}
 	},
 	computed: {
@@ -391,23 +397,29 @@ export default {
 		sendFiles () {
 			this.initVariablesForSending()
 
-			this.filesToDicomize = this.copyFiles.filter(file => { return file.type.includes('image/jpeg') || file.type.includes('application/pdf') })
-			const filesFiltered = this.copyFiles.filter(file => {
+			this.filesToDicomize = this.copyFiles.filter(file => {
+				return file.type.includes('image/jpeg') || file.type.includes('application/pdf')
+			})
+
+			this.filesFiltered = this.copyFiles.filter(file => {
 				return !file.type.includes('image/jpeg') && !file.type.includes('application/pdf')
 			})
 
 			if (this.filesToDicomize.length > 0) {
 				this.UI.getInfo = true
-				this.UI.show = true
+				this.UI.hide = false
 			}
 
-			if (filesFiltered.length > 0) {
-				this.sendFormData(filesFiltered)
+			if (this.filesFiltered.length > 0 && this.filesToDicomize.length === 0) {
+				this.sendFormData(this.filesFiltered)
 			}
 		},
 		validDicomValue (dicomValue) {
 			this.UI.getInfo = false
 			this.sendDicomizeFiles(this.filesToDicomize, dicomValue)
+			if (this.filesFiltered.length > 0) {
+				this.sendFormData(this.filesFiltered)
+			}
 		},
 		sendDicomizeFiles (files, dicomValue) {
 			files.forEach(file => {
@@ -467,32 +479,31 @@ export default {
 			}
 			// https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
 			let promiseChain = Promise.resolve()
-
 			files.forEach(async (file, index) => {
 				state.size += file.content.size
 				if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
-					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
+					const nextPromise = this.createNextPromise(files, state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
 					state.size = 0
 				} else if (index === files.length - 1) {
-					const nextPromise = this.createNextPromise(state.tmpIndex, files.length)
+					const nextPromise = this.createNextPromise(files, state.tmpIndex, files.length)
 					promiseChain = promiseChain.then(nextPromise())
 				}
 			})
 		},
-		createNextPromise (firstIndex, secondIndex) {
-			let currentFiles = this.getArrayFilesToSend(firstIndex, secondIndex)
+		createNextPromise (files, firstIndex, secondIndex) {
+			let currentFiles = this.getArrayFilesToSend(files, firstIndex, secondIndex)
 			const nextPromise = () => () => {
 				return this.sendFormDataPromise(currentFiles)
 			}
 			return nextPromise
 		},
-		getArrayFilesToSend (firstIndex, secondIndex) {
+		getArrayFilesToSend (files, firstIndex, secondIndex) {
 			if (firstIndex === secondIndex) {
-				return [this.copyFiles[secondIndex]]
+				return [files[secondIndex]]
 			} else {
-				return this.copyFiles.slice(firstIndex, secondIndex)
+				return files.slice(firstIndex, secondIndex)
 			}
 		},
 		sendFormDataPromise (files) {
