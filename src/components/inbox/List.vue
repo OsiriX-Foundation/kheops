@@ -1181,14 +1181,18 @@ export default {
 			ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`
 		},
 		inputLoadFiles () {
-			const filesFromInput = this.$refs.inputfiles.files
-			this.$emit('loadfiles', filesFromInput, this.studyUIDadd)
-			this.initStudyUIDadd()
+			if (this.$refs.inputfiles.files.length > 0) {
+				const filesFromInput = this.$refs.inputfiles.files
+				this.$emit('loadfiles', filesFromInput, this.studyUIDadd)
+				this.initStudyUIDadd()
+			}
 		},
 		inputLoadDirectories () {
-			const filesFromInput = this.$refs.inputdir.files
-			this.$emit('loaddirectories', filesFromInput, this.studyUIDadd)
-			this.initStudyUIDadd()
+			if (this.$refs.inputdir.files.length > 0) {
+				const filesFromInput = this.$refs.inputdir.files
+				this.$emit('loaddirectories', filesFromInput, this.studyUIDadd)
+				this.initStudyUIDadd()
+			}
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
