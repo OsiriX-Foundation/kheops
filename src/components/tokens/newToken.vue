@@ -2,29 +2,29 @@
 {
 	"en": {
 		"newtoken": "New token",
-		"description": "description",
-		"scope": "scope",
+		"description": "Description",
+		"scope": "Scope",
 		"album": "album",
-		"permission": "permission",
+		"permission": "Permission",
 		"write": "write",
 		"read": "read",
 		"download": "download",
 		"appropriate": "appropriate",
-		"expirationdate": "expiration date",
+		"expirationdate": "Expiration date",
 		"tokencopysuccess": "Token successfully copied"
 
 	},
 	"fr": {
 		"newtoken": "Nouveau token",
-		"description": "description",
-		"scope": "applicable à",
+		"description": "Description",
+		"scope": "Applicable à",
 		"album": "album",
-		"permission": "permission",
+		"permission": "Permission",
 		"write": "écriture",
 		"read": "lecture",
 		"download": "téléchargement",
 		"appropriate": "approprier",
-		"expirationdate": "date d'expiration",
+		"expirationdate": "Date d'expiration",
 		"tokencopysuccess": "Token copié avec succès"
 	}
 }
@@ -43,128 +43,118 @@
     <form @submit.prevent="createToken">
       <fieldset>
         <div class="row">
-          <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('description') }}</dt>
+          <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
+            <b>{{ $t('description') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-9">
-            <dd>
-              <input
-                v-model="token.title"
-                type="text"
-                :placeholder="$t('description')"
-                class="form-control"
-                required
-                maxlength="255"
-              >
-            </dd>
+          <div class="col-xs-12 col-sm-12 col-md-10 mb-3">
+            <input
+              v-model="token.title"
+              type="text"
+              :placeholder="$t('description')"
+              class="form-control"
+              required
+              maxlength="255"
+            >
           </div>
         </div>
         <div
           v-if="scope!=='album'"
           class="row"
         >
-          <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('scope') }}</dt>
+          <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
+            <b>{{ $t('scope') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-9">
-            <dd>
-              <select
-                v-model="token.scope_type"
-                class="form-control"
+          <div class="col-xs-12 col-sm-12 col-md-4 mb-3">
+            <select
+              v-model="token.scope_type"
+              class="form-control"
+            >
+              <option
+                v-for="(option_scope,idx) in scopes"
+                :key="idx"
+                :value="option_scope"
               >
-                <option
-                  v-for="(option_scope,idx) in scopes"
-                  :key="idx"
-                  :value="option_scope"
-                >
-                  {{ $t(option_scope) }}
-                </option>
-              </select>
-            </dd>
+                {{ $t(option_scope) }}
+              </option>
+            </select>
           </div>
         </div>
         <div
           v-if="token.scope_type==='album' && scope!=='album'"
           class="row"
         >
-          <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('album') }}</dt>
+          <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
+            <b>{{ $t('album') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-9">
-            <dd>
-              <select
-                v-model="token.album"
-                class="form-control"
+          <div class="col-xs-12 col-sm-12 col-md-4 mb-3">
+            <select
+              v-model="token.album"
+              class="form-control"
+            >
+              <option
+                v-for="album in albums"
+                :key="album.album_id"
+                :value="album.album_id"
               >
-                <option
-                  v-for="album in albums"
-                  :key="album.album_id"
-                  :value="album.album_id"
-                >
-                  {{ album.name }}
-                </option>
-              </select>
-            </dd>
+                {{ album.name }}
+              </option>
+            </select>
           </div>
         </div>
         <div
           v-if="token.scope_type=='album'"
           class="row"
         >
-          <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('permission') }}</dt>
+          <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
+            <b>{{ $t('permission') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-9">
-            <dd>
-              <toggle-button
-                v-model="token.write_permission"
-                :labels="{checked: 'Yes', unchecked: 'No'}"
-              /> <label>{{ $t('write') }}</label><br>
-              <toggle-button
-                v-model="token.read_permission"
-                :labels="{checked: 'Yes', unchecked: 'No'}"
-              /> <label>{{ $t('read') }}</label><br>
-              <toggle-button
-                v-if="token.read_permission"
-                v-model="token.download_permission"
-                :labels="{checked: 'Yes', unchecked: 'No'}"
-                class="ml-3"
-              /> <label v-if="token.read_permission">
-                {{ $t('download') }}
-              </label><br>
-              <toggle-button
-                v-if="token.read_permission"
-                v-model="token.appropriate_permission"
-                :labels="{checked: 'Yes', unchecked: 'No'}"
-                class="ml-3"
-              /> <label v-if="token.read_permission">
-                {{ $t('appropriate') }}
-              </label>
-            </dd>
+          <div class="col-xs-12 col-sm-12 col-md-3">
+            <toggle-button
+              v-model="token.write_permission"
+              :labels="{checked: 'Yes', unchecked: 'No'}"
+            /> <label>{{ $t('write') }}</label><br>
+            <toggle-button
+              v-model="token.read_permission"
+              :labels="{checked: 'Yes', unchecked: 'No'}"
+            /> <label>{{ $t('read') }}</label><br>
+            <toggle-button
+              v-if="token.read_permission"
+              v-model="token.download_permission"
+              :labels="{checked: 'Yes', unchecked: 'No'}"
+              class="ml-3"
+            /> <label v-if="token.read_permission">
+              {{ $t('download') }}
+            </label><br>
+            <toggle-button
+              v-if="token.read_permission"
+              v-model="token.appropriate_permission"
+              :labels="{checked: 'Yes', unchecked: 'No'}"
+              class="ml-3"
+            /> <label v-if="token.read_permission">
+              {{ $t('appropriate') }}
+            </label>
           </div>
         </div>
         <div class="row">
-          <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('expirationdate') }}</dt>
+          <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
+            <b>{{ $t('expirationdate') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-3">
-            <dd>
-              <datepicker
-                v-model="token.expiration_time"
-                :bootstrap-styling="false"
-                input-class="form-control form-control-sm  search-calendar"
-                :calendar-button="false"
-                calendar-button-icon=""
-                wrapper-class="calendar-wrapper"
-                :placeholder="$t('expirationdate')"
-                :clear-button="true"
-                clear-button-icon="fa fa-times"
-              />
-            </dd>
+          <div class="col-xs-12 col-sm-12 col-md-10 mb-3">
+            <datepicker
+              v-model="token.expiration_time"
+              :bootstrap-styling="false"
+              input-class="form-control form-control-sm  search-calendar"
+              :calendar-button="false"
+              calendar-button-icon=""
+              wrapper-class="calendar-wrapper"
+              :placeholder="$t('expirationdate')"
+              :clear-button="true"
+              clear-button-icon="fa fa-times"
+            />
           </div>
         </div>
         <div class="row">
-          <div class="col-xs-12 offset-sm-3 col-sm-9">
+          <div class="col-xs-12 col-sm-12 offset-md-2 col-md-10 mb-1">
             <button
               type="submit"
               class="btn btn-primary"

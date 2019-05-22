@@ -10,6 +10,7 @@
 		"cancel": "Cancel",
 		"titleBoxSending": "Sending files",
 		"titleBoxSended": "Files sent",
+		"titleBoxDicomize": "Waiting for your input",
 		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :"
 	},
 	"fr": {
@@ -22,6 +23,7 @@
 		"cancel": "Annuler",
 		"titleBoxSending": "Fichiers en cours d'envois",
 		"titleBoxSended": "Fichiers envoyés",
+		"titleBoxDicomize": "En attente d'informations",
 		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :"
 	}
 }
@@ -36,7 +38,7 @@
         class="closeBtn d-flex"
       >
         <div
-          v-if="sending === true"
+          v-if="sending === true && UI.getInfo === false"
           class="p-2"
         >
           <clip-loader
@@ -46,7 +48,7 @@
           />
         </div>
         <div
-          v-if="sending === false"
+          v-else-if="sending === false && UI.getInfo === false"
           class="p-2"
         >
           <done-icon
@@ -55,17 +57,31 @@
           />
         </div>
         <div
+          v-else-if="UI.getInfo === true"
+          class="p-2 text-danger"
+        >
+          <v-icon
+            class="align-middle"
+            name="baidu"
+          />
+        </div>
+        <div
           class="p-2"
         >
           <span
-            v-if="sending === true"
+            v-if="sending === true && UI.getInfo === false"
           >
             {{ $t("titleBoxSending") }}
           </span>
           <span
-            v-else-if="sending === false"
+            v-else-if="sending === false && UI.getInfo === false"
           >
             {{ $t("titleBoxSended") }}
+          </span>
+          <span
+            v-else-if="UI.getInfo === true"
+          >
+            {{ $t("titleBoxDicomize") }}
           </span>
         </div>
         <div
@@ -119,6 +135,16 @@
         v-if="UI.hide === false"
         class="p-2"
       >
+        <div
+          v-if="UI.getInfo"
+          class="mb-2"
+        >
+          <input-dicomize
+            :files-to-dicomize="filesToDicomize"
+            :create-study="studyUIDToSend === '' ? true : false"
+            @valid-dicom-value="validDicomValue"
+          />
+        </div>
         <!--
 					When sending
 				-->
@@ -189,6 +215,14 @@
                 {{ $t("album") }}
               </a>
             </span>
+
+            <span
+              v-if="studyUIDToSend!== ''"
+            >
+              <!--
+								{{ studyUIDToSend }}
+							-->
+            </span>
             <div
               v-if="Object.keys(listErrorUnknownFiles).length > 0"
             >
@@ -257,6 +291,7 @@
 import { mapGetters } from 'vuex'
 import { HTTP } from '@/router/http'
 import ListErrorFiles from '@/components/study/ListErrorFiles'
+import InputDicomize from '@/components/study/InputDicomize'
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import BlockIcon from '@/components/kheopsSVG/BlockIcon'
@@ -264,10 +299,12 @@ import CloseIcon from '@/components/kheopsSVG/CloseIcon'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 import RemoveIcon from '@/components/kheopsSVG/RemoveIcon'
 import DoneIcon from '@/components/kheopsSVG/DoneIcon'
+import { DicomOperations } from '@/mixins/dicomoperations'
 
 export default {
 	name: 'SendStudies',
-	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon },
+	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize },
+	mixins: [ DicomOperations ],
 	props: {
 	},
 	data () {
@@ -281,16 +318,26 @@ export default {
 				SVGwidth: '20',
 				SVGHeaderHeight: '16',
 				SVGHeaderWidth: '16',
-				SpinnerCancelSize: '30px'
+				SpinnerCancelSize: '30px',
+				getInfo: false
 			},
 			maxsize: 10e6,
 			maxsend: 99,
 			config: {
-				headers: {
-					'Accept': 'application/dicom+json'
+				formData: {
+					headers: {
+						'Accept': 'application/dicom+json'
+					},
+					onUploadProgress: progressEvent => {
+						if ((this.progress + this.currentFiles) > this.totalSize) {
+							this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
+						}
+					}
 				},
-				onUploadProgress: progressEvent => {
-					this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
+				dicomizeData: {
+					headers: {
+						'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary'
+					}
 				}
 			},
 			errorValues: {
@@ -306,7 +353,9 @@ export default {
 			totalUnknownFilesError: 0,
 			progress: 0,
 			copyFiles: [],
-			countSentFiles: 0
+			countSentFiles: 0,
+			filesToDicomize: [],
+			filesFiltered: []
 		}
 	},
 	computed: {
@@ -315,7 +364,8 @@ export default {
 			files: 'files',
 			totalSize: 'totalSize',
 			error: 'error',
-			source: 'source'
+			source: 'source',
+			studyUIDToSend: 'studyUIDToSend'
 		}),
 		totalSizeFiles () {
 			return this.copyFiles.reduce(function (total, file) {
@@ -349,16 +399,84 @@ export default {
 		closeWindow () {
 			this.UI.show = !this.UI.show
 			this.UI.cancel = true
+			this.initFiles()
 		},
 		setCancel () {
 			this.UI.cancel = !this.UI.cancel
+			this.initFiles()
+		},
+		initFiles () {
+			if (this.UI.getInfo) {
+				this.UI.getInfo = false
+			}
+			if (this.files.length > 0) {
+				this.$store.dispatch('initFiles')
+			}
 		},
 		sendFiles () {
 			this.initVariablesForSending()
-			if (this.maxsize > this.totalSizeFiles && this.copyFiles.length <= this.maxsend) {
-				this.sendFormDataPromise(this.copyFiles)
-			} else {
-				this.sendBySize(this.copyFiles)
+
+			this.filesToDicomize = this.copyFiles.filter(file => {
+				return file.type.includes('image/jpeg') || file.type.includes('application/pdf')
+			})
+
+			this.filesFiltered = this.copyFiles.filter(file => {
+				return !file.type.includes('image/jpeg') && !file.type.includes('application/pdf')
+			})
+
+			if (this.filesToDicomize.length > 0) {
+				this.UI.getInfo = true
+				this.UI.hide = false
+			}
+
+			if (this.filesFiltered.length > 0 && this.filesToDicomize.length === 0) {
+				this.sendFormData(this.filesFiltered)
+			}
+		},
+		validDicomValue (dicomValue) {
+			this.UI.getInfo = false
+			this.sendDicomizeFiles(this.filesToDicomize, dicomValue)
+			if (this.filesFiltered.length > 0) {
+				this.sendFormData(this.filesFiltered)
+			}
+		},
+		sendDicomizeFiles (files, dicomValue) {
+			files.forEach(file => {
+				this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then(res => {
+					if (res !== -1) {
+						let data = res
+						this.sendDicomizeDataPromise(file.id, data).then(res => {
+							this.$store.dispatch('removeFileId', { id: file.id })
+							this.countSentFiles++
+						}).catch(err => {
+							console.log(err)
+						})
+					} else {
+						this.$store.dispatch('removeFileId', { id: file.id })
+						this.countSentFiles++
+					}
+				})
+			})
+		},
+		sendDicomizeDataPromise (idFile, data) {
+			return new Promise((resolve) => {
+				let formData = new FormData()
+				formData.append(idFile, data)
+
+				const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
+
+				HTTP.post(request, data, this.config['dicomizeData']).then(res => {
+					resolve(res)
+				}).catch(res => {
+					resolve(res)
+				})
+			})
+		},
+		sendFormData (files) {
+			if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
+				this.sendFormDataPromise(files)
+			} else if (files.length > 0) {
+				this.sendBySize(files)
 			}
 		},
 		initVariablesForSending () {
@@ -380,32 +498,31 @@ export default {
 			}
 			// https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
 			let promiseChain = Promise.resolve()
-
 			files.forEach(async (file, index) => {
 				state.size += file.content.size
 				if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
-					const nextPromise = this.createNextPromise(state.tmpIndex, index + 1)
+					const nextPromise = this.createNextPromise(files, state.tmpIndex, index + 1)
 					promiseChain = promiseChain.then(nextPromise())
 					state.tmpIndex = index + 1
 					state.size = 0
 				} else if (index === files.length - 1) {
-					const nextPromise = this.createNextPromise(state.tmpIndex, files.length)
+					const nextPromise = this.createNextPromise(files, state.tmpIndex, files.length)
 					promiseChain = promiseChain.then(nextPromise())
 				}
 			})
 		},
-		createNextPromise (firstIndex, secondIndex) {
-			let currentFiles = this.getArrayFilesToSend(firstIndex, secondIndex)
+		createNextPromise (files, firstIndex, secondIndex) {
+			let currentFiles = this.getArrayFilesToSend(files, firstIndex, secondIndex)
 			const nextPromise = () => () => {
 				return this.sendFormDataPromise(currentFiles)
 			}
 			return nextPromise
 		},
-		getArrayFilesToSend (firstIndex, secondIndex) {
+		getArrayFilesToSend (files, firstIndex, secondIndex) {
 			if (firstIndex === secondIndex) {
-				return [this.copyFiles[secondIndex]]
+				return [files[secondIndex]]
 			} else {
-				return this.copyFiles.slice(firstIndex, secondIndex)
+				return files.slice(firstIndex, secondIndex)
 			}
 		},
 		sendFormDataPromise (files) {
@@ -414,7 +531,7 @@ export default {
 					let formData = this.createFormData(files)
 					this.currentFilesLength = files.length
 					const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
-					HTTP.post(request, formData, this.config).then(res => {
+					HTTP.post(request, formData, this.config['formData']).then(res => {
 						this.manageResult(files, res.data)
 						resolve(res)
 					}).catch(res => {

@@ -185,13 +185,15 @@ export default {
 					'content': file,
 					'path': path,
 					'name': name,
-					'id': this.count.toString(16)
+					'id': this.count.toString(16),
+					'type': file.type
 				}
 				this.count++
 				return objFile
 			}
 		},
-		inputLoadFiles (filesFromInput) {
+		inputLoadFiles (filesFromInput, studyUID) {
+			this.$store.dispatch('setStudyUIDtoSend', { studyUID: studyUID })
 			let arrayFiles = []
 			for (let i = 0; i < filesFromInput.length; i++) {
 				const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name
@@ -203,6 +205,7 @@ export default {
 			this.storeFiles(arrayFiles)
 		},
 		manageDataTransfer (dataTransferItems) {
+			this.$store.dispatch('setStudyUIDtoSend', { studyUID: '' })
 			const arrayPromises = []
 			for (let i = 0; i < dataTransferItems.length; i++) {
 				let entry = this.determineGetAsEntry(dataTransferItems[i])

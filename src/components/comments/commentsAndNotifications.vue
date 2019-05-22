@@ -265,7 +265,7 @@
                   title="send comment"
                   type="submit"
                   class="btn btn-primary"
-                  :disabled="newComment.comment.length < 2 || disabledText"
+                  :disabled="newComment.comment.length < 1 || disabledText"
                 >
                   <v-icon name="paper-plane" />
                 </button>
@@ -360,7 +360,7 @@ export default {
 			}
 		},
 		addComment () {
-			if (this.newComment.comment.length > 2) {
+			if (this.newComment.comment.length >= 1) {
 				if (this.enablePrivate) {
 					this.newComment.to_user = this.privateUser
 				}

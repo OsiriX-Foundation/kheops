@@ -657,7 +657,6 @@
                     height="24px"
                   />
                 </span>
-
                 <b-dropdown
                   v-if="providersEnable.length > 0"
                   size="sm"
@@ -705,6 +704,16 @@
                     </b-dropdown-item-button>
                   </b-dropdown-form>
                 </b-dropdown>
+                <label
+                  for="file"
+                  style="cursor:pointer; display: inline;"
+                  @click="studyUIDadd=row.item.StudyInstanceUID[0]"
+                >
+                  <add-icon
+                    width="24px"
+                    height="24px"
+                  />
+                </label>
                 <!--
                 <span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
                 -->
@@ -857,7 +866,8 @@ export default {
 			},
 			confirmDelete: false,
 			selectedSeriesNb: 0,
-			isActive: false
+			isActive: false,
+			studyUIDadd: ''
 		}
 	},
 	computed: {
@@ -1239,12 +1249,18 @@ export default {
 			ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`
 		},
 		inputLoadFiles () {
-			const filesFromInput = this.$refs.inputfiles.files
-			this.$emit('loadfiles', filesFromInput)
+			if (this.$refs.inputfiles.files.length > 0) {
+				const filesFromInput = this.$refs.inputfiles.files
+				this.$emit('loadfiles', filesFromInput, this.studyUIDadd)
+				this.initStudyUIDadd()
+			}
 		},
 		inputLoadDirectories () {
-			const filesFromInput = this.$refs.inputdir.files
-			this.$emit('loaddirectories', filesFromInput)
+			if (this.$refs.inputdir.files.length > 0) {
+				const filesFromInput = this.$refs.inputdir.files
+				this.$emit('loaddirectories', filesFromInput, this.studyUIDadd)
+				this.initStudyUIDadd()
+			}
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -1268,7 +1284,10 @@ export default {
 			}
 			this.$store.dispatch('postRedirectProvider', { queries }).then(res => {
 				console.log(res)
-			})
+      })
+    },
+		initStudyUIDadd () {
+			this.studyUIDadd = ''
 		}
 	}
 }
