@@ -8,6 +8,7 @@
 		"modalitiesinstudy": "Modalities in study",
 		"studydate": "Study date",
 		"studyid": "Study ID",
+		"StudyInstanceUID": "Study Instance UID",
 		"studytime": "Study time",
 		"patientinfo": "Patient details",
 		"studyinfo": "Study details",
@@ -22,6 +23,7 @@
 		"modalitiesinstudy": "Modalité d'étude",
 		"studydate": "Date de l'étude",
 		"studyid": "ID étude",
+		"StudyInstanceUID": "Study Instance UID",
 		"studytime": "Temps d'étude",
 		"patientinfo": "Informations du patient",
 		"studyinfo": "Information de l'étude",
@@ -37,7 +39,10 @@
       <div class="col-xl-1" />
       <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
         <h5>{{ $t('patientinfo') }}</h5>
-        <table class="table table-striped">
+        <table
+          class="table table-striped"
+          style="word-break: break-word;"
+        >
           <tbody>
             <tr v-if="metadata.PatientName">
               <th>{{ $t('patientname') }}</th>
@@ -61,7 +66,10 @@
 
       <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
         <h5>{{ $t('studyinfo') }}</h5>
-        <table class="table table-striped">
+        <table
+          class="table table-striped"
+          style="word-break: break-word;"
+        >
           <tbody>
             <tr v-if="metadata.ModalitiesInStudy">
               <th>{{ $t('modalitiesinstudy') }}</th>
@@ -75,6 +83,10 @@
               <th>{{ $t('studyid') }}</th>
               <td>{{ metadata.StudyID[0] }}</td>
             </tr>
+            <tr v-if="metadata.StudyInstanceUID">
+              <th>{{ $t('StudyInstanceUID') }}</th>
+              <td>{{ metadata.StudyInstanceUID[0] }}</td>
+            </tr>
             <tr v-if="matchNumbers(metadata.StudyTime)">
               <th>{{ $t('studytime') }}</th>
               <td>{{ metadata.StudyTime[0] }}</td>
@@ -82,10 +94,6 @@
             <tr v-if="matchNumbers(metadata.NumberOfStudyRelatedSeries)">
               <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
               <td>{{ metadata.NumberOfStudyRelatedSeries[0] }}</td>
-            </tr>
-            <tr v-if="matchNumbers(metadata.NumberOfStudyRelatedInstances)">
-              <th>{{ $t('NumberOfStudyRelatedInstances') }}</th>
-              <td>{{ metadata.NumberOfStudyRelatedInstances[0] }}</td>
             </tr>
           </tbody>
         </table>
