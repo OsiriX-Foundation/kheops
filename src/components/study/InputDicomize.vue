@@ -1,3 +1,16 @@
+<i18n>
+{
+	"en": {
+		"description": "Description",
+		"upload": "Upload"
+	},
+	"fr": {
+		"description": "Description",
+		"upload": "Charger"
+	}
+}
+</i18n>
+
 <template>
   <div>
     <!--
