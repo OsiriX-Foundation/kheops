@@ -175,7 +175,7 @@ export default {
 		},
 		openWADO (series) {
 			let wadoWindow = window.open('', 'WADO')
-			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
+			this.getViewerToken(this.user.jwt, this.studyInstanceUID, this.source).then(res => {
 				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO`
 				wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`
 			}).catch(err => {
