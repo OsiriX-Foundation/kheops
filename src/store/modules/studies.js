@@ -4,6 +4,7 @@ import customdicom from '@/mixins/customdicom'
 import moment from 'moment'
 import axios from 'axios'
 import SRImage from '@/assets/SR_2.png'
+import PDFImage from '@/assets/pdf-240x240.png'
 import DicomLogo from '@/assets/dicom_logo.png'
 // initial state
 const state = {
@@ -172,10 +173,14 @@ const actions = {
 					if (t.Modality && t.Modality.includes('SR')) {
 						t.imgSrc = SRImage
 					} else {
-						dispatch('getImage', {
-							StudyInstanceUID: study.StudyInstanceUID[0],
-							SeriesInstanceUID: t.SeriesInstanceUID[0]
-						})
+						if (t.Modality.includes('DOC') && t.NumberOfSeriesRelatedInstances[0] === 1) {
+							t.imgSrc = PDFImage
+						} else {
+							dispatch('getImage', {
+								StudyInstanceUID: study.StudyInstanceUID[0],
+								SeriesInstanceUID: t.SeriesInstanceUID[0]
+							})
+						}
 					}
 					if (t.SeriesInstanceUID !== undefined) data.push(t)
 				})
