@@ -43,12 +43,20 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <img
-          v-if="!series.Modality.includes('SR')"
+          v-if="!series.Modality.includes('SR') && !series.Modality.includes('DOC')"
           class="cursor-img"
           :src="series.imgSrc"
           width="250"
           height="250"
           @click="openViewer"
+        >
+        <img
+          v-else-if="series.Modality.includes('DOC') && series.NumberOfSeriesRelatedInstances[0] === 1"
+          class="cursor-img"
+          :src="series.imgSrc"
+          width="250"
+          height="250"
+          @click="openWADO(series)"
         >
         <img
           v-else
@@ -161,6 +169,15 @@ export default {
 			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
 				let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
 				ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		openWADO (series) {
+			let wadoWindow = window.open('', 'WADO')
+			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
+				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO`
+				wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`
 			}).catch(err => {
 				console.log(err)
 			})
