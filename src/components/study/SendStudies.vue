@@ -413,22 +413,27 @@ export default {
 		},
 		sendFiles () {
 			this.initVariablesForSending()
-
 			this.filesToDicomize = this.copyFiles.filter(file => {
-				return file.type.includes('image/jpeg') || file.type.includes('application/pdf')
+				return (file.type.includes('image/jpeg') || file.type.includes('application/pdf')	||
+					file.type.includes('video/mp4') || file.type.includes('video/mpeg'))
 			})
 
 			this.filesFiltered = this.copyFiles.filter(file => {
-				return !file.type.includes('image/jpeg') && !file.type.includes('application/pdf')
+				return (!file.type.includes('image/jpeg') && !file.type.includes('application/pdf') &&
+					!file.type.includes('video/mp4') && !file.type.includes('video/mpeg'))
 			})
 
-			if (this.filesToDicomize.length > 0) {
+			if (this.filesToDicomize.length > 0 && this.filesFiltered.length === 0) {
 				this.UI.getInfo = true
 				this.UI.hide = false
 			}
 
 			if (this.filesFiltered.length > 0 && this.filesToDicomize.length === 0) {
 				this.sendFormData(this.filesFiltered)
+			}
+
+			if (this.filesFiltered.length > 0 && this.filesToDicomize.length > 0) {
+				this.sendFormData(this.copyFiles)
 			}
 		},
 		validDicomValue (dicomValue) {
