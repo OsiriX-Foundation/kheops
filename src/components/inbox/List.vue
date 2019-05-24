@@ -803,6 +803,7 @@ export default {
 	data () {
 		return {
 			pageNb: 1,
+			serverURL: serverURL,
 			active: false,
 			form_send_study: false,
 			fields: [
