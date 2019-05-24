@@ -39,7 +39,8 @@ export const DicomOperations = {
 					{ tag: '00400555', 'vr': 'SQ', value: '' },
 					{ tag: '00080008', 'vr': 'CS', value: ['ORIGINAL', 'PRIMARY'] }
 				],
-				tagBulkDataURI: '7FE00010'
+				tagBulkDataURI: '7FE00010',
+				transferSyntax: '1.2.840.10008.1.2.4.50'
 			},
 			tagEncapsulatedPDF: {
 				necessaryTag: [
@@ -73,7 +74,48 @@ export const DicomOperations = {
 					{ tag: '00080016', 'vr': 'UI', value: ['1.2.840.10008.5.1.4.1.1.104.1'] },
 					{ tag: '00080018', 'vr': 'UI', value: 'OID' }
 				],
-				tagBulkDataURI: '00420011'
+				tagBulkDataURI: '00420011',
+				transferSyntax: '1.2.840.10008.1.2.4.50'
+			},
+			tagVideo: {
+				necessaryTag: [
+					'00100010',
+					'00100020',
+					'00100030',
+					'00100040',
+					'0020000D',
+					'00080020',
+					'00080030',
+					'00080090',
+					'00200010',
+					'00080050',
+					'00080005'
+				],
+				createTag: [
+					{ tag: '00080060', 'vr': 'CS', value: ['XC'] },
+					{ tag: '0020000E', 'vr': 'UI', value: 'OID' },
+					{ tag: '00200011', 'vr': 'IS', value: '' },
+					{ tag: '00080070', 'vr': 'LO', value: '' },
+					{ tag: '00200013', 'vr': 'IS', value: [1] },
+					{ tag: '00280008', 'vr': 'IS', value: [0] },
+					{ tag: '00280009', 'vr': 'AT', value: ['00181063'] },
+					{ tag: '00280002', 'vr': 'US', value: [0] },
+					{ tag: '00280004', 'vr': 'CS', value: ['YBR_PARTIAL_420'] },
+					{ tag: '00280010', 'vr': 'US', value: [3] },
+					{ tag: '00280011', 'vr': 'US', value: [3] },
+					{ tag: '00280100', 'vr': 'US', value: [8] },
+					{ tag: '00280101', 'vr': 'US', value: [8] },
+					{ tag: '00280102', 'vr': 'US', value: [7] },
+					{ tag: '00280103', 'vr': 'US', value: [0] },
+					{ tag: '00280006', 'vr': 'US', value: [0] },
+					{ tag: '00400555', 'vr': 'SQ', value: '' },
+					{ tag: '00080008', 'vr': 'CS', value: ['ORIGINAL', 'PRIMARY'] },
+					{ tag: '00080016', 'vr': 'UI', value: ['1.2.840.10008.5.1.4.1.1.77.1.4.1'] },
+					{ tag: '00080018', 'vr': 'UI', value: 'OID' },
+					{ tag: '7FE00010', 'vr': 'OB', value: 'BulkDataURI' }
+				],
+				tagBulkDataURI: '7FE00010',
+				transferSyntax: '1.2.840.10008.1.2.4.102'
 			},
 			tagStudiesUID: '0020000D',
 			tagSeriesUID: '0020000E',
@@ -85,11 +127,10 @@ export const DicomOperations = {
 		dicomize (studyUID, file, dicomValue) {
 			return new Promise((resolve, reject) => {
 				if (studyUID) {
-					const boundary = 'myboundary'
-					const contentTypeHeader = 'Content-Type: application/dicom+json; transfer-syntax=' + this.transferSyntax
-
 					this.getStudy(studyUID).then(res => {
 						let tags = this.getTags(file.type)
+						const boundary = 'myboundary'
+						const contentTypeHeader = 'Content-Type: application/dicom+json; transfer-syntax=' + tags['transferSyntax']
 						if (tags !== -1) {
 							let objDicom = this.generateDicom(tags['necessaryTag'], tags['createTag'], tags['tagBulkDataURI'], res.data[0], dicomValue)
 							this.generateMultiPart(boundary, [objDicom['ordered']], contentTypeHeader, file, objDicom['bulkDataUri'])
@@ -120,6 +161,9 @@ export const DicomOperations = {
 			}
 			if (type.includes('image')) {
 				return this.tagPhotographicImage
+			}
+			if (type.includes('video')) {
+				return this.tagVideo
 			}
 			return -1
 		},
