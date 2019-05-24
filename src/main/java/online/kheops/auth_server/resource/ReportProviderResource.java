@@ -216,7 +216,7 @@ public class ReportProviderResource {
                     .queryParam("conf_uri", confUri);
 
             for (String uid: studyInstanceUID) {
-                reportProviderUrlBuilder.queryParam(StudyInstanceUID, URLEncoder.encode(uid, StandardCharsetsUTF8));
+                reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, StandardCharsetsUTF8));
             }
 
             final String reportProviderUrl = reportProviderUrlBuilder.toString();
