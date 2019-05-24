@@ -49,6 +49,8 @@ import static online.kheops.auth_server.util.Tools.checkValidUID;
 public class ReportProviderResource {
     private static final Logger LOG = Logger.getLogger(ReportProviderResource.class.getName());
 
+    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
+
     @Context
     private UriInfo uriInfo;
 
@@ -157,12 +159,16 @@ public class ReportProviderResource {
 
         final ReportProvider reportProvider;
         final String albumId;
+        final String configIssuer;
         try {
             tx.begin();
             reportProvider = getReportProviderWithClientId(clientId, em);
             albumId = reportProvider.getAlbum().getId();
-        } catch (NoResultException e){
+            configIssuer = ReportProviders.getConfigIssuer(reportProvider);
+        } catch (NoResultException e) {
             return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
+        } catch (ReportProviderUriNotValidException e) {
+            return Response.status(NOT_FOUND).entity("Configuration URI is not valid").build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -202,12 +208,15 @@ public class ReportProviderResource {
                 .withArrayClaim("study_uids", studyInstanceUID.toArray(new String[0]))
                 .withClaim("client_id", reportProvider.getClientId())
                 .withSubject(assertion.getSub())
+                .withIssuer(getHostRoot())
+                .withAudience(getHostRoot())
+                .withClaim("azp", configIssuer)
                 .withClaim("type", "report_provider_code");
 
         final String token = jwtBuilder.sign(algorithmHMAC);
 
         try {
-            final String kheopsConfigUrl = context.getInitParameter("online.kheops.root.uri") + "/api/reportproviders/" + clientId + "/configuration";
+            final String kheopsConfigUrl = getHostRoot() + "/api/reportproviders/" + clientId + "/configuration";
             final String StandardCharsetsUTF8 = java.nio.charset.StandardCharsets.UTF_8.toString();
 
             final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
@@ -353,5 +362,9 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity("url not valid").build();
         }
         return  Response.status(OK).build();
+    }
+
+    private String getHostRoot() {
+        return context.getInitParameter(HOST_ROOT_PARAMETER);
     }
 }
