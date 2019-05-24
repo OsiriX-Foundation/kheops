@@ -159,18 +159,13 @@ public class ReportProviderResource {
 
         final ReportProvider reportProvider;
         final String albumId;
-        final String configIssuer;
         try {
             tx.begin();
             reportProvider = getReportProviderWithClientId(clientId, em);
             albumId = reportProvider.getAlbum().getId();
-            configIssuer = ReportProviders.getConfigIssuer(reportProvider);
         } catch (NoResultException e) {
             LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
             return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
-        } catch (ReportProviderUriNotValidException e) {
-            LOG.log(Level.WARNING, "Configuration URI is not valid", e);
-            return Response.status(NOT_FOUND).entity("Configuration URI is not valid").build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -208,11 +203,10 @@ public class ReportProviderResource {
                 .withExpiresAt(Date.from(Instant.now().plus(2, ChronoUnit.MINUTES)))
                 .withNotBefore(new Date())
                 .withArrayClaim("study_uids", studyInstanceUID.toArray(new String[0]))
-                .withClaim("client_id", reportProvider.getClientId())
                 .withSubject(assertion.getSub())
                 .withIssuer(getHostRoot())
                 .withAudience(getHostRoot())
-                .withClaim("azp", configIssuer)
+                .withClaim("azp", reportProvider.getClientId())
                 .withClaim("type", "report_provider_code");
 
         final String token = jwtBuilder.sign(algorithmHMAC);
