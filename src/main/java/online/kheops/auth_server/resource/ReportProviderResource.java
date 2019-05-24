@@ -100,8 +100,8 @@ public class ReportProviderResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newReport(@FormParam("access_token") final String accessToken,
-                              @FormParam("clientId") final String clientId,
-                              @FormParam(StudyInstanceUID) List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
+                              @FormParam("client_id") final String clientId,
+                              @FormParam("studyUID") List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
 
         if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
             return Response.status(BAD_REQUEST).entity(StudyInstanceUID +" param must be set").build();
