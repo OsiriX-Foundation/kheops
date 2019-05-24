@@ -61,11 +61,12 @@ public class AccessToken {
             }
 
             final Form form = new Form()
-                    .param("assertion", capability)
-                    .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer")
+                    .param("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
+                    .param("subject_token", capability)
+                    .param("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
                     .param("scope", "pep")
-                    .param("study_instance_uid", seriesID.getStudyUID())
-                    .param("series_instance_uid", seriesID.getSeriesUID());
+                    .param("studyUID", seriesID.getStudyUID())
+                    .param("seriesUID", seriesID.getSeriesUID());
 
             URI uri = UriBuilder.fromUri(authorizationServerRoot).path("token").build();
 

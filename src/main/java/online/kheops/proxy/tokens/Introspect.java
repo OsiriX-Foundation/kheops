@@ -52,8 +52,7 @@ public class Introspect {
 
         public Response token(String token) throws AccessTokenException {
             final Form form = new Form()
-                    .param("assertion", token)
-                    .param("grant_type", "urn:x-kheops:params:oauth:grant-type:unknown-bearer");
+                    .param("token", token);
 
             try {
                 return webTarget.request(APPLICATION_JSON_TYPE).post(Entity.form(form), Response.class);
