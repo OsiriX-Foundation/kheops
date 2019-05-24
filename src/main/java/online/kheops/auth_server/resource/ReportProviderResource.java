@@ -166,8 +166,10 @@ public class ReportProviderResource {
             albumId = reportProvider.getAlbum().getId();
             configIssuer = ReportProviders.getConfigIssuer(reportProvider);
         } catch (NoResultException e) {
+            LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
             return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
         } catch (ReportProviderUriNotValidException e) {
+            LOG.log(Level.WARNING, "Configuration URI is not valid", e);
             return Response.status(NOT_FOUND).entity("Configuration URI is not valid").build();
         } finally {
             if (tx.isActive()) {
