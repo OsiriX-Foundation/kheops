@@ -213,7 +213,8 @@ public class ReportProviderResource {
             final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
             final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
                     .queryParam("code", token)
-                    .queryParam("conf_uri", confUri);
+                    .queryParam("conf_uri", confUri)
+                    .queryParam("client_id", reportProvider.getClientId());
 
             for (String uid: studyInstanceUID) {
                 reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, StandardCharsetsUTF8));
