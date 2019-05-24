@@ -43,26 +43,11 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <img
-          v-if="!series.Modality.includes('SR') && !series.Modality.includes('DOC')"
-          class="cursor-img"
+          :class="!series.Modality.includes('SR') ? 'cursor-img' : ''"
           :src="series.imgSrc"
           width="250"
           height="250"
-          @click="openViewer"
-        >
-        <img
-          v-else-if="series.Modality.includes('DOC') && series.NumberOfSeriesRelatedInstances[0] === 1"
-          class="cursor-img"
-          :src="series.imgSrc"
-          width="250"
-          height="250"
-          @click="openWADO(series)"
-        >
-        <img
-          v-else
-          :src="series.imgSrc"
-          width="250"
-          height="250"
+          @click="openTab(series)"
         >
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
@@ -164,6 +149,13 @@ export default {
 		toggleChecked () {
 			this.isSelected = !this.isSelected
 		},
+		openTab (series) {
+			if (series.Modality[0] === 'DOC' && series.NumberOfSeriesRelatedInstances[0] === 1) {
+				this.openWADO(series)
+			} else if (series.Modality[0] !== 'SR') {
+				this.openViewer()
+			}
+		},
 		openViewer () {
 			let ohifWindow = window.open('', 'OHIFViewer')
 			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
@@ -176,7 +168,7 @@ export default {
 		openWADO (series) {
 			let wadoWindow = window.open('', 'WADO')
 			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
-				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO`
+				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO` // &contentType=video/mp4`
 				wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`
 			}).catch(err => {
 				console.log(err)
