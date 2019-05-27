@@ -12,10 +12,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import Providers from '@/components/providers/Providers'
+import { AlbumRedirect } from '@/mixins/redirect.js'
 
 export default {
 	name: 'AlbumSettingsReportProvider',
 	components: { Providers },
+	mixins: [ AlbumRedirect ],
 	data () {
 		return {
 		}
@@ -24,6 +26,9 @@ export default {
 		...mapGetters({
 			album: 'album'
 		})
+	},
+	created () {
+		this.getAlbum()
 	}
 }
 </script>
