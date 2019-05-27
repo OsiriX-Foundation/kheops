@@ -49,6 +49,8 @@ import static online.kheops.auth_server.util.Tools.checkValidUID;
 public class ReportProviderResource {
     private static final Logger LOG = Logger.getLogger(ReportProviderResource.class.getName());
 
+    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
+
     @Context
     private UriInfo uriInfo;
 
@@ -100,8 +102,8 @@ public class ReportProviderResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newReport(@FormParam("access_token") final String accessToken,
-                              @FormParam("clientId") final String clientId,
-                              @FormParam(StudyInstanceUID) List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
+                              @FormParam("client_id") final String clientId,
+                              @FormParam("studyUID") List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
 
         if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
             return Response.status(BAD_REQUEST).entity(StudyInstanceUID +" param must be set").build();
@@ -161,7 +163,8 @@ public class ReportProviderResource {
             tx.begin();
             reportProvider = getReportProviderWithClientId(clientId, em);
             albumId = reportProvider.getAlbum().getId();
-        } catch (NoResultException e){
+        } catch (NoResultException e) {
+            LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
             return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
         } finally {
             if (tx.isActive()) {
@@ -200,23 +203,26 @@ public class ReportProviderResource {
                 .withExpiresAt(Date.from(Instant.now().plus(2, ChronoUnit.MINUTES)))
                 .withNotBefore(new Date())
                 .withArrayClaim("study_uids", studyInstanceUID.toArray(new String[0]))
-                .withClaim("client_id", reportProvider.getClientId())
                 .withSubject(assertion.getSub())
+                .withIssuer(getHostRoot())
+                .withAudience(getHostRoot())
+                .withClaim("azp", reportProvider.getClientId())
                 .withClaim("type", "report_provider_code");
 
         final String token = jwtBuilder.sign(algorithmHMAC);
 
         try {
-            final String kheopsConfigUrl = context.getInitParameter("online.kheops.root.uri") + "/api/reportproviders/" + clientId + "/configuration";
+            final String kheopsConfigUrl = getHostRoot() + "/api/reportproviders/" + clientId + "/configuration";
             final String StandardCharsetsUTF8 = java.nio.charset.StandardCharsets.UTF_8.toString();
 
             final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
             final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
                     .queryParam("code", token)
-                    .queryParam("conf_uri", confUri);
+                    .queryParam("conf_uri", confUri)
+                    .queryParam("client_id", reportProvider.getClientId());
 
             for (String uid: studyInstanceUID) {
-                reportProviderUrlBuilder.queryParam(StudyInstanceUID, URLEncoder.encode(uid, StandardCharsetsUTF8));
+                reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, StandardCharsetsUTF8));
             }
 
             final String reportProviderUrl = reportProviderUrlBuilder.toString();
@@ -350,5 +356,9 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity("url not valid").build();
         }
         return  Response.status(OK).build();
+    }
+
+    private String getHostRoot() {
+        return context.getInitParameter(HOST_ROOT_PARAMETER);
     }
 }

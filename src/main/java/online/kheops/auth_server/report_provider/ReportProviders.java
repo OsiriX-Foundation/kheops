@@ -100,6 +100,21 @@ public class ReportProviders {
         return reply.getString("jwks_uri");
     }
 
+    public static String getConfigIssuer(ReportProvider reportProvider) throws ReportProviderUriNotValidException{
+        final URI configurationUri;
+        try {
+            configurationUri = new URI(reportProvider.getUrl());
+        } catch (URISyntaxException e) {
+            throw new ReportProviderUriNotValidException("Bad configuration URI", e);
+        }
+
+//        if (!configurationUri.getScheme().equals("https") && !configurationUri.getHost().equals("localhost")) {
+//            throw new ReportProviderUriNotValidException("Non https configuration URIs are only allowed for localhost");
+//        }
+
+        return configurationUri.getScheme() + "://" + configurationUri.getAuthority();
+    }
+
     public static boolean isValidConfigUrl(String configUrl) {
 
         try {
