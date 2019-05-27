@@ -120,7 +120,7 @@ export const DicomOperations = {
 			tagStudiesUID: '0020000D',
 			tagSeriesUID: '0020000E',
 			tagSOPUID: '00080018',
-			transferSyntax: '1.2.840.10008.1.2.4.50'
+			modelBulkDataUri: 'http://kheops/dcm4chee-arc/aets/DCM4CHEE/rs'
 		}
 	},
 	methods: {
@@ -170,7 +170,7 @@ export const DicomOperations = {
 		generateDicom (necessaryTag, createTag, tagBulkDataURI, study, dicomValue) {
 			let dicomGenerated = {}
 
-			let bulkDataUri = 'http://kheops/dcm4chee-arc/aets/DCM4CHEE/rs'
+			let bulkDataUri = this.modelBulkDataUri
 			const oidSeries = this.generateOID()
 			const oidSOP = this.generateOID()
 			bulkDataUri = `${bulkDataUri}/studies/${study[this.tagStudiesUID]['Value'][0]}/series/${oidSeries}/instances/${oidSOP}`
