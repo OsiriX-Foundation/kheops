@@ -76,7 +76,7 @@ const actions = {
 		}
 
 		let offset = 0
-		if (state.filterParams.sortBy !== params.sortBy || state.filterParams.sortDesc !== params.sortDesc || state.request !== requestParams) {
+		if (state.filterParams.sortBy !== params.sortBy || state.filterParams.sortDesc !== params.sortDesc || state.request !== requestParams || params.reset === true) {
 			offset = 0
 			params.limit = (state.all.length > 100) ? state.all.length : 100
 			reset = true
