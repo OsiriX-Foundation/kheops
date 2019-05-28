@@ -189,7 +189,7 @@
         </dt>
         <dd class="col-xs-10 col-sm-8">
           <input
-            v-model="token.secret"
+            v-model="token.access_token"
             type="text"
             readonly
             class="form-control form-control-sm"
@@ -197,7 +197,7 @@
         </dd>
         <div class="col-xs-2 col-sm-1 pointer">
           <button
-            v-clipboard:copy="token.secret"
+            v-clipboard:copy="token.access_token"
             v-clipboard:success="onCopy"
             v-clipboard:error="onCopyError"
             type="button"
@@ -238,7 +238,7 @@ export default {
 				title: '',
 				scope_type: this.scope,
 				album: this.albumid,
-				secret: '',
+				access_token: '',
 				read_permission: false,
 				write_permission: false,
 				appropriate_permission: false,
@@ -274,7 +274,7 @@ export default {
 			token.expiration_time = moment(this.token.expiration_time).format()
 			token.not_before_time = moment(this.token.not_before_time).format()
 			this.$store.dispatch('createToken', { token: token }).then(res => {
-				this.token.secret = res.data.secret
+				this.token.access_token = res.data.access_token
 				this.$snotify.success('token created successfully')
 				this.$refs.tokenModal.show()
 			}).catch(() => {
