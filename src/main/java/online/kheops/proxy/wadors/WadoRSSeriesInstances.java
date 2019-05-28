@@ -64,8 +64,8 @@ public class WadoRSSeriesInstances {
         final AccessToken accessToken;
         try {
             accessToken = AccessToken.createBuilder(authorizationURI)
-                    .withClientId(context.getInitParameter("kheops.client.dicomwebproxyclientid"))
-                    .withClientSecret(context.getInitParameter("kheops.client.dicomwebproxysecret"))
+                    .withClientId(context.getInitParameter("online.kheops.client.dicomwebproxyclientid"))
+                    .withClientSecret(context.getInitParameter("online.kheops.client.dicomwebproxysecret"))
                     .withCapability(AuthorizationToken.fromAuthorizationHeader(authorizationHeader).getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();
