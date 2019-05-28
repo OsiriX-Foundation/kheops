@@ -76,6 +76,8 @@ public final class WadoRSStudy {
 
         final AuthorizationToken authorizationToken = AuthorizationToken.fromAuthorizationHeader(authorizationHeader);
         final AccessToken.AccessTokenBuilder accessTokenBuilder =  AccessToken.createBuilder(authorizationURI)
+                .withClientId(context.getInitParameter("online.client.dicomwebproxyclientid"))
+                .withClientSecret(context.getInitParameter("online.client.dicomwebproxysecret"))
                 .withCapability(authorizationToken.getToken());
 
         final UriBuilder qidoServiceURIBuilder = UriBuilder.fromUri(authorizationURI)

@@ -35,6 +35,14 @@
         <param-name>online.kheops.auth.hmacsecretpost</param-name>
         <param-value>P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==</param-value>
     </context-param>
-
-
+    <context-param>
+        <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
+        <param-name>online.client.dicomwebproxyclientid</param-name>
+        <param-value>dicomwebproxy</param-value>
+    </context-param>
+    <context-param>
+        <description>Password the dicomewebproxy uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.dicomwebproxysecret</param-name>
+        <param-value>dicomwebproxyclientpassword</param-value>
+    </context-param>
 </web-app>

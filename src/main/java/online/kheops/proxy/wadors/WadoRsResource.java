@@ -4,6 +4,7 @@ import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -73,6 +74,8 @@ public final class WadoRsResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessToken.createBuilder(authorizationURI)
+                    .withClientId(context.getInitParameter("online.client.dicomwebproxyclientid"))
+                    .withClientSecret(context.getInitParameter("online.client.dicomwebproxysecret"))
                     .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .build();

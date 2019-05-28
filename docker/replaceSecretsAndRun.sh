@@ -7,6 +7,10 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_auth_hmasecret_post ]; then
     echo "Missing kheops_auth_hmasecret_post secret"
     missing_env_var_secret=true
 fi
+if ! [ -f ${SECRET_FILE_PATH}/kheops_client_dicomwebproxysecret ]; then
+    echo "Missing kheops_client_dicomwebproxysecret secret"
+    missing_env_var_secret=true
+fi
 
 #Verify environment variables
 if [ -z "$KHEOPS_PACS_PEP_HOST" ]; then
@@ -41,6 +45,10 @@ if [ -z "$KHEOPS_API_PATH" ]; then
     echo "Missing KHEOPS_API_PATH environment variable"
     missing_env_var_secret=true
 fi
+if [ -z "$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID" ]; then
+    echo "Missing $KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID environment variable"
+    missing_env_var_secret=true
+fi
 
 #if missing env var or secret => exit
 if [ "$missing_env_var_secret" = true ]; then
@@ -69,6 +77,7 @@ done
 #get env var
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT$KHEOPS_AUTHORIZATION_PATH|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 
 if { [ "$KHEOPS_ROOT_SCHEME" = "http" ] && [ "$KHEOPS_ROOT_PORT" = "80" ]; } || { [ "$KHEOPS_ROOT_SCHEME" = "https" ] && [ "$KHEOPS_ROOT_PORT" = "443" ]; }; then
     sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST|" ${REPLACE_FILE_PATH}
