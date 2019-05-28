@@ -37,12 +37,12 @@
     </context-param>
     <context-param>
         <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
-        <param-name>online.client.dicomwebproxyclientid</param-name>
+        <param-name>kheops.client.dicomwebproxyclientid</param-name>
         <param-value>dicomwebproxy</param-value>
     </context-param>
     <context-param>
         <description>Password the dicomewebproxy uses when connecting to the token endpoint</description>
-        <param-name>online.kheops.client.dicomwebproxysecret</param-name>
+        <param-name>kheops.client.client.dicomwebproxysecret</param-name>
         <param-value>dicomwebproxyclientpassword</param-value>
     </context-param>
 </web-app>
