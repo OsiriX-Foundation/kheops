@@ -196,17 +196,19 @@ const actions = {
 
 				HTTP.get(`/studies/${study.StudyInstanceUID}/metadata`).then(res => {
 					const metadata = res.data
+					const tagSeriesUID = '0020000E'
+					const tagSOPClassUID = '00080016'
 					metadata.forEach(instance => {
-						let serieUID = instance['0020000E'].Value[0]
+						let serieUID = instance[tagSeriesUID].Value[0]
 						for (var i in data) {
 							if (serieUID === data[i]['SeriesInstanceUID'][0]) {
-								if (instance['00080016'] && data[i]['NumberOfSeriesRelatedInstances'][0] <= 1) {
-									data[i][dicom.dicom2name['00080016']] = instance['00080016'].Value
+								if (instance[tagSOPClassUID] && data[i]['NumberOfSeriesRelatedInstances'][0] <= 1) {
+									data[i][dicom.dicom2name[tagSOPClassUID]] = instance[tagSOPClassUID].Value
 									if (data[i].Modality.includes('SR')) {
 										data[i]['imgSrc'] = SRImage
-									} else if (instance['00080016'].Value[0] === '1.2.840.10008.5.1.4.1.1.77.1.4.1') {
+									} else if (instance[tagSOPClassUID].Value[0] === '1.2.840.10008.5.1.4.1.1.77.1.4.1') {
 										data[i]['imgSrc'] = VideoImage
-									} else if (instance['00080016'].Value[0] === '1.2.840.10008.5.1.4.1.1.104.1') {
+									} else if (instance[tagSOPClassUID].Value[0] === '1.2.840.10008.5.1.4.1.1.104.1') {
 										data[i]['imgSrc'] = PDFImage
 									} else {
 										dispatch('getImage', {
