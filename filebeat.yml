@@ -95,7 +95,7 @@ tags: [${elastic_tags}]
 # Optional fields that you can specify to add additional information to the
 # output.
 fields:
-  instance: my_instance
+  instance: ${instance}
 
 
 #============================== Dashboards =====================================
