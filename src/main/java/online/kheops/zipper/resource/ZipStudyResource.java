@@ -95,8 +95,8 @@ public final class ZipStudyResource {
 
         final URI metadataURI = metadataUriBuilder.build(studyInstanceUID);
 
-        CLIENT.property(HTTP_AUTHENTICATION_USERNAME, context.getInitParameter("kheops.client.zipperclientid"));
-        CLIENT.property(HTTP_AUTHENTICATION_PASSWORD, context.getInitParameter("kheops.client.zippersecret"));
+        CLIENT.property(HTTP_AUTHENTICATION_USERNAME, context.getInitParameter("online.kheops.client.zipperclientid"));
+        CLIENT.property(HTTP_AUTHENTICATION_PASSWORD, context.getInitParameter("online.kheops.client.zippersecret"));
 
         List<Attributes> attributesList;
         try {
