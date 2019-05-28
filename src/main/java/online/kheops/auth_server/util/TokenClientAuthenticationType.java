@@ -109,10 +109,13 @@ public enum TokenClientAuthenticationType {
                 if (authorizationHeaders.get(0).substring(0, 6).toUpperCase().equals("BASIC ")) {
                     return TokenClientAuthenticationType.CLIENT_SECRET_BASIC;
                 }
+                if (authorizationHeaders.get(0).substring(0, 6).toUpperCase().equals("BEARER ")) {
+                    return TokenClientAuthenticationType.PUBLIC;
+                }
             } catch (IndexOutOfBoundsException e) {
-                LOG.log(WARNING, "not basic authorization", e);
+                throw new TokenAuthenticationException("Unknown authorization type", e);
             }
-            throw new TokenAuthenticationException("Unknown authorization header type");
+            throw new TokenAuthenticationException("Unknown authorization type");
         }
 
         if (formMap.containsKey(CLIENT_ASSERTION_TYPE) || formMap.containsKey(CLIENT_ASSERTION)) {
