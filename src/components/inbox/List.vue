@@ -705,6 +705,7 @@
                   </b-dropdown-form>
                 </b-dropdown>
                 <label
+                  v-if="!filters.album_id || (album.add_series || album.is_admin)"
                   for="file"
                   style="cursor:pointer; display: inline;"
                   @click="studyUIDadd=row.item.StudyInstanceUID[0]"
