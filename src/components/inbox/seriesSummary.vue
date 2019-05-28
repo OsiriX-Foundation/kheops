@@ -150,11 +150,22 @@ export default {
 			this.isSelected = !this.isSelected
 		},
 		openTab (series) {
+			const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1'
+			const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1'
+
+			if (series.SOPClassUID[0] === SOPPdf || series.SOPClassUID[0] === SOPVideo) {
+				let contentType = series.SOPClassUID[0] === SOPPdf ? 'application/pdf' : 'video/mp4'
+				this.openWADO(series, contentType)
+			} else if (series.Modality[0] !== 'SR') {
+				this.openViewer()
+			}
+			/*
 			if (series.Modality[0] === 'DOC' && series.NumberOfSeriesRelatedInstances[0] === 1) {
 				this.openWADO(series)
 			} else if (series.Modality[0] !== 'SR') {
 				this.openViewer()
 			}
+			*/
 		},
 		openViewer () {
 			let ohifWindow = window.open('', 'OHIFViewer')
@@ -165,10 +176,10 @@ export default {
 				console.log(err)
 			})
 		},
-		openWADO (series) {
+		openWADO (series, contentType) {
 			let wadoWindow = window.open('', 'WADO')
 			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
-				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO` // &contentType=video/mp4`
+				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`
 				wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`
 			}).catch(err => {
 				console.log(err)

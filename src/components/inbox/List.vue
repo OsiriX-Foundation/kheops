@@ -1067,7 +1067,7 @@ export default {
 		},
 		showDetailsOnRow (row) {
 			if (!row._showDetails) {
-				this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id })
+				this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id, reload: true })
 			}
 			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.StudyInstanceUID[0] })
 			row._showDetails = !row._showDetails
