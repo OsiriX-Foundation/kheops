@@ -9,6 +9,6 @@
                override="false"/>
     <Parameter name="online.kheops.client.dicomwebproxyclientid" value="${kheops_client_dicomwebproxyclientid}"
                override="false"/>
-    <Parameter name="online.kheops.client.dicomwebproxysecret" value="${kheops_client dicomwebproxysecret}"
+    <Parameter name="online.kheops.client.dicomwebproxysecret" value="${kheops_client_dicomwebproxysecret}"
                override="false"/>
 </Context>
