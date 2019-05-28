@@ -5,6 +5,7 @@ import moment from 'moment'
 import axios from 'axios'
 import SRImage from '@/assets/SR_2.png'
 import PDFImage from '@/assets/pdf-240x240.png'
+import VideoImage from '@/assets/video.png'
 import DicomLogo from '@/assets/dicom_logo.png'
 // initial state
 const state = {
@@ -131,7 +132,7 @@ const actions = {
 			}
 			if (!study) return
 
-			if (study.series !== undefined && study.series.length) return study.series
+			if (study.series !== undefined && study.series.length && !params.reload) return study.series
 
 			let queryString = (params.album_id) ? '&album=' + params.album_id : '&inbox=true'
 
@@ -170,6 +171,13 @@ const actions = {
 							commit('SET_FLAG', flag)
 						}
 					}
+					if (t.NumberOfSeriesRelatedInstances[0] > 1) {
+						dispatch('getImage', {
+							StudyInstanceUID: study.StudyInstanceUID[0],
+							SeriesInstanceUID: t.SeriesInstanceUID[0]
+						})
+					}
+					/*
 					if (t.Modality && t.Modality.includes('SR')) {
 						t.imgSrc = SRImage
 					} else {
@@ -182,8 +190,36 @@ const actions = {
 							})
 						}
 					}
+					*/
 					if (t.SeriesInstanceUID !== undefined) data.push(t)
 				})
+
+				HTTP.get(`/studies/${study.StudyInstanceUID}/metadata`).then(res => {
+					const metadata = res.data
+					metadata.forEach(instance => {
+						let serieUID = instance['0020000E'].Value[0]
+						for (var i in data) {
+							if (serieUID === data[i]['SeriesInstanceUID'][0]) {
+								if (instance['00080016'] && data[i]['NumberOfSeriesRelatedInstances'][0] <= 1) {
+									data[i][dicom.dicom2name['00080016']] = instance['00080016'].Value
+									if (data[i].Modality.includes('SR')) {
+										data[i]['imgSrc'] = SRImage
+									} else if (instance['00080016'].Value[0] === '1.2.840.10008.5.1.4.1.1.77.1.4.1') {
+										data[i]['imgSrc'] = VideoImage
+									} else if (instance['00080016'].Value[0] === '1.2.840.10008.5.1.4.1.1.104.1') {
+										data[i]['imgSrc'] = PDFImage
+									} else {
+										dispatch('getImage', {
+											StudyInstanceUID: study.StudyInstanceUID[0],
+											SeriesInstanceUID: data[i]['SeriesInstanceUID'][0]
+										})
+									}
+								}
+							}
+						}
+					})
+				})
+
 				commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: data })
 			})
 		}
