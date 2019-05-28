@@ -157,6 +157,14 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
            sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
+        
+       if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_INSTANCE ]]; then
+          echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_INSTANCE environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_INSTANCE \e[92mOK\e[0m"
+           sed -i "s|\${instance}|$KHEOPS_REVERSE_PROXY_ELASTIC_INSTANCE|" /etc/filebeat/filebeat.yml
+        fi
 
         if [[ -z $KHEOPS_REVERSE_PROXY_ELASTIC_USER ]]; then
           echo "Missing KHEOPS_REVERSE_PROXY_ELASTIC_USER environment variable"
