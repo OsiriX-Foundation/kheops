@@ -109,7 +109,7 @@ public enum TokenClientAuthenticationType {
                 if (authorizationHeaders.get(0).substring(0, 6).toUpperCase().equals("BASIC ")) {
                     return TokenClientAuthenticationType.CLIENT_SECRET_BASIC;
                 }
-                if (authorizationHeaders.get(0).substring(0, 6).toUpperCase().equals("BEARER ")) {
+                if (authorizationHeaders.get(0).substring(0, 7).toUpperCase().equals("BEARER ")) {
                     return TokenClientAuthenticationType.PUBLIC;
                 }
             } catch (IndexOutOfBoundsException e) {
