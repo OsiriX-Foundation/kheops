@@ -59,7 +59,7 @@
         <input
           ref="textcomment"
           v-model="newUserName"
-          type="text"
+          type="email"
           class="form-control form-control-sm"
           placeholder="email"
           aria-label="Email"
@@ -135,7 +135,7 @@ export default {
 		},
 		checkUser () {
 			if (this.newUserName.length > 0) {
-				const username = this.newUserName.trim()
+				const username = this.newUserName
 				const request = `users?reference=${username}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`
 
 				HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
