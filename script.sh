@@ -130,7 +130,7 @@ echo "Ending setup NGINX secrets and env var"
 if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
     if [ "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" = true ]; then
 
-        echo "Start init metricbeat and filebeat"
+        echo "Start init filebeat"
         missing_env_var_secret=false
 
         #Verify secrets
@@ -147,7 +147,6 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_NAME \e[92mOK\e[0m"
-           sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_name}|$KHEOPS_REVERSE_PROXY_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
         fi
 
@@ -156,7 +155,6 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_TAGS \e[92mOK\e[0m"
-           sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_tags}|$KHEOPS_REVERSE_PROXY_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
 
@@ -165,7 +163,6 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_USER \e[92mOK\e[0m"
-           sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_user}|$KHEOPS_REVERSE_PROXY_ELASTIC_USER|" /etc/filebeat/filebeat.yml
         fi
 
@@ -174,7 +171,6 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_REVERSE_PROXY_ELASTIC_URL \e[92mOK\e[0m"
-           sed -i "s|\${elastic_url}|$KHEOPS_REVERSE_PROXY_ELASTIC_URL|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_url}|$KHEOPS_REVERSE_PROXY_ELASTIC_URL|" /etc/filebeat/filebeat.yml
         fi
 
@@ -183,7 +179,6 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_REVERSE_PROXY_KIBANA_URL \e[92mOK\e[0m"
-           sed -i "s|\${kibana_url}|$KHEOPS_REVERSE_PROXY_KIBANA_URL|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${kibana_url}|$KHEOPS_REVERSE_PROXY_KIBANA_URL|" /etc/filebeat/filebeat.yml
         fi
 
@@ -194,15 +189,12 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
            echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
         fi
 
-        metricbeat modules disable system
         filebeat modules disable system
 
-        cat ${SECRET_FILE_PATH}/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
-        service metricbeat restart
         cat ${SECRET_FILE_PATH}/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
         service filebeat restart
 
-        echo "Ending setup METRICBEAT and FILEBEAT"
+        echo "Ending setup FILEBEAT"
     fi
 else
     echo "[INFO] : Missing KHEOPS_REVERSE_PPROXY_ENABLE_ELASTIC environment variable. Elastic is not enable."
