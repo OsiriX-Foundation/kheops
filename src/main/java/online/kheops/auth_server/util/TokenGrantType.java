@@ -117,7 +117,7 @@ public enum TokenGrantType {
                     verifySingleHeader(form, "source_id");
                     sourceId = form.getFirst("source_id");
                 } else {
-                    if (form.get("source_id") == null) {
+                    if (form.get("source_id") != null) {
                         throw new TokenRequestException(INVALID_REQUEST, "source_id should not be specified for non-album sources");
                     }
                     sourceId = null;
