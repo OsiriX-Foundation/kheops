@@ -73,12 +73,15 @@ public final class BearerTokenRetriever {
     }
 
     private Form getForm() {
-        return new Form().param("assertion", accessToken.toString()).param("grant_type", AccessToken.UNKNOWN_TOKEN_URN);
+        return new Form()
+                .param("subject_token", accessToken.toString())
+                .param("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
+                .param("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
     }
 
     private Form getInstanceForm(Instance instance) {
         return getForm().param("scope", "pep")
-                .param("study_instance_uid", instance.getStudyInstanceUID())
-                .param("series_instance_uid", instance.getSeriesInstanceUID());
+                .param("studyUID", instance.getStudyInstanceUID())
+                .param("seriesUID", instance.getSeriesInstanceUID());
     }
 }

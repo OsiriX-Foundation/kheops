@@ -8,6 +8,7 @@ import online.kheops.zipper.InstanceZipper;
 import online.kheops.zipper.marshaller.AttributesListMarshaller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
@@ -29,6 +30,8 @@ import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
 import static javax.ws.rs.core.Response.Status.*;
+import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_PASSWORD;
+import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_USERNAME;
 
 @Path("/studies")
 public final class ZipStudyResource {
@@ -38,7 +41,7 @@ public final class ZipStudyResource {
     private static final String INBOX = "inbox";
     private static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
 
-    private static final Client CLIENT = newClient();
+    private static final Client CLIENT = newClient().register(HttpAuthenticationFeature.basicBuilder().build());
     private static final String DICOM_ZIP_FILENAME = "DICOM.ZIP";
 
     @Context
@@ -91,6 +94,9 @@ public final class ZipStudyResource {
         }
 
         final URI metadataURI = metadataUriBuilder.build(studyInstanceUID);
+
+        CLIENT.property(HTTP_AUTHENTICATION_USERNAME, context.getInitParameter("online.client.zipperclientid"));
+        CLIENT.property(HTTP_AUTHENTICATION_PASSWORD, context.getInitParameter("online.client.zippersecret"));
 
         List<Attributes> attributesList;
         try {

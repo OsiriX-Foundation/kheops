@@ -24,5 +24,14 @@
         <param-name>online.kheops.auth_server.uri</param-name>
         <param-value>https://itmi.kheops.online/authorization</param-value>
     </context-param>
- 
+    <context-param>
+        <description>Username the zipper uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.zipperclientid</param-name>
+        <param-value>zipper</param-value>
+    </context-param>
+    <context-param>
+        <description>Password the zipper uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.zippersecret</param-name>
+        <param-value>zipperclientpassword</param-value>
+    </context-param>
 </web-app>
