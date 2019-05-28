@@ -62,7 +62,7 @@ public final class TokenBasicAuthenticator {
         Objects.requireNonNull(password);
 
         for (KnownClients client: KnownClients.values()) {
-            if (client.matchesCredentials(context, password, clientId)) {
+            if (client.matchesCredentials(context, clientId, password)) {
                 return new TokenPrincipal() {
                     @Override
                     public TokenClientKind getClientKind() {
