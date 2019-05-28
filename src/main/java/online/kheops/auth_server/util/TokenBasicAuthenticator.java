@@ -29,6 +29,10 @@ public final class TokenBasicAuthenticator {
         public String getPassword(ServletContext context) {
             return context.getInitParameter(passwordParameter);
         }
+
+        public boolean matchesCredentials(ServletContext context, String username, String password) {
+            return getClientId(context).equals(username) && getPassword(context).equals(password);
+        }
     }
 
     final private ServletContext context;
@@ -58,9 +62,7 @@ public final class TokenBasicAuthenticator {
         Objects.requireNonNull(password);
 
         for (KnownClients client: KnownClients.values()) {
-            final String knownClient = client.getClientId(context);
-            final String knownSecret = client.getPassword(context);
-            if (knownClient.equals(clientId) && knownSecret.equals(password)) {
+            if (client.matchesCredentials(context, password, clientId)) {
                 return new TokenPrincipal() {
                     @Override
                     public TokenClientKind getClientKind() {
@@ -69,12 +71,12 @@ public final class TokenBasicAuthenticator {
 
                     @Override
                     public String getName() {
-                        return knownClient;
+                        return clientId;
                     }
                 };
             }
         }
 
-        throw new TokenAuthenticationException("unable to authenticate clientId: " + clientId);
+        throw new TokenAuthenticationException("unable to authenticate clientId: " + clientId + " password: " + password); // TODO clean up log
     }
 }
