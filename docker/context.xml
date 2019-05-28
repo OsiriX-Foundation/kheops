@@ -21,5 +21,12 @@
                override="false"/>
     <Parameter name="online.kheops.root.uri" value="${kheops_root_uri}"
                override="false"/>
-
+    <Parameter name="online.kheops.client.dicomwebproxyclientid" value="${kheops_client_dicomwebproxyclientid}"
+               override="false"/>
+    <Parameter name="online.kheops.client.dicomwebproxysecret" value="${kheops_client_dicomwebproxysecret}"
+               override="false"/>
+    <Parameter name="online.kheops.client.zipperclientid" value="${kheops_client_zipperclientid}"
+               override="false"/>
+    <Parameter name="online.kheops.client.zippersecret" value="${kheops_client_zippersecret}"
+               override="false"/>
 </Context>

@@ -8,6 +8,7 @@ import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import online.kheops.auth_server.util.TokenAuthenticationException;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
@@ -25,13 +26,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.event.Events.reportProviderMutation;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.*;
 
 public class ReportProviders {
-
 
 
     private ReportProviders() {
@@ -154,7 +155,7 @@ public class ReportProviders {
 
         try {
             tx.begin();
-            reportProvidersEntity = getReportProvidersWithAlbumId(albumId,limit, offset, em);
+            reportProvidersEntity = getReportProvidersWithAlbumId(albumId, limit, offset, em);
             totalCount = countReportProviderWithAlbumId(albumId, em);
             tx.commit();
         } finally {
@@ -182,12 +183,12 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
-                throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
+                throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
             }
 
             tx.commit();
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -210,7 +211,7 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
-                throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
+                throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
             }
 
             reportProvider.setAsRemoved();
@@ -222,7 +223,7 @@ public class ReportProviders {
 
             tx.commit();
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -243,14 +244,14 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
-                throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found for the album " + albumId);
+                throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
             }
 
-            if(!(url == null || url.isEmpty() )) {
+            if (!(url == null || url.isEmpty())) {
                 reportProvider.setUrl(url);
             }
 
-            if(!(name == null || name.isEmpty() )) {
+            if (!(name == null || name.isEmpty())) {
                 reportProvider.setName(name);
             }
 
@@ -265,14 +266,14 @@ public class ReportProviders {
 
             tx.commit();
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return  new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider);
     }
 
     public static ReportProvider getReportProvider(String clientId)
@@ -289,7 +290,7 @@ public class ReportProviders {
 
             tx.commit();
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
+            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

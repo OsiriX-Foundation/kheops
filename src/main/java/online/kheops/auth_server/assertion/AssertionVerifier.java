@@ -24,7 +24,7 @@ public abstract class AssertionVerifier {
     private static final String VIEWER_URN = "urn:x-kheops:params:oauth:grant-type:viewer";
     private static final String UNKNOWN_BEARER_URN = "urn:x-kheops:params:oauth:grant-type:unknown-bearer";
 
-    private enum GrantType {
+    private enum TokenType {
         JWT_BEARER(JWT_BEARER_URN) {
             AssertionBuilder getAssertionBuilder() {
                 if (superuserSecret == null) {
@@ -82,15 +82,15 @@ public abstract class AssertionVerifier {
 
         private final String urn;
 
-        GrantType(String urn) {
+        TokenType(String urn) {
             this.urn = urn;
         }
 
-        static GrantType valueOfUrn(String urn) throws UnknownGrantTypeException {
+        static TokenType valueOfUrn(String urn) throws UnknownGrantTypeException {
             Objects.requireNonNull(urn);
-            for (GrantType grantType: GrantType.values()) {
-                if (grantType.getUrn().equals(urn)) {
-                    return grantType;
+            for (TokenType tokenType : TokenType.values()) {
+                if (tokenType.getUrn().equals(urn)) {
+                    return tokenType;
                 }
             }
             throw new UnknownGrantTypeException("Unknown grant type: " + urn);
@@ -106,7 +106,7 @@ public abstract class AssertionVerifier {
     private AssertionVerifier() {}
 
     public static Assertion createAssertion(String assertionToken, String grantType) throws UnknownGrantTypeException, BadAssertionException {
-        return GrantType.valueOfUrn(grantType).getAssertionBuilder().build(assertionToken);
+        return TokenType.valueOfUrn(grantType).getAssertionBuilder().build(assertionToken);
     }
 
     public static Assertion createAssertion(String bearerToken) throws BadAssertionException {

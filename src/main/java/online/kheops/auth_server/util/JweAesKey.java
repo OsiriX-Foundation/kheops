@@ -11,10 +11,10 @@ public class JweAesKey {
 
 
     private JweAesKey() {
-        this.key = new AesKey(ByteUtil.randomBytes(16));
+        key = new AesKey(ByteUtil.randomBytes(16));
     }
 
-    public static JweAesKey getInstance() {
+    public static synchronized JweAesKey getInstance() {
         if (instance == null) {
             instance = new JweAesKey();
         }

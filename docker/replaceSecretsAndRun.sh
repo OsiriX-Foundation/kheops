@@ -19,6 +19,14 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_keycloak_clientsecret ]; then
     echo "Missing kheops_keycloak_clientsecret secret"
     missing_env_var_secret=true
 fi
+if ! [ -f ${SECRET_FILE_PATH}/kheops_client_dicomwebproxysecret ]; then
+    echo "Missing kheops_client_dicomwebproxysecret secret"
+    missing_env_var_secret=true
+fi
+if ! [ -f ${SECRET_FILE_PATH}/kheops_client_zippersecret ]; then
+    echo "Missing kheops_client_zippersecret secret"
+    missing_env_var_secret=true
+fi
 
 #Verify environment variables
 if [ -z "$KHEOPS_AUTHDB_USER" ]; then
@@ -65,6 +73,14 @@ if [ -z "$KHEOPS_KEYCLOAK_REALMS" ]; then
     echo "Missing KHEOPS_KEYCLOAK_REALMS environment variable"
     missing_env_var_secret=true
 fi
+if [ -z "$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID" ]; then
+    echo "Missing $KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID environment variable"
+    missing_env_var_secret=true
+fi
+if [ -z "$KHEOPS_CLIENT_ZIPPERCLIENTID" ]; then
+    echo "Missing $KHEOPS_CLIENT_ZIPPERCLIENTID environment variable"
+    missing_env_var=true
+fi
 
 #if missing env var or secret => exit
 if [ "$missing_env_var_secret" = true ]; then
@@ -90,7 +106,11 @@ done
 
 
 #get env var
-sed -i "s|\${kheops_root_uri}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:$KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
+if { [ "$KHEOPS_ROOT_SCHEME" = "http" ] && [ "$KHEOPS_ROOT_PORT" = "80" ]; } || { [ "$KHEOPS_ROOT_SCHEME" = "https" ] && [ "$KHEOPS_ROOT_PORT" = "443" ]; }; then
+    sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST|" ${REPLACE_FILE_PATH}
+else
+    sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:$KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
+fi
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
@@ -98,6 +118,8 @@ sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT
 sed -i "s|\${kheops_keycloak_uri}|$KHEOPS_KEYCLOAK_URI|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_keycloak_clientid}|$KHEOPS_KEYCLOAK_CLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 
 
 echo "Ending setup NGINX secrets and env var"

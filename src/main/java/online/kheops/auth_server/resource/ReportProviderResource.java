@@ -200,7 +200,7 @@ public class ReportProviderResource {
         }
 
         final JWTCreator.Builder jwtBuilder = JWT.create()
-                .withExpiresAt(Date.from(Instant.now().plus(2, ChronoUnit.MINUTES)))
+                .withExpiresAt(Date.from(Instant.now().plus(10, ChronoUnit.MINUTES)))
                 .withNotBefore(new Date())
                 .withArrayClaim("study_uids", studyInstanceUID.toArray(new String[0]))
                 .withSubject(assertion.getSub())

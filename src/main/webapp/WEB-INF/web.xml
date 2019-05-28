@@ -30,6 +30,11 @@
         <param-value>P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==</param-value>
     </context-param>
     <context-param>
+        <description>Root url of the Kheops service</description>
+        <param-name>online.kheops.root.uri</param-name>
+        <param-value>http://localhost:8042</param-value>
+    </context-param>
+    <context-param>
         <description>Base URI for the pacs from which study and series metadata can be acquired</description>
         <param-name>online.kheops.pacs.uri</param-name>
         <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
@@ -52,21 +57,41 @@
     <context-param>
         <description>Client ID for the keycloak API</description>
         <param-name>online.kheops.keycloak.clientid</param-name>
-        <param-value>mypwd</param-value>
+        <param-value>kheopsAuthorization</param-value>
     </context-param>
     <context-param>
         <description>Client secret for the keycloak API</description>
         <param-name>online.kheops.keycloak.clientsecret</param-name>
-        <param-value>mypwd</param-value>
+        <param-value>b227ef2b-f4d9-4c8b-a25c-2005cd083ebf</param-value>
     </context-param>
     <context-param>
         <description>Uri for the keycloak API</description>
         <param-name>online.kheops.keycloak.uri</param-name>
-        <param-value>mypwd</param-value>
+        <param-value>https://keycloak.kheops.online</param-value>
+    </context-param>
+    <context-param>
+        <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.dicomwebproxyclientid</param-name>
+        <param-value>dicomwebproxy</param-value>
+    </context-param>
+    <context-param>
+        <description>Password the dicomewebproxy uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.dicomwebproxysecret</param-name>
+        <param-value>dicomwebproxyclientpassword</param-value>
+    </context-param>
+    <context-param>
+        <description>Username the zipper uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.zipperclientid</param-name>
+        <param-value>zipper</param-value>
+    </context-param>
+    <context-param>
+        <description>Password the zipper uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.zippersecret</param-name>
+        <param-value>zipperclientpassword</param-value>
     </context-param>
     <context-param>
         <description>Realms for the keycloak API</description>
         <param-name>online.kheops.keycloak.realms</param-name>
-        <param-value>mypwd</param-value>
+        <param-value>travis</param-value>
     </context-param>
 </web-app>
