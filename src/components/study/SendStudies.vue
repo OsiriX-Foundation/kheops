@@ -424,8 +424,12 @@ export default {
 			})
 
 			if (this.filesToDicomize.length > 0 && this.filesFiltered.length === 0) {
-				this.UI.getInfo = true
-				this.UI.hide = false
+				if (this.studyUIDToSend !== '') {
+					this.UI.getInfo = true
+					this.UI.hide = false
+				} else {
+					this.sendFormData(this.filesToDicomize)
+				}
 			}
 
 			if (this.filesFiltered.length > 0 && this.filesToDicomize.length === 0) {
