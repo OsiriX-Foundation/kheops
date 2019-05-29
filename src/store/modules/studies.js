@@ -114,9 +114,10 @@ const actions = {
 			commit('SET_STUDIES', { data: data, reset: reset })
 			commit('SET_STUDIES_FILTER_PARAMS', params)
 			commit('SET_REQUEST_PARAMS', requestParams)
+			let reloadSeries = params.reloadSeries !== undefined
 			_.forEach(state.flags, (flag, StudyInstanceUID) => {
 				if (flag.show_details) {
-					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null })
+					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null, reload: reloadSeries })
 				}
 			})
 			return res

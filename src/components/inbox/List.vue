@@ -929,7 +929,8 @@ export default {
 	watch: {
 		sendingFiles () {
 			if (!this.sendingFiles) {
-				this.getStudies()
+				const reloadSeries = true
+				this.getStudies(reloadSeries)
 			}
 		},
 		selectedStudiesNb: {
@@ -1004,14 +1005,15 @@ export default {
 		this.scroll()
 	},
 	methods: {
-		getStudies () {
+		getStudies (reloadSeries) {
 			this.$store.dispatch('getStudies', {
 				pageNb: this.pageNb,
 				filters: this.filters,
 				sortBy: this.sortBy,
 				sortDesc: this.sortDesc,
 				limit: this.limit,
-				includefield: ['favorite', 'comments', '00081030']
+				includefield: ['favorite', 'comments', '00081030'],
+				reloadSeries: reloadSeries
 			})
 		},
 		getURLDownload (StudyInstanceUID) {
