@@ -66,6 +66,7 @@
         type="text"
         :placeholder="$t('description')"
         class="form-control"
+        @keydown.enter.prevent="validDicomValue"
       >
     </div>
     <div
