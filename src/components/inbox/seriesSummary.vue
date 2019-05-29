@@ -43,26 +43,11 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <img
-          v-if="!series.Modality.includes('SR') && !series.Modality.includes('DOC')"
-          class="cursor-img"
+          :class="!series.Modality.includes('SR') ? 'cursor-img' : ''"
           :src="series.imgSrc"
           width="250"
           height="250"
-          @click="openViewer"
-        >
-        <img
-          v-else-if="series.Modality.includes('DOC') && series.NumberOfSeriesRelatedInstances[0] === 1"
-          class="cursor-img"
-          :src="series.imgSrc"
-          width="250"
-          height="250"
-          @click="openWADO(series)"
-        >
-        <img
-          v-else
-          :src="series.imgSrc"
-          width="250"
-          height="250"
+          @click="openTab(series)"
         >
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
@@ -102,10 +87,11 @@
 <script>
 import { mapGetters } from 'vuex'
 import { ViewerToken } from '../../mixins/tokens.js'
+import { CurrentUser } from '../../mixins/currentuser.js'
 
 export default {
 	name: 'SeriesSummary',
-	mixins: [ ViewerToken ],
+	mixins: [ ViewerToken, CurrentUser ],
 	props: {
 		seriesInstanceUID: {
 			type: String,
@@ -130,8 +116,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studies',
-			user: 'currentUser'
+			studies: 'studies'
 		}),
 		series () {
 			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
@@ -164,19 +149,38 @@ export default {
 		toggleChecked () {
 			this.isSelected = !this.isSelected
 		},
+		openTab (series) {
+			const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1'
+			const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1'
+
+			if (series.SOPClassUID[0] === SOPPdf || series.SOPClassUID[0] === SOPVideo) {
+				let contentType = series.SOPClassUID[0] === SOPPdf ? 'application/pdf' : 'video/mp4'
+				this.openWADO(series, contentType)
+			} else if (series.Modality[0] !== 'SR') {
+				this.openViewer()
+			}
+			/*
+			if (series.Modality[0] === 'DOC' && series.NumberOfSeriesRelatedInstances[0] === 1) {
+				this.openWADO(series)
+			} else if (series.Modality[0] !== 'SR') {
+				this.openViewer()
+			}
+			*/
+		},
 		openViewer () {
 			let ohifWindow = window.open('', 'OHIFViewer')
-			this.getViewerToken(this.user.jwt, this.studyInstanceUID, this.source).then(res => {
+			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
 				let url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
 				ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`
 			}).catch(err => {
 				console.log(err)
 			})
 		},
-		openWADO (series) {
+
+		openWADO (series, contentType) {
 			let wadoWindow = window.open('', 'WADO')
-			this.getViewerToken(this.user.jwt, this.studyInstanceUID, this.source).then(res => {
-				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO`
+			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {
+				let queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`
 				wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`
 			}).catch(err => {
 				console.log(err)

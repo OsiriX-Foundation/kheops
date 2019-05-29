@@ -573,7 +573,11 @@
             </div>
           </b-card>
         </template>
-        <!-- Button next to patient name -->
+        <!--
+          Button next to patient name
+          https://github.com/Justineo/vue-awesome#more-advanced-cases
+          https://justineo.github.io/vue-awesome/demo/
+        -->
         <template
           slot="PatientName"
           slot-scope="row"
@@ -589,7 +593,7 @@
               <div class="patientNameIcons col-md-auto">
                 <span
                   :class="row.item.is_favorite?'selected':''"
-                  @click="toggleFavorite(row.item)"
+                  @click.stop="toggleFavorite(row.item)"
                 >
                   <v-icon
                     v-if="row.item.is_favorite"
@@ -607,7 +611,7 @@
                 </span>
                 <span
                   :class="row.item.SumComments[0]?'selected':''"
-                  @click="handleComments(row)"
+                  @click.stop="handleComments(row)"
                 >
                   <v-icon
                     v-if="row.item.SumComments[0]"
@@ -627,7 +631,7 @@
                   v-if="!filters.album_id || (album.download_series || album.is_admin)"
                   href="#"
                   class="download"
-                  @click="getURLDownload(row.item.StudyInstanceUID)"
+                  @click.stop="getURLDownload(row.item.StudyInstanceUID)"
                 >
                   <v-icon
                     class="align-middle"
@@ -637,7 +641,7 @@
                 </a>
                 <span
                   v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
-                  @click="openViewer(row.item.StudyInstanceUID, 'Osirix')"
+                  @click.stop="openViewer(row.item.StudyInstanceUID, 'Osirix')"
                 >
                   <osirix-icon
                     width="22px"
@@ -646,13 +650,71 @@
                 </span>
                 <span
                   v-if="row.item.ModalitiesInStudy[0] !== 'SR'"
-                  @click="openViewer(row.item.StudyInstanceUID, 'Ohif')"
+                  @click.stop="openViewer(row.item.StudyInstanceUID, 'Ohif')"
                 >
                   <visibility-icon
                     width="24px"
                     height="24px"
                   />
                 </span>
+                <b-dropdown
+                  v-if="providersEnable.length > 0"
+                  size="sm"
+                  variant="link"
+                  no-caret
+                  right
+                >
+                  <template slot="button-content">
+                    <build-icon
+                      width="22px"
+                      height="22px"
+                    />
+                  </template>
+                  <!-- "redirectProvider(provider.client_id, row.item.StudyInstanceUID[0])" -->
+                  <b-dropdown-form
+                    v-for="provider in providersEnable"
+                    :id="row.item.StudyInstanceUID[0]"
+                    :key="provider.id"
+                    :action="serverURL + '/report'"
+                    method="post"
+                  >
+                    <input
+                      type="text"
+                      hidden
+                      name="access_token"
+                      :value="access_token"
+                    >
+                    <input
+                      type="text"
+                      hidden
+                      name="client_id"
+                      :value="provider.client_id"
+                    >
+                    <input
+                      type="text"
+                      hidden
+                      name="studyUID"
+                      :value="row.item.StudyInstanceUID[0]"
+                    >
+                    <b-dropdown-item-button
+                      style="cursor: pointer"
+                      type="submit"
+                    >
+                      {{ provider.name }}
+                    </b-dropdown-item-button>
+                  </b-dropdown-form>
+                </b-dropdown>
+                <label
+                  v-if="!filters.album_id || (album.add_series || album.is_admin)"
+                  for="file"
+                  style="cursor:pointer; display: inline;"
+                  @click="studyUIDadd=row.item.StudyInstanceUID[0]"
+                >
+                  <add-icon
+                    width="24px"
+                    height="24px"
+                  />
+                </label>
                 <!--
                 <span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
                 -->
@@ -723,12 +785,14 @@ import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import { ViewerToken } from '@/mixins/tokens.js'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
+import BuildIcon from '@/components/kheopsSVG/BuildIcon'
+import { serverURL } from '@/app_config'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'Studies',
-	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon, AddIcon },
+	components: { seriesSummary, Datepicker, commentsAndNotifications, studyMetadata, formGetUser, PulseLoader, ConfirmButton, OsirixIcon, VisibilityIcon, AddIcon, BuildIcon },
 	mixins: [ ViewerToken ],
 	props: {
 		album: {
@@ -740,6 +804,7 @@ export default {
 	data () {
 		return {
 			pageNb: 1,
+			serverURL: serverURL,
 			active: false,
 			form_send_study: false,
 			fields: [
@@ -804,15 +869,16 @@ export default {
 			},
 			confirmDelete: false,
 			selectedSeriesNb: 0,
-			isActive: false
+			isActive: false,
+			studyUIDadd: ''
 		}
 	},
 	computed: {
 		...mapGetters({
 			studies: 'studies',
 			albums: 'albums',
-			user: 'currentUser',
-			sendingFiles: 'sending'
+			sendingFiles: 'sending',
+			providers: 'providers'
 		}),
 		totalRows () {
 			return this.studies.length
@@ -851,13 +917,22 @@ export default {
 		},
 		disableBtnHeader () {
 			return !this.selectedSeriesNb
+		},
+		providersEnable () {
+			return this.providers.filter(function (provider) {
+				return provider.stateURL['checkURL'] === true
+			})
+		},
+		access_token () {
+			return Vue.prototype.$keycloak.token
 		}
 	},
 
 	watch: {
 		sendingFiles () {
 			if (!this.sendingFiles) {
-				this.getStudies()
+				const reloadSeries = true
+				this.getStudies(reloadSeries)
 			}
 		},
 		selectedStudiesNb: {
@@ -906,9 +981,19 @@ export default {
 
 	created () {
 		this.setLoading(true)
+		this.$store.commit('INIT_PROVIDERS')
+
 		if (this.$route.params.album_id) {
 			this.$store.commit('RESET_FLAGS')
 			this.filters.album_id = this.$route.params.album_id
+
+			this.$store.dispatch('getProviders', { albumID: this.filters.album_id }).then(res => {
+				if (res.status !== 200) {
+					this.$snotify.error('Sorry, an error occured')
+				}
+			}).catch(err => {
+				console.log(err)
+			})
 		} else {
 			this.$store.dispatch('getStudies', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, includefield: ['favorite', 'comments', '00081030'], resetDisplay: true })
 				.then(() => {
@@ -922,19 +1007,20 @@ export default {
 		this.scroll()
 	},
 	methods: {
-		getStudies () {
+		getStudies (reloadSeries) {
 			this.$store.dispatch('getStudies', {
 				pageNb: this.pageNb,
 				filters: this.filters,
 				sortBy: this.sortBy,
 				sortDesc: this.sortDesc,
 				limit: this.limit,
-				includefield: ['favorite', 'comments', '00081030']
+				includefield: ['favorite', 'comments', '00081030'],
+				reloadSeries: reloadSeries
 			})
 		},
 		getURLDownload (StudyInstanceUID) {
 			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
-			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
+			this.getViewerToken(this.access_token, StudyInstanceUID, source).then(res => {
 				const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : 'album=' + source}`
 				const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`
 				location.href = URL
@@ -985,7 +1071,7 @@ export default {
 		},
 		showDetailsOnRow (row) {
 			if (!row._showDetails) {
-				this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id })
+				this.$store.dispatch('getSeries', { StudyInstanceUID: row.StudyInstanceUID[0], album_id: this.filters.album_id, reload: true })
 			}
 			this.$store.commit('TOGGLE_DETAILS', { StudyInstanceUID: row.StudyInstanceUID[0] })
 			row._showDetails = !row._showDetails
@@ -1149,7 +1235,7 @@ export default {
 			if (viewer === 'Ohif') {
 				ohifWindow = window.open('', 'OHIFViewer')
 			}
-			this.getViewerToken(this.user.jwt, StudyInstanceUID, source).then(res => {
+			this.getViewerToken(this.access_token, StudyInstanceUID, source).then(res => {
 				if (viewer === 'Osirix') {
 					this.openOsiriX(StudyInstanceUID, res.data.access_token)
 				} else if (viewer === 'Ohif') {
@@ -1168,12 +1254,18 @@ export default {
 			ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`
 		},
 		inputLoadFiles () {
-			const filesFromInput = this.$refs.inputfiles.files
-			this.$emit('loadfiles', filesFromInput)
+			if (this.$refs.inputfiles.files.length > 0) {
+				const filesFromInput = this.$refs.inputfiles.files
+				this.$emit('loadfiles', filesFromInput, this.studyUIDadd)
+				this.initStudyUIDadd()
+			}
 		},
 		inputLoadDirectories () {
-			const filesFromInput = this.$refs.inputdir.files
-			this.$emit('loaddirectories', filesFromInput)
+			if (this.$refs.inputdir.files.length > 0) {
+				const filesFromInput = this.$refs.inputdir.files
+				this.$emit('loaddirectories', filesFromInput, this.studyUIDadd)
+				this.initStudyUIDadd()
+			}
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -1184,6 +1276,23 @@ export default {
 		},
 		showDragAndDrop () {
 			this.$emit('demohover')
+		},
+		openProvider (clientID, StudyInstanceUID) {
+			let url = `https://test2.kheops.online:443/api/reportproviders/${clientID}/configuration`
+			window.open(`http://IP_ADDR/report.html?code=${this.access_token}&conf_uri=${url}`, '_self')
+		},
+		redirectProvider (clientID, StudyInstanceUID) {
+			const queries = {
+				'access_token': this.access_token,
+				'clientId': clientID,
+				'StudyInstanceUID': StudyInstanceUID
+			}
+			this.$store.dispatch('postRedirectProvider', { queries }).then(res => {
+				console.log(res)
+			})
+		},
+		initStudyUIDadd () {
+			this.studyUIDadd = ''
 		}
 	}
 }

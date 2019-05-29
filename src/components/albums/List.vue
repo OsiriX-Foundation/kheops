@@ -484,7 +484,7 @@ export default {
 		}
 	},
 	created () {
-		this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit })
+		this.$store.dispatch('getAlbums', { pageNb: this.pageNb, filters: this.filters, sortBy: this.sortBy, sortDesc: this.sortDesc, limit: this.limit, reset: true })
 	},
 	mounted () {
 		this.scroll()

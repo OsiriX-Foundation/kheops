@@ -5,6 +5,7 @@ import moment from 'moment'
 import axios from 'axios'
 import SRImage from '@/assets/SR_2.png'
 import PDFImage from '@/assets/pdf-240x240.png'
+import VideoImage from '@/assets/video.png'
 import DicomLogo from '@/assets/dicom_logo.png'
 // initial state
 const state = {
@@ -113,9 +114,10 @@ const actions = {
 			commit('SET_STUDIES', { data: data, reset: reset })
 			commit('SET_STUDIES_FILTER_PARAMS', params)
 			commit('SET_REQUEST_PARAMS', requestParams)
+			let reloadSeries = params.reloadSeries !== undefined
 			_.forEach(state.flags, (flag, StudyInstanceUID) => {
 				if (flag.show_details) {
-					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null })
+					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null, reload: reloadSeries })
 				}
 			})
 			return res
@@ -131,7 +133,7 @@ const actions = {
 			}
 			if (!study) return
 
-			if (study.series !== undefined && study.series.length) return study.series
+			if (study.series !== undefined && study.series.length && !params.reload) return study.series
 
 			let queryString = (params.album_id) ? '&album=' + params.album_id : '&inbox=true'
 
@@ -170,6 +172,13 @@ const actions = {
 							commit('SET_FLAG', flag)
 						}
 					}
+					if (t.NumberOfSeriesRelatedInstances[0] > 1) {
+						dispatch('getImage', {
+							StudyInstanceUID: study.StudyInstanceUID[0],
+							SeriesInstanceUID: t.SeriesInstanceUID[0]
+						})
+					}
+					/*
 					if (t.Modality && t.Modality.includes('SR')) {
 						t.imgSrc = SRImage
 					} else {
@@ -182,8 +191,42 @@ const actions = {
 							})
 						}
 					}
+					*/
 					if (t.SeriesInstanceUID !== undefined) data.push(t)
 				})
+
+				HTTP.get(`/studies/${study.StudyInstanceUID}/metadata`).then(res => {
+					const metadata = res.data
+					const tagSeriesUID = '0020000E'
+					const tagSOPClassUID = '00080016'
+					const SOPClassUID = {
+						'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
+						'encapsulatedPDFStorage': '1.2.840.10008.5.1.4.1.1.104.1'
+					}
+					metadata.forEach(instance => {
+						let serieUID = instance[tagSeriesUID].Value[0]
+						for (var i in data) {
+							if (serieUID === data[i]['SeriesInstanceUID'][0] && data[i]['NumberOfSeriesRelatedInstances'][0] <= 1) {
+								if (instance[tagSOPClassUID]) {
+									data[i][dicom.dicom2name[tagSOPClassUID]] = instance[tagSOPClassUID].Value
+									if (data[i].Modality.includes('SR')) {
+										data[i]['imgSrc'] = SRImage
+									} else if (instance[tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {
+										data[i]['imgSrc'] = VideoImage
+									} else if (instance[tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
+										data[i]['imgSrc'] = PDFImage
+									} else {
+										dispatch('getImage', {
+											StudyInstanceUID: study.StudyInstanceUID[0],
+											SeriesInstanceUID: data[i]['SeriesInstanceUID'][0]
+										})
+									}
+								}
+							}
+						}
+					})
+				})
+
 				commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: data })
 			})
 		}

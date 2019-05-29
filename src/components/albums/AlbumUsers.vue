@@ -17,18 +17,22 @@ Props :
 		"usersettoadmin": "User has admin rights",
 		"warningtoggleadmin": "Warning! Do you really want to revoke your admin role? ",
 		"remove": "Remove user",
-    "warningtoggledelete": "Do you realy want to delete this user ?"
+    "warningtoggledelete": "Do you realy want to delete this user ?",
+    "Admin": "Data steward",
+    "admin": "data steward"
 	},
 	"fr": {
 		"username": "Utilisateur",
-		"user": "Utilisateur",
+		"user": "utilisateur",
 		"changerole": "changer le rôle pour",
 		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
 		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
 		"usersettoadmin": "L'utilisateur a des droits admin",
 		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
 		"remove": "Retirer l'utilisateur",
-    "warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?"
+    "warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?",
+    "Admin": "Gardien des données",
+    "admin": "gardien des données"
 	}
 }
 </i18n>
@@ -52,7 +56,7 @@ Props :
               v-if="user.is_admin"
               style="color:#13B98B"
             >
-              (Admin)
+              {{ $t("Admin") }}
             </span>
             <!-- on mobile -->
             <div
@@ -67,7 +71,7 @@ Props :
                   v-if="showChangeRole"
                   @click.stop="toggleAdmin(user)"
                 >
-                  {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                  {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
                   <v-icon	name="user" />
                 </a>
                 <br>
@@ -138,7 +142,7 @@ Props :
                 v-if="showChangeRole"
                 @click.stop="toggleAdmin(user)"
               >
-                {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):"admin" }}
+                {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
                 <v-icon	name="user" />
               </a>
               <br>
@@ -200,13 +204,13 @@ Props :
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import mobiledetect from '@/mixins/mobiledetect.js'
 import { AlbumRedirect } from '@/mixins/redirect.js'
+import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'AlbumUsers',
-	mixins: [ AlbumRedirect ],
+	mixins: [ AlbumRedirect, CurrentUser ],
 	props: {
 		album: {
 			type: Object,
@@ -236,9 +240,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters({
-			user: 'currentUser'
-		}),
 		mobiledetect () {
 			return mobiledetect.mobileAndTabletcheck()
 		}
@@ -255,7 +256,7 @@ export default {
 	},
 	methods: {
 		toggleAdmin (user) {
-			if (this.user.sub === user.user_id && !this.confirmResetAdmin) {
+			if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
 				this.confirmResetAdmin = user.user_name
 				return
 			}

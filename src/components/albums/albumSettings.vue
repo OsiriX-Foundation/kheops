@@ -5,12 +5,14 @@
 	"en": {
 		"general": "General",
 		"user": "User",
-		"token": "Token"
+		"token": "Token",
+    "providerSR": "Report providers"
 	},
 	"fr": {
 		"general": "Général",
 		"user": "Utilisateur",
-		"token": "Token"
+    "token": "Token",
+    "providerSR": "Report providers"
 	}
 }
 </i18n>
@@ -63,6 +65,7 @@
         <album-settings-general v-if="view=='general'" />
         <album-settings-user v-if="view=='user'" />
         <album-settings-token v-if="view=='token'" />
+        <album-settings-report-provider v-if="view=='providerSR'" />
       </div>
     </div>
   </div>
@@ -74,15 +77,16 @@ import { AlbumRedirect } from '../../mixins/redirect.js'
 import albumSettingsGeneral from '@/components/albums/albumSettingsGeneral'
 import albumSettingsUser from '@/components/albums/albumSettingsUser'
 import albumSettingsToken from '@/components/albums/albumSettingsToken'
+import albumSettingsReportProvider from '@/components/albums/albumSettingsReportProvider'
 
 export default {
 	name: 'AlbumSettings',
-	components: { albumSettingsGeneral, albumSettingsUser, albumSettingsToken },
+	components: { albumSettingsGeneral, albumSettingsUser, albumSettingsToken, albumSettingsReportProvider },
 	mixins: [ AlbumRedirect ],
 	data () {
 		return {
 			view: 'general',
-			basicCategories: ['general', 'user']
+			basicCategories: ['general', 'user', 'providerSR']
 		}
 	},
 	computed: {

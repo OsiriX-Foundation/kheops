@@ -4,16 +4,18 @@ export const ViewerToken = {
 	data: function () {
 		return {
 			scope: 'viewer',
-			grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer'
+			grant_type: 'urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange',
+			subject_token_type: 'urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token'
 		}
 	},
 	methods: {
 		getViewerToken (token, studyInstanceUID, source) {
 			const body = {
 				grant_type: this.grant_type,
-				assertion: token,
+				subject_token: token,
+				subject_token_type: this.subject_token_type,
 				scope: this.scope,
-				study_instance_uid: studyInstanceUID,
+				studyUID: studyInstanceUID,
 				source_type: source === 'inbox' ? source : 'album',
 				source_id: source === 'inbox' ? '' : source
 			}
@@ -23,7 +25,13 @@ export const ViewerToken = {
 			})
 
 			return new Promise((resolve, reject) => {
-				HTTP.post(`/token`, bodyParams.join('&')).then(res => {
+				let config = {
+					transformRequest: [(data, headers) => {
+						delete headers.common.Authorization
+						return data
+					}]
+				}
+				HTTP.post(`/token`, bodyParams.join('&'), config).then(res => {
 					resolve(res)
 				}).catch(err => {
 					reject(err)

@@ -49,9 +49,6 @@ const keycloakconfig = {
 
 function tokenInterceptor () {
 	let user = {
-		login: `${Vue.prototype.$keycloak.userName}`,
-		jwt: `${Vue.prototype.$keycloak.token}`,
-		fullname: `${Vue.prototype.$keycloak.fullName}`,
 		permissions: ['active']
 	}
 	store.dispatch('login', user)
@@ -89,3 +86,11 @@ Vue.use(VueKeyCloak, {
 //   components: { App },
 //   template: '<App/>'
 // })
+
+Icon.register({
+	baidu: {
+		width: 24,
+		height: 24,
+		d: 'M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z'
+	}
+})

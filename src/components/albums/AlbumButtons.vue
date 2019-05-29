@@ -113,12 +113,13 @@ Props :
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import AlbumUsers from '@/components/albums/AlbumUsers'
+import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'AlbumButtons',
 	components: { AlbumUsers },
+	mixins: [ CurrentUser ],
 	props: {
 		album: {
 			type: Object,
@@ -148,18 +149,15 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters({
-			user: 'currentUser'
-		}),
 		lastAdmin () {
-			let last = this.users.filter(user => user.is_admin && user.user_name !== this.user.email)
+			let last = this.users.filter(user => user.is_admin && user.user_name !== this.currentuserEmail)
 			return !(last.length > 0)
 		},
 		lastUser () {
 			return !(this.users.length > 1)
 		},
 		listUsers () {
-			return this.users.filter(user => user.user_name !== this.user.email)
+			return this.users.filter(user => user.user_name !== this.currentuserEmail)
 		}
 	},
 	methods: {
@@ -179,7 +177,7 @@ export default {
 			if (!this.confirmQuit) {
 				this.confirmQuit = true
 			} else {
-				this.$store.dispatch('quitAlbum', this.user.sub).then(() => {
+				this.$store.dispatch('quitAlbum', this.currentuserSub).then(() => {
 					this.$snotify.success(this.$t('albumquitsuccess'))
 					this.$router.push('/albums')
 				}).catch(() => {
