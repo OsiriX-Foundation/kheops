@@ -30,8 +30,6 @@ import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_DISPOSITION;
 import static javax.ws.rs.core.Response.Status.*;
-import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_PASSWORD;
-import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_USERNAME;
 
 @Path("/studies")
 public final class ZipStudyResource {
@@ -58,8 +56,7 @@ public final class ZipStudyResource {
 
         final AccessToken accessToken = AccessToken.fromAuthorizationHeader(authorizationHeader);
         final Set<Instance> instances = getInstances(accessToken, studyInstanceUID, fromAlbum, fromInbox);
-        final BearerTokenRetriever bearerTokenRetriever = new BearerTokenRetriever.Builder()
-                .client(CLIENT)
+        final BearerTokenRetriever bearerTokenRetriever = new BearerTokenRetriever.Builder(context)
                 .authorizationURI(authorizationURI())
                 .accessToken(accessToken)
                 .build();
@@ -94,9 +91,6 @@ public final class ZipStudyResource {
         }
 
         final URI metadataURI = metadataUriBuilder.build(studyInstanceUID);
-
-        CLIENT.property(HTTP_AUTHENTICATION_USERNAME, context.getInitParameter("online.kheops.client.zipperclientid"));
-        CLIENT.property(HTTP_AUTHENTICATION_PASSWORD, context.getInitParameter("online.kheops.client.zippersecret"));
 
         List<Attributes> attributesList;
         try {
