@@ -1,12 +1,6 @@
 import Vue from 'vue'
 
 export const CurrentUser = {
-	data: function () {
-		return {
-			scope: 'viewer',
-			grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer'
-		}
-	},
 	computed: {
 		currentuserAccessToken () {
 			return Vue.prototype.$keycloak.token

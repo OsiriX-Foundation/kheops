@@ -675,7 +675,7 @@
                     v-for="provider in providersEnable"
                     :id="row.item.StudyInstanceUID[0]"
                     :key="provider.id"
-                    action="https://test2.kheops.online/api/report"
+                    :action="serverURL + '/report'"
                     method="post"
                   >
                     <input
@@ -687,13 +687,13 @@
                     <input
                       type="text"
                       hidden
-                      name="clientId"
+                      name="client_id"
                       :value="provider.client_id"
                     >
                     <input
                       type="text"
                       hidden
-                      name="StudyInstanceUID"
+                      name="studyUID"
                       :value="row.item.StudyInstanceUID[0]"
                     >
                     <b-dropdown-item-button
@@ -786,6 +786,7 @@ import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import { ViewerToken } from '@/mixins/tokens.js'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 import BuildIcon from '@/components/kheopsSVG/BuildIcon'
+import { serverURL } from '@/app_config'
 
 Vue.use(ToggleButton)
 
@@ -803,6 +804,7 @@ export default {
 	data () {
 		return {
 			pageNb: 1,
+			serverURL: serverURL,
 			active: false,
 			form_send_study: false,
 			fields: [

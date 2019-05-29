@@ -274,7 +274,7 @@ export default {
 				read_permission: false,
 				revoked: false,
 				scope_type: '',
-				secret: '',
+				access_token: '',
 				title: '',
 				write_permission: false
 			},
@@ -365,7 +365,7 @@ export default {
 				read_permission: false,
 				revoked: false,
 				scope_type: '',
-				secret: '',
+				access_token: '',
 				title: '',
 				write_permission: false
 			}
