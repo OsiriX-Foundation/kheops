@@ -8,8 +8,10 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -19,9 +21,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.capability.Capabilities.ID_PATTERN;
 import static online.kheops.auth_server.capability.Capabilities.generateCapability;
-import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.capability.CapabilityId.ID_PATTERN;
+import static online.kheops.auth_server.capability.CapabilityToken.TOKEN_PATTERN;
+import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 
 @Path("/")
@@ -41,18 +45,18 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response createNewCapability(@NotNull @NotEmpty @FormParam("title") String title,
-                                                         @FormParam("expiration_time") String expirationTime,
-                                                         @FormParam("not_before_time") String notBeforeTime,
-                                                         @NotNull @FormParam("scope_type") String scopeType,
-                                                         @FormParam("album") String albumId,
-                                                         @NotNull @FormParam("read_permission") boolean readPermission,
-                                                         @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
-                                                         @NotNull @FormParam("download_permission") boolean downloadPermission,
-                                                         @NotNull @FormParam("write_permission") boolean writePermission) {
+    public Response createNewCapability(@NotNull @NotEmpty @FormParam("title") String title,
+                                        @FormParam("expiration_time") String expirationTime,
+                                        @FormParam("not_before_time") String notBeforeTime,
+                                        @NotNull @FormParam("scope_type") String scopeType,
+                                        @FormParam("album") String albumId,
+                                        @NotNull @FormParam("read_permission") boolean readPermission,
+                                        @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
+                                        @NotNull @FormParam("download_permission") boolean downloadPermission,
+                                        @NotNull @FormParam("write_permission") boolean writePermission) {
 
         if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
+            return Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface) securityContext.getUserPrincipal();
@@ -72,7 +76,7 @@ public class CapabilitiesResource {
             try {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
             } catch (DateTimeParseException e) {
-                return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("Bad query parameter {not_before_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter {not_before_time}").build();
             }
         }
         if(expirationTime != null) {
@@ -80,16 +84,16 @@ public class CapabilitiesResource {
                 capabilityParametersBuilder.expirationTime(expirationTime);
 
             } catch (DateTimeParseException e) {
-                return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
             }
         }
 
         try {
             capabilityParametersBuilder.scope(scopeType, albumId);
         } catch (CapabilityBadRequestException e) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
+            return Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
         }
 
         final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
@@ -98,25 +102,25 @@ public class CapabilitiesResource {
             capabilityResponse = generateCapability(capabilityParameters);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.WARNING, "Bad Request", e);
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (NewCapabilityForbidden e) {
             LOG.log(Level.WARNING, "Forbidden", e);
-            return javax.ws.rs.core.Response.status(FORBIDDEN).entity(e.getMessage()).build();
+            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         } catch (CapabilityBadRequestException e) {
             LOG.log(Level.WARNING, "Bad Request", e);
-            return javax.ws.rs.core.Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return javax.ws.rs.core.Response.status(CREATED).entity(capabilityResponse).build();
+        return Response.status(CREATED).entity(capabilityResponse).build();
     }
 
     @POST
     @Secured
     @CapabilitySecured
-    @Path("capabilities/{capability_id:"+Capabilities.ID_PATTERN+"}/revoke")
+    @Path("capabilities/{capability_id:"+ID_PATTERN+"}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
+    public Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
 
         final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
         final CapabilitiesResponse capabilityResponse;
@@ -125,10 +129,10 @@ public class CapabilitiesResource {
             capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
         } catch (CapabilityNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        return javax.ws.rs.core.Response.status(OK).entity(capabilityResponse).build();
+        return Response.status(OK).entity(capabilityResponse).build();
     }
 
     @GET
@@ -139,28 +143,30 @@ public class CapabilitiesResource {
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response getCapabilities(@QueryParam("valid") boolean valid,
-                                                     @QueryParam(ALBUM) String albumId) {
+    public Response getCapabilities(@QueryParam("valid") boolean valid,
+                                    @QueryParam(ALBUM) String albumId,
+                                    @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                    @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
-        final List<CapabilitiesResponse> capabilityResponses;
+        final PairListXTotalCount<CapabilitiesResponse> pair;
 
         if(albumId != null) {
-            capabilityResponses = Capabilities.getCapabilities(albumId, valid);
+            pair = Capabilities.getCapabilities(albumId, valid, limit, offset);
         } else {
             final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
-            capabilityResponses = Capabilities.getCapabilities(kheopsPrincipal.getUser(), valid);
+            pair = Capabilities.getCapabilities(kheopsPrincipal.getUser(), valid, limit, offset);
         }
 
-        GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(capabilityResponses) {};
-        return javax.ws.rs.core.Response.status(OK).entity(genericCapabilityResponsesList).build();
+        GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(pair.getAttributesList()) {};
+        return Response.status(OK).entity(genericCapabilityResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
 
     @GET
-    @Path("capabilities/{capability_token:"+Capabilities.TOKEN_PATTERN+"}")
+    @Path("capabilities/{capability_token:" + TOKEN_PATTERN + "}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
+    public Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
 
         final CapabilitiesResponse capabilityResponses;
 
@@ -168,18 +174,18 @@ public class CapabilitiesResource {
             capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
         } catch (CapabilityNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();
+        return Response.status(OK).entity(capabilityResponses).build();
     }
 
     @GET
     @Secured
     @UserAccessSecured
-    @Path("capabilities/{capability_token_id:"+ ID_PATTERN+"}")
+    @Path("capabilities/{capability_token_id:" + ID_PATTERN + "}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
+    public Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
 
         final CapabilitiesResponse capabilityResponses;
         final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
@@ -188,8 +194,8 @@ public class CapabilitiesResource {
             capabilityResponses = Capabilities.getCapability(capabilityTokenID, callingUserPk);
         } catch (CapabilityNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
-            return javax.ws.rs.core.Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        return javax.ws.rs.core.Response.status(OK).entity(capabilityResponses).build();
+        return Response.status(OK).entity(capabilityResponses).build();
     }
 }

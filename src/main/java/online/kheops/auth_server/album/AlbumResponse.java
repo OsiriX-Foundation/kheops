@@ -1,5 +1,7 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.entity.Capability;
+
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -77,6 +79,15 @@ public class AlbumResponse {
         if(!albumResponseBuilder.getUsers().isEmpty()) {
             users = albumResponseBuilder.getUsers();
             Collections.sort(users);
+        }
+    }
+
+    public AlbumResponse(Capability capability) {
+        if(capability.getAlbum() == null) {
+            throw new IllegalStateException();
+        } else {
+            id = capability.getAlbum().getId();
+            name = capability.getAlbum().getName();
         }
     }
 

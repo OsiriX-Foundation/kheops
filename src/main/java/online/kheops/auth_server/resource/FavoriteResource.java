@@ -47,7 +47,7 @@ public class FavoriteResource {
     @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
+    public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                              @QueryParam(ALBUM) String fromAlbumId,
                                              @QueryParam(INBOX) Boolean fromInbox) {
 
@@ -82,8 +82,8 @@ public class FavoriteResource {
     @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
-                                         @PathParam(SeriesInstanceUID) @UIDValidator  String seriesInstanceUID,
+    public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                         @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                          @QueryParam(ALBUM) String fromAlbumId,
                                          @QueryParam(INBOX) Boolean fromInbox) {
 
@@ -97,8 +97,8 @@ public class FavoriteResource {
     @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator  String studyInstanceUID,
-                                              @PathParam(SeriesInstanceUID) @UIDValidator  String seriesInstanceUID,
+    public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                              @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                               @QueryParam(ALBUM) String fromAlbumId,
                                               @QueryParam(INBOX) Boolean fromInbox) {
 

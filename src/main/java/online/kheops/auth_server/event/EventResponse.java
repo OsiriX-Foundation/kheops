@@ -29,6 +29,16 @@ public class EventResponse {
         private String id;
     }
 
+    private static class ReportProviderResponse {
+        @XmlElement(name = "name")
+        private String name;
+        @XmlElement(name = "id")
+        private String id;
+        @XmlElement(name = "is_removed")
+        private boolean removed;
+
+    }
+
 
     @XmlElement(name = "event_type")
     private String eventType;
@@ -54,6 +64,8 @@ public class EventResponse {
     private StudyResponse study;
     @XmlElement(name = "capability")
     private CapabilityResponse capability;
+    @XmlElement(name = "report_provider")
+    private ReportProviderResponse reportProvider;
 
     private EventResponse() { /*empty*/ }
 
@@ -87,7 +99,8 @@ public class EventResponse {
             targetName = mutation.getToUser().getEmail();
         }
         if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString())) {
+                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString()) ||
+                mutation.getMutationType().equals(Events.MutationType.NEW_REPORT.toString())) {
             series = new SeriesResponse();
             study = new StudyResponse();
             series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
@@ -112,11 +125,22 @@ public class EventResponse {
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
         }
+        if (mutation.getReportProvider().isPresent()) {
+            reportProvider = new ReportProviderResponse();
+            if(mutation.getReportProvider().get().isRemoved()) {
+                reportProvider.removed = true;
+            } else {
+                reportProvider.removed = false;
+                reportProvider.id = mutation.getReportProvider().get().getClientId();
+            }
+
+            reportProvider.name = mutation.getReportProvider().get().getName();
+        }
         if (mutation.getCapability().isPresent()) {
-            final CapabilityResponse capabilityResponse = new CapabilityResponse();
-            capabilityResponse.id = mutation.getCapability().get().getId();
-            capabilityResponse.title = mutation.getCapability().get().getTitle();
-            capability = capabilityResponse;
+            capability = new CapabilityResponse();
+            capability.id = mutation.getCapability().get().getId();
+            capability.title = mutation.getCapability().get().getTitle();
+            //originName = null; TODO
         }
     }
 }

@@ -25,7 +25,7 @@ final class JWTAssertionBuilder implements AssertionBuilder {
 
         try {
             issuer = JWT.decode(assertionToken).getIssuer();
-        } catch (JWTDecodeException e) {
+        } catch (JWTDecodeException | NullPointerException e) {
             throw new BadAssertionException("Unable to decode JWT", e);
         }
 

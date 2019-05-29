@@ -8,88 +8,24 @@ import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.regex.Pattern;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
+import static online.kheops.auth_server.capability.CapabilitiesQueries.findAllCapabilitiesByAlbum;
+import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
 import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 
 public class Capabilities {
 
-    private static final String TOKEN_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    private static final int TOKEN_LENGTH = 22;
-    public static final String TOKEN_PATTERN = "[A-Za-z0-9]{" + TOKEN_LENGTH + "}";
-    private static final String TOKEN_PATTERN_STRICT = "^" + TOKEN_PATTERN + "$";
-    private static final Pattern tokenPattern = Pattern.compile(TOKEN_PATTERN_STRICT);
-
-    private static final String ID_DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    private static final int ID_LENGTH = 10;
-    public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
-
-    private static final Random rdm = new SecureRandom();
-
     private Capabilities() {
         throw new IllegalStateException("Utility class");
-    }
-
-    public static String newCapabilityToken() {
-        final StringBuilder secretBuilder = new StringBuilder();
-        do {
-            while (secretBuilder.length() < TOKEN_LENGTH) {
-                int index = rdm.nextInt(TOKEN_DICT.length());
-                secretBuilder.append(TOKEN_DICT.charAt(index));
-            }
-        } while (capabilitySecretExist(secretBuilder.toString()));
-        return secretBuilder.toString();
-    }
-
-    public static String newCapabilityID() {
-        final StringBuilder idBuilder = new StringBuilder();
-
-        do {
-            idBuilder.setLength(0);
-            while (idBuilder.length() < ID_LENGTH) {
-                int index = rdm.nextInt(ID_DICT.length());
-                idBuilder.append(ID_DICT.charAt(index));
-            }
-        } while (capabilityIDExist(idBuilder.toString()));
-        return idBuilder.toString();
-    }
-
-    public static String hashCapability(String capability) {
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException();
-        }
-        byte[] encodedhash = digest.digest(capability.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(encodedhash);
-    }
-
-    private static String bytesToHex(byte[] hash) {
-        final StringBuilder hexString = new StringBuilder();
-        for (byte hash1 : hash) {
-            String hex = Integer.toHexString(0xff & hash1);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
-    public static Boolean isValidFormat(String token) {
-        return tokenPattern.matcher(token).matches();
     }
 
     public static CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
@@ -204,9 +140,10 @@ public class Capabilities {
         return  capabilityResponse;
     }
 
-    public static List<CapabilitiesResponse> getCapabilities(User callingUser, boolean valid) {
+    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(User callingUser, boolean valid, Integer limit, Integer offset) {
 
         final List<CapabilitiesResponse> capabilityResponses = new ArrayList<>();
+        final long totalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -218,9 +155,11 @@ public class Capabilities {
 
             final List<Capability> capabilities;
             if(valid) {
-                capabilities = findCapabilitiesByUserValidOnly(callingUser, em);
+                capabilities = findCapabilitiesByUserValidOnly(callingUser, limit, offset, em);
+                totalCount = countCapabilitiesByUserValidOnly(callingUser, em);
             } else {
-                capabilities = findAllCapabilitiesByUser(callingUser, em);
+                capabilities = findAllCapabilitiesByUser(callingUser, limit, offset, em);
+                totalCount = countAllCapabilitiesByUser(callingUser, em);
             }
 
             for (Capability capability: capabilities) {
@@ -234,12 +173,13 @@ public class Capabilities {
             }
             em.close();
         }
-        return capabilityResponses;
+        return new PairListXTotalCount<>(totalCount, capabilityResponses);
     }
 
-    public static List<CapabilitiesResponse> getCapabilities(String albumId, boolean valid) {
+    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(String albumId, boolean valid, Integer limit, Integer offset) {
 
         final List<CapabilitiesResponse> capabilityResponses = new ArrayList<>();
+        final long totalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -249,9 +189,11 @@ public class Capabilities {
 
             final List<Capability> capabilities;
             if(valid) {
-                capabilities = findCapabilitiesByAlbumValidOnly(albumId, em);
+                capabilities = findCapabilitiesByAlbumValidOnly(albumId, limit, offset, em);
+                totalCount = countCapabilitiesByAlbumValidOnly(albumId, em);
             } else {
-                capabilities = findAllCapabilitiesByAlbum(albumId, em);
+                capabilities = findAllCapabilitiesByAlbum(albumId, limit, offset, em);
+                totalCount = countAllCapabilitiesByAlbum(albumId, em);
             }
 
             for (Capability capability: capabilities) {
@@ -265,7 +207,8 @@ public class Capabilities {
             }
             em.close();
         }
-        return capabilityResponses;
+        return new PairListXTotalCount<>(totalCount, capabilityResponses);
+
     }
 
     public static CapabilitiesResponse getCapabilityInfo(String capabilityToken)

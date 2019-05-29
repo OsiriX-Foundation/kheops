@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Events extends TableImpl<EventsRecord> {
 
-    private static final long serialVersionUID = 2119705138;
+    private static final long serialVersionUID = -868413618;
 
     /**
      * The reference instance of <code>public.events</code>
@@ -116,6 +116,11 @@ public class Events extends TableImpl<EventsRecord> {
      * The column <code>public.events.series_fk</code>.
      */
     public final TableField<EventsRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>public.events.report_provider_fk</code>.
+     */
+    public final TableField<EventsRecord, Long> REPORT_PROVIDER_FK = createField("report_provider_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * Create a <code>public.events</code> table reference
@@ -195,7 +200,7 @@ public class Events extends TableImpl<EventsRecord> {
      */
     @Override
     public List<ForeignKey<EventsRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<EventsRecord, ?>>asList(Keys.EVENTS__EVENT_ALBUM_FK_FKEY, Keys.EVENTS__EVENT_STUDY_FK_FKEY, Keys.EVENTS__EVENT_USER_FK_FKEY, Keys.EVENTS__EVENT_CAPABILITY_FK_FKEY, Keys.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENTS__EVENT_TO_USER_FK_FKEY, Keys.EVENTS__EVENT_SERIES_FK_FKEY);
+        return Arrays.<ForeignKey<EventsRecord, ?>>asList(Keys.EVENTS__EVENT_ALBUM_FK_FKEY, Keys.EVENTS__EVENT_STUDY_FK_FKEY, Keys.EVENTS__EVENT_USER_FK_FKEY, Keys.EVENTS__EVENT_CAPABILITY_FK_FKEY, Keys.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENTS__EVENT_TO_USER_FK_FKEY, Keys.EVENTS__EVENT_SERIES_FK_FKEY, Keys.EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY);
     }
 
     public Albums albums() {
@@ -224,6 +229,10 @@ public class Events extends TableImpl<EventsRecord> {
 
     public Series series() {
         return new Series(this, Keys.EVENTS__EVENT_SERIES_FK_FKEY);
+    }
+
+    public ReportProviders reportProviders() {
+        return new ReportProviders(this, Keys.EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY);
     }
 
     /**

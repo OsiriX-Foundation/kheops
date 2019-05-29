@@ -21,6 +21,10 @@ public class Mutation extends Event{
     @JoinColumn(name = "capability_fk", nullable=true, insertable = false, updatable = false)
     private Capability capability;
 
+    @ManyToOne
+    @JoinColumn(name = "report_provider_fk", nullable=true, insertable = false, updatable = false)
+    private ReportProvider reportProvider;
+
     @Basic(optional = false)
     @Column(name = "mutation_type", updatable = false)
     private String mutationType;
@@ -32,6 +36,8 @@ public class Mutation extends Event{
     public String getMutationType() { return mutationType; }
 
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
+
+    public Optional<ReportProvider> getReportProvider() { return Optional.ofNullable(reportProvider); }
 
     public Mutation(){}
 
@@ -46,6 +52,21 @@ public class Mutation extends Event{
     public Mutation(User callingUser, Album album, Events.MutationType mutationType) {
         super(callingUser, album);
         this.mutationType = mutationType.toString();
+    }
+
+    public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
+        super(callingUser, album);
+        this.mutationType = mutationType.toString();
+        this.reportProvider = reportProvider;
+
+        reportProvider.addMutation(this);
+    }
+
+    public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType, Series series) {
+        this(callingUser, album, mutationType, series);
+        this.reportProvider = reportProvider;
+
+        reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Series series) {

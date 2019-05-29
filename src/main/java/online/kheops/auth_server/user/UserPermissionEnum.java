@@ -16,6 +16,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
     },
     REMOVE_USER {
@@ -29,6 +31,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -43,6 +47,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -57,6 +63,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -71,6 +79,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return true; }
 
 
     },
@@ -85,6 +95,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -99,6 +111,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -113,6 +127,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return true; }
 
 
     },
@@ -127,6 +143,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return true; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return true; }
 
 
     },
@@ -141,6 +159,22 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
+
+
+    },
+    READ_COMMENT {
+        @Override
+        public boolean hasUserPermission(Album album) { return true; }
+        @Override
+        public boolean hasCapabilityPermission(Capability capability) {
+            return false;
+        }
+        @Override
+        public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -155,6 +189,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -169,6 +205,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -183,6 +221,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -197,6 +237,8 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
 
     },
@@ -211,10 +253,36 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
-    };
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
 
+    },
+    MANAGE_DICOM_SR {
+        @Override
+        public boolean hasUserPermission(Album album) { return false; }
+        @Override
+        public boolean hasCapabilityPermission(Capability capability) { return false; }
+        @Override
+        public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
+
+    },
+    GET_DICOM_SR {
+        @Override
+        public boolean hasUserPermission(Album album) { return true; }
+        @Override
+        public boolean hasCapabilityPermission(Capability capability) { return false; }
+        @Override
+        public boolean hasViewerPermission(Album album) { return false; }
+        @Override
+        public boolean hasProviderPermission(Album album) { return false; }
+
+    }
+    ;
 
     public abstract boolean hasUserPermission(Album album);
     public abstract boolean hasCapabilityPermission(Capability capability);
     public abstract boolean hasViewerPermission(Album album);
+    public abstract boolean hasProviderPermission(Album album);
 }

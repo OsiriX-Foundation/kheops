@@ -11,6 +11,7 @@ import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
 import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
@@ -19,6 +20,7 @@ import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
 import online.kheops.auth_server.generated.tables.records.CapabilitiesRecord;
 import online.kheops.auth_server.generated.tables.records.EventsRecord;
+import online.kheops.auth_server.generated.tables.records.ReportProvidersRecord;
 import online.kheops.auth_server.generated.tables.records.SeriesRecord;
 import online.kheops.auth_server.generated.tables.records.StudiesRecord;
 import online.kheops.auth_server.generated.tables.records.UsersRecord;
@@ -52,6 +54,7 @@ public class Keys {
     public static final Identity<AlbumsRecord, Long> IDENTITY_ALBUMS = Identities0.IDENTITY_ALBUMS;
     public static final Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Identities0.IDENTITY_CAPABILITIES;
     public static final Identity<EventsRecord, Long> IDENTITY_EVENTS = Identities0.IDENTITY_EVENTS;
+    public static final Identity<ReportProvidersRecord, Long> IDENTITY_REPORT_PROVIDERS = Identities0.IDENTITY_REPORT_PROVIDERS;
     public static final Identity<SeriesRecord, Long> IDENTITY_SERIES = Identities0.IDENTITY_SERIES;
     public static final Identity<StudiesRecord, Long> IDENTITY_STUDIES = Identities0.IDENTITY_STUDIES;
     public static final Identity<UsersRecord, Long> IDENTITY_USERS = Identities0.IDENTITY_USERS;
@@ -70,6 +73,8 @@ public class Keys {
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = UniqueKeys0.CAPABILITIES_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = UniqueKeys0.CAPABILITIES_SECRET_UNIQUE;
     public static final UniqueKey<EventsRecord> EVENT_PK = UniqueKeys0.EVENT_PK;
+    public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = UniqueKeys0.REPORT_PROVIDERS_PK;
+    public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = UniqueKeys0.REPORT_PROVIDERS_CLIENT_ID_UNIQUE;
     public static final UniqueKey<SeriesRecord> SERIES_PK = UniqueKeys0.SERIES_PK;
     public static final UniqueKey<SeriesRecord> SERIES_UID_UNIQUE = UniqueKeys0.SERIES_UID_UNIQUE;
     public static final UniqueKey<StudiesRecord> STUDIES_PK = UniqueKeys0.STUDIES_PK;
@@ -94,6 +99,8 @@ public class Keys {
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_TO_USER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_TO_USER_FK_FKEY;
     public static final ForeignKey<EventsRecord, SeriesRecord> EVENTS__EVENT_SERIES_FK_FKEY = ForeignKeys0.EVENTS__EVENT_SERIES_FK_FKEY;
+    public static final ForeignKey<EventsRecord, ReportProvidersRecord> EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY = ForeignKeys0.EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY;
+    public static final ForeignKey<ReportProvidersRecord, AlbumsRecord> REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY = ForeignKeys0.REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY;
     public static final ForeignKey<SeriesRecord, StudiesRecord> SERIES__SERIES_STUDY_FK_FKEY = ForeignKeys0.SERIES__SERIES_STUDY_FK_FKEY;
     public static final ForeignKey<UsersRecord, AlbumsRecord> USERS__USERS_INBOX_FK_FKEY = ForeignKeys0.USERS__USERS_INBOX_FK_FKEY;
 
@@ -107,6 +114,7 @@ public class Keys {
         public static Identity<AlbumsRecord, Long> IDENTITY_ALBUMS = Internal.createIdentity(Albums.ALBUMS, Albums.ALBUMS.PK);
         public static Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Internal.createIdentity(Capabilities.CAPABILITIES, Capabilities.CAPABILITIES.PK);
         public static Identity<EventsRecord, Long> IDENTITY_EVENTS = Internal.createIdentity(Events.EVENTS, Events.EVENTS.PK);
+        public static Identity<ReportProvidersRecord, Long> IDENTITY_REPORT_PROVIDERS = Internal.createIdentity(ReportProviders.REPORT_PROVIDERS, ReportProviders.REPORT_PROVIDERS.PK);
         public static Identity<SeriesRecord, Long> IDENTITY_SERIES = Internal.createIdentity(Series.SERIES, Series.SERIES.PK);
         public static Identity<StudiesRecord, Long> IDENTITY_STUDIES = Internal.createIdentity(Studies.STUDIES, Studies.STUDIES.PK);
         public static Identity<UsersRecord, Long> IDENTITY_USERS = Internal.createIdentity(Users.USERS, Users.USERS.PK);
@@ -123,6 +131,8 @@ public class Keys {
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_id_unique", Capabilities.CAPABILITIES.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_secret_unique", Capabilities.CAPABILITIES.SECRET);
         public static final UniqueKey<EventsRecord> EVENT_PK = Internal.createUniqueKey(Events.EVENTS, "event_pk", Events.EVENTS.PK);
+        public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_pk", ReportProviders.REPORT_PROVIDERS.PK);
+        public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_client_id_unique", ReportProviders.REPORT_PROVIDERS.CLIENT_ID);
         public static final UniqueKey<SeriesRecord> SERIES_PK = Internal.createUniqueKey(Series.SERIES, "series_pk", Series.SERIES.PK);
         public static final UniqueKey<SeriesRecord> SERIES_UID_UNIQUE = Internal.createUniqueKey(Series.SERIES, "series_uid_unique", Series.SERIES.SERIES_UID);
         public static final UniqueKey<StudiesRecord> STUDIES_PK = Internal.createUniqueKey(Studies.STUDIES, "studies_pk", Studies.STUDIES.PK);
@@ -145,6 +155,8 @@ public class Keys {
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_private_target_user_fk_fkey", Events.EVENTS.PRIVATE_TARGET_USER_FK);
         public static final ForeignKey<EventsRecord, UsersRecord> EVENTS__EVENT_TO_USER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.USERS_PK, Events.EVENTS, "events__event_to_user_fk_fkey", Events.EVENTS.TO_USER_FK);
         public static final ForeignKey<EventsRecord, SeriesRecord> EVENTS__EVENT_SERIES_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.SERIES_PK, Events.EVENTS, "events__event_series_fk_fkey", Events.EVENTS.SERIES_FK);
+        public static final ForeignKey<EventsRecord, ReportProvidersRecord> EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.REPORT_PROVIDERS_PK, Events.EVENTS, "events__event_report_provider_fk_fkey", Events.EVENTS.REPORT_PROVIDER_FK);
+        public static final ForeignKey<ReportProvidersRecord, AlbumsRecord> REPORT_PROVIDERS__REPORT_PROVIDERS_ALBUM_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, ReportProviders.REPORT_PROVIDERS, "report_providers__report_providers_album_fk_fkey", ReportProviders.REPORT_PROVIDERS.ALBUM_FK);
         public static final ForeignKey<SeriesRecord, StudiesRecord> SERIES__SERIES_STUDY_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.STUDIES_PK, Series.SERIES, "series__series_study_fk_fkey", Series.SERIES.STUDY_FK);
         public static final ForeignKey<UsersRecord, AlbumsRecord> USERS__USERS_INBOX_FK_FKEY = Internal.createForeignKey(online.kheops.auth_server.generated.Keys.ALBUM_PK, Users.USERS, "users__users_inbox_fk_fkey", Users.USERS.INBOX_FK);
     }

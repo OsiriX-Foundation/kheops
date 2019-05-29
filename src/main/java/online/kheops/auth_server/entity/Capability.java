@@ -1,9 +1,6 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.capability.Capabilities;
-import online.kheops.auth_server.capability.CapabilityBadRequestException;
-import online.kheops.auth_server.capability.CapabilityNotValidException;
-import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.capability.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,8 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import static online.kheops.auth_server.capability.Capabilities.hashCapability;
-import static online.kheops.auth_server.capability.Capabilities.newCapabilityID;
+import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
 @SuppressWarnings("unused")
@@ -96,10 +92,10 @@ public class Capability {
 
     @PrePersist
     public void onPrePersist() {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         issuedAtTime = now;
         updatedTime = now;
-        id = newCapabilityID();
+        id = new CapabilityId().getId();
         if(notBeforeTime == null) {
             notBeforeTime = now;
         }
@@ -113,7 +109,7 @@ public class Capability {
     private Capability() {}
 
     private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
-        secretBeforeHash = Capabilities.newCapabilityToken();
+        secretBeforeHash = new CapabilityToken().getToken();
         this.secret = hashCapability(secretBeforeHash);
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
@@ -181,7 +177,6 @@ public class Capability {
         if (ZonedDateTime.of(getNotBeforeTime().minusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isAfter(ZonedDateTime.now())) {
             throw new CapabilityNotValidException("Capability token is not yet valid");
         }
-
         if (ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
             throw new CapabilityNotValidException("Capability token is expired");
         }

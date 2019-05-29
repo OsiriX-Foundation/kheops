@@ -83,9 +83,22 @@ public class Studies {
         applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.REFERRING_PHYSICIAN_NAME, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getPatientNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_NAME, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getPatientIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching())));
-        applyIfPresent(qidoParams::getStudyInstanceUIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_UID, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getStudyIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_ID, qidoParams.isFuzzyMatching())));
         applyIfPresent(qidoParams::getFavoriteFilter, filter -> conditionArrayList.add(ALBUM_SERIES.FAVORITE.eq(filter)));
+
+        if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
+            Condition condition = trueCondition();
+            boolean conditionIsInitialised = false;
+            for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
+                if(!conditionIsInitialised) {
+                    condition = STUDIES.STUDY_UID.eq(studyInstanceUID);
+                    conditionIsInitialised = true;
+                } else {
+                    condition = condition.or(STUDIES.STUDY_UID.eq(studyInstanceUID));
+                }
+            }
+            conditionArrayList.add(condition);
+        }
 
         qidoParams.getModalityFilter().ifPresent(filter -> conditionArrayList.add(createConditionModality(filter)));
 
@@ -124,7 +137,7 @@ public class Studies {
                 isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
                 isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
                 countDistinct(SERIES.PK).as("count:" + SERIES.PK.getName()),
-                sumDistinct(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
                 countDistinct(when(ALBUM_SERIES.FAVORITE.eq(true), ALBUM_SERIES.PK)).as("sum_fav"),
                 countDistinct(EVENTS).as("sum_comments"));
@@ -420,6 +433,41 @@ public class Studies {
             return true;
         } catch (StudyNotFoundException e) {
             return false;
+        }
+    }
+
+    public static boolean canAccessStudy(Album album, Study study) {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            StudyQueries.findStudyByStudyandAlbum(study, album, em);
+            return true;
+
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static boolean canAccessStudy(Album album, String studyUID) {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+            StudyQueries.findStudyByStudyandAlbum(studyUID, album, em);
+            return true;
+
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
     }
 

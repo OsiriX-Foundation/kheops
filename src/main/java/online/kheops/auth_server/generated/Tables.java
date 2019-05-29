@@ -11,9 +11,11 @@ import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
 import online.kheops.auth_server.generated.tables.Events;
+import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.Version;
 
 
 /**
@@ -55,6 +57,11 @@ public class Tables {
     public static final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
 
     /**
+     * The table <code>public.report_providers</code>.
+     */
+    public static final ReportProviders REPORT_PROVIDERS = online.kheops.auth_server.generated.tables.ReportProviders.REPORT_PROVIDERS;
+
+    /**
      * The table <code>public.series</code>.
      */
     public static final Series SERIES = online.kheops.auth_server.generated.tables.Series.SERIES;
@@ -68,4 +75,9 @@ public class Tables {
      * The table <code>public.users</code>.
      */
     public static final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
+
+    /**
+     * The table <code>public.version</code>.
+     */
+    public static final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
 }
