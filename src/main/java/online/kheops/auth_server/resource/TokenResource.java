@@ -94,6 +94,11 @@ public class TokenResource
 
         final IntrospectResponse introspectResponse = new IntrospectResponse();
 
+        if (assertionToken == null) {
+            LOG.log(WARNING, "Missing token");
+            return Response.status(OK).entity(errorIntrospectResponse).build();
+        }
+
         if (!securityContext.isUserInRole(TokenClientKind.PUBLIC.getRoleString())) {
             throw new NotAuthorizedException("Basic");
         }
