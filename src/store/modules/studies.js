@@ -206,8 +206,8 @@ const actions = {
 					metadata.forEach(instance => {
 						let serieUID = instance[tagSeriesUID].Value[0]
 						for (var i in data) {
-							if (serieUID === data[i]['SeriesInstanceUID'][0]) {
-								if (instance[tagSOPClassUID] && data[i]['NumberOfSeriesRelatedInstances'][0] <= 1) {
+							if (serieUID === data[i]['SeriesInstanceUID'][0] && data[i]['NumberOfSeriesRelatedInstances'][0] <= 1) {
+								if (instance[tagSOPClassUID]) {
 									data[i][dicom.dicom2name[tagSOPClassUID]] = instance[tagSOPClassUID].Value
 									if (data[i].Modality.includes('SR')) {
 										data[i]['imgSrc'] = SRImage
