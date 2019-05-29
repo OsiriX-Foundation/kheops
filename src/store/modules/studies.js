@@ -199,6 +199,10 @@ const actions = {
 					const metadata = res.data
 					const tagSeriesUID = '0020000E'
 					const tagSOPClassUID = '00080016'
+					const SOPClassUID = {
+						'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
+						'encapsulatedPDFStorage': '1.2.840.10008.5.1.4.1.1.104.1'
+					}
 					metadata.forEach(instance => {
 						let serieUID = instance[tagSeriesUID].Value[0]
 						for (var i in data) {
@@ -207,9 +211,9 @@ const actions = {
 									data[i][dicom.dicom2name[tagSOPClassUID]] = instance[tagSOPClassUID].Value
 									if (data[i].Modality.includes('SR')) {
 										data[i]['imgSrc'] = SRImage
-									} else if (instance[tagSOPClassUID].Value[0] === '1.2.840.10008.5.1.4.1.1.77.1.4.1') {
+									} else if (instance[tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {
 										data[i]['imgSrc'] = VideoImage
-									} else if (instance[tagSOPClassUID].Value[0] === '1.2.840.10008.5.1.4.1.1.104.1') {
+									} else if (instance[tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
 										data[i]['imgSrc'] = PDFImage
 									} else {
 										dispatch('getImage', {
