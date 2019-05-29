@@ -25,7 +25,13 @@ export const ViewerToken = {
 			})
 
 			return new Promise((resolve, reject) => {
-				HTTP.post(`/token`, bodyParams.join('&')).then(res => {
+				let config = {
+					transformRequest: [(data, headers) => {
+						delete headers.common.Authorization
+						return data
+					}]
+				}
+				HTTP.post(`/token`, bodyParams.join('&'), config).then(res => {
 					resolve(res)
 				}).catch(err => {
 					reject(err)
