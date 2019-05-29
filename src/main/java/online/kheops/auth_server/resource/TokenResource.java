@@ -99,7 +99,7 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        if (!securityContext.isUserInRole(TokenClientKind.PUBLIC.getRoleString())) {
+        if (securityContext.isUserInRole(TokenClientKind.PUBLIC.getRoleString())) {
             throw new NotAuthorizedException("Basic");
         }
         // TODO secure this resource
