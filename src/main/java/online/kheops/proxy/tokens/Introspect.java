@@ -1,5 +1,8 @@
 package online.kheops.proxy.tokens;
 
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+
+import javax.servlet.ServletContext;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -12,9 +15,11 @@ import java.net.URI;
 import java.util.Objects;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_PASSWORD;
+import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_USERNAME;
 
 public class Introspect {
-    private static final Client CLIENT = ClientBuilder.newClient();
+    private static final Client CLIENT = ClientBuilder.newClient().register(HttpAuthenticationFeature.basicBuilder().build());
 
     private Introspect() {}
 
@@ -44,9 +49,11 @@ public class Introspect {
     }
 
     public static class Introspector {
+        private final ServletContext servletContext;
         private final WebTarget webTarget;
 
-        private Introspector(URI endpoint) {
+        private Introspector(ServletContext servletContext, URI endpoint) {
+            this.servletContext = servletContext;
             webTarget = CLIENT.target(Objects.requireNonNull(endpoint));
         }
 
@@ -55,15 +62,17 @@ public class Introspect {
                     .param("token", token);
 
             try {
-                return webTarget.request(APPLICATION_JSON_TYPE).post(Entity.form(form), Response.class);
+                return webTarget.request(APPLICATION_JSON_TYPE)
+                        .property(HTTP_AUTHENTICATION_USERNAME, servletContext.getInitParameter("online.kheops.client.dicomwebproxyclientid"))
+                        .property(HTTP_AUTHENTICATION_PASSWORD, servletContext.getInitParameter("online.kheops.client.dicomwebproxysecret"))
+                        .post(Entity.form(form), Response.class);
             } catch (ProcessingException | WebApplicationException e) {
                 throw new AccessTokenException("Error introspecting", e);
             }
         }
     }
 
-    public static Introspector endpoint(URI endpoint) {
-        return new Introspector(endpoint);
+    public static Introspector endpoint(ServletContext servletContext, URI endpoint) {
+        return new Introspector(servletContext, endpoint);
     }
-
 }

@@ -113,7 +113,7 @@ public final class Resource {
 
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
         try {
-            Introspect.Response introspectResponse = Introspect.endpoint(introspectionURI).token(authorizationToken.getToken());
+            Introspect.Response introspectResponse = Introspect.endpoint(context, introspectionURI).token(authorizationToken.getToken());
             if (!introspectResponse.isActive()) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
                 throw new NotAuthorizedException("Bearer", "Basic");
