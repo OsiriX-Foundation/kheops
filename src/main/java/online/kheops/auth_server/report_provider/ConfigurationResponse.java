@@ -73,7 +73,5 @@ public class ConfigurationResponse {
         tokenEndpoint = kheopsRootUri + "/api/token";
         introspectUri = kheopsRootUri + "/api/token/introspect";
         userInfoEndpoint = kheopsRootUri + "/api/userinfo";
-        jwksUri = kheopsRootUri + "/api/certs";
-
     }
 }
