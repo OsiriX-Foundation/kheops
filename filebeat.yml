@@ -25,7 +25,7 @@ filebeat.inputs:
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
-    - /var/log/nginx/*.log
+    - /var/log/nginx/access.log
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
@@ -45,22 +45,26 @@ filebeat.inputs:
   #fields:
   #  level: debug
   #  review: 1
-
+- type: log
+  enable: true
+  paths:
+    - /var/log/nginx/error.logcat err 
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
-  #multiline.pattern: ^\[
+  multiline.pattern: ^%{YEAR}/%{MONTHNUM}/%{MONTHDAY}
 
   # Defines if the pattern set under pattern should be negated or not. Default is false.
-  #multiline.negate: false
+  multiline.negate: true
 
   # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
   # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
-  #multiline.match: after
+  multiline.match: before
+  
 
 
 #============================= Filebeat modules ===============================
