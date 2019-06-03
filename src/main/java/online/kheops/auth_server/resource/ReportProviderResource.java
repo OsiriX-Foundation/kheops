@@ -94,9 +94,6 @@ public class ReportProviderResource {
         return Response.status(CREATED).entity(dicomSrResponse).build();
     }
 
-
-    private static final String UNKNOWN_BEARER_URN = "urn:x-kheops:params:oauth:grant-type:unknown-bearer";
-
     @POST
     @Path("report")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
