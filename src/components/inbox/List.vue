@@ -657,6 +657,17 @@
                     height="24px"
                   />
                 </span>
+                <label
+                  v-if="!filters.album_id || (album.add_series || album.is_admin)"
+                  for="file"
+                  style="cursor:pointer; display: inline;"
+                  @click="studyUIDadd=row.item.StudyInstanceUID[0]"
+                >
+                  <add-icon
+                    width="24px"
+                    height="24px"
+                  />
+                </label>
                 <b-dropdown
                   v-if="providersEnable.length > 0"
                   size="sm"
@@ -704,17 +715,6 @@
                     </b-dropdown-item-button>
                   </b-dropdown-form>
                 </b-dropdown>
-                <label
-                  v-if="!filters.album_id || (album.add_series || album.is_admin)"
-                  for="file"
-                  style="cursor:pointer; display: inline;"
-                  @click="studyUIDadd=row.item.StudyInstanceUID[0]"
-                >
-                  <add-icon
-                    width="24px"
-                    height="24px"
-                  />
-                </label>
                 <!--
                 <span><v-icon class="align-middle" style="margin-right:0" name="link"></v-icon></span>
                 -->
