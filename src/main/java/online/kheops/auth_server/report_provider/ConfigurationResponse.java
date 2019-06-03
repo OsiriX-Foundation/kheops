@@ -22,19 +22,28 @@ public class ConfigurationResponse {
     private String returnUri;
     @XmlElement(name = "dicomweb_endpoint")
     private String dicomwebEndpoint;
-    @XmlElement(name = "wado_endpoint")
+    @XmlElement(name = "dicomweb_uri_endpoint")
     private String wadoEndpoint;
     @XmlElement(name = "token_endpoint")
     private String tokenEndpoint;
-    @XmlElement(name = "introspect_uri")
+    @XmlElement(name = "introspection_endpoint")
     private String introspectUri;
     @XmlElement(name = "userinfo_endpoint")
     private String userInfoEndpoint;
-    @XmlElement(name = "jwks_uri")
-    private String jwksUri;
+//    @XmlElement(name = "jwks_uri")
+//    private String jwksUri;
+    @XmlElement(name = "grant_types_supported")
+    private String grantTypesSupported = "authorization_code";
+    @XmlElement(name = "token_endpoint_auth_methods_supported")
+    private String tokenEndpointAuthMethodsSupported = "private_key_jwt";
+    @XmlElement(name = "token_endpoint_auth_signing_alg_values_supported")
+    private String tokenEndpointAuthSigningAlgValuesSupported = "RS256";
+    @XmlElement(name = "introspection_endpoint_auth_methods_supported")
+    private String introspectionEndpointAuthMethodsSupported = "private_key_jwt";
+    @XmlElement(name = "introspection_endpoint_auth_signing_alg_values_supported")
+    private String introspectionEndpointAuthSigningAlgValuesSupported = "RS256";
 
-
-    private ConfigurationResponse() { /*empty*/ }
+    public ConfigurationResponse() { /*empty*/ }
 
     public ConfigurationResponse(String clientId, String kheopsRootUri)
             throws ClientIdNotFoundException {
@@ -60,7 +69,7 @@ public class ConfigurationResponse {
         issuer = kheopsRootUri;
         returnUri = kheopsRootUri + "/albums/" + albumId;
         dicomwebEndpoint = kheopsRootUri + "/api";
-        wadoEndpoint = kheopsRootUri + "/api";
+        wadoEndpoint = kheopsRootUri + "/api/wado";
         tokenEndpoint = kheopsRootUri + "/api/token";
         introspectUri = kheopsRootUri + "/api/token/introspect";
         userInfoEndpoint = kheopsRootUri + "/api/userinfo";
