@@ -227,7 +227,7 @@ public class ReportProviderResource {
 
             final String reportProviderUrl = reportProviderUrlBuilder.toString();
 
-            return Response.status(FOUND).header("Location", reportProviderUrl).build();
+            return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
         } catch (ReportProviderUriNotValidException e) {
             return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
         } catch (UnsupportedEncodingException e) {
