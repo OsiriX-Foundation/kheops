@@ -48,7 +48,7 @@ filebeat.inputs:
 - type: log
   enable: true
   paths:
-    - /var/log/nginx/error.logcat err 
+    - /var/log/nginx/error.log
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
