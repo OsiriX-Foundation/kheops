@@ -18,6 +18,7 @@ import online.kheops.auth_server.util.Consts;
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +37,11 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     private final KheopsPrincipalInterface kheopsPrincipal;
 
 
-    public ViewerPrincipal(JsonObject jwe) {
+    public ViewerPrincipal(ServletContext servletContext, JsonObject jwe) {
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(jwe.getString(Consts.JWE.TOKEN));
+            assertion = AssertionVerifier.createAssertion(servletContext, jwe.getString(Consts.JWE.TOKEN));
         } catch (BadAssertionException e) {
             throw new IllegalStateException(e);
         }
@@ -51,10 +52,11 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         } catch (UserNotFoundException e) {
             throw new IllegalStateException(e);
         }
-        kheopsPrincipal = assertion.newPrincipal(user);
+        kheopsPrincipal = assertion.newPrincipal(servletContext, user);
 
         this.jwe = jwe;
     }
+
     @Override
     public long getDBID() {
         return kheopsPrincipal.getDBID();
@@ -204,7 +206,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public Optional<List<String>> getStudyList() {
-        final List<String> studyList = new ArrayList();
+        final List<String> studyList = new ArrayList<>();
         studyList.add(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID));
         return Optional.of(studyList);
     }

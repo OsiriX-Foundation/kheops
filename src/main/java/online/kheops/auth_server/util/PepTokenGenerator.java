@@ -59,7 +59,7 @@ public class PepTokenGenerator {
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(Objects.requireNonNull(token));
+            assertion = AssertionVerifier.createAssertion(context, Objects.requireNonNull(token));
         } catch (BadAssertionException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
@@ -79,7 +79,7 @@ public class PepTokenGenerator {
         }
 
         try {
-            final KheopsPrincipalInterface principal = assertion.newPrincipal(callingUser);
+            final KheopsPrincipalInterface principal = assertion.newPrincipal(context, callingUser);
             if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 throw new SeriesNotFoundException("");
             }

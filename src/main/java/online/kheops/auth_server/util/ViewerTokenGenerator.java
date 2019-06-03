@@ -8,6 +8,7 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.lang.JoseException;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
@@ -25,10 +26,16 @@ import static online.kheops.auth_server.util.Consts.INBOX;
 public class ViewerTokenGenerator {
     private static final Logger LOG = Logger.getLogger(ViewerTokenGenerator.class.getName());
 
+    private final ServletContext servletContext;
+
     private String token;
     private String studyInstanceUID;
     private String sourceType;
     private String sourceId;
+
+    private ViewerTokenGenerator(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
 
     public ViewerTokenGenerator withToken(final String token) {
         this.token = Objects.requireNonNull(token);
@@ -50,8 +57,8 @@ public class ViewerTokenGenerator {
         return this;
     }
 
-    public static ViewerTokenGenerator createGenerator() {
-        return new ViewerTokenGenerator();
+    public static ViewerTokenGenerator createGenerator(ServletContext servletContext) {
+        return new ViewerTokenGenerator(servletContext);
     }
 
     @SuppressWarnings("unchecked")
@@ -71,7 +78,7 @@ public class ViewerTokenGenerator {
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(token);
+            assertion = AssertionVerifier.createAssertion(servletContext, token);
         } catch (BadAssertionException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
