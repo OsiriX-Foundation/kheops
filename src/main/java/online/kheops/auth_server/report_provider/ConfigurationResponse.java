@@ -8,6 +8,9 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.util.Collections;
+import java.util.List;
+
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 
 public class ConfigurationResponse {
@@ -33,15 +36,20 @@ public class ConfigurationResponse {
 //    @XmlElement(name = "jwks_uri")
 //    private String jwksUri;
     @XmlElement(name = "grant_types_supported")
-    private String grantTypesSupported = "authorization_code";
+    private List<String> grantTypesSupported = Collections.singletonList("authorization_code");
     @XmlElement(name = "token_endpoint_auth_methods_supported")
-    private String tokenEndpointAuthMethodsSupported = "private_key_jwt";
+    private List<String> tokenEndpointAuthMethodsSupported = Collections.singletonList("private_key_jwt");
     @XmlElement(name = "token_endpoint_auth_signing_alg_values_supported")
-    private String tokenEndpointAuthSigningAlgValuesSupported = "RS256";
+    private List<String> tokenEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
     @XmlElement(name = "introspection_endpoint_auth_methods_supported")
-    private String introspectionEndpointAuthMethodsSupported = "private_key_jwt";
+    private List<String> introspectionEndpointAuthMethodsSupported = Collections.singletonList("private_key_jwt");
     @XmlElement(name = "introspection_endpoint_auth_signing_alg_values_supported")
-    private String introspectionEndpointAuthSigningAlgValuesSupported = "RS256";
+    private List<String> introspectionEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
+
+    @XmlElement(name = "response_types_supported")
+    private List<String> responseTypesSupported = Collections.singletonList("code");
+    @XmlElement(name = "response_modes_supported")
+    private List<String> responseModes_Supported = Collections.singletonList("query");
 
     public ConfigurationResponse() { /*empty*/ }
 
