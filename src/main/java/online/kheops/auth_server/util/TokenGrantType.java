@@ -123,7 +123,7 @@ public enum TokenGrantType {
                     sourceId = null;
                 }
 
-                String viewerToken = ViewerTokenGenerator.createGenerator()
+                String viewerToken = ViewerTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSourceType(sourceType)

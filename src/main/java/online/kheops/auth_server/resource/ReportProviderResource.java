@@ -117,10 +117,7 @@ public class ReportProviderResource {
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(accessToken, UNKNOWN_BEARER_URN);
-        } catch (UnknownGrantTypeException e) {
-            LOG.log(Level.WARNING, "Unknown grant type", e);
-            return Response.status(BAD_REQUEST).entity("error with the grant_type param").build();
+            assertion = AssertionVerifier.createAssertion(context, accessToken);
         } catch (BadAssertionException e) {
             LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
@@ -152,7 +149,7 @@ public class ReportProviderResource {
         }
 
         //vérifier l'acces a l'album
-        final KheopsPrincipalInterface principal = assertion.newPrincipal(callingUser);
+        final KheopsPrincipalInterface principal = assertion.newPrincipal(context, callingUser);
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -227,7 +224,7 @@ public class ReportProviderResource {
 
             final String reportProviderUrl = reportProviderUrlBuilder.toString();
 
-            return Response.status(FOUND).header("Location", reportProviderUrl).build();
+            return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
         } catch (ReportProviderUriNotValidException e) {
             return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
         } catch (UnsupportedEncodingException e) {

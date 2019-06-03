@@ -106,7 +106,7 @@ public class TokenResource
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(assertionToken);
+            assertion = AssertionVerifier.createAssertion(context, assertionToken);
         } catch (BadAssertionException e) {
             LOG.log(WARNING, "Error validating a token", e);
             return Response.status(OK).entity(errorIntrospectResponse).build();

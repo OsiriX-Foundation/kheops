@@ -14,7 +14,6 @@ import java.util.Objects;
 final class AuthorizationJWTAssertion implements Assertion {
 
     private final String sub;
-    private final String email;
     private final boolean capabilityAccess;
 
     static final class Builder {
@@ -42,7 +41,7 @@ final class AuthorizationJWTAssertion implements Assertion {
                 if (capabilityClaim != null) {
                     capabilityBoolean = capabilityClaim;
                 }
-                return new AuthorizationJWTAssertion(jwt.getSubject(), user.getEmail(), capabilityBoolean);
+                return new AuthorizationJWTAssertion(jwt.getSubject(), capabilityBoolean);
 
             } catch (JWTVerificationException | UnsupportedEncodingException e) {
                 throw new BadAssertionException("Verification of the access token failed", e);
@@ -50,9 +49,8 @@ final class AuthorizationJWTAssertion implements Assertion {
         }
     }
 
-    private AuthorizationJWTAssertion(String sub, String email, boolean capabilityAccess) {
+    private AuthorizationJWTAssertion(String sub, boolean capabilityAccess) {
         this.sub = sub;
-        this.email = email;
         this.capabilityAccess = capabilityAccess;
     }
 
@@ -63,11 +61,6 @@ final class AuthorizationJWTAssertion implements Assertion {
     @Override
     public String getSub() {
         return sub;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
     }
 
     @Override

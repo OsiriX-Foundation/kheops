@@ -11,7 +11,6 @@ import java.util.Objects;
 
 final class SuperuserJWTAssertion implements Assertion {
     private final String sub;
-    private final String email;
 
     static class Builder {
         private final String superuserSecret;
@@ -43,12 +42,7 @@ final class SuperuserJWTAssertion implements Assertion {
                 throw new BadAssertionException("Missing sub claim in token.");
             }
 
-            final Claim emailClaim = jwt.getClaim("email");
-            if (emailClaim.isNull()) {
-                throw new BadAssertionException("Missing email claim in token");
-            }
-
-            return new SuperuserJWTAssertion(jwt.getSubject(), emailClaim.asString());
+            return new SuperuserJWTAssertion(jwt.getSubject());
         }
     }
 
@@ -56,19 +50,13 @@ final class SuperuserJWTAssertion implements Assertion {
         return new Builder(superuserSecret);
     }
 
-    private SuperuserJWTAssertion(String sub, String email) {
+    private SuperuserJWTAssertion(String sub) {
         this.sub = Objects.requireNonNull(sub);
-        this.email = Objects.requireNonNull(email);
     }
 
     @Override
     public String getSub() {
         return sub;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
     }
 
     @Override

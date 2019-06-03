@@ -7,12 +7,13 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.lang.JoseException;
 
+import javax.servlet.ServletContext;
+
 final class ViewerAssertionBuilder implements AssertionBuilder {
+    private final ServletContext servletContext;
 
-    private final String authorizationSecret;
-
-    ViewerAssertionBuilder(String authorizationSecret) {
-        this.authorizationSecret = authorizationSecret;
+    ViewerAssertionBuilder(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     @Override
@@ -28,7 +29,7 @@ final class ViewerAssertionBuilder implements AssertionBuilder {
 
             jwe.setCompactSerialization(assertionToken);
 
-            return ViewerAssertion.getBuilder().build(jwe.getPayload());
+            return ViewerAssertion.getBuilder(servletContext).build(jwe.getPayload());
         } catch (JoseException e) {
             throw new BadAssertionException("Unable to decode JWT", e);
         }

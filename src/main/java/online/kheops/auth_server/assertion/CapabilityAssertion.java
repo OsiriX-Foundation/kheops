@@ -14,7 +14,6 @@ import java.util.Optional;
 
 final class CapabilityAssertion implements Assertion {
     private final String sub;
-    private final String email;
     private static final Builder BUILDER = new Builder();
     private Capability capability;
 
@@ -34,13 +33,12 @@ final class CapabilityAssertion implements Assertion {
                 capability.isValid();
 
                 final String sub = capability.getUser().getKeycloakId();
-                final String email = capability.getUser().getEmail();
 
                 capability.setLastUsed();
 
                 tx.commit();
 
-                return new CapabilityAssertion(capability, sub, email);
+                return new CapabilityAssertion(capability, sub);
             } catch (CapabilityNotFoundException e) {
                 throw new BadAssertionException("Unknown capability token");
             } catch (CapabilityNotValidException e) {
@@ -58,20 +56,14 @@ final class CapabilityAssertion implements Assertion {
         return BUILDER;
     }
 
-    private CapabilityAssertion(Capability capability, String sub, String email) {
+    private CapabilityAssertion(Capability capability, String sub) {
         this.capability = Objects.requireNonNull(capability);
         this.sub = Objects.requireNonNull(sub);
-        this.email = Objects.requireNonNull(email);
     }
 
     @Override
     public String getSub() {
         return sub;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
     }
 
     @Override

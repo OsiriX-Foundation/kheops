@@ -9,9 +9,11 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.annotation.Priority;
+import javax.servlet.ServletContext;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -31,6 +33,9 @@ import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
 public class SecuredFilter implements ContainerRequestFilter {
     private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
 
+    @Context
+    ServletContext servletContext;
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
@@ -46,7 +51,7 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final Assertion assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(token);
+            assertion = AssertionVerifier.createAssertion(servletContext, token);
         } catch (BadAssertionException e) {
             LOG.log(Level.WARNING, "Received bad assertion" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
@@ -69,7 +74,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public KheopsPrincipalInterface getUserPrincipal() {
-                return assertion.newPrincipal(finalUser);
+                return assertion.newPrincipal(servletContext, finalUser);
             }
 
             @Override

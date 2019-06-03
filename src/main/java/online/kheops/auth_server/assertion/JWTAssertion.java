@@ -26,7 +26,6 @@ final class JWTAssertion implements Assertion {
         String jwksURI;
     }
 
-    private final String email;
     private final String sub;
 
 
@@ -78,12 +77,8 @@ final class JWTAssertion implements Assertion {
             if (jwt.getSubject() == null) {
                 throw new BadAssertionException("No subject present in the token, configuration URL:" + configurationUrl);
             }
-            final Claim emailClaim = jwt.getClaim("email");
-            if (emailClaim.isNull()) {
-                throw new BadAssertionException("No email present in the token, configuration URL:" + configurationUrl);
-            }
 
-            return new JWTAssertion(jwt.getSubject(), emailClaim.asString());
+            return new JWTAssertion(jwt.getSubject());
         }
     }
 
@@ -91,14 +86,8 @@ final class JWTAssertion implements Assertion {
         return new Builder(configurationUrl);
     }
 
-    private JWTAssertion(String sub, String email) {
+    private JWTAssertion(String sub) {
         this.sub = sub;
-        this.email = email;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
     }
 
     @Override
