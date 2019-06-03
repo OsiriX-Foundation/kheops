@@ -55,7 +55,7 @@ filebeat.inputs:
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
-  multiline.pattern: ^%{YEAR}/%{MONTHNUM}/%{MONTHDAY}
+  multiline.pattern: ^[0-9]{4}/[0-9]{2}/[0-9]{2}
 
   # Defines if the pattern set under pattern should be negated or not. Default is false.
   multiline.negate: true
