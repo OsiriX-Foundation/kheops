@@ -48,7 +48,7 @@ final class JWTAssertionBuilder implements AssertionBuilder {
                 if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
                     return JWTAssertion.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
                 } else if (issuer.equals(issuerHost)) {
-                    return JWTAssertion.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
+                    return ReportProviderAssertion.getBuilder(servletContext).build(assertionToken);
                 } else {
                     throw new BadAssertionException("Unknown JWT Issuer:" + issuer);
                 }
