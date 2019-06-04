@@ -73,7 +73,7 @@ public class TokenResource
         try {
             grantType = TokenGrantType.fromString(form.getFirst("grant_type"));
         } catch (IllegalArgumentException e) {
-            throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE, "Missing or duplicate grant_type");
+            throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
 
         try {

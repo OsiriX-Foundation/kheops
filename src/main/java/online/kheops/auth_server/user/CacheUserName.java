@@ -8,9 +8,7 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 
-
 public class CacheUserName {
-
 
     private static CacheUserName instance = null;
     private static Cache<String, String> userCache;

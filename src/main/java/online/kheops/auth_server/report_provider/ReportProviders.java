@@ -103,7 +103,7 @@ public class ReportProviders {
         try {
             configurationUri = new URI(reportProvider.getUrl());
         } catch (URISyntaxException e) {
-            throw new ReportProviderUriNotValidException("Bad configuration URI", e);
+            throw new ReportProviderUriNotValidException("Unable to get issuer from the report provider configuration URL", e);
         }
 
 //        if (!configurationUri.getScheme().equals("https") && !configurationUri.getHost().equals("localhost")) {

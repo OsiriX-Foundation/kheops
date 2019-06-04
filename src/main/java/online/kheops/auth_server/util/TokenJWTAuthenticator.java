@@ -103,7 +103,7 @@ public class TokenJWTAuthenticator {
                     .withAudience(getAudienceHost())
                     .build().verify(clientJWT);
         } catch (JWTVerificationException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Unable to verify the JWT", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to verify the JWT. " + e.getMessage() , e);
         }
 
         return new TokenPrincipal() {
@@ -153,7 +153,9 @@ public class TokenJWTAuthenticator {
         try {
             JwkProvider provider = new UrlJwkProvider(getJWKSUri().toURL());
             return (RSAPublicKey) provider.get(getKeyId()).getPublicKey();
-        } catch (JwkException | MalformedURLException | IllegalArgumentException e) {
+        } catch (JwkException e) {
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to get public key." + e.getMessage(), e);
+        } catch (MalformedURLException | IllegalArgumentException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
         }
     }
@@ -166,7 +168,7 @@ public class TokenJWTAuthenticator {
         } catch (ClientIdNotFoundException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Unknown clientID", e);
         } catch (ReportProviderUriNotValidException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Configuration URI not valid", e);
         }
     }
 
@@ -183,7 +185,7 @@ public class TokenJWTAuthenticator {
         } catch (ClientIdNotFoundException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Unknown clientID", e);
         } catch (URISyntaxException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI Syntax", e);
         }
 
 //        if (!configurationUri.getScheme().equals("https") && !configurationUri.getHost().equals("localhost")) {
