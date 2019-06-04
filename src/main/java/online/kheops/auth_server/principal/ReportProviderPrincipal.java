@@ -97,7 +97,7 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         try {
             tx.begin();
 
-            if (canAccessStudy(album, studyInstanceUID)) {
+            if (!canAccessStudy(album, studyInstanceUID)) {
                 return false;
             }
 
