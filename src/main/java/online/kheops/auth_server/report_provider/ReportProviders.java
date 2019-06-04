@@ -25,14 +25,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.event.Events.reportProviderMutation;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.*;
 
 public class ReportProviders {
-
 
     private ReportProviders() {
         throw new IllegalStateException("Utility class");
@@ -133,7 +131,10 @@ public class ReportProviders {
                 String output = response.readEntity(String.class);
                 try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
                     final JsonObject reply = jsonReader.readObject();
-                    return reply.containsKey("redirect_uri") && reply.containsKey("token_endpoint_auth_method") && reply.containsKey("jwks_uri");
+                    return reply.containsKey("redirect_uri")
+                            && reply.containsKey("token_endpoint_auth_method")
+                            && reply.containsKey("token_endpoint_auth_signing_alg")
+                            && reply.containsKey("jwks_uri");
                 }
             }
             return false;

@@ -8,17 +8,22 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonReader;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Keycloak {
+
+    private static final Client CLIENT = ClientBuilder.newClient();
 
     private static final String usersPath = "/users";
 
@@ -32,6 +37,39 @@ public class Keycloak {
 
     private static CacheUserName cacheUserName;
 
+    public static class UserRepresentation {
+        @XmlElement(name = "email")
+        private String email;
+        @XmlElement(name = "firstName")
+        private String firstName;
+        @XmlElement(name = "lastName")
+        private String lastName;
+        @XmlElement(name = "username")
+        private String username;
+        @XmlElement(name = "id")
+        private String id;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getId() {
+            return id;
+        }
+    }
+
     private Keycloak() throws KeycloakException{
         usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
         token = KeycloakToken.getInstance();
@@ -43,6 +81,18 @@ public class Keycloak {
             instance = new Keycloak();
         }
         return instance;
+    }
+
+    public UserRepresentation getUserRepresentation(String sub) throws UserNotFoundException, KeycloakException {
+        final URI userUri = UriBuilder.fromUri(usersUri).path("/" + sub).build();
+        try {
+            return CLIENT.target(userUri)
+                    .request()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken())
+                    .get(UserRepresentation.class);
+        } catch (ProcessingException | WebApplicationException e) {
+            throw new UserNotFoundException("unable to find the userinfo", e);
+        }
     }
 
     public UserResponseBuilder getUser(String user)
