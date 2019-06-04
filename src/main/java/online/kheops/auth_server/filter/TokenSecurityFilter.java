@@ -18,8 +18,6 @@ import java.security.Principal;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_CLIENT;
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
 
 @TokenSecurity
 @Provider
