@@ -10,6 +10,8 @@ import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+
 public class AuthorizationCodeValidator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
@@ -30,7 +32,7 @@ public class AuthorizationCodeValidator {
         return this;
     }
 
-    public DecodedAuthorizationCode validate(final String authorizationCode) throws TokenAuthenticationException {
+    public DecodedAuthorizationCode validate(final String authorizationCode) {
         final DecodedJWT jwt;
         try {
             jwt = JWT.require(Algorithm.HMAC256(getHMAC256Secret()))
@@ -41,27 +43,27 @@ public class AuthorizationCodeValidator {
                     .build()
                     .verify(authorizationCode);
         } catch (JWTVerificationException | UnsupportedEncodingException e) {
-            throw new TokenAuthenticationException("Unable to validate the authorization code", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to validate the authorization code", e);
         }
 
         final List<String> studyUIs;
         try {
             studyUIs = jwt.getClaim("study_uids").asList(String.class);
         } catch (JWTDecodeException e) {
-            throw new TokenAuthenticationException("can't read study UIDs", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Can't read study UIDs", e);
         }
         if (studyUIs == null) {
-            throw new TokenAuthenticationException("can't find study UIDs");
+            throw new TokenRequestException(INVALID_REQUEST, "Can't find study UIDs");
         }
 
         final String subject;
         try {
             subject = jwt.getSubject();
         } catch (JWTDecodeException e) {
-            throw new TokenAuthenticationException("can't read Subject", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Can't read subject", e);
         }
         if (subject == null) {
-            throw new TokenAuthenticationException("can't find Subject");
+            throw new TokenRequestException(INVALID_REQUEST, "Can't find subject");
         }
 
         return DecodedAuthorizationCode.createDecodedAuthorizationCode(subject, new HashSet<>(studyUIs));

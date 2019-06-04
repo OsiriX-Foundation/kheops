@@ -10,7 +10,6 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponseBuilder;
-import online.kheops.auth_server.user.Users;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -29,6 +28,32 @@ import static online.kheops.auth_server.util.Consts.ALBUM;
 @Path("/")
 public class UserResource {
     private static final Logger LOG = Logger.getLogger(UserResource.class.getName());
+
+    private static class OIDCUserInfo {
+        @XmlElement(name = "sub")
+        public String sub;
+        @XmlElement(name = "name")
+        public String name;
+        @XmlElement(name = "given_name")
+        public String givenName;
+        @XmlElement(name = "family_name")
+        public String familyName;
+        @XmlElement(name = "email")
+        public String email;
+        @XmlElement(name = "preferred_username")
+        public String preferredUsername;
+
+        private static OIDCUserInfo from(Keycloak.UserRepresentation userRepresentation) {
+            OIDCUserInfo userInfo = new OIDCUserInfo();
+            userInfo.sub = userRepresentation.getId();
+            userInfo.name = userRepresentation.getFirstName() + " " + userRepresentation.getLastName();
+            userInfo.givenName = userRepresentation.getFirstName();
+            userInfo.familyName = userRepresentation.getLastName();
+            userInfo.email = userRepresentation.getEmail();
+            userInfo.preferredUsername = userRepresentation.getUsername();
+            return userInfo;
+        }
+    }
 
     @Context
     private UriInfo uriInfo;
@@ -75,17 +100,10 @@ public class UserResource {
         }
     }
 
-    private static class OIDCUserInfoResponse {
-        @XmlElement(name = "sub")
-        String sub;
-        @XmlElement(name = "email")
-        String email;
-    }
-
     @GET
     @Path("userinfo")
     @Produces(MediaType.APPLICATION_JSON)
-    public OIDCUserInfoResponse getOIDCUserinfo(@HeaderParam(AUTHORIZATION) String authorizationHeader) {
+    public OIDCUserInfo getOIDCUserInfo(@HeaderParam(AUTHORIZATION) String authorizationHeader) {
 
         final String token;
         if (authorizationHeader.toUpperCase().startsWith("BEARER ")) {
@@ -108,15 +126,11 @@ public class UserResource {
             throw new ForbiddenException("Can only get userinfo for report provider tokens");
         }
 
-        final OIDCUserInfoResponse userInfo = new OIDCUserInfoResponse();
         try {
-            userInfo.sub = assertion.getSub();
-            userInfo.email = Users.getOrCreateUser(assertion.getSub()).getEmail();
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.INFO, "unknown sub", e);
-            throw new InternalServerErrorException(e);
+            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(assertion.getSub()));
+        } catch (UserNotFoundException | KeycloakException e) {
+            LOG.log(Level.INFO, "Unable to get the user info", e);
+            throw new ServerErrorException("Unable to get the user info", BAD_GATEWAY, e);
         }
-
-        return userInfo;
     }
 }

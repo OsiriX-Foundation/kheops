@@ -8,10 +8,13 @@ import online.kheops.auth_server.report_provider.ReportProviderUriNotValidExcept
 import online.kheops.auth_server.report_provider.ReportProviders;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.InternalServerErrorException;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
 
 public class ReportProviderTokenGenerator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
@@ -47,7 +50,7 @@ public class ReportProviderTokenGenerator {
         return this;
     }
 
-    public String generate(long expiresIn) throws TokenAuthenticationException {
+    public String generate(long expiresIn) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(getHMAC256Secret());
             return JWT.create()
@@ -63,7 +66,7 @@ public class ReportProviderTokenGenerator {
                     .withArrayClaim("study_uids", studyInstanceUIDs.toArray(new String[0]))
                     .sign(algorithm);
         } catch (JWTCreationException | UnsupportedEncodingException e) {
-            throw new TokenAuthenticationException("Error signing the token", e);
+            throw new InternalServerErrorException("Error signing the token", e);
         }
     }
 
@@ -83,15 +86,15 @@ public class ReportProviderTokenGenerator {
         return context.getInitParameter(HMAC_SECRET_PARAMETER);
     }
 
-    private String getConfigurationIssuer() throws TokenAuthenticationException {
+    private String getConfigurationIssuer() {
         Objects.requireNonNull(clientId);
 
         try {
             return ReportProviders.getConfigIssuer(ReportProviders.getReportProvider(clientId));
         } catch (ClientIdNotFoundException e) {
-            throw new TokenAuthenticationException("Unknown client id", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unknown client id", e);
         } catch (ReportProviderUriNotValidException e) {
-            throw new TokenAuthenticationException("Bad ", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Bad report provider configuration uri", e);
         }
     }
 }

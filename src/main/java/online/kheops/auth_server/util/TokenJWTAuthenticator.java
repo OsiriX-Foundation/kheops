@@ -29,6 +29,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
 
+import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+
 public class TokenJWTAuthenticator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String RS256 = "RS256";
@@ -57,19 +59,19 @@ public class TokenJWTAuthenticator {
         return this;
     }
 
-    public TokenJWTAuthenticator clientJWT(final String clientJWT) throws TokenAuthenticationException {
+    public TokenJWTAuthenticator clientJWT(final String clientJWT) {
         this.clientJWT = Objects.requireNonNull(clientJWT);
 
         try {
             decodedJWT = JWT.decode(clientJWT);
         } catch (JWTDecodeException e) {
-            throw new TokenAuthenticationException("Unable to decode the JWT");
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to decode client_assertion JWT");
         }
 
         return this;
     }
 
-    public TokenPrincipal authenticate() throws TokenAuthenticationException {
+    public TokenPrincipal authenticate() {
         Objects.requireNonNull(clientId);
         Objects.requireNonNull(clientJWT);
         Objects.requireNonNull(decodedJWT);
@@ -101,7 +103,7 @@ public class TokenJWTAuthenticator {
                     .withAudience(getAudienceHost())
                     .build().verify(clientJWT);
         } catch (JWTVerificationException e) {
-            throw new TokenAuthenticationException("Unable to verify the JWT", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to verify the JWT", e);
         }
 
         return new TokenPrincipal() {
@@ -117,28 +119,28 @@ public class TokenJWTAuthenticator {
         };
     }
 
-    private void basicValidation() throws TokenAuthenticationException {
+    private void basicValidation() {
         Objects.requireNonNull(decodedJWT);
 
         if (!decodedJWT.getAlgorithm().equals(RS256)) {
-            throw new TokenAuthenticationException("Unknown JWT signing algorithm: " + decodedJWT.getAlgorithm());
+            throw new TokenRequestException(INVALID_REQUEST, "Unknown JWT signing algorithm: " + decodedJWT.getAlgorithm());
         }
 
         if (decodedJWT.getId() == null) {
-            throw new TokenAuthenticationException("Token id (jti) claim is required");
+            throw new TokenRequestException(INVALID_REQUEST, "Token id (jti) claim is required");
         }
 
         if (decodedJWT.getKeyId() == null) {
-            throw new TokenAuthenticationException("Token id (kid) header is required");
+            throw new TokenRequestException(INVALID_REQUEST, "Token id (kid) header is required");
         }
 
         Date expDate = decodedJWT.getExpiresAt();
         if (expDate == null) {
-            throw new TokenAuthenticationException("Expiration date (exp) claim is required");
+            throw new TokenRequestException(INVALID_REQUEST, "Expiration date (exp) claim is required");
         }
 
         if (expDate.after(Date.from(Instant.now().plus(10, ChronoUnit.MINUTES)))) {
-            throw new TokenAuthenticationException("Expiration date (exp) claim is too far in the future");
+            throw new TokenRequestException(INVALID_REQUEST, "Expiration date (exp) claim is too far in the future");
         }
     }
 
@@ -147,24 +149,24 @@ public class TokenJWTAuthenticator {
         return decodedJWT.getKeyId();
     }
 
-    private RSAPublicKey getPublicKey() throws TokenAuthenticationException {
+    private RSAPublicKey getPublicKey() {
         try {
             JwkProvider provider = new UrlJwkProvider(getJWKSUri().toURL());
             return (RSAPublicKey) provider.get(getKeyId()).getPublicKey();
         } catch (JwkException | MalformedURLException | IllegalArgumentException e) {
-            throw new TokenAuthenticationException("Bad configuration URI", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
         }
     }
 
-    private String getConfigurationIssuer() throws TokenAuthenticationException {
+    private String getConfigurationIssuer() {
         Objects.requireNonNull(clientId);
 
         try {
             return ReportProviders.getConfigIssuer(ReportProviders.getReportProvider(clientId));
         } catch (ClientIdNotFoundException e) {
-            throw new TokenAuthenticationException("Unknown clientID", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unknown clientID", e);
         } catch (ReportProviderUriNotValidException e) {
-            throw new TokenAuthenticationException("Bad configuration URI", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
         }
     }
 
@@ -172,42 +174,42 @@ public class TokenJWTAuthenticator {
         return context.getInitParameter(HOST_ROOT_PARAMETER);
     }
 
-    private URI getConfigurationURI() throws TokenAuthenticationException {
+    private URI getConfigurationURI() {
         Objects.requireNonNull(clientId);
 
         final URI configurationUri;
         try {
             configurationUri = new URI((ReportProviders.getReportProvider(clientId).getUrl()));
         } catch (ClientIdNotFoundException e) {
-            throw new TokenAuthenticationException("Unknown clientID", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unknown clientID", e);
         } catch (URISyntaxException e) {
-            throw new TokenAuthenticationException("Bad configuration URI", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
         }
 
 //        if (!configurationUri.getScheme().equals("https") && !configurationUri.getHost().equals("localhost")) {
-//            throw new TokenAuthenticationException("Non https configuration URIs are only allowed for localhost");
+//            throw new TokenRequestException(INVALID_REQUEST, "Non https jwks URIs are only allowed for localhost");
 //        }
 
         return configurationUri;
     }
 
-    private URI getJWKSUri() throws TokenAuthenticationException {
+    private URI getJWKSUri() {
         final ConfigurationEntity configurationEntity;
         try {
             configurationEntity = CLIENT.target(getConfigurationURI()).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
         } catch (WebApplicationException | ProcessingException e) {
-            throw new TokenAuthenticationException("Unable to obtain the jwks_uri", e);
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to obtain the jwks_uri", e);
         }
 
         final URI jwksUri;
         try {
             jwksUri = new URI(configurationEntity.jwksURI);
         } catch (URISyntaxException e) {
-            throw new TokenAuthenticationException("jwks_uri is not a valid URI", e);
+            throw new TokenRequestException(INVALID_REQUEST, "jwks_uri is not a valid URI", e);
         }
 
 //        if (!jwksUri.getScheme().equals("https") && !jwksUri.getHost().equals("localhost")) {
-//            throw new TokenAuthenticationException("Non https jwks URIs are only allowed for localhost");
+//            throw new TokenRequestException(INVALID_REQUEST, "Non https jwks URIs are only allowed for localhost");
 //        }
 
         return jwksUri;
