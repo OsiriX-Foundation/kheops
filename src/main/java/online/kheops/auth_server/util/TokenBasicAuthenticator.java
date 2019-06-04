@@ -3,6 +3,8 @@ package online.kheops.auth_server.util;
 import javax.servlet.ServletContext;
 import java.util.Objects;
 
+import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_CLIENT;
+
 public final class TokenBasicAuthenticator {
 
     private static final String DICOMWEB_PROXY_CLIENT_ID_PARAMETER = "online.kheops.client.dicomwebproxyclientid";
@@ -57,7 +59,7 @@ public final class TokenBasicAuthenticator {
         return this;
     }
 
-    public TokenPrincipal authenticate() throws TokenAuthenticationException {
+    public TokenPrincipal authenticate() {
         Objects.requireNonNull(clientId);
         Objects.requireNonNull(password);
 
@@ -77,6 +79,6 @@ public final class TokenBasicAuthenticator {
             }
         }
 
-        throw new TokenAuthenticationException("unable to authenticate clientId: " + clientId + " password: " + password); // TODO clean up log
+        throw new TokenRequestException(INVALID_CLIENT, "unable to authenticate clientId: " + clientId);
     }
 }

@@ -8,7 +8,6 @@ import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import online.kheops.auth_server.util.TokenAuthenticationException;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 

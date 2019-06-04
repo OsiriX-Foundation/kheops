@@ -1,16 +1,14 @@
 package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.TokenSecurity;
-import online.kheops.auth_server.util.TokenAuthenticationException;
-import online.kheops.auth_server.util.TokenClientAuthenticationType;
-import online.kheops.auth_server.util.TokenErrorResponse;
-import online.kheops.auth_server.util.TokenPrincipal;
+import online.kheops.auth_server.util.*;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.annotation.Priority;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.*;
@@ -20,9 +18,8 @@ import java.security.Principal;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static online.kheops.auth_server.util.TokenErrorResponse.Error.INVALID_REQUEST;
-import static online.kheops.auth_server.util.TokenErrorResponse.Error.INVALID_CLIENT;
+import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_CLIENT;
+import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
 
 @TokenSecurity
 @Provider
@@ -55,19 +52,17 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
         final TokenClientAuthenticationType authenticationType;
         try {
             authenticationType = TokenClientAuthenticationType.getAuthenticationType(requestHeaders, form);
-        } catch (TokenAuthenticationException e) {
+        } catch (WebApplicationException e) {
             LOG.log(INFO, "Unable to find the authentication type", e);
-            requestContext.abortWith(Response.status(BAD_REQUEST).entity(new TokenErrorResponse(INVALID_REQUEST, e.getMessage())).build());
-            return;
+            throw e;
         }
 
         final TokenPrincipal principal;
         try {
             principal = authenticationType.authenticate(servletContext, requestHeaders, form);
-        } catch (TokenAuthenticationException e) {
+        } catch (WebApplicationException e) {
             LOG.log(INFO, "Unable to authenticate the client", e);
-            requestContext.abortWith(Response.status(BAD_REQUEST).entity(new TokenErrorResponse(INVALID_CLIENT, e.getMessage())).build());
-            return;
+            throw e;
         }
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();

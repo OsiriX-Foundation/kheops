@@ -30,24 +30,16 @@ public enum TokenGrantType {
             }
 
             final DecodedAuthorizationCode authorizationCode;
-            try {
-                authorizationCode = AuthorizationCodeValidator.createAuthorizer(servletContext)
-                        .withClientId(clientId)
-                        .validate(code);
-            } catch (TokenAuthenticationException e) {
-                throw new TokenRequestException(UNAUTHORIZED_CLIENT, e);
-            }
+            authorizationCode = AuthorizationCodeValidator.createAuthorizer(servletContext)
+                    .withClientId(clientId)
+                    .validate(code);
 
             final String token;
-            try {
-                token = ReportProviderTokenGenerator.createGenerator(servletContext)
-                        .withSubject(authorizationCode.getSubject())
-                        .withClientId(clientId)
-                        .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
-                        .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
-            } catch (TokenAuthenticationException e) {
-                throw new TokenRequestException(UNAUTHORIZED_CLIENT, e.getMessage(), e);
-            }
+            token = ReportProviderTokenGenerator.createGenerator(servletContext)
+                    .withSubject(authorizationCode.getSubject())
+                    .withClientId(clientId)
+                    .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
+                    .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
 
             return Response.ok(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME)).build();
         }
