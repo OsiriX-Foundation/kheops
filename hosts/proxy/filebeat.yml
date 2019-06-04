@@ -26,7 +26,7 @@ filebeat.inputs:
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
-    - /var/log/nginx/access.log
+    - /var/nginx/access.log
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
@@ -49,7 +49,7 @@ filebeat.inputs:
 - type: log
   enable: true
   paths:
-    - /var/log/nginx/error.log
+    - /var/nginx/error.log
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
