@@ -6,15 +6,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import java.util.logging.Logger;
 
-import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 public enum TokenClientAuthenticationType {
 
     CLIENT_SECRET_BASIC("client_secret_basic") {
-        public TokenPrincipal authenticatePrincipal(ServletContext context, MultivaluedMap<String, String> headers, Form form)
+        public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form)
                 throws TokenAuthenticationException {
             final String encodedAuthorization = headers.getFirst(AUTHORIZATION).substring(6);
 
@@ -36,8 +34,8 @@ public enum TokenClientAuthenticationType {
         }
     },
 
-    PRIVATE_KEY_JWT("private_key_jwt") {
-        public TokenPrincipal authenticatePrincipal(ServletContext context, MultivaluedMap<String, String> headers, Form form)
+    KHEOPS_PRIVATE_KEY_JWT("kheops_private_key_jwt") {
+        public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form)
                 throws TokenAuthenticationException {
             MultivaluedMap<String, String> formParams = form.asMap();
 
@@ -57,12 +55,10 @@ public enum TokenClientAuthenticationType {
     },
 
     PUBLIC("public") {
-        public TokenPrincipal authenticatePrincipal(ServletContext context, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form) {
             return PUBLIC_PRINCIPAL;
         }
     };
-
-    private static final Logger LOG = Logger.getLogger(TokenClientAuthenticationType.class.getName());
 
     private static final String CLIENT_ASSERTION_TYPE = "client_assertion_type";
     private static final String CLIENT_ASSERTION = "client_assertion";
@@ -124,15 +120,15 @@ public enum TokenClientAuthenticationType {
 
             if (clientAssertionTypes == null || clientAssertions == null ||
                     clientAssertionTypes.size() != 1 || clientAssertions.size() != 1) {
-                throw new TokenAuthenticationException("Only one client assertion can be present");
+                throw new TokenAuthenticationException("Only one client_assertion can be present");
             }
             if (!clientAssertionTypes.get(0).equals(JWT_BEARER_URN)) {
-                throw new TokenAuthenticationException("Unknown client assertion type");
+                throw new TokenAuthenticationException("Unknown client_assertion_type");
             }
             if (clientAssertions.get(0).startsWith("eyJ")) {
-                return TokenClientAuthenticationType.PRIVATE_KEY_JWT;
+                return TokenClientAuthenticationType.KHEOPS_PRIVATE_KEY_JWT;
             } else {
-                throw new TokenAuthenticationException("Malformed client Assertion");
+                throw new TokenAuthenticationException("Malformed client_assertion");
             }
         }
 
@@ -147,5 +143,5 @@ public enum TokenClientAuthenticationType {
         }
     }
 
-    public abstract TokenPrincipal authenticatePrincipal(ServletContext context, MultivaluedMap<String, String> headers, Form form) throws TokenAuthenticationException;
+    public abstract TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form) throws TokenAuthenticationException;
 }

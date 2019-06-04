@@ -63,7 +63,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
 
         final TokenPrincipal principal;
         try {
-            principal = authenticationType.authenticatePrincipal(servletContext, requestHeaders, form);
+            principal = authenticationType.authenticate(servletContext, requestHeaders, form);
         } catch (TokenAuthenticationException e) {
             LOG.log(INFO, "Unable to authenticate the client", e);
             requestContext.abortWith(Response.status(BAD_REQUEST).entity(new TokenErrorResponse(INVALID_CLIENT, e.getMessage())).build());

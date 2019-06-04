@@ -38,11 +38,11 @@ public class ConfigurationResponse {
     @XmlElement(name = "grant_types_supported")
     private List<String> grantTypesSupported = Collections.singletonList("authorization_code");
     @XmlElement(name = "token_endpoint_auth_methods_supported")
-    private List<String> tokenEndpointAuthMethodsSupported = Collections.singletonList("private_key_jwt");
+    private List<String> tokenEndpointAuthMethodsSupported = Collections.singletonList("kheops_private_key_jwt");
     @XmlElement(name = "token_endpoint_auth_signing_alg_values_supported")
     private List<String> tokenEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
     @XmlElement(name = "introspection_endpoint_auth_methods_supported")
-    private List<String> introspectionEndpointAuthMethodsSupported = Collections.singletonList("private_key_jwt");
+    private List<String> introspectionEndpointAuthMethodsSupported = Collections.singletonList("kheops_private_key_jwt");
     @XmlElement(name = "introspection_endpoint_auth_signing_alg_values_supported")
     private List<String> introspectionEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
 
