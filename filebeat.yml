@@ -27,6 +27,9 @@ filebeat.inputs:
   paths:
     - /var/log/nginx/access.log
     #- c:\programdata\elasticsearch\logs\*
+  fields:
+    docker_type: nginx
+    log_type: access
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
@@ -49,6 +52,9 @@ filebeat.inputs:
   enable: true
   paths:
     - /var/log/nginx/error.log
+  fields:
+    docker_type: nginx
+    log_type: error
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
