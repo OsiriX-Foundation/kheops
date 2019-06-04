@@ -4,6 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
+import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserPermissionEnum;
 
 import javax.persistence.EntityManager;
@@ -15,6 +16,8 @@ import java.util.Optional;
 
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesBySeriesAndAlbumWithSendPermission;
+import static online.kheops.auth_server.series.SeriesQueries.isOrphan;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
 public class ReportProviderPrincipal implements KheopsPrincipalInterface {
@@ -82,7 +85,8 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
     public boolean hasUserAccess() { return false; }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID)
+            throws SeriesNotFoundException {
 
         if (!studyUids.contains(studyInstanceUID)) {
             return false;
@@ -92,12 +96,20 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         this.tx = em.getTransaction();
         try {
             tx.begin();
-            album = em.merge(album);
-            tx.commit();
 
-            if (canAccessStudy(album, studyInstanceUID) && seriesExist(studyInstanceUID, seriesInstanceUID, em)) {
+            if (canAccessStudy(album, studyInstanceUID)) {
                 return false;
-            } else {
+            }
+
+            //find if the series exist
+            try {
+                getSeries(studyInstanceUID, seriesInstanceUID, em);
+            } catch (SeriesNotFoundException e) {
+                return true;
+            }
+
+            // we need to check here if the series that was found is in the right album
+            if(canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em)) {
                 return true;
             }
         } finally {
@@ -106,6 +118,7 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
             }
             em.close();
         }
+        throw new SeriesNotFoundException("SeriesUID : " + seriesInstanceUID + "from studyUID : " + studyInstanceUID + "not found");
     }
 
     @Override
