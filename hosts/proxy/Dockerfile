@@ -64,18 +64,6 @@ WORKDIR $NGINX_PREFIX/
 RUN rm -rf conf/* html/*
 COPY default/nginx $NGINX_PREFIX/
 
-
-#METRICBEAT
-ENV METRICBEAT_VERSION 6.7.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-${METRICBEAT_VERSION}-amd64.deb \
- && dpkg -i metricbeat-${METRICBEAT_VERSION}-amd64.deb \
- && rm metricbeat-${METRICBEAT_VERSION}-amd64.deb
-
-COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
-COPY metricbeat_nginx.yml /etc/metricbeat/modules.d/nginx.yml
-RUN chmod go-w /etc/metricbeat/metricbeat.yml \
- && chmod go-w /etc/metricbeat/modules.d/nginx.yml
-
 #FILEBEAT
 ENV FILEBEAT_VERSION 6.7.1
 RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb \
@@ -83,13 +71,7 @@ RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${
  && rm filebeat-${FILEBEAT_VERSION}-amd64.deb
 
 COPY filebeat.yml /etc/filebeat/filebeat.yml
-COPY filebeat_kheopspepnginx.yml /etc/filebeat/modules.d/kheopspepnginx.yml
-COPY kheopspepnginx /usr/share/filebeat/module/kheopspepnginx
-RUN chmod go-w /etc/filebeat/modules.d/kheopspepnginx.yml \
- && chmod go-w /etc/filebeat/filebeat.yml \
- && chmod go-w /usr/share/filebeat/module/kheopspepnginx/access/manifest.yml \
- && chmod go-w /usr/share/filebeat/module/kheopspepnginx/error/manifest.yml
-
+RUN chmod go-w /etc/filebeat/filebeat.yml
 
 RUN chmod +x $NGINX_PREFIX/script.sh
 

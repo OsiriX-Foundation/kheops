@@ -69,7 +69,7 @@ echo "Ending setup PEP secrets and env var"
 if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
     if [ "$KHEOPS_PEP_ENABLE_ELASTIC" = true ]; then
 
-        echo "Start init metricbeat and filebeat"
+        echo "Start init filebeat"
         missing_env_var_secret=false
 
         #Verify secrets
@@ -86,7 +86,6 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_PEP_ELASTIC_NAME OK"
-           sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
         fi
         if [ -z $KHEOPS_PEP_ELASTIC_TAGS ]; then
@@ -94,7 +93,6 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_PEP_ELASTIC_TAGS OK"
-           sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
         fi
 
@@ -103,7 +101,6 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_PEP_ELASTIC_USER OK"
-           sed -i "s|\${elastic_user}|$KHEOPS_PEP_ELASTIC_USER|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_user}|$KHEOPS_PEP_ELASTIC_USER|" /etc/filebeat/filebeat.yml
         fi
 
@@ -112,7 +109,6 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_PEP_ELASTIC_URL OK"
-           sed -i "s|\${elastic_url}|$KHEOPS_PEP_ELASTIC_URL|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${elastic_url}|$KHEOPS_PEP_ELASTIC_URL|" /etc/filebeat/filebeat.yml
         fi
 
@@ -121,8 +117,15 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
           missing_env_var_secret=true
         else
            echo -e "environment variable KHEOPS_PEP_KIBANA_URL OK"
-           sed -i "s|\${kibana_url}|$KHEOPS_PEP_KIBANA_URL|" /etc/metricbeat/metricbeat.yml
            sed -i "s|\${kibana_url}|$KHEOPS_PEP_KIBANA_URL|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_PEP_ELASTIC_INSTANCE ]]; then
+           echo "Missing KHEOPS_PEP_ELASTIC_INSTANCE environment variable"
+           missing_env_var_secret=true
+        else
+            echo -e "environment variable KHEOPS_PEP_ELASTIC_INSTANCE \e[92mOK\e[0m"
+            sed -i "s|\${instance}|$KHEOPS_PEP_ELASTIC_INSTANCE|" /etc/filebeat/filebeat.yml
         fi
 
 
@@ -133,15 +136,12 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
            echo "all elastic secrets and all env var OK"
         fi
 
-        metricbeat modules disable system
         filebeat modules disable system
 
-        cat /run/secrets/elastic_pwd | metricbeat keystore add ES_PWD --stdin --force
-        service metricbeat restart
         cat /run/secrets/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
         service filebeat restart
 
-        echo "Ending setup METRICBEAT and FILEBEAT"
+        echo "Ending setup FILEBEAT"
     fi
 else
     echo "[INFO] : Missing KHEOPS_PEP_ENABLE_ELASTIC environment variable. Elastic is not enable."
