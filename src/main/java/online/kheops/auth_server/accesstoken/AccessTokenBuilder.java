@@ -16,6 +16,9 @@ abstract class AccessTokenBuilder {
     abstract AccessToken build(String assertionToken) throws BadAccessTokenException;
 
     protected ServletContext getServletContext() {
+        if (servletContext == null) {
+            throw new IllegalStateException("Can't access the servlet context if it was not set in the constructor");
+        }
         return servletContext;
     }
 }
