@@ -6,15 +6,14 @@ import online.kheops.auth_server.keycloak.KeycloakContextListener;
 
 import javax.servlet.ServletContext;
 
-final class JWTAccessTokenBuilder implements AccessTokenBuilder {
+final class JWTAccessTokenBuilder extends AccessTokenBuilder {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
 
     private final String issuerHost;
 
-    private final ServletContext servletContext;
     JWTAccessTokenBuilder(ServletContext servletContext) {
-        this.servletContext = servletContext;
+        super(servletContext);
         this.issuerHost = getIssuerHost();
     }
 
@@ -37,21 +36,17 @@ final class JWTAccessTokenBuilder implements AccessTokenBuilder {
         } else if (issuer.equals(SUPERUSER_ISSUER)) {
             return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
         } else if (issuer.equals(issuerHost)) {
-            return ReportProviderAccessToken.getBuilder(servletContext).build(assertionToken);
+            return ReportProviderAccessToken.getBuilder(getServletContext()).build(assertionToken);
         } else {
             throw new BadAccessTokenException("Unknown JWT Issuer:" + issuer);
         }
     }
 
-    private String authorizationSecret() {
-        return servletContext.getInitParameter("online.kheops.auth.hmacsecret");
-    }
-
     private String superuserSecret() {
-        return servletContext.getInitParameter("online.kheops.superuser.hmacsecret");
+        return getServletContext().getInitParameter("online.kheops.superuser.hmacsecret");
     }
 
     private String getIssuerHost() {
-        return servletContext.getInitParameter(HOST_ROOT_PARAMETER);
+        return getServletContext().getInitParameter(HOST_ROOT_PARAMETER);
     }
 }
