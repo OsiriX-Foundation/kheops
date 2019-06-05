@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.Capabilities;
@@ -12,15 +12,15 @@ import javax.persistence.EntityTransaction;
 import java.util.Objects;
 import java.util.Optional;
 
-final class CapabilityAssertion implements Assertion {
+final class CapabilityAccessToken implements AccessToken {
     private final String sub;
     private static final Builder BUILDER = new Builder();
     private Capability capability;
 
     static final class Builder {
-        CapabilityAssertion build(String capabilityToken) throws BadAssertionException {
+        CapabilityAccessToken build(String capabilityToken) throws BadAccessTokenException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {
-                throw new BadAssertionException("Bad capability token format");
+                throw new BadAccessTokenException("Bad capability token format");
             }
 
             final EntityManager em = EntityManagerListener.createEntityManager();
@@ -38,11 +38,11 @@ final class CapabilityAssertion implements Assertion {
 
                 tx.commit();
 
-                return new CapabilityAssertion(capability, sub);
+                return new CapabilityAccessToken(capability, sub);
             } catch (CapabilityNotFoundException e) {
-                throw new BadAssertionException("Unknown capability token");
+                throw new BadAccessTokenException("Unknown capability token");
             } catch (CapabilityNotValidException e) {
-                throw new BadAssertionException(e.getMessage());
+                throw new BadAccessTokenException(e.getMessage());
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -56,7 +56,7 @@ final class CapabilityAssertion implements Assertion {
         return BUILDER;
     }
 
-    private CapabilityAssertion(Capability capability, String sub) {
+    private CapabilityAccessToken(Capability capability, String sub) {
         this.capability = Objects.requireNonNull(capability);
         this.sub = Objects.requireNonNull(sub);
     }

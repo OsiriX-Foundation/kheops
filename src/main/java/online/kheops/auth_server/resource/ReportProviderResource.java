@@ -7,7 +7,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
-import online.kheops.auth_server.assertion.*;
+import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
@@ -112,10 +112,10 @@ public class ReportProviderResource {
             }
         }
 
-        final Assertion assertion;
+        final AccessToken assertion;
         try {
-            assertion = AssertionVerifier.createAssertion(context, accessToken);
-        } catch (BadAssertionException e) {
+            assertion = AccessTokenVerifier.authenticateAccessToken(context, accessToken);
+        } catch (BadAccessTokenException e) {
             LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
         } catch (DownloadKeyException e) {
@@ -131,8 +131,8 @@ public class ReportProviderResource {
         }
 
         //vérifier la permission de créer report_provider_code (user) pas capability token
-        if (! (assertion.getTokenType() == Assertion.TokenType.KEYCLOAK_TOKEN  ||
-                assertion.getTokenType() == Assertion.TokenType.SUPER_USER_TOKEN)) {
+        if (! (assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN  ||
+                assertion.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN)) {
 
             return Response.status(FORBIDDEN).build();
         }

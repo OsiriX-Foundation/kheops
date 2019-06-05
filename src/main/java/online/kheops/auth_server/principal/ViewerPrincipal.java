@@ -3,9 +3,9 @@ package online.kheops.auth_server.principal;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.AssertionVerifier;
-import online.kheops.auth_server.assertion.BadAssertionException;
+import online.kheops.auth_server.accesstoken.AccessToken;
+import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
+import online.kheops.auth_server.accesstoken.BadAccessTokenException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
@@ -39,20 +39,20 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     public ViewerPrincipal(ServletContext servletContext, JsonObject jwe) {
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(servletContext, jwe.getString(Consts.JWE.TOKEN));
-        } catch (BadAssertionException e) {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
+        } catch (BadAccessTokenException e) {
             throw new IllegalStateException(e);
         }
 
         final User user;
         try {
-            user = getOrCreateUser(assertion.getSub());
+            user = getOrCreateUser(accessToken.getSub());
         } catch (UserNotFoundException e) {
             throw new IllegalStateException(e);
         }
-        kheopsPrincipal = assertion.newPrincipal(servletContext, user);
+        kheopsPrincipal = accessToken.newPrincipal(servletContext, user);
 
         this.jwe = jwe;
     }

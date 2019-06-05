@@ -1,9 +1,9 @@
 package online.kheops.auth_server.filter;
 
+import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.AssertionVerifier;
-import online.kheops.auth_server.assertion.BadAssertionException;
+import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
+import online.kheops.auth_server.accesstoken.BadAccessTokenException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -49,32 +49,32 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(servletContext, token);
-        } catch (BadAssertionException e) {
-            LOG.log(Level.WARNING, "Received bad assertion" + getRequestString(requestContext), e);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+        } catch (BadAccessTokenException e) {
+            LOG.log(Level.WARNING, "Received bad accesstoken" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
 
         final User user;
         try {
-            user = getOrCreateUser(assertion.getSub());
+            user = getOrCreateUser(accessToken.getSub());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found" + requestContext.getUriInfo().getRequestUri(), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
 
-        final boolean capabilityAccess = assertion.hasCapabilityAccess();
-        final boolean viewerTokenAccess = assertion.getViewer().isPresent();
+        final boolean capabilityAccess = accessToken.hasCapabilityAccess();
+        final boolean viewerTokenAccess = accessToken.getViewer().isPresent();
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final User finalUser = user;
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public KheopsPrincipalInterface getUserPrincipal() {
-                return assertion.newPrincipal(servletContext, finalUser);
+                return accessToken.newPrincipal(servletContext, finalUser);
             }
 
             @Override

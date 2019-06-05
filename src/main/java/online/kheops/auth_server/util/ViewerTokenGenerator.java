@@ -1,6 +1,6 @@
 package online.kheops.auth_server.util;
 
-import online.kheops.auth_server.assertion.*;
+import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.user.UserNotFoundException;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
@@ -76,10 +76,10 @@ public class ViewerTokenGenerator {
                     "'source_id' must be set when 'source_type'=" + ALBUM);
         }
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(servletContext, token);
-        } catch (BadAssertionException e) {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+        } catch (BadAccessTokenException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
@@ -87,13 +87,13 @@ public class ViewerTokenGenerator {
         }
 
         try {
-            getOrCreateUser(assertion.getSub());
+            getOrCreateUser(accessToken.getSub());
         } catch (UserNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "User not found", e);
         }
 
-        if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ||
-                assertion.getTokenType() == Assertion.TokenType.PEP_TOKEN) {
+        if (accessToken.getTokenType() == AccessToken.TokenType.VIEWER_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.PEP_TOKEN) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "Request a viewer token is unauthorized with a viewer token");
         }
 
@@ -110,7 +110,7 @@ public class ViewerTokenGenerator {
             jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
             jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
             jwe.setKey(JweAesKey.getInstance().getKey());
-            LOG.info(() -> "Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
+            LOG.info(() -> "Returning viewer token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID);
             return jwe.getCompactSerialization();
         } catch (JoseException e) {
             LOG.log(Level.SEVERE, "JoseException", e);

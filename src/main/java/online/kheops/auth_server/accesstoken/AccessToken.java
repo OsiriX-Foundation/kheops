@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
@@ -11,7 +11,7 @@ import javax.json.JsonObject;
 import javax.servlet.ServletContext;
 import java.util.Optional;
 
-public interface Assertion {
+public interface AccessToken {
 
     enum TokenType  {KEYCLOAK_TOKEN, CAPABILITY_TOKEN, SUPER_USER_TOKEN, PEP_TOKEN, VIEWER_TOKEN, REPORT_PROVIDER_TOKEN}
 

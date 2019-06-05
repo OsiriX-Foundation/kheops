@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
@@ -6,7 +6,7 @@ import online.kheops.auth_server.keycloak.KeycloakContextListener;
 
 import javax.servlet.ServletContext;
 
-final class JWTAssertionBuilder implements AssertionBuilder {
+final class JWTAccessTokenBuilder implements AccessTokenBuilder {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 
     private static final String KHEOPS_ISSUER = "auth.kheops.online";
@@ -18,39 +18,39 @@ final class JWTAssertionBuilder implements AssertionBuilder {
     private final String issuerHost;
 
     private final ServletContext servletContext;
-    JWTAssertionBuilder(ServletContext servletContext) {
+    JWTAccessTokenBuilder(ServletContext servletContext) {
         this.servletContext = servletContext;
         this.issuerHost = getIssuerHost();
     }
 
     @Override
-    public Assertion build(String assertionToken) throws BadAssertionException {
+    public AccessToken build(String assertionToken) throws BadAccessTokenException {
         final String issuer;
 
         try {
             issuer = JWT.decode(assertionToken).getIssuer();
         } catch (JWTDecodeException | NullPointerException e) {
-            throw new BadAssertionException("Unable to decode JWT", e);
+            throw new BadAccessTokenException("Unable to decode JWT", e);
         }
 
         if (issuer == null) {
-            throw new BadAssertionException("JWT has no issuer");
+            throw new BadAccessTokenException("JWT has no issuer");
         }
 
         switch (issuer) {
             case KHEOPS_ISSUER:
-                return AuthorizationJWTAssertion.getBuilder(authorizationSecret()).build(assertionToken);
+                return AuthorizationJWTAccessToken.getBuilder(authorizationSecret()).build(assertionToken);
             case SUPERUSER_ISSUER:
-                return SuperuserJWTAssertion.getBuilder(superuserSecret()).build(assertionToken);
+                return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
             case GOOGLE_ISSUER:
-                return JWTAssertion.getBuilder(GOOGLE_CONFIGURATION_URL).build(assertionToken);
+                return JWTAccessToken.getBuilder(GOOGLE_CONFIGURATION_URL).build(assertionToken);
             default:
                 if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
-                    return JWTAssertion.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
+                    return JWTAccessToken.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
                 } else if (issuer.equals(issuerHost)) {
-                    return ReportProviderAssertion.getBuilder(servletContext).build(assertionToken);
+                    return ReportProviderAccessToken.getBuilder(servletContext).build(assertionToken);
                 } else {
-                    throw new BadAssertionException("Unknown JWT Issuer:" + issuer);
+                    throw new BadAccessTokenException("Unknown JWT Issuer:" + issuer);
                 }
         }
     }

@@ -4,7 +4,7 @@ package online.kheops.auth_server.resource;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.TokenSecurity;
-import online.kheops.auth_server.assertion.*;
+import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.util.*;
@@ -104,10 +104,10 @@ public class TokenResource
         }
         // TODO secure this resource
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(context, assertionToken);
-        } catch (BadAssertionException e) {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(context, assertionToken);
+        } catch (BadAccessTokenException e) {
             LOG.log(WARNING, "Error validating a token", e);
             return Response.status(OK).entity(errorIntrospectResponse).build();
         } catch (DownloadKeyException e) {
@@ -115,7 +115,7 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        final Capability capability = assertion.getCapability().orElse(null);
+        final Capability capability = accessToken.getCapability().orElse(null);
 
         if(capability != null) {
             if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
@@ -129,7 +129,7 @@ public class TokenResource
             } else {
                 introspectResponse.scope = "read write";
             }
-        } else if(assertion.getViewer().isPresent()) {
+        } else if(accessToken.getViewer().isPresent()) {
             introspectResponse.scope = "read";
         } else {
             introspectResponse.scope = "read write";
