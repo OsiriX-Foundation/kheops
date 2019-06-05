@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 final class JWTAccessTokenBuilder extends AccessTokenBuilder {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
+    private static final String KHEOPS_ISSUER = "auth.kheops.online";
 
     private final String issuerHost;
 
@@ -33,6 +34,8 @@ final class JWTAccessTokenBuilder extends AccessTokenBuilder {
 
         if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
             return JWTAccessToken.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
+        } else if (issuer.equals(KHEOPS_ISSUER)) {
+            return SuperuserJWTAccessToken.getBuilder(authorizationSecret()).build(assertionToken);
         } else if (issuer.equals(SUPERUSER_ISSUER)) {
             return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
         } else if (issuer.equals(issuerHost)) {
@@ -40,6 +43,10 @@ final class JWTAccessTokenBuilder extends AccessTokenBuilder {
         } else {
             throw new BadAccessTokenException("Unknown JWT Issuer:" + issuer);
         }
+    }
+
+    private String authorizationSecret() {
+        return getServletContext().getInitParameter("online.kheops.auth.hmacsecret");
     }
 
     private String superuserSecret() {
