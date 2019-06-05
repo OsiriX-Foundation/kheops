@@ -35,7 +35,7 @@ final class JWTAccessTokenBuilder extends AccessTokenBuilder {
         if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
             return JWTAccessToken.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
         } else if (issuer.equals(KHEOPS_ISSUER)) {
-            return SuperuserJWTAccessToken.getBuilder(authorizationSecret()).build(assertionToken);
+            return AuthorizationJWTAccessToken.getBuilder(authorizationSecret()).build(assertionToken);
         } else if (issuer.equals(SUPERUSER_ISSUER)) {
             return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
         } else if (issuer.equals(issuerHost)) {
