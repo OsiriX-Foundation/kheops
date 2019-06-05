@@ -12,7 +12,7 @@ public abstract class AccessTokenVerifier {
     private static List<Class<?>> getAccessTokenBuilders() {
         List<Class<?>> accessTokenBuilders = new ArrayList<>();
         accessTokenBuilders.add(JWTAccessTokenBuilder.class);
-        accessTokenBuilders.add(CapabilityAccessTokenBuilder.class);
+        accessTokenBuilders.add(CapabilityAccessToken.CapabilityAccessTokenBuilder.class);
         accessTokenBuilders.add(ViewerAccessTokenBuilder.class);
 
         return accessTokenBuilders;

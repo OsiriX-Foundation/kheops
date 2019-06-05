@@ -14,11 +14,11 @@ import java.util.Optional;
 
 final class CapabilityAccessToken implements AccessToken {
     private final String sub;
-    private static final Builder BUILDER = new Builder();
     private Capability capability;
 
-    static final class Builder {
-        CapabilityAccessToken build(String capabilityToken) throws BadAccessTokenException {
+    static final class CapabilityAccessTokenBuilder extends AccessTokenBuilder {
+        @Override
+        public AccessToken build(String capabilityToken) throws BadAccessTokenException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {
                 throw new BadAccessTokenException("Bad capability token format");
             }
@@ -50,10 +50,6 @@ final class CapabilityAccessToken implements AccessToken {
                 em.close();
             }
         }
-    }
-
-    static Builder getBuilder() {
-        return BUILDER;
     }
 
     private CapabilityAccessToken(Capability capability, String sub) {
