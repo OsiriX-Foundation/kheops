@@ -8,8 +8,6 @@ import javax.servlet.ServletContext;
 
 final class JWTAccessTokenBuilder implements AccessTokenBuilder {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
-
-    private static final String KHEOPS_ISSUER = "auth.kheops.online";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
 
     private final String issuerHost;
@@ -34,19 +32,14 @@ final class JWTAccessTokenBuilder implements AccessTokenBuilder {
             throw new BadAccessTokenException("JWT has no issuer");
         }
 
-        switch (issuer) {
-            case KHEOPS_ISSUER:
-                return AuthorizationJWTAccessToken.getBuilder(authorizationSecret()).build(assertionToken);
-            case SUPERUSER_ISSUER:
-                return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
-            default:
-                if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
-                    return JWTAccessToken.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
-                } else if (issuer.equals(issuerHost)) {
-                    return ReportProviderAccessToken.getBuilder(servletContext).build(assertionToken);
-                } else {
-                    throw new BadAccessTokenException("Unknown JWT Issuer:" + issuer);
-                }
+        if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
+            return JWTAccessToken.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);
+        } else if (issuer.equals(SUPERUSER_ISSUER)) {
+            return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
+        } else if (issuer.equals(issuerHost)) {
+            return ReportProviderAccessToken.getBuilder(servletContext).build(assertionToken);
+        } else {
+            throw new BadAccessTokenException("Unknown JWT Issuer:" + issuer);
         }
     }
 
