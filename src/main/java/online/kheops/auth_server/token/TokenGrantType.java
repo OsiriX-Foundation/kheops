@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
@@ -8,7 +8,7 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
 import static online.kheops.auth_server.util.Consts.ALBUM;
-import static online.kheops.auth_server.util.TokenRequestException.Error.*;
+import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Tools.checkValidUID;
 
 public enum TokenGrantType {

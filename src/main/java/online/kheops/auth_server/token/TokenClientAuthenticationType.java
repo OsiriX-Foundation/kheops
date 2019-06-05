@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Form;
@@ -8,7 +8,7 @@ import java.util.Base64;
 import java.util.List;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 public enum TokenClientAuthenticationType {
 

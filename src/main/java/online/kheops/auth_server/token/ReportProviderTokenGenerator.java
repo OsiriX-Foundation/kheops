@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 public class ReportProviderTokenGenerator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
@@ -26,11 +26,11 @@ public class ReportProviderTokenGenerator {
     private String clientId;
     private Set<String> studyInstanceUIDs;
 
-    public static ReportProviderTokenGenerator createGenerator(final ServletContext servletContext) {
+    static ReportProviderTokenGenerator createGenerator(final ServletContext servletContext) {
         return new ReportProviderTokenGenerator(servletContext);
     }
 
-    public ReportProviderTokenGenerator withSubject(final String subject) {
+    ReportProviderTokenGenerator withSubject(final String subject) {
         this.subject = Objects.requireNonNull(subject);
         return this;
     }
@@ -40,17 +40,17 @@ public class ReportProviderTokenGenerator {
         return this;
     }
 
-    public ReportProviderTokenGenerator withClientId(final String clientId) {
+    ReportProviderTokenGenerator withClientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    public ReportProviderTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
+    ReportProviderTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
         this.studyInstanceUIDs = new HashSet<>(studyInstanceUIDs);
         return this;
     }
 
-    public String generate(long expiresIn) {
+    String generate(long expiresIn) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(getHMAC256Secret());
             return JWT.create()

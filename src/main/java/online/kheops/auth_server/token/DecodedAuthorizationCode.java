@@ -1,13 +1,13 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import java.util.Objects;
 import java.util.Set;
 
-public class DecodedAuthorizationCode {
+class DecodedAuthorizationCode {
     private final String subject;
     private final Set<String> studyInstanceUIDs;
 
-    public static DecodedAuthorizationCode createDecodedAuthorizationCode(final String subject, final Set<String> studyInstanceUIDs) {
+    static DecodedAuthorizationCode createDecodedAuthorizationCode(final String subject, final Set<String> studyInstanceUIDs) {
         return new DecodedAuthorizationCode(subject, studyInstanceUIDs);
     }
 
@@ -16,11 +16,11 @@ public class DecodedAuthorizationCode {
         this.studyInstanceUIDs = Objects.requireNonNull(studyInstanceUIDs);
     }
 
-    public String getSubject() {
+    String getSubject() {
         return subject;
     }
 
-    public Set<String> getStudyInstanceUIDs() {
+    Set<String> getStudyInstanceUIDs() {
         return studyInstanceUIDs;
     }
 }

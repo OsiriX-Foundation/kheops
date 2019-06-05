@@ -1,7 +1,6 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import java.security.Principal;
-import java.util.Objects;
 
 public interface TokenPrincipal extends Principal {
     TokenClientKind getClientKind();

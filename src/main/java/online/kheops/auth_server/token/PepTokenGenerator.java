@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
-public class PepTokenGenerator {
+class PepTokenGenerator {
     private static final Logger LOG = Logger.getLogger(PepTokenGenerator.class.getName());
 
     private final ServletContext context;
@@ -36,26 +36,26 @@ public class PepTokenGenerator {
         this.context = Objects.requireNonNull(context);
     }
 
-    public PepTokenGenerator withToken(final String token) {
+    PepTokenGenerator withToken(final String token) {
         this.token = Objects.requireNonNull(token);
         return this;
     }
 
-    public PepTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
+    PepTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
         this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID);
         return this;
     }
 
-    public PepTokenGenerator withSeriesInstanceUID(final String seriesInstanceUID) {
+    PepTokenGenerator withSeriesInstanceUID(final String seriesInstanceUID) {
         this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID);
         return this;
     }
 
-    public static PepTokenGenerator createGenerator(final ServletContext context) {
+    static PepTokenGenerator createGenerator(final ServletContext context) {
       return new PepTokenGenerator(context);
     }
 
-    public String generate(long expiresIn) {
+    String generate(long expiresIn) {
 
         final AccessToken accessToken;
         try {

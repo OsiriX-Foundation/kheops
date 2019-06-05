@@ -7,7 +7,9 @@ import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
-import online.kheops.auth_server.util.*;
+import online.kheops.auth_server.token.TokenClientKind;
+import online.kheops.auth_server.token.TokenGrantType;
+import online.kheops.auth_server.token.TokenRequestException;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -19,8 +21,8 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.util.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 
 @Path("/")
