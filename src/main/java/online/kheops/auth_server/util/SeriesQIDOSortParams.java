@@ -1,18 +1,19 @@
 package online.kheops.auth_server.util;
 
-import com.google.common.collect.Lists;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 
 import javax.ws.rs.core.MultivaluedMap;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_SORT;
 
 public class SeriesQIDOSortParams {
-    private static final HashSet<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Lists.newArrayList(Tag.Modality, Tag.SeriesInstanceUID, Tag.SeriesNumber, Tag.NumberOfSeriesRelatedInstances));
+    private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(Tag.Modality, Tag.SeriesInstanceUID, Tag.SeriesNumber, Tag.NumberOfSeriesRelatedInstances));
 
     public static Comparator<Attributes> sortComparator(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
 

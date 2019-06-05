@@ -11,9 +11,6 @@ final class JWTAccessTokenBuilder implements AccessTokenBuilder {
 
     private static final String KHEOPS_ISSUER = "auth.kheops.online";
     private static final String SUPERUSER_ISSUER = "authorization.kheops.online";
-    private static final String GOOGLE_ISSUER = "accounts.google.com";
-
-    private static final String GOOGLE_CONFIGURATION_URL = "https://accounts.google.com/.well-known/openid-configuration";
 
     private final String issuerHost;
 
@@ -42,8 +39,6 @@ final class JWTAccessTokenBuilder implements AccessTokenBuilder {
                 return AuthorizationJWTAccessToken.getBuilder(authorizationSecret()).build(assertionToken);
             case SUPERUSER_ISSUER:
                 return SuperuserJWTAccessToken.getBuilder(superuserSecret()).build(assertionToken);
-            case GOOGLE_ISSUER:
-                return JWTAccessToken.getBuilder(GOOGLE_CONFIGURATION_URL).build(assertionToken);
             default:
                 if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
                     return JWTAccessToken.getBuilder(KeycloakContextListener.getKeycloakOIDCConfigurationString()).build(assertionToken);

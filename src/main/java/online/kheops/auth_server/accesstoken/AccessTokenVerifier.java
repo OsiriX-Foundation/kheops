@@ -1,52 +1,54 @@
 package online.kheops.auth_server.accesstoken;
 
 import javax.servlet.ServletContext;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public abstract class AccessTokenVerifier {
 
-    private static final Logger LOG = Logger.getLogger(AccessTokenVerifier.class.getName());
+    private static final List<Class<?>> accessTokenBuilders = getAccessTokenBuilders();
 
-    private enum TokenType {
-        JWT_BEARER {
-            AccessTokenBuilder getAccessTokenBuilder(ServletContext servletContext) {
-                return new JWTAccessTokenBuilder(servletContext);
-            }
-        },
-        CAPABILITY {
-            AccessTokenBuilder getAccessTokenBuilder(ServletContext servletContext) {
-                return new CapabilityAccessTokenBuilder();
-            }
-        },
-        VIEWER {
-            AccessTokenBuilder getAccessTokenBuilder(ServletContext servletContext) {
-                return new ViewerAccessTokenBuilder(servletContext);
-            }
-        };
+    private static List<Class<?>> getAccessTokenBuilders() {
+        List<Class<?>> accessTokenBuilders = new ArrayList<>();
+        accessTokenBuilders.add(JWTAccessTokenBuilder.class);
+        accessTokenBuilders.add(CapabilityAccessTokenBuilder.class);
+        accessTokenBuilders.add(ViewerAccessTokenBuilder.class);
 
-        abstract AccessTokenBuilder getAccessTokenBuilder(ServletContext servletContext);
+        return accessTokenBuilders;
     }
 
     private AccessTokenVerifier() {}
 
-    public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken) throws BadAccessTokenException {
+    public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
+            throws BadAccessTokenException {
+
         List<BadAccessTokenException> exceptionList = new ArrayList<>(3);
-        try {
-            return TokenType.JWT_BEARER.getAccessTokenBuilder(servletContext).build(accessToken);
-        } catch (BadAccessTokenException e) {
-            exceptionList.add(e);
-        }
-        try {
-            return TokenType.CAPABILITY.getAccessTokenBuilder(servletContext).build(accessToken);
-        } catch (BadAccessTokenException e) {
-            exceptionList.add(e);
-        }
-        try {
-            return TokenType.VIEWER.getAccessTokenBuilder(servletContext).build(accessToken);
-        } catch (BadAccessTokenException e) {
-            exceptionList.add(e);
+
+        for (Class<?> builderClass: accessTokenBuilders) {
+            final AccessTokenBuilder accessTokenBuilder;
+            Constructor<?> servletContextConstructor;
+            try {
+                servletContextConstructor = builderClass.getDeclaredConstructor((ServletContext.class));
+            } catch (NoSuchMethodException e) {
+                servletContextConstructor = null;
+            }
+
+            try {
+                if (servletContextConstructor != null) {
+                    accessTokenBuilder = (AccessTokenBuilder) servletContextConstructor.newInstance(servletContext);
+                } else {
+                    accessTokenBuilder = (AccessTokenBuilder) builderClass.getDeclaredConstructor().newInstance();
+                }
+            } catch (ReflectiveOperationException | ClassCastException e) {
+                throw new IllegalStateException(e);
+            }
+
+            try {
+                return accessTokenBuilder.build(accessToken);
+            } catch (BadAccessTokenException e) {
+                exceptionList.add(e);
+            }
         }
 
         final StringBuilder messageBuilder = new StringBuilder("Unable to verify accesstoken because");
@@ -57,6 +59,4 @@ public abstract class AccessTokenVerifier {
 
         throw badAccessTokenException;
     }
-
 }
-
