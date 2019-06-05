@@ -16,7 +16,7 @@ final class ViewerAccessTokenBuilder extends AccessTokenBuilder {
     }
 
     @Override
-    public AccessToken build(String assertionToken) throws BadAccessTokenException {
+    public AccessToken build(String assertionToken) throws AccessTokenVerificationException {
 
         try {
             final JsonWebEncryption jwe = new JsonWebEncryption();
@@ -30,7 +30,7 @@ final class ViewerAccessTokenBuilder extends AccessTokenBuilder {
 
             return ViewerAccessToken.getBuilder(getServletContext()).build(jwe.getPayload());
         } catch (JoseException e) {
-            throw new BadAccessTokenException("Unable to decode JWT", e);
+            throw new AccessTokenVerificationException("Unable to decode JWT", e);
         }
     }
 }

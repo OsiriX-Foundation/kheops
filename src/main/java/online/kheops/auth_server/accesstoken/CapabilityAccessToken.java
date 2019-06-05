@@ -18,9 +18,9 @@ final class CapabilityAccessToken implements AccessToken {
 
     static final class CapabilityAccessTokenBuilder extends AccessTokenBuilder {
         @Override
-        public AccessToken build(String capabilityToken) throws BadAccessTokenException {
+        public AccessToken build(String capabilityToken) throws AccessTokenVerificationException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {
-                throw new BadAccessTokenException("Bad capability token format");
+                throw new AccessTokenVerificationException("Bad capability token format");
             }
 
             final EntityManager em = EntityManagerListener.createEntityManager();
@@ -40,9 +40,9 @@ final class CapabilityAccessToken implements AccessToken {
 
                 return new CapabilityAccessToken(capability, sub);
             } catch (CapabilityNotFoundException e) {
-                throw new BadAccessTokenException("Unknown capability token");
+                throw new AccessTokenVerificationException("Unknown capability token");
             } catch (CapabilityNotValidException e) {
-                throw new BadAccessTokenException(e.getMessage());
+                throw new AccessTokenVerificationException(e.getMessage());
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();

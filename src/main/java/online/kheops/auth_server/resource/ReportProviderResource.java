@@ -115,7 +115,7 @@ public class ReportProviderResource {
         final AccessToken assertion;
         try {
             assertion = AccessTokenVerifier.authenticateAccessToken(context, accessToken);
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
         } catch (DownloadKeyException e) {

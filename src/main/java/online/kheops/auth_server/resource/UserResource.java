@@ -4,7 +4,7 @@ import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.BadAccessTokenException;
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.study.Studies;
@@ -116,7 +116,7 @@ public class UserResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             LOG.log(Level.INFO, "bad accesstoken", e);
             throw new ForbiddenException("Bad AccessToken");
         }

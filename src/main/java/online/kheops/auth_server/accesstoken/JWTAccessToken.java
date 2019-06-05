@@ -59,7 +59,7 @@ final class JWTAccessToken implements AccessToken {
             this.configurationUrl = configurationUrl;
         }
 
-        JWTAccessToken build(String assertionToken) throws BadAccessTokenException {
+        JWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -78,11 +78,11 @@ final class JWTAccessToken implements AccessToken {
                         .acceptLeeway(120)
                         .build().verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAccessTokenException("Verification of the token failed, configuration URL:" + configurationUrl, e);
+                throw new AccessTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAccessTokenException("No subject present in the token, configuration URL:" + configurationUrl);
+                throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
             return new JWTAccessToken(jwt.getSubject());

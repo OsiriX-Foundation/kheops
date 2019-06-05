@@ -3,7 +3,7 @@ package online.kheops.auth_server.filter;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.BadAccessTokenException;
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -52,7 +52,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Received bad accesstoken" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;

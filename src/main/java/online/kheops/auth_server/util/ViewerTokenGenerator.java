@@ -79,7 +79,7 @@ public class ViewerTokenGenerator {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);

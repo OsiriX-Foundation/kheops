@@ -20,7 +20,7 @@ final class ViewerAccessToken implements AccessToken {
         }
 
         ViewerAccessToken build(String assertionToken)
-                throws BadAccessTokenException {
+                throws AccessTokenVerificationException {
 
             try(JsonReader jsonReader = Json.createReader(new StringReader(assertionToken))) {
                 JsonObject jwe = jsonReader.readObject();
@@ -32,7 +32,7 @@ final class ViewerAccessToken implements AccessToken {
     static Builder getBuilder(ServletContext servletContext) { return new Builder(servletContext); }
 
     private ViewerAccessToken(ServletContext servletContext, JsonObject jwe)
-            throws BadAccessTokenException {
+            throws AccessTokenVerificationException {
 
         this.jwe = jwe;
 

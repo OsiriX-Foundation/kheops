@@ -107,7 +107,7 @@ public class TokenResource
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(context, assertionToken);
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             LOG.log(WARNING, "Error validating a token", e);
             return Response.status(OK).entity(errorIntrospectResponse).build();
         } catch (DownloadKeyException e) {

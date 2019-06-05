@@ -23,7 +23,7 @@ final class AuthorizationJWTAccessToken implements AccessToken {
             this.authorizationSecret = Objects.requireNonNull(authorizationSecret);
         }
 
-        AuthorizationJWTAccessToken build(String assertionToken) throws BadAccessTokenException {
+        AuthorizationJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             try {
                 final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret))
                         .withIssuer("auth.kheops.online")
@@ -34,7 +34,7 @@ final class AuthorizationJWTAccessToken implements AccessToken {
                 try {
                     user = Users.getOrCreateUser(jwt.getSubject());
                 } catch (UserNotFoundException e) {
-                    throw new BadAccessTokenException("Can't find user");
+                    throw new AccessTokenVerificationException("Can't find user");
                 }
                 final Boolean capabilityClaim = jwt.getClaim("capability").asBoolean();
                 boolean capabilityBoolean = false;
@@ -44,7 +44,7 @@ final class AuthorizationJWTAccessToken implements AccessToken {
                 return new AuthorizationJWTAccessToken(jwt.getSubject(), capabilityBoolean);
 
             } catch (JWTVerificationException | UnsupportedEncodingException e) {
-                throw new BadAccessTokenException("Verification of the access token failed", e);
+                throw new AccessTokenVerificationException("Verification of the access token failed", e);
             }
         }
     }

@@ -60,7 +60,7 @@ public class PepTokenGenerator {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(context, Objects.requireNonNull(token));
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);

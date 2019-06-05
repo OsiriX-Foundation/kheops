@@ -18,7 +18,7 @@ final class SuperuserJWTAccessToken implements AccessToken {
             this.superuserSecret = Objects.requireNonNull(superuserSecret);
         }
 
-        SuperuserJWTAccessToken build(String assertionToken) throws BadAccessTokenException {
+        SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -34,11 +34,11 @@ final class SuperuserJWTAccessToken implements AccessToken {
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAccessTokenException("AccessToken verification failed.", e);
+                throw new AccessTokenVerificationException("AccessToken verification failed.", e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAccessTokenException("Missing sub claim in token.");
+                throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
             return new SuperuserJWTAccessToken(jwt.getSubject());

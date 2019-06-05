@@ -28,7 +28,7 @@ public class ReportProviderAccessToken implements AccessToken {
             this.servletContext = Objects.requireNonNull(servletContext);
         }
 
-        ReportProviderAccessToken build(String assertionToken) throws BadAccessTokenException {
+        ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -46,26 +46,26 @@ public class ReportProviderAccessToken implements AccessToken {
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAccessTokenException("AccessToken verification failed.", e);
+                throw new AccessTokenVerificationException("AccessToken verification failed.", e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAccessTokenException("Missing sub claim in token.");
+                throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
             final Claim clientIdClaim = jwt.getClaim("client_id");
             if (clientIdClaim.isNull() || clientIdClaim.asString() == null) {
-                throw new BadAccessTokenException("Missing client_id claim in token");
+                throw new AccessTokenVerificationException("Missing client_id claim in token");
             }
 
             final Claim studyUIDsClaim = jwt.getClaim("study_uids");
             try {
                 if (studyUIDsClaim.isNull() || studyUIDsClaim.asList(String.class) == null) {
-                    throw new BadAccessTokenException("Missing study_uids claim in token");
+                    throw new AccessTokenVerificationException("Missing study_uids claim in token");
                 }
                 return new ReportProviderAccessToken(jwt.getSubject(), studyUIDsClaim.asList(String.class), clientIdClaim.asString());
             } catch (JWTDecodeException e) {
-                throw new BadAccessTokenException("unable to decode study_uids");
+                throw new AccessTokenVerificationException("unable to decode study_uids");
             }
         }
 

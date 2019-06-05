@@ -19,17 +19,17 @@ final class JWTAccessTokenBuilder extends AccessTokenBuilder {
     }
 
     @Override
-    public AccessToken build(String assertionToken) throws BadAccessTokenException {
+    public AccessToken build(String assertionToken) throws AccessTokenVerificationException {
         final String issuer;
 
         try {
             issuer = JWT.decode(assertionToken).getIssuer();
         } catch (JWTDecodeException | NullPointerException e) {
-            throw new BadAccessTokenException("Unable to decode JWT", e);
+            throw new AccessTokenVerificationException("Unable to decode JWT", e);
         }
 
         if (issuer == null) {
-            throw new BadAccessTokenException("JWT has no issuer");
+            throw new AccessTokenVerificationException("JWT has no issuer");
         }
 
         if (issuer.equals(KeycloakContextListener.getKeycloakIssuer())) {
@@ -41,7 +41,7 @@ final class JWTAccessTokenBuilder extends AccessTokenBuilder {
         } else if (issuer.equals(issuerHost)) {
             return ReportProviderAccessToken.getBuilder(getServletContext()).build(assertionToken);
         } else {
-            throw new BadAccessTokenException("Unknown JWT Issuer:" + issuer);
+            throw new AccessTokenVerificationException("Unknown JWT Issuer:" + issuer);
         }
     }
 

@@ -21,9 +21,9 @@ public abstract class AccessTokenVerifier {
     private AccessTokenVerifier() {}
 
     public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
-            throws BadAccessTokenException {
+            throws AccessTokenVerificationException {
 
-        List<BadAccessTokenException> exceptionList = new ArrayList<>(3);
+        List<AccessTokenVerificationException> exceptionList = new ArrayList<>(3);
 
         for (Class<?> builderClass: accessTokenBuilders) {
             final AccessTokenBuilder accessTokenBuilder;
@@ -46,7 +46,7 @@ public abstract class AccessTokenVerifier {
 
             try {
                 return accessTokenBuilder.build(accessToken);
-            } catch (BadAccessTokenException e) {
+            } catch (AccessTokenVerificationException e) {
                 exceptionList.add(e);
             }
         }
@@ -54,9 +54,9 @@ public abstract class AccessTokenVerifier {
         final StringBuilder messageBuilder = new StringBuilder("Unable to verify accesstoken because");
         exceptionList.forEach(e -> messageBuilder.append(", ").append(e.getMessage()));
 
-        final BadAccessTokenException badAccessTokenException = new BadAccessTokenException(messageBuilder.toString());
-        exceptionList.forEach(badAccessTokenException::addSuppressed);
+        final AccessTokenVerificationException accessTokenVerificationException = new AccessTokenVerificationException(messageBuilder.toString());
+        exceptionList.forEach(accessTokenVerificationException::addSuppressed);
 
-        throw badAccessTokenException;
+        throw accessTokenVerificationException;
     }
 }

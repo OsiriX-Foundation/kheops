@@ -13,7 +13,7 @@ abstract class AccessTokenBuilder {
         this.servletContext = servletContext;
     }
 
-    abstract AccessToken build(String assertionToken) throws BadAccessTokenException;
+    abstract AccessToken build(String assertionToken) throws AccessTokenVerificationException;
 
     protected ServletContext getServletContext() {
         if (servletContext == null) {

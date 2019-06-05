@@ -5,7 +5,7 @@ import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.BadAccessTokenException;
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
@@ -42,7 +42,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
-        } catch (BadAccessTokenException e) {
+        } catch (AccessTokenVerificationException e) {
             throw new IllegalStateException(e);
         }
 
