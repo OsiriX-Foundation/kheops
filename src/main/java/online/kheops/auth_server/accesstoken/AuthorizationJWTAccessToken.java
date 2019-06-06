@@ -4,35 +4,32 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 
+import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
-import java.util.Objects;
 
 final class AuthorizationJWTAccessToken implements AccessToken {
 
     private final String sub;
     private final boolean capabilityAccess;
 
-    static final class Builder {
-        private final String authorizationSecret;
+    static final class Builder extends AccessTokenBuilder {
 
-        private Builder(String authorizationSecret) {
-            this.authorizationSecret = Objects.requireNonNull(authorizationSecret);
+        private Builder(ServletContext servletContext) {
+            super(servletContext);
         }
 
         AuthorizationJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             try {
-                final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret))
+                final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
                         .withIssuer("auth.kheops.online")
                         .build()
                         .verify(assertionToken);
 
-                final User user;
                 try {
-                    user = Users.getOrCreateUser(jwt.getSubject());
+                    Users.getOrCreateUser(jwt.getSubject());
                 } catch (UserNotFoundException e) {
                     throw new AccessTokenVerificationException("Can't find user");
                 }
@@ -47,15 +44,15 @@ final class AuthorizationJWTAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Verification of the access token failed", e);
             }
         }
+
+        private String authorizationSecret() {
+            return getServletContext().getInitParameter("online.kheops.auth.hmacsecret");
+        }
     }
 
     private AuthorizationJWTAccessToken(String sub, boolean capabilityAccess) {
         this.sub = sub;
         this.capabilityAccess = capabilityAccess;
-    }
-
-    static Builder getBuilder(String authorizationSecret) {
-        return new Builder(authorizationSecret);
     }
 
     @Override

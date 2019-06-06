@@ -3,27 +3,25 @@ package online.kheops.auth_server.accesstoken;
 import javax.servlet.ServletContext;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AccessTokenVerifier {
 
-    private static final List<Class<?>> accessTokenBuilders = getAccessTokenBuilders();
-
-    private static List<Class<?>> getAccessTokenBuilders() {
-        List<Class<?>> accessTokenBuilders = new ArrayList<>();
-        accessTokenBuilders.add(JWTAccessTokenBuilder.class);
-        accessTokenBuilders.add(CapabilityAccessToken.CapabilityAccessTokenBuilder.class);
-        accessTokenBuilders.add(ViewerAccessTokenBuilder.class);
-
-        return accessTokenBuilders;
-    }
+    private static final List<Class<?>> accessTokenBuilders =
+            Arrays.asList(ReportProviderAccessToken.Builder.class,
+                          CapabilityAccessToken.CapabilityAccessTokenBuilder.class,
+                          ViewerAccessTokenBuilder.class,
+                          KeycloakAccessToken.Builder.class,
+                          AuthorizationJWTAccessToken.Builder.class,
+                          SuperuserJWTAccessToken.Builder.class);
 
     private AccessTokenVerifier() {}
 
     public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
             throws AccessTokenVerificationException {
 
-        List<AccessTokenVerificationException> exceptionList = new ArrayList<>(3);
+        List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
 
         for (Class<?> builderClass: accessTokenBuilders) {
             final AccessTokenBuilder accessTokenBuilder;

@@ -5,17 +5,16 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
 final class SuperuserJWTAccessToken implements AccessToken {
     private final String sub;
 
-    static class Builder {
-        private final String superuserSecret;
-
-        private Builder(String superuserSecret) {
-            this.superuserSecret = Objects.requireNonNull(superuserSecret);
+    static class Builder extends AccessTokenBuilder {
+        private Builder(ServletContext servletContext) {
+            super(servletContext);
         }
 
         SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
@@ -23,7 +22,7 @@ final class SuperuserJWTAccessToken implements AccessToken {
 
             final Algorithm algorithm;
             try {
-                algorithm = Algorithm.HMAC256(superuserSecret);
+                algorithm = Algorithm.HMAC256(getSuperuserSecret());
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalArgumentException("superuserSecret is not a valid HMAC256 secret", e);
             }
@@ -43,10 +42,10 @@ final class SuperuserJWTAccessToken implements AccessToken {
 
             return new SuperuserJWTAccessToken(jwt.getSubject());
         }
-    }
 
-    static Builder getBuilder(String superuserSecret) {
-        return new Builder(superuserSecret);
+        private String getSuperuserSecret() {
+            return getServletContext().getInitParameter("online.kheops.superuser.hmacsecret");
+        }
     }
 
     private SuperuserJWTAccessToken(String sub) {

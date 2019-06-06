@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import online.kheops.auth_server.keycloak.KeycloakContextListener;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -24,7 +25,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 
-final class JWTAccessToken implements AccessToken {
+final class KeycloakAccessToken implements AccessToken {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
@@ -52,14 +53,10 @@ final class JWTAccessToken implements AccessToken {
         String jwksURI;
     }
 
-    static final class Builder {
-        private final String configurationUrl;
+    static final class Builder extends AccessTokenBuilder{
+        private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
 
-        Builder(String configurationUrl) {
-            this.configurationUrl = configurationUrl;
-        }
-
-        JWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        KeycloakAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -85,7 +82,7 @@ final class JWTAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
-            return new JWTAccessToken(jwt.getSubject());
+            return new KeycloakAccessToken(jwt.getSubject());
         }
     }
 
@@ -125,11 +122,7 @@ final class JWTAccessToken implements AccessToken {
         return publicKey;
     }
 
-    static Builder getBuilder(String configurationUrl) {
-        return new Builder(configurationUrl);
-    }
-
-    private JWTAccessToken(String sub) {
+    private KeycloakAccessToken(String sub) {
         this.sub = sub;
     }
 

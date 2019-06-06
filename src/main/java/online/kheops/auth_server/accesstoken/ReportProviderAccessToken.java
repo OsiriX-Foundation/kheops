@@ -19,7 +19,7 @@ public class ReportProviderAccessToken implements AccessToken {
     private final List<String> studyUIDs;
     private final String clientId;
 
-    static class Builder {
+    static class Builder extends AccessTokenBuilder{
         private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 
         private final ServletContext servletContext;
@@ -77,10 +77,6 @@ public class ReportProviderAccessToken implements AccessToken {
             return servletContext.getInitParameter(HOST_ROOT_PARAMETER);
         }
 
-    }
-
-    static ReportProviderAccessToken.Builder getBuilder(ServletContext servletContext) {
-        return new ReportProviderAccessToken.Builder(servletContext);
     }
 
     private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId) {
