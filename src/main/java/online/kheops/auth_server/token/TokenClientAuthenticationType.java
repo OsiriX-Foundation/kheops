@@ -62,7 +62,7 @@ public enum TokenClientAuthenticationType {
     private static final String CLIENT_ASSERTION_TYPE = "client_assertion_type";
     private static final String CLIENT_ASSERTION = "client_assertion";
     private static final String CLIENT_ID = "client_id";
-    private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:client-accesstoken-type:jwt-bearer";
+    private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 
     private static final TokenPrincipal PUBLIC_PRINCIPAL = new TokenPrincipal() {
         @Override
