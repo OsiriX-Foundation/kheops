@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Objects;
 
-public class ReportProviderAssertion implements Assertion {
+public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
     private final List<String> studyUIDs;
     private final String clientId;
@@ -28,7 +28,7 @@ public class ReportProviderAssertion implements Assertion {
             this.servletContext = Objects.requireNonNull(servletContext);
         }
 
-        ReportProviderAssertion build(String assertionToken) throws BadAssertionException {
+        ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -46,26 +46,26 @@ public class ReportProviderAssertion implements Assertion {
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAssertionException("Assertion verification failed.", e);
+                throw new AccessTokenVerificationException("AccessToken verification failed.", e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAssertionException("Missing sub claim in token.");
+                throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
             final Claim clientIdClaim = jwt.getClaim("client_id");
             if (clientIdClaim.isNull() || clientIdClaim.asString() == null) {
-                throw new BadAssertionException("Missing client_id claim in token");
+                throw new AccessTokenVerificationException("Missing client_id claim in token");
             }
 
             final Claim studyUIDsClaim = jwt.getClaim("study_uids");
             try {
                 if (studyUIDsClaim.isNull() || studyUIDsClaim.asList(String.class) == null) {
-                    throw new BadAssertionException("Missing study_uids claim in token");
+                    throw new AccessTokenVerificationException("Missing study_uids claim in token");
                 }
-                return new ReportProviderAssertion(jwt.getSubject(), studyUIDsClaim.asList(String.class), clientIdClaim.asString());
+                return new ReportProviderAccessToken(jwt.getSubject(), studyUIDsClaim.asList(String.class), clientIdClaim.asString());
             } catch (JWTDecodeException e) {
-                throw new BadAssertionException("unable to decode study_uids");
+                throw new AccessTokenVerificationException("unable to decode study_uids");
             }
         }
 
@@ -79,11 +79,11 @@ public class ReportProviderAssertion implements Assertion {
 
     }
 
-    static ReportProviderAssertion.Builder getBuilder(ServletContext servletContext) {
-        return new ReportProviderAssertion.Builder(servletContext);
+    static ReportProviderAccessToken.Builder getBuilder(ServletContext servletContext) {
+        return new ReportProviderAccessToken.Builder(servletContext);
     }
 
-    private ReportProviderAssertion(String sub, List<String> studyUIDs, String ClientId) {
+    private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId) {
         this.sub = Objects.requireNonNull(sub);
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
         this.clientId = Objects.requireNonNull(ClientId);

@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

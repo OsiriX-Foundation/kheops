@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Form;
@@ -8,7 +8,7 @@ import java.util.Base64;
 import java.util.List;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 public enum TokenClientAuthenticationType {
 
@@ -43,7 +43,7 @@ public enum TokenClientAuthenticationType {
             verifySingleHeader(formParams, CLIENT_ASSERTION_TYPE);
 
             if (!formParams.getFirst(CLIENT_ASSERTION_TYPE).equals(JWT_BEARER_URN)) {
-                throw new TokenRequestException(INVALID_REQUEST, "Unknown client assertion type");
+                throw new TokenRequestException(INVALID_REQUEST, "Unknown client accesstoken type");
             }
 
             return TokenJWTAuthenticator.newAuthenticator(context)
@@ -62,7 +62,7 @@ public enum TokenClientAuthenticationType {
     private static final String CLIENT_ASSERTION_TYPE = "client_assertion_type";
     private static final String CLIENT_ASSERTION = "client_assertion";
     private static final String CLIENT_ID = "client_id";
-    private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+    private static final String JWT_BEARER_URN = "urn:ietf:params:oauth:client-accesstoken-type:jwt-bearer";
 
     private static final TokenPrincipal PUBLIC_PRINCIPAL = new TokenPrincipal() {
         @Override
@@ -92,7 +92,7 @@ public enum TokenClientAuthenticationType {
 
         if (headers.containsKey(AUTHORIZATION)) {
             if (formMap.containsKey(CLIENT_ASSERTION_TYPE) || formMap.containsKey(CLIENT_ASSERTION)) {
-                throw new TokenRequestException(INVALID_REQUEST, "Client assertion and Authorization Header can not both be present");
+                throw new TokenRequestException(INVALID_REQUEST, "Client accesstoken and Authorization Header can not both be present");
             }
 
             List<String> authorizationHeaders = headers.get(AUTHORIZATION);

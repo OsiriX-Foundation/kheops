@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 import java.io.StringReader;
 import java.util.Optional;
 
-final class ViewerAssertion implements Assertion {
+final class ViewerAccessToken implements AccessToken {
 
     private final JsonObject jwe;
     private final String sub;
@@ -19,25 +19,25 @@ final class ViewerAssertion implements Assertion {
             this.servletContext = servletContext;
         }
 
-        ViewerAssertion build(String assertionToken)
-                throws BadAssertionException {
+        ViewerAccessToken build(String assertionToken)
+                throws AccessTokenVerificationException {
 
             try(JsonReader jsonReader = Json.createReader(new StringReader(assertionToken))) {
                 JsonObject jwe = jsonReader.readObject();
-                return new ViewerAssertion(servletContext, jwe);
+                return new ViewerAccessToken(servletContext, jwe);
             }
         }
     }
 
     static Builder getBuilder(ServletContext servletContext) { return new Builder(servletContext); }
 
-    private ViewerAssertion(ServletContext servletContext, JsonObject jwe)
-            throws BadAssertionException {
+    private ViewerAccessToken(ServletContext servletContext, JsonObject jwe)
+            throws AccessTokenVerificationException {
 
         this.jwe = jwe;
 
-        Assertion assertion = AssertionVerifier.createAssertion(servletContext, jwe.getString("token"));
-        this.sub = assertion.getSub();
+        AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString("token"));
+        this.sub = accessToken.getSub();
     }
 
     @Override

@@ -4,10 +4,12 @@ package online.kheops.auth_server.resource;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.TokenSecurity;
-import online.kheops.auth_server.assertion.*;
+import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
-import online.kheops.auth_server.util.*;
+import online.kheops.auth_server.token.TokenClientKind;
+import online.kheops.auth_server.token.TokenGrantType;
+import online.kheops.auth_server.token.TokenRequestException;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -19,8 +21,8 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.util.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 
 @Path("/")
@@ -104,10 +106,10 @@ public class TokenResource
         }
         // TODO secure this resource
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(context, assertionToken);
-        } catch (BadAssertionException e) {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(context, assertionToken);
+        } catch (AccessTokenVerificationException e) {
             LOG.log(WARNING, "Error validating a token", e);
             return Response.status(OK).entity(errorIntrospectResponse).build();
         } catch (DownloadKeyException e) {
@@ -115,7 +117,7 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        final Capability capability = assertion.getCapability().orElse(null);
+        final Capability capability = accessToken.getCapability().orElse(null);
 
         if(capability != null) {
             if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
@@ -129,7 +131,7 @@ public class TokenResource
             } else {
                 introspectResponse.scope = "read write";
             }
-        } else if(assertion.getViewer().isPresent()) {
+        } else if(accessToken.getViewer().isPresent()) {
             introspectResponse.scope = "read";
         } else {
             introspectResponse.scope = "read write";

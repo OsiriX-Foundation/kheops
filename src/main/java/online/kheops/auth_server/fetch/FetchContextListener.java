@@ -2,7 +2,6 @@ package online.kheops.auth_server.fetch;
 
 
 import online.kheops.auth_server.PACSAuthTokenBuilder;
-import online.kheops.auth_server.assertion.AssertionVerifier;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

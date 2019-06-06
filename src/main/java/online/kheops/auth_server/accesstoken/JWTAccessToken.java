@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import com.auth0.jwk.JwkException;
 import com.auth0.jwk.UrlJwkProvider;
@@ -24,7 +24,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 
-final class JWTAssertion implements Assertion {
+final class JWTAccessToken implements AccessToken {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
@@ -59,7 +59,7 @@ final class JWTAssertion implements Assertion {
             this.configurationUrl = configurationUrl;
         }
 
-        JWTAssertion build(String assertionToken) throws BadAssertionException {
+        JWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -78,14 +78,14 @@ final class JWTAssertion implements Assertion {
                         .acceptLeeway(120)
                         .build().verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAssertionException("Verification of the token failed, configuration URL:" + configurationUrl, e);
+                throw new AccessTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAssertionException("No subject present in the token, configuration URL:" + configurationUrl);
+                throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
-            return new JWTAssertion(jwt.getSubject());
+            return new JWTAccessToken(jwt.getSubject());
         }
     }
 
@@ -129,7 +129,7 @@ final class JWTAssertion implements Assertion {
         return new Builder(configurationUrl);
     }
 
-    private JWTAssertion(String sub) {
+    private JWTAccessToken(String sub) {
         this.sub = sub;
     }
 

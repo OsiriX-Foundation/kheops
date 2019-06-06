@@ -1,9 +1,9 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import online.kheops.auth_server.assertion.*;
+import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.SeriesNotFoundException;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
-public class PepTokenGenerator {
+class PepTokenGenerator {
     private static final Logger LOG = Logger.getLogger(PepTokenGenerator.class.getName());
 
     private final ServletContext context;
@@ -36,50 +36,50 @@ public class PepTokenGenerator {
         this.context = Objects.requireNonNull(context);
     }
 
-    public PepTokenGenerator withToken(final String token) {
+    PepTokenGenerator withToken(final String token) {
         this.token = Objects.requireNonNull(token);
         return this;
     }
 
-    public PepTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
+    PepTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
         this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID);
         return this;
     }
 
-    public PepTokenGenerator withSeriesInstanceUID(final String seriesInstanceUID) {
+    PepTokenGenerator withSeriesInstanceUID(final String seriesInstanceUID) {
         this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID);
         return this;
     }
 
-    public static PepTokenGenerator createGenerator(final ServletContext context) {
+    static PepTokenGenerator createGenerator(final ServletContext context) {
       return new PepTokenGenerator(context);
     }
 
-    public String generate(long expiresIn) {
+    String generate(long expiresIn) {
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(context, Objects.requireNonNull(token));
-        } catch (BadAssertionException e) {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(context, Objects.requireNonNull(token));
+        } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
             throw new WebApplicationException(Response.status(BAD_GATEWAY).entity("Error downloading the public key").build());
         }
 
-        if (assertion.getTokenType() == Assertion.TokenType.PEP_TOKEN ) {
+        if (accessToken.getTokenType() == AccessToken.TokenType.PEP_TOKEN ) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "Request a pep token is unauthorized with a pep token");
         }
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(assertion.getSub());
+            callingUser = getOrCreateUser(accessToken.getSub());
         } catch (UserNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "User not found", e);
         }
 
         try {
-            final KheopsPrincipalInterface principal = assertion.newPrincipal(context, callingUser);
+            final KheopsPrincipalInterface principal = accessToken.newPrincipal(context, callingUser);
             if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 throw new SeriesNotFoundException("");
             }
@@ -98,7 +98,7 @@ public class PepTokenGenerator {
 
         JWTCreator.Builder jwtBuilder = JWT.create()
                 .withIssuer("auth.kheops.online")
-                .withSubject(assertion.getSub())
+                .withSubject(accessToken.getSub())
                 .withAudience("dicom.kheops.online")
                 .withClaim("capability", false) // don't give capability access
                 .withClaim("study_uid", studyInstanceUID)
@@ -106,7 +106,7 @@ public class PepTokenGenerator {
                 .withExpiresAt(Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)))
                 .withNotBefore(new Date());
 
-        LOG.info(() -> "Returning pep token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
+        LOG.info(() -> "Returning pep token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
         return jwtBuilder.sign(algorithmHMAC);
     }
 }

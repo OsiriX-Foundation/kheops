@@ -2,9 +2,9 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
-import online.kheops.auth_server.assertion.Assertion;
-import online.kheops.auth_server.assertion.AssertionVerifier;
-import online.kheops.auth_server.assertion.BadAssertionException;
+import online.kheops.auth_server.accesstoken.AccessToken;
+import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.study.Studies;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.assertion.Assertion.TokenType.REPORT_PROVIDER_TOKEN;
+import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT_PROVIDER_TOKEN;
 import static online.kheops.auth_server.user.UserPermissionEnum.LIST_USERS;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 
@@ -113,21 +113,21 @@ public class UserResource {
             throw new NotAuthorizedException("Bearer");
         }
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(servletContext, token);
-        } catch (BadAssertionException e) {
-            LOG.log(Level.INFO, "bad assertion", e);
-            throw new ForbiddenException("Bad Assertion");
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+        } catch (AccessTokenVerificationException e) {
+            LOG.log(Level.INFO, "bad accesstoken", e);
+            throw new ForbiddenException("Bad AccessToken");
         }
 
-        if (!assertion.getTokenType().equals(REPORT_PROVIDER_TOKEN)) {
+        if (!accessToken.getTokenType().equals(REPORT_PROVIDER_TOKEN)) {
             LOG.log(Level.INFO, "Can only get userinfo for report provider tokens");
             throw new ForbiddenException("Can only get userinfo for report provider tokens");
         }
 
         try {
-            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(assertion.getSub()));
+            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSub()));
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.INFO, "Unable to get the user info", e);
             throw new ServerErrorException("Unable to get the user info", BAD_GATEWAY, e);

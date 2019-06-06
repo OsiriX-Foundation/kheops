@@ -1,7 +1,8 @@
 package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.TokenSecurity;
-import online.kheops.auth_server.util.*;
+import online.kheops.auth_server.token.TokenClientAuthenticationType;
+import online.kheops.auth_server.token.TokenPrincipal;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.annotation.Priority;

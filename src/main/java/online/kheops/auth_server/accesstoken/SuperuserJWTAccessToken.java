@@ -1,15 +1,14 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
-final class SuperuserJWTAssertion implements Assertion {
+final class SuperuserJWTAccessToken implements AccessToken {
     private final String sub;
 
     static class Builder {
@@ -19,7 +18,7 @@ final class SuperuserJWTAssertion implements Assertion {
             this.superuserSecret = Objects.requireNonNull(superuserSecret);
         }
 
-        SuperuserJWTAssertion build(String assertionToken) throws BadAssertionException {
+        SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -35,14 +34,14 @@ final class SuperuserJWTAssertion implements Assertion {
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new BadAssertionException("Assertion verification failed.", e);
+                throw new AccessTokenVerificationException("AccessToken verification failed.", e);
             }
 
             if (jwt.getSubject() == null) {
-                throw new BadAssertionException("Missing sub claim in token.");
+                throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
-            return new SuperuserJWTAssertion(jwt.getSubject());
+            return new SuperuserJWTAccessToken(jwt.getSubject());
         }
     }
 
@@ -50,7 +49,7 @@ final class SuperuserJWTAssertion implements Assertion {
         return new Builder(superuserSecret);
     }
 
-    private SuperuserJWTAssertion(String sub) {
+    private SuperuserJWTAccessToken(String sub) {
         this.sub = Objects.requireNonNull(sub);
     }
 

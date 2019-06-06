@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import com.auth0.jwk.*;
 import com.auth0.jwt.JWT;
@@ -29,7 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
 
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 public class TokenJWTAuthenticator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
@@ -46,7 +46,7 @@ public class TokenJWTAuthenticator {
         String jwksURI;
     }
 
-    public static TokenJWTAuthenticator newAuthenticator(final ServletContext context) {
+    static TokenJWTAuthenticator newAuthenticator(final ServletContext context) {
         return new TokenJWTAuthenticator(context);
     }
 
@@ -54,12 +54,12 @@ public class TokenJWTAuthenticator {
         this.context = context;
     }
 
-    public TokenJWTAuthenticator clientId(final String clientId) {
+    TokenJWTAuthenticator clientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    public TokenJWTAuthenticator clientJWT(final String clientJWT) {
+    TokenJWTAuthenticator clientJWT(final String clientJWT) {
         this.clientJWT = Objects.requireNonNull(clientJWT);
 
         try {
@@ -71,7 +71,7 @@ public class TokenJWTAuthenticator {
         return this;
     }
 
-    public TokenPrincipal authenticate() {
+    TokenPrincipal authenticate() {
         Objects.requireNonNull(clientId);
         Objects.requireNonNull(clientJWT);
         Objects.requireNonNull(decodedJWT);

@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -10,16 +10,16 @@ import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
-public class AuthorizationCodeValidator {
+class AuthorizationCodeValidator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
     private final ServletContext servletContext;
     private String clientId;
 
-    public static AuthorizationCodeValidator createAuthorizer(ServletContext servletContext) {
+    static AuthorizationCodeValidator createAuthorizer(ServletContext servletContext) {
         return new AuthorizationCodeValidator(servletContext);
     }
 
@@ -27,12 +27,12 @@ public class AuthorizationCodeValidator {
         this.servletContext = servletContext;
     }
 
-    public AuthorizationCodeValidator withClientId(final String clientId) {
+    AuthorizationCodeValidator withClientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    public DecodedAuthorizationCode validate(final String authorizationCode) {
+    DecodedAuthorizationCode validate(final String authorizationCode) {
         final DecodedJWT jwt;
         try {
             jwt = JWT.require(Algorithm.HMAC256(getHMAC256Secret()))

@@ -1,4 +1,4 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 public enum TokenClientKind {
     REPORT_PROVIDER("report_provider_client"),

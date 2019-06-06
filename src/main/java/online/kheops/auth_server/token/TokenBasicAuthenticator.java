@@ -1,9 +1,9 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
 import javax.servlet.ServletContext;
 import java.util.Objects;
 
-import static online.kheops.auth_server.util.TokenRequestException.Error.INVALID_CLIENT;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_CLIENT;
 
 public final class TokenBasicAuthenticator {
 
@@ -41,7 +41,7 @@ public final class TokenBasicAuthenticator {
     private String clientId;
     private String password;
 
-    public static TokenBasicAuthenticator newAuthenticator(final ServletContext context) {
+    static TokenBasicAuthenticator newAuthenticator(final ServletContext context) {
         return new TokenBasicAuthenticator(context);
     }
 
@@ -54,12 +54,12 @@ public final class TokenBasicAuthenticator {
         return this;
     }
 
-    public TokenBasicAuthenticator password(final String password) {
+    TokenBasicAuthenticator password(final String password) {
         this.password = Objects.requireNonNull(password);
         return this;
     }
 
-    public TokenPrincipal authenticate() {
+    TokenPrincipal authenticate() {
         Objects.requireNonNull(clientId);
         Objects.requireNonNull(password);
 

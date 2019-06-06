@@ -1,4 +1,4 @@
-package online.kheops.auth_server.assertion;
+package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.util.JweAesKey;
 import org.jose4j.jwa.AlgorithmConstraints;
@@ -9,15 +9,14 @@ import org.jose4j.lang.JoseException;
 
 import javax.servlet.ServletContext;
 
-final class ViewerAssertionBuilder implements AssertionBuilder {
-    private final ServletContext servletContext;
+final class ViewerAccessTokenBuilder extends AccessTokenBuilder {
 
-    ViewerAssertionBuilder(ServletContext servletContext) {
-        this.servletContext = servletContext;
+    ViewerAccessTokenBuilder(ServletContext servletContext) {
+        super(servletContext);
     }
 
     @Override
-    public Assertion build(String assertionToken) throws BadAssertionException {
+    public AccessToken build(String assertionToken) throws AccessTokenVerificationException {
 
         try {
             final JsonWebEncryption jwe = new JsonWebEncryption();
@@ -29,9 +28,9 @@ final class ViewerAssertionBuilder implements AssertionBuilder {
 
             jwe.setCompactSerialization(assertionToken);
 
-            return ViewerAssertion.getBuilder(servletContext).build(jwe.getPayload());
+            return ViewerAccessToken.getBuilder(getServletContext()).build(jwe.getPayload());
         } catch (JoseException e) {
-            throw new BadAssertionException("Unable to decode JWT", e);
+            throw new AccessTokenVerificationException("Unable to decode JWT", e);
         }
     }
 }

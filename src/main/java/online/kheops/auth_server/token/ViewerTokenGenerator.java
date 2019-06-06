@@ -1,7 +1,9 @@
-package online.kheops.auth_server.util;
+package online.kheops.auth_server.token;
 
-import online.kheops.auth_server.assertion.*;
+import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.JweAesKey;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -23,7 +25,7 @@ import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 
-public class ViewerTokenGenerator {
+class ViewerTokenGenerator {
     private static final Logger LOG = Logger.getLogger(ViewerTokenGenerator.class.getName());
 
     private final ServletContext servletContext;
@@ -37,32 +39,32 @@ public class ViewerTokenGenerator {
         this.servletContext = servletContext;
     }
 
-    public ViewerTokenGenerator withToken(final String token) {
+    ViewerTokenGenerator withToken(final String token) {
         this.token = Objects.requireNonNull(token);
         return this;
     }
 
-    public ViewerTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
+    ViewerTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
         this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID);
         return this;
     }
 
-    public ViewerTokenGenerator withSourceType(final String sourceType) {
+    ViewerTokenGenerator withSourceType(final String sourceType) {
         this.sourceType = Objects.requireNonNull(sourceType);
         return this;
     }
 
-    public ViewerTokenGenerator withSourceId(final String sourceId) {
+    ViewerTokenGenerator withSourceId(final String sourceId) {
         this.sourceId = sourceId;
         return this;
     }
 
-    public static ViewerTokenGenerator createGenerator(ServletContext servletContext) {
+    static ViewerTokenGenerator createGenerator(ServletContext servletContext) {
         return new ViewerTokenGenerator(servletContext);
     }
 
     @SuppressWarnings("unchecked")
-    public String generate(final long expiresIn) {
+    String generate(final long expiresIn) {
         Objects.requireNonNull(token);
         Objects.requireNonNull(studyInstanceUID);
         Objects.requireNonNull(sourceType);
@@ -76,10 +78,10 @@ public class ViewerTokenGenerator {
                     "'source_id' must be set when 'source_type'=" + ALBUM);
         }
 
-        final Assertion assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AssertionVerifier.createAssertion(servletContext, token);
-        } catch (BadAssertionException e) {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+        } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
@@ -87,13 +89,13 @@ public class ViewerTokenGenerator {
         }
 
         try {
-            getOrCreateUser(assertion.getSub());
+            getOrCreateUser(accessToken.getSub());
         } catch (UserNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "User not found", e);
         }
 
-        if (assertion.getTokenType() == Assertion.TokenType.VIEWER_TOKEN ||
-                assertion.getTokenType() == Assertion.TokenType.PEP_TOKEN) {
+        if (accessToken.getTokenType() == AccessToken.TokenType.VIEWER_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.PEP_TOKEN) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "Request a viewer token is unauthorized with a viewer token");
         }
 
@@ -110,7 +112,7 @@ public class ViewerTokenGenerator {
             jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.A128KW);
             jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
             jwe.setKey(JweAesKey.getInstance().getKey());
-            LOG.info(() -> "Returning viewer token for user: " + assertion.getSub() + "for studyInstanceUID " + studyInstanceUID);
+            LOG.info(() -> "Returning viewer token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID);
             return jwe.getCompactSerialization();
         } catch (JoseException e) {
             LOG.log(Level.SEVERE, "JoseException", e);
