@@ -203,7 +203,8 @@ public class Sending {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().get());
                 mutation = Events.albumPostSeriesMutation(capability, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             } else if(kheopsPrincipal.getClientId().isPresent()) {
-                final ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().get());
+                ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().get());
+                reportProvider = em.merge(reportProvider);
                 mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);

@@ -64,7 +64,6 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         try {
             tx.begin();
             album = em.merge(album);
-            tx.commit();
 
             return canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em);
 
