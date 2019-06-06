@@ -53,10 +53,10 @@ final class KeycloakAccessToken implements AccessToken {
         String jwksURI;
     }
 
-    static final class Builder extends AccessTokenBuilder{
+    static final class Builder implements AccessTokenBuilder{
         private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
 
-        KeycloakAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public KeycloakAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {

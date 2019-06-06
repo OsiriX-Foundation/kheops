@@ -19,16 +19,16 @@ public class ReportProviderAccessToken implements AccessToken {
     private final List<String> studyUIDs;
     private final String clientId;
 
-    static class Builder extends AccessTokenBuilder{
+    static class Builder implements AccessTokenBuilder{
         private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 
         private final ServletContext servletContext;
 
-        private Builder(ServletContext servletContext) {
+        Builder(ServletContext servletContext) {
             this.servletContext = Objects.requireNonNull(servletContext);
         }
 
-        ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;

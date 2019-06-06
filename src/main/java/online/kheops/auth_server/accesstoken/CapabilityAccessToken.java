@@ -16,7 +16,7 @@ final class CapabilityAccessToken implements AccessToken {
     private final String sub;
     private Capability capability;
 
-    static final class CapabilityAccessTokenBuilder extends AccessTokenBuilder {
+    static final class CapabilityAccessTokenBuilder implements AccessTokenBuilder {
         @Override
         public AccessToken build(String capabilityToken) throws AccessTokenVerificationException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {

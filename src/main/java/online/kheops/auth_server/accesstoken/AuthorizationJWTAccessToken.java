@@ -15,13 +15,14 @@ final class AuthorizationJWTAccessToken implements AccessToken {
     private final String sub;
     private final boolean capabilityAccess;
 
-    static final class Builder extends AccessTokenBuilder {
+    static final class Builder implements AccessTokenBuilder {
+        private final ServletContext servletContext;
 
-        private Builder(ServletContext servletContext) {
-            super(servletContext);
+        Builder(ServletContext servletContext) {
+            this.servletContext = servletContext;
         }
 
-        AuthorizationJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public AuthorizationJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             try {
                 final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
                         .withIssuer("auth.kheops.online")
@@ -46,7 +47,7 @@ final class AuthorizationJWTAccessToken implements AccessToken {
         }
 
         private String authorizationSecret() {
-            return getServletContext().getInitParameter("online.kheops.auth.hmacsecret");
+            return servletContext.getInitParameter("online.kheops.auth.hmacsecret");
         }
     }
 

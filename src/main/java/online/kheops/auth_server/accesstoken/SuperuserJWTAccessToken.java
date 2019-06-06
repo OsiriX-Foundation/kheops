@@ -12,12 +12,14 @@ import java.util.Objects;
 final class SuperuserJWTAccessToken implements AccessToken {
     private final String sub;
 
-    static class Builder extends AccessTokenBuilder {
-        private Builder(ServletContext servletContext) {
-            super(servletContext);
+    static class Builder implements AccessTokenBuilder {
+        private final ServletContext servletContext;
+
+        Builder(ServletContext servletContext) {
+            this.servletContext = servletContext;
         }
 
-        SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -44,7 +46,7 @@ final class SuperuserJWTAccessToken implements AccessToken {
         }
 
         private String getSuperuserSecret() {
-            return getServletContext().getInitParameter("online.kheops.superuser.hmacsecret");
+            return servletContext.getInitParameter("online.kheops.superuser.hmacsecret");
         }
     }
 
