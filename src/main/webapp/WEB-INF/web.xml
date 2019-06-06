@@ -72,7 +72,7 @@
     <context-param>
         <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
         <param-name>online.kheops.client.dicomwebproxyclientid</param-name>
-        <param-value>dicomwebproxy</param-value>
+        <param-value>DICOMWebProxy</param-value>
     </context-param>
     <context-param>
         <description>Password the dicomewebproxy uses when connecting to the token endpoint</description>
@@ -82,7 +82,7 @@
     <context-param>
         <description>Username the zipper uses when connecting to the token endpoint</description>
         <param-name>online.kheops.client.zipperclientid</param-name>
-        <param-value>zipper</param-value>
+        <param-value>Zipper</param-value>
     </context-param>
     <context-param>
         <description>Password the zipper uses when connecting to the token endpoint</description>
