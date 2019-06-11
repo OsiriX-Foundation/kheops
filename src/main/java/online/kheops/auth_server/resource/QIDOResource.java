@@ -213,7 +213,11 @@ public class QIDOResource {
         queryParameters.remove(QUERY_PARAMETER_SORT);
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
-        String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
+        String authToken = PACSAuthTokenBuilder.newBuilder()
+                .withStudyUID(studyInstanceUID)
+                .withAllSeries()
+                .withSubject(kheopsPrincipal.getUser().getKeycloakId())
+                .build();
 
         WebTarget webTarget = CLIENT.target(uri);
 
@@ -336,7 +340,11 @@ public class QIDOResource {
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
-        String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
+        String authToken = PACSAuthTokenBuilder.newBuilder()
+                .withStudyUID(studyInstanceUID)
+                .withAllSeries()
+                .withSubject(kheopsPrincipal.getUser().getKeycloakId())
+                .build();
         final Response upstreamResponse;
         try {
             upstreamResponse = CLIENT.target(uri).request("application/dicom+json").header("Authorization", "Bearer " + authToken).get();

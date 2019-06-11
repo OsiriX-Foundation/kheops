@@ -13,8 +13,8 @@ public abstract class AccessTokenVerifier {
                           CapabilityAccessToken.CapabilityAccessTokenBuilder.class,
                           ViewerAccessTokenBuilder.class,
                           KeycloakAccessToken.Builder.class,
-                          AuthorizationJWTAccessToken.Builder.class,
-                          SuperuserJWTAccessToken.Builder.class);
+                          PepAccessToken.Builder.class,
+                          SuperuserAccessToken.Builder.class);
 
     private AccessTokenVerifier() {}
 

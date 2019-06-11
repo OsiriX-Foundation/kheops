@@ -54,7 +54,7 @@ public abstract class Fetcher {
 
         final Attributes attributes;
         try {
-            String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().build();
+            String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().withSubject("Fetcher").build();
             List<Attributes> studyList = CLIENT.target(studyUri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
             if (studyList == null || studyList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch study returned nothing");
@@ -99,7 +99,7 @@ public abstract class Fetcher {
 
         final Attributes attributes;
         try {
-            String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyUID).withSeriesUID(seriesUID).build();
+            String authToken = PACSAuthTokenBuilder.newBuilder().withStudyUID(studyUID).withSeriesUID(seriesUID).withSubject("Fetcher").build();
             List<Attributes> seriesList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer " + authToken).get(new GenericType<List<Attributes>>() {
             });
             if (seriesList == null || seriesList.isEmpty()) {

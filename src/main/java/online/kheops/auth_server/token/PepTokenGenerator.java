@@ -3,6 +3,7 @@ package online.kheops.auth_server.token;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import online.kheops.auth_server.PACSAuthTokenBuilder;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
@@ -86,27 +87,12 @@ class PepTokenGenerator {
         } catch (SeriesNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair", e);
         }
-        // Generate a pep token
-        final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-        final Algorithm algorithmHMAC;
-        try {
-            algorithmHMAC = Algorithm.HMAC256(authSecret);
-        } catch (UnsupportedEncodingException e) {
-            LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
-            throw new WebApplicationException(Response.status(INTERNAL_SERVER_ERROR).entity("Error downloading the public key").build());
-        }
-
-        JWTCreator.Builder jwtBuilder = JWT.create()
-                .withIssuer("auth.kheops.online")
-                .withSubject(accessToken.getSub())
-                .withAudience("dicom.kheops.online")
-                .withClaim("capability", false) // don't give capability access
-                .withClaim("study_uid", studyInstanceUID)
-                .withClaim("series_uid", seriesInstanceUID)
-                .withExpiresAt(Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)))
-                .withNotBefore(new Date());
 
         LOG.info(() -> "Returning pep token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        return jwtBuilder.sign(algorithmHMAC);
+        return PACSAuthTokenBuilder.newBuilder()
+                .withStudyUID(studyInstanceUID)
+                .withSeriesUID(seriesInstanceUID)
+                .withSubject(accessToken.getSub())
+                .build();
     }
 }

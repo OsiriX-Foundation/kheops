@@ -10,10 +10,9 @@ import online.kheops.auth_server.user.Users;
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 
-final class AuthorizationJWTAccessToken implements AccessToken {
+final class PepAccessToken implements AccessToken {
 
     private final String sub;
-    private final boolean capabilityAccess;
 
     static final class Builder implements AccessTokenBuilder {
         private final ServletContext servletContext;
@@ -22,10 +21,11 @@ final class AuthorizationJWTAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        public AuthorizationJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public PepAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             try {
                 final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
                         .withIssuer("auth.kheops.online")
+                        .withAudience("dicom.kheops.online")
                         .build()
                         .verify(assertionToken);
 
@@ -34,12 +34,7 @@ final class AuthorizationJWTAccessToken implements AccessToken {
                 } catch (UserNotFoundException e) {
                     throw new AccessTokenVerificationException("Can't find user");
                 }
-                final Boolean capabilityClaim = jwt.getClaim("capability").asBoolean();
-                boolean capabilityBoolean = false;
-                if (capabilityClaim != null) {
-                    capabilityBoolean = capabilityClaim;
-                }
-                return new AuthorizationJWTAccessToken(jwt.getSubject(), capabilityBoolean);
+                return new PepAccessToken(jwt.getSubject());
 
             } catch (JWTVerificationException | UnsupportedEncodingException e) {
                 throw new AccessTokenVerificationException("Verification of the access token failed", e);
@@ -51,9 +46,8 @@ final class AuthorizationJWTAccessToken implements AccessToken {
         }
     }
 
-    private AuthorizationJWTAccessToken(String sub, boolean capabilityAccess) {
+    private PepAccessToken(String sub) {
         this.sub = sub;
-        this.capabilityAccess = capabilityAccess;
     }
 
     @Override
@@ -63,7 +57,7 @@ final class AuthorizationJWTAccessToken implements AccessToken {
 
     @Override
     public boolean hasCapabilityAccess() {
-        return capabilityAccess;
+        return false;
     }
 
     @Override

@@ -16,7 +16,7 @@ public abstract class PACSAuthTokenBuilder {
     public abstract PACSAuthTokenBuilder withSeriesUID(String seriesUID);
     public abstract PACSAuthTokenBuilder withAllSeries();
 
-//    abstract public PACSAuthTokenBuilder withSubject(String sub);
+    abstract public PACSAuthTokenBuilder withSubject(String sub);
 
     public abstract String build();
 }

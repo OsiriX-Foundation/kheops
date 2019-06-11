@@ -9,7 +9,7 @@ import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
-final class SuperuserJWTAccessToken implements AccessToken {
+final class SuperuserAccessToken implements AccessToken {
     private final String sub;
 
     static class Builder implements AccessTokenBuilder {
@@ -19,7 +19,7 @@ final class SuperuserJWTAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        public SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public SuperuserAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -42,7 +42,7 @@ final class SuperuserJWTAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
-            return new SuperuserJWTAccessToken(jwt.getSubject());
+            return new SuperuserAccessToken(jwt.getSubject());
         }
 
         private String getSuperuserSecret() {
@@ -50,7 +50,7 @@ final class SuperuserJWTAccessToken implements AccessToken {
         }
     }
 
-    private SuperuserJWTAccessToken(String sub) {
+    private SuperuserAccessToken(String sub) {
         this.sub = Objects.requireNonNull(sub);
     }
 

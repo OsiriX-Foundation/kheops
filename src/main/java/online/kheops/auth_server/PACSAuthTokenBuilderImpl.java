@@ -51,11 +51,11 @@ public class PACSAuthTokenBuilderImpl extends PACSAuthTokenBuilder {
         return this;
     }
 
-//    @Override
-//    public PACSAuthTokenBuilder withSubject(String subject){
-//        claims.put(SUBJECT, subject);
-//        return this;
-//    }
+    @Override
+    public PACSAuthTokenBuilder withSubject(String subject){
+        claims.put(SUBJECT, subject);
+        return this;
+    }
 
     @Override
     public String build() {
@@ -65,11 +65,12 @@ public class PACSAuthTokenBuilderImpl extends PACSAuthTokenBuilder {
         if (!claims.containsKey(SERIES_UID)) {
             throw new IllegalStateException("Missing seriesUID");
         }
-//        if (!claims.containsKey(SUBJECT)) {
-//            throw new IllegalStateException("Missing Subject");
-//        }
+        if (!claims.containsKey(SUBJECT)) {
+            throw new IllegalStateException("Missing Subject");
+        }
 
         return JWT.create().withIssuer("auth.kheops.online")
+                .withAudience("dicom.kheops.online")
                 .withClaim(STUDY_UID, claims.get(STUDY_UID))
                 .withClaim(SERIES_UID, claims.get(SERIES_UID))
                 .withSubject(claims.get(SUBJECT))
