@@ -117,7 +117,8 @@ const actions = {
 			let reloadSeries = params.reloadSeries !== undefined
 			_.forEach(state.flags, (flag, StudyInstanceUID) => {
 				if (flag.show_details) {
-					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: null, reload: reloadSeries })
+					let albumid = params.filters.album_id !== '' ? params.filters.album_id : null
+					dispatch('getSeries', { StudyInstanceUID: StudyInstanceUID, album_id: albumid, reload: reloadSeries })
 				}
 			})
 			return res

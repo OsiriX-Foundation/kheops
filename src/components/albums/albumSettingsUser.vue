@@ -12,7 +12,8 @@
 		"write_comments": "Write Comments",
 		"albumuseraddsuccess": "User successfully added to the album",
 		"Unknown user": "Unknown user",
-    "usersettings": "Album user settings"
+    "usersettings": "Album user settings",
+    "allreadypresent": "This user is already present in the album"
 	},
 	"fr": {
 		"userlist": "Liste d'utilisateurs",
@@ -24,7 +25,8 @@
 		"write_comments": "Commenter",
 		"albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
 		"Unknown user": "Utilisateur inconnu",
-    "usersettings": "Réglages des utilisateurs de l'album"
+    "usersettings": "Réglages des utilisateurs de l'album",
+    "allreadypresent": "Cet utilisateur est déjà présent dans l'album"
 	}
 }
 </i18n>
@@ -168,8 +170,17 @@ export default {
 	},
 	methods: {
 		addUser () {
+			let allreadyPresent = false
+			for (var i = 0; i < this.users.length; i++) {
+				if (this.users[i].user_name === this.new_user_name) {
+					allreadyPresent = true
+				}
+			}
+
 			if (!this.form_add_user) this.form_add_user = true
-			else {
+			else if (allreadyPresent) {
+				this.$snotify.error(this.$t('allreadypresent'))
+			} else {
 				if (this.new_user_name && this.validEmail(this.new_user_name)) {
 					this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then(() => {
 						this.$snotify.success(this.$t('albumuseraddsuccess'))
