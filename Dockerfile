@@ -2,7 +2,7 @@ FROM nginx:stable as builder
 
 COPY . .
 
-ENV FILEBEAT_VERSION 6.7.1
+ENV FILEBEAT_VERSION 7.1.1
 
 RUN apt-get update && \
     apt-get install -y curl && \
@@ -20,7 +20,7 @@ COPY --from=builder chain.pem /etc/nginx/chain.pem
 RUN chmod +x /etc/nginx/conf.d/script.sh
 
 #FILEBEAT
-ENV FILEBEAT_VERSION 6.7.1
+ENV FILEBEAT_VERSION 7.1.1
 COPY --from=builder filebeat-${FILEBEAT_VERSION}-amd64.deb filebeat-${FILEBEAT_VERSION}-amd64.deb
 RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb && \
     rm filebeat-${FILEBEAT_VERSION}-amd64.deb
