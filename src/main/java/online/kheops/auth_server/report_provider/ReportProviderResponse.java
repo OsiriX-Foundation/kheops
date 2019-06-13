@@ -3,7 +3,6 @@ package online.kheops.auth_server.report_provider;
 
 import online.kheops.auth_server.entity.ReportProvider;
 
-import javax.json.JsonObject;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 
@@ -17,8 +16,7 @@ public class ReportProviderResponse {
     private String clientId;
     @XmlElement(name = "created_time")
     private LocalDateTime createdTime;
-    @XmlElement(name = "config")
-    private JsonObject config;
+
 
     private ReportProviderResponse() { /*empty*/ }
 
@@ -28,11 +26,5 @@ public class ReportProviderResponse {
         clientId = reportProvider.getClientId();
 
         createdTime = reportProvider.getCreationTime();
-    }
-
-    protected ReportProviderResponse(ReportProvider reportProvider, JsonObject config) {
-        this(reportProvider);
-        this.config = config;
-
     }
 }

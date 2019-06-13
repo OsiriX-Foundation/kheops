@@ -343,13 +343,23 @@ public class ReportProviderResource {
     @POST
     @Secured
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("reportproviders/testuri")
+    @Path("reportproviders/metadata")
     public Response testUri(@FormParam("url") final String url) {
 
-        if (url == null || url.isEmpty() || !isValidConfigUrl(url)) {
-            return Response.status(BAD_REQUEST).entity("url not valid").build();
+        if (url == null || url.isEmpty()) {
+            return Response.status(BAD_REQUEST).entity("Missing formParam 'url'").build();
         }
-        return  Response.status(OK).build();
+
+        ReportProviderClientMetadataResponse clientMetadataResponse = new ReportProviderClientMetadataResponse();
+
+        try {
+            clientMetadataResponse = getClientMetadata(url);
+            clientMetadataResponse.setValid(true);
+        } catch (ReportProviderUriNotValidException e) {
+            clientMetadataResponse.setValid(false);
+        }
+
+        return  Response.status(OK).entity(clientMetadataResponse).build();
     }
 
     private String getHostRoot() {
