@@ -176,6 +176,7 @@ export default {
 				console.log(err)
 			})
 		},
+
 		openWADO (series, contentType) {
 			let wadoWindow = window.open('', 'WADO')
 			this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then(res => {

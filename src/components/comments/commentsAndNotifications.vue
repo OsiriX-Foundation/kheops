@@ -21,11 +21,7 @@
     "to": "to",
     "writecomment": "Write your comment here",
     "checkprivateuser": "Send private message to",
-    "notificationof": "Notification of",
-    "createreportprovider": "{user} create the report provider {reportname}",
-    "editreportprovider": "{user} edit the report provider {reportname}",
-    "deletereportprovider": "{user} delete the report provider {reportname}",
-    "newreport": "{user} add a new report in the study {study} with the report provider {reportname}"
+    "notificationof": "Notification of"
 	},
 	"fr" : {
 		"commentpostsuccess": "le commentaire a été posté avec succès",
@@ -46,11 +42,7 @@
     "to": "à",
     "writecomment": "Ecrivez votre commentaire ici",
     "checkprivateuser": "Envoyer un message privé à",
-    "notificationof": "Notification du",
-    "createreportprovider": "{user} a créé le report provider {reportname}",
-    "editreportprovider": "{user} a édité le report provider {reportname}",
-    "deletereportprovider": "{user} a supprimé le report provider {reportname}",
-    "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}"
+    "notificationof": "Notification du"
 	}
 }
 </i18n>
@@ -222,34 +214,6 @@
                 class=" flex-grow-1 bd-highlight"
               >
                 <i>{{ comment.origin_name }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
-              </div>
-
-              <div
-                v-if="comment.mutation_type === 'CREATE_REPORT_PROVIDER' && comment.report_provider"
-                class=" flex-grow-1 bd-highlight"
-              >
-                {{ $t('createreportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
-              </div>
-
-              <div
-                v-if="comment.mutation_type === 'EDIT_REPORT_PROVIDER' && comment.report_provider"
-                class=" flex-grow-1 bd-highlight"
-              >
-                {{ $t('editreportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
-              </div>
-
-              <div
-                v-if="comment.mutation_type === 'DELETE_REPORT_PROVIDER' && comment.report_provider"
-                class=" flex-grow-1 bd-highlight"
-              >
-                {{ $t('deletereportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
-              </div>
-
-              <div
-                v-if="comment.mutation_type === 'NEW_REPORT' && comment.report_provider"
-                class=" flex-grow-1 bd-highlight"
-              >
-                {{ $t('newreport', {user: comment.origin_name, reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
               </div>
             </div>
           </div>

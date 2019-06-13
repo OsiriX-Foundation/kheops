@@ -999,7 +999,7 @@ export default {
 				.then(() => {
 					this.setLoading(false)
 				})
-			this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
+			setTimeout(() => this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true }), 300)
 		}
 	},
 
