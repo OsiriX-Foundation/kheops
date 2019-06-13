@@ -10,16 +10,24 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
+
 import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 
 public class Users {
     private static final Logger LOG = Logger.getLogger(Users.class.getName());
+    private static final Client CLIENT = ClientBuilder.newClient();
 
     private Users() {
         throw new IllegalStateException("Utility class");
@@ -46,7 +54,6 @@ public class Users {
 
     public static User getOrCreateUser(String userReference)
             throws UserNotFoundException {
-
 
         final EntityManager getUserEntityManager = EntityManagerListener.createEntityManager();
         //try to find the user in kheops db
@@ -91,7 +98,6 @@ public class Users {
             em.persist(newUser);
             em.persist(albumUser);
             tx.commit();
-            return newUser;
         } catch (PersistenceException e) {
             final EntityManager secondTryEntityManager = EntityManagerListener.createEntityManager();
             try {
@@ -110,5 +116,20 @@ public class Users {
             }
             em.close();
         }
+        // Demo specific, go tickle the welcomebot when a new user is added.
+        // Block until the reply so that the welcome bot has an opportunity to call back to the
+        // Authorization server and share series/albums.
+        try {
+            LOG.log(INFO, "About to try to share with the welcomebot");
+            CLIENT.target("http://welcomebot:8080/share")
+                    .queryParam("user", newUser.getKeycloakId())
+                    .request()
+                    .post(Entity.text(""));
+        } catch (ProcessingException | WebApplicationException e) {
+            LOG.log(SEVERE, "Unable to communicate with the welcomebot", e);
+        }
+        LOG.log(INFO, "Finished sharing with the welcomebot");
+
+        return newUser;
     }
 }
