@@ -126,10 +126,15 @@ public class ReportProviders {
             configuration.property(ClientProperties.CONNECT_TIMEOUT, 5000);
             configuration.property(ClientProperties.READ_TIMEOUT, 5000);
 
-            return ClientBuilder.newClient(configuration).target(configUrl).request().get(ReportProviderClientMetadataResponse.class);
+
+            ReportProviderClientMetadataResponse clientMetadata = ClientBuilder.newClient(configuration).target(configUrl).request().get(ReportProviderClientMetadataResponse.class);
+            if (clientMetadata.isValid()) {
+                return clientMetadata;
+            }
         } catch (Exception e) {
             throw new ReportProviderUriNotValidException("error during request");
         }
+        throw new ReportProviderUriNotValidException("uri not valid");
     }
 
 
