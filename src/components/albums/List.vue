@@ -94,6 +94,7 @@
     />
     <b-table
       striped
+      hover
       :items="albums"
       :fields="fields"
       :sort-desc="true"
@@ -101,6 +102,7 @@
       :no-local-sorting="true"
       :dark="false"
       :no-sort-reset="true"
+      :tbody-class="'link'"
       @sort-changed="sortingChanged"
       @row-clicked="selectAlbum"
     >
