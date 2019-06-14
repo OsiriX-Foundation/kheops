@@ -97,11 +97,11 @@ setup.template.settings:
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
-name: "${elastic_name}"
+name: kheops_pep
 
 # The tags of the shipper are included in their own field with each
 # transaction published.
-tags: [${elastic_tags}]
+#tags: [${elastic_tags}]
 
 # Optional fields that you can specify to add additional information to the
 # output.
@@ -166,7 +166,7 @@ output.elasticsearch:
 #--------------------------- Logstash output --------------------------------
 output.logstash:
   # The Logstash hosts
-  hosts: ["10.5.7.8:5044"]
+  hosts: ["${logstash_url}"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
