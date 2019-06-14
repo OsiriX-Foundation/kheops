@@ -63,11 +63,12 @@
 		"addInbox": "Add to inbox",
     "nostudy": "Aucne étude trouvée",
 		"studiessend": "études envoyées dans votre boîte de réception",
-    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
     "cancel": "Annuler",
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
+    "confirmDelete": "Etes vous de sûr de vouloir supprimer {count} étude | Etes vous de sûr de vouloir supprimer {count} études",
+    "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
     "favorites": "Favorites"
 	}
 }
