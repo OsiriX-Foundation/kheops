@@ -41,9 +41,8 @@ filebeat.inputs:
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
-  #fields:
-  #  level: debug
-  #  review: 1
+  fields:
+    docker_type: tomcat
 
   ### Multiline options
 
@@ -95,6 +94,7 @@ name: "kheops_authorization"
 # output.
 fields:
   instance: ${instance}
+
 
 
 #============================== Dashboards =====================================
