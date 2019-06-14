@@ -8,7 +8,14 @@
       "created_time": "Created time",
       "edit": "Edit",
       "remove": "Remove",
-      "back": "Back"
+      "back": "Back",
+      "client_name": "Client name",
+      "client_uri": "Client URL",
+      "logo_uri": "Logo URL",
+      "tos_uri": "terms of service document",
+      "policy_uri": "Privacy policy document",
+      "software_version": "Software version",
+      "contacts": "Contact"
 		},
 		"fr": {
 			"url": "URL de configuration",
@@ -18,7 +25,14 @@
       "created_time": "Date de création",
       "edit": "Editer",
       "remove": "Supprimer",
-      "back": "Retour"
+      "back": "Retour",
+      "client_name": "Nom du client",
+      "client_uri": "URL du client",
+      "logo_uri": "URL du logo",
+      "tos_uri": "Document de conditions d'utilisation",
+      "policy_uri": "Document de la politique de confidentialité",
+      "software_version": "Version du logiciel",
+      "contacts": "Contact"
 		}
 	}
 </i18n>
@@ -79,6 +93,114 @@
           </dd>
         </div>
       </div>
+      <span
+        v-if="provider.data"
+      >
+        <div
+          v-if="provider.data.client_name"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('client_name') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              {{ provider.data.client_name }}
+            </dd>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.client_uri"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('client_uri') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <a :href="provider.data.client_uri">
+                {{ provider.data.client_uri }}
+              </a>
+            </dd>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.logo_uri"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('logo_uri') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <a :href="provider.data.logo_uri">
+                {{ provider.data.logo_uri }}
+              </a>
+            </dd>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.contacts"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('contacts') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <li
+              v-for="contact in provider.data.contacts"
+              :key="contact.id"
+            >
+              <a :href="`mailto:${contact}`">
+                {{ contact }}
+              </a>
+            </li>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.tos_uri"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('tos_uri') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <a :href="provider.data.tos_uri">
+                {{ provider.data.tos_uri }}
+              </a>
+            </dd>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.policy_uri"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('policy_uri') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <a :href="provider.data.policy_uri">
+                {{ provider.data.policy_uri }}
+              </a>
+            </dd>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.software_version"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('software_version') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              {{ provider.data.software_version }}
+            </dd>
+          </div>
+        </div>
+      </span>
     </div>
     <div class="row mb-2">
       <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
