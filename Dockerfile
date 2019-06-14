@@ -1,30 +1,19 @@
-FROM nginx:stable as builder
-
-COPY . .
-
-ENV FILEBEAT_VERSION 7.1.1
-
-RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb
-#########################################################################################
 FROM nginx:stable
 
 ENV SECRET_FILE_PATH=/run/secrets
 
-COPY --from=builder kheops.conf /etc/nginx/conf.d/kheops.conf
-COPY --from=builder script.sh /etc/nginx/conf.d/script.sh
-COPY --from=builder nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder chain.pem /etc/nginx/chain.pem
+COPY kheops.conf /etc/nginx/conf.d/kheops.conf
+COPY script.sh /etc/nginx/conf.d/script.sh
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY chain.pem /etc/nginx/chain.pem
 
 RUN chmod +x /etc/nginx/conf.d/script.sh
 
 #FILEBEAT
-ENV FILEBEAT_VERSION 7.1.1
-COPY --from=builder filebeat-${FILEBEAT_VERSION}-amd64.deb filebeat-${FILEBEAT_VERSION}-amd64.deb
-RUN dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb && \
-    rm filebeat-${FILEBEAT_VERSION}-amd64.deb
-COPY --from=builder filebeat.yml /etc/filebeat/filebeat.yml
+COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
+RUN dpkg -i filebeat-amd64.deb && \
+    rm filebeat-amd64.deb
+COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
 
