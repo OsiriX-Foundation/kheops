@@ -279,12 +279,12 @@
       </div>
       <confirm-button
         v-if="confirmDelete && selectedStudiesNb"
-        :btn-primary-text="$t('delete')"
-        :btn-danger-text="$t('cancel')"
+        :btn-primary-text="$t('cancel')"
+        :btn-danger-text="$t('delete')"
         :text="$tc('confirmDelete',selectedStudiesNb,{count: selectedStudiesNb}) + ' ' +
           $tc('confirmDeleteSeries', selectedSeriesNb, {count: selectedSeriesNb})"
-        :method-confirm="deleteSelectedStudies"
-        :method-cancel="() => confirmDelete=false"
+        :method-confirm="() => confirmDelete=false"
+        :method-cancel="deleteSelectedStudies"
       />
       <form-get-user
         v-if="form_send_study && selectedStudiesNb"
@@ -300,13 +300,14 @@
       <b-table
         class="container-fluid"
         striped
+        hover
         :items="studies"
         :fields="fields"
         :sort-desc="true"
         :sort-by.sync="sortBy"
         :no-local-sorting="true"
         :no-sort-reset="true"
-        :tbody-class="'table-wrapper-scroll-y'"
+        :tbody-class="'table-wrapper-scroll-y link'"
         @sort-changed="sortingChanged"
         @row-clicked="showDetailsOnRow"
       >
@@ -1177,7 +1178,13 @@ export default {
 			if (studyIds.length || seriesIds.length) {
 				this.$store.dispatch('sendStudies', { StudyInstanceUIDs: studyIds, SeriesInstanceUIDs: seriesIds, user: userSub, src: this.filters.album_id ? this.filters.album_id : 'inbox' }).then(res => {
 					this.$snotify.success(`${studies.length} ${this.$t('studiessharedsuccess')}`)
-					if (res.error) this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
+					this.form_send_study = false
+					this.studies.forEach(study => {
+						study.is_selected = false
+					})
+					if (res.error) {
+						this.$snotify.error(`${res.error} ${this.$t('studiessharederror')}`)
+					}
 				})
 			}
 		},
