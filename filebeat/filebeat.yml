@@ -21,7 +21,6 @@ filebeat.inputs:
 - type: log
   # Change to true to enable this input configuration.
   enabled: true
-  pipeline: "kheops-authorization"
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
@@ -86,16 +85,16 @@ setup.template.settings:
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
-name: "${elastic_name}"
+name: "kheops_authorization"
 
 # The tags of the shipper are included in their own field with each
 # transaction published.
-tags: [${elastic_tags}]
+#tags: [${elastic_tags}]
 
 # Optional fields that you can specify to add additional information to the
 # output.
-#fields:
-#  env: staging
+fields:
+  instance: ${instance}
 
 
 #============================== Dashboards =====================================
@@ -147,6 +146,7 @@ setup.kibana:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
+  enable: false
   hosts: ["${elastic_url}:9200"]
 
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
@@ -157,10 +157,10 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-#----------------------------- Logstash output --------------------------------
-#output.logstash:
+#--------------------------- Logstash output --------------------------------
+output.logstash:
   # The Logstash hosts
-  #hosts: ["localhost:5044"]
+  hosts: ["${logstash_url}"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
