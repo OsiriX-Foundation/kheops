@@ -25,6 +25,7 @@ filebeat.inputs:
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
     - /usr/local/tomcat/logs/*.log
+    - /usr/local/tomcat/logs/*.txt
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
