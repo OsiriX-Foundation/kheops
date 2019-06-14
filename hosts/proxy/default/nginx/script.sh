@@ -72,52 +72,12 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
         echo "Start init filebeat"
         missing_env_var_secret=false
 
-        #Verify secrets
-        if ! [ -f /run/secrets/elastic_pwd ]; then
-            echo "Missing elastic_pwd secret"
-            missing_env_var_secret=true
-        else
-           echo "secret elastic_pwd OK"
-        fi
-
-
-        if [ -z $KHEOPS_PEP_ELASTIC_NAME ]; then
-          echo "Missing KHEOPS_PEP_ELASTIC_NAME environment variable"
+        if [ -z $KHEOPS_PEP_LOGSTASH_URL ]; then
+          echo "Missing KHEOPS_PEP_LOGSTASH_URL environment variable"
           missing_env_var_secret=true
         else
-           echo -e "environment variable KHEOPS_PEP_ELASTIC_NAME OK"
-           sed -i "s|\${elastic_name}|$KHEOPS_PEP_ELASTIC_NAME|" /etc/filebeat/filebeat.yml
-        fi
-        if [ -z $KHEOPS_PEP_ELASTIC_TAGS ]; then
-          echo "Missing KHEOPS_PEP_ELASTIC_TAGS environment variable"
-          missing_env_var_secret=true
-        else
-           echo -e "environment variable KHEOPS_PEP_ELASTIC_TAGS OK"
-           sed -i "s|\${elastic_tags}|$KHEOPS_PEP_ELASTIC_TAGS|" /etc/filebeat/filebeat.yml
-        fi
-
-        if [ -z $KHEOPS_PEP_ELASTIC_USER ]; then
-          echo "Missing KHEOPS_PEP_ELASTIC_USER environment variable"
-          missing_env_var_secret=true
-        else
-           echo -e "environment variable KHEOPS_PEP_ELASTIC_USER OK"
-           sed -i "s|\${elastic_user}|$KHEOPS_PEP_ELASTIC_USER|" /etc/filebeat/filebeat.yml
-        fi
-
-        if [ -z $KHEOPS_PEP_ELASTIC_URL ]; then
-          echo "Missing KHEOPS_PEP_ELASTIC_URL environment variable"
-          missing_env_var_secret=true
-        else
-           echo -e "environment variable KHEOPS_PEP_ELASTIC_URL OK"
-           sed -i "s|\${elastic_url}|$KHEOPS_PEP_ELASTIC_URL|" /etc/filebeat/filebeat.yml
-        fi
-
-        if [ -z $KHEOPS_PEP_KIBANA_URL ]; then
-          echo "Missing KHEOPS_PEP_KIBANA_URL environment variable"
-          missing_env_var_secret=true
-        else
-           echo -e "environment variable KHEOPS_PEP_KIBANA_URL OK"
-           sed -i "s|\${kibana_url}|$KHEOPS_PEP_KIBANA_URL|" /etc/filebeat/filebeat.yml
+           echo -e "environment variable KHEOPS_PEP_LOGSTASH_URL OK"
+           sed -i "s|\${logstash_url}|$KHEOPS_PEP_LOGSTASH_URL|" /etc/filebeat/filebeat.yml
         fi
 
         if [[ -z $KHEOPS_PEP_ELASTIC_INSTANCE ]]; then
@@ -137,8 +97,6 @@ if ! [ -z "$KHEOPS_PEP_ENABLE_ELASTIC" ]; then
         fi
 
         filebeat modules disable system
-
-        cat /run/secrets/elastic_pwd | filebeat keystore add ES_PWD --stdin --force
         service filebeat restart
 
         echo "Ending setup FILEBEAT"
