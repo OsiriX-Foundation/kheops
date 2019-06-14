@@ -65,10 +65,9 @@ RUN rm -rf conf/* html/*
 COPY default/nginx $NGINX_PREFIX/
 
 #FILEBEAT
-ENV FILEBEAT_VERSION 7.1.1
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb \
- && dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb \
- && rm filebeat-${FILEBEAT_VERSION}-amd64.deb
+COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
+RUN dpkg -i filebeat-amd64.deb && \
+    rm filebeat-amd64.deb
 
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
