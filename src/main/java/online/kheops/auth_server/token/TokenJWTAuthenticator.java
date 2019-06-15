@@ -8,16 +8,11 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
+import online.kheops.auth_server.report_provider.ReportProviderClientMetadataResponse;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.report_provider.ReportProviders;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlElement;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,22 +24,17 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
 
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_CLIENT;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
-public class TokenJWTAuthenticator {
+class TokenJWTAuthenticator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String RS256 = "RS256";
-    private static final Client CLIENT = ClientBuilder.newClient();
 
     final private ServletContext context;
     private String clientId;
     private String clientJWT;
     private DecodedJWT decodedJWT;
-
-    private static class ConfigurationEntity {
-        @XmlElement(name="jwks_uri")
-        String jwksURI;
-    }
 
     static TokenJWTAuthenticator newAuthenticator(final ServletContext context) {
         return new TokenJWTAuthenticator(context);
@@ -164,43 +154,23 @@ public class TokenJWTAuthenticator {
         return context.getInitParameter(HOST_ROOT_PARAMETER);
     }
 
-    private URI getConfigurationURI() {
-        Objects.requireNonNull(clientId);
-
-        final URI configurationUri;
-        try {
-            configurationUri = new URI((ReportProviders.getReportProvider(clientId).getUrl()));
-        } catch (ClientIdNotFoundException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Unknown clientID", e);
-        } catch (URISyntaxException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI Syntax", e);
-        }
-
-//        if (!configurationUri.getScheme().equals("https") && !configurationUri.getHost().equals("localhost")) {
-//            throw new TokenRequestException(INVALID_REQUEST, "Non https jwks URIs are only allowed for localhost");
-//        }
-
-        return configurationUri;
-    }
-
     private URI getJWKSUri() {
-        final ConfigurationEntity configurationEntity;
+
+        final ReportProviderClientMetadataResponse clientMetadata;
         try {
-            configurationEntity = CLIENT.target(getConfigurationURI()).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
-        } catch (WebApplicationException | ProcessingException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Unable to obtain the jwks_uri", e);
+            clientMetadata = ReportProviders.getClientMetadata(ReportProviders.getReportProvider(clientId).getUrl());
+        } catch (ClientIdNotFoundException e) {
+            throw new TokenRequestException(INVALID_CLIENT, "Unknown client_id", e);
+        } catch (ReportProviderUriNotValidException e) {
+            throw new TokenRequestException(INVALID_CLIENT, "Error with the client config: " + e.getMessage(), e);
         }
 
         final URI jwksUri;
         try {
-            jwksUri = new URI(configurationEntity.jwksURI);
+            jwksUri = new URI(clientMetadata.getJwksUri());
         } catch (URISyntaxException e) {
             throw new TokenRequestException(INVALID_REQUEST, "jwks_uri is not a valid URI", e);
         }
-
-//        if (!jwksUri.getScheme().equals("https") && !jwksUri.getHost().equals("localhost")) {
-//            throw new TokenRequestException(INVALID_REQUEST, "Non https jwks URIs are only allowed for localhost");
-//        }
 
         return jwksUri;
     }
