@@ -13,6 +13,7 @@ import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
@@ -112,12 +113,12 @@ public class ReportProviderAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return true;
-    }
+    public TokenType getTokenType() { return TokenType.REPORT_PROVIDER_TOKEN; }
 
     @Override
-    public TokenType getTokenType() { return TokenType.REPORT_PROVIDER_TOKEN; }
+    public Optional<String> getScope() {
+        return Optional.of("read write");
+    }
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {

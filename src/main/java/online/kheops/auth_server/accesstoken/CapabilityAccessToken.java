@@ -1,14 +1,15 @@
 package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.capability.Capabilities;
-import online.kheops.auth_server.capability.CapabilityNotFoundException;
-import online.kheops.auth_server.capability.CapabilityNotValidException;
-import online.kheops.auth_server.capability.CapabilityToken;
+import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.CapabilityPrincipal;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,15 +64,29 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return false;
-    }
+    public Optional<String> getScope() {
+        String scope;
+        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+            scope = (capability.isWritePermission()?"write ":"") +
+                    (capability.isReadPermission()?"read ":"") +
+                    (capability.isDownloadPermission()?"downloadbutton ":"") +
+                    (capability.isAppropriatePermission()?"appropriate ":"");
+            if (scope.length() > 0) {
+                scope = scope.substring(0, scope.length() - 1);
+            }
+        } else {
+            scope = "read write";
+        }
 
-    @Override
-    public Optional<Capability> getCapability() {
-        return Optional.of(capability);
+        return Optional.of(scope);
     }
 
     @Override
     public TokenType getTokenType() { return TokenType.CAPABILITY_TOKEN; }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new CapabilityPrincipal(capability, user);
+    }
+
 }

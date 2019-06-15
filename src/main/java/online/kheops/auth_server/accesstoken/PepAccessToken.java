@@ -4,6 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.UserPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 
@@ -56,12 +59,12 @@ final class PepAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return false;
+    public TokenType getTokenType() {
+        return TokenType.PEP_TOKEN;
     }
 
     @Override
-    public TokenType getTokenType() {
-        return TokenType.PEP_TOKEN;
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new UserPrincipal(user);
     }
 }
