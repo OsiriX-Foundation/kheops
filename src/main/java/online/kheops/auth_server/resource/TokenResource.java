@@ -7,6 +7,7 @@ import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.token.TokenClientKind;
 import online.kheops.auth_server.token.TokenGrantType;
 import online.kheops.auth_server.token.TokenRequestException;
+import sun.tools.jstat.Token;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -99,7 +100,6 @@ public class TokenResource
         if (securityContext.isUserInRole(TokenClientKind.PUBLIC.getRoleString())) {
             throw new NotAuthorizedException("Basic");
         }
-        // TODO secure this resource
 
         final AccessToken accessToken;
         try {
@@ -109,6 +109,12 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
+            return Response.status(OK).entity(errorIntrospectResponse).build();
+        }
+
+        if (securityContext.isUserInRole(TokenClientKind.REPORT_PROVIDER.getRoleString()) &&
+                accessToken.getTokenType() != AccessToken.TokenType.REPORT_PROVIDER_TOKEN) {
+            LOG.log(WARNING, "Report Provider introspecting a valid non-report provider token");
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
