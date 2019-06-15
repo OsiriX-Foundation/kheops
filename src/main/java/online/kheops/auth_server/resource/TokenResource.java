@@ -63,14 +63,14 @@ public class TokenResource
     public Response token(MultivaluedMap<String, String> form) {
         final List<String> grantTypes = form.get("grant_type");
 
-        if (grantTypes == null || form.get("grant_type").size() != 1) {
+        if (grantTypes == null || grantTypes.size() != 1) {
             LOG.log(WARNING, "Missing or duplicate grant_type");
             throw new TokenRequestException(INVALID_REQUEST, "Missing or duplicate grant_type");
         }
 
         final TokenGrantType grantType;
         try {
-            grantType = TokenGrantType.fromString(form.getFirst("grant_type"));
+            grantType = TokenGrantType.fromString(grantTypes.get(0));
         } catch (IllegalArgumentException e) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
