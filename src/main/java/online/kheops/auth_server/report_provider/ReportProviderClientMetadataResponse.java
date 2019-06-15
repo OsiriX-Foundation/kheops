@@ -21,7 +21,7 @@ public class ReportProviderClientMetadataResponse {
     @XmlElement(name = "response_types")
     private ArrayList<String> responseTypes;
     @XmlElement(name = "client_name")
-    private String clienNname;
+    private String clientName;
     @XmlElement(name = "client_uri")
     private String clientUri;
     @XmlElement(name = "logo_uri")
@@ -46,8 +46,6 @@ public class ReportProviderClientMetadataResponse {
     @XmlElement(name = "token_endpoint_auth_signing_alg")
     private String tokenEndpointAuthSigningAlg;
 
-
-
     public ReportProviderClientMetadataResponse() {
         valid = false;
     }
@@ -56,7 +54,7 @@ public class ReportProviderClientMetadataResponse {
     public String getTokenEndpointAuthMethod() { return tokenEndpointAuthMethod; }
     public String getTokenEndpointAuthSigningAlg() { return tokenEndpointAuthSigningAlg; }
     public String getRedirectUri() { return redirectUri; }
-    public String getClienNname() { return clienNname; }
+    public String getClientName() { return clientName; }
     public String getClientUri() { return clientUri; }
     public ArrayList<String> getContacts() { return contacts; }
 
