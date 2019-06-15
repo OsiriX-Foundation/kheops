@@ -105,7 +105,7 @@ class ViewerAccessTokenGenerator {
             data.put(Consts.JWE.SOURCE_ID, sourceId);
             data.put(Consts.JWE.IS_INBOX, sourceType.equals(INBOX));
             data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
-            data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
+            data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
 
             final JsonWebEncryption jwe = new JsonWebEncryption();
             jwe.setPayload(data.toJSONString());
