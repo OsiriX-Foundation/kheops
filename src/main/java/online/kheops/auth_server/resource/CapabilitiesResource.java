@@ -41,7 +41,6 @@ public class CapabilitiesResource {
     @POST
     @Secured
     @CapabilitySecured
-    @FormURLEncodedContentType
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)

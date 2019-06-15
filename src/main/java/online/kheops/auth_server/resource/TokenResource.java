@@ -2,7 +2,6 @@ package online.kheops.auth_server.resource;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.token.TokenClientKind;
@@ -57,7 +56,6 @@ public class TokenResource
 
     @POST
     @TokenSecurity
-    @FormURLEncodedContentType
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -86,7 +84,6 @@ public class TokenResource
 
     @POST
     @TokenSecurity
-    @FormURLEncodedContentType
     @Path("/token/introspect")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
