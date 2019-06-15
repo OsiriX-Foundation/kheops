@@ -46,7 +46,7 @@ public enum TokenClientAuthenticationType {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown client accesstoken type");
             }
 
-            return TokenJWTAuthenticator.newAuthenticator(context)
+            return PrivateKeyJWTAuthenticator.newAuthenticator(context)
                     .clientJWT(formParams.getFirst(CLIENT_ASSERTION))
                     .clientId(formParams.getFirst(CLIENT_ID))
                     .authenticate();

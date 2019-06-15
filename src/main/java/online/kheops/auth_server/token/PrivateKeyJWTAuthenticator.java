@@ -27,7 +27,7 @@ import java.util.Objects;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_CLIENT;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
-class TokenJWTAuthenticator {
+class PrivateKeyJWTAuthenticator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String RS256 = "RS256";
 
@@ -36,20 +36,20 @@ class TokenJWTAuthenticator {
     private String clientJWT;
     private DecodedJWT decodedJWT;
 
-    static TokenJWTAuthenticator newAuthenticator(final ServletContext context) {
-        return new TokenJWTAuthenticator(context);
+    static PrivateKeyJWTAuthenticator newAuthenticator(final ServletContext context) {
+        return new PrivateKeyJWTAuthenticator(context);
     }
 
-    private TokenJWTAuthenticator(ServletContext context) {
+    private PrivateKeyJWTAuthenticator(ServletContext context) {
         this.context = context;
     }
 
-    TokenJWTAuthenticator clientId(final String clientId) {
+    PrivateKeyJWTAuthenticator clientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    TokenJWTAuthenticator clientJWT(final String clientJWT) {
+    PrivateKeyJWTAuthenticator clientJWT(final String clientJWT) {
         this.clientJWT = Objects.requireNonNull(clientJWT);
 
         try {
