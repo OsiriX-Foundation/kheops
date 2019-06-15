@@ -8,7 +8,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
-import online.kheops.auth_server.report_provider.ReportProviderClientMetadataResponse;
+import online.kheops.auth_server.report_provider.ReportProviderClientMetadata;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.report_provider.ReportProviders;
 
@@ -156,7 +156,7 @@ class TokenJWTAuthenticator {
 
     private URI getJWKSUri() {
 
-        final ReportProviderClientMetadataResponse clientMetadata;
+        final ReportProviderClientMetadata clientMetadata;
         try {
             clientMetadata = ReportProviders.getClientMetadata(ReportProviders.getReportProvider(clientId).getUrl());
         } catch (ClientIdNotFoundException e) {

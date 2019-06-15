@@ -63,14 +63,14 @@ public class ReportProviders {
         return new ReportProviderResponse(reportProvider);
     }
 
-    public static ReportProviderClientMetadataResponse callConfigURL(ReportProvider reportProvider)
+    public static ReportProviderClientMetadata callConfigURL(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
 
         try {
-            ReportProviderClientMetadataResponse clientMetadata = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get(ReportProviderClientMetadataResponse.class);
+            ReportProviderClientMetadata clientMetadata = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get(ReportProviderClientMetadata.class);
 
-            ReportProviderClientMetadataResponse.ValidationResult validationResult = clientMetadata.validateForConfigUri(reportProvider.getUrl());
-            if (validationResult != ReportProviderClientMetadataResponse.ValidationResult.OK) {
+            ReportProviderClientMetadata.ValidationResult validationResult = clientMetadata.validateForConfigUri(reportProvider.getUrl());
+            if (validationResult != ReportProviderClientMetadata.ValidationResult.OK) {
                 throw new ReportProviderUriNotValidException(validationResult.getDescription());
             }
             return clientMetadata;
@@ -81,13 +81,13 @@ public class ReportProviders {
 
     public static String getRedirectUri(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
-        ReportProviderClientMetadataResponse clientMetadata = callConfigURL(reportProvider);
+        ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
         return clientMetadata.getRedirectUri();
     }
 
     public static String getJwksUri(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
-        ReportProviderClientMetadataResponse clientMetadata = callConfigURL(reportProvider);
+        ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
         return clientMetadata.getJwksUri();
     }
 
@@ -116,7 +116,7 @@ public class ReportProviders {
         }
     }
 
-    public static ReportProviderClientMetadataResponse getClientMetadata (String configUrl)
+    public static ReportProviderClientMetadata getClientMetadata (String configUrl)
     throws ReportProviderUriNotValidException {
         try {
             new URI(configUrl);
@@ -130,10 +130,10 @@ public class ReportProviders {
             configuration.property(ClientProperties.READ_TIMEOUT, 5000);
 
 
-            ReportProviderClientMetadataResponse clientMetadata = ClientBuilder.newClient(configuration).target(configUrl).request().get(ReportProviderClientMetadataResponse.class);
+            ReportProviderClientMetadata clientMetadata = ClientBuilder.newClient(configuration).target(configUrl).request().get(ReportProviderClientMetadata.class);
 
-            ReportProviderClientMetadataResponse.ValidationResult validationResult = clientMetadata.validateForConfigUri(configUrl);
-            if (validationResult != ReportProviderClientMetadataResponse.ValidationResult.OK) {
+            ReportProviderClientMetadata.ValidationResult validationResult = clientMetadata.validateForConfigUri(configUrl);
+            if (validationResult != ReportProviderClientMetadata.ValidationResult.OK) {
                 throw new ReportProviderUriNotValidException(validationResult.getDescription());
             }
             return clientMetadata;

@@ -350,7 +350,7 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity("Missing formParam 'url'").build();
         }
 
-        ReportProviderClientMetadataResponse clientMetadataResponse = new ReportProviderClientMetadataResponse();
+        ReportProviderClientMetadata clientMetadataResponse = new ReportProviderClientMetadata();
 
         try {
             clientMetadataResponse = getClientMetadata(url);

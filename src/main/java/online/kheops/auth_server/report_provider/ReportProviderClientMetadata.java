@@ -6,7 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-public class ReportProviderClientMetadataResponse {
+public class ReportProviderClientMetadata {
 //https://tools.ietf.org/html/rfc7591
 
 
@@ -76,7 +76,7 @@ public class ReportProviderClientMetadataResponse {
         }
     }
 
-    public ReportProviderClientMetadataResponse() {
+    public ReportProviderClientMetadata() {
         valid = false;
     }
 
