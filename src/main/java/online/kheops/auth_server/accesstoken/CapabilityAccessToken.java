@@ -67,10 +67,10 @@ final class CapabilityAccessToken implements AccessToken {
     public Optional<String> getScope() {
         String scope;
         if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
-            scope = (capability.isWritePermission()?"write ":"") +
-                    (capability.isReadPermission()?"read ":"") +
-                    (capability.isDownloadPermission()?"downloadbutton ":"") +
-                    (capability.isAppropriatePermission()?"appropriate ":"");
+            scope = (capability.hasWritePermission()?"write ":"") +
+                    (capability.hasReadPermission()?"read ":"") +
+                    (capability.hasDownloadButtonPermission()?"downloadbutton ":"") +
+                    (capability.hasAppropriatePermission()?"appropriate ":"");
             if (scope.length() > 0) {
                 scope = scope.substring(0, scope.length() - 1);
             }

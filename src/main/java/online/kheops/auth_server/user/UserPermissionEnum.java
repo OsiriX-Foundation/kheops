@@ -75,7 +75,7 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
-            return capability.isReadPermission() && capability.isDownloadPermission();
+            return capability.hasReadPermission() && capability.hasDownloadButtonPermission();
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
@@ -91,7 +91,7 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
-            return capability.isReadPermission() && capability.isAppropriatePermission();
+            return capability.hasReadPermission() && capability.hasAppropriatePermission();
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
@@ -107,7 +107,7 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
-            return  capability.isReadPermission() && capability.isWritePermission();
+            return  capability.hasReadPermission() && capability.hasWritePermission();
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
@@ -123,7 +123,7 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
-            return capability.isWritePermission();
+            return capability.hasWritePermission();
         }
         @Override
         public boolean hasViewerPermission(Album album) { return false; }
@@ -139,7 +139,7 @@ public enum UserPermissionEnum {
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
-            return capability.isReadPermission();
+            return capability.hasReadPermission();
         }
         @Override
         public boolean hasViewerPermission(Album album) { return true; }

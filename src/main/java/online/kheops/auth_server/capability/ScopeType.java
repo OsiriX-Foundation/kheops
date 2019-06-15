@@ -59,10 +59,10 @@ public enum ScopeType {
             final AlbumResponse albumResponse = new AlbumResponse(capability);
             capabilityResponse.setAlbumResponse(albumResponse);
             capabilityResponse.setScopeType(this.name().toLowerCase());
-            capabilityResponse.setAppropriatePermission(capability.isAppropriatePermission());
-            capabilityResponse.setDownloadPermission(capability.isDownloadPermission());
-            capabilityResponse.setReadPermission(capability.isReadPermission());
-            capabilityResponse.setWritePermission(capability.isWritePermission());
+            capabilityResponse.setAppropriatePermission(capability.hasAppropriatePermission());
+            capabilityResponse.setDownloadPermission(capability.hasDownloadButtonPermission());
+            capabilityResponse.setReadPermission(capability.hasReadPermission());
+            capabilityResponse.setWritePermission(capability.hasWritePermission());
         }
 
         @Override

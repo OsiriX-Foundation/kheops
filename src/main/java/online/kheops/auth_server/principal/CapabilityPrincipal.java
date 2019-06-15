@@ -60,7 +60,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 } else {
                     throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + "not found");
                 }
-            } else if (getScope() == ScopeType.ALBUM && capability.isReadPermission()) {
+            } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
@@ -87,7 +87,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             final Study study = getStudy(studyInstanceUID, em);
             if(getScope() == ScopeType.USER) {
                 return canAccessStudy(user, study, em);
-            } else if (getScope() == ScopeType.ALBUM && capability.isReadPermission()) {
+            } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
@@ -146,7 +146,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             return false;
 
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!capability.isWritePermission()) {
+            if (!capability.hasWritePermission()) {
                 return false;
             }
             try {
@@ -191,7 +191,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            return capability.isWritePermission();
+            return capability.hasWritePermission();
         } else {
             return false;
         }
