@@ -1,6 +1,5 @@
 package online.kheops.auth_server.token;
 
-import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.report_provider.ReportProviders;
@@ -54,6 +53,7 @@ public enum TokenGrantType {
                     .withSubject(authorizationCode.getSubject())
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
+                    .withScope("read write")
                     .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
 
             return Response.ok(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME)).build();
