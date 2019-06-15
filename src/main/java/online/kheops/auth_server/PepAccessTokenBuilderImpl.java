@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PACSAuthTokenBuilderImpl extends PACSAuthTokenBuilder {
+public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
 
     private static final String STUDY_UID = "study_uid";
     private static final String SERIES_UID = "series_uid";
@@ -22,7 +22,7 @@ public class PACSAuthTokenBuilderImpl extends PACSAuthTokenBuilder {
     private Map<String, String> claims;
     private Algorithm algorithm;
 
-    PACSAuthTokenBuilderImpl(String secret) {
+    PepAccessTokenBuilderImpl(String secret) {
         claims = new HashMap<>();
         try {
             algorithm = Algorithm.HMAC256(secret);
@@ -32,27 +32,27 @@ public class PACSAuthTokenBuilderImpl extends PACSAuthTokenBuilder {
     }
 
     @Override
-    public PACSAuthTokenBuilder withStudyUID(String studyUID) {
+    public PepAccessTokenBuilder withStudyUID(String studyUID) {
         validateUID(studyUID);
         claims.put(STUDY_UID, studyUID);
         return this;
     }
 
     @Override
-    public PACSAuthTokenBuilder withSeriesUID(String seriesUID) {
+    public PepAccessTokenBuilder withSeriesUID(String seriesUID) {
         validateUID(seriesUID);
         claims.put(SERIES_UID, seriesUID);
         return this;
     }
 
     @Override
-    public PACSAuthTokenBuilder withAllSeries() {
+    public PepAccessTokenBuilder withAllSeries() {
         claims.put(SERIES_UID, SERIES_ALL_ACCESS);
         return this;
     }
 
     @Override
-    public PACSAuthTokenBuilder withSubject(String subject){
+    public PepAccessTokenBuilder withSubject(String subject){
         claims.put(SUBJECT, subject);
         return this;
     }

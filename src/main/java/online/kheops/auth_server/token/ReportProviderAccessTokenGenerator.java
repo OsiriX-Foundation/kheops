@@ -16,7 +16,7 @@ import java.util.*;
 
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
-public class ReportProviderTokenGenerator {
+public class ReportProviderAccessTokenGenerator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
@@ -26,26 +26,26 @@ public class ReportProviderTokenGenerator {
     private String clientId;
     private Set<String> studyInstanceUIDs;
 
-    static ReportProviderTokenGenerator createGenerator(final ServletContext servletContext) {
-        return new ReportProviderTokenGenerator(servletContext);
+    static ReportProviderAccessTokenGenerator createGenerator(final ServletContext servletContext) {
+        return new ReportProviderAccessTokenGenerator(servletContext);
     }
 
-    ReportProviderTokenGenerator withSubject(final String subject) {
+    ReportProviderAccessTokenGenerator withSubject(final String subject) {
         this.subject = Objects.requireNonNull(subject);
         return this;
     }
 
-    public ReportProviderTokenGenerator withAuthTime(final Date authTime) {
+    public ReportProviderAccessTokenGenerator withAuthTime(final Date authTime) {
         this.authTime = authTime;
         return this;
     }
 
-    ReportProviderTokenGenerator withClientId(final String clientId) {
+    ReportProviderAccessTokenGenerator withClientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    ReportProviderTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
+    ReportProviderAccessTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
         this.studyInstanceUIDs = new HashSet<>(studyInstanceUIDs);
         return this;
     }
@@ -70,7 +70,7 @@ public class ReportProviderTokenGenerator {
         }
     }
 
-    private ReportProviderTokenGenerator(final ServletContext servletContext) {
+    private ReportProviderAccessTokenGenerator(final ServletContext servletContext) {
         this.context = servletContext;
     }
 
