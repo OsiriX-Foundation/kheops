@@ -9,7 +9,6 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.ServletContext;
 import java.io.StringReader;
-import java.util.Optional;
 
 final class ViewerAccessToken implements AccessToken {
 
@@ -43,9 +42,6 @@ final class ViewerAccessToken implements AccessToken {
         AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString("token"));
         this.sub = accessToken.getSub();
     }
-
-    @Override
-    public Optional<JsonObject> getViewer() { return Optional.of(jwe); }
 
     @Override
     public boolean hasCapabilityAccess() {

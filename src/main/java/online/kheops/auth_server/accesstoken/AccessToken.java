@@ -3,9 +3,7 @@ package online.kheops.auth_server.accesstoken;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
-import javax.json.JsonObject;
 import javax.servlet.ServletContext;
-import java.util.Optional;
 
 public interface AccessToken {
 
@@ -17,7 +15,6 @@ public interface AccessToken {
     default String getScope() {
         return "read write";
     }
-    default Optional<JsonObject> getViewer() { return Optional.empty(); }
 
     KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user);
 }
