@@ -59,11 +59,6 @@ final class PepAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return false;
-    }
-
-    @Override
     public TokenType getTokenType() {
         return TokenType.PEP_TOKEN;
     }

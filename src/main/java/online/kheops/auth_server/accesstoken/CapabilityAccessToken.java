@@ -63,11 +63,6 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return false;
-    }
-
-    @Override
     public String getScope() {
         String scope;
         if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {

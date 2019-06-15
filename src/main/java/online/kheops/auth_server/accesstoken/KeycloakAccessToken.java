@@ -131,11 +131,6 @@ final class KeycloakAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return true;
-    }
-
-    @Override
     public String getSub() {
         return sub;
     }

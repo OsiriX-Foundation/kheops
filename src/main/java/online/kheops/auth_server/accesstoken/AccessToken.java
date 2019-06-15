@@ -11,7 +11,6 @@ public interface AccessToken {
 
     String getSub();
     TokenType getTokenType();
-    boolean hasCapabilityAccess();
     default String getScope() {
         return "read write";
     }

@@ -91,11 +91,6 @@ public class ReportProviderAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return true;
-    }
-
-    @Override
     public TokenType getTokenType() { return TokenType.REPORT_PROVIDER_TOKEN; }
 
     @Override

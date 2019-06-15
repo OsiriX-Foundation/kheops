@@ -44,11 +44,6 @@ final class ViewerAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return false;
-    }
-
-    @Override
     public String getScope() {
         return "read";
     }

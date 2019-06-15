@@ -67,7 +67,6 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        final boolean capabilityAccess = accessToken.hasCapabilityAccess();
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final User finalUser = user;
         requestContext.setSecurityContext(new SecurityContext() {
@@ -79,7 +78,8 @@ public class SecuredFilter implements ContainerRequestFilter {
             @Override
             public boolean isUserInRole(String role) {
                 if (role.equals(USER_IN_ROLE.CAPABILITY)) {
-                    return capabilityAccess;
+                    return accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
+                            accessToken.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN;
                 } else if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
                     return accessToken.getTokenType() == AccessToken.TokenType.VIEWER_TOKEN;
                 }
