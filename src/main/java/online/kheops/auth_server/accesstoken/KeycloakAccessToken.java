@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Optional;
 
 final class KeycloakAccessToken implements AccessToken {
 
@@ -138,6 +139,11 @@ final class KeycloakAccessToken implements AccessToken {
     @Override
     public TokenType getTokenType() {
         return TokenType.KEYCLOAK_TOKEN;
+    }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("read write downloadbutton appropriate");
     }
 
     @Override

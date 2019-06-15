@@ -115,7 +115,7 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        introspectResponse.scope = accessToken.getScope();
+        introspectResponse.scope = accessToken.getScope().orElse(null);
 
         introspectResponse.active = true;
         return Response.status(OK).entity(introspectResponse).build();

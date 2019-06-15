@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import java.util.Objects;
+import java.util.Optional;
 
 final class CapabilityAccessToken implements AccessToken {
     private final String sub;
@@ -63,12 +64,12 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public String getScope() {
+    public Optional<String> getScope() {
         String scope;
         if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
             scope = (capability.isWritePermission()?"write ":"") +
                     (capability.isReadPermission()?"read ":"") +
-                    (capability.isDownloadPermission()?"download ":"") +
+                    (capability.isDownloadPermission()?"downloadbutton ":"") +
                     (capability.isAppropriatePermission()?"appropriate ":"");
             if (scope.length() > 0) {
                 scope = scope.substring(0, scope.length() - 1);
@@ -77,7 +78,7 @@ final class CapabilityAccessToken implements AccessToken {
             scope = "read write";
         }
 
-        return scope;
+        return Optional.of(scope);
     }
 
     @Override

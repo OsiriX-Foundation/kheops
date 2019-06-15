@@ -4,6 +4,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
 import javax.servlet.ServletContext;
+import java.util.Optional;
 
 public interface AccessToken {
 
@@ -11,8 +12,8 @@ public interface AccessToken {
 
     String getSub();
     TokenType getTokenType();
-    default String getScope() {
-        return "read write";
+    default Optional<String> getScope() {
+        return Optional.empty();
     }
 
     KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user);

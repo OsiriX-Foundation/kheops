@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.ServletContext;
 import java.io.StringReader;
+import java.util.Optional;
 
 final class ViewerAccessToken implements AccessToken {
 
@@ -44,17 +45,17 @@ final class ViewerAccessToken implements AccessToken {
     }
 
     @Override
-    public String getScope() {
-        return "read";
-    }
-
-    @Override
     public String getSub() {
         return sub;
     }
 
     @Override
     public TokenType getTokenType() { return TokenType.VIEWER_TOKEN; }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("read");
+    }
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {

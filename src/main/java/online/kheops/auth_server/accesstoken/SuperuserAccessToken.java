@@ -11,6 +11,7 @@ import online.kheops.auth_server.principal.UserPrincipal;
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
+import java.util.Optional;
 
 final class SuperuserAccessToken implements AccessToken {
     private final String sub;
@@ -64,6 +65,11 @@ final class SuperuserAccessToken implements AccessToken {
 
     @Override
     public TokenType getTokenType() { return TokenType.SUPER_USER_TOKEN; }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("read write downloadbutton appropriate");
+    }
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
