@@ -6,9 +6,13 @@ import online.kheops.auth_server.capability.CapabilityNotFoundException;
 import online.kheops.auth_server.capability.CapabilityNotValidException;
 import online.kheops.auth_server.capability.CapabilityToken;
 import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.CapabilityPrincipal;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -74,4 +78,10 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public TokenType getTokenType() { return TokenType.CAPABILITY_TOKEN; }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new CapabilityPrincipal(capability, user);
+    }
+
 }

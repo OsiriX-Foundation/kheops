@@ -1,5 +1,9 @@
 package online.kheops.auth_server.accesstoken;
 
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.ViewerPrincipal;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -55,4 +59,10 @@ final class ViewerAccessToken implements AccessToken {
 
     @Override
     public TokenType getTokenType() { return TokenType.VIEWER_TOKEN; }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new ViewerPrincipal(servletContext, jwe);
+    }
+
 }

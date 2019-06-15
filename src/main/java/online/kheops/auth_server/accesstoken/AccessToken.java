@@ -23,15 +23,5 @@ public interface AccessToken {
     }
     default Optional<JsonObject> getViewer() { return Optional.empty(); }
 
-    default KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        Capability capability;
-        JsonObject viewer;
-        if((capability = getCapability().orElse(null)) != null) {
-            return new CapabilityPrincipal(capability, user);
-        } else if((viewer = getViewer().orElse(null)) != null) {
-            return new ViewerPrincipal(servletContext, viewer);
-        } else {
-            return new UserPrincipal(user);
-        }
-    }
+    KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user);
 }

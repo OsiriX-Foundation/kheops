@@ -4,6 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.UserPrincipal;
 
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
@@ -66,4 +69,9 @@ final class SuperuserAccessToken implements AccessToken {
 
     @Override
     public TokenType getTokenType() { return TokenType.SUPER_USER_TOKEN; }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new UserPrincipal(user);
+    }
 }
