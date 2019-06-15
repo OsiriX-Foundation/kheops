@@ -11,16 +11,13 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
 
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -70,9 +67,15 @@ public class ReportProviders {
             throws ReportProviderUriNotValidException {
 
         try {
-            return ClientBuilder.newClient().target(reportProvider.getUrl()).request().get(ReportProviderClientMetadataResponse.class);
-        } catch (Exception e) {
-            throw new ReportProviderUriNotValidException("report provider uri not valid");
+            ReportProviderClientMetadataResponse clientMetadata = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get(ReportProviderClientMetadataResponse.class);
+
+            ReportProviderClientMetadataResponse.ValidationResult validationResult = clientMetadata.validateForConfigUri(reportProvider.getUrl());
+            if (validationResult != ReportProviderClientMetadataResponse.ValidationResult.OK) {
+                throw new ReportProviderUriNotValidException(validationResult.getDescription());
+            }
+            return clientMetadata;
+        } catch (ProcessingException | WebApplicationException e) {
+            throw new ReportProviderUriNotValidException("report provider uri not valid", e);
         }
     }
 
@@ -128,13 +131,15 @@ public class ReportProviders {
 
 
             ReportProviderClientMetadataResponse clientMetadata = ClientBuilder.newClient(configuration).target(configUrl).request().get(ReportProviderClientMetadataResponse.class);
-            if (clientMetadata.isValid()) {
-                return clientMetadata;
+
+            ReportProviderClientMetadataResponse.ValidationResult validationResult = clientMetadata.validateForConfigUri(configUrl);
+            if (validationResult != ReportProviderClientMetadataResponse.ValidationResult.OK) {
+                throw new ReportProviderUriNotValidException(validationResult.getDescription());
             }
-        } catch (Exception e) {
+            return clientMetadata;
+        } catch (ProcessingException | WebApplicationException e) {
             throw new ReportProviderUriNotValidException("error during request");
         }
-        throw new ReportProviderUriNotValidException("uri not valid");
     }
 
 
