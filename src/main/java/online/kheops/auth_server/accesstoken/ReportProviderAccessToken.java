@@ -11,6 +11,7 @@ import online.kheops.auth_server.principal.*;
 
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -117,7 +118,20 @@ public class ReportProviderAccessToken implements AccessToken {
 
     @Override
     public Optional<String> getScope() {
-        return Optional.of("read write");
+        final List<String> scopes = new ArrayList<>(2);
+
+        if (hasReadAccess) {
+            scopes.add("read");
+        }
+        if (hasWriteAccess) {
+            scopes.add("write");
+        }
+
+        if (!scopes.isEmpty()) {
+            return Optional.of(String.join(" ", scopes));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
