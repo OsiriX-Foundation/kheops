@@ -67,17 +67,8 @@ public class ReportProviderAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Missing scope claim in token");
             }
 
-            boolean hasReadAccess = false;
-            boolean hasWriteAccess = false;
-            final String[] scopeWords = scopeClaim.asString().split("\\s+", 40);
-            for (String scopeWord : scopeWords) {
-                if (scopeWord.equals("read")) {
-                    hasReadAccess = true;
-                }
-                if (scopeWord.equals("write")) {
-                    hasWriteAccess = true;
-                }
-            }
+            final boolean hasReadAccess = scopeClaim.asString().matches("\\bread\\b");
+            final boolean hasWriteAccess = scopeClaim.asString().matches("\\bread\\b");
 
             final Claim studyUIDsClaim = jwt.getClaim("study_uids");
             try {
