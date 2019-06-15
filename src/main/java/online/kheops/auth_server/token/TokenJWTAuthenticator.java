@@ -98,7 +98,7 @@ public class TokenJWTAuthenticator {
         try {
             JWT.require(Algorithm.RSA256(keyProvider))
                     .acceptLeeway(5)
-                    .withIssuer(getConfigurationIssuer())
+                    .withIssuer(clientId)
                     .withSubject(clientId)
                     .withAudience(getAudienceHost())
                     .build().verify(clientJWT);
@@ -123,7 +123,7 @@ public class TokenJWTAuthenticator {
         Objects.requireNonNull(decodedJWT);
 
         if (!decodedJWT.getAlgorithm().equals(RS256)) {
-            throw new TokenRequestException(INVALID_REQUEST, "Unknown JWT signing algorithm: " + decodedJWT.getAlgorithm());
+            throw new TokenRequestException(INVALID_REQUEST, "Unexpected JWT signing algorithm: " + decodedJWT.getAlgorithm());
         }
 
         if (decodedJWT.getId() == null) {
@@ -157,18 +157,6 @@ public class TokenJWTAuthenticator {
             throw new TokenRequestException(INVALID_REQUEST, "Unable to get public key." + e.getMessage(), e);
         } catch (MalformedURLException | IllegalArgumentException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Bad configuration URI", e);
-        }
-    }
-
-    private String getConfigurationIssuer() {
-        Objects.requireNonNull(clientId);
-
-        try {
-            return ReportProviders.getConfigIssuer(ReportProviders.getReportProvider(clientId));
-        } catch (ClientIdNotFoundException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Unknown clientID", e);
-        } catch (ReportProviderUriNotValidException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Configuration URI not valid", e);
         }
     }
 
