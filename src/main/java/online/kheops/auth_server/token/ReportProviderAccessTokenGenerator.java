@@ -59,6 +59,7 @@ public class ReportProviderAccessTokenGenerator {
                     .withAudience(getAudienceHost())
                     .withExpiresAt(Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)))
                     .withIssuedAt(Date.from(Instant.now()))
+                    .withNotBefore(new Date())
                     .withClaim("auth_time", authTime != null ? authTime : Date.from(Instant.now()))
                     .withClaim("azp", getConfigurationIssuer())
                     .withClaim("client_id", Objects.requireNonNull(clientId))
