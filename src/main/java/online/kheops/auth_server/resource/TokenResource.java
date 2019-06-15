@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
-import online.kheops.auth_server.capability.ScopeType;
-import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.token.TokenClientKind;
 import online.kheops.auth_server.token.TokenGrantType;
 import online.kheops.auth_server.token.TokenRequestException;
@@ -117,25 +115,7 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        final Capability capability = accessToken.getCapability().orElse(null);
-
-        if(capability != null) {
-            if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
-                introspectResponse.scope = (capability.isWritePermission()?"write ":"") +
-                        (capability.isReadPermission()?"read ":"") +
-                        (capability.isDownloadPermission()?"download ":"") +
-                        (capability.isAppropriatePermission()?"appropriate ":"");
-                if (introspectResponse.scope.length() > 0) {
-                    introspectResponse.scope = introspectResponse.scope.substring(0, introspectResponse.scope.length() - 1);
-                }
-            } else {
-                introspectResponse.scope = "read write";
-            }
-        } else if(accessToken.getViewer().isPresent()) {
-            introspectResponse.scope = "read";
-        } else {
-            introspectResponse.scope = "read write";
-        }
+        introspectResponse.scope = accessToken.getScope();
 
         introspectResponse.active = true;
         return Response.status(OK).entity(introspectResponse).build();

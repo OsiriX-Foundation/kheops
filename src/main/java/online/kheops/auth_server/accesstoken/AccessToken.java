@@ -1,11 +1,7 @@
 package online.kheops.auth_server.accesstoken;
 
-import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.principal.UserPrincipal;
-import online.kheops.auth_server.principal.ViewerPrincipal;
 
 import javax.json.JsonObject;
 import javax.servlet.ServletContext;
@@ -18,8 +14,8 @@ public interface AccessToken {
     String getSub();
     TokenType getTokenType();
     boolean hasCapabilityAccess();
-    default Optional<Capability> getCapability() {
-        return Optional.empty();
+    default String getScope() {
+        return "read write";
     }
     default Optional<JsonObject> getViewer() { return Optional.empty(); }
 

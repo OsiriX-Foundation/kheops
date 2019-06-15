@@ -53,6 +53,11 @@ final class ViewerAccessToken implements AccessToken {
     }
 
     @Override
+    public String getScope() {
+        return "read";
+    }
+
+    @Override
     public String getSub() {
         return sub;
     }
