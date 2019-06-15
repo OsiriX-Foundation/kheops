@@ -10,6 +10,8 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -65,20 +67,30 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public Optional<String> getScope() {
-        String scope;
+        List<String> scopes = new ArrayList<>(4);
+
         if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
-            scope = (capability.isWritePermission()?"write ":"") +
-                    (capability.isReadPermission()?"read ":"") +
-                    (capability.isDownloadPermission()?"downloadbutton ":"") +
-                    (capability.isAppropriatePermission()?"appropriate ":"");
-            if (scope.length() > 0) {
-                scope = scope.substring(0, scope.length() - 1);
+            if (capability.hasReadPermission()) {
+                scopes.add("read");
+            }
+            if (capability.hasWritePermission()) {
+                scopes.add("write");
+            }
+            if (capability.hasDownloadButtonPermission()) {
+                scopes.add("downloadbutton");
+            }
+            if (capability.hasAppropriatePermission()) {
+                scopes.add("appropriate");
+            }
+
+            if (!scopes.isEmpty()) {
+                return Optional.of(String.join(" ", scopes));
+            } else {
+                return Optional.empty();
             }
         } else {
-            scope = "read write";
+            return Optional.of("read write downloadbutton appropriate");
         }
-
-        return Optional.of(scope);
     }
 
     @Override
