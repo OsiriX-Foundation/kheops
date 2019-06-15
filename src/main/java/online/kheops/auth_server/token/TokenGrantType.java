@@ -49,7 +49,7 @@ public enum TokenGrantType {
                     .validate(code);
 
             final String token;
-            token = ReportProviderTokenGenerator.createGenerator(servletContext)
+            token = ReportProviderAccessTokenGenerator.createGenerator(servletContext)
                     .withSubject(authorizationCode.getSubject())
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
@@ -109,7 +109,7 @@ public enum TokenGrantType {
                     throw new TokenRequestException(UNAUTHORIZED_CLIENT);
                 }
 
-                String pepToken = PepTokenGenerator.createGenerator(servletContext)
+                String pepToken = PepAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSeriesInstanceUID(seriesInstanceUID)
@@ -130,7 +130,7 @@ public enum TokenGrantType {
                     sourceId = null;
                 }
 
-                String viewerToken = ViewerTokenGenerator.createGenerator(servletContext)
+                String viewerToken = ViewerAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSourceType(sourceType)

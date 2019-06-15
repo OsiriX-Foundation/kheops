@@ -1,9 +1,6 @@
 package online.kheops.auth_server.token;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.algorithms.Algorithm;
-import online.kheops.auth_server.PACSAuthTokenBuilder;
+import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
@@ -13,10 +10,6 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.io.UnsupportedEncodingException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,8 +17,8 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
-class PepTokenGenerator {
-    private static final Logger LOG = Logger.getLogger(PepTokenGenerator.class.getName());
+class PepAccessTokenGenerator {
+    private static final Logger LOG = Logger.getLogger(PepAccessTokenGenerator.class.getName());
 
     private final ServletContext context;
 
@@ -33,27 +26,27 @@ class PepTokenGenerator {
     private String studyInstanceUID;
     private String seriesInstanceUID;
 
-    private PepTokenGenerator (final ServletContext context) {
+    private PepAccessTokenGenerator(final ServletContext context) {
         this.context = Objects.requireNonNull(context);
     }
 
-    PepTokenGenerator withToken(final String token) {
+    PepAccessTokenGenerator withToken(final String token) {
         this.token = Objects.requireNonNull(token);
         return this;
     }
 
-    PepTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
+    PepAccessTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
         this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID);
         return this;
     }
 
-    PepTokenGenerator withSeriesInstanceUID(final String seriesInstanceUID) {
+    PepAccessTokenGenerator withSeriesInstanceUID(final String seriesInstanceUID) {
         this.seriesInstanceUID = Objects.requireNonNull(seriesInstanceUID);
         return this;
     }
 
-    static PepTokenGenerator createGenerator(final ServletContext context) {
-      return new PepTokenGenerator(context);
+    static PepAccessTokenGenerator createGenerator(final ServletContext context) {
+      return new PepAccessTokenGenerator(context);
     }
 
     String generate(long expiresIn) {
@@ -89,7 +82,7 @@ class PepTokenGenerator {
         }
 
         LOG.info(() -> "Returning pep token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        return PACSAuthTokenBuilder.newBuilder()
+        return PepAccessTokenBuilder.newBuilder()
                 .withStudyUID(studyInstanceUID)
                 .withSeriesUID(seriesInstanceUID)
                 .withSubject(accessToken.getSub())

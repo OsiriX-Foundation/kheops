@@ -2,7 +2,7 @@ package online.kheops.auth_server.resource;
 
 
 import online.kheops.auth_server.NotAlbumScopeTypeException;
-import online.kheops.auth_server.PACSAuthTokenBuilder;
+import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
@@ -213,7 +213,7 @@ public class QIDOResource {
         queryParameters.remove(QUERY_PARAMETER_SORT);
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
-        String authToken = PACSAuthTokenBuilder.newBuilder()
+        String authToken = PepAccessTokenBuilder.newBuilder()
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getKeycloakId())
@@ -340,7 +340,7 @@ public class QIDOResource {
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
-        String authToken = PACSAuthTokenBuilder.newBuilder()
+        String authToken = PepAccessTokenBuilder.newBuilder()
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getKeycloakId())

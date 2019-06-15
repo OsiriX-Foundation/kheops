@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-public class ReportProviderTokenGenerator {
+class ReportProviderAccessTokenGenerator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
@@ -22,31 +22,31 @@ public class ReportProviderTokenGenerator {
     private String scope;
     private Set<String> studyInstanceUIDs;
 
-    static ReportProviderTokenGenerator createGenerator(final ServletContext servletContext) {
-        return new ReportProviderTokenGenerator(servletContext);
+    static ReportProviderAccessTokenGenerator createGenerator(final ServletContext servletContext) {
+        return new ReportProviderAccessTokenGenerator(servletContext);
     }
 
-    ReportProviderTokenGenerator withSubject(final String subject) {
+    ReportProviderAccessTokenGenerator withSubject(final String subject) {
         this.subject = Objects.requireNonNull(subject);
         return this;
     }
 
-    public ReportProviderTokenGenerator withAuthTime(final Date authTime) {
+    ReportProviderAccessTokenGenerator withAuthTime(final Date authTime) {
         this.authTime = authTime;
         return this;
     }
 
-    ReportProviderTokenGenerator withScope(final String scope) {
+    ReportProviderAccessTokenGenerator withScope(final String scope) {
         this.scope = Objects.requireNonNull(scope);
         return this;
     }
 
-    ReportProviderTokenGenerator withClientId(final String clientId) {
+    ReportProviderAccessTokenGenerator withClientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    ReportProviderTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
+    ReportProviderAccessTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
         this.studyInstanceUIDs = new HashSet<>(studyInstanceUIDs);
         return this;
     }
@@ -60,6 +60,7 @@ public class ReportProviderTokenGenerator {
                     .withAudience(getAudienceHost())
                     .withExpiresAt(Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)))
                     .withIssuedAt(Date.from(Instant.now()))
+                    .withNotBefore(new Date())
                     .withClaim("auth_time", authTime != null ? authTime : Date.from(Instant.now()))
                     .withClaim("azp", Objects.requireNonNull(clientId))
                     .withClaim("scope", Objects.requireNonNull(scope))
@@ -71,7 +72,7 @@ public class ReportProviderTokenGenerator {
         }
     }
 
-    private ReportProviderTokenGenerator(final ServletContext servletContext) {
+    private ReportProviderAccessTokenGenerator(final ServletContext servletContext) {
         this.context = servletContext;
     }
 

@@ -5,25 +5,41 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AccessTokenVerifier {
 
-    private static final List<Class<?>> accessTokenBuilders =
+    private static final List<Class<?>> accessTokenBuilderClasses =
             Arrays.asList(ReportProviderAccessToken.Builder.class,
                           CapabilityAccessToken.CapabilityAccessTokenBuilder.class,
                           ViewerAccessTokenBuilder.class,
                           KeycloakAccessToken.Builder.class,
-                          PepAccessToken.Builder.class,
                           SuperuserAccessToken.Builder.class);
+
+    private static final Class<PepAccessToken.Builder> pepAccessTokenClass = PepAccessToken.Builder.class;
 
     private AccessTokenVerifier() {}
 
     public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
             throws AccessTokenVerificationException {
+        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken);
+    }
+
+    public static AccessToken authenticateIntrospectableAccessToken(ServletContext servletContext, String accessToken)
+            throws AccessTokenVerificationException {
+
+        List<Class<?>> introspectableAccessTokenBuilderClasses = new ArrayList<>(accessTokenBuilderClasses);
+        introspectableAccessTokenBuilderClasses.add(pepAccessTokenClass);
+
+        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken);
+    }
+
+    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken)
+            throws AccessTokenVerificationException {
 
         List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
 
-        for (Class<?> builderClass: accessTokenBuilders) {
+        for (Class<?> builderClass: accessTokenBuilderClasses) {
             final AccessTokenBuilder accessTokenBuilder;
             Constructor<?> servletContextConstructor;
             try {
@@ -49,10 +65,11 @@ public abstract class AccessTokenVerifier {
             }
         }
 
-        final StringBuilder messageBuilder = new StringBuilder("Unable to verify accesstoken because");
-        exceptionList.forEach(e -> messageBuilder.append(", ").append(e.getMessage()));
-
-        final AccessTokenVerificationException accessTokenVerificationException = new AccessTokenVerificationException(messageBuilder.toString());
+        final String message = "Unable to verify access token because: " +
+                exceptionList.stream()
+                        .map(Throwable::getMessage)
+                        .collect(Collectors.joining(", "));
+        final AccessTokenVerificationException accessTokenVerificationException = new AccessTokenVerificationException(message);
         exceptionList.forEach(accessTokenVerificationException::addSuppressed);
 
         throw accessTokenVerificationException;
