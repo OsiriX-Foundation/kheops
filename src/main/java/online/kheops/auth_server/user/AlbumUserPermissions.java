@@ -111,15 +111,30 @@ public enum AlbumUserPermissions {
         public boolean hasUserPermission(Album album) { return true; }
     };
 
+    /**
+     * @param album For overrides
+     */
     public boolean hasUserPermission(Album album) {
         return false;
     }
+
+    /**
+     * @param capability For overrides
+     */
     public boolean hasCapabilityPermission(Capability capability) {
         return false;
     }
+
+    /**
+     * @param album For overrides
+     */
     public boolean hasViewerPermission(Album album) {
         return false;
     }
+
+    /**
+     * @param album For overrides
+     */
     public boolean hasProviderPermission(Album album) {
         return false;
     }
