@@ -114,15 +114,12 @@ public enum AlbumUserPermissions {
     public boolean hasUserPermission(Album album) {
         return false;
     }
-
     public boolean hasCapabilityPermission(Capability capability) {
         return false;
     }
-
     public boolean hasViewerPermission(Album album) {
         return false;
     }
-
     public boolean hasProviderPermission(Album album) {
         return false;
     }
