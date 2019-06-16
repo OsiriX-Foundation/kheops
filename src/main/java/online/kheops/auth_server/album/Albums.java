@@ -191,9 +191,13 @@ public class Albums {
 
             int i = 0;
             for (AlbumUser albumUser : album.getAlbumUser()) {
-                if (i++ < offset) continue;
-                if (i > offset + limit) break;
-                listUserAlbumResponse.add(new UserAlbumResponse(albumUser));
+                if (i++ >= offset) {
+                    if (i > offset + limit) {
+                        break;
+                    } else {
+                        listUserAlbumResponse.add(new UserAlbumResponse(albumUser));
+                    }
+                }
             }
         } finally {
             em.close();
