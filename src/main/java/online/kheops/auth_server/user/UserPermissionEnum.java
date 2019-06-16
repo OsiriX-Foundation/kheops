@@ -10,57 +10,15 @@ public enum UserPermissionEnum {
         public boolean hasUserPermission(Album album) {
             return album.isAddUser();
         }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
     REMOVE_USER {
         @Override
         public boolean hasUserPermission(Album album) {
             return true;
         }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
-    ADD_ADMIN {
-        @Override
-        public boolean hasUserPermission(Album album) {
-            return false;
-        }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
-    },
-    REMOVE_ADMIN {
-        @Override
-        public boolean hasUserPermission(Album album) {
-            return false;
-        }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
-    },
+    ADD_ADMIN,
+    REMOVE_ADMIN,
     DOWNLOAD_SERIES {
         @Override
         public boolean hasUserPermission(Album album) {
@@ -70,10 +28,6 @@ public enum UserPermissionEnum {
         public boolean hasCapabilityPermission(Capability capability) {
             return capability.hasReadPermission() && capability.hasDownloadButtonPermission();
         }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return true; }
     },
     SEND_SERIES {
         @Override
@@ -84,10 +38,6 @@ public enum UserPermissionEnum {
         public boolean hasCapabilityPermission(Capability capability) {
             return capability.hasReadPermission() && capability.hasAppropriatePermission();
         }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
     DELETE_SERIES {
         @Override
@@ -98,10 +48,6 @@ public enum UserPermissionEnum {
         public boolean hasCapabilityPermission(Capability capability) {
             return  capability.hasReadPermission() && capability.hasWritePermission();
         }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
     ADD_SERIES {
         @Override
@@ -112,8 +58,6 @@ public enum UserPermissionEnum {
         public boolean hasCapabilityPermission(Capability capability) {
             return capability.hasWritePermission();
         }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
         @Override
         public boolean hasProviderPermission(Album album) { return true; }
     },
@@ -136,120 +80,50 @@ public enum UserPermissionEnum {
         public boolean hasUserPermission(Album album) {
             return album.isWriteComments();
         }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
     READ_COMMENT {
         @Override
         public boolean hasUserPermission(Album album) { return true; }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
     EDIT_ALBUM {
         @Override
         public boolean hasUserPermission(Album album) {
             return true;
         }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
-    DELETE_ALBUM {
-        @Override
-        public boolean hasUserPermission(Album album) {
-            return false;
-        }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
-    },
+    DELETE_ALBUM,
     LIST_USERS {
         @Override
         public boolean hasUserPermission(Album album) {
             return true;
         }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
-    MANAGE_CAPABILITIES_TOKEN {
-        @Override
-        public boolean hasUserPermission(Album album) {
-            return false;
-        }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
-    },
+    MANAGE_CAPABILITIES_TOKEN,
     EDIT_FAVORITES {
         @Override
         public boolean hasUserPermission(Album album) {
             return album.isAddSeries();
         }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) {
-            return false;
-        }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     },
-    MANAGE_DICOM_SR {
-        @Override
-        public boolean hasUserPermission(Album album) { return false; }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) { return false; }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
-    },
+    MANAGE_DICOM_SR,
     GET_DICOM_SR {
         @Override
         public boolean hasUserPermission(Album album) { return true; }
-        @Override
-        public boolean hasCapabilityPermission(Capability capability) { return false; }
-        @Override
-        public boolean hasViewerPermission(Album album) { return false; }
-        @Override
-        public boolean hasProviderPermission(Album album) { return false; }
     };
 
-    public abstract boolean hasUserPermission(Album album);
-    public abstract boolean hasCapabilityPermission(Capability capability);
-    public abstract boolean hasViewerPermission(Album album);
-    public abstract boolean hasProviderPermission(Album album);
+    public boolean hasUserPermission(Album album) {
+        return false;
+    }
+
+    public boolean hasCapabilityPermission(Capability capability) {
+        return false;
+    }
+
+    public boolean hasViewerPermission(Album album) {
+        return false;
+    }
+
+    public boolean hasProviderPermission(Album album) {
+        return false;
+    }
 }
