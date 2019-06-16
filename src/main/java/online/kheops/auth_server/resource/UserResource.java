@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT_PROVIDER_TOKEN;
-import static online.kheops.auth_server.user.UserPermissionEnum.LIST_USERS;
+import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 
 @Path("/")

@@ -6,7 +6,7 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -138,7 +138,7 @@ public class CapabilitiesResource {
     @Secured
     @CapabilitySecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_CAPABILITIES_TOKEN)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_CAPABILITIES_TOKEN)
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)

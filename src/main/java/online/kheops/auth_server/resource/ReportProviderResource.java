@@ -14,7 +14,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
@@ -64,7 +64,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -247,7 +247,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.GET_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.GET_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -266,7 +266,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.GET_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.GET_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -286,7 +286,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
@@ -308,7 +308,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")

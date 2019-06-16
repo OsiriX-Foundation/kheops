@@ -3,7 +3,7 @@ package online.kheops.auth_server.user;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
 
-public enum UserPermissionEnum {
+public enum AlbumUserPermissions {
 
     ADD_USER {
         @Override

@@ -7,7 +7,7 @@ import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -30,7 +30,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
+    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -44,7 +44,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
+    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -79,7 +79,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
+    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -94,7 +94,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.EDIT_FAVORITES)
+    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,

@@ -3,7 +3,7 @@ package online.kheops.auth_server.filter;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -34,9 +34,9 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
 
     @Priority(ALBUM_PERMISSION_ACCESS_PRIORITY)
     private static class AlbumPermissionFilter implements ContainerRequestFilter {
-        private final UserPermissionEnum permission;
+        private final AlbumUserPermissions permission;
 
-        AlbumPermissionFilter(UserPermissionEnum permission) {
+        AlbumPermissionFilter(AlbumUserPermissions permission) {
             this.permission = permission;
         }
 

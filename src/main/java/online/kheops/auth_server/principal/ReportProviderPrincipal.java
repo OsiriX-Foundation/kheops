@@ -5,7 +5,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -16,8 +16,6 @@ import java.util.Optional;
 
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesBySeriesAndAlbumWithSendPermission;
-import static online.kheops.auth_server.series.SeriesQueries.isOrphan;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
 public class ReportProviderPrincipal implements KheopsPrincipalInterface {
@@ -126,7 +124,7 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {

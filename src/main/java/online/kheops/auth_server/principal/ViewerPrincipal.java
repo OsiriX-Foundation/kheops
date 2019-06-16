@@ -12,7 +12,7 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.Consts;
 
 import javax.json.JsonObject;
@@ -124,7 +124,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     public boolean hasStudyWriteAccess(String study) { return false; }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId)
             throws AlbumNotFoundException {
 
         if (!kheopsPrincipal.hasAlbumPermission(usersPermission, albumId)) {

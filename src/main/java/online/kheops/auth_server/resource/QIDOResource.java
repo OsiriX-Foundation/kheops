@@ -11,7 +11,7 @@ import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.SeriesQIDOSortParams;
 import online.kheops.auth_server.util.StudyQIDOParams;
@@ -66,7 +66,7 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
+    @AlbumPermissionSecured(AlbumUserPermissions.READ_SERIES)
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
@@ -133,7 +133,7 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
+    @AlbumPermissionSecured(AlbumUserPermissions.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -299,7 +299,7 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.READ_SERIES)
+    @AlbumPermissionSecured(AlbumUserPermissions.READ_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
