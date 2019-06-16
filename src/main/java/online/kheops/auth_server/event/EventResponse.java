@@ -136,11 +136,10 @@ public class EventResponse {
 
             reportProvider.name = mutation.getReportProvider().get().getName();
         }
-        if (mutation.getCapability().isPresent()) {
+        mutation.getCapability().ifPresent(mutationCapability -> {
             capability = new CapabilityResponse();
-            capability.id = mutation.getCapability().get().getId();
-            capability.title = mutation.getCapability().get().getTitle();
-            //originName = null; TODO
-        }
+            capability.id = mutationCapability.getId();
+            capability.title = mutationCapability.getTitle();
+        });
     }
 }
