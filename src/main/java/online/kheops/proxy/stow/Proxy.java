@@ -6,7 +6,6 @@ import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.part.Part;
 import online.kheops.proxy.stow.authorization.AuthorizationManager;
 import online.kheops.proxy.stow.authorization.AuthorizationManagerException;
-import online.kheops.proxy.stow.resource.Resource;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.mime.MultipartParser;
 
