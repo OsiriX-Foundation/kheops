@@ -133,8 +133,6 @@ public class Keycloak {
             try {
                 String tokenString = token.getToken();
                 Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
-                LOG.log(Level.WARNING, "userUri: ", userUri);
-                LOG.log(Level.WARNING, "tokenString: ", tokenString);
                 response = builder.get();
             } catch (ProcessingException e) {
                 throw new KeycloakException("Error during introspect token", e);
