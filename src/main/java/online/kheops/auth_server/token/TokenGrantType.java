@@ -128,9 +128,9 @@ public enum TokenGrantType {
         }
     };
 
-    final private static long REPORT_PROVIDER_TOKEN_LIFETIME = 60 * 60; // 1 hour
-    final private static long PEP_TOKEN_LIFETIME = 60 * 60; // 1 hours
-    final private static long VIEWER_TOKEN_LIFETIME = 60 * 60 * 5; // 5 hours
+    final private static long REPORT_PROVIDER_TOKEN_LIFETIME = 60L * 60L; // 1 hour
+    final private static long PEP_TOKEN_LIFETIME = 60L * 60L; // 1 hours
+    final private static long VIEWER_TOKEN_LIFETIME = 60L * 60L * 5L; // 5 hours
 
     private final String grantType;
 
