@@ -55,7 +55,7 @@ class PrivateKeyJWTAuthenticator {
         try {
             decodedJWT = JWT.decode(clientJWT);
         } catch (JWTDecodeException e) {
-            throw new TokenRequestException(INVALID_REQUEST, "Unable to decode client_assertion JWT");
+            throw new TokenRequestException(INVALID_REQUEST, "Unable to verify the JWT. " + e.getMessage(), e);
         }
 
         return this;

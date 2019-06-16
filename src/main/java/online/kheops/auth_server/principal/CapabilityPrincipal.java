@@ -8,7 +8,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -198,7 +198,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
             return false;

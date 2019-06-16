@@ -31,6 +31,7 @@ class ReportProviderAccessTokenGenerator {
         return this;
     }
 
+    @SuppressWarnings("unused")
     ReportProviderAccessTokenGenerator withAuthTime(final Date authTime) {
         this.authTime = authTime;
         return this;
@@ -51,7 +52,7 @@ class ReportProviderAccessTokenGenerator {
         return this;
     }
 
-    String generate(long expiresIn) {
+    String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(getHMAC256Secret());
             return JWT.create()

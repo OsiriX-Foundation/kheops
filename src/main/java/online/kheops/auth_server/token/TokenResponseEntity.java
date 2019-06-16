@@ -1,20 +1,21 @@
 package online.kheops.auth_server.token;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 class TokenResponseEntity {
     @XmlElement(name = "access_token")
-    String accessToken;
+    private final String accessToken;
     @XmlElement(name = "token_type")
-    final String tokenType = "Bearer";
+    private final String tokenType = "Bearer";
     @XmlElement(name = "expires_in")
-    Long expiresIn;
+    private final Long expiresIn;
 
-    TokenResponseEntity() {}
+    @SuppressWarnings("unused")
+    private TokenResponseEntity() {
+        accessToken = null;
+        expiresIn = null;
+    }
 
     private TokenResponseEntity(final String accessToken, final long expiresIn) {
         this.accessToken = Objects.requireNonNull(accessToken);
@@ -25,5 +26,3 @@ class TokenResponseEntity {
         return new TokenResponseEntity(accessToken, expiresIn);
     }
 }
-
-

@@ -1,13 +1,12 @@
 package online.kheops.auth_server.token;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
+@SuppressWarnings("unused")
 public class TokenRequestException extends BadRequestException {
 
     public enum Error {
@@ -29,7 +28,6 @@ public class TokenRequestException extends BadRequestException {
         }
     }
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class TokenErrorResponse {
 
         @XmlElement(name = "error")

@@ -49,7 +49,7 @@ class PepAccessTokenGenerator {
       return new PepAccessTokenGenerator(context);
     }
 
-    String generate(long expiresIn) {
+    String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
 
         final AccessToken accessToken;
         try {
@@ -83,6 +83,7 @@ class PepAccessTokenGenerator {
 
         LOG.info(() -> "Returning pep token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
         return PepAccessTokenBuilder.newBuilder()
+                .withExpiresIn(expiresIn)
                 .withStudyUID(studyInstanceUID)
                 .withSeriesUID(seriesInstanceUID)
                 .withSubject(accessToken.getSub())

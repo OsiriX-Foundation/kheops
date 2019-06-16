@@ -11,7 +11,7 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -41,7 +41,7 @@ public class EventResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.READ_COMMENT)
+    @AlbumPermissionSecured(AlbumUserPermissions.READ_COMMENT)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -90,7 +90,7 @@ public class EventResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.WRITE_COMMENT)
+    @AlbumPermissionSecured(AlbumUserPermissions.WRITE_COMMENT)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
