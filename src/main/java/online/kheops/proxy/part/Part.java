@@ -127,7 +127,7 @@ public abstract class Part implements AutoCloseable {
         }
 
         final String frontTrimmed = contentDisposition.substring(frontIndex + 7);
-        final int backIndex = frontTrimmed.indexOf(";");
+        final int backIndex = frontTrimmed.indexOf(';');
         if (backIndex == -1) {
             throw new IllegalArgumentException();
         }

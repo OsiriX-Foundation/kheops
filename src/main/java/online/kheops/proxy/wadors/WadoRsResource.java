@@ -4,7 +4,6 @@ import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;

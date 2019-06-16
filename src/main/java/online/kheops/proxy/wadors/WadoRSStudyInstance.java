@@ -33,7 +33,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 @Path("/")
 public final class WadoRSStudyInstance {
-    private static final Logger LOG = Logger.getLogger(WadoRSStudy.class.getName());
+    private static final Logger LOG = Logger.getLogger(WadoRSStudyInstance.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
     @Context

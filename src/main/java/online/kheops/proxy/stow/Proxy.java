@@ -24,7 +24,7 @@ import static javax.ws.rs.core.HttpHeaders.CONTENT_LOCATION;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 public final class Proxy {
-    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
+    private static final Logger LOG = Logger.getLogger(Proxy.class.getName());
 
     private final Providers providers;
 
