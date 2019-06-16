@@ -53,7 +53,8 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
             authenticationType = TokenClientAuthenticationType.getAuthenticationType(requestHeaders, form);
         } catch (WebApplicationException e) {
             LOG.log(INFO, "Unable to find the authentication type", e);
-            throw e;
+            containerRequest.abortWith(e.getResponse());
+            return;
         }
 
         final TokenPrincipal principal;
@@ -61,7 +62,8 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
             principal = authenticationType.authenticate(servletContext, requestHeaders, form);
         } catch (WebApplicationException e) {
             LOG.log(INFO, "Unable to authenticate the client", e);
-            throw e;
+            containerRequest.abortWith(e.getResponse());
+            return;
         }
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
