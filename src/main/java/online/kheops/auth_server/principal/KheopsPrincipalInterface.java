@@ -14,7 +14,6 @@ import java.util.Optional;
 
 public interface KheopsPrincipalInterface extends java.security.Principal{
 
-    //for old version
     long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
@@ -27,7 +26,7 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     boolean hasStudyWriteAccess(String study);
 
-    boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)throws AlbumNotFoundException;
+    boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) throws AlbumNotFoundException;
 
     boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException;
 
