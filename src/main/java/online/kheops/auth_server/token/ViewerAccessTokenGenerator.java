@@ -64,7 +64,7 @@ class ViewerAccessTokenGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    String generate(final long expiresIn) {
+    String generate(@SuppressWarnings("SameParameterValue") final long expiresIn) {
         Objects.requireNonNull(token);
         Objects.requireNonNull(studyInstanceUID);
         Objects.requireNonNull(sourceType);

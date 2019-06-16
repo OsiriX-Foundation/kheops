@@ -11,6 +11,8 @@ public abstract class PepAccessTokenBuilder {
         return new PepAccessTokenBuilderImpl(secret);
     }
 
+    public abstract PepAccessTokenBuilder withExpiresIn(long seconds);
+
     public abstract PepAccessTokenBuilder withStudyUID(String studyUID);
 
     public abstract PepAccessTokenBuilder withSeriesUID(String seriesUID);

@@ -1,13 +1,11 @@
 package online.kheops.auth_server.resource;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.token.TokenClientKind;
 import online.kheops.auth_server.token.TokenGrantType;
 import online.kheops.auth_server.token.TokenRequestException;
-import sun.tools.jstat.Token;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -45,7 +43,6 @@ public class TokenResource
         String user;
     }
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     static class IntrospectResponse {
         @XmlElement(name = "active")
         boolean active;

@@ -31,7 +31,7 @@ import java.util.Objects;
 
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
-public class TokenJWTAuthenticator {
+class TokenJWTAuthenticator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String RS256 = "RS256";
     private static final Client CLIENT = ClientBuilder.newClient();
