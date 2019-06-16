@@ -128,9 +128,9 @@ public enum TokenGrantType {
         }
     };
 
-    final private static long REPORT_PROVIDER_TOKEN_LIFETIME = 60L * 60L; // 1 hour
-    final private static long PEP_TOKEN_LIFETIME = 60L * 60L; // 1 hours
-    final private static long VIEWER_TOKEN_LIFETIME = 60L * 60L * 5L; // 5 hours
+    private static final long REPORT_PROVIDER_TOKEN_LIFETIME = 60L * 60L; // 1 hour
+    private static final long PEP_TOKEN_LIFETIME = 60L * 60L; // 1 hours
+    private static final long VIEWER_TOKEN_LIFETIME = 60L * 60L * 5L; // 5 hours
 
     private final String grantType;
 
@@ -138,6 +138,7 @@ public enum TokenGrantType {
         this.grantType = grantType;
     }
 
+    @Override
     public String toString() {
         return grantType;
     }
