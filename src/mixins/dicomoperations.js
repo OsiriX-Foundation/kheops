@@ -1,5 +1,7 @@
 import { HTTP } from '@/router/http'
 import { uuid } from 'vue-uuid'
+import dicom from '@/mixins/dicom'
+import customdicom from '@/mixins/customdicom'
 
 export const DicomOperations = {
 	data: function () {
@@ -279,5 +281,24 @@ export const DicomOperations = {
 				fr.readAsArrayBuffer(file)
 			})
 		}
+	}
+}
+export default {
+	translateDICOM: function (studies) {
+		let translate = []
+		studies.forEach(study => {
+			let objStudy = {}
+			for (let dicomID in study) {
+				if (dicom.dicom2name[dicomID] !== undefined) {
+					objStudy[dicom.dicom2name[dicomID]] = study[dicomID]
+				} else if (customdicom.customdicom2name[dicomID] !== undefined) {
+					objStudy[customdicom.customdicom2name[dicomID]] = study[dicomID]
+				} else {
+					objStudy[dicomID] = study[dicomID]
+				}
+			}
+			translate.push(objStudy)
+		})
+		return translate
 	}
 }

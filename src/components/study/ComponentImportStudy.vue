@@ -75,6 +75,14 @@
             @loaddirectories="inputLoadFiles"
             @demohover="demoHover"
           />
+
+          <list-data-model
+            ref="list"
+            :album="album"
+            @loadfiles="inputLoadFiles"
+            @loaddirectories="inputLoadFiles"
+            @demohover="demoHover"
+          />
         </div>
       </div>
     </form>
@@ -84,12 +92,13 @@
 <script>
 import { mapGetters } from 'vuex'
 import List from '@/components/inbox/List'
+import ListDataModel from '@/components/inbox/ListDataModel'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'ComponentDragAndDrop',
-	components: { List, ClipLoader },
+	components: { List, ClipLoader, ListDataModel },
 	props: {
 		album: {
 			type: Object,
