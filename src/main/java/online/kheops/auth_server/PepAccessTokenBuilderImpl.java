@@ -66,9 +66,6 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
 
     @Override
     public String build() {
-        if (expiresIn == 0) {
-            throw new IllegalStateException("expiresIn not set");
-        }
         if (!claims.containsKey(STUDY_UID)) {
             throw new IllegalStateException("Missing StudyUID");
         }
@@ -84,7 +81,7 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
                 .withClaim(STUDY_UID, claims.get(STUDY_UID))
                 .withClaim(SERIES_UID, claims.get(SERIES_UID))
                 .withSubject(claims.get(SUBJECT))
-                .withExpiresAt(Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)))
+                .withExpiresAt(Date.from(Instant.now().plus(expiresIn != 0 ? expiresIn : 300, ChronoUnit.SECONDS)))
                 .withNotBefore(new Date()).sign(algorithm);
     }
 
