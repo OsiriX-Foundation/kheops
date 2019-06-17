@@ -44,7 +44,7 @@ function M.auth(claim_specs, use_post_secret)
     end
 
    if jwt_obj.payload["sub"] ~= nil then
-      ngx.var.remote_user = jwt_obj.payload["sub"]
+      ngx.var.lua_remote_user = jwt_obj.payload["sub"]
    end
       if jwt_obj.payload["azt"] ~= nil then
       ngx.var.azt = jwt_obj.payload["azt"]
