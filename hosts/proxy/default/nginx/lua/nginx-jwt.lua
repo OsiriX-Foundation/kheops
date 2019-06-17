@@ -15,6 +15,9 @@ local M = {}
 
 function M.auth(claim_specs, use_post_secret)
     -- require Authorization request header
+   
+   ngx.var.toto = "bateau"
+   
     local auth_header = ngx.var.http_Authorization
     local token = nil
     local validation_secret = nil
