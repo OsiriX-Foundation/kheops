@@ -36,25 +36,48 @@
 <template>
   <div class="container-fluid">
     <div
-      class="my-3 selection-button-container"
-      style=" position: relative;"
+      class="d-flex"
     >
-      <h3>
-        <router-link
-          to="albums/new"
-          class="nav-link"
-          active-class="active"
-          style="display: inline"
-        >
-          <v-icon
-            name="plus"
-            class="mr-2"
-          />{{ $t('newalbum') }}
-        </router-link>
+      <div
+        class="p-2"
+      >
+        <h3>
+          <router-link
+            to="albums/new"
+            active-class="active"
+            style="display: inline; color: white"
+          >
+            <v-icon
+              name="plus"
+              class="mr-2"
+            />{{ $t('newalbum') }}
+          </router-link>
+        </h3>
+      </div>
+      <div
+        class="p-2"
+      >
         <button
           type="button"
-          class="btn btn-link btn-lg float-right"
-          style="position: absolute; right: 20px;top: 0"
+          class="btn btn-link btn-sm text-center"
+          :disabled="selectedAlbumsNb===0"
+          @click.stop="form_send_album=!form_send_album"
+        >
+          <span>
+            <v-icon
+              name="user-plus"
+              scale="1.5"
+            />
+          </span><br>
+          {{ $t("share") }}
+        </button>
+      </div>
+      <div
+        class="ml-auto"
+      >
+        <button
+          type="button"
+          class="btn btn-link btn-lg"
           @click="showFilters=!showFilters"
         >
           <v-icon
@@ -62,34 +85,7 @@
             scale="2"
           />
         </button>
-      </h3>
-    </div>
-    <!--
-			TODO: Generate a components ?
-			send icon
-		-->
-    <div
-      v-if="selectedAlbumsNb"
-      class="container-fluid my-3 selection-button-container"
-    >
-      <span
-        class="float-left"
-      >
-        <span>{{ $tc("selectednbalbums",selectedAlbumsNb,{count: selectedAlbumsNb}) }}</span>
-        <button
-          type="button"
-          class="btn btn-link btn-sm text-center"
-          @click.stop="form_send_album=!form_send_album"
-        >
-          <span>
-            <v-icon
-              class="align-middle"
-              name="user"
-            />
-          </span><br>
-          {{ $t("share") }}
-        </button>
-      </span>
+      </div>
     </div>
     <form-get-user
       v-if="form_send_album && selectedAlbumsNb"
@@ -98,6 +94,7 @@
     />
     <b-table
       striped
+      hover
       :items="albums"
       :fields="fields"
       :sort-desc="true"
@@ -105,6 +102,7 @@
       :no-local-sorting="true"
       :dark="false"
       :no-sort-reset="true"
+      :tbody-class="'link'"
       @sort-changed="sortingChanged"
       @row-clicked="selectAlbum"
     >
@@ -481,6 +479,13 @@ export default {
 					}
 				}
 			}
+		},
+		selectedAlbumsNb: {
+			handler: function (selectedAlbumsNb) {
+				if (selectedAlbumsNb === 0) {
+					this.form_send_album = false
+				}
+			}
 		}
 	},
 	created () {
@@ -567,6 +572,10 @@ export default {
 				albumsSelected.forEach(album => {
 					this.$store.dispatch('add_user_to_album', { album_id: album.album_id, user_name: userSub })
 						.then(() => {
+							this.form_send_album = false
+							this.albums.forEach(album => {
+								album.is_selected = false
+							})
 							this.$snotify.success(`${this.$t('send', { albumName: album.name })}`)
 						})
 						.catch(res => {
