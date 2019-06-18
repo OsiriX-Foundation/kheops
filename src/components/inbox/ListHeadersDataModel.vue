@@ -4,6 +4,8 @@
 		"selectednbstudies": "{count} study is selected | {count} studies are selected",
 		"addalbum": "Add to an album",
 		"infoFavorites": "Favorites",
+		"send": "Send",
+		"delete": "Delete",
 		"addfavorites": "Add too favorites",
 		"addfavorites": "Remove too favorites",
     "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
@@ -13,8 +15,12 @@
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
 		"addalbum": "Ajouter à un album",
 		"infoFavorites": "Favoris",
+		"send": "Send",
+		"delete": "Delete",
 		"addfavorites": "Ajouter aux favoris",
-		"addfavorites": "Supprimer des favoris"
+		"addfavorites": "Supprimer des favoris",
+		"confirmDelete": "Etes vous de sûr de vouloir supprimer {count} étude | Etes vous de sûr de vouloir supprimer {count} études",
+    "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries."
 	}
 }
 </i18n>
@@ -220,4 +226,13 @@ export default {
 		background-color: transparent;
 		border-color: transparent;
 	}
+
+	.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
 </style>

@@ -94,25 +94,29 @@
         slot-scope="row"
       >
         <b-button-group>
-          <b-button
-            variant="link"
-            size="sm"
-            class="mr-1 pt-0"
-          >
-            <v-icon
-              v-if="row.detailsShowing"
-              class="align-middle"
-              name="chevron-down"
-            />
-            <v-icon
-              v-else
-              class="align-middle"
-              name="chevron-right"
-            />
-          </b-button>
+					<b-button
+						variant="link"
+						size="sm"
+						class="mr-1 pt-0"
+						@click.stop="showSeries(row)"
+					>
+						<v-icon
+							v-if="row.detailsShowing"
+							class="align-middle"
+							name="chevron-down"
+							@click.stop="row.toggleDetails"
+						/>
+						<v-icon
+							v-else
+							class="align-middle"
+							name="chevron-right"
+							@click.stop="row.toggleDetails"
+						/>
+					</b-button>
           <b-form-checkbox
             v-model="row.item.flag.is_selected"
             inline
+						@change="setSeriesCheck(row)"
           />
         </b-button-group>
       </template>
@@ -125,6 +129,17 @@
           :study="row.item"
         />
       </template>
+			<!--Infos study (Series / Comments / Study Metadata) -->
+        <template
+          slot="row-details"
+          slot-scope="row"
+        >
+          <b-card>
+						<list-item-details
+							:study="row.item"
+						/>
+          </b-card>
+        </template>
     </b-table>
   </div>
 </template>
@@ -133,10 +148,11 @@
 import { mapGetters } from 'vuex'
 import ListHeadersDataModel from '@/components/inbox/ListHeadersDataModel'
 import ListIcons from '@/components/inbox/ListIcons'
+import ListItemDetails from '@/components/inbox/ListItemDetails.vue'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { ListHeadersDataModel, ListIcons },
+	components: { ListHeadersDataModel, ListIcons, ListItemDetails },
 	mixins: [ ],
 	props: {
 		album: {
@@ -244,11 +260,52 @@ export default {
 		setItemHover (item, index, event) {
 			let params = {
 				StudyInstanceUID: item.StudyInstanceUID.Value[0],
-				index: index,
 				flag: 'is_hover',
 				value: !item.flag.is_hover
 			}
 			this.$store.dispatch('setFlagByStudyUID', params)
+		},
+		showSeries (row) {
+			if (!row.item.detailsShowing) {
+				let params = {
+					StudyInstanceUID: row.item.StudyInstanceUID.Value[0],
+					queries: {
+						inbox: true,
+						includefield: ['00080021', '00080031']
+					}
+				}
+				this.$store.dispatch('getSeriesTest', params).then(res => {
+					this.toggleDetails(row)
+				})
+			}
+		},
+		setViewDetails (StudyInstanceUID, flagView) {
+			let viewSelected = flagView === '' ? 'series' : flagView
+			let params = {
+				StudyInstanceUID: StudyInstanceUID,
+				flag: 'view',
+				value: viewSelected
+			}
+			this.$store.dispatch('setFlagByStudyUID', params)
+		},
+		toggleDetails (row) {
+			this.setViewDetails(row.item.StudyInstanceUID.Value[0], row.item.flag.view)
+			row.toggleDetails()
+		},
+		setSeriesCheck (row) {
+			if (row.item.series !== undefined) {
+				let value = row.item.flag.is_selected
+				let StudyInstanceUID = row.item.StudyInstanceUID.Value[0]
+				row.item.series.forEach(serie => {
+					let params = {
+						StudyInstanceUID: StudyInstanceUID,
+						SeriesInstanceUID: serie.SeriesInstanceUID.Value[0],
+						flag: 'is_selected',
+						value: !value
+					}
+					this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
+				});
+			}
 		}
 	}
 }
