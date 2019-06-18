@@ -75,6 +75,9 @@
 
 <template>
   <div>
+    <list-headers-data-model
+      :studies="studies"
+    />
     <b-table
       stacked="sm"
       striped
@@ -118,73 +121,9 @@
         slot-scope="row"
       >
         {{ row.value }}
-        {{ row.item.flag.is_hover }}
-        <span
-          :class="row.item.flag.is_favorite ? '' : classIconPN(row.item.flag.is_hover)"
-          @click.stop="toggleFavorite(row.item)"
-        >
-          <v-icon
-            class="align-middle"
-            style="margin-right:1"
-            name="star"
-            :color="(!row.item.flag.is_favorite && (Object.keys(album).length === 0 || (album.add_series || album.is_admin))) ? 'grey' : ''"
-          />
-        </span>
-        <span
-          :class="row.item.flag.is_commented ? '' : classIconPN(row.item.flag.is_hover)"
-          @click.stop="handleComments(row)"
-        >
-          <v-icon
-            class="align-middle"
-            style="margin-right:1"
-            name="comment-dots"
-            :color="row.item.flag.is_commented ? '' : 'grey'"
-          />
-        </span>
-        <span
-          :class="classIconPN(row.item.flag.is_hover)"
-        >
-          <a
-            href="#"
-            class="download"
-            @click.stop="getURLDownload(row.item.StudyInstanceUID)"
-          >
-            <v-icon
-              class="align-middle"
-              style="margin-right:1"
-              name="download"
-            />
-          </a>
-          <span
-            v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
-            @click.stop="openViewer(row.item.StudyInstanceUID, 'Osirix')"
-          >
-            <osirix-icon
-              width="22px"
-              height="22px"
-            />
-          </span>
-          <span
-            v-if="row.item.ModalitiesInStudy[0] !== 'SR'"
-            @click.stop="openViewer(row.item.StudyInstanceUID, 'Ohif')"
-          >
-            <visibility-icon
-              width="24px"
-              height="24px"
-            />
-          </span>
-
-          <label
-            for="file"
-            style="cursor:pointer; display: inline;"
-            @click="studyUIDadd=row.item.StudyInstanceUID[0]"
-          >
-            <add-icon
-              width="24px"
-              height="24px"
-            />
-          </label>
-        </span>
+        <list-icons
+          :study="row.item"
+        />
       </template>
     </b-table>
   </div>
@@ -192,13 +131,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
-import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
-import AddIcon from '@/components/kheopsSVG/AddIcon'
+import ListHeadersDataModel from '@/components/inbox/ListHeadersDataModel'
+import ListIcons from '@/components/inbox/ListIcons'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { OsirixIcon, VisibilityIcon, AddIcon },
+	components: { ListHeadersDataModel, ListIcons },
 	mixins: [ ],
 	props: {
 		album: {
@@ -303,14 +241,6 @@ export default {
 	},
 
 	methods: {
-		setUIflag () {
-			for (var i = 0; i < this.studies.length; i++) {
-				this.UI.studiesFlag.push({
-					is_hover: false,
-					is_selected: false
-				})
-			}
-		},
 		setItemHover (item, index, event) {
 			let params = {
 				StudyInstanceUID: item.StudyInstanceUID.Value[0],
@@ -319,13 +249,6 @@ export default {
 				value: !item.flag.is_hover
 			}
 			this.$store.dispatch('setFlagByStudyUID', params)
-		},
-		classIconPN (visibility) {
-			if (visibility) {
-				return 'iconsHover'
-			} else {
-				return 'iconsUnhover'
-			}
 		}
 	}
 }

@@ -4,7 +4,13 @@ import httpoperations from '@/mixins/httpoperations'
 
 // initial state
 const state = {
-	studies: []
+	studies: [],
+	defaultFlag: {
+		is_selected: false,
+		is_hover: false,
+		is_favorite: false,
+		is_commented: false
+	}
 }
 
 // getters
@@ -17,33 +23,63 @@ const actions = {
 	getStudiesTest ({ commit, dispatch }, params) {
 		const request = 'studies'
 		let queries = []
-		let defaultFlag = {
-			is_selected: false,
-			is_hover: false,
-			is_favorite: false,
-			is_commented: false
-		}
 
 		if (params.queries !== undefined) {
 			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		return HTTP.get(`${request}${queries.length > 0 ? '?' + queries.join('&') : ''}`, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
-			const studies = dicomoperations.translateDICOM(res.data)
-			let params = {}
-			studies.forEach(study => {
-				study.flag = JSON.parse(JSON.stringify(defaultFlag))
-				study.flag.is_favorite = study.SumFavorites['Value'][0] > 0
-				study.flag.is_commented = study.SumComments['Value'][0] > 0
-			})
-			params.studies = studies
-			commit('SET_STUDIES_TEST', params.studies)
+			if (res.data !== '') {
+				const studies = dicomoperations.translateDICOM(res.data)
+				let params = {}
+				studies.forEach(study => {
+					study.flag = JSON.parse(JSON.stringify(state.defaultFlag))
+					study.flag.is_favorite = study.SumFavorites['Value'][0] > 0
+					study.flag.is_commented = study.SumComments['Value'][0] > 0
+				})
+				params.studies = studies
+				commit('SET_STUDIES_TEST', params.studies)
+			}
 		})
 	},
 	setFlagByStudyUID ({ commit }, params) {
-		let index = state.studies.findIndex(x => {
-			return x.StudyInstanceUID.Value[0] === params.StudyInstanceUID
+		let index = state.studies.findIndex(study => {
+			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
 		commit('SET_FLAG_TEST', { index: index, flag: params.flag, value: params.value })
+	},
+	favoriteStudy ({ commit }, params) {
+		let index = state.studies.findIndex(study => {
+			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
+		})
+
+		let queriesTab = []
+		if (params.queries !== undefined) {
+			queriesTab = httpoperations.getQueriesParameters(params.queries)
+		}
+		let request = `/studies/${params.StudyInstanceUID}/favorites`
+		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
+		return HTTP.put(request + queries).then(res => {
+			commit('SET_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
+			return true
+		}).catch(err => {
+			console.log(err)
+			return false
+		})
+	},
+	deleteStudyTest ({ commit }, params) {
+		let queriesTab = []
+		if (params.queries !== undefined) {
+			queriesTab = httpoperations.getQueriesParameters(params.queries)
+		}
+		const request = `/studies/${params.StudyInstanceUID}`
+		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
+		return HTTP.delete(request + queries).then(res => {
+			commit('DELETE_STUDY_TEST', { StudyInstanceUID: params.StudyInstanceUID })
+			return true
+		}).catch(err => {
+			console.log(err)
+			return false
+		})
 	}
 }
 
@@ -60,6 +96,10 @@ const mutations = {
 	},
 	UPDATE_STUDIES_TEST (state, params) {
 		state.studies = params.studies
+	},
+	DELETE_STUDY_TEST (state, params) {
+		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
+		if (studyIdx > -1) state.studies.splice(studyIdx, 1)
 	}
 }
 
