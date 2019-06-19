@@ -86,6 +86,11 @@ public class ReportProviderClientMetadata {
     public String getRedirectUri() { return redirectUri; }
     public String getClientName() { return clientName; }
     public String getClientUri() { return clientUri; }
+
+    public String getResponseType() {
+        return responseType;
+    }
+
     public ArrayList<String> getContacts() { return contacts; }
 
     public Boolean getValid() { return valid; }
@@ -145,7 +150,7 @@ public class ReportProviderClientMetadata {
             } else if (!tokenEndpointAuthSigningAlg.equals("RS256")) {
                 return ValidationResult.TOKEN_ENDPOINT_AUTH_SIGNING_ALG_UNKNOWN;
             }
-        } else {
+        } else if (!responseType.equals("token")) {
             return ValidationResult.RESPONSE_TYPE_UNKNOWN;
         }
 

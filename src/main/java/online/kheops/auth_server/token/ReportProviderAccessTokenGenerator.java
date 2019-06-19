@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-class ReportProviderAccessTokenGenerator {
+public class ReportProviderAccessTokenGenerator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
@@ -22,37 +22,37 @@ class ReportProviderAccessTokenGenerator {
     private String scope;
     private Set<String> studyInstanceUIDs;
 
-    static ReportProviderAccessTokenGenerator createGenerator(final ServletContext servletContext) {
+    public static ReportProviderAccessTokenGenerator createGenerator(final ServletContext servletContext) {
         return new ReportProviderAccessTokenGenerator(servletContext);
     }
 
-    ReportProviderAccessTokenGenerator withSubject(final String subject) {
+    public ReportProviderAccessTokenGenerator withSubject(final String subject) {
         this.subject = Objects.requireNonNull(subject);
         return this;
     }
 
     @SuppressWarnings("unused")
-    ReportProviderAccessTokenGenerator withAuthTime(final Date authTime) {
+    public ReportProviderAccessTokenGenerator withAuthTime(final Date authTime) {
         this.authTime = authTime;
         return this;
     }
 
-    ReportProviderAccessTokenGenerator withScope(final String scope) {
+    public ReportProviderAccessTokenGenerator withScope(final String scope) {
         this.scope = Objects.requireNonNull(scope);
         return this;
     }
 
-    ReportProviderAccessTokenGenerator withClientId(final String clientId) {
+    public ReportProviderAccessTokenGenerator withClientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
         return this;
     }
 
-    ReportProviderAccessTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
+    public ReportProviderAccessTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
         this.studyInstanceUIDs = new HashSet<>(studyInstanceUIDs);
         return this;
     }
 
-    String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
+    public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(getHMAC256Secret());
             return JWT.create()

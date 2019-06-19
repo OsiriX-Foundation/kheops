@@ -85,6 +85,12 @@ public class ReportProviders {
         return clientMetadata.getRedirectUri();
     }
 
+    public static String getResponseType(ReportProvider reportProvider)
+            throws ReportProviderUriNotValidException {
+        ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
+        return clientMetadata.getResponseType();
+    }
+
     public static String getJwksUri(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
         ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
