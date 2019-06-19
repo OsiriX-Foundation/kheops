@@ -34,7 +34,7 @@ public enum TokenClientAuthenticationType {
         }
     },
 
-    KHEOPS_PRIVATE_KEY_JWT("kheops_private_key_jwt") {
+    PRIVATE_KEY_JWT("private_key_jwt") {
         public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form) {
             MultivaluedMap<String, String> formParams = form.asMap();
 
@@ -46,7 +46,7 @@ public enum TokenClientAuthenticationType {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown client accesstoken type");
             }
 
-            return TokenJWTAuthenticator.newAuthenticator(context)
+            return PrivateKeyJWTAuthenticator.newAuthenticator(context)
                     .clientJWT(formParams.getFirst(CLIENT_ASSERTION))
                     .clientId(formParams.getFirst(CLIENT_ID))
                     .authenticate();
@@ -125,7 +125,7 @@ public enum TokenClientAuthenticationType {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown client_assertion_type");
             }
             if (clientAssertions.get(0).startsWith("eyJ")) {
-                return TokenClientAuthenticationType.KHEOPS_PRIVATE_KEY_JWT;
+                return TokenClientAuthenticationType.PRIVATE_KEY_JWT;
             } else {
                 throw new TokenRequestException(INVALID_REQUEST, "Malformed client_assertion");
             }

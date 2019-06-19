@@ -4,26 +4,31 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.UserPrincipal;
 
+import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
+import java.util.Optional;
 
-final class SuperuserJWTAccessToken implements AccessToken {
+final class SuperuserAccessToken implements AccessToken {
     private final String sub;
 
-    static class Builder {
-        private final String superuserSecret;
+    static class Builder implements AccessTokenBuilder {
+        private final ServletContext servletContext;
 
-        private Builder(String superuserSecret) {
-            this.superuserSecret = Objects.requireNonNull(superuserSecret);
+        Builder(ServletContext servletContext) {
+            this.servletContext = servletContext;
         }
 
-        SuperuserJWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public SuperuserAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
             try {
-                algorithm = Algorithm.HMAC256(superuserSecret);
+                algorithm = Algorithm.HMAC256(getSuperuserSecret());
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalArgumentException("superuserSecret is not a valid HMAC256 secret", e);
             }
@@ -41,15 +46,15 @@ final class SuperuserJWTAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
-            return new SuperuserJWTAccessToken(jwt.getSubject());
+            return new SuperuserAccessToken(jwt.getSubject());
+        }
+
+        private String getSuperuserSecret() {
+            return servletContext.getInitParameter("online.kheops.superuser.hmacsecret");
         }
     }
 
-    static Builder getBuilder(String superuserSecret) {
-        return new Builder(superuserSecret);
-    }
-
-    private SuperuserJWTAccessToken(String sub) {
+    private SuperuserAccessToken(String sub) {
         this.sub = Objects.requireNonNull(sub);
     }
 
@@ -59,10 +64,15 @@ final class SuperuserJWTAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return true;
+    public TokenType getTokenType() { return TokenType.SUPER_USER_TOKEN; }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("read write downloadbutton send");
     }
 
     @Override
-    public TokenType getTokenType() { return TokenType.SUPER_USER_TOKEN; }
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new UserPrincipal(user);
+    }
 }

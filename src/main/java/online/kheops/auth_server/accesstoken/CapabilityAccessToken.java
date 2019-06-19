@@ -1,14 +1,17 @@
 package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.capability.Capabilities;
-import online.kheops.auth_server.capability.CapabilityNotFoundException;
-import online.kheops.auth_server.capability.CapabilityNotValidException;
-import online.kheops.auth_server.capability.CapabilityToken;
+import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.CapabilityPrincipal;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -16,7 +19,7 @@ final class CapabilityAccessToken implements AccessToken {
     private final String sub;
     private Capability capability;
 
-    static final class CapabilityAccessTokenBuilder extends AccessTokenBuilder {
+    static final class CapabilityAccessTokenBuilder implements AccessTokenBuilder {
         @Override
         public AccessToken build(String capabilityToken) throws AccessTokenVerificationException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {
@@ -63,15 +66,39 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return false;
-    }
+    public Optional<String> getScope() {
+        List<String> scopes = new ArrayList<>(4);
 
-    @Override
-    public Optional<Capability> getCapability() {
-        return Optional.of(capability);
+        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+            if (capability.hasReadPermission()) {
+                scopes.add("read");
+            }
+            if (capability.hasWritePermission()) {
+                scopes.add("write");
+            }
+            if (capability.hasDownloadButtonPermission()) {
+                scopes.add("downloadbutton");
+            }
+            if (capability.hasAppropriatePermission()) {
+                scopes.add("send");
+            }
+
+            if (!scopes.isEmpty()) {
+                return Optional.of(String.join(" ", scopes));
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.of("read write downloadbutton send");
+        }
     }
 
     @Override
     public TokenType getTokenType() { return TokenType.CAPABILITY_TOKEN; }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new CapabilityPrincipal(capability, user);
+    }
+
 }

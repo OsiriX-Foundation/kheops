@@ -11,16 +11,13 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
 
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -66,36 +63,38 @@ public class ReportProviders {
         return new ReportProviderResponse(reportProvider);
     }
 
-    public static JsonObject callConfigURL(ReportProvider reportProvider)
+    public static ReportProviderClientMetadata callConfigURL(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
 
-        final Response response;
-
         try {
-            response = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get();
-        } catch (Exception e) {
-            throw new ReportProviderUriNotValidException("report provider uri not valid");
-        }
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            String output = response.readEntity(String.class);
-            try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
-                return jsonReader.readObject();
-            }
-        }
-        throw new ReportProviderUriNotValidException("report provider uri not valid");
+            ReportProviderClientMetadata clientMetadata = ClientBuilder.newClient().target(reportProvider.getUrl()).request().get(ReportProviderClientMetadata.class);
 
+            ReportProviderClientMetadata.ValidationResult validationResult = clientMetadata.validateForConfigUri(reportProvider.getUrl());
+            if (validationResult != ReportProviderClientMetadata.ValidationResult.OK) {
+                throw new ReportProviderUriNotValidException(validationResult.getDescription());
+            }
+            return clientMetadata;
+        } catch (ProcessingException | WebApplicationException e) {
+            throw new ReportProviderUriNotValidException("report provider uri not valid", e);
+        }
     }
 
     public static String getRedirectUri(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
-        JsonObject reply = callConfigURL(reportProvider);
-        return reply.getString("redirect_uri");
+        ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
+        return clientMetadata.getRedirectUri();
+    }
+
+    public static String getResponseType(ReportProvider reportProvider)
+            throws ReportProviderUriNotValidException {
+        ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
+        return clientMetadata.getResponseType();
     }
 
     public static String getJwksUri(ReportProvider reportProvider)
             throws ReportProviderUriNotValidException {
-        JsonObject reply = callConfigURL(reportProvider);
-        return reply.getString("jwks_uri");
+        ReportProviderClientMetadata clientMetadata = callConfigURL(reportProvider);
+        return clientMetadata.getJwksUri();
     }
 
     public static String getConfigIssuer(ReportProvider reportProvider) throws ReportProviderUriNotValidException{
@@ -116,9 +115,19 @@ public class ReportProviders {
     public static boolean isValidConfigUrl(String configUrl) {
 
         try {
+            getClientMetadata(configUrl);
+            return true;
+        } catch (ReportProviderUriNotValidException e) {
+            return false;
+        }
+    }
+
+    public static ReportProviderClientMetadata getClientMetadata (String configUrl)
+    throws ReportProviderUriNotValidException {
+        try {
             new URI(configUrl);
         } catch (URISyntaxException e) {
-            return false;
+            throw new ReportProviderUriNotValidException("syntax not valid");
         }
 
         try {
@@ -126,20 +135,16 @@ public class ReportProviders {
             configuration.property(ClientProperties.CONNECT_TIMEOUT, 5000);
             configuration.property(ClientProperties.READ_TIMEOUT, 5000);
 
-            final Response response = ClientBuilder.newClient(configuration).target(configUrl).request().get();
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                String output = response.readEntity(String.class);
-                try (JsonReader jsonReader = Json.createReader(new StringReader(output))) {
-                    final JsonObject reply = jsonReader.readObject();
-                    return reply.containsKey("redirect_uri")
-                            && reply.containsKey("token_endpoint_auth_method")
-                            && reply.containsKey("token_endpoint_auth_signing_alg")
-                            && reply.containsKey("jwks_uri");
-                }
+
+            ReportProviderClientMetadata clientMetadata = ClientBuilder.newClient(configuration).target(configUrl).request().get(ReportProviderClientMetadata.class);
+
+            ReportProviderClientMetadata.ValidationResult validationResult = clientMetadata.validateForConfigUri(configUrl);
+            if (validationResult != ReportProviderClientMetadata.ValidationResult.OK) {
+                throw new ReportProviderUriNotValidException(validationResult.getDescription());
             }
-            return false;
-        } catch (Exception e) {
-            return false;
+            return clientMetadata;
+        } catch (ProcessingException | WebApplicationException e) {
+            throw new ReportProviderUriNotValidException("error during request");
         }
     }
 

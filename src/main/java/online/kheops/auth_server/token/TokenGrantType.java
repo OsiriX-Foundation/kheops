@@ -1,5 +1,9 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
+import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
+import online.kheops.auth_server.report_provider.ReportProviders;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -21,12 +25,22 @@ public enum TokenGrantType {
         public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             verifySingleHeader(form, "code");
             verifySingleHeader(form, "client_id");
+            verifySingleHeader(form, "redirect_uri");
 
             final String code = form.getFirst("code");
             final String clientId = form.getFirst("client_id");
+            final String redirectUri = form.getFirst("redirect_uri");
 
             if (!securityContext.isUserInRole(TokenClientKind.REPORT_PROVIDER.getRoleString())) {
                 throw new TokenRequestException(UNAUTHORIZED_CLIENT);
+            }
+
+            try {
+                if (!ReportProviders.getRedirectUri(ReportProviders.getReportProvider(clientId)).equals(redirectUri)) {
+                    throw new TokenRequestException(INVALID_GRANT, "redirect_uri does not match");
+                }
+            } catch (ReportProviderUriNotValidException | ClientIdNotFoundException e) {
+                throw new TokenRequestException(INVALID_GRANT, e.getMessage(), e);
             }
 
             final DecodedAuthorizationCode authorizationCode;
@@ -35,10 +49,11 @@ public enum TokenGrantType {
                     .validate(code);
 
             final String token;
-            token = ReportProviderTokenGenerator.createGenerator(servletContext)
+            token = ReportProviderAccessTokenGenerator.createGenerator(servletContext)
                     .withSubject(authorizationCode.getSubject())
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
+                    .withScope("read write")
                     .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
 
             return Response.ok(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME)).build();
@@ -94,7 +109,7 @@ public enum TokenGrantType {
                     throw new TokenRequestException(UNAUTHORIZED_CLIENT);
                 }
 
-                String pepToken = PepTokenGenerator.createGenerator(servletContext)
+                String pepToken = PepAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSeriesInstanceUID(seriesInstanceUID)
@@ -115,7 +130,7 @@ public enum TokenGrantType {
                     sourceId = null;
                 }
 
-                String viewerToken = ViewerTokenGenerator.createGenerator(servletContext)
+                String viewerToken = ViewerAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSourceType(sourceType)
@@ -128,9 +143,9 @@ public enum TokenGrantType {
         }
     };
 
-    final private static long REPORT_PROVIDER_TOKEN_LIFETIME = 60 * 60; // 1 hour
-    final private static long PEP_TOKEN_LIFETIME = 60 * 60; // 1 hours
-    final private static long VIEWER_TOKEN_LIFETIME = 60 * 60 * 5; // 5 hours
+    private static final long REPORT_PROVIDER_TOKEN_LIFETIME = 60L * 60L; // 1 hour
+    private static final long PEP_TOKEN_LIFETIME = 60L * 60L; // 1 hours
+    private static final long VIEWER_TOKEN_LIFETIME = 60L * 60L * 5L; // 5 hours
 
     private final String grantType;
 
@@ -138,6 +153,7 @@ public enum TokenGrantType {
         this.grantType = grantType;
     }
 
+    @Override
     public String toString() {
         return grantType;
     }

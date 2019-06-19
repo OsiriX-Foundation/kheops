@@ -184,13 +184,13 @@ public class Capability {
 
     public String getSecret() { return secret; }
 
-    public boolean isReadPermission() { return readPermission; }
+    public boolean hasReadPermission() { return readPermission; }
 
-    public boolean isWritePermission() { return writePermission; }
+    public boolean hasWritePermission() { return writePermission; }
 
-    public boolean isAppropriatePermission() { return appropriatePermission; }
+    public boolean hasAppropriatePermission() { return appropriatePermission; }
 
-    public boolean isDownloadPermission() { return downloadPermission; }
+    public boolean hasDownloadButtonPermission() { return downloadPermission; }
 
     public String getScopeType() { return scopeType; }
 

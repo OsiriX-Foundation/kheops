@@ -5,7 +5,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -16,8 +16,6 @@ import java.util.Optional;
 
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesBySeriesAndAlbumWithSendPermission;
-import static online.kheops.auth_server.series.SeriesQueries.isOrphan;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
 public class ReportProviderPrincipal implements KheopsPrincipalInterface {
@@ -25,6 +23,8 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
     private EntityManager em;
     private EntityTransaction tx;
     private final User user;
+    private final boolean hasReadAccess;
+    private final boolean hasWriteAccess;
 
     private List<String> studyUids;
     private String clientId;
@@ -32,7 +32,7 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
 
     //old version
     private final Long dbid;
-    public ReportProviderPrincipal(User user, List<String> studyUids, String clientId) {
+    public ReportProviderPrincipal(User user, List<String> studyUids, String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess) {
         try {
             album = getReportProvider(clientId).getAlbum();
         } catch (ClientIdNotFoundException e) {
@@ -42,6 +42,8 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         this.studyUids = studyUids;
         this.dbid = user.getPk();
         this.user = user;
+        this.hasReadAccess = hasReadAccessAccess;
+        this.hasWriteAccess = hasWriteAccess;
     }
     @Override
     public long getDBID() {
@@ -54,6 +56,10 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+
+        if (!hasReadAccess) {
+            return false;
+        }
 
         if (!studyUids.contains(studyInstanceUID)) {
             return false;
@@ -86,6 +92,10 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID)
             throws SeriesNotFoundException {
+
+        if (!hasWriteAccess) {
+            return false;
+        }
 
         if (!studyUids.contains(studyInstanceUID)) {
             return false;
@@ -126,7 +136,7 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {

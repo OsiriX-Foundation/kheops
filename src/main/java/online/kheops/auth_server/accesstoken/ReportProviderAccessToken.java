@@ -11,24 +11,28 @@ import online.kheops.auth_server.principal.*;
 
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
     private final List<String> studyUIDs;
     private final String clientId;
+    private final boolean hasReadAccess;
+    private final boolean hasWriteAccess;
 
-    static class Builder {
+    static class Builder implements AccessTokenBuilder{
         private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 
         private final ServletContext servletContext;
 
-        private Builder(ServletContext servletContext) {
+        Builder(ServletContext servletContext) {
             this.servletContext = Objects.requireNonNull(servletContext);
         }
 
-        ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -53,17 +57,25 @@ public class ReportProviderAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Missing sub claim in token.");
             }
 
-            final Claim clientIdClaim = jwt.getClaim("client_id");
-            if (clientIdClaim.isNull() || clientIdClaim.asString() == null) {
-                throw new AccessTokenVerificationException("Missing client_id claim in token");
+            final Claim azpClaim = jwt.getClaim("azp");
+            if (azpClaim.isNull() || azpClaim.asString() == null) {
+                throw new AccessTokenVerificationException("Missing azp claim in token");
             }
+
+            final Claim scopeClaim = jwt.getClaim("scope");
+            if (scopeClaim.isNull() || scopeClaim.asString() == null) {
+                throw new AccessTokenVerificationException("Missing scope claim in token");
+            }
+
+            final boolean hasReadAccess = scopeClaim.asString().matches("\\bread\\b");
+            final boolean hasWriteAccess = scopeClaim.asString().matches("\\bread\\b");
 
             final Claim studyUIDsClaim = jwt.getClaim("study_uids");
             try {
                 if (studyUIDsClaim.isNull() || studyUIDsClaim.asList(String.class) == null) {
                     throw new AccessTokenVerificationException("Missing study_uids claim in token");
                 }
-                return new ReportProviderAccessToken(jwt.getSubject(), studyUIDsClaim.asList(String.class), clientIdClaim.asString());
+                return new ReportProviderAccessToken(jwt.getSubject(), studyUIDsClaim.asList(String.class), azpClaim.asString(), hasReadAccess, hasWriteAccess);
             } catch (JWTDecodeException e) {
                 throw new AccessTokenVerificationException("unable to decode study_uids");
             }
@@ -79,14 +91,12 @@ public class ReportProviderAccessToken implements AccessToken {
 
     }
 
-    static ReportProviderAccessToken.Builder getBuilder(ServletContext servletContext) {
-        return new ReportProviderAccessToken.Builder(servletContext);
-    }
-
-    private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId) {
+    private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess) {
         this.sub = Objects.requireNonNull(sub);
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
         this.clientId = Objects.requireNonNull(ClientId);
+        this.hasReadAccess = hasReadAccess;
+        this.hasWriteAccess = hasWriteAccess;
     }
 
     @Override
@@ -95,16 +105,28 @@ public class ReportProviderAccessToken implements AccessToken {
     }
 
     @Override
-    public boolean hasCapabilityAccess() {
-        return true;
-    }
-
-    @Override
     public TokenType getTokenType() { return TokenType.REPORT_PROVIDER_TOKEN; }
 
     @Override
-    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+    public Optional<String> getScope() {
+        final List<String> scopes = new ArrayList<>(2);
 
-        return new ReportProviderPrincipal(user, studyUIDs, clientId);
+        if (hasReadAccess) {
+            scopes.add("read");
+        }
+        if (hasWriteAccess) {
+            scopes.add("write");
+        }
+
+        if (!scopes.isEmpty()) {
+            return Optional.of(String.join(" ", scopes));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new ReportProviderPrincipal(user, studyUIDs, clientId, hasReadAccess, hasWriteAccess);
     }
 }

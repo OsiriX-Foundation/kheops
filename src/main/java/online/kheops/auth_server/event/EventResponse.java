@@ -125,22 +125,21 @@ public class EventResponse {
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
         }
-        if (mutation.getReportProvider().isPresent()) {
+        mutation.getReportProvider().ifPresent(mutationReportProvider -> {
             reportProvider = new ReportProviderResponse();
-            if(mutation.getReportProvider().get().isRemoved()) {
+            if(mutationReportProvider.isRemoved()) {
                 reportProvider.removed = true;
             } else {
                 reportProvider.removed = false;
-                reportProvider.id = mutation.getReportProvider().get().getClientId();
+                reportProvider.id = mutationReportProvider.getClientId();
             }
 
-            reportProvider.name = mutation.getReportProvider().get().getName();
-        }
-        if (mutation.getCapability().isPresent()) {
+            reportProvider.name = mutationReportProvider.getName();
+        });
+        mutation.getCapability().ifPresent(mutationCapability -> {
             capability = new CapabilityResponse();
-            capability.id = mutation.getCapability().get().getId();
-            capability.title = mutation.getCapability().get().getTitle();
-            //originName = null; TODO
-        }
+            capability.id = mutationCapability.getId();
+            capability.title = mutationCapability.getTitle();
+        });
     }
 }

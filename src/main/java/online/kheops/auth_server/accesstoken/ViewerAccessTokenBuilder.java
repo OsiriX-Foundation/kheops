@@ -9,10 +9,11 @@ import org.jose4j.lang.JoseException;
 
 import javax.servlet.ServletContext;
 
-final class ViewerAccessTokenBuilder extends AccessTokenBuilder {
+final class ViewerAccessTokenBuilder implements AccessTokenBuilder {
+    private final ServletContext servletContext;
 
     ViewerAccessTokenBuilder(ServletContext servletContext) {
-        super(servletContext);
+        this.servletContext = servletContext;
     }
 
     @Override
@@ -28,7 +29,7 @@ final class ViewerAccessTokenBuilder extends AccessTokenBuilder {
 
             jwe.setCompactSerialization(assertionToken);
 
-            return ViewerAccessToken.getBuilder(getServletContext()).build(jwe.getPayload());
+            return ViewerAccessToken.getBuilder(servletContext).build(jwe.getPayload());
         } catch (JoseException e) {
             throw new AccessTokenVerificationException("Unable to decode JWT", e);
         }

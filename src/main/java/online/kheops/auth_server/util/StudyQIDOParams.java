@@ -6,7 +6,7 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import org.dcm4che3.data.Tag;
 
 import javax.persistence.NoResultException;
@@ -72,7 +72,7 @@ public final class StudyQIDOParams {
                 throw new IllegalStateException(" Should not happen", e);
             }
 
-            if (!kheopsPrincipal.hasAlbumPermission(UserPermissionEnum.READ_SERIES, albumIDLocal)) {
+            if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.READ_SERIES, albumIDLocal)) {
                 throw new AlbumForbiddenException("Token doesn't have read access");
             }
         }

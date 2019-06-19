@@ -6,7 +6,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,6 @@ import java.util.Optional;
 
 public interface KheopsPrincipalInterface extends java.security.Principal{
 
-    //for old version
     long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
@@ -27,7 +26,7 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     boolean hasStudyWriteAccess(String study);
 
-    boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId)throws AlbumNotFoundException;
+    boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) throws AlbumNotFoundException;
 
     boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException;
 

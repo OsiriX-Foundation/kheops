@@ -25,8 +25,8 @@ import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 
-class ViewerTokenGenerator {
-    private static final Logger LOG = Logger.getLogger(ViewerTokenGenerator.class.getName());
+class ViewerAccessTokenGenerator {
+    private static final Logger LOG = Logger.getLogger(ViewerAccessTokenGenerator.class.getName());
 
     private final ServletContext servletContext;
 
@@ -35,36 +35,36 @@ class ViewerTokenGenerator {
     private String sourceType;
     private String sourceId;
 
-    private ViewerTokenGenerator(ServletContext servletContext) {
+    private ViewerAccessTokenGenerator(ServletContext servletContext) {
         this.servletContext = servletContext;
     }
 
-    ViewerTokenGenerator withToken(final String token) {
+    ViewerAccessTokenGenerator withToken(final String token) {
         this.token = Objects.requireNonNull(token);
         return this;
     }
 
-    ViewerTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
+    ViewerAccessTokenGenerator withStudyInstanceUID(final String studyInstanceUID) {
         this.studyInstanceUID = Objects.requireNonNull(studyInstanceUID);
         return this;
     }
 
-    ViewerTokenGenerator withSourceType(final String sourceType) {
+    ViewerAccessTokenGenerator withSourceType(final String sourceType) {
         this.sourceType = Objects.requireNonNull(sourceType);
         return this;
     }
 
-    ViewerTokenGenerator withSourceId(final String sourceId) {
+    ViewerAccessTokenGenerator withSourceId(final String sourceId) {
         this.sourceId = sourceId;
         return this;
     }
 
-    static ViewerTokenGenerator createGenerator(ServletContext servletContext) {
-        return new ViewerTokenGenerator(servletContext);
+    static ViewerAccessTokenGenerator createGenerator(ServletContext servletContext) {
+        return new ViewerAccessTokenGenerator(servletContext);
     }
 
     @SuppressWarnings("unchecked")
-    String generate(final long expiresIn) {
+    String generate(@SuppressWarnings("SameParameterValue") final long expiresIn) {
         Objects.requireNonNull(token);
         Objects.requireNonNull(studyInstanceUID);
         Objects.requireNonNull(sourceType);
@@ -105,7 +105,7 @@ class ViewerTokenGenerator {
             data.put(Consts.JWE.SOURCE_ID, sourceId);
             data.put(Consts.JWE.IS_INBOX, sourceType.equals(INBOX));
             data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
-            data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(12, ChronoUnit.HOURS)));
+            data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
 
             final JsonWebEncryption jwe = new JsonWebEncryption();
             jwe.setPayload(data.toJSONString());

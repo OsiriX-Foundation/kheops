@@ -1,5 +1,9 @@
 package online.kheops.auth_server.accesstoken;
 
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.ViewerPrincipal;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -41,18 +45,21 @@ final class ViewerAccessToken implements AccessToken {
     }
 
     @Override
-    public Optional<JsonObject> getViewer() { return Optional.of(jwe); }
-
-    @Override
-    public boolean hasCapabilityAccess() {
-        return false;
-    }
-
-    @Override
     public String getSub() {
         return sub;
     }
 
     @Override
     public TokenType getTokenType() { return TokenType.VIEWER_TOKEN; }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("read");
+    }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new ViewerPrincipal(servletContext, jwe);
+    }
+
 }

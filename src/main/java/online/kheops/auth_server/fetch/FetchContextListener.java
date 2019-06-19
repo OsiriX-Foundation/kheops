@@ -1,7 +1,7 @@
 package online.kheops.auth_server.fetch;
 
 
-import online.kheops.auth_server.PACSAuthTokenBuilder;
+import online.kheops.auth_server.PepAccessTokenBuilder;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -25,7 +25,7 @@ public class FetchContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         executor = new ScheduledThreadPoolExecutor(MAXIMUM_CONCURRENT);
 
-        PACSAuthTokenBuilder.setSecret(sce.getServletContext().getInitParameter("online.kheops.auth.hmacsecret"));
+        PepAccessTokenBuilder.setSecret(sce.getServletContext().getInitParameter("online.kheops.auth.hmacsecret"));
 
         try {
             Fetcher.setDicomWebURI(new URI(sce.getServletContext().getInitParameter("online.kheops.pacs.uri")));

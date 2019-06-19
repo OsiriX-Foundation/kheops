@@ -1,8 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
@@ -13,8 +10,10 @@ import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
+import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
@@ -26,18 +25,18 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
+import static online.kheops.auth_server.user.AlbumUserPermissions.ADD_SERIES;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
@@ -64,7 +63,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -183,49 +182,74 @@ public class ReportProviderResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        //générer le jwt
-        final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecret");
-        final Algorithm algorithmHMAC;
+        final String responseType;
         try {
-            algorithmHMAC = Algorithm.HMAC256(authSecret);
-        } catch (UnsupportedEncodingException e) {
-            LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            responseType = getResponseType(reportProvider);
+        } catch (ReportProviderUriNotValidException e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        final JWTCreator.Builder jwtBuilder = JWT.create()
-                .withExpiresAt(Date.from(Instant.now().plus(10, ChronoUnit.MINUTES)))
-                .withNotBefore(new Date())
-                .withArrayClaim("study_uids", studyInstanceUID.toArray(new String[0]))
-                .withSubject(assertion.getSub())
-                .withIssuer(getHostRoot())
-                .withAudience(getHostRoot())
-                .withClaim("azp", reportProvider.getClientId())
-                .withClaim("type", "report_provider_code");
+        final String kheopsConfigUrl = getHostRoot() + "/api/reportproviders/" + clientId + "/configuration";
+        if (responseType.equals("code")) {
+            final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
+                    .withClientId(reportProvider.getClientId())
+                    .withStudyInstanceUIDs(studyInstanceUID)
+                    .withSubject(assertion.getSub())
+                    .generate(600);
 
-        final String token = jwtBuilder.sign(algorithmHMAC);
+            try {
+                final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
+                final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
+                        .queryParam("code", token)
+                        .queryParam("conf_uri", confUri)
+                        .queryParam("client_id", reportProvider.getClientId());
 
-        try {
-            final String kheopsConfigUrl = getHostRoot() + "/api/reportproviders/" + clientId + "/configuration";
-            final String StandardCharsetsUTF8 = java.nio.charset.StandardCharsets.UTF_8.toString();
+                for (String uid : studyInstanceUID) {
+                    reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, UTF_8.toString()));
+                }
 
-            final String confUri = URLEncoder.encode(kheopsConfigUrl, StandardCharsetsUTF8);
-            final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
-                    .queryParam("code", token)
-                    .queryParam("conf_uri", confUri)
-                    .queryParam("client_id", reportProvider.getClientId());
+                final String reportProviderUrl = reportProviderUrlBuilder.toString();
 
-            for (String uid: studyInstanceUID) {
-                reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, StandardCharsetsUTF8));
+                return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
+            } catch (ReportProviderUriNotValidException e) {
+                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            } catch (UnsupportedEncodingException e) {
+                return Response.status(FORBIDDEN).entity("ERROR").build();
             }
+        } else if (responseType.equals("token")) {
+            try {
+                final boolean userHasWriteAccess = principal.hasAlbumPermission(ADD_SERIES, albumId);
+                final String token = ReportProviderAccessTokenGenerator.createGenerator(context)
+                        .withClientId(clientId)
+                        .withScope(userHasWriteAccess ? "read write" : "read")
+                        .withStudyInstanceUIDs(studyInstanceUID)
+                        .withSubject(assertion.getSub())
+                        .generate(3600);
 
-            final String reportProviderUrl = reportProviderUrlBuilder.toString();
+                final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
 
-            return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
-        } catch (ReportProviderUriNotValidException e) {
-            return Response.status(BAD_REQUEST ).entity(e.getMessage()).build();
-        } catch (UnsupportedEncodingException e) {
-            return Response.status(FORBIDDEN).entity("ERROR").build();
+                final String reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
+                        .fragment("access_token=" + token +
+                                "&token_type=" + "Bearer" +
+                                "&expires_in=3600" +
+                                "&scope=" + (userHasWriteAccess ? "read%20write" : "read") +
+                                "&client_id=" + clientId +
+                                "&conf_uri=" + confUri +
+                                studyInstanceUID.stream()
+                                        .map(uid -> "&study_uid="+uid)
+                                        .collect(Collectors.joining()))
+                        .toString();
+
+                return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
+            } catch (AlbumNotFoundException e) {
+                throw new IllegalStateException("Album just found, how could we not have it now", e);
+            } catch (ReportProviderUriNotValidException e) {
+                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            } catch (UnsupportedEncodingException e) {
+                return Response.status(FORBIDDEN).entity("ERROR").build();
+            }
+        } else {
+            return Response.status(BAD_REQUEST).entity("bad response type").build();
         }
     }
 
@@ -247,7 +271,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.GET_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.GET_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -266,7 +290,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.GET_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.GET_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -286,7 +310,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
@@ -308,7 +332,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(UserPermissionEnum.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
@@ -343,13 +367,23 @@ public class ReportProviderResource {
     @POST
     @Secured
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("reportproviders/testuri")
+    @Path("reportproviders/metadata")
     public Response testUri(@FormParam("url") final String url) {
 
-        if (url == null || url.isEmpty() || !isValidConfigUrl(url)) {
-            return Response.status(BAD_REQUEST).entity("url not valid").build();
+        if (url == null || url.isEmpty()) {
+            return Response.status(BAD_REQUEST).entity("Missing formParam 'url'").build();
         }
-        return  Response.status(OK).build();
+
+        ReportProviderClientMetadata clientMetadataResponse = new ReportProviderClientMetadata();
+
+        try {
+            clientMetadataResponse = getClientMetadata(url);
+            clientMetadataResponse.setValid(true);
+        } catch (ReportProviderUriNotValidException e) {
+            clientMetadataResponse.setValid(false);
+        }
+
+        return  Response.status(OK).entity(clientMetadataResponse).build();
     }
 
     private String getHostRoot() {

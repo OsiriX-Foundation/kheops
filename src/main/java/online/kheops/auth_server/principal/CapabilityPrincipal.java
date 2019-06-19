@@ -8,7 +8,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.UserPermissionEnum;
+import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -60,7 +60,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
                 } else {
                     throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + "not found");
                 }
-            } else if (getScope() == ScopeType.ALBUM && capability.isReadPermission()) {
+            } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
@@ -87,7 +87,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             final Study study = getStudy(studyInstanceUID, em);
             if(getScope() == ScopeType.USER) {
                 return canAccessStudy(user, study, em);
-            } else if (getScope() == ScopeType.ALBUM && capability.isReadPermission()) {
+            } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) {
                     return false;
@@ -146,7 +146,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
             return false;
 
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!capability.isWritePermission()) {
+            if (!capability.hasWritePermission()) {
                 return false;
             }
             try {
@@ -191,14 +191,14 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            return capability.isWritePermission();
+            return capability.hasWritePermission();
         } else {
             return false;
         }
     }
 
     @Override
-    public boolean hasAlbumPermission(UserPermissionEnum usersPermission, String albumId) {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
             return false;

@@ -1,12 +1,8 @@
 package online.kheops.auth_server.resource;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import online.kheops.auth_server.annotation.FormURLEncodedContentType;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
-import online.kheops.auth_server.capability.ScopeType;
-import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.token.TokenClientKind;
 import online.kheops.auth_server.token.TokenGrantType;
 import online.kheops.auth_server.token.TokenRequestException;
@@ -47,7 +43,6 @@ public class TokenResource
         String user;
     }
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     static class IntrospectResponse {
         @XmlElement(name = "active")
         boolean active;
@@ -59,21 +54,20 @@ public class TokenResource
 
     @POST
     @TokenSecurity
-    @FormURLEncodedContentType
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(MultivaluedMap<String, String> form) {
         final List<String> grantTypes = form.get("grant_type");
 
-        if (grantTypes == null || form.get("grant_type").size() != 1) {
+        if (grantTypes == null || grantTypes.size() != 1) {
             LOG.log(WARNING, "Missing or duplicate grant_type");
             throw new TokenRequestException(INVALID_REQUEST, "Missing or duplicate grant_type");
         }
 
         final TokenGrantType grantType;
         try {
-            grantType = TokenGrantType.fromString(form.getFirst("grant_type"));
+            grantType = TokenGrantType.fromString(grantTypes.get(0));
         } catch (IllegalArgumentException e) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
@@ -81,14 +75,13 @@ public class TokenResource
         try {
             return grantType.processGrant(securityContext, context, form);
         } catch (WebApplicationException e) {
-            LOG.log(WARNING, "error processing grant", e);
+            LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e;
         }
     }
 
     @POST
     @TokenSecurity
-    @FormURLEncodedContentType
     @Path("/token/introspect")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -104,11 +97,10 @@ public class TokenResource
         if (securityContext.isUserInRole(TokenClientKind.PUBLIC.getRoleString())) {
             throw new NotAuthorizedException("Basic");
         }
-        // TODO secure this resource
 
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(context, assertionToken);
+            accessToken = AccessTokenVerifier.authenticateIntrospectableAccessToken(context, assertionToken);
         } catch (AccessTokenVerificationException e) {
             LOG.log(WARNING, "Error validating a token", e);
             return Response.status(OK).entity(errorIntrospectResponse).build();
@@ -117,25 +109,13 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        final Capability capability = accessToken.getCapability().orElse(null);
-
-        if(capability != null) {
-            if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
-                introspectResponse.scope = (capability.isWritePermission()?"write ":"") +
-                        (capability.isReadPermission()?"read ":"") +
-                        (capability.isDownloadPermission()?"download ":"") +
-                        (capability.isAppropriatePermission()?"appropriate ":"");
-                if (introspectResponse.scope.length() > 0) {
-                    introspectResponse.scope = introspectResponse.scope.substring(0, introspectResponse.scope.length() - 1);
-                }
-            } else {
-                introspectResponse.scope = "read write";
-            }
-        } else if(accessToken.getViewer().isPresent()) {
-            introspectResponse.scope = "read";
-        } else {
-            introspectResponse.scope = "read write";
+        if (securityContext.isUserInRole(TokenClientKind.REPORT_PROVIDER.getRoleString()) &&
+                accessToken.getTokenType() != AccessToken.TokenType.REPORT_PROVIDER_TOKEN) {
+            LOG.log(WARNING, "Report Provider introspecting a valid non-report provider token");
+            return Response.status(OK).entity(errorIntrospectResponse).build();
         }
+
+        introspectResponse.scope = accessToken.getScope().orElse(null);
 
         introspectResponse.active = true;
         return Response.status(OK).entity(introspectResponse).build();

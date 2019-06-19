@@ -40,7 +40,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) {
         final List<Attributes> list = new ArrayList<>();
 
-        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { public void close() {} })) {
+        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { @Override public void close(/* close shield */) {} })) {
             final JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Exception e){

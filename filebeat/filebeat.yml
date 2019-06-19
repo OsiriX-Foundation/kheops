@@ -18,49 +18,151 @@ filebeat.inputs:
 # you can use different inputs for various configurations.
 # Below are the input specific configurations.
 
-- type: log
-  # Change to true to enable this input configuration.
-  enabled: true
-  pipeline: "kheops-authorization"
+  - type: log
+    # Change to true to enable this input configuration.
+    enabled: true
 
-  # Paths that should be crawled and fetched. Glob based paths.
-  paths:
-    - /usr/local/tomcat/logs/*.log
-    #- c:\programdata\elasticsearch\logs\*
+    # Paths that should be crawled and fetched. Glob based paths.
+    paths:
+      - /usr/local/tomcat/logs/catalina.*.log
 
-  # Exclude lines. A list of regular expressions to match. It drops the lines that are
-  # matching any regular expression from the list.
-  #exclude_lines: ['^DBG']
+    fields:
+      docker_type: tomcat
+      log_type: catalina
 
-  # Include lines. A list of regular expressions to match. It exports the lines that are
-  # matching any regular expression from the list.
-  #include_lines: ['^ERR', '^WARN']
+    ### Multiline options
 
-  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
-  # are matching any regular expression from the list. By default, no files are dropped.
-  #exclude_files: ['.gz$']
+    # Multiline can be used for log messages spanning multiple lines. This is common
+    # for Java Stack Traces or C-Line Continuation
 
-  # Optional additional fields. These fields can be freely picked
-  # to add additional information to the crawled log files for filtering
-  #fields:
-  #  level: debug
-  #  review: 1
+    # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+    multiline.pattern: '^\t|^[[:space:]]+(at|...)|^Caused by:|^Suppressed:'
 
-  ### Multiline options
+    # Defines if the pattern set under pattern should be negated or not. Default is false.
+    multiline.negate: false
 
-  # Multiline can be used for log messages spanning multiple lines. This is common
-  # for Java Stack Traces or C-Line Continuation
+    # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+    # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+    # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+    multiline.match: after
 
-  # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
-  multiline.pattern: '^\t|^[[:space:]]+(at|...)|^Caused by:|^Suppressed:'
+  - type: log
+    # Change to true to enable this input configuration.
+    enabled: true
 
-  # Defines if the pattern set under pattern should be negated or not. Default is false.
-  multiline.negate: false
+    # Paths that should be crawled and fetched. Glob based paths.
+    paths:
+      - /usr/local/tomcat/logs/localhost_access_log.*.txt
 
-  # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
-  # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
-  multiline.match: after
+    fields:
+      docker_type: tomcat
+      log_type: localhost_access_log
+
+    ### Multiline options
+
+    # Multiline can be used for log messages spanning multiple lines. This is common
+    # for Java Stack Traces or C-Line Continuation
+
+    # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+    multiline.pattern: '^\t|^[[:space:]]+(at|...)|^Caused by:|^Suppressed:'
+
+    # Defines if the pattern set under pattern should be negated or not. Default is false.
+    multiline.negate: false
+
+    # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+    # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+    # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+    multiline.match: after
+
+  - type: log
+    # Change to true to enable this input configuration.
+    enabled: true
+
+    # Paths that should be crawled and fetched. Glob based paths.
+    paths:
+      - /usr/local/tomcat/logs/manager.*.txt
+
+    fields:
+      docker_type: tomcat
+      log_type: manager
+
+    ### Multiline options
+
+    # Multiline can be used for log messages spanning multiple lines. This is common
+    # for Java Stack Traces or C-Line Continuation
+
+    # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+    multiline.pattern: '^\t|^[[:space:]]+(at|...)|^Caused by:|^Suppressed:'
+
+    # Defines if the pattern set under pattern should be negated or not. Default is false.
+    multiline.negate: false
+
+    # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+    # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+    # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+    multiline.match: after
+
+  - type: log
+    # Change to true to enable this input configuration.
+    enabled: true
+
+    # Paths that should be crawled and fetched. Glob based paths.
+    paths:
+      - /usr/local/tomcat/logs/host-manager.*.txt
+
+    fields:
+      docker_type: tomcat
+      log_type: manager
+
+    ### Multiline options
+
+    # Multiline can be used for log messages spanning multiple lines. This is common
+    # for Java Stack Traces or C-Line Continuation
+
+    # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+    multiline.pattern: '^\t|^[[:space:]]+(at|...)|^Caused by:|^Suppressed:'
+
+    # Defines if the pattern set under pattern should be negated or not. Default is false.
+    multiline.negate: false
+
+    # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+    # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+    # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+    multiline.match: after
+
+
+
+  - type: log
+    # Change to true to enable this input configuration.
+    enabled: true
+
+    # Paths that should be crawled and fetched. Glob based paths.
+    paths:
+      - /usr/local/tomcat/logs/localhost.*.txt
+
+    fields:
+      docker_type: tomcat
+      log_type: localhost
+
+    ### Multiline options
+
+    # Multiline can be used for log messages spanning multiple lines. This is common
+    # for Java Stack Traces or C-Line Continuation
+
+    # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+    multiline.pattern: '^\t|^[[:space:]]+(at|...)|^Caused by:|^Suppressed:'
+
+    # Defines if the pattern set under pattern should be negated or not. Default is false.
+    multiline.negate: false
+
+    # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+    # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+    # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+    multiline.match: after
+
+
+
+
 
 
 #============================= Filebeat modules ===============================
@@ -86,16 +188,17 @@ setup.template.settings:
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
-name: "${elastic_name}"
+name: "kheops_authorization"
 
 # The tags of the shipper are included in their own field with each
 # transaction published.
-tags: [${elastic_tags}]
+#tags: [${elastic_tags}]
 
 # Optional fields that you can specify to add additional information to the
 # output.
-#fields:
-#  env: staging
+fields:
+  instance: ${instance}
+
 
 
 #============================== Dashboards =====================================
@@ -147,6 +250,7 @@ setup.kibana:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
+  enabled: false
   hosts: ["${elastic_url}:9200"]
 
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
@@ -157,10 +261,10 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-#----------------------------- Logstash output --------------------------------
-#output.logstash:
+#--------------------------- Logstash output --------------------------------
+output.logstash:
   # The Logstash hosts
-  #hosts: ["localhost:5044"]
+  hosts: ["${logstash_url}"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications

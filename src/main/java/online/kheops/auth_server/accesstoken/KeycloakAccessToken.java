@@ -7,6 +7,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.keycloak.KeycloakContextListener;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.UserPrincipal;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -14,6 +18,7 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
@@ -23,8 +28,9 @@ import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Optional;
 
-final class JWTAccessToken implements AccessToken {
+final class KeycloakAccessToken implements AccessToken {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
@@ -52,14 +58,10 @@ final class JWTAccessToken implements AccessToken {
         String jwksURI;
     }
 
-    static final class Builder {
-        private final String configurationUrl;
+    static final class Builder implements AccessTokenBuilder{
+        private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
 
-        Builder(String configurationUrl) {
-            this.configurationUrl = configurationUrl;
-        }
-
-        JWTAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public KeycloakAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -85,7 +87,7 @@ final class JWTAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
-            return new JWTAccessToken(jwt.getSubject());
+            return new KeycloakAccessToken(jwt.getSubject());
         }
     }
 
@@ -125,17 +127,8 @@ final class JWTAccessToken implements AccessToken {
         return publicKey;
     }
 
-    static Builder getBuilder(String configurationUrl) {
-        return new Builder(configurationUrl);
-    }
-
-    private JWTAccessToken(String sub) {
+    private KeycloakAccessToken(String sub) {
         this.sub = sub;
-    }
-
-    @Override
-    public boolean hasCapabilityAccess() {
-        return true;
     }
 
     @Override
@@ -146,5 +139,15 @@ final class JWTAccessToken implements AccessToken {
     @Override
     public TokenType getTokenType() {
         return TokenType.KEYCLOAK_TOKEN;
+    }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("read write downloadbutton send");
+    }
+
+    @Override
+    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+        return new UserPrincipal(user);
     }
 }
