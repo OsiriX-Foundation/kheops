@@ -23,45 +23,45 @@ public class KheopsLogBuilder {
     }
 
     public KheopsLogBuilder user(String userId) {
-        log.add(new Pair<>("user", userId));
+        log.add(new Pair<String,String>("user", userId));
         return this;
     }
     public KheopsLogBuilder targetUser(String userId) {
-        log.add(new Pair<>("target_user", userId));
+        log.add(new Pair<String,String>("target_user", userId));
         return this;
     }
     public KheopsLogBuilder album(String albumId) {
-        log.add(new Pair<>("album", albumId));
+        log.add(new Pair<String,String>("album", albumId));
         return this;
     }
     public KheopsLogBuilder fromAlbum(String albumId) {
-        log.add(new Pair<>("fromAlbum", albumId));
+        log.add(new Pair<String,String>("fromAlbum", albumId));
         return this;
     }
     public KheopsLogBuilder action(ActionType action) {
-        log.add(new Pair<>("action", action.name()));
+        log.add(new Pair<String,String>("action", action.name()));
         return this;
     }
     public KheopsLogBuilder userPermission(UsersPermission usersPermission) {
-        usersPermission.getAddSeries().ifPresent(addSeries -> log.add(new Pair<>("addSeries", addSeries.toString())));
-        usersPermission.getAddUser().ifPresent(addUser -> log.add(new Pair<>("addUser", addUser.toString())));
-        usersPermission.getDeleteSeries().ifPresent(deleteSeries -> log.add(new Pair<>("deleteSeries", deleteSeries.toString())));
-        usersPermission.getDownloadSeries().ifPresent(downloarSeries -> log.add(new Pair<>("downloadSeries", downloarSeries.toString())));
-        usersPermission.getSendSeries().ifPresent(sendSeries -> log.add(new Pair<>("sendSeries", sendSeries.toString())));
-        usersPermission.getWriteComments().ifPresent(writeComments -> log.add(new Pair<>("writeComments", writeComments.toString())));
+        usersPermission.getAddSeries().ifPresent(addSeries -> log.add(new Pair<String,String>("addSeries", addSeries.toString())));
+        usersPermission.getAddUser().ifPresent(addUser -> log.add(new Pair<String,String>("addUser", addUser.toString())));
+        usersPermission.getDeleteSeries().ifPresent(deleteSeries -> log.add(new Pair<String,String>("deleteSeries", deleteSeries.toString())));
+        usersPermission.getDownloadSeries().ifPresent(downloarSeries -> log.add(new Pair<String,String>("downloadSeries", downloarSeries.toString())));
+        usersPermission.getSendSeries().ifPresent(sendSeries -> log.add(new Pair<String,String>("sendSeries", sendSeries.toString())));
+        usersPermission.getWriteComments().ifPresent(writeComments -> log.add(new Pair<String,String>("writeComments", writeComments.toString())));
         return this;
     }
 
     public KheopsLogBuilder study(String studyUID) {
-        log.add(new Pair<>("studyUID", studyUID));
+        log.add(new Pair<String,String>("studyUID", studyUID));
         return this;
     }
     public KheopsLogBuilder series(String seriesUID) {
-        log.add(new Pair<>("seriesUID", seriesUID));
+        log.add(new Pair<String,String>("seriesUID", seriesUID));
         return this;
     }
     public KheopsLogBuilder fromInbox(Boolean fromInbox) {
-        log.add(new Pair<>("fromInbox", fromInbox.toString()));
+        log.add(new Pair<String,String>("fromInbox", fromInbox.toString()));
         return this;
     }
 
