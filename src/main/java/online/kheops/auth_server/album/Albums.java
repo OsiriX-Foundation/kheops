@@ -206,7 +206,7 @@ public class Albums {
         return new PairListXTotalCount<>(totalCount, listUserAlbumResponse);
     }
 
-    public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
+    public static User addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -253,6 +253,7 @@ public class Albums {
             }
 
             tx.commit();
+            return targetUser;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -261,7 +262,7 @@ public class Albums {
         }
     }
 
-    public static void deleteUser(User callingUser, String userName,  String albumId)
+    public static User deleteUser(User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException, AlbumForbiddenException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -304,6 +305,7 @@ public class Albums {
             }
 
             tx.commit();
+            return removedUser;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -312,7 +314,7 @@ public class Albums {
         }
     }
 
-    public static void removeAdmin(User callingUser, String userName,  String albumId)
+    public static User removeAdmin(User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -338,6 +340,7 @@ public class Albums {
             }
 
             tx.commit();
+            return removedUser;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

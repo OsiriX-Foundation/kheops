@@ -69,4 +69,9 @@ public class UsersPermission {
     public boolean areSet() {
         return (addUser != null || downloadSeries != null || sendSeries != null || deleteSeries != null || addSeries != null || writeComments != null);
     }
+
+    @Override
+    public String toString() {
+        return " addUser="+addUser+" downloadSeries="+downloadSeries+" sendSeries="+sendSeries+" deleteSeries="+deleteSeries+" addSeries="+addSeries+" writeComments="+writeComments;
+    }
 }
