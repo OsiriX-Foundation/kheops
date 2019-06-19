@@ -88,9 +88,10 @@ const actions = {
 	},
 	setCheckURLProvider ({ commit }, params) {
 		let query = `url=${params.provider.url}`
-		return HTTP.post('/reportproviders/testuri', query, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+		return HTTP.post('/reportproviders/metadata', query, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			params.provider.stateURL.loading = false
-			params.provider.stateURL.checkURL = (res.status === 200)
+			params.provider.stateURL.checkURL = (res.data.valid === true)
+			params.provider.data = res.data
 			commit(params.commit, { provider: params.provider })
 			return res
 		}).catch(err => {
@@ -103,14 +104,6 @@ const actions = {
 	setCheckURLProviders ({ commit, dispatch }, params) {
 		params.providers.forEach(provider => {
 			dispatch('setCheckURLProvider', { provider: provider, commit: 'UPDATE_PROVIDERS' })
-		})
-	},
-	testURLProvider ({ dispatch }, params) {
-		let query = `url=${params.url}`
-		return HTTP.post('/reportproviders/testuri', query, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
-			return res
-		}).catch(err => {
-			return err
 		})
 	},
 	postRedirectProvider ({ dispatch }, params) {
@@ -141,14 +134,14 @@ const mutations = {
 		state.providers = []
 	},
 	UPDATE_PROVIDER (state, params) {
-		state.provider.stateURL.loading = params.provider.stateURL.loading
-		state.provider.stateURL.checkURL = params.provider.stateURL.checkURL
+		state.provider.stateURL = params.provider.stateURL
+		state.provider.data = params.provider.data
 	},
 	UPDATE_PROVIDERS (state, params) {
 		state.providers.forEach(provider => {
 			if (provider.client_id === params.provider.client_id) {
-				provider.stateURL.loading = params.provider.stateURL.loading
-				provider.stateURL.checkURL = params.provider.stateURL.checkURL
+				provider.stateURL = params.provider.stateURL
+				provider.data = params.provider.data
 			}
 		})
 	},
