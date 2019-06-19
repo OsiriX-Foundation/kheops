@@ -123,7 +123,7 @@ public class Sending {
 
             tx.commit();
             kheopsLog.user(callingUser.getKeycloakId())
-                    .action(KheopsLogBuilder.ActionType.REMOVE_SERIES)
+                    .action(KheopsLogBuilder.ActionType.REMOVE_STUDY)
                     .album(albumId)
                     .study(studyInstanceUID)
                     .log();
