@@ -10,6 +10,7 @@ import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -104,8 +105,10 @@ public class Sending {
                 throw new SeriesNotFoundException("No study with the given StudyInstanceUID in the album");
             }
 
+            final KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
             for (Series series: availableSeries) {
                 callingAlbum.removeSeries(series, em);
+                kheopsLog.series(series.getSeriesInstanceUID());
             }
 
             final Study study = availableSeries.get(0).getStudy();
@@ -119,6 +122,11 @@ public class Sending {
             em.persist(mutation);
 
             tx.commit();
+            kheopsLog.user(callingUser.getKeycloakId())
+                    .action(KheopsLogBuilder.ActionType.REMOVE_SERIES)
+                    .album(albumId)
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -153,6 +161,12 @@ public class Sending {
             em.persist(mutation);
 
             tx.commit();
+            new KheopsLogBuilder().user(callingUser.getKeycloakId())
+                    .action(KheopsLogBuilder.ActionType.REMOVE_SERIES)
+                    .album(albumId)
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -232,6 +246,7 @@ public class Sending {
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
 
+            KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
             boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
                 if (!targetAlbum.containsSeries(series, em)) {
@@ -240,6 +255,7 @@ public class Sending {
                     targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
+                    kheopsLog.series(series.getSeriesInstanceUID());
                 }
             }
 
@@ -257,6 +273,15 @@ public class Sending {
                 em.persist(mutation);
 
             tx.commit();
+            if(fromAlbumId != null) {
+                kheopsLog.fromAlbum(fromAlbumId);
+            }
+            kheopsLog.user(callingUser.getKeycloakId())
+                    .fromInbox(fromInbox)
+                    .album(albumId)
+                    .action(KheopsLogBuilder.ActionType.SHARE_STUDY_WITH_ALBUM)
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -286,6 +311,7 @@ public class Sending {
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
 
+            final KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
             final Album inbox = targetUser.getInbox();
             for (Series series : availableSeries) {
                 if (!inbox.containsSeries(series, em)) {
@@ -293,16 +319,27 @@ public class Sending {
                     series.addAlbumSeries(albumSeries);
                     inbox.addSeries(albumSeries);
                     em.persist(albumSeries);
+                    kheopsLog.series(series.getSeriesInstanceUID());
                 }
             }
 
             tx.commit();
+            if(fromAlbumId != null) {
+                kheopsLog.fromAlbum(fromAlbumId);
+            }
+            kheopsLog.user(callingUser.getKeycloakId())
+                    .fromInbox(fromInbox)
+                    .targetUser(targetUser.getKeycloakId())
+                    .action(KheopsLogBuilder.ActionType.SHARE_STUDY_WITH_USER)
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
+
     }
 
     public static void shareSeriesWithUser(User callingUser, String targetUsername, String studyInstanceUID, String seriesInstanceUID)
@@ -334,6 +371,12 @@ public class Sending {
             em.persist(albumSeries);
 
             tx.commit();
+            new KheopsLogBuilder().user(callingUser.getKeycloakId())
+                    .targetUser(targetUser.getKeycloakId())
+                    .action(KheopsLogBuilder.ActionType.SHARE_SERIES_WITH_USER)
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
