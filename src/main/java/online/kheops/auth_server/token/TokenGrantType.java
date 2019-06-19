@@ -1,5 +1,9 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
+import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
+import online.kheops.auth_server.report_provider.ReportProviders;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -21,12 +25,22 @@ public enum TokenGrantType {
         public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             verifySingleHeader(form, "code");
             verifySingleHeader(form, "client_id");
+            verifySingleHeader(form, "redirect_uri");
 
             final String code = form.getFirst("code");
             final String clientId = form.getFirst("client_id");
+            final String redirectUri = form.getFirst("redirect_uri");
 
             if (!securityContext.isUserInRole(TokenClientKind.REPORT_PROVIDER.getRoleString())) {
                 throw new TokenRequestException(UNAUTHORIZED_CLIENT);
+            }
+
+            try {
+                if (!ReportProviders.getRedirectUri(ReportProviders.getReportProvider(clientId)).equals(redirectUri)) {
+                    throw new TokenRequestException(INVALID_GRANT, "redirect_uri does not match");
+                }
+            } catch (ReportProviderUriNotValidException | ClientIdNotFoundException e) {
+                throw new TokenRequestException(INVALID_GRANT, e.getMessage(), e);
             }
 
             final DecodedAuthorizationCode authorizationCode;
@@ -39,6 +53,7 @@ public enum TokenGrantType {
                     .withSubject(authorizationCode.getSubject())
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
+                    .withScope("read write")
                     .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
 
             return Response.ok(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME)).build();

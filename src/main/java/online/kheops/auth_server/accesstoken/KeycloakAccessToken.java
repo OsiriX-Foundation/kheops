@@ -143,7 +143,7 @@ final class KeycloakAccessToken implements AccessToken {
 
     @Override
     public Optional<String> getScope() {
-        return Optional.of("read write downloadbutton appropriate");
+        return Optional.of("read write downloadbutton send");
     }
 
     @Override

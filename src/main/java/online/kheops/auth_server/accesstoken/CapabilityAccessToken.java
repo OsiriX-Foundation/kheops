@@ -80,7 +80,7 @@ final class CapabilityAccessToken implements AccessToken {
                 scopes.add("downloadbutton");
             }
             if (capability.hasAppropriatePermission()) {
-                scopes.add("appropriate");
+                scopes.add("send");
             }
 
             if (!scopes.isEmpty()) {
@@ -89,7 +89,7 @@ final class CapabilityAccessToken implements AccessToken {
                 return Optional.empty();
             }
         } else {
-            return Optional.of("read write downloadbutton appropriate");
+            return Optional.of("read write downloadbutton send");
         }
     }
 
