@@ -72,6 +72,14 @@ public class UsersPermission {
 
     @Override
     public String toString() {
-        return " addUser="+addUser+" downloadSeries="+downloadSeries+" sendSeries="+sendSeries+" deleteSeries="+deleteSeries+" addSeries="+addSeries+" writeComments="+writeComments;
+        String string = "";
+        if(addUser != null) string += " addUser="+addUser;
+        if(downloadSeries != null) string += " downloadSeries="+downloadSeries;
+        if(sendSeries != null) string += " sendSeries="+sendSeries;
+        if(deleteSeries != null) string += " deleteSeries="+deleteSeries;
+        if(addSeries != null) string += " addSeries="+addSeries;
+        if(writeComments != null) string += " writeComments="+writeComments;
+
+        return string;
     }
 }

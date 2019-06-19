@@ -109,7 +109,7 @@ public class AlbumResource {
         }
 
         final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+"action=ALBUM_LIST");
+        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" action=ALBUM_LIST");
         return Response.ok(genericAlbumResponsesList)
                 .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
                 .build();
