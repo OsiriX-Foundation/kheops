@@ -80,7 +80,7 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
         LOG.info(() -> "New album id:"+albumResponse.getId() +" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
-        LOG.log(KheopsLevel.KHEOPS, "user:"+kheopsPrincipal.getUser().getKeycloakId()+" album:"+albumResponse.getId()+" action:NEW_ALBUM");
+        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumResponse.getId()+" action=NEW_ALBUM");
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
