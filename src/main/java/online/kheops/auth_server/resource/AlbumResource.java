@@ -10,6 +10,7 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
+import online.kheops.auth_server.util.KheopsLevel;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.validation.constraints.Min;
@@ -28,6 +29,7 @@ import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 public class AlbumResource {
 
     private static final Logger LOG = Logger.getLogger(AlbumResource.class.getName());
+
 
     @Context
     private UriInfo uriInfo;
@@ -78,6 +80,7 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
         LOG.info(() -> "New album id:"+albumResponse.getId() +" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
+        LOG.log(KheopsLevel.KHEOPS, "user:"+kheopsPrincipal.getUser().getKeycloakId()+" album:"+albumResponse.getId()+" action:NEW_ALBUM");
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
