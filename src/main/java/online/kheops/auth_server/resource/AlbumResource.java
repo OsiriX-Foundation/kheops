@@ -12,6 +12,8 @@ import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.KheopsLevel;
+import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.validation.constraints.Min;
@@ -22,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -82,7 +83,12 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
         LOG.info(() -> "New album id:"+albumResponse.getId() +" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumResponse.getId()+" action=NEW_ALBUM"+usersPermission.toString());
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumResponse.getId())
+                .action(ActionType.NEW_ALBUM)
+                .userPermission(usersPermission)
+                .log();
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
@@ -109,7 +115,10 @@ public class AlbumResource {
         }
 
         final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" action=ALBUM_LIST");
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .action(ActionType.LIST_ALBUMS)
+                .log();
         return Response.ok(genericAlbumResponsesList)
                 .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
                 .build();
@@ -145,13 +154,15 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final String kheopsLog;
+        KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
         if (includeUsers) {
-            kheopsLog = " action=GET_ALBUM action=GET_USERS";
-        } else {
-            kheopsLog = " action=GET_ALBUM";
+            kheopsLog.action(ActionType.LIST_USERS);
         }
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+kheopsLog);
+        kheopsLog.logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumResponse.getId())
+                .action(ActionType.GET_ALBUM)
+                .log();
         return Response.status(OK).entity(albumResponse).build();
     }
 
@@ -203,7 +214,12 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=EDIT_ALBUM"+usersPermission.toString());
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumResponse.getId())
+                .userPermission(usersPermission)
+                .action(ActionType.EDIT_ALBUM)
+                .log();
         return Response.status(OK).entity(albumResponse).build();
     }
 
@@ -225,7 +241,11 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         LOG.info(() -> "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " SUCCESS");
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=DELETE_ALBUM");
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.DELETE_ALBUM)
+                .log();
 
         return Response.status(NO_CONTENT).build();
     }
@@ -255,6 +275,11 @@ public class AlbumResource {
         }
 
         final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(pair.getAttributesList()) {};
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.LIST_USERS)
+                .log();
         return Response.status(OK).entity(genericUsersAlbumResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
@@ -269,10 +294,10 @@ public class AlbumResource {
                             @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final User tergetUser;
+        final User targetUser;
 
         try {
-            tergetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
+            targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Add a user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -281,7 +306,12 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=ADD_USER target_user="+tergetUser.getKeycloakId());
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.ADD_USER)
+                .targetUser(targetUser.getKeycloakId())
+                .log();
         return Response.status(CREATED).build();
     }
 
@@ -308,7 +338,12 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=ADD_ADMIN target_user="+targetUser.getKeycloakId());
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.ADD_ADMIN)
+                .targetUser(targetUser.getKeycloakId())
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -332,7 +367,12 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=REMOVE_ADMIN target_user="+targetUser.getKeycloakId());
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.REMOVE_ADMIN)
+                .targetUser(targetUser.getKeycloakId())
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -359,7 +399,12 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=REMOVE_USER target_user="+targetUser.getKeycloakId());
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.REMOVE_USER)
+                .targetUser(targetUser.getKeycloakId())
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -381,7 +426,11 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=ADD_FAVORITE");
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.ADD_FAVORITE)
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -402,7 +451,11 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.log(KheopsLevel.KHEOPS, "user="+kheopsPrincipal.getUser().getKeycloakId()+" album="+albumId+" action=REMOVE_FAVORITE");
+        new KheopsLogBuilder().logger(LOG)
+                .user(kheopsPrincipal.getUser().getKeycloakId())
+                .album(albumId)
+                .action(ActionType.REMOVE_FAVORITE)
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 }
