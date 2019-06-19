@@ -13,6 +13,9 @@ public class ReportProviderClientMetadata {
     @XmlElement(name = "valid")
     private Boolean valid;
 
+    @XmlElement(name = "error_description")
+    private String errorDescription;
+
     @XmlElement(name = "redirect_uri")
     private String redirectUri;
     @XmlElement(name = "token_endpoint_auth_method")
@@ -95,6 +98,14 @@ public class ReportProviderClientMetadata {
 
     public Boolean getValid() { return valid; }
     public void setValid(Boolean valid) { this.valid = valid; }
+
+    public String getErrorDescription() {
+        return errorDescription;
+    }
+
+    public void setErrorDescription(String errorDescription) {
+        this.errorDescription = errorDescription;
+    }
 
     public ValidationResult validateForConfigUri(String configUriString) throws ReportProviderUriNotValidException {
         final URI configUri;
