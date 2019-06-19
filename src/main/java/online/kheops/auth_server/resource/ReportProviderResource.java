@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.logging.Level.INFO;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
@@ -380,7 +381,9 @@ public class ReportProviderResource {
             clientMetadataResponse = getClientMetadata(url);
             clientMetadataResponse.setValid(true);
         } catch (ReportProviderUriNotValidException e) {
+            LOG.log(INFO, "error validating the configuration url", e);
             clientMetadataResponse.setValid(false);
+            clientMetadataResponse.setErrorDescription(e.getMessage());
         }
 
         return  Response.status(OK).entity(clientMetadataResponse).build();
