@@ -138,7 +138,20 @@ export default {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) }).length
 		},
 		selectedStudies () {
-			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) })
+			return _.filter(this.studies, s => { return (s.flag.is_selected === true) })
+		},
+		selectedSeries () {
+			let series = {}
+			let notAllSeriesSelected = this.studies.filter(study => { return (study.flag.is_indeterminate === true) })
+			notAllSeriesSelected.forEach(study => {
+				if (study.series !== undefined) {
+					let serieNeed = study.series.filter(serie => {return serie.flag.is_selected === true})
+					if (serieNeed.length > 0) {
+						series[study.StudyInstanceUID.Value[0]] = serieNeed
+					}
+				}
+			})
+			return series
 		}
 	},
 
@@ -164,6 +177,12 @@ export default {
 				this.selectedStudies.forEach(study => {
 					promises.push(HTTP.put(`studies/${study.StudyInstanceUID.Value[0]}/users/${userSub}?inbox=true`))
 				})
+				for (let studyUID in this.selectedSeries) {
+					this.selectedSeries[studyUID].forEach(serie => {
+						let serieUID = serie.SeriesInstanceUID.Value[0]
+						promises.push(HTTP.put(`studies/${studyUID}/series/${serieUID}/users/${userSub}?inbox=true`))
+					})
+				}
 
 				Promise.all(promises).then(res => {
 					this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('studiessharedsuccess')}`)

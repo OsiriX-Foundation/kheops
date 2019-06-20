@@ -89,7 +89,6 @@ const actions = {
 							'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
 							'encapsulatedPDFStorage': '1.2.840.10008.5.1.4.1.1.104.1'
 						}
-						console.log(res.data[0])
 						if (res.data[0]['00080060'].Value[0].includes('SR')) {
 							serie.imgSrc = SRImage
 						} else if (res.data[0][tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {

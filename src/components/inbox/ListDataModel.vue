@@ -285,7 +285,6 @@ export default {
 			row.toggleDetails()
 		},
 		setChecked (row) {
-			row.rowSelected = true
 			let value = row.item.flag.is_selected
 			let StudyInstanceUID = row.item.StudyInstanceUID.Value[0]
 			let params = {
