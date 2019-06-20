@@ -218,6 +218,12 @@ public class Sending {
             }
 
             if (targetAlbum.containsSeries(availableSeries, em)) {
+                new KheopsLogBuilder().user(callingUser.getKeycloakId())
+                        .action(ActionType.SHARE_SERIES_WITH_ALBUM)
+                        .album(albumId)
+                        .study(studyInstanceUID)
+                        .series(seriesInstanceUID)
+                        .log();
                 return;
             }
 
@@ -275,8 +281,8 @@ public class Sending {
                     targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
-                    kheopsLog.series(series.getSeriesInstanceUID());
                 }
+                kheopsLog.series(series.getSeriesInstanceUID());
             }
 
             if (allSeriesAlreadyExist) {
@@ -340,8 +346,8 @@ public class Sending {
                     series.addAlbumSeries(albumSeries);
                     inbox.addSeries(albumSeries);
                     em.persist(albumSeries);
-                    kheopsLog.series(series.getSeriesInstanceUID());
                 }
+                kheopsLog.series(series.getSeriesInstanceUID());
             }
 
             tx.commit();
@@ -384,6 +390,12 @@ public class Sending {
             final Album inbox = targetUser.getInbox();
             if(inbox.containsSeries(series, em)) {
                 //target user has already access to the series
+                new KheopsLogBuilder().user(callingUser.getKeycloakId())
+                        .targetUser(targetUser.getKeycloakId())
+                        .action(ActionType.SHARE_SERIES_WITH_USER)
+                        .study(studyInstanceUID)
+                        .series(seriesInstanceUID)
+                        .log();
                 return;
             }
 
@@ -439,7 +451,8 @@ public class Sending {
                     kheopsLog.log();
                     return; //appropriate OK
                 } else if(isSeriesInInbox(callingUser, storedSeries, em)) {
-                        return;
+                    kheopsLog.log();
+                    return;
                 } else {
                     try {
                         final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
@@ -504,9 +517,9 @@ public class Sending {
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
                     series.addAlbumSeries(inboxSeries);
                     inbox.addSeries(inboxSeries);
-                    kheopsLog.series(series.getSeriesInstanceUID());
                     em.persist(inboxSeries);
                 }
+                kheopsLog.series(series.getSeriesInstanceUID());
             }
 
             tx.commit();
