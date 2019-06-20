@@ -415,7 +415,7 @@ public class AlbumResource {
 
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
-                .action(ActionType.ADD_FAVORITE)
+                .action(ActionType.ALBUM_ADD_FAVORITE)
                 .log();
         return Response.status(NO_CONTENT).build();
     }
@@ -439,7 +439,7 @@ public class AlbumResource {
 
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
-                .action(ActionType.REMOVE_FAVORITE)
+                .action(ActionType.ALBUM_REMOVE_FAVORITE)
                 .log();
         return Response.status(NO_CONTENT).build();
     }
