@@ -23,7 +23,7 @@
 <template>
   <div class="seriesSummaryContainer">
     <div class="row justify-content-center">
-			{{ series.is_selected }}
+      {{ series.is_selected }}
       <div class="mb-2">
         <b-form-checkbox
           v-if="series.SeriesDescription"

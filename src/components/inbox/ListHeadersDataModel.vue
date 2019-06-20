@@ -34,7 +34,7 @@
         class="d-flex flex-wrap"
       >
         <div class="p-2 align-self-center d-none d-sm-block">
-          <span>{{ $tc("selectednbstudies", selectedStudiesNb, {count: selectedStudiesNb}) }}</span>
+          <span>{{ $tc("selectednbstudies", selectedStudiesNb, { count: selectedStudiesNb }) }}</span>
         </div>
         <div
           class="align-self-center"
@@ -135,10 +135,10 @@ export default {
 	},
 	computed: {
 		selectedStudiesNb () {
-			return _.filter(this.studies, s => { return s.flag.is_selected === true }).length
+			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) }).length
 		},
 		selectedStudies () {
-			return _.filter(this.studies, s => { return s.flag.is_selected === true })
+			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) })
 		}
 	},
 

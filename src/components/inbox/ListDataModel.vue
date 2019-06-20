@@ -78,45 +78,43 @@
     <list-headers-data-model
       :studies="studies"
     />
-    <b-table
-      stacked="sm"
-      striped
-      hover
-      :items="studies"
-      :fields="fields"
-      :sort-desc="true"
-      tbody-tr-class="link"
-      @row-hovered="setItemHover"
-      @row-unhovered="setItemHover"
-    >
+		<b-table
+			class="container-fluid"
+			striped
+			hover
+			:items="studies"
+			:fields="fields"
+			:sort-desc="true"
+			:no-local-sorting="true"
+			:no-sort-reset="true"
+			:tbody-class="'table-wrapper-scroll-y link'"
+			@sort-changed="sortingChanged"
+			@row-hovered="setItemHover"
+			@row-unhovered="setItemHover"
+			@row-clicked="showRowDetails"
+		>
       <template
         slot="is_selected"
         slot-scope="row"
       >
         <b-button-group>
-					<b-button
-						variant="link"
-						size="sm"
-						class="mr-1 pt-0"
-						@click.stop="showSeries(row)"
-					>
-						<v-icon
-							v-if="row.detailsShowing"
-							class="align-middle"
-							name="chevron-down"
-							@click.stop="row.toggleDetails"
-						/>
-						<v-icon
-							v-else
-							class="align-middle"
-							name="chevron-right"
-							@click.stop="row.toggleDetails"
-						/>
-					</b-button>
-          <b-form-checkbox
-            v-model="row.item.flag.is_selected"
+          <b-button
+            variant="link"
+            size="sm"
+            class="mr-1 pt-0"
+            @click.stop="showSeries(row)"
+          >
+            <v-icon
+              class="align-middle"
+              :name="row.detailsShowing ? 'chevron-down' : 'chevron-right'"
+              @click.stop="row.toggleDetails"
+            />
+          </b-button>
+					<b-form-checkbox
+						v-model="row.item.flag.is_selected"
+						:indeterminate="row.item.flag.is_indeterminate"
             inline
-						@change="setSeriesCheck(row)"
+            @change="setChecked(row)"
           />
         </b-button-group>
       </template>
@@ -129,17 +127,17 @@
           :study="row.item"
         />
       </template>
-			<!--Infos study (Series / Comments / Study Metadata) -->
-        <template
-          slot="row-details"
-          slot-scope="row"
-        >
-          <b-card>
-						<list-item-details
-							:study="row.item"
-						/>
-          </b-card>
-        </template>
+      <!--Infos study (Series / Comments / Study Metadata) -->
+      <template
+        slot="row-details"
+        slot-scope="row"
+      >
+        <b-card>
+          <list-item-details
+            :study="row.item"
+          />
+        </b-card>
+      </template>
     </b-table>
   </div>
 </template>
@@ -161,7 +159,6 @@ export default {
 			default: () => ({})
 		}
 	},
-
 	data () {
 		return {
 			UI: {
@@ -194,7 +191,7 @@ export default {
 				},
 				StudyDescription: {
 					label: this.$t('StudyDescription'),
-					sortable: true,
+					sortable: false,
 					tdClass: 'breakwork',
 					class: 'breakword d-none d-lg-table-cell',
 					formatter: (value, key, item) => {
@@ -212,7 +209,7 @@ export default {
 				},
 				ModalitiesInStudy: {
 					label: this.$t('Modality'),
-					sortable: true,
+					sortable: false,
 					tdClass: 'breakwork',
 					class: 'breakword d-none d-sm-table-cell',
 					formatter: (value, key, item) => {
@@ -222,7 +219,6 @@ export default {
 			}
 		}
 	},
-
 	computed: {
 		...mapGetters({
 			studies: 'studiesTest'
@@ -231,7 +227,6 @@ export default {
 			return navigator.platform
 		}
 	},
-
 	watch: {
 		studies: {
 			handler: function (studies) {
@@ -241,7 +236,6 @@ export default {
 			}
 		}
 	},
-
 	created () {
 		this.UI.loading = true
 		let params = {
@@ -252,10 +246,8 @@ export default {
 		}
 		this.$store.dispatch('getStudiesTest', { queries: params })
 	},
-
 	mounted () {
 	},
-
 	methods: {
 		setItemHover (item, index, event) {
 			let params = {
@@ -292,19 +284,53 @@ export default {
 			this.setViewDetails(row.item.StudyInstanceUID.Value[0], row.item.flag.view)
 			row.toggleDetails()
 		},
-		setSeriesCheck (row) {
+		setChecked (row) {
+			row.rowSelected = true
+			let value = row.item.flag.is_selected
+			let StudyInstanceUID = row.item.StudyInstanceUID.Value[0]
+			let params = {
+				StudyInstanceUID: StudyInstanceUID,
+				flag: 'is_selected',
+				value: !value
+			}
+			this.$store.dispatch('setFlagByStudyUID', params)
 			if (row.item.series !== undefined) {
-				let value = row.item.flag.is_selected
-				let StudyInstanceUID = row.item.StudyInstanceUID.Value[0]
-				row.item.series.forEach(serie => {
-					let params = {
-						StudyInstanceUID: StudyInstanceUID,
-						SeriesInstanceUID: serie.SeriesInstanceUID.Value[0],
-						flag: 'is_selected',
-						value: !value
+				this.setSeriesCheck(row.item.series, params)
+			}
+		},
+		setSeriesCheck (series, params) {
+			series.forEach(serie => {
+				params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
+				this.$store.dispatch('setFlagByStudyUID', params)
+				this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
+			})
+		},
+		sortingChanged (ctx) {
+			this.UI.loading = true
+			let params = {
+				limit: 100,
+				offset: 0,
+				inbox: true,
+				includefield: ['favorite', 'comments', '00081030'],
+				sort: (ctx.sortDesc ? '-' : '') + ctx.sortBy
+			}
+			this.$store.dispatch('getStudiesTest', { queries: params })
+		},
+		showRowDetails (item, index, event) {
+			if (!item._showDetails) {
+				let params = {
+					StudyInstanceUID: item.StudyInstanceUID.Value[0],
+					queries: {
+						inbox: true,
+						includefield: ['00080021', '00080031']
 					}
-					this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
-				});
+				}
+				this.$store.dispatch('getSeriesTest', params).then(res => {
+					this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view)
+					item._showDetails = true
+				})
+			} else {
+				item._showDetails = false
 			}
 		}
 	}
