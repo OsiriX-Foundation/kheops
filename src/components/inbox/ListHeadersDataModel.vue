@@ -97,7 +97,7 @@
       :btn-primary-text="$t('delete')"
       :btn-danger-text="$t('cancel')"
       :text="$tc('confirmDelete',selectedStudiesNb,{count: selectedStudiesNb})"
-      :method-confirm="deleteSelectedStudies"
+      :method-confirm="deleteStudies"
       :method-cancel="() => confirmDelete=false"
     />
     <form-get-user
@@ -152,6 +152,9 @@ export default {
 				}
 			})
 			return series
+		},
+		allSelectedStudies () {
+			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) })
 		}
 	},
 
@@ -187,13 +190,13 @@ export default {
 				Promise.all(promises).then(res => {
 					this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('studiessharedsuccess')}`)
 					this.formSendStudy = false
-					this.deselectStudy()
+					this.deselectStudySeries()
 				}).catch(err => {
 					console.log(err)
 				})
 			}
 		},
-		deselectStudy () {
+		deselectStudySeries () {
 			let params = {
 				flag: 'is_selected',
 				value: false
@@ -201,10 +204,16 @@ export default {
 			this.selectedStudies.forEach(study => {
 				params.StudyInstanceUID = study.StudyInstanceUID.Value[0]
 				this.$store.dispatch('setFlagByStudyUID', params)
+				if (study.series !== undefined) {
+					study.series.forEach(serie => {
+						params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
+						this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
+					})
+				}
 			})
 		},
 		favoriteSelectedStudies () {
-			let favorites = this.selectedStudies.every(s => { return s.flag.is_favorite === true })
+			let favorites = this.allSelectedStudies.every(s => { return s.flag.is_favorite === true })
 			let params = {
 				StudyInstanceUID: '',
 				queries: {
@@ -212,10 +221,15 @@ export default {
 				},
 				value: !favorites
 			}
-			this.selectedStudies.forEach(study => {
+			this.allSelectedStudies.forEach(study => {
 				params.StudyInstanceUID = study.StudyInstanceUID.Value[0]
 				this.$store.dispatch('favoriteStudy', params)
 			})
+		},
+		deleteStudies () {
+			this.deleteSelectedStudies()
+			this.deleteSelectedSeries()
+			this.confirmDelete = false
 		},
 		deleteSelectedStudies () {
 			this.selectedStudies.forEach(study => {
@@ -225,8 +239,23 @@ export default {
 						inbox: true
 					}
 				}
-				this.$store.dispatch('deleteStudy', params)
+				this.$store.dispatch('deleteStudyTest', params)
 			})
+		},
+		deleteSelectedSeries() {
+			for (let studyUID in this.selectedSeries) {
+				this.selectedSeries[studyUID].forEach(serie => {
+					let serieUID = serie.SeriesInstanceUID.Value[0]
+					let params = {
+						StudyInstanceUID: studyUID,
+						SeriesInstanceUID: serieUID,
+						queries: {
+							inbox: true
+						}
+					}
+					this.$store.dispatch('deleteSerieTest', params)
+				})
+			}
 		}
 	}
 }

@@ -158,7 +158,7 @@ const actions = {
 		commit('SET_SERIE_FLAG_TEST', { indexStudy: indexStudy, indexSerie: indexSerie, flag: params.flag, value: params.value })
 		return true
 	},
-	favoriteStudy ({ commit }, params) {
+	favoriteStudy ({ commit, dispatch }, params) {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
@@ -169,12 +169,26 @@ const actions = {
 		}
 		let request = `/studies/${params.StudyInstanceUID}/favorites`
 		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
-		return HTTP.put(request + queries).then(res => {
-			commit('SET_STUDY_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
-			return true
-		}).catch(err => {
-			console.log(err)
-			return false
+		if (params.value === true) {
+			return dispatch('addFavorite', { request: (request + queries) }).then(res => {
+				commit('SET_STUDY_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
+				return true
+			})
+		} else {
+			return dispatch('removeFavorite', { request: (request + queries) }).then(res => {
+				commit('SET_STUDY_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
+				return true
+			})
+		}
+	},
+	addFavorite ({ commit }, params) {
+		return HTTP.put(params.request).then(res => {
+			return res
+		})
+	},
+	removeFavorite ({ commit }, params) {
+		return HTTP.delete(params.request).then(res => {
+			return res
 		})
 	},
 	deleteStudyTest ({ commit }, params) {
@@ -186,6 +200,21 @@ const actions = {
 		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
 		return HTTP.delete(request + queries).then(res => {
 			commit('DELETE_STUDY_TEST', { StudyInstanceUID: params.StudyInstanceUID })
+			return true
+		}).catch(err => {
+			console.log(err)
+			return false
+		})
+	},
+	deleteSerieTest ({ commit }, params) {
+		let queriesTab = []
+		if (params.queries !== undefined) {
+			queriesTab = httpoperations.getQueriesParameters(params.queries)
+		}
+		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}`
+		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
+		return HTTP.delete(request + queries).then(res => {
+			commit('DELETE_SERIE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 			return true
 		}).catch(err => {
 			console.log(err)
@@ -230,8 +259,19 @@ const mutations = {
 		state.studies = params.studies
 	},
 	DELETE_STUDY_TEST (state, params) {
-		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID[0] === params.StudyInstanceUID })
-		if (studyIdx > -1) state.studies.splice(studyIdx, 1)
+		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
+		if (studyIdx > -1) {
+			Vue.delete(state.studies, studyIdx)
+		}
+	},
+	DELETE_SERIE_TEST (state, params) {
+		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
+		if (studyIdx > -1) {
+			let seriesIdx = _.findIndex(state.studies[studyIdx].series, s => { return s.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID })
+			if (seriesIdx > -1) {
+				Vue.delete(state.studies[studyIdx].series, seriesIdx)
+			}
+		}
 	}
 }
 

@@ -69,7 +69,6 @@
             :serie="serie"
             :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
             :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
-            @selectedSeries="countSelectedSeries"
           />
         </div>
       </div>
@@ -133,13 +132,6 @@ export default {
 				value: viewSelected
 			}
 			this.$store.dispatch('setFlagByStudyUID', params)
-		},
-		countSelectedSeries () {
-			this.selectedSeriesNb = 0
-			this.studies.filter(s => { return s.is_selected }).forEach(function (study) {
-				if (study.series.length) this.selectedSeriesNb += study.series.filter(s => { return s.is_selected }).length
-				else this.selectedSeriesNb += study.NumberOfStudyRelatedSeries[0]
-			}.bind(this))
 		}
 	}
 }

@@ -75,6 +75,7 @@
 
 <template>
   <div>
+		{{ studies.length }}
     <list-headers-data-model
       :studies="studies"
     />

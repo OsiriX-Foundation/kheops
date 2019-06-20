@@ -22,6 +22,7 @@
 
 <template>
   <div class="seriesSummaryContainer">
+		{{ studies[index.study].series.length }}
     <div class="row justify-content-center">
       <div class="mb-2">
         <b-form-checkbox
