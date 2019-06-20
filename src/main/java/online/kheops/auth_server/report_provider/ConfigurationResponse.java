@@ -8,6 +8,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,9 +48,9 @@ public class ConfigurationResponse {
     private List<String> introspectionEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
 
     @XmlElement(name = "response_types_supported")
-    private List<String> responseTypesSupported = Collections.singletonList("code");
+    private List<String> responseTypesSupported = Arrays.asList("code", "token");
     @XmlElement(name = "response_modes_supported")
-    private List<String> responseModes_Supported = Collections.singletonList("query");
+    private List<String> responseModes_Supported = Arrays.asList("query", "fragment");
 
     public ConfigurationResponse() { /*empty*/ }
 
