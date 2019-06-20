@@ -11,12 +11,34 @@ public class KheopsLogBuilder {
     public enum ActionType {LIST_ALBUMS, LIST_USERS, NEW_ALBUM, EDIT_ALBUM, ADD_USER, REMOVE_USER, ADD_ADMIN, REMOVE_ADMIN, ADD_FAVORITE, REMOVE_FAVORITE, DELETE_ALBUM, GET_ALBUM,
         SHARE_STUDY_WITH_USER, SHARE_SERIES_WITH_USER, SHARE_STUDY_WITH_ALBUM, SHARE_SERIES_WITH_ALBUM, REMOVE_SERIES, REMOVE_STUDY, APPROPRIATE_STUDY, APPROPRIATE_SERIES}
 
+    public enum PrincipalType {CAPABILITY, USER, VIEWER, REPORT_PROVIDER}
+
     private ArrayList<LogEntry> log;
     private static final Logger LOG = Logger.getLogger(KheopsLogBuilder.class.getName());
 
 
     public KheopsLogBuilder() {
         log = new ArrayList<>();
+    }
+
+    public KheopsLogBuilder principalType(PrincipalType principalType) {
+        log.add(new LogEntry("type", principalType.name()));
+        return this;
+    }
+
+    public KheopsLogBuilder scope(String scope) {
+        log.add(new LogEntry("scope", scope));
+        return this;
+    }
+
+    public KheopsLogBuilder clientID(String clientID) {
+        log.add(new LogEntry("clientID", clientID));
+        return this;
+    }
+
+    public KheopsLogBuilder capabilityID(String capabilityID) {
+        log.add(new LogEntry("capabilityID", capabilityID));
+        return this;
     }
 
     public KheopsLogBuilder user(String userId) {

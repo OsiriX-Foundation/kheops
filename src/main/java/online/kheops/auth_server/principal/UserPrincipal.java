@@ -9,6 +9,8 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -181,6 +183,11 @@ public class UserPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public String getAlbumID() throws NotAlbumScopeTypeException { throw new NotAlbumScopeTypeException(""); }
+
+    @Override
+    public KheopsLogBuilder getKheopsLogBuilder() {
+        return new KheopsLogBuilder().user(getUser().getKeycloakId()).principalType(PrincipalType.USER);
+    }
 
     @Override
     public String toString() {
