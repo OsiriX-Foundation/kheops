@@ -71,7 +71,6 @@ public class SendingResource
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" with "+username);
         return Response.status(CREATED).build();
     }
 
@@ -100,7 +99,6 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" with "+username);
         return Response.status(CREATED).build();
     }
 
@@ -126,13 +124,13 @@ public class SendingResource
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumID)) {
-                    Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID);//TODO kheopsLog
+                    Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID);
                 } else {
                     LOG.warning(() -> "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
                     return Response.status(FORBIDDEN).entity("No write access with this credential").build();
                 }
             } else {
-                Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);//TODO kheopsLog
+                Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException | ClientIdNotFoundException e) {
             LOG.log(WARNING, "Unable to add series", e);
@@ -159,12 +157,12 @@ public class SendingResource
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumID)) {
-                    Sending.putStudyInAlbum(kheopsPrincipal, albumID, studyInstanceUID, albumId, false);//TODO kheopsLog
+                    Sending.putStudyInAlbum(kheopsPrincipal, albumID, studyInstanceUID, albumId, false);
                 } else {
                     return Response.status(FORBIDDEN).entity("No write access with this credential").build();
                 }
             } else {
-                Sending.appropriateStudy(kheopsPrincipal.getUser(), studyInstanceUID, albumId);//TODO kheopsLog
+                Sending.appropriateStudy(kheopsPrincipal.getUser(), studyInstanceUID, albumId);
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -189,7 +187,7 @@ public class SendingResource
             try {
                 String albumId = kheopsPrincipal.getAlbumID();
                 if(kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.DELETE_SERIES,albumId)) {
-                    Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID);//TODO kheopsLog
+                    Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID);
                     LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
                     return Response.status(NO_CONTENT).build();
                 } else {
@@ -203,11 +201,10 @@ public class SendingResource
         }
 
         try {
-            Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID);//TODO kheopsLog
+            Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID);
         } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from user:" + kheopsPrincipal.getDBID());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -233,7 +230,7 @@ public class SendingResource
             try {
                 String albumId = kheopsPrincipal.getAlbumID();
                 if(kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.DELETE_SERIES,albumId)) {
-                    Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID);//TODO kheopsLog
+                    Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID);
                     LOG.info(() -> "finished removing StudyInstanceUID:" + studyInstanceUID + " SeriesInstanceUID:" + seriesInstanceUID + " from albumId " + albumId);
                     return Response.status(NO_CONTENT).build();
                 } else {
@@ -249,11 +246,10 @@ public class SendingResource
         }
 
         try {
-            Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);//TODO kheopsLog
+            Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID);
         } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from user:" + kheopsPrincipal.getDBID());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -278,12 +274,11 @@ public class SendingResource
         }
 
         try {
-            Sending.putSeriesInAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID);//TODO kheopsLog
+            Sending.putSeriesInAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID);
         } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+ "SeriesInstanceUID:"+seriesInstanceUID+" with albumID "+albumId);
         return Response.status(CREATED).build();
 
     }
@@ -327,7 +322,6 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info(() -> "finished sharing StudyInstanceUID:"+studyInstanceUID+" with albumId "+albumId);
         return Response.status(CREATED).build();
     }
 
@@ -348,7 +342,6 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
         return Response.status(NO_CONTENT).build();
     }
 
@@ -370,7 +363,6 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" SeriesInstanceUID:"+seriesInstanceUID+" from albumId "+albumId);
         return Response.status(NO_CONTENT).build();
     }
 }

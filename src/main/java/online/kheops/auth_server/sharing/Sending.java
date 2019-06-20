@@ -11,6 +11,7 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -52,11 +53,18 @@ public class Sending {
                 throw new SeriesNotFoundException("No access to any series with the given studyInstanceUID");
             }
 
+            final KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
             for (final Series series: seriesList) {
                 callingUser.getInbox().removeSeries(series, em);
+                kheopsLog.series(series.getSeriesInstanceUID());
             }
 
             tx.commit();
+            kheopsLog.user(callingUser.getKeycloakId())
+                    .action(ActionType.REMOVE_STUDY)
+                    .album("inbox")
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -79,6 +87,12 @@ public class Sending {
             callingUser.getInbox().removeSeries(series, em);
 
             tx.commit();
+            new KheopsLogBuilder().user(callingUser.getKeycloakId())
+                    .action(ActionType.REMOVE_SERIES)
+                    .album("inbox")
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -123,7 +137,7 @@ public class Sending {
 
             tx.commit();
             kheopsLog.user(callingUser.getKeycloakId())
-                    .action(KheopsLogBuilder.ActionType.REMOVE_STUDY)
+                    .action(ActionType.REMOVE_STUDY)
                     .album(albumId)
                     .study(studyInstanceUID)
                     .log();
@@ -162,7 +176,7 @@ public class Sending {
 
             tx.commit();
             new KheopsLogBuilder().user(callingUser.getKeycloakId())
-                    .action(KheopsLogBuilder.ActionType.REMOVE_SERIES)
+                    .action(ActionType.REMOVE_SERIES)
                     .album(albumId)
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID)
@@ -225,6 +239,12 @@ public class Sending {
             }
             em.persist(mutation);
             tx.commit();
+            new KheopsLogBuilder().user(callingUser.getKeycloakId())
+                    .action(ActionType.SHARE_SERIES_WITH_ALBUM)
+                    .album(albumId)
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -275,11 +295,12 @@ public class Sending {
             tx.commit();
             if(fromAlbumId != null) {
                 kheopsLog.fromAlbum(fromAlbumId);
+            } else {
+                kheopsLog.fromAlbum("inbox");
             }
             kheopsLog.user(callingUser.getKeycloakId())
-                    .fromInbox(fromInbox)
                     .album(albumId)
-                    .action(KheopsLogBuilder.ActionType.SHARE_STUDY_WITH_ALBUM)
+                    .action(ActionType.SHARE_STUDY_WITH_ALBUM)
                     .study(studyInstanceUID)
                     .log();
         } finally {
@@ -326,11 +347,12 @@ public class Sending {
             tx.commit();
             if(fromAlbumId != null) {
                 kheopsLog.fromAlbum(fromAlbumId);
+            } else {
+                kheopsLog.fromAlbum("inbox");
             }
             kheopsLog.user(callingUser.getKeycloakId())
-                    .fromInbox(fromInbox)
                     .targetUser(targetUser.getKeycloakId())
-                    .action(KheopsLogBuilder.ActionType.SHARE_STUDY_WITH_USER)
+                    .action(ActionType.SHARE_STUDY_WITH_USER)
                     .study(studyInstanceUID)
                     .log();
         } finally {
@@ -373,7 +395,7 @@ public class Sending {
             tx.commit();
             new KheopsLogBuilder().user(callingUser.getKeycloakId())
                     .targetUser(targetUser.getKeycloakId())
-                    .action(KheopsLogBuilder.ActionType.SHARE_SERIES_WITH_USER)
+                    .action(ActionType.SHARE_SERIES_WITH_USER)
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID)
                     .log();
@@ -396,6 +418,12 @@ public class Sending {
 
             callingUser = em.merge(callingUser);
 
+            final KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
+            kheopsLog.user(callingUser.getKeycloakId())
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .action(ActionType.APPROPRIATE_SERIES);
+
             try {
                 final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
@@ -408,8 +436,7 @@ public class Sending {
                     em.persist(inboxSeries);
                     tx.commit();
 
-                    final User finalCallingUser1 = callingUser;
-                    LOG.info(() -> "Claim accepted because the series is inside an album where the calling user (" + finalCallingUser1.getKeycloakId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
+                    kheopsLog.log();
                     return; //appropriate OK
                 } else if(isSeriesInInbox(callingUser, storedSeries, em)) {
                         return;
@@ -423,6 +450,7 @@ public class Sending {
 
                         em.persist(inboxSeries);
                         tx.commit();
+                        kheopsLog.log();
                         return;
                     } catch (SeriesNotFoundException e2) {
                         throw new SeriesNotFoundException(e2.getMessage());
@@ -445,11 +473,8 @@ public class Sending {
             em.persist(series);
             em.persist(inboxSeries);
 
-            final User finalCallingUser = callingUser;
-            LOG.info(() -> "finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + finalCallingUser.getKeycloakId());
-
             tx.commit();
-            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + finalCallingUser.getKeycloakId());
+            kheopsLog.log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -467,26 +492,29 @@ public class Sending {
         try {
             tx.begin();
 
-
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
             final Album inbox = callingUser.getInbox();
 
             final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(callingUser, album, studyInstanceUID, em);
 
+            KheopsLogBuilder kheopsLog = new KheopsLogBuilder();
             for (Series series : seriesLst) {
                 if(!inbox.containsSeries(series, em)) {
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
                     series.addAlbumSeries(inboxSeries);
                     inbox.addSeries(inboxSeries);
-
+                    kheopsLog.series(series.getSeriesInstanceUID());
                     em.persist(inboxSeries);
                 }
             }
 
             tx.commit();
-            final User finalCallingUser = callingUser;
-            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + " to " + finalCallingUser.getKeycloakId() + "from album :" + albumId);
+            kheopsLog.user(callingUser.getKeycloakId())
+                    .action(ActionType.APPROPRIATE_STUDY)
+                    .study(studyInstanceUID)
+                    .fromAlbum(albumId)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

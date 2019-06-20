@@ -81,7 +81,6 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "New album id:"+albumResponse.getId() +" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
         new KheopsLogBuilder().user(kheopsPrincipal.getUser().getKeycloakId())
                 .album(albumResponse.getId())
                 .action(ActionType.NEW_ALBUM)
@@ -235,7 +234,6 @@ public class AlbumResource {
             LOG.log(Level.INFO, "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        LOG.info(() -> "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " SUCCESS");
         new KheopsLogBuilder().user(kheopsPrincipal.getUser().getKeycloakId())
                 .album(albumId)
                 .action(ActionType.DELETE_ALBUM)
