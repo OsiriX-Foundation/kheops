@@ -203,7 +203,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder().user(getUser().getKeycloakId()).principalType(PrincipalType.VIEWER);
+        return new KheopsLogBuilder().user(getUser().getKeycloakId()).tokenType(AccessToken.TokenType.VIEWER_TOKEN);
     }
 
     @Override
