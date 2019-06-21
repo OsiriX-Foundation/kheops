@@ -3,9 +3,11 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.token.TokenClientKind;
 import online.kheops.auth_server.token.TokenGrantType;
 import online.kheops.auth_server.token.TokenRequestException;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -73,7 +75,12 @@ public class TokenResource
         }
 
         try {
-            return grantType.processGrant(securityContext, context, form);
+            final Response response = grantType.processGrant(securityContext, context, form);
+            ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                    .action(ActionType.NEW_TOKEN)
+                    .scope(grantType.name())
+                    .log();
+            return response;
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e;
@@ -118,6 +125,9 @@ public class TokenResource
         introspectResponse.scope = accessToken.getScope().orElse(null);
 
         introspectResponse.active = true;
+        ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                .action(ActionType.NEW_TOKEN)
+                .log();
         return Response.status(OK).entity(introspectResponse).build();
     }
 }
