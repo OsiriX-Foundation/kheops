@@ -2,6 +2,7 @@ package online.kheops.auth_server.principal;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.accesstoken.AccessToken.*;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
@@ -10,7 +11,6 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -302,7 +302,7 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder().user(user.getKeycloakId()).capabilityID(capability.getId()).scope(capability.getScopeType()).principalType(PrincipalType.CAPABILITY);
+        return new KheopsLogBuilder().user(user.getKeycloakId()).capabilityID(capability.getId()).scope(capability.getScopeType()).tokenType(TokenType.CAPABILITY_TOKEN);
     }
 
     @Override

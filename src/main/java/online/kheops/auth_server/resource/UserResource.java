@@ -7,9 +7,12 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponseBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -77,19 +80,24 @@ public class UserResource {
                                 @QueryParam("studyInstanceUID") @UIDValidator String studyInstanceUID) {
 
         final UserResponseBuilder userResponseBuilder;
+        KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                .action(ActionType.TEST_USER);
 
         try {
             final Keycloak keycloak = Keycloak.getInstance();
             userResponseBuilder = keycloak.getUser(reference);
 
             if(albumId != null) {
+                kheopsLogBuilder.album(albumId);
                 userResponseBuilder.setAlbumAccess(Albums.isMemberOfAlbum(userResponseBuilder.getSub(), albumId));
             }
 
             if(studyInstanceUID != null) {
                 userResponseBuilder.setStudyAccess(Studies.canAccessStudy(userResponseBuilder.getSub(), studyInstanceUID));
+                kheopsLogBuilder.study(studyInstanceUID);
             }
 
+            kheopsLogBuilder.log();
             return Response.status(OK).entity(userResponseBuilder.build()).build();
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
@@ -127,6 +135,10 @@ public class UserResource {
         }
 
         try {
+            new KheopsLogBuilder().user(accessToken.getSub())
+                    .action(ActionType.USER_INFO)
+                    .tokenType(accessToken.getTokenType())
+                    .log();
             return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSub()));
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.INFO, "Unable to get the user info", e);

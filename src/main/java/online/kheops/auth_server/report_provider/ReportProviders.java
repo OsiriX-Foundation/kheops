@@ -10,6 +10,8 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
+import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -33,7 +35,7 @@ public class ReportProviders {
         throw new IllegalStateException("Utility class");
     }
 
-    public static ReportProviderResponse newReportProvider(User callingUser, String albumId, String name, String url)
+    public static ReportProviderResponse newReportProvider(User callingUser, String albumId, String name, String url, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -60,6 +62,10 @@ public class ReportProviders {
             em.close();
         }
 
+        kheopsLogBuilder.album(albumId)
+                .action(ActionType.NEW_REPORT_PROVIDER)
+                .clientID(reportProvider.getClientId())
+                .log();
         return new ReportProviderResponse(reportProvider);
     }
 
@@ -149,7 +155,7 @@ public class ReportProviders {
     }
 
 
-    public static PairListXTotalCount<ReportProviderResponse> getReportProviders(String albumId, Integer limit, Integer offset) {
+    public static PairListXTotalCount<ReportProviderResponse> getReportProviders(String albumId, Integer limit, Integer offset, KheopsLogBuilder kheopsLogBuilder) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -173,10 +179,14 @@ public class ReportProviders {
         for (ReportProvider reportProvider : reportProvidersEntity) {
             reportProviders.add(new ReportProviderResponse(reportProvider));
         }
+
+        kheopsLogBuilder.album(albumId)
+                .action(ActionType.LIST_REPORT_PROVIDERS)
+                .log();
         return new PairListXTotalCount<>(totalCount, reportProviders);
     }
 
-    public static ReportProviderResponse getReportProvider(String albumId, String clientId)
+    public static ReportProviderResponse getReportProvider(String albumId, String clientId, KheopsLogBuilder kheopsLogBuilder)
             throws ClientIdNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -201,10 +211,14 @@ public class ReportProviders {
             em.close();
         }
 
+        kheopsLogBuilder.action(ActionType.GET_REPORT_PROVIDER)
+                .clientID(clientId)
+                .album(albumId)
+                .log();
         return new ReportProviderResponse(reportProvider);
     }
 
-    public static void deleteReportProvider(User callingUser, String albumId, String clientId)
+    public static void deleteReportProvider(User callingUser, String albumId, String clientId, KheopsLogBuilder kheopsLogBuilder)
             throws ClientIdNotFoundException, AlbumNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -235,9 +249,13 @@ public class ReportProviders {
             }
             em.close();
         }
+        kheopsLogBuilder.album(albumId)
+                .clientID(clientId)
+                .action(ActionType.DELETE_REPORT_PROVIDER)
+                .log();
     }
 
-    public static ReportProviderResponse editReportProvider(User callingUser, String albumId, String clientId, String url, String name, boolean newClientId)
+    public static ReportProviderResponse editReportProvider(User callingUser, String albumId, String clientId, String url, String name, boolean newClientId, KheopsLogBuilder kheopsLogBuilder)
             throws ClientIdNotFoundException, AlbumNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -254,14 +272,17 @@ public class ReportProviders {
 
             if (!(url == null || url.isEmpty())) {
                 reportProvider.setUrl(url);
+                kheopsLogBuilder.scope("url");
             }
 
             if (!(name == null || name.isEmpty())) {
                 reportProvider.setName(name);
+                kheopsLogBuilder.scope("name");
             }
 
             if (newClientId) {
                 reportProvider.setClientId(new ClientId().getClientId());
+                kheopsLogBuilder.scope("newClientId");
             }
 
             callingUser = em.merge(callingUser);
@@ -278,6 +299,10 @@ public class ReportProviders {
             }
             em.close();
         }
+        kheopsLogBuilder.album(albumId)
+                .clientID(clientId)
+                .action(ActionType.EDIT_REPORT_PROVIDER)
+                .log();
         return new ReportProviderResponse(reportProvider);
     }
 

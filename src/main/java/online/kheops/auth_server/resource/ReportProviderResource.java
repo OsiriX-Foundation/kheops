@@ -15,6 +15,8 @@ import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -86,7 +88,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse dicomSrResponse;
         try {
-            dicomSrResponse = ReportProviders.newReportProvider(kheopsPrincipal.getUser(), albumId, name, url);
+            dicomSrResponse = ReportProviders.newReportProvider(kheopsPrincipal.getUser(), albumId, name, url, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).build();
         }
@@ -241,6 +243,15 @@ public class ReportProviderResource {
                                         .collect(Collectors.joining()))
                         .toString();
 
+                KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
+                        .action(ActionType.NEW_REPORT)
+                        .album(albumId)
+                        .clientID(clientId);
+                for (String studyUID:studyInstanceUID) {
+                    kheopsLogBuilder.study(studyUID);
+                }
+                kheopsLogBuilder.log();
+
                 return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
             } catch (AlbumNotFoundException e) {
                 throw new IllegalStateException("Album just found, how could we not have it now", e);
@@ -261,10 +272,13 @@ public class ReportProviderResource {
 
         final ConfigurationResponse configurationResponse;
         try {
-            configurationResponse = new ConfigurationResponse(clientId, context.getInitParameter("online.kheops.root.uri"));
+            configurationResponse = new ConfigurationResponse(clientId, getHostRoot());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
+        new KheopsLogBuilder().action(ActionType.REPORT_PROVIDER_CONFIGURATION)
+                .clientID(clientId)
+                .log();
         return  Response.status(OK).entity(configurationResponse).build();
     }
 
@@ -281,7 +295,7 @@ public class ReportProviderResource {
 
         final PairListXTotalCount<ReportProviderResponse> pair;
 
-        pair = ReportProviders.getReportProviders(albumId, limit, offset);
+        pair = ReportProviders.getReportProviders(albumId, limit, offset, ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder());
 
         final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<List<ReportProviderResponse>>(pair.getAttributesList()) {};
         return  Response.status(OK).entity(genericReportProvidersResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
@@ -299,7 +313,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse reportProvider;
         try {
-            reportProvider = getReportProvider(albumId, clientId);
+            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -319,7 +333,7 @@ public class ReportProviderResource {
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
         try {
-            deleteReportProvider(callingUser, albumId, clientId);
+            deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (AlbumNotFoundException e) {
@@ -355,7 +369,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse reportProvider;
         try {
-            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, newClientId);
+            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, newClientId, kheopsPrincipal.getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (AlbumNotFoundException e) {
@@ -386,6 +400,9 @@ public class ReportProviderResource {
             clientMetadataResponse.setErrorDescription(e.getMessage());
         }
 
+        ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                .action(ActionType.REPORT_PROVIDER_METADATA)
+                .log();
         return  Response.status(OK).entity(clientMetadataResponse).build();
     }
 

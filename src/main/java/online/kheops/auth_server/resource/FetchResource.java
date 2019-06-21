@@ -5,6 +5,7 @@ import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,7 +32,7 @@ public class FetchResource {
         Fetcher.fetchStudy(studyInstanceUID);
         ((KheopsPrincipalInterface) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .study(studyInstanceUID)
-                .action(KheopsLogBuilder.ActionType.FETCH)
+                .action(ActionType.FETCH)
                 .log();
         return Response.ok().build();
     }

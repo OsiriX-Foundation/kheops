@@ -1,5 +1,6 @@
 package online.kheops.auth_server.util;
 
+import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.user.UsersPermission;
 
 import java.util.ArrayList;
@@ -14,7 +15,8 @@ public class KheopsLogBuilder {
         ADD_FAVORITE_SERIES, ADD_FAVORITE_STUDY, REMOVE_FAVORITE_SERIES, REMOVE_FAVORITE_STUDY,
         QIDO_STUDIES, QIDO_STUDY, QIDO_STUDY_METADATA,
         POST_COMMENT, LIST_EVENTS,
-        FETCH}
+        FETCH, TEST_USER, USER_INFO,
+        NEW_REPORT_PROVIDER, NEW_REPORT, REPORT_PROVIDER_CONFIGURATION, LIST_REPORT_PROVIDERS, GET_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, REPORT_PROVIDER_METADATA}
 
     public enum PrincipalType {CAPABILITY, USER, VIEWER, REPORT_PROVIDER}
 
@@ -26,8 +28,8 @@ public class KheopsLogBuilder {
         log = new ArrayList<>();
     }
 
-    public KheopsLogBuilder principalType(PrincipalType principalType) {
-        log.add(new LogEntry("type", principalType.name()));
+    public KheopsLogBuilder tokenType(AccessToken.TokenType tokenType) {
+        log.add(new LogEntry("tokenType", tokenType.name()));
         return this;
     }
 

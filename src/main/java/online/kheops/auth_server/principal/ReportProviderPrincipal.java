@@ -1,13 +1,13 @@
 package online.kheops.auth_server.principal;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.accesstoken.AccessToken.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -179,7 +179,7 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder().user(getUser().getKeycloakId()).clientID(clientId).principalType(PrincipalType.REPORT_PROVIDER);
+        return new KheopsLogBuilder().user(getUser().getKeycloakId()).clientID(clientId).tokenType(TokenType.REPORT_PROVIDER_TOKEN);
     }
 
     @Override
