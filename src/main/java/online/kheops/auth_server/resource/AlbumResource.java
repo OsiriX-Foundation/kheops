@@ -154,8 +154,7 @@ public class AlbumResource {
         if (includeUsers) {
             kheopsLog.action(ActionType.LIST_USERS);
         }
-        kheopsLog.user(kheopsPrincipal.getUser().getKeycloakId())
-                .album(albumResponse.getId())
+        kheopsLog.album(albumResponse.getId())
                 .action(ActionType.GET_ALBUM)
                 .log();
         return Response.status(OK).entity(albumResponse).build();
