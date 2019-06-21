@@ -90,7 +90,7 @@ public final class WadoRsResource {
     }
     
     @GET
-    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{sopInstanceUID:([0-9]+[.])*[0-9]+}/frames/{frameNumber:([0-9]+}")
+    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{sopInstanceUID:([0-9]+[.])*[0-9]+}/frames/{frameNumber:[0-9]+}")
     public Response wadoInstanceFrame(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                                  @PathParam("studyInstanceUID") String studyInstanceUID,
                                  @PathParam("seriesInstanceUID") String seriesInstanceUID) {
