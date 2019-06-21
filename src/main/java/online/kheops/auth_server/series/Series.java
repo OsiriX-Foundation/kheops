@@ -93,9 +93,9 @@ public class Series {
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
             }
-            final Mutation newAlbumMutation = Events.albumPostSeriesMutation(callingUser, album, mutation, series);
-            em.persist(newAlbumMutation);
-
+            final Mutation favSeriesMutation = Events.albumPostSeriesMutation(callingUser, album, mutation, series);
+            em.persist(favSeriesMutation);
+            album.updateLastEventTime();
             tx.commit();
 
             if(favorite) {

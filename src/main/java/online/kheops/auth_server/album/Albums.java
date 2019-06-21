@@ -93,6 +93,7 @@ public class Albums {
                 usersPermission.getWriteComments().ifPresent(editAlbum::setWriteComments);
 
                 Mutation mutation = Events.albumPostEditMutation(callingUser, editAlbum);
+                editAlbum.updateLastEventTime();
                 em.persist(mutation);
 
             } else if (name != null || description != null || usersPermission.areSet()) {
@@ -251,7 +252,7 @@ public class Albums {
                 em.persist(mutation);
                 em.persist(targetAlbumUser);
             }
-
+            album.updateLastEventTime();
             tx.commit();
             return targetUser;
         } finally {
@@ -303,7 +304,7 @@ public class Albums {
                 em.persist(mutation);
                 em.remove(removedAlbumUser);
             }
-
+            album.updateLastEventTime();
             tx.commit();
             return removedUser;
         } finally {
@@ -338,7 +339,7 @@ public class Albums {
                     capability.setRevoked(true);
                 }
             }
-
+            targetAlbum.updateLastEventTime();
             tx.commit();
             return removedUser;
         } finally {

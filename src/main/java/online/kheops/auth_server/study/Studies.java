@@ -513,9 +513,9 @@ public class Studies {
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
             }
-            final Mutation newAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
-            em.persist(newAlbumMutation);
-
+            final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
+            em.persist(favAlbumMutation);
+            album.updateLastEventTime();
             tx.commit();
             kheopsLogBuilder.study(studyInstanceUID)
                     .log();

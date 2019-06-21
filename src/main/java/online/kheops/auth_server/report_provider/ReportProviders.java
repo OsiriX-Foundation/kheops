@@ -53,6 +53,8 @@ public class ReportProviders {
 
             em.persist(mutation);
             em.persist(reportProvider);
+            album.updateLastEventTime();
+            album.updateLastEventTime();
             tx.commit();
 
         } finally {
@@ -239,7 +241,7 @@ public class ReportProviders {
             final Album album = getAlbum(albumId, em);
             final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.DELETE_REPORT_PROVIDER);
             em.persist(mutation);
-
+            album.updateLastEventTime();
             tx.commit();
         } catch (NoResultException e) {
             throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
@@ -289,7 +291,7 @@ public class ReportProviders {
             final Album album = getAlbum(albumId, em);
             final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.EDIT_REPORT_PROVIDER);
             em.persist(mutation);
-
+            album.updateLastEventTime();
             tx.commit();
         } catch (NoResultException e) {
             throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");

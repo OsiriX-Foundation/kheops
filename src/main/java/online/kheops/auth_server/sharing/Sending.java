@@ -129,6 +129,7 @@ public class Sending {
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
             }
+            callingAlbum.updateLastEventTime();
             em.persist(mutation);
 
             tx.commit();
@@ -168,7 +169,7 @@ public class Sending {
             }
 
             em.persist(mutation);
-
+            callingAlbum.updateLastEventTime();
             tx.commit();
             kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
                     .album(albumId)
@@ -237,6 +238,7 @@ public class Sending {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             }
             em.persist(mutation);
+            targetAlbum.updateLastEventTime();
             tx.commit();
             kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
                     .album(albumId)
@@ -287,8 +289,8 @@ public class Sending {
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
             }
-                em.persist(mutation);
-
+            em.persist(mutation);
+            targetAlbum.updateLastEventTime();
             tx.commit();
             if(fromAlbumId != null) {
                 kheopsLogBuilder.fromAlbum(fromAlbumId);
