@@ -88,11 +88,11 @@ public class KheopsLogBuilder {
 
 
     public void log() {
-        String logString = "";
+        StringBuilder logString = new StringBuilder();
         for (LogEntry pair:log) {
-            logString += pair.getKey() + "=" + pair.getValue() + " ";
+            logString.append(pair.getKey()).append("=").append(pair.getValue()).append(" ");
         }
-        LOG.log(KheopsLevel.KHEOPS, logString);
+        LOG.log(KheopsLevel.KHEOPS, logString.toString());
     }
 
 
