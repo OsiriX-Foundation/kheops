@@ -1,25 +1,15 @@
 package online.kheops.auth_server.report_provider;
 
-import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.entity.ReportProvider;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
 import javax.xml.bind.annotation.XmlElement;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
-
 public class ConfigurationResponse {
 
     @XmlElement(name = "issuer")
     private String issuer;
-    @XmlElement(name = "return_uri") // deprecated
-    private String returnUri;
     @XmlElement(name = "dicomweb_endpoint")
     private String dicomwebEndpoint;
     @XmlElement(name = "dicomweb_uri_endpoint")
@@ -50,29 +40,9 @@ public class ConfigurationResponse {
 
     public ConfigurationResponse() { /*empty*/ }
 
-    public ConfigurationResponse(String clientId, String kheopsRootUri)
-            throws ClientIdNotFoundException {
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
-
-        final ReportProvider reportProvider;
-        final String albumId;
-        try {
-            tx.begin();
-            reportProvider = getReportProviderWithClientId(clientId, em);
-            albumId = reportProvider.getAlbum().getId();
-        } catch (NoResultException e){
-            throw new ClientIdNotFoundException("ClientId: "+ clientId + " Not Found");
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-        }
+    public ConfigurationResponse(String kheopsRootUri) {
 
         issuer = kheopsRootUri;
-        returnUri = kheopsRootUri + "/albums/" + albumId;
         dicomwebEndpoint = kheopsRootUri + "/api";
         wadoEndpoint = kheopsRootUri + "/api/wado";
         tokenEndpoint = kheopsRootUri + "/api/token";
