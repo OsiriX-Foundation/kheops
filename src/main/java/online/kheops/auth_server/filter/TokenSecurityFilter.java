@@ -59,7 +59,8 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
 
         final TokenPrincipal principal;
         try {
-            principal = authenticationType.authenticate(servletContext, requestHeaders, form);
+            final String relativePath = containerRequest.getBaseUri().relativize(containerRequest.getRequestUri()).toString();
+            principal = authenticationType.authenticate(servletContext, "/api/" + relativePath, requestHeaders, form);
         } catch (WebApplicationException e) {
             LOG.log(INFO, "Unable to authenticate the client", e);
             containerRequest.abortWith(e.getResponse());

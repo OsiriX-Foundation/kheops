@@ -1,12 +1,18 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
+import online.kheops.auth_server.entity.ReportProvider;
+import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.token.TokenClientKind;
 import online.kheops.auth_server.token.TokenGrantType;
 import online.kheops.auth_server.token.TokenRequestException;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -17,6 +23,8 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
+import static online.kheops.auth_server.report_provider.ReportProviders.getRedirectUri;
 import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
@@ -32,22 +40,17 @@ public class TokenResource
     @Context
     SecurityContext securityContext;
 
-    static class TokenResponse {
-        @XmlElement(name = "access_token")
-        String accessToken;
-        @XmlElement(name = "token_type")
-        String tokenType;
-        @XmlElement(name = "expires_in")
-        Long expiresIn;
-        @XmlElement(name = "user")
-        String user;
-    }
-
     static class IntrospectResponse {
         @XmlElement(name = "active")
         boolean active;
         @XmlElement(name = "scope")
         String scope;
+        @XmlElement(name = "redirect_uri")
+        String redirectUri;
+        @XmlElement(name = "client_id")
+        String clientId;
+        @XmlElement(name = "album_id")
+        String albumId;
     }
 
     private IntrospectResponse errorIntrospectResponse = new IntrospectResponse();
@@ -94,10 +97,6 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        if (securityContext.isUserInRole(TokenClientKind.PUBLIC.getRoleString())) {
-            throw new NotAuthorizedException("Basic");
-        }
-
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateIntrospectableAccessToken(context, assertionToken);
@@ -109,16 +108,49 @@ public class TokenResource
             return Response.status(OK).entity(errorIntrospectResponse).build();
         }
 
-        if (securityContext.isUserInRole(TokenClientKind.REPORT_PROVIDER.getRoleString()) &&
-                accessToken.getTokenType() != AccessToken.TokenType.REPORT_PROVIDER_TOKEN) {
-            LOG.log(WARNING, "Report Provider introspecting a valid non-report provider token");
-            return Response.status(OK).entity(errorIntrospectResponse).build();
+        if (accessToken.getTokenType() == AccessToken.TokenType.REPORT_PROVIDER_TOKEN) {
+            final String clientId = ((ReportProviderAccessToken) accessToken).getClientId();
+
+            final EntityManager em = EntityManagerListener.createEntityManager();
+            final EntityTransaction tx = em.getTransaction();
+
+            final ReportProvider reportProvider;
+            final String albumId;
+            final String redirectUri;
+            try {
+                tx.begin();
+                reportProvider = getReportProviderWithClientId(clientId, em);
+                albumId = reportProvider.getAlbum().getId();
+                redirectUri = getRedirectUri(reportProvider);
+            } catch (ReportProviderUriNotValidException e) {
+                LOG.log(WARNING, "Unable to get the Report Provider's redirect_uri", e);
+                return Response.status(OK).entity(errorIntrospectResponse).build();
+            } catch (NoResultException e){
+                LOG.log(WARNING, "ClientId: "+ clientId + " Not Found", e);
+                return Response.status(OK).entity(errorIntrospectResponse).build();
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
+            }
+
+            introspectResponse.scope = accessToken.getScope().orElse(null);
+            introspectResponse.clientId = clientId;
+            introspectResponse.albumId = albumId;
+            introspectResponse.redirectUri = redirectUri;
+            introspectResponse.active = true;
+            return Response.status(OK).entity(introspectResponse).build();
         }
 
-        introspectResponse.scope = accessToken.getScope().orElse(null);
-
-        introspectResponse.active = true;
-        return Response.status(OK).entity(introspectResponse).build();
+        if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString())) {
+            introspectResponse.scope = accessToken.getScope().orElse(null);
+            introspectResponse.active = true;
+            return Response.status(OK).entity(introspectResponse).build();
+        } else {
+            LOG.log(WARNING, "Public or Report Provider attempting to introspect a valid non-report provider token");
+            return Response.status(OK).entity(errorIntrospectResponse).build();
+        }
     }
 }
 

@@ -33,6 +33,7 @@ class PrivateKeyJWTAuthenticator {
 
     final private ServletContext context;
     private String clientId;
+    private String requestPath;
     private String clientJWT;
     private DecodedJWT decodedJWT;
 
@@ -46,6 +47,11 @@ class PrivateKeyJWTAuthenticator {
 
     PrivateKeyJWTAuthenticator clientId(final String clientId) {
         this.clientId = Objects.requireNonNull(clientId);
+        return this;
+    }
+
+    PrivateKeyJWTAuthenticator requestPath(final String requestPath) {
+        this.requestPath = Objects.requireNonNull(requestPath);
         return this;
     }
 
@@ -63,6 +69,7 @@ class PrivateKeyJWTAuthenticator {
 
     TokenPrincipal authenticate() {
         Objects.requireNonNull(clientId);
+        Objects.requireNonNull(requestPath);
         Objects.requireNonNull(clientJWT);
         Objects.requireNonNull(decodedJWT);
         basicValidation();
@@ -90,7 +97,7 @@ class PrivateKeyJWTAuthenticator {
                     .acceptLeeway(5)
                     .withIssuer(clientId)
                     .withSubject(clientId)
-                    .withAudience(getAudienceHost())
+                    .withAudience(getRootHost() + requestPath)
                     .build().verify(clientJWT);
         } catch (JWTVerificationException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Unable to verify the JWT. " + e.getMessage() , e);
@@ -150,7 +157,7 @@ class PrivateKeyJWTAuthenticator {
         }
     }
 
-    private String getAudienceHost() {
+    private String getRootHost() {
         return context.getInitParameter(HOST_ROOT_PARAMETER);
     }
 

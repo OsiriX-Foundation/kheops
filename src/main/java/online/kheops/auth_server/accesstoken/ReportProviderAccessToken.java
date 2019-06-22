@@ -91,6 +91,10 @@ public class ReportProviderAccessToken implements AccessToken {
 
     }
 
+    public String getClientId() {
+        return clientId;
+    }
+
     private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess) {
         this.sub = Objects.requireNonNull(sub);
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
