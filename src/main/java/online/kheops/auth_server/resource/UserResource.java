@@ -127,7 +127,7 @@ public class UserResource {
         }
 
         try {
-            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSub()));
+            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSubject()));
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.INFO, "Unable to get the user info", e);
             throw new ServerErrorException("Unable to get the user info", BAD_GATEWAY, e);

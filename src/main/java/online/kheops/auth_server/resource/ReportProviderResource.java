@@ -124,7 +124,7 @@ public class ReportProviderResource {
         }
 
         try {
-            getOrCreateUser(assertion.getSub());
+            getOrCreateUser(assertion.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).build();
@@ -139,7 +139,7 @@ public class ReportProviderResource {
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(assertion.getSub());
+            callingUser = getOrCreateUser(assertion.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).entity("User not found").build();
@@ -195,7 +195,7 @@ public class ReportProviderResource {
             final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
                     .withClientId(reportProvider.getClientId())
                     .withStudyInstanceUIDs(studyInstanceUID)
-                    .withSubject(assertion.getSub())
+                    .withSubject(assertion.getSubject())
                     .generate(600);
 
             try {
@@ -225,7 +225,7 @@ public class ReportProviderResource {
                         .withClientId(clientId)
                         .withScope(userHasWriteAccess ? "read write" : "read")
                         .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSub())
+                        .withSubject(assertion.getSubject())
                         .generate(3600);
 
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());

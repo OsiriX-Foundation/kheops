@@ -11,10 +11,8 @@ import online.kheops.auth_server.principal.*;
 
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
 
 public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
@@ -22,6 +20,11 @@ public class ReportProviderAccessToken implements AccessToken {
     private final String clientId;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;
+    private final Instant exp;
+    private final Instant iat;
+    private final Instant nbf;
+    private final List<String> aud;
+    private final String iss;
 
     static class Builder implements AccessTokenBuilder{
         private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
@@ -70,14 +73,17 @@ public class ReportProviderAccessToken implements AccessToken {
             final boolean hasReadAccess = scopeClaim.asString().matches(".*\\bread\\b.*");
             final boolean hasWriteAccess = scopeClaim.asString().matches(".*\\bwrite\\b.*");
 
-            final Claim studyUIDsClaim = jwt.getClaim("study_uids");
             try {
-                if (studyUIDsClaim.isNull() || studyUIDsClaim.asList(String.class) == null) {
-                    throw new AccessTokenVerificationException("Missing study_uids claim in token");
-                }
-                return new ReportProviderAccessToken(jwt.getSubject(), studyUIDsClaim.asList(String.class), azpClaim.asString(), hasReadAccess, hasWriteAccess);
-            } catch (JWTDecodeException e) {
-                throw new AccessTokenVerificationException("unable to decode study_uids");
+                final Instant exp = jwt.getExpiresAt().toInstant();
+                final Instant iat = jwt.getIssuedAt().toInstant();
+                final Instant nbf = jwt.getNotBefore().toInstant();
+                final List<String> aud = Objects.requireNonNull(jwt.getAudience());
+                final String iss = Objects.requireNonNull(jwt.getIssuer());
+                final List<String> studyUIDs = jwt.getClaim("studyUID").asList(String.class);
+
+                return new ReportProviderAccessToken(jwt.getSubject(), studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss);
+            } catch (NullPointerException | JWTDecodeException e) {
+                throw new AccessTokenVerificationException("AccessToken missing fields.", e);
             }
         }
 
@@ -91,20 +97,22 @@ public class ReportProviderAccessToken implements AccessToken {
 
     }
 
-    public String getClientId() {
-        return clientId;
-    }
-
-    private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess) {
+    private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess, Instant exp, Instant iat, Instant nbf,
+                                                    List<String> aud, String iss) {
         this.sub = Objects.requireNonNull(sub);
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
         this.clientId = Objects.requireNonNull(ClientId);
         this.hasReadAccess = hasReadAccess;
         this.hasWriteAccess = hasWriteAccess;
+        this.exp = exp;
+        this.iat = iat;
+        this.nbf = nbf;
+        this.aud = aud;
+        this.iss = iss;
     }
 
     @Override
-    public String getSub() {
+    public String getSubject() {
         return sub;
     }
 
@@ -127,6 +135,46 @@ public class ReportProviderAccessToken implements AccessToken {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<String> getClientId() {
+        return Optional.of(clientId);
+    }
+
+    @Override
+    public Optional<List<String>> getStudyUIDs() {
+        return Optional.of(studyUIDs);
+    }
+
+    @Override
+    public Optional<Instant> getExpiresAt() {
+        return Optional.of(exp);
+    }
+
+    @Override
+    public Optional<Instant> getIssuedAt() {
+        return Optional.of(iat);
+    }
+
+    @Override
+    public Optional<Instant> getNotBefore() {
+        return Optional.of(nbf);
+    }
+
+    @Override
+    public Optional<List<String>> getAudience() {
+        return Optional.of(aud);
+    }
+
+    @Override
+    public Optional<String> getIssuer() {
+        return Optional.of(iss);
+    }
+
+    @Override
+    public Optional<String> getAuthorizedParty() {
+        return Optional.of(clientId);
     }
 
     @Override

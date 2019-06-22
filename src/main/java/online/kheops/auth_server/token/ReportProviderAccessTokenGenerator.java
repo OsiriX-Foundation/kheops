@@ -66,7 +66,7 @@ public class ReportProviderAccessTokenGenerator {
                     .withClaim("azp", Objects.requireNonNull(clientId))
                     .withClaim("scope", Objects.requireNonNull(scope))
                     .withClaim("type", "report_generator")
-                    .withArrayClaim("study_uids", studyInstanceUIDs.toArray(new String[0]))
+                    .withArrayClaim("studyUID", studyInstanceUIDs.toArray(new String[0]))
                     .sign(algorithm);
         } catch (JWTCreationException | UnsupportedEncodingException e) {
             throw new InternalServerErrorException("Error signing the token", e);
