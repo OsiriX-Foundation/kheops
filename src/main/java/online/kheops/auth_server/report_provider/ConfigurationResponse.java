@@ -16,13 +16,9 @@ import static online.kheops.auth_server.report_provider.ReportProviderQueries.ge
 
 public class ConfigurationResponse {
 
-    @XmlElement(name = "album_id")
-    private String albumId;
-    @XmlElement(name = "client_id")
-    private String clientId;
     @XmlElement(name = "issuer")
     private String issuer;
-    @XmlElement(name = "return_uri")
+    @XmlElement(name = "return_uri") // deprecated
     private String returnUri;
     @XmlElement(name = "dicomweb_endpoint")
     private String dicomwebEndpoint;
@@ -37,13 +33,13 @@ public class ConfigurationResponse {
 //    @XmlElement(name = "jwks_uri")
 //    private String jwksUri;
     @XmlElement(name = "grant_types_supported")
-    private List<String> grantTypesSupported = Collections.singletonList("authorization_code");
+    private List<String> grantTypesSupported = Arrays.asList("authorization_code", "implicit");
     @XmlElement(name = "token_endpoint_auth_methods_supported")
     private List<String> tokenEndpointAuthMethodsSupported = Collections.singletonList("private_key_jwt");
     @XmlElement(name = "token_endpoint_auth_signing_alg_values_supported")
     private List<String> tokenEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
     @XmlElement(name = "introspection_endpoint_auth_methods_supported")
-    private List<String> introspectionEndpointAuthMethodsSupported = Collections.singletonList("private_key_jwt");
+    private List<String> introspectionEndpointAuthMethodsSupported = Arrays.asList("private_key_jwt", "none");
     @XmlElement(name = "introspection_endpoint_auth_signing_alg_values_supported")
     private List<String> introspectionEndpointAuthSigningAlgValuesSupported = Collections.singletonList("RS256");
 
@@ -61,6 +57,7 @@ public class ConfigurationResponse {
         final EntityTransaction tx = em.getTransaction();
 
         final ReportProvider reportProvider;
+        final String albumId;
         try {
             tx.begin();
             reportProvider = getReportProviderWithClientId(clientId, em);
@@ -74,7 +71,6 @@ public class ConfigurationResponse {
             em.close();
         }
 
-        this.clientId = clientId;
         issuer = kheopsRootUri;
         returnUri = kheopsRootUri + "/albums/" + albumId;
         dicomwebEndpoint = kheopsRootUri + "/api";

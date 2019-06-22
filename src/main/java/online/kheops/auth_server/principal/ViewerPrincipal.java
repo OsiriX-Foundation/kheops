@@ -50,7 +50,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
         final User user;
         try {
-            user = getOrCreateUser(accessToken.getSub());
+            user = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             throw new IllegalStateException(e);
         }

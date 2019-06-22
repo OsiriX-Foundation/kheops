@@ -67,7 +67,7 @@ class PepAccessTokenGenerator {
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(accessToken.getSub());
+            callingUser = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "User not found", e);
         }
@@ -81,12 +81,12 @@ class PepAccessTokenGenerator {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair", e);
         }
 
-        LOG.info(() -> "Returning pep token for user: " + accessToken.getSub() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
+        LOG.info(() -> "Returning pep token for user: " + accessToken.getSubject() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
         return PepAccessTokenBuilder.newBuilder()
                 .withExpiresIn(expiresIn)
                 .withStudyUID(studyInstanceUID)
                 .withSeriesUID(seriesInstanceUID)
-                .withSubject(accessToken.getSub())
+                .withSubject(accessToken.getSubject())
                 .build();
     }
 }

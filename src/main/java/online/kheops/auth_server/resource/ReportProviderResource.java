@@ -126,7 +126,7 @@ public class ReportProviderResource {
         }
 
         try {
-            getOrCreateUser(assertion.getSub());
+            getOrCreateUser(assertion.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).build();
@@ -141,7 +141,7 @@ public class ReportProviderResource {
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(assertion.getSub());
+            callingUser = getOrCreateUser(assertion.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).entity("User not found").build();
@@ -197,7 +197,7 @@ public class ReportProviderResource {
             final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
                     .withClientId(reportProvider.getClientId())
                     .withStudyInstanceUIDs(studyInstanceUID)
-                    .withSubject(assertion.getSub())
+                    .withSubject(assertion.getSubject())
                     .generate(600);
 
             try {
@@ -205,7 +205,8 @@ public class ReportProviderResource {
                 final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
                         .queryParam("code", token)
                         .queryParam("conf_uri", confUri)
-                        .queryParam("client_id", reportProvider.getClientId());
+                        .queryParam("client_id", reportProvider.getClientId())
+                        .queryParam("return_uri", getHostRoot() + "/albums/" + albumId);
 
                 for (String uid : studyInstanceUID) {
                     reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, UTF_8.toString()));
@@ -226,20 +227,22 @@ public class ReportProviderResource {
                         .withClientId(clientId)
                         .withScope(userHasWriteAccess ? "read write" : "read")
                         .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSub())
+                        .withSubject(assertion.getSubject())
                         .generate(3600);
 
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
+                final String returnUri = URLEncoder.encode(getHostRoot() + "/albums/" + albumId, UTF_8.toString());
 
                 final String reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
                         .fragment("access_token=" + token +
-                                "&token_type=" + "Bearer" +
+                                "&token_type=" + "bearer" +
                                 "&expires_in=3600" +
                                 "&scope=" + (userHasWriteAccess ? "read%20write" : "read") +
                                 "&client_id=" + clientId +
                                 "&conf_uri=" + confUri +
+                                "&return_uri=" + returnUri +
                                 studyInstanceUID.stream()
-                                        .map(uid -> "&study_uid="+uid)
+                                        .map(uid -> "&studyUID="+uid)
                                         .collect(Collectors.joining()))
                         .toString();
 

@@ -4,17 +4,47 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 
 import javax.servlet.ServletContext;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface AccessToken {
 
     enum TokenType  {KEYCLOAK_TOKEN, CAPABILITY_TOKEN, SUPER_USER_TOKEN, PEP_TOKEN, VIEWER_TOKEN, REPORT_PROVIDER_TOKEN}
 
-    String getSub();
+    String getSubject();
     TokenType getTokenType();
+
+    KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user);
+
     default Optional<String> getScope() {
         return Optional.empty();
     }
-
-    KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user);
+    default Optional<String> getClientId() {
+        return Optional.empty();
+    }
+    default Optional<List<String>> getStudyUIDs() {
+        return Optional.empty();
+    }
+    default Optional<Instant> getExpiresAt() {
+        return Optional.empty();
+    }
+    default Optional<Instant> getIssuedAt() {
+        return Optional.empty();
+    }
+    default Optional<Instant> getNotBefore() {
+        return Optional.empty();
+    }
+    default Optional<List<String>> getAudience() {
+        return Optional.empty();
+    }
+    default Optional<String> getIssuer() {
+        return Optional.empty();
+    }
+    default Optional<String> getAuthorizedParty() {
+        return Optional.empty();
+    }
+    default Optional<String> getActingParty() {
+        return Optional.empty();
+    }
 }

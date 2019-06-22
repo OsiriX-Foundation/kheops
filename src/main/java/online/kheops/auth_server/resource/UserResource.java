@@ -135,11 +135,11 @@ public class UserResource {
         }
 
         try {
-            new KheopsLogBuilder().user(accessToken.getSub())
+            new KheopsLogBuilder().user(accessToken.getSubject())
                     .action(ActionType.USER_INFO)
                     .tokenType(accessToken.getTokenType())
                     .log();
-            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSub()));
+            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSubject()));
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.INFO, "Unable to get the user info", e);
             throw new ServerErrorException("Unable to get the user info", BAD_GATEWAY, e);
