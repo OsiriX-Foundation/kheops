@@ -12,7 +12,7 @@ export const CurrentUser = {
 			return Vue.prototype.$keycloak.idTokenParsed.email
 		},
 		currentuserFullname () {
-			return Vue.prototype.$keycloak.idTokenParsed.fullName
+			return Vue.prototype.$keycloak.idTokenParsed.name
 		}
 	}
 }
