@@ -61,7 +61,7 @@ public class TokenResource
         }
 
         try {
-            return grantType.processGrant(securityContext, context, form);
+            return Response.ok(grantType.processGrant(securityContext, context, form).getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e;
