@@ -192,7 +192,7 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        final String kheopsConfigUrl = getHostRoot() + "/api/reportproviders/" + clientId + "/configuration";
+        final String kheopsConfigUrl = getHostRoot() + "/api/.well-known/report-provider-configuration";
         if (responseType.equals("code")) {
             final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
                     .withClientId(reportProvider.getClientId())
@@ -269,20 +269,11 @@ public class ReportProviderResource {
     }
 
     @GET
-    @Path("reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}/configuration")
+    @Path(".well-known/report-provider-configuration")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response configuration(@SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
-
-        final ConfigurationResponse configurationResponse;
-        try {
-            configurationResponse = new ConfigurationResponse(clientId, getHostRoot());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
-        }
-        new KheopsLogBuilder().action(ActionType.REPORT_PROVIDER_CONFIGURATION)
-                .clientID(clientId)
-                .log();
-        return  Response.status(OK).entity(configurationResponse).build();
+    public Response configuration() {
+        new KheopsLogBuilder().action(ActionType.REPORT_PROVIDER_CONFIGURATION).log();
+        return  Response.status(OK).entity(new ConfigurationResponse(getHostRoot())).build();
     }
 
     @GET

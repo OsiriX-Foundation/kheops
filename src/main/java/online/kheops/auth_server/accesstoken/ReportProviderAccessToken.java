@@ -70,10 +70,9 @@ public class ReportProviderAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Missing scope claim in token");
             }
 
-            final boolean hasReadAccess = scopeClaim.asString().matches(".*\\bread\\b.*");
-            final boolean hasWriteAccess = scopeClaim.asString().matches(".*\\bwrite\\b.*");
-
             try {
+                final boolean hasReadAccess = scopeClaim.asString().matches(".*\\bread\\b.*");
+                final boolean hasWriteAccess = scopeClaim.asString().matches(".*\\bwrite\\b.*");
                 final Instant exp = jwt.getExpiresAt().toInstant();
                 final Instant iat = jwt.getIssuedAt().toInstant();
                 final Instant nbf = jwt.getNotBefore().toInstant();
