@@ -158,7 +158,7 @@ public enum TokenGrantType {
         return grantType;
     }
 
-    public static TokenGrantType fromString(String grantTypeString) {
+    public static TokenGrantType from(String grantTypeString) {
         for (TokenGrantType grantType: TokenGrantType.values()) {
             if (grantType.toString().equals(grantTypeString)) {
                 return grantType;
