@@ -58,8 +58,14 @@ final class KeycloakAccessToken implements AccessToken {
         String jwksURI;
     }
 
-    static final class Builder implements AccessTokenBuilder{
+    static final class Builder implements AccessTokenBuilder {
         private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
+
+        private final ServletContext servletContext;
+
+        Builder(ServletContext servletContext) {
+            this.servletContext = servletContext;
+        }
 
         public KeycloakAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
@@ -78,6 +84,7 @@ final class KeycloakAccessToken implements AccessToken {
             try {
                 jwt = JWT.require(Algorithm.RSA256(keyProvider))
                         .acceptLeeway(120)
+                        .withIssuer(getIssuer())
                         .build().verify(assertionToken);
             } catch (JWTVerificationException e) {
                 throw new AccessTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
@@ -87,7 +94,20 @@ final class KeycloakAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
+            try {
+                if (!jwt.getClaim("scope").asString().matches(".*\\bkheops\\b.*")) {
+                    throw new AccessTokenVerificationException("Token not valid for kheops");
+                }
+            } catch (NullPointerException e) {
+                throw new AccessTokenVerificationException("Missing scope claim");
+            }
+
             return new KeycloakAccessToken(jwt.getSubject());
+        }
+
+        private String getIssuer() {
+            return servletContext.getInitParameter("online.kheops.keycloak.uri") + "/auth/realms/" +
+                    servletContext.getInitParameter("online.kheops.keycloak.realms");
         }
     }
 
