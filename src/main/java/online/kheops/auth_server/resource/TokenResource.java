@@ -65,10 +65,11 @@ public class TokenResource
 
         try {
             final Response response = grantType.processGrant(securityContext, context, form);
-            ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                    .action(ActionType.NEW_TOKEN)
-                    .scope(grantType.name())
-                    .log();
+            // I'm not convinced there is always a user involved with a token grant
+//            ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+//                    .action(ActionType.NEW_TOKEN)
+//                    .scope(grantType.name())
+//                    .log();
             return response;
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
