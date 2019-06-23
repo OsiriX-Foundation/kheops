@@ -66,6 +66,7 @@ public class TokenResource
         try {
             final Response response = grantType.processGrant(securityContext, context, form);
             new KheopsLogBuilder()
+                    .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .log();
             return response;
@@ -126,6 +127,7 @@ public class TokenResource
             }
 
             new KheopsLogBuilder().user(accessToken.getSubject())
+                    .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .log();
 
@@ -137,6 +139,7 @@ public class TokenResource
 
         if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString())) {
             new KheopsLogBuilder().user(accessToken.getSubject())
+                    .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .log();
 
