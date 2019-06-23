@@ -4,13 +4,9 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
-import online.kheops.auth_server.token.IntrospectResponse;
-import online.kheops.auth_server.token.TokenClientKind;
-import online.kheops.auth_server.token.TokenGrantType;
-import online.kheops.auth_server.token.TokenRequestException;
+import online.kheops.auth_server.token.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
@@ -58,18 +54,19 @@ public class TokenResource
 
         final TokenGrantType grantType;
         try {
-            grantType = TokenGrantType.fromString(grantTypes.get(0));
+            grantType = TokenGrantType.from(grantTypes.get(0));
         } catch (IllegalArgumentException e) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
 
         try {
-            final Response response = grantType.processGrant(securityContext, context, form);
+            final TokenGrantResult result = grantType.processGrant(securityContext, context, form);
             new KheopsLogBuilder()
+                    .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .log();
-            return response;
+            return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e;
