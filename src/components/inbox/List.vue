@@ -691,30 +691,31 @@
                     :action="serverURL + '/report'"
                     method="post"
                   >
-                    <input
+                    <b-form-input
                       type="text"
                       hidden
                       name="access_token"
                       :value="access_token"
-                    >
-                    <input
+                    />
+                    <b-form-input
                       type="text"
                       hidden
                       name="client_id"
                       :value="provider.client_id"
-                    >
-                    <input
+                    />
+                    <b-form-input
                       type="text"
                       hidden
                       name="studyUID"
                       :value="row.item.StudyInstanceUID[0]"
-                    >
-                    <b-dropdown-item-button
+                    />
+                    <button
                       style="cursor: pointer"
                       type="submit"
+                      class="dropdown-item"
                     >
                       {{ provider.name }}
-                    </b-dropdown-item-button>
+                    </button>
                   </b-dropdown-form>
                 </b-dropdown>
                 <!--
