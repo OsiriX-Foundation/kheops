@@ -116,7 +116,7 @@ public class Album {
 
     public LocalDateTime getLastEventTime() { return lastEventTime; }
 
-    public void setLastEventTime(LocalDateTime lasteEventTime) { this.lastEventTime = lasteEventTime; }
+    public void updateLastEventTime() { this.lastEventTime = LocalDateTime.now(ZoneOffset.UTC); }
 
     public boolean isAddUser() { return addUser; }
 

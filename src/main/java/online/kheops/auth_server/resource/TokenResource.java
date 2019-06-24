@@ -6,10 +6,9 @@ import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
-import online.kheops.auth_server.token.IntrospectResponse;
-import online.kheops.auth_server.token.TokenClientKind;
-import online.kheops.auth_server.token.TokenGrantType;
-import online.kheops.auth_server.token.TokenRequestException;
+import online.kheops.auth_server.token.*;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -61,7 +60,13 @@ public class TokenResource
         }
 
         try {
-            return Response.ok(grantType.processGrant(securityContext, context, form).getTokenResponseEntity()).build();
+            final TokenGrantResult result = grantType.processGrant(securityContext, context, form);
+            new KheopsLogBuilder()
+                    .user(result.getSubject())
+                    .clientID(securityContext.getUserPrincipal().getName())
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .log();
+            return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e;
@@ -118,6 +123,11 @@ public class TokenResource
                 em.close();
             }
 
+            new KheopsLogBuilder().user(accessToken.getSubject())
+                    .clientID(securityContext.getUserPrincipal().getName())
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .log();
+
             final IntrospectResponse introspectResponse = IntrospectResponse.from(accessToken);
             introspectResponse.setAlbumId(albumId);
             introspectResponse.setRedirectUri(redirectUri);
@@ -125,6 +135,11 @@ public class TokenResource
         }
 
         if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString())) {
+            new KheopsLogBuilder().user(accessToken.getSubject())
+                    .clientID(securityContext.getUserPrincipal().getName())
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .log();
+
             return Response.status(OK).entity(IntrospectResponse.from(accessToken).toJson()).build();
         } else {
             LOG.log(WARNING, "Public or Report Provider attempting to introspect a valid non-report provider token");

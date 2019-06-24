@@ -14,6 +14,8 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.json.JsonObject;
 import javax.persistence.EntityManager;
@@ -80,10 +82,10 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
             final List<Series> seriesList;
             if(jwe.getBoolean(Consts.JWE.IS_INBOX)) {
-                seriesList = findSeriesListByStudyUIDFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, em);
+                seriesList = findSeriesListByStudyUIDFromInbox(getUser(), studyInstanceUID, em);
             } else {
                 final Album album = getAlbum(jwe.getString(Consts.JWE.SOURCE_ID), em);
-                seriesList = findSeriesListByStudyUIDFromAlbum(kheopsPrincipal.getUser(), album, studyInstanceUID, em);
+                seriesList = findSeriesListByStudyUIDFromAlbum(getUser(), album, studyInstanceUID, em);
             }
 
             if (seriesList.contains(getSeries(studyInstanceUID, seriesInstanceUID, em))) {
@@ -135,7 +137,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
             try {
                 tx.begin();
 
-                final User userMerge = em.merge(kheopsPrincipal.getUser());
+                final User userMerge = em.merge(getUser());
                 final Album album = getAlbum(albumId, em);
 
                 if(!isMemberOfAlbum(userMerge, album, em)) {
@@ -197,6 +199,11 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         } else {
             throw new AlbumNotFoundException("");
         }
+    }
+
+    @Override
+    public KheopsLogBuilder getKheopsLogBuilder() {
+        return new KheopsLogBuilder().user(getUser().getKeycloakId()).tokenType(AccessToken.TokenType.VIEWER_TOKEN);
     }
 
     @Override

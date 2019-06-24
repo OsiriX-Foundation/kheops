@@ -93,6 +93,7 @@ public class Albums {
                 usersPermission.getWriteComments().ifPresent(editAlbum::setWriteComments);
 
                 Mutation mutation = Events.albumPostEditMutation(callingUser, editAlbum);
+                editAlbum.updateLastEventTime();
                 em.persist(mutation);
 
             } else if (name != null || description != null || usersPermission.areSet()) {
@@ -206,7 +207,7 @@ public class Albums {
         return new PairListXTotalCount<>(totalCount, listUserAlbumResponse);
     }
 
-    public static void addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
+    public static User addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
             throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -251,8 +252,9 @@ public class Albums {
                 em.persist(mutation);
                 em.persist(targetAlbumUser);
             }
-
+            album.updateLastEventTime();
             tx.commit();
+            return targetUser;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -261,7 +263,7 @@ public class Albums {
         }
     }
 
-    public static void deleteUser(User callingUser, String userName,  String albumId)
+    public static User deleteUser(User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException, AlbumForbiddenException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -302,8 +304,9 @@ public class Albums {
                 em.persist(mutation);
                 em.remove(removedAlbumUser);
             }
-
+            album.updateLastEventTime();
             tx.commit();
+            return removedUser;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -312,7 +315,7 @@ public class Albums {
         }
     }
 
-    public static void removeAdmin(User callingUser, String userName,  String albumId)
+    public static User removeAdmin(User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -336,8 +339,9 @@ public class Albums {
                     capability.setRevoked(true);
                 }
             }
-
+            targetAlbum.updateLastEventTime();
             tx.commit();
+            return removedUser;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
