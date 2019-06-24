@@ -63,7 +63,7 @@ public class Events {
                 comment.setPrivateTargetUser(targetUser);
                 targetUser.getComments().add(comment);
             } else {
-                album.updateLastEventTime();
+                album.setLastEventTime(LocalDateTime.now(ZoneOffset.UTC));
             }
 
             em.persist(comment);

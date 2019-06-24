@@ -5,14 +5,11 @@ import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
-import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
-import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
-import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.validation.constraints.Min;
@@ -31,7 +28,6 @@ import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 public class AlbumResource {
 
     private static final Logger LOG = Logger.getLogger(AlbumResource.class.getName());
-
 
     @Context
     private UriInfo uriInfo;
@@ -81,11 +77,7 @@ public class AlbumResource {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumResponse.getId())
-                .action(ActionType.NEW_ALBUM)
-                .userPermission(usersPermission)
-                .log();
+        LOG.info(() -> "New album id:"+albumResponse.getId() +" created by user:"+kheopsPrincipal.getUser().getKeycloakId());
         return Response.status(CREATED).entity(albumResponse).build();
     }
 
@@ -112,9 +104,6 @@ public class AlbumResource {
         }
 
         final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
-        kheopsPrincipal.getKheopsLogBuilder()
-                .action(ActionType.LIST_ALBUMS)
-                .log();
         return Response.ok(genericAlbumResponsesList)
                 .header(X_TOTAL_COUNT, pairAlbumsTotalAlbum.getXTotalCount())
                 .build();
@@ -129,13 +118,13 @@ public class AlbumResource {
     public Response getAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                              @QueryParam("includeUsers") @DefaultValue("false") boolean includeUsers) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface) securityContext.getUserPrincipal());
+        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         final AlbumResponse albumResponse;
 
         try {
-            if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
+            if(!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
                 return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
             }
         } catch (AlbumNotFoundException e) {
@@ -150,13 +139,7 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final KheopsLogBuilder kheopsLog = kheopsPrincipal.getKheopsLogBuilder();
-        if (includeUsers) {
-            kheopsLog.action(ActionType.LIST_USERS);
-        }
-        kheopsLog.album(albumResponse.getId())
-                .action(ActionType.GET_ALBUM)
-                .log();
+
         return Response.status(OK).entity(albumResponse).build();
     }
 
@@ -208,11 +191,6 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumResponse.getId())
-                .userPermission(usersPermission)
-                .action(ActionType.EDIT_ALBUM)
-                .log();
         return Response.status(OK).entity(albumResponse).build();
     }
 
@@ -233,11 +211,7 @@ public class AlbumResource {
             LOG.log(Level.INFO, "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.DELETE_ALBUM)
-                .log();
-
+        LOG.info(() -> "Delete album id:" +albumId+  " by user pk:"+callingUserPk+ " SUCCESS");
         return Response.status(NO_CONTENT).build();
     }
 
@@ -266,10 +240,6 @@ public class AlbumResource {
         }
 
         final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(pair.getAttributesList()) {};
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.LIST_USERS)
-                .log();
         return Response.status(OK).entity(genericUsersAlbumResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
@@ -284,10 +254,9 @@ public class AlbumResource {
                             @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final User targetUser;
 
         try {
-            targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
+            Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Add a user userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -296,11 +265,6 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.ADD_USER)
-                .targetUser(targetUser.getKeycloakId())
-                .log();
         return Response.status(CREATED).build();
     }
 
@@ -315,10 +279,9 @@ public class AlbumResource {
                              @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final User targetUser;
 
         try {
-            targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, true);
+            Albums.addUser(kheopsPrincipal.getUser(), user, albumId, true);
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.INFO, "Add an admin userName:"+user+" to the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -327,11 +290,6 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.ADD_ADMIN)
-                .targetUser(targetUser.getKeycloakId())
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -346,20 +304,14 @@ public class AlbumResource {
                                 @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final User targetUser;
 
         try {
-            targetUser = Albums.removeAdmin(kheopsPrincipal.getUser(), user, albumId);
+            Albums.removeAdmin(kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.REMOVE_ADMIN)
-                .targetUser(targetUser.getKeycloakId())
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -374,10 +326,9 @@ public class AlbumResource {
                                @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
-        final User targetUser;
 
         try {
-            targetUser = Albums.deleteUser(kheopsPrincipal.getUser(), user, albumId);
+            Albums.deleteUser(kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.INFO, "Remove a user userName:"+user+" from the album id:" +albumId+  " by user pk:"+kheopsPrincipal.getDBID()+ " FAILED", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -386,11 +337,6 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.REMOVE_USER)
-                .targetUser(targetUser.getKeycloakId())
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -412,10 +358,6 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.ALBUM_ADD_FAVORITE)
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -436,10 +378,6 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .album(albumId)
-                .action(ActionType.ALBUM_REMOVE_FAVORITE)
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 }

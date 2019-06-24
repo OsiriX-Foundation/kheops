@@ -8,8 +8,6 @@ import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
@@ -30,12 +28,12 @@ public class Capabilities {
         throw new IllegalStateException("Utility class");
     }
 
-    public static CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
+    public static CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
             throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException, UserNotMemberException {
-        return capabilityParameters.getScopeType().generateCapability(capabilityParameters, kheopsLogBuilder);
+        return capabilityParameters.getScopeType().generateCapability(capabilityParameters);
     }
 
-    public static CapabilitiesResponse createUserCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
+    public static CapabilitiesResponse createUserCapability(CapabilityParameters capabilityParameters)
             throws CapabilityBadRequestException {
 
         final CapabilitiesResponse capabilityResponse;
@@ -60,10 +58,6 @@ public class Capabilities {
             capabilityResponse = new CapabilitiesResponse(capability, true, false);
 
             tx.commit();
-            kheopsLogBuilder.action(ActionType.NEW_CAPABILITY)
-                    .capabilityID(capability.getId())
-                    .scope("user")
-                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -73,7 +67,7 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponse createAlbumCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
+    public static CapabilitiesResponse createAlbumCapability(CapabilityParameters capabilityParameters)
             throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
 
         final CapabilitiesResponse capabilityResponse;
@@ -108,11 +102,6 @@ public class Capabilities {
             capabilityResponse = new CapabilitiesResponse(capability, true, false);
 
             tx.commit();
-            kheopsLogBuilder.action(ActionType.NEW_CAPABILITY)
-                    .capabilityID(capability.getId())
-                    .scope("album")
-                    .album(album.getId())
-                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -122,7 +111,7 @@ public class Capabilities {
         return capabilityResponse;
     }
     
-    public static CapabilitiesResponse revokeCapability(User callingUser, String capabilityId, KheopsLogBuilder kheopsLogBuilder)
+    public static CapabilitiesResponse revokeCapability(User callingUser, String capabilityId)
             throws CapabilityNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -142,9 +131,6 @@ public class Capabilities {
             capabilityResponse = new CapabilitiesResponse(capability, false, false);
 
             tx.commit();
-            kheopsLogBuilder.action(ActionType.REVOKE_CAPABILITY)
-                    .capabilityID(capabilityId)
-                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

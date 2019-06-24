@@ -7,8 +7,6 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
@@ -473,30 +471,23 @@ public class Studies {
         }
     }
 
-    public static void editFavorites(User callingUser, String studyInstanceUID, String fromAlbumId, boolean favorite, KheopsLogBuilder kheopsLogBuilder)
+    public static void editFavorites(User callingUser, String studyInstanceUID, String fromAlbumId, boolean favorite)
             throws AlbumNotFoundException, StudyNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
-            if(favorite) {
-                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_STUDY);
-            } else {
-                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
-            }
+
             callingUser = em.merge(callingUser);
             List<Series> seriesList;
             final Album album;
             if (fromAlbumId == null) {
                 seriesList = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
                 album = callingUser.getInbox();
-                kheopsLogBuilder.album("inbox");
-
             } else {
                 album = getAlbum(fromAlbumId, em);
                 seriesList = findSeriesListByStudyUIDFromAlbum(callingUser,album, studyInstanceUID, em);
-                kheopsLogBuilder.album(fromAlbumId);
             }
             if(seriesList.isEmpty()) {
                 throw new StudyNotFoundException("Study not found");
@@ -504,7 +495,6 @@ public class Studies {
 
             for(Series s: seriesList) {
                 editSeriesFavorites(s, album, favorite, em);
-                kheopsLogBuilder.series(s.getSeriesInstanceUID());
             }
             final Study study = getStudy(studyInstanceUID, em);
             final Events.MutationType mutation;
@@ -513,12 +503,10 @@ public class Studies {
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
             }
-            final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
-            em.persist(favAlbumMutation);
-            album.updateLastEventTime();
+            final Mutation newAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
+            em.persist(newAlbumMutation);
+
             tx.commit();
-            kheopsLogBuilder.study(studyInstanceUID)
-                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

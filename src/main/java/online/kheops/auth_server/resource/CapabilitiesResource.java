@@ -8,8 +8,6 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.Consts;
-import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -100,7 +98,7 @@ public class CapabilitiesResource {
         final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
 
         try {
-            capabilityResponse = generateCapability(capabilityParameters, kheopsPrincipal.getKheopsLogBuilder());
+            capabilityResponse = generateCapability(capabilityParameters);
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
             LOG.log(Level.WARNING, "Bad Request", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -127,7 +125,7 @@ public class CapabilitiesResource {
         final CapabilitiesResponse capabilityResponse;
 
         try {
-            capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId, kheopsPrincipal.getKheopsLogBuilder());
+            capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId);
         } catch (CapabilityNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
@@ -150,20 +148,14 @@ public class CapabilitiesResource {
                                     @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
         final PairListXTotalCount<CapabilitiesResponse> pair;
-        final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
-        final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
         if(albumId != null) {
             pair = Capabilities.getCapabilities(albumId, valid, limit, offset);
-            kheopsLogBuilder.album(albumId)
-            .scope("album");
         } else {
+            final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
             pair = Capabilities.getCapabilities(kheopsPrincipal.getUser(), valid, limit, offset);
-            kheopsLogBuilder.scope("user");
         }
 
-        kheopsLogBuilder.action(ActionType.GET_CAPABILITIES)
-                .log();
         GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(pair.getAttributesList()) {};
         return Response.status(OK).entity(genericCapabilityResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
@@ -195,18 +187,14 @@ public class CapabilitiesResource {
     public Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
 
         final CapabilitiesResponse capabilityResponses;
-        final KheopsPrincipalInterface kheopsPrincipal = (KheopsPrincipalInterface)securityContext.getUserPrincipal();
-
+        final long callingUserPk = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getDBID();
 
         try {
-            capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getDBID());
+            capabilityResponses = Capabilities.getCapability(capabilityTokenID, callingUserPk);
         } catch (CapabilityNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        kheopsPrincipal.getKheopsLogBuilder().action(ActionType.GET_CAPABILITY)
-                .capabilityID(capabilityTokenID)
-                .log();
         return Response.status(OK).entity(capabilityResponses).build();
     }
 }

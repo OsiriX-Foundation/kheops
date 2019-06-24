@@ -7,8 +7,6 @@ import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.VR;
 
@@ -67,7 +65,7 @@ public class Series {
     }
 
 
-    public static void editFavorites(User callingUser, String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, boolean favorite, KheopsLogBuilder kheopsLogBuilder)
+    public static void editFavorites(User callingUser, String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, boolean favorite)
             throws AlbumNotFoundException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -79,10 +77,8 @@ public class Series {
             final Album album;
             if (fromAlbumId == null) {
                 album = callingUser.getInbox();
-                kheopsLogBuilder.album("inbox");
             } else {
                 album = getAlbum(fromAlbumId, em);
-                kheopsLogBuilder.album(fromAlbumId);
             }
             final online.kheops.auth_server.entity.Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             editSeriesFavorites(series, album, favorite, em);
@@ -93,19 +89,10 @@ public class Series {
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
             }
-            final Mutation favSeriesMutation = Events.albumPostSeriesMutation(callingUser, album, mutation, series);
-            em.persist(favSeriesMutation);
-            album.updateLastEventTime();
-            tx.commit();
+            final Mutation newAlbumMutation = Events.albumPostSeriesMutation(callingUser, album, mutation, series);
+            em.persist(newAlbumMutation);
 
-            if(favorite) {
-                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_SERIES);
-            } else {
-                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_SERIES);
-            }
-            kheopsLogBuilder.series(seriesInstanceUID)
-                    .study(studyInstanceUID)
-                    .log();
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

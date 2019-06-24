@@ -12,7 +12,6 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
-import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -67,30 +66,21 @@ public class EventResource {
             return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
         }
 
-        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
-
         try {
             if (types.contains("comments") && types.contains("mutations")) {
                 pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments_mutations");
             } else if (types.contains("comments")) {
                 pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments");
             } else if (types.contains("mutations")) {
                 pair = Events.getMutationsAlbum(albumId, offset, limit);
-                kheopsLogBuilder.scope("mutations");
             } else {
                 pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments_mutations");
             }
         } catch (AlbumNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
-        kheopsLogBuilder.album(albumId)
-                .action(KheopsLogBuilder.ActionType.LIST_EVENTS)
-                .log();
         return Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
@@ -124,9 +114,6 @@ public class EventResource {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder().album(albumId)
-                .action(KheopsLogBuilder.ActionType.POST_COMMENT)
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -158,9 +145,6 @@ public class EventResource {
 
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
-        kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)
-                .action(KheopsLogBuilder.ActionType.LIST_EVENTS)
-                .log();
         return Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
@@ -195,9 +179,6 @@ public class EventResource {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)
-                .action(KheopsLogBuilder.ActionType.POST_COMMENT)
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 }
