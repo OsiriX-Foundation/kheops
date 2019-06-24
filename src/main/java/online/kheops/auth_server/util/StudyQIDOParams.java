@@ -41,6 +41,7 @@ public final class StudyQIDOParams {
     private final Optional<String> patientNameFilter;
     private final Optional<String> patientIDFilter;
     private final Optional<String> studyIDFilter;
+    private final Optional<String> studyDescriptionFilter;
     private final Optional<Boolean> favoriteFilter;
     private List<String> studyInstanceUIDFilter;
 
@@ -113,6 +114,7 @@ public final class StudyQIDOParams {
         patientNameFilter = getFilter(Tag.PatientName, queryParameters);
         patientIDFilter = getFilter(Tag.PatientID, queryParameters);
         studyIDFilter = getFilter(Tag.StudyID, queryParameters);
+        studyDescriptionFilter = getFilter(Tag.StudyDescription, queryParameters);
 
         String studyInstanceUIDFilterTmp = getFilter(Tag.StudyInstanceUID, queryParameters).orElse(null);
         List<String> studyInstanceUIDFilterTmpLst = kheopsPrincipal.getStudyList().orElse(new ArrayList<>());
@@ -216,6 +218,8 @@ public final class StudyQIDOParams {
     public Optional<String> getStudyIDFilter() {
         return studyIDFilter;
     }
+
+    public Optional<String> getStudyDescriptionFilter() { return studyDescriptionFilter; }
 
     public Optional<Boolean> getFavoriteFilter() { return favoriteFilter; }
 

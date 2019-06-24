@@ -133,27 +133,27 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         echo "Start init filebeat"
         missing_env_var_secret=false
 
-        if [[ -z $KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE ]]; then
-          echo "Missing $KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE environment variable"
+        if [ -z "$KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE" ]; then
+          echo "Missing KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE environment variable"
           missing_env_var_secret=true
         else
-           echo -e "environment variable $KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE \e[92mOK\e[0m"
+           echo "environment variable KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE \e[92mOK\e[0m"
            sed -i "s|\${instance}|$KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE|" /etc/filebeat/filebeat.yml
         fi
 
-        if [[ -z $KHEOPS_AUTHORIZATION_LOGSTASH_URL ]]; then
-          echo "Missing $KHEOPS_AUTHORIZATION_LOGSTASH_URL environment variable"
+        if [ -z "$KHEOPS_AUTHORIZATION_LOGSTASH_URL" ]; then
+          echo "Missing KHEOPS_AUTHORIZATION_LOGSTASH_URL environment variable"
           missing_env_var_secret=true
         else
-           echo -e "environment variable $KHEOPS_AUTHORIZATION_LOGSTASH_URL \e[92mOK\e[0m"
+           echo "environment variable KHEOPS_AUTHORIZATION_LOGSTASH_URL \e[92mOK\e[0m"
            sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_LOGSTASH_URL|" /etc/filebeat/filebeat.yml
         fi
 
         #if missing env var or secret => exit
-        if [[ $missing_env_var_secret = true ]]; then
+        if [ $missing_env_var_secret = true ]; then
           exit 1
         else
-           echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
+           echo "all elastic secrets and all env var \e[92mOK\e[0m"
         fi
 
         filebeat modules disable system
