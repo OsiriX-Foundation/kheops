@@ -303,8 +303,9 @@ public class Albums {
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
                 em.persist(mutation);
                 em.remove(removedAlbumUser);
+                album.updateLastEventTime();
             }
-            album.updateLastEventTime();
+
             tx.commit();
             return removedUser;
         } finally {
