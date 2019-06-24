@@ -132,8 +132,10 @@ public class QIDOResource {
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDIES);
         if (fromAlbumId != null) {
             kheopsLogBuilder.album(fromAlbumId);
-        } else if (fromInbox) {
+        } else if (fromInbox != null && fromInbox) {
             kheopsLogBuilder.album("inbox");
+        } else {
+            kheopsLogBuilder.album("inbox/all_albums");
         }
         kheopsLogBuilder.log();
         return response.build();
