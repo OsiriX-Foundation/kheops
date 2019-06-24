@@ -1,4 +1,4 @@
-FROM node:9.11.1-alpine as build-stage
+FROM node:10-alpine as build-stage
 RUN apk update && apk add yarn python g++ make && rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY package*.json ./
