@@ -59,7 +59,7 @@ final class SuperuserAccessToken implements AccessToken {
     }
 
     @Override
-    public String getSub() {
+    public String getSubject() {
         return sub;
     }
 

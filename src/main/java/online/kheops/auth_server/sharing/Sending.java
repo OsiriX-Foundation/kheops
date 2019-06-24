@@ -10,6 +10,8 @@ import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -34,7 +36,7 @@ public class Sending {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void deleteStudyFromInbox(User callingUser, String studyInstanceUID)
+    public static void deleteStudyFromInbox(User callingUser, String studyInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -53,9 +55,14 @@ public class Sending {
 
             for (final Series series: seriesList) {
                 callingUser.getInbox().removeSeries(series, em);
+                kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
 
             tx.commit();
+            kheopsLogBuilder.action(ActionType.REMOVE_STUDY)
+                    .album("inbox")
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -64,7 +71,7 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID)
+    public static void deleteSeriesFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -78,6 +85,11 @@ public class Sending {
             callingUser.getInbox().removeSeries(series, em);
 
             tx.commit();
+            kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
+                    .album("inbox")
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -86,7 +98,7 @@ public class Sending {
         }
     }
 
-    public static void deleteStudyFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID)
+    public static void deleteStudyFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -106,6 +118,7 @@ public class Sending {
 
             for (Series series: availableSeries) {
                 callingAlbum.removeSeries(series, em);
+                kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
 
             final Study study = availableSeries.get(0).getStudy();
@@ -116,9 +129,14 @@ public class Sending {
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
             }
+            callingAlbum.updateLastEventTime();
             em.persist(mutation);
 
             tx.commit();
+            kheopsLogBuilder.action(ActionType.REMOVE_STUDY)
+                    .album(albumId)
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -127,7 +145,7 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID)
+    public static void deleteSeriesFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -151,8 +169,13 @@ public class Sending {
             }
 
             em.persist(mutation);
-
+            callingAlbum.updateLastEventTime();
             tx.commit();
+            kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
+                    .album(albumId)
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -161,7 +184,7 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID)
+    public static void putSeriesInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, ClientIdNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -190,6 +213,11 @@ public class Sending {
             }
 
             if (targetAlbum.containsSeries(availableSeries, em)) {
+                kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
+                        .album(albumId)
+                        .study(studyInstanceUID)
+                        .series(seriesInstanceUID)
+                        .log();
                 return;
             }
 
@@ -210,7 +238,13 @@ public class Sending {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             }
             em.persist(mutation);
+            targetAlbum.updateLastEventTime();
             tx.commit();
+            kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
+                    .album(albumId)
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -219,7 +253,7 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+    public static void putStudyInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -241,6 +275,7 @@ public class Sending {
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
                 }
+                kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
 
             if (allSeriesAlreadyExist) {
@@ -254,9 +289,18 @@ public class Sending {
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
             }
-                em.persist(mutation);
-
+            em.persist(mutation);
+            targetAlbum.updateLastEventTime();
             tx.commit();
+            if(fromAlbumId != null) {
+                kheopsLogBuilder.fromAlbum(fromAlbumId);
+            } else {
+                kheopsLogBuilder.fromAlbum("inbox");
+            }
+            kheopsLogBuilder.album(albumId)
+                    .action(ActionType.SHARE_STUDY_WITH_ALBUM)
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -265,7 +309,7 @@ public class Sending {
         }
     }
 
-    public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+    public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
             throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException, BadRequestException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -278,7 +322,7 @@ public class Sending {
 
             if (callingUser == targetUser) {
                 if(fromAlbumId != null) {
-                    appropriateStudy(callingUser, studyInstanceUID, fromAlbumId);
+                    appropriateStudy(callingUser, studyInstanceUID, fromAlbumId, kheopsLogBuilder);
                     return;
                 }
                 throw new BadRequestException("CallingUser ant targetUser are the same : it's for appropriate a study. But queryParam 'album' is null");
@@ -294,18 +338,29 @@ public class Sending {
                     inbox.addSeries(albumSeries);
                     em.persist(albumSeries);
                 }
+                kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
 
             tx.commit();
+            if(fromAlbumId != null) {
+                kheopsLogBuilder.fromAlbum(fromAlbumId);
+            } else {
+                kheopsLogBuilder.fromAlbum("inbox");
+            }
+            kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
+                    .action(ActionType.SHARE_STUDY_WITH_USER)
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
+
     }
 
-    public static void shareSeriesWithUser(User callingUser, String targetUsername, String studyInstanceUID, String seriesInstanceUID)
+    public static void shareSeriesWithUser(User callingUser, String targetUsername, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws UserNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -317,14 +372,21 @@ public class Sending {
             final User targetUser = em.merge(getOrCreateUser(targetUsername));
             callingUser = em.merge(callingUser);
 
+            kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
+                    .action(ActionType.SHARE_SERIES_WITH_USER)
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID);
+
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID);
+                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, kheopsLogBuilder);
             }
 
             final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             final Album inbox = targetUser.getInbox();
             if(inbox.containsSeries(series, em)) {
                 //target user has already access to the series
+
+                kheopsLogBuilder.log();
                 return;
             }
 
@@ -334,6 +396,7 @@ public class Sending {
             em.persist(albumSeries);
 
             tx.commit();
+            kheopsLogBuilder.log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -342,7 +405,7 @@ public class Sending {
         }
     }
 
-    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID)
+    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -352,6 +415,10 @@ public class Sending {
             tx.begin();
 
             callingUser = em.merge(callingUser);
+
+            kheopsLogBuilder.study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .action(ActionType.APPROPRIATE_SERIES);
 
             try {
                 final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
@@ -365,11 +432,11 @@ public class Sending {
                     em.persist(inboxSeries);
                     tx.commit();
 
-                    final User finalCallingUser1 = callingUser;
-                    LOG.info(() -> "Claim accepted because the series is inside an album where the calling user (" + finalCallingUser1.getKeycloakId() + ") is member, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID);
+                    kheopsLogBuilder.log();
                     return; //appropriate OK
                 } else if(isSeriesInInbox(callingUser, storedSeries, em)) {
-                        return;
+                    kheopsLogBuilder.log();
+                    return;
                 } else {
                     try {
                         final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
@@ -380,6 +447,7 @@ public class Sending {
 
                         em.persist(inboxSeries);
                         tx.commit();
+                        kheopsLogBuilder.log();
                         return;
                     } catch (SeriesNotFoundException e2) {
                         throw new SeriesNotFoundException(e2.getMessage());
@@ -402,11 +470,8 @@ public class Sending {
             em.persist(series);
             em.persist(inboxSeries);
 
-            final User finalCallingUser = callingUser;
-            LOG.info(() -> "finished claiming, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + finalCallingUser.getKeycloakId());
-
             tx.commit();
-            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + ", SeriesInstanceUID:" + seriesInstanceUID + " to " + finalCallingUser.getKeycloakId());
+            kheopsLogBuilder.log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -415,7 +480,7 @@ public class Sending {
         }
     }
 
-    public static void appropriateStudy(User callingUser, String studyInstanceUID, String albumId)
+    public static void appropriateStudy(User callingUser, String studyInstanceUID, String albumId, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -423,7 +488,6 @@ public class Sending {
 
         try {
             tx.begin();
-
 
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
@@ -436,14 +500,16 @@ public class Sending {
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
                     series.addAlbumSeries(inboxSeries);
                     inbox.addSeries(inboxSeries);
-
                     em.persist(inboxSeries);
                 }
+                kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
 
             tx.commit();
-            final User finalCallingUser = callingUser;
-            LOG.info(() -> "sending, StudyInstanceUID:" + studyInstanceUID + " to " + finalCallingUser.getKeycloakId() + "from album :" + albumId);
+            kheopsLogBuilder.action(ActionType.APPROPRIATE_STUDY)
+                    .study(studyInstanceUID)
+                    .fromAlbum(albumId)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

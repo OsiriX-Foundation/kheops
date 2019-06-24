@@ -41,11 +41,11 @@ final class ViewerAccessToken implements AccessToken {
         this.jwe = jwe;
 
         AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString("token"));
-        this.sub = accessToken.getSub();
+        this.sub = accessToken.getSubject();
     }
 
     @Override
-    public String getSub() {
+    public String getSubject() {
         return sub;
     }
 

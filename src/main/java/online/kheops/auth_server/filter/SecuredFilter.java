@@ -60,7 +60,7 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final User user;
         try {
-            user = getOrCreateUser(accessToken.getSub());
+            user = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found" + requestContext.getUriInfo().getRequestUri(), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());

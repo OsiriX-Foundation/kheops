@@ -1,5 +1,7 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
+import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.report_provider.ReportProviders;
@@ -17,12 +19,12 @@ import static online.kheops.auth_server.util.Tools.checkValidUID;
 
 public enum TokenGrantType {
     REFRESH_TOKEN("refresh_token") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
     AUTHORIZATION_CODE("authorization_code") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             verifySingleHeader(form, "code");
             verifySingleHeader(form, "client_id");
             verifySingleHeader(form, "redirect_uri");
@@ -56,31 +58,31 @@ public enum TokenGrantType {
                     .withScope("read write")
                     .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
 
-            return Response.ok(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME)).build();
+            return new TokenGrantResult(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME), authorizationCode.getSubject());
         }
     },
     PASSWORD("password") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
     CLIENT_CREDENTIALS("client_credentials") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
     JWT_ASSERTION("urn:ietf:params:oauth:grant-type:jwt-bearer") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
     SAML_ASSERTION("urn:ietf:params:oauth:grant-type:saml2-bearer") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
     TOKEN_EXCHANGE("urn:ietf:params:oauth:grant-type:token-exchange") {
-        public Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
+        public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             verifySingleHeader(form, "scope");
             verifySingleHeader(form, "subject_token");
             verifySingleHeader(form, "subject_token_type");
@@ -98,6 +100,13 @@ public enum TokenGrantType {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown subject token type");
             }
 
+            final String subject;
+            try {
+                subject = AccessTokenVerifier.authenticateAccessToken(servletContext, subjectToken).getSubject();
+            } catch (AccessTokenVerificationException e) {
+                throw new TokenRequestException(INVALID_REQUEST, "Bad subject_token");
+            }
+
             if (scope.equals("pep")) {
                 verifySingleHeader(form, "seriesUID");
                 final String seriesInstanceUID = form.getFirst("seriesUID");
@@ -109,12 +118,13 @@ public enum TokenGrantType {
                     throw new TokenRequestException(UNAUTHORIZED_CLIENT);
                 }
 
-                String pepToken = PepAccessTokenGenerator.createGenerator(servletContext)
+                final String pepToken = PepAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSeriesInstanceUID(seriesInstanceUID)
                         .generate(PEP_TOKEN_LIFETIME);
-                return Response.ok(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME)).build();
+
+                return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject);
             } else if (scope.equals("viewer")) {
                 verifySingleHeader(form, "source_type");
                 final String sourceType = form.getFirst("source_type");
@@ -130,13 +140,14 @@ public enum TokenGrantType {
                     sourceId = null;
                 }
 
-                String viewerToken = ViewerAccessTokenGenerator.createGenerator(servletContext)
+                final String viewerToken = ViewerAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSourceType(sourceType)
                         .withSourceId(sourceId)
                         .generate(VIEWER_TOKEN_LIFETIME);
-                return Response.ok(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME)).build();
+
+                return new TokenGrantResult(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME), subject);
             } else {
                 throw new TokenRequestException(INVALID_SCOPE);
             }
@@ -158,7 +169,7 @@ public enum TokenGrantType {
         return grantType;
     }
 
-    public static TokenGrantType fromString(String grantTypeString) {
+    public static TokenGrantType from(String grantTypeString) {
         for (TokenGrantType grantType: TokenGrantType.values()) {
             if (grantType.toString().equals(grantTypeString)) {
                 return grantType;
@@ -168,7 +179,7 @@ public enum TokenGrantType {
         throw new IllegalArgumentException("Unknown grant type");
     }
 
-    public abstract Response processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form);
+    public abstract TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form);
 
     private static void verifySingleHeader(final MultivaluedMap<String, String> form, final String param) throws TokenRequestException {
         final List<String> params = form.get(param);

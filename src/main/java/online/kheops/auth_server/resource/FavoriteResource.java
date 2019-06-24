@@ -8,6 +8,7 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -68,10 +69,11 @@ public class FavoriteResource {
         }
 
         try {
-            Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite);
+            Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | StudyNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
+
         return Response.status(NO_CONTENT).build();
     }
 
@@ -123,7 +125,7 @@ public class FavoriteResource {
         }
 
         try {
-            Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite);
+            Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }

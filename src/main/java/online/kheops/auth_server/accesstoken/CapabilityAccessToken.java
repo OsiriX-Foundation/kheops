@@ -61,7 +61,7 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public String getSub() {
+    public String getSubject() {
         return sub;
     }
 

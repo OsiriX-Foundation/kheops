@@ -12,6 +12,8 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.SeriesQIDOSortParams;
 import online.kheops.auth_server.util.StudyQIDOParams;
@@ -127,6 +129,13 @@ public class QIDOResource {
         cacheControl.setNoCache(true);
         response.cacheControl(cacheControl);
 
+        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDIES);
+        if (fromAlbumId != null) {
+            kheopsLogBuilder.album(fromAlbumId);
+        } else if (fromInbox) {
+            kheopsLogBuilder.album("inbox");
+        }
+        kheopsLogBuilder.log();
         return response.build();
     }
 
@@ -177,6 +186,9 @@ public class QIDOResource {
         }
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+
+        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY)
+                .study(studyInstanceUID);
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
@@ -272,6 +284,7 @@ public class QIDOResource {
                                 series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
                             }
                             availableSeries.add(series);
+                            kheopsLogBuilder.series(seriesInstanceUID);
                         }
                     }
                 } else {
@@ -293,6 +306,12 @@ public class QIDOResource {
             responseBuilder.header("Warning", "299 {+service}: There are " + remaining + " additional results that can be requested");
         }
 
+        if (fromAlbumId != null) {
+            kheopsLogBuilder.album(fromAlbumId);
+        } else if (fromInbox) {
+            kheopsLogBuilder.album("inbox");
+        }
+        kheopsLogBuilder.log();
         return responseBuilder.build();
     }
 
@@ -313,6 +332,9 @@ public class QIDOResource {
         fromInbox = fromInbox != null;
 
         final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+
+        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY_METADATA)
+                .study(studyInstanceUID);
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
@@ -378,9 +400,9 @@ public class QIDOResource {
                 jsonReader.readDatasets((fmi, dataset) -> {
                     if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
                         jsonWriter.write(dataset);
+                        kheopsLogBuilder.series(dataset.getString(Tag.SeriesInstanceUID));
                     }
                 });
-
                 generator.writeEnd();
                 generator.flush();
             } catch (Exception e) {
@@ -391,6 +413,12 @@ public class QIDOResource {
             }
         };
 
+        if (fromAlbumId != null) {
+            kheopsLogBuilder.album(fromAlbumId);
+        } else if (fromInbox) {
+            kheopsLogBuilder.album("inbox");
+        }
+        kheopsLogBuilder.log();
         return Response.ok(stream).build();
     }
 

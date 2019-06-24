@@ -8,6 +8,7 @@ import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import java.time.format.DateTimeParseException;
 
@@ -17,9 +18,9 @@ import static online.kheops.auth_server.capability.Capabilities.createUserCapabi
 public enum ScopeType {
     USER {
         @Override
-        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
+        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
                 throws CapabilityBadRequestException {
-            return createUserCapability(capabilityParameters);
+            return createUserCapability(capabilityParameters, kheopsLogBuilder);
         }
 
         @Override
@@ -40,9 +41,9 @@ public enum ScopeType {
     },
     ALBUM {
         @Override
-        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
+        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
                 throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
-            return createAlbumCapability(capabilityParameters);
+            return createAlbumCapability(capabilityParameters, kheopsLogBuilder);
         }
 
         @Override
@@ -76,7 +77,7 @@ public enum ScopeType {
         }
     };
 
-    public abstract CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters)
+    public abstract CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
             throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException;
 
     /**

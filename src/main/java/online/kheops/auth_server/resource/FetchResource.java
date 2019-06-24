@@ -3,6 +3,9 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.fetch.Fetcher;
+import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,15 +20,20 @@ import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 
 @Path("/")
 public class FetchResource {
-    private static final Logger LOG = Logger.getLogger(FetchResource.class.getName());
+
+    @Context
+    private SecurityContext securityContext;
 
     @POST
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @Context SecurityContext securityContext) {
-        LOG.log(Level.WARNING,() ->  "Fetch resource called for StudyUID:" + studyInstanceUID);
         Fetcher.fetchStudy(studyInstanceUID);
+        ((KheopsPrincipalInterface) securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                .study(studyInstanceUID)
+                .action(ActionType.FETCH)
+                .log();
         return Response.ok().build();
     }
 }

@@ -13,7 +13,7 @@ import static online.kheops.auth_server.token.TokenRequestException.Error.INVALI
 public enum TokenClientAuthenticationType {
 
     CLIENT_SECRET_BASIC("client_secret_basic") {
-        public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
             final String encodedAuthorization = headers.getFirst(AUTHORIZATION).substring(6);
 
             final String decoded;
@@ -35,7 +35,7 @@ public enum TokenClientAuthenticationType {
     },
 
     PRIVATE_KEY_JWT("private_key_jwt") {
-        public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
             MultivaluedMap<String, String> formParams = form.asMap();
 
             verifySingleHeader(formParams, CLIENT_ASSERTION);
@@ -49,12 +49,13 @@ public enum TokenClientAuthenticationType {
             return PrivateKeyJWTAuthenticator.newAuthenticator(context)
                     .clientJWT(formParams.getFirst(CLIENT_ASSERTION))
                     .clientId(formParams.getFirst(CLIENT_ID))
+                    .requestPath(requestPath)
                     .authenticate();
         }
     },
 
     PUBLIC("public") {
-        public TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
             return PUBLIC_PRINCIPAL;
         }
     };
@@ -142,5 +143,5 @@ public enum TokenClientAuthenticationType {
         }
     }
 
-    public abstract TokenPrincipal authenticate(ServletContext context, MultivaluedMap<String, String> headers, Form form);
+    public abstract TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form);
 }
