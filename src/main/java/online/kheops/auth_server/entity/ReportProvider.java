@@ -24,7 +24,7 @@ public class ReportProvider {
     private LocalDateTime creationTime;
 
     @Basic(optional = false)
-    @Column(name = "client_id")
+    @Column(name = "client_id", updatable = false)
     private String clientId;
 
     @Basic(optional = false)
@@ -84,8 +84,6 @@ public class ReportProvider {
     public Album getAlbum() { return album; }
 
     public void addMutation(Mutation mutation) { mutations.add(mutation); }
-
-    public void setClientId(String clientId) { this.clientId = clientId; }
 
     public void setUrl(String url) { this.url = url; }
 

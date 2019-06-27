@@ -348,8 +348,7 @@ public class ReportProviderResource {
     public Response editReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                         @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId,
                                         @FormParam("url") final String url,
-                                        @FormParam("name") final String name,
-                                        @FormParam("new_client_id") final boolean newClientId) {
+                                        @FormParam("name") final String name) {
 
 
         if(!(url == null || url.isEmpty() )) {
@@ -363,7 +362,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse reportProvider;
         try {
-            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, newClientId, kheopsPrincipal.getKheopsLogBuilder());
+            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (AlbumNotFoundException e) {
