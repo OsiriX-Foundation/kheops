@@ -87,7 +87,7 @@
       v-if="study.flag.view === 'study'"
       class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
     >
-      <study-metadata
+      <study-metadata-data-model
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
       />
@@ -99,10 +99,11 @@
 import studyMetadata from '@/components/study/studyMetadata.vue'
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 import seriesSummaryDataModel from '@/components/inbox/seriesSummaryDataModel'
+import studyMetadataDataModel from '@/components/study/studyMetadataDataModel'
 
 export default {
 	name: 'ListItemDetails',
-	components: { seriesSummaryDataModel, commentsAndNotifications, studyMetadata },
+	components: { seriesSummaryDataModel, commentsAndNotifications, studyMetadataDataModel },
 	props: {
 		study: {
 			type: Object,
