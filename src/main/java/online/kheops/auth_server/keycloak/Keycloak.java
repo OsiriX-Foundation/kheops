@@ -24,7 +24,7 @@ public class Keycloak {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
-    private static final String usersPath = "/users";
+    private static final String USERS_PATH = "/users";
 
     private static URI usersUri;
 
@@ -70,7 +70,7 @@ public class Keycloak {
     }
 
     private Keycloak() throws KeycloakException{
-        usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(usersPath).build();
+        usersUri = UriBuilder.fromUri(KeycloakContextListener.getKeycloakAdminURI()).path(USERS_PATH).build();
         token = KeycloakToken.getInstance();
         cacheUserName = CacheUserName.getInstance();
     }

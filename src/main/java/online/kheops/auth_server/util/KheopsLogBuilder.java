@@ -19,77 +19,77 @@ public class KheopsLogBuilder {
         NEW_REPORT_PROVIDER, NEW_REPORT, REPORT_PROVIDER_CONFIGURATION, LIST_REPORT_PROVIDERS, GET_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, REPORT_PROVIDER_METADATA,
         NEW_TOKEN, INTROSPECT_TOKEN}
 
-    private ArrayList<LogEntry> log;
+    private ArrayList<LogEntry> logEntry;
     private static final Logger LOG = Logger.getLogger(KheopsLogBuilder.class.getName());
 
 
     public KheopsLogBuilder() {
-        log = new ArrayList<>();
+        logEntry = new ArrayList<>();
     }
 
     public KheopsLogBuilder tokenType(AccessToken.TokenType tokenType) {
-        log.add(new LogEntry("tokenType", tokenType.name()));
+        logEntry.add(new LogEntry("tokenType", tokenType.name()));
         return this;
     }
 
     public KheopsLogBuilder scope(String scope) {
-        log.add(new LogEntry("scope", scope));
+        logEntry.add(new LogEntry("scope", scope));
         return this;
     }
 
     public KheopsLogBuilder clientID(String clientID) {
-        log.add(new LogEntry("clientID", clientID));
+        logEntry.add(new LogEntry("clientID", clientID));
         return this;
     }
 
     public KheopsLogBuilder capabilityID(String capabilityID) {
-        log.add(new LogEntry("capabilityID", capabilityID));
+        logEntry.add(new LogEntry("capabilityID", capabilityID));
         return this;
     }
 
     public KheopsLogBuilder user(String userId) {
-        log.add(new LogEntry("user", userId));
+        logEntry.add(new LogEntry("user", userId));
         return this;
     }
     public KheopsLogBuilder targetUser(String userId) {
-        log.add(new LogEntry("target_user", userId));
+        logEntry.add(new LogEntry("target_user", userId));
         return this;
     }
     public KheopsLogBuilder album(String albumId) {
-        log.add(new LogEntry("album", albumId));
+        logEntry.add(new LogEntry("album", albumId));
         return this;
     }
     public KheopsLogBuilder fromAlbum(String albumId) {
-        log.add(new LogEntry("fromAlbum", albumId));
+        logEntry.add(new LogEntry("fromAlbum", albumId));
         return this;
     }
     public KheopsLogBuilder action(ActionType action) {
-        log.add(new LogEntry("action", action.name()));
+        logEntry.add(new LogEntry("action", action.name()));
         return this;
     }
     public KheopsLogBuilder userPermission(UsersPermission usersPermission) {
-        usersPermission.getAddSeries().ifPresent(addSeries -> log.add(new LogEntry("addSeries", addSeries.toString())));
-        usersPermission.getAddUser().ifPresent(addUser -> log.add(new LogEntry("addUser", addUser.toString())));
-        usersPermission.getDeleteSeries().ifPresent(deleteSeries -> log.add(new LogEntry("deleteSeries", deleteSeries.toString())));
-        usersPermission.getDownloadSeries().ifPresent(downloarSeries -> log.add(new LogEntry("downloadSeries", downloarSeries.toString())));
-        usersPermission.getSendSeries().ifPresent(sendSeries -> log.add(new LogEntry("sendSeries", sendSeries.toString())));
-        usersPermission.getWriteComments().ifPresent(writeComments -> log.add(new LogEntry("writeComments", writeComments.toString())));
+        usersPermission.getAddSeries().ifPresent(addSeries -> logEntry.add(new LogEntry("addSeries", addSeries.toString())));
+        usersPermission.getAddUser().ifPresent(addUser -> logEntry.add(new LogEntry("addUser", addUser.toString())));
+        usersPermission.getDeleteSeries().ifPresent(deleteSeries -> logEntry.add(new LogEntry("deleteSeries", deleteSeries.toString())));
+        usersPermission.getDownloadSeries().ifPresent(downloarSeries -> logEntry.add(new LogEntry("downloadSeries", downloarSeries.toString())));
+        usersPermission.getSendSeries().ifPresent(sendSeries -> logEntry.add(new LogEntry("sendSeries", sendSeries.toString())));
+        usersPermission.getWriteComments().ifPresent(writeComments -> logEntry.add(new LogEntry("writeComments", writeComments.toString())));
         return this;
     }
 
     public KheopsLogBuilder study(String studyUID) {
-        log.add(new LogEntry("studyUID", studyUID));
+        logEntry.add(new LogEntry("studyUID", studyUID));
         return this;
     }
     public KheopsLogBuilder series(String seriesUID) {
-        log.add(new LogEntry("seriesUID", seriesUID));
+        logEntry.add(new LogEntry("seriesUID", seriesUID));
         return this;
     }
 
 
     public void log() {
         StringBuilder logString = new StringBuilder();
-        for (LogEntry pair:log) {
+        for (LogEntry pair: logEntry) {
             logString.append(pair.getKey()).append("=").append(pair.getValue()).append(" ");
         }
         LOG.log(KheopsLevel.KHEOPS, logString.toString());
