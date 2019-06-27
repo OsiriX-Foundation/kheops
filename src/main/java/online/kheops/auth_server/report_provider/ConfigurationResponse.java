@@ -36,7 +36,7 @@ public class ConfigurationResponse {
     @XmlElement(name = "response_types_supported")
     private List<String> responseTypesSupported = Arrays.asList("code", "token");
     @XmlElement(name = "response_modes_supported")
-    private List<String> responseModes_Supported = Arrays.asList("query", "fragment");
+    private List<String> responseModesSupported = Arrays.asList("query", "fragment");
 
     public ConfigurationResponse() { /*empty*/ }
 

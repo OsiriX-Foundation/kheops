@@ -8,7 +8,6 @@ import online.kheops.auth_server.report_provider.ReportProviders;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import java.util.List;

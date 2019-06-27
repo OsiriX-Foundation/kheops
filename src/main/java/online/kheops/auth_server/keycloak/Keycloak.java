@@ -18,7 +18,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Keycloak {
