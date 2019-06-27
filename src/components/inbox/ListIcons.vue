@@ -14,7 +14,7 @@
     </span>
     <span
       :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
-      @click.stop="handleComments(row)"
+      @click.stop="showComments(study, 'comments')"
     >
       <v-icon
         class="align-middle"
@@ -169,6 +169,18 @@ export default {
 		openOhif (StudyInstanceUID, token, queryparams, ohifWindow) {
 			let url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`
 			ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`
+		},
+		showComments (study, flagView) {
+			let params = {
+				StudyInstanceUID: study.StudyInstanceUID.Value[0],
+				flag: 'view',
+				value: flagView
+			}
+			this.$store.dispatch('setFlagByStudyUID', params)
+			this.$store.dispatch('setShowDetails', {
+				StudyInstanceUID: study.StudyInstanceUID.Value[0],
+				value: !study._showDetails
+			})
 		}
 	}
 }

@@ -120,6 +120,14 @@ export default {
 	watch: {
 	},
 	created () {
+		let params = {
+			StudyInstanceUID: this.study.StudyInstanceUID.Value[0],
+			queries: {
+				inbox: true,
+				includefield: ['00080021', '00080031']
+			}
+		}
+		this.$store.dispatch('getSeriesTest', params)
 	},
 	mounted () {
 	},

@@ -75,25 +75,25 @@
 
 <template>
   <div>
-		{{ studies.length }}
+    {{ studies.length }}
     <list-headers-data-model
       :studies="studies"
     />
-		<b-table
-			class="container-fluid"
-			striped
-			hover
-			:items="studies"
-			:fields="fields"
-			:sort-desc="true"
-			:no-local-sorting="true"
-			:no-sort-reset="true"
-			:tbody-class="'table-wrapper-scroll-y link'"
-			@sort-changed="sortingChanged"
-			@row-hovered="setItemHover"
-			@row-unhovered="setItemHover"
-			@row-clicked="showRowDetails"
-		>
+    <b-table
+      class="container-fluid"
+      striped
+      hover
+      :items="studies"
+      :fields="fields"
+      :sort-desc="true"
+      :no-local-sorting="true"
+      :no-sort-reset="true"
+      :tbody-class="'table-wrapper-scroll-y link'"
+      @sort-changed="sortingChanged"
+      @row-hovered="setItemHover"
+      @row-unhovered="setItemHover"
+      @row-clicked="showRowDetails"
+    >
       <template
         slot="is_selected"
         slot-scope="row"
@@ -111,9 +111,9 @@
               @click.stop="row.toggleDetails"
             />
           </b-button>
-					<b-form-checkbox
-						v-model="row.item.flag.is_selected"
-						:indeterminate="row.item.flag.is_indeterminate"
+          <b-form-checkbox
+            v-model="row.item.flag.is_selected"
+            :indeterminate="row.item.flag.is_indeterminate"
             inline
             @change="setChecked(row)"
           />

@@ -142,6 +142,12 @@ const actions = {
 			commit('SET_IMAGE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: DicomLogo })
 		})
 	},
+	setShowDetails ({ commit }, params) {
+		let index = state.studies.findIndex(study => {
+			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
+		})
+		commit('SET_STUDY_SHOW_DETAILS', { index: index, value: params.value })
+	},
 	setFlagByStudyUID ({ commit }, params) {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
@@ -272,6 +278,11 @@ const mutations = {
 				Vue.delete(state.studies[studyIdx].series, seriesIdx)
 			}
 		}
+	},
+	SET_STUDY_SHOW_DETAILS (state, params) {
+		let study = state.studies[params.index]
+		study._showDetails = params.value
+		Vue.set(state.studies, params.indexStudy, study)
 	}
 }
 

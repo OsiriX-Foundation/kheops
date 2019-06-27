@@ -145,7 +145,7 @@ export default {
 			let notAllSeriesSelected = this.studies.filter(study => { return (study.flag.is_indeterminate === true) })
 			notAllSeriesSelected.forEach(study => {
 				if (study.series !== undefined) {
-					let serieNeed = study.series.filter(serie => {return serie.flag.is_selected === true})
+					let serieNeed = study.series.filter(serie => { return serie.flag.is_selected === true })
 					if (serieNeed.length > 0) {
 						series[study.StudyInstanceUID.Value[0]] = serieNeed
 					}
@@ -242,7 +242,7 @@ export default {
 				this.$store.dispatch('deleteStudyTest', params)
 			})
 		},
-		deleteSelectedSeries() {
+		deleteSelectedSeries () {
 			for (let studyUID in this.selectedSeries) {
 				this.selectedSeries[studyUID].forEach(serie => {
 					let serieUID = serie.SeriesInstanceUID.Value[0]

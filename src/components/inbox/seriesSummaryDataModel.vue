@@ -22,7 +22,7 @@
 
 <template>
   <div class="seriesSummaryContainer">
-		{{ studies[index.study].series.length }}
+    {{ studies[index.study].series.length }}
     <div class="row justify-content-center">
       <div class="mb-2">
         <b-form-checkbox
@@ -191,7 +191,7 @@ export default {
 				})
 			}
 		},
-		allSerieSelected (study) { 
+		allSerieSelected (study) {
 			return study.series.every(serie => {
 				return serie.flag.is_selected === true
 			})
