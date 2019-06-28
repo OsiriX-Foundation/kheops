@@ -6,7 +6,7 @@
 		"infoFavorites": "Favorites",
 		"addfavorites": "Add too favorites",
 		"addfavorites": "Remove too favorites",
-    	"confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
+    "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
 		"confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
 		"series": "Series",
 		"comments": "Comments",
@@ -55,39 +55,31 @@
       </nav>
     </div>
     <div
-      v-if="study.flag.view === 'series'"
       class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
     >
-      <div class="row">
+      <div
+        v-if="study.flag.view === 'series'"
+        class="row"
+      >
         <div
-          v-for="serie in study.series"
+          v-for="serie in studyByID.series"
           :key="serie.id"
           class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
         >
           <series-summary-data-model
-            :study="study"
-            :serie="serie"
             :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
             :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
           />
         </div>
       </div>
-    </div>
 
-    <div
-      v-if="study.flag.view === 'comments'"
-      class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
-    >
       <comments-and-notifications
+        v-if="study.flag.view === 'comments'"
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
       />
-    </div>
-    <div
-      v-if="study.flag.view === 'study'"
-      class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
-    >
       <study-metadata-data-model
+        v-if="study.flag.view === 'study'"
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
       />
@@ -96,7 +88,6 @@
 </template>
 
 <script>
-import studyMetadata from '@/components/study/studyMetadata.vue'
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 import seriesSummaryDataModel from '@/components/inbox/seriesSummaryDataModel'
 import studyMetadataDataModel from '@/components/study/studyMetadataDataModel'
@@ -116,8 +107,10 @@ export default {
 		}
 	},
 	computed: {
+		studyByID () {
+			return this.$store.getters.getStudyByUID(this.study.StudyInstanceUID.Value[0])
+		}
 	},
-
 	watch: {
 	},
 	created () {
@@ -129,8 +122,6 @@ export default {
 			}
 		}
 		this.$store.dispatch('getSeriesTest', params)
-	},
-	mounted () {
 	},
 	methods: {
 		setViewDetails (StudyInstanceUID, flagView) {

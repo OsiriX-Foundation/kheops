@@ -5,7 +5,6 @@ import SRImage from '@/assets/SR_2.png'
 import PDFImage from '@/assets/pdf-240x240.png'
 import VideoImage from '@/assets/video.png'
 import DicomLogo from '@/assets/dicom_logo.png'
-import { stat } from 'fs'
 import Vue from 'vue'
 
 // initial state
@@ -34,6 +33,23 @@ const getters = {
 			obj[study.StudyInstanceUID.Value[0]] = study.flag
 		})
 		return obj
+	},
+	getStudyByUID: state => (uid) => {
+		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === uid })
+		if (idx > -1) {
+			return state.studies[idx]
+		}
+		return {}
+	},
+	getSerieByUID: state => (studyUID, serieUID) => {
+		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === studyUID })
+		if (idx > -1) {
+			let sidx = _.findIndex(state.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === serieUID })
+			if (sidx > -1) {
+				return state.studies[idx].series[sidx]
+			}
+		}
+		return {}
 	}
 }
 
@@ -276,6 +292,7 @@ const mutations = {
 			let seriesIdx = _.findIndex(state.studies[studyIdx].series, s => { return s.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID })
 			if (seriesIdx > -1) {
 				Vue.delete(state.studies[studyIdx].series, seriesIdx)
+				Vue.set(state.studies, studyIdx, state.studies[studyIdx])
 			}
 		}
 	},

@@ -22,16 +22,15 @@
 
 <template>
   <div class="seriesSummaryContainer">
-    {{ studies[index.study].series.length }}
     <div class="row justify-content-center">
       <div class="mb-2">
         <b-form-checkbox
           v-model="isSelected"
         >
           <span
-            v-if="studies[index.study].series[index.serie].SeriesDescription"
+            v-if="serie.SeriesDescription"
           >
-            {{ studies[index.study].series[index.serie].SeriesDescription.Value[0] }}
+            {{ serie.SeriesDescription.Value[0] }}
           </span>
           <span
             v-else
@@ -45,39 +44,39 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <img
-          :class="!studies[index.study].series[index.serie].Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
-          :src="studies[index.study].series[index.serie].imgSrc"
+          :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
+          :src="serie.imgSrc"
           width="250"
           height="250"
-          @click="openTab(studies[index.study].series[index.serie])"
+          @click="openTab(serie)"
         >
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
         <table class="table table-striped">
           <tbody>
-            <tr v-if="studies[index.study].series[index.serie].Modality">
+            <tr v-if="serie.Modality">
               <th>{{ $t('modality') }}</th>
-              <td>{{ studies[index.study].series[index.serie].Modality.Value[0] }}</td>
+              <td>{{ serie.Modality.Value[0] }}</td>
             </tr>
-            <tr v-if="studies[index.study].series[index.serie].RetrieveAETitle">
+            <tr v-if="serie.RetrieveAETitle">
               <th>{{ $t('applicationentity') }}</th>
-              <td>{{ studies[index.study].series[index.serie].RetrieveAETitle.Value[0] }}</td>
+              <td>{{ serie.RetrieveAETitle.Value[0] }}</td>
             </tr>
-            <tr v-if="studies[index.study].series[index.serie].NumberOfSeriesRelatedInstances">
+            <tr v-if="serie.NumberOfSeriesRelatedInstances">
               <th>{{ $t('numberimages') }}</th>
-              <td>{{ studies[index.study].series[index.serie].NumberOfSeriesRelatedInstances.Value[0] }}</td>
+              <td>{{ serie.NumberOfSeriesRelatedInstances.Value[0] }}</td>
             </tr>
-            <tr v-if="studies[index.study].series[index.serie].SeriesDescription">
+            <tr v-if="serie.SeriesDescription">
               <th>{{ $t('description') }}</th>
-              <td>{{ studies[index.study].series[index.serie].SeriesDescription.Value[0] }}</td>
+              <td>{{ serie.SeriesDescription.Value[0] }}</td>
             </tr>
-            <tr v-if="studies[index.study].series[index.serie].SeriesDate">
+            <tr v-if="serie.SeriesDate">
               <th>{{ $t('seriesdate') }}</th>
-              <td>{{ studies[index.study].series[index.serie].SeriesDate.Value[0]|formatDate }}</td>
+              <td>{{ serie.SeriesDate.Value[0]|formatDate }}</td>
             </tr>
-            <tr v-if="studies[index.study].series[index.serie].SeriesTime">
+            <tr v-if="serie.SeriesTime">
               <th>{{ $t('seriestime') }}</th>
-              <td>{{ studies[index.study].series[index.serie].SeriesTime.Value[0] }}</td>
+              <td>{{ serie.SeriesTime.Value[0] }}</td>
             </tr>
           </tbody>
         </table>
@@ -114,19 +113,24 @@ export default {
 		...mapGetters({
 			studies: 'studiesTest'
 		}),
+		serie () {
+			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)
+		},
 		index () {
 			let idx = _.findIndex(this.studies, s => { return s.StudyInstanceUID.Value[0] === this.studyInstanceUID })
 			if (idx > -1) {
 				let sidx = _.findIndex(this.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === this.seriesInstanceUID })
-				return {
-					study: idx,
-					serie: sidx
+				if (sidx > -1) {
+					return {
+						study: idx,
+						serie: sidx
+					}
 				}
 			}
 			return {}
 		},
 		selected () {
-			return this.studies[this.index.study].series[this.index.serie].flag.is_selected
+			return this.serie.flag.is_selected
 		},
 		source () {
 			return this.$route.params.album_id ? this.$route.params.album_id : 'inbox'

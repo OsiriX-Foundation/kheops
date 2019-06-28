@@ -260,16 +260,7 @@ export default {
 		},
 		showSeries (row) {
 			if (!row.item.detailsShowing) {
-				let params = {
-					StudyInstanceUID: row.item.StudyInstanceUID.Value[0],
-					queries: {
-						inbox: true,
-						includefield: ['00080021', '00080031']
-					}
-				}
-				this.$store.dispatch('getSeriesTest', params).then(res => {
-					this.toggleDetails(row)
-				})
+				this.toggleDetails(row)
 			}
 		},
 		setViewDetails (StudyInstanceUID, flagView) {
@@ -318,17 +309,8 @@ export default {
 		},
 		showRowDetails (item, index, event) {
 			if (!item._showDetails) {
-				let params = {
-					StudyInstanceUID: item.StudyInstanceUID.Value[0],
-					queries: {
-						inbox: true,
-						includefield: ['00080021', '00080031']
-					}
-				}
-				this.$store.dispatch('getSeriesTest', params).then(res => {
-					this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view)
-					item._showDetails = true
-				})
+				this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view)
+				item._showDetails = true
 			} else {
 				item._showDetails = false
 			}
