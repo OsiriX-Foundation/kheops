@@ -126,7 +126,6 @@ export default {
 	},
 	methods: {
 		sendToUser (userSub) {
-			console.log(this.studies)
 			let studies = _.filter(this.studies, s => { return s.is_selected })
 			let studyIds = []; let seriesIds = []
 			_.forEach(studies, s => {

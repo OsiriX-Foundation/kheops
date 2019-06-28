@@ -125,7 +125,7 @@ export default {
 			})
 			if (studyIdx > -1) {
 				return this.studies[studyIdx]
-            }
+			}
 			return {}
 		}
 	},
