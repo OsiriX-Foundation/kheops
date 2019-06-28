@@ -75,7 +75,6 @@
 
 <template>
   <div>
-    {{ studies.length }}
     <list-headers-data-model
       :studies="studies"
     />
@@ -135,7 +134,7 @@
       >
         <b-card>
           <list-item-details
-            :study="row.item"
+            :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
           />
         </b-card>
       </template>

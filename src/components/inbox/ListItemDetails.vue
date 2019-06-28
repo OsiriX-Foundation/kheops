@@ -62,7 +62,7 @@
         class="row"
       >
         <div
-          v-for="serie in studyByID.series"
+          v-for="serie in study.series"
           :key="serie.id"
           class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
         >
@@ -96,10 +96,10 @@ export default {
 	name: 'ListItemDetails',
 	components: { seriesSummaryDataModel, commentsAndNotifications, studyMetadataDataModel },
 	props: {
-		study: {
-			type: Object,
+		studyUID: {
+			type: String,
 			required: true,
-			default: () => ({})
+			default: ''
 		}
 	},
 	data () {
@@ -107,15 +107,15 @@ export default {
 		}
 	},
 	computed: {
-		studyByID () {
-			return this.$store.getters.getStudyByUID(this.study.StudyInstanceUID.Value[0])
+		study () {
+			return this.$store.getters.getStudyByUID(this.studyUID)
 		}
 	},
 	watch: {
 	},
 	created () {
 		let params = {
-			StudyInstanceUID: this.study.StudyInstanceUID.Value[0],
+			StudyInstanceUID: this.studyUID,
 			queries: {
 				inbox: true,
 				includefield: ['00080021', '00080031']
