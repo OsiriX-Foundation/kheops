@@ -349,8 +349,12 @@ export default {
 			album: 'album',
 			studies: 'studies',
 			albumComments: 'albumComments',
-			users: 'users'
-		}),
+      users: 'users'
+    }),
+    comments () {
+			return this.$store.getters.getCommentsByUID(this.id)
+    },
+    /*
 		comments () {
 			if (this.scope === 'album') return this.albumComments
 			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
@@ -358,7 +362,8 @@ export default {
 				return this.studies[studyIdx].comments
 			}
 			return []
-		},
+    },
+    */
 		container_id () {
 			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
 		}
@@ -374,8 +379,9 @@ export default {
 		}
 	},
 	created () {
-		this.getComments()
-		if (this.album.album_id) this.$store.dispatch('getUsers')
+		// this.getComments()
+    if (this.album.album_id) this.$store.dispatch('getUsers')
+    this.$store.dispatch('getCommentsStudy', { StudyInstanceUID: this.id })
 	},
 	methods: {
 		checkUserFromTextarea () {
@@ -396,6 +402,9 @@ export default {
 			}
 		},
 		addComment () {
+      let queries = {
+        comment: this.newComment
+      }
 			if (this.newComment.comment.length >= 1) {
 				if (this.enablePrivate) {
 					this.newComment.to_user = this.privateUser
@@ -417,6 +426,7 @@ export default {
 					})
 				} else if (this.scope === 'studies') {
 					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(() => {
+          // this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, queries: queries }).then(() => {
 						this.$snotify.success(this.$t('commentpostsuccess'))
 						this.newComment.comment = ''
 						this.newComment.to_user = ''

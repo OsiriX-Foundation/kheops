@@ -73,7 +73,7 @@
         </div>
       </div>
 
-      <comments-and-notifications
+      <comments-and-notifications-data-model
         v-if="study.flag.view === 'comments'"
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
@@ -88,13 +88,13 @@
 </template>
 
 <script>
-import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
+import commentsAndNotificationsDataModel from '@/components/comments/commentsAndNotificationsDataModel'
 import seriesSummaryDataModel from '@/components/inbox/seriesSummaryDataModel'
 import studyMetadataDataModel from '@/components/study/studyMetadataDataModel'
 
 export default {
 	name: 'ListItemDetails',
-	components: { seriesSummaryDataModel, commentsAndNotifications, studyMetadataDataModel },
+	components: { seriesSummaryDataModel, commentsAndNotificationsDataModel, studyMetadataDataModel },
 	props: {
 		studyUID: {
 			type: String,
