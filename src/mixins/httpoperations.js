@@ -10,6 +10,7 @@ export default {
 				})
 			}
 		}
-		return tabQueries
+		let stringQueries = tabQueries.length > 0 ? '?' + tabQueries.join('&') : ''
+		return stringQueries
 	}
 }

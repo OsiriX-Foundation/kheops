@@ -57,12 +57,11 @@ const getters = {
 const actions = {
 	getStudiesTest ({ commit, dispatch }, params) {
 		const request = 'studies'
-		let queries = []
-
+		let queries = ''
 		if (params.queries !== undefined) {
 			queries = httpoperations.getQueriesParameters(params.queries)
 		}
-		return HTTP.get(`${request}${queries.length > 0 ? '?' + queries.join('&') : ''}`, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
+		return HTTP.get(`${request}${queries}`, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 			if (res.data !== '') {
 				const studies = dicomoperations.translateDICOM(res.data)
 				let params = {}
@@ -83,12 +82,11 @@ const actions = {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
-		let queriesTab = []
+		let queries = ''
 		if (params.queries !== undefined) {
-			queriesTab = httpoperations.getQueriesParameters(params.queries)
+			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		const request = `/studies/${params.StudyInstanceUID}/series`
-		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
 		return HTTP.get(request + queries, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 			const series = dicomoperations.translateDICOM(res.data)
 			let indexSerie
@@ -126,11 +124,10 @@ const actions = {
 	},
 	getSerieMetadata ({ commit }, params) {
 		let request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/metadata`
-		let queriesTab = []
+		let queries = ''
 		if (params.queries !== undefined) {
-			queriesTab = httpoperations.getQueriesParameters(params.queries)
+			queries = httpoperations.getQueriesParameters(params.queries)
 		}
-		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
 		return HTTP.get(request + queries).then(res => {
 			return res
 		}).catch(err => {
@@ -185,12 +182,11 @@ const actions = {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
 
-		let queriesTab = []
+		let queries = ''
 		if (params.queries !== undefined) {
-			queriesTab = httpoperations.getQueriesParameters(params.queries)
+			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		let request = `/studies/${params.StudyInstanceUID}/favorites`
-		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
 		if (params.value === true) {
 			return dispatch('addFavorite', { request: (request + queries) }).then(res => {
 				commit('SET_STUDY_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
@@ -214,12 +210,11 @@ const actions = {
 		})
 	},
 	deleteStudyTest ({ commit }, params) {
-		let queriesTab = []
+		let queries = ''
 		if (params.queries !== undefined) {
-			queriesTab = httpoperations.getQueriesParameters(params.queries)
+			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		const request = `/studies/${params.StudyInstanceUID}`
-		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
 		return HTTP.delete(request + queries).then(res => {
 			commit('DELETE_STUDY_TEST', { StudyInstanceUID: params.StudyInstanceUID })
 			return true
@@ -229,12 +224,11 @@ const actions = {
 		})
 	},
 	deleteSerieTest ({ commit }, params) {
-		let queriesTab = []
+		let queries = ''
 		if (params.queries !== undefined) {
-			queriesTab = httpoperations.getQueriesParameters(params.queries)
+			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}`
-		let queries = queriesTab.length > 0 ? '?' + queriesTab.join('&') : ''
 		return HTTP.delete(request + queries).then(res => {
 			commit('DELETE_SERIE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 			return true
