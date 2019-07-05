@@ -6,7 +6,7 @@ export default {
 				tabQueries.push(`${key}=${queries[key]}`)
 			} else if (typeof queries[key] !== 'function' && queries[key].constructor === Array) {
 				queries[key].forEach(value => {
-					tabQueries.push(`${key}=${value}`)
+					tabQueries.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
 				})
 			}
 		}
