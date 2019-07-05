@@ -114,6 +114,9 @@ export default {
 			studies: 'studiesTest'
 		}),
 		serie () {
+			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID).serie
+		},
+		infoSerie () {
 			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)
 		},
 		index () {
@@ -145,6 +148,8 @@ export default {
 				let params = {
 					StudyInstanceUID: this.studyInstanceUID,
 					SeriesInstanceUID: this.seriesInstanceUID,
+					studyIndex: this.infoSerie.studyIndex,
+					serieIndex: this.infoSerie.serieIndex,
 					flag: 'is_selected',
 					value: newValue
 				}
@@ -160,7 +165,7 @@ export default {
 	},
 	methods: {
 		setCheckBoxStudy (value) {
-			if (this.allSerieSelected(this.studies[this.index.study])) {
+			if (this.allSerieSelected(this.studies[this.infoSerie.studyIndex])) {
 				this.$store.dispatch('setFlagByStudyUID', {
 					StudyInstanceUID: this.studyInstanceUID,
 					flag: 'is_indeterminate',
@@ -171,7 +176,7 @@ export default {
 					flag: 'is_selected',
 					value: true
 				})
-			} else if (this.noSeriesSelected(this.studies[this.index.study])) {
+			} else if (this.noSeriesSelected(this.studies[this.infoSerie.studyIndex])) {
 				this.$store.dispatch('setFlagByStudyUID', {
 					StudyInstanceUID: this.studyInstanceUID,
 					flag: 'is_indeterminate',
@@ -201,7 +206,9 @@ export default {
 			})
 		},
 		noSeriesSelected (study) {
-			return study.series.every(serie => { return serie.flag.is_selected === false })
+			return study.series.every(serie => {
+				return serie.flag.is_selected === false
+			})
 		},
 		openTab (series) {
 			const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1'

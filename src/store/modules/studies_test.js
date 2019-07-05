@@ -46,7 +46,11 @@ const getters = {
 		if (idx > -1) {
 			let sidx = _.findIndex(state.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === serieUID })
 			if (sidx > -1) {
-				return state.studies[idx].series[sidx]
+				return {
+					serie: state.studies[idx].series[sidx],
+					studyIndex: idx,
+					serieIndex: sidx
+				}
 			}
 		}
 		return {}
@@ -168,12 +172,18 @@ const actions = {
 		commit('SET_STUDY_FLAG_TEST', { index: index, flag: params.flag, value: params.value })
 	},
 	setFlagByStudyUIDSerieUID ({ commit }, params) {
-		let indexStudy = state.studies.findIndex(study => {
-			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
-		})
-		let indexSerie = state.studies[indexStudy].series.findIndex(serie => {
-			return serie.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID
-		})
+		let indexStudy = params.studyIndex
+		if (indexStudy === undefined || state.studies[indexStudy].StudyInstanceUID.Value[0] !== params.StudyInstanceUID) {
+			indexStudy = state.studies.findIndex(study => {
+				return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
+			})
+		}
+		let indexSerie = params.serieIndex
+		if (indexSerie === undefined || state.studies[indexStudy].series[indexSerie].SeriesInstanceUID.Value[0] !== params.SeriesInstanceUID) {
+			indexSerie = state.studies[indexStudy].series.findIndex(serie => {
+				return serie.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID
+			})
+		}
 		commit('SET_SERIE_FLAG_TEST', { indexStudy: indexStudy, indexSerie: indexSerie, flag: params.flag, value: params.value })
 		return true
 	},

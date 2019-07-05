@@ -278,8 +278,12 @@ export default {
 		setChecked (row) {
 			let value = row.item.flag.is_selected
 			let StudyInstanceUID = row.item.StudyInstanceUID.Value[0]
+			let studyIndex = this.studies.findIndex(study => {
+				return study.StudyInstanceUID.Value[0] === StudyInstanceUID
+			})
 			let params = {
 				StudyInstanceUID: StudyInstanceUID,
+				studyIndex: studyIndex,
 				flag: 'is_selected',
 				value: !value
 			}
@@ -289,8 +293,9 @@ export default {
 			}
 		},
 		setSeriesCheck (series, params) {
-			series.forEach(serie => {
+			series.forEach((serie, index) => {
 				params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
+				params.serieIndex = index
 				this.$store.dispatch('setFlagByStudyUID', params)
 				this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
 			})
