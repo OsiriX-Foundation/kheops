@@ -48,7 +48,7 @@ const actions = {
 			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		console.log(queries)
-		return HTTP.post(request, 'comment='+params.queries.comment, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+		return HTTP.post(request, 'comment=' + params.queries.comment, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			if (res.status === 204) {
 				dispatch('getStudiesComments', { StudyInstanceUID: params.StudyInstanceUID })
 			} else return res
