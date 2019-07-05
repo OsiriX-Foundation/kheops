@@ -114,7 +114,7 @@ const actions = {
 						} else if (res.data[0][tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
 							serie.imgSrc = PDFImage
 						} else {
-							dispatch('getImage', {
+							dispatch('getImageTest', {
 								StudyInstanceUID: params.StudyInstanceUID,
 								SeriesInstanceUID: serie.SeriesInstanceUID.Value[0]
 							})
@@ -138,7 +138,7 @@ const actions = {
 			console.log(err)
 		})
 	},
-	getImage ({ commit }, params) {
+	getImageTest ({ commit }, params) {
 		let request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`
 		return HTTP.get(request, {
 			responseType: 'arraybuffer',
@@ -191,7 +191,6 @@ const actions = {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
-
 		let queries = ''
 		if (params.queries !== undefined) {
 			queries = httpoperations.getQueriesParameters(params.queries)
