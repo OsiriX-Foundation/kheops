@@ -28,9 +28,15 @@ public class Introspect {
         boolean active;
         @XmlElement(name = "scope")
         String scope;
+        @XmlElement(name = "sub")
+        String subject;
 
         public boolean isActive() {
             return active;
+        }
+
+        public String getSubject() {
+            return subject;
         }
 
         public boolean isValidForScope(String requestedScope) {
