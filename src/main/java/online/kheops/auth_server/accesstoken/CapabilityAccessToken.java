@@ -94,7 +94,15 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public TokenType getTokenType() { return TokenType.CAPABILITY_TOKEN; }
+    public TokenType getTokenType() {
+        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+            return TokenType.ALBUM_CAPABILITY_TOKEN;
+        } else if (capability.getScopeType().equalsIgnoreCase(ScopeType.USER.name())) {
+            return TokenType.USER_CAPABILITY_TOKEN;
+        } else {
+            throw new IllegalStateException("unknown scope type");
+        }
+    }
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {

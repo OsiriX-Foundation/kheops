@@ -132,10 +132,9 @@ public class ReportProviderResource {
             return Response.status(UNAUTHORIZED).build();
         }
 
-        //vérifier la permission de créer report_provider_code (user) pas capability token
-        if (!(assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
-                assertion.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN)) {
-
+        if (!  (assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
+                assertion.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN ||
+                assertion.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
             return Response.status(FORBIDDEN).build();
         }
 
@@ -147,7 +146,6 @@ public class ReportProviderResource {
             return Response.status(UNAUTHORIZED).entity("User not found").build();
         }
 
-        //vérifier l'acces a l'album
         final KheopsPrincipalInterface principal = assertion.newPrincipal(context, callingUser);
 
         final EntityManager em = EntityManagerListener.createEntityManager();
