@@ -100,23 +100,23 @@ public class ReportProviderResource {
     @Path("report")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response newReport(@FormParam("access_token") final String accessToken,
+    public Response newReport(@FormParam("access_token") final String tokenParam,
                               @FormParam("client_id") final String clientId,
-                              @FormParam("studyUID") List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
+                              @FormParam("studyUID") List<String> studyInstanceUIDs) {//Edit UidValidator for work with @FormParam
 
-        if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
+        if (studyInstanceUIDs == null || studyInstanceUIDs.isEmpty()) {
             return Response.status(BAD_REQUEST).entity(StudyInstanceUID + " param must be set").build();
         }
 
-        for (String uid : studyInstanceUID) {
+        for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
                 return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
             }
         }
 
-        final AccessToken assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AccessTokenVerifier.authenticateAccessToken(context, accessToken);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
@@ -126,27 +126,27 @@ public class ReportProviderResource {
         }
 
         try {
-            getOrCreateUser(assertion.getSubject());
+            getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).build();
         }
 
-        if (!  (assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
-                assertion.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN ||
-                assertion.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
+        if (!  (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
             return Response.status(FORBIDDEN).build();
         }
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(assertion.getSubject());
+            callingUser = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).entity("User not found").build();
         }
 
-        final KheopsPrincipalInterface principal = assertion.newPrincipal(context, callingUser);
+        final KheopsPrincipalInterface principal = accessToken.newPrincipal(context, callingUser);
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -174,7 +174,7 @@ public class ReportProviderResource {
             }
 
             album = getAlbum(albumId);
-            for (String uid : studyInstanceUID) {
+            for (String uid : studyInstanceUIDs) {
                 if (!canAccessStudy(album, uid)) {
                     return Response.status(NOT_FOUND).entity("Study uid: " + uid + "not found").build();
                 }
@@ -199,11 +199,11 @@ public class ReportProviderResource {
 
                 ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context)
                         .withClientId(reportProvider.getClientId())
-                        .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSubject());
+                        .withStudyInstanceUIDs(studyInstanceUIDs)
+                        .withSubject(accessToken.getSubject());
 
-                assertion.getActingParty().ifPresent(generator::withActingParty);
-                assertion.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+                accessToken.getActingParty().ifPresent(generator::withActingParty);
+                accessToken.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
 
                 final String token = generator.generate(600);
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
@@ -213,7 +213,7 @@ public class ReportProviderResource {
                         .queryParam("client_id", reportProvider.getClientId())
                         .queryParam("return_uri", getHostRoot() + "/albums/" + albumId);
 
-                for (String uid : studyInstanceUID) {
+                for (String uid : studyInstanceUIDs) {
                     reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, UTF_8.toString()));
                 }
 
@@ -225,11 +225,11 @@ public class ReportProviderResource {
                 ReportProviderAccessTokenGenerator generator = ReportProviderAccessTokenGenerator.createGenerator(context)
                         .withClientId(clientId)
                         .withScope(userHasWriteAccess ? "read write" : "read")
-                        .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSubject());
+                        .withStudyInstanceUIDs(studyInstanceUIDs)
+                        .withSubject(accessToken.getSubject());
 
-                assertion.getActingParty().ifPresent(generator::withActingParty);
-                assertion.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+                accessToken.getActingParty().ifPresent(generator::withActingParty);
+                accessToken.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
 
                 final String token = generator.generate(3600);
 
@@ -244,7 +244,7 @@ public class ReportProviderResource {
                                 "&client_id=" + clientId +
                                 "&conf_uri=" + confUri +
                                 "&return_uri=" + returnUri +
-                                studyInstanceUID.stream()
+                                studyInstanceUIDs.stream()
                                         .map(uid -> "&studyUID=" + uid)
                                         .collect(Collectors.joining()))
                         .toString();
@@ -256,9 +256,7 @@ public class ReportProviderResource {
                     .action(ActionType.NEW_REPORT)
                     .album(albumId)
                     .clientID(clientId);
-            for (String studyUID : studyInstanceUID) {
-                kheopsLogBuilder.study(studyUID);
-            }
+            studyInstanceUIDs.forEach(kheopsLogBuilder::study);
             kheopsLogBuilder.log();
 
             final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
