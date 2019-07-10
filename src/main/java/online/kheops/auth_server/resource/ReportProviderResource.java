@@ -214,7 +214,27 @@ public class ReportProviderResource {
 
                 final String reportProviderUrl = reportProviderUrlBuilder.toString();
 
-                return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
+                KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
+                        .action(ActionType.NEW_REPORT)
+                        .album(albumId)
+                        .clientID(clientId);
+                for (String studyUID:studyInstanceUID) {
+                    kheopsLogBuilder.study(studyUID);
+                }
+                kheopsLogBuilder.log();
+
+                final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">    \n" +
+                        "  <head>      \n" +
+                        "    <title>"+reportProvider.getName()+"</title>      \n" +
+                        "    <meta http-equiv=\"refresh\" content=\"0;URL='"+reportProviderUrl+"'\" />    \n" +
+                        "  </head>    \n" +
+                        "  <body> \n" +
+                        "    <p>This page has moved to <a href=\""+reportProviderUrl+"\">\n" +
+                        "      here</a>.</p> \n" +
+                        "  </body>  \n" +
+                        "</html>     ";
+
+                return Response.status(OK).entity(html).build();
             } catch (ReportProviderUriNotValidException e) {
                 return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
             } catch (UnsupportedEncodingException e) {
