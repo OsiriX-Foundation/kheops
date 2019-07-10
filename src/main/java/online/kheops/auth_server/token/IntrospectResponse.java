@@ -124,9 +124,6 @@ public class IntrospectResponse {
             if (authorizedParty != null) {
                 objectBuilder.add("azp", authorizedParty);
             }
-            if (actingParty != null) {
-                objectBuilder.add("act", actingParty);
-            }
             if (clientId != null) {
                 objectBuilder.add("client_id", clientId);
             }
@@ -144,6 +141,10 @@ public class IntrospectResponse {
             }
             if (albumId != null) {
                 objectBuilder.add("album_id", albumId);
+            }
+
+            if (actingParty != null) {
+                objectBuilder.add("act", Json.createObjectBuilder().add("sub", actingParty));
             }
 
             if (audience != null && audience.size() > 0) {
