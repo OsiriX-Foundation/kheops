@@ -99,7 +99,7 @@ public class ReportProviderResource {
     @POST
     @Path("report")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_HTML)
     public Response newReport(@FormParam("access_token") final String accessToken,
                               @FormParam("client_id") final String clientId,
                               @FormParam("studyUID") List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
@@ -255,7 +255,18 @@ public class ReportProviderResource {
                 }
                 kheopsLogBuilder.log();
 
-                return Response.status(SEE_OTHER).header("Location", reportProviderUrl).build();
+                final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">    \n" +
+                        "  <head>      \n" +
+                        "    <title>"+reportProvider.getName()+"</title>      \n" +
+                        "    <meta http-equiv=\"refresh\" content=\"0;URL='"+reportProviderUrl+"'\" />    \n" +
+                        "  </head>    \n" +
+                        "  <body> \n" +
+                        "    <p>This page has moved to <a href=\""+reportProviderUrl+"\">\n" +
+                        "      here</a>.</p> \n" +
+                        "  </body>  \n" +
+                        "</html>     ";
+
+                return Response.status(OK).entity(html).build();
             } catch (AlbumNotFoundException e) {
                 throw new IllegalStateException("Album just found, how could we not have it now", e);
             } catch (ReportProviderUriNotValidException e) {
