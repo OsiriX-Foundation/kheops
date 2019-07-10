@@ -46,11 +46,14 @@ function M.auth(claim_specs, use_post_secret)
    if jwt_obj.payload["sub"] ~= nil then
       ngx.var.lua_remote_user = jwt_obj.payload["sub"]
    end
-      if jwt_obj.payload["azt"] ~= nil then
-      ngx.var.azt = jwt_obj.payload["azt"]
+   if jwt_obj.payload["azp"] ~= nil then
+      ngx.var.azp = jwt_obj.payload["azp"]
    end
-      if jwt_obj.payload["cap_token"] ~= nil then
+   if jwt_obj.payload["cap_token"] ~= nil then
       ngx.var.cap_token = jwt_obj.payload["cap_token"]
+   end 
+   if jwt_obj.payload["act"] ~= nil then
+      ngx.var.act = jwt_obj.payload["act"]
    end
    
     -- if wado uri request
