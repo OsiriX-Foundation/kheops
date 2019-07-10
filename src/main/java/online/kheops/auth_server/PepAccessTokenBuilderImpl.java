@@ -19,6 +19,7 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     private static final String SERIES_ALL_ACCESS = "all_access";
     private static final String SUBJECT = "sub";
     private static final String ACTING_PARTY = "act";
+    private static final String AUTHORIZED_PARTY = "azp";
 
     private Map<String, String> claims;
     private Algorithm algorithm;
@@ -76,6 +77,16 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     }
 
     @Override
+    public PepAccessTokenBuilder withAuthorizedParty(String authorizedParty) {
+        if (authorizedParty == null) {
+            claims.remove(AUTHORIZED_PARTY);
+        } else {
+            claims.put(AUTHORIZED_PARTY, authorizedParty);
+        }
+        return this;
+    }
+
+    @Override
     public String build() {
         if (!claims.containsKey(STUDY_UID)) {
             throw new IllegalStateException("Missing StudyUID");
@@ -89,15 +100,10 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
 
         JWTCreator.Builder jwtBuilder = JWT.create().withIssuer("auth.kheops.online")
                 .withAudience("dicom.kheops.online")
-                .withClaim(STUDY_UID, claims.get(STUDY_UID))
-                .withClaim(SERIES_UID, claims.get(SERIES_UID))
-                .withSubject(claims.get(SUBJECT))
                 .withExpiresAt(Date.from(Instant.now().plus(expiresIn != 0 ? expiresIn : 300, ChronoUnit.SECONDS)))
                 .withNotBefore(new Date());
 
-        if (claims.get(ACTING_PARTY) != null) {
-            jwtBuilder.withClaim(ACTING_PARTY, claims.get(ACTING_PARTY));
-        }
+        claims.forEach(jwtBuilder::withClaim);
 
         return jwtBuilder.sign(algorithm);
     }

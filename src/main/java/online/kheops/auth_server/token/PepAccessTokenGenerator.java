@@ -88,6 +88,7 @@ class PepAccessTokenGenerator {
                 .withSeriesUID(seriesInstanceUID)
                 .withSubject(accessToken.getSubject());
         accessToken.getActingParty().ifPresent(tokenBuilder::withActingParty);
+        accessToken.getAuthorizedParty().ifPresent(tokenBuilder::withAuthorizedParty);
         return tokenBuilder.build();
     }
 }
