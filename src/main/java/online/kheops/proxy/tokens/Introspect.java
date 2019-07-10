@@ -36,6 +36,8 @@ public class Introspect {
         String scope;
         @XmlElement(name = "sub")
         String subject;
+        @XmlElement(name = "azp")
+        String authorizedParty;
         @XmlElement(name = "act")
         actingPartyResponse actingPartyResponse;
 
@@ -67,6 +69,10 @@ public class Introspect {
                 return Optional.of(actingPartyResponse.subject);
             }
             return Optional.empty();
+        }
+
+        public Optional<String> getAuthorizedParty() {
+            return Optional.ofNullable(authorizedParty);
         }
     }
 

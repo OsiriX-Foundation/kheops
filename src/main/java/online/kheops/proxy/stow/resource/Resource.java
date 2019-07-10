@@ -251,6 +251,7 @@ public final class Resource {
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
 
         introspectResponse.getActingParty().ifPresent(actingParty -> jwtBuilder.withClaim("act", actingParty));
+        introspectResponse.getAuthorizedParty().ifPresent(authorizedParty -> jwtBuilder.withClaim("azp", authorizedParty));
 
         return jwtBuilder.sign(algorithmHMAC);
     }
