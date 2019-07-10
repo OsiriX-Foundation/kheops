@@ -105,10 +105,10 @@ public class ReportProviderResource {
                               @FormParam("studyUID") List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
 
         if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity(StudyInstanceUID +" param must be set").build();
+            return Response.status(BAD_REQUEST).entity(StudyInstanceUID + " param must be set").build();
         }
 
-        for (String uid: studyInstanceUID) {
+        for (String uid : studyInstanceUID) {
             if (!checkValidUID(uid)) {
                 return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
             }
@@ -133,7 +133,7 @@ public class ReportProviderResource {
         }
 
         //vérifier la permission de créer report_provider_code (user) pas capability token
-        if (! (assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN  ||
+        if (!(assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
                 assertion.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN)) {
 
             return Response.status(FORBIDDEN).build();
@@ -171,7 +171,7 @@ public class ReportProviderResource {
 
         final Album album;
         try {
-            if (! (principal.hasUserAccess() && principal.hasAlbumAccess(albumId))) {
+            if (!(principal.hasUserAccess() && principal.hasAlbumAccess(albumId))) {
                 return Response.status(FORBIDDEN).build();
             }
 
@@ -193,14 +193,18 @@ public class ReportProviderResource {
         }
 
         final String kheopsConfigUrl = getHostRoot() + "/api/.well-known/report-provider-configuration";
-        if (responseType.equals("code")) {
-            final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
-                    .withClientId(reportProvider.getClientId())
-                    .withStudyInstanceUIDs(studyInstanceUID)
-                    .withSubject(assertion.getSubject())
-                    .generate(600);
 
-            try {
+        try {
+
+            final String reportProviderUrl;
+
+            if (responseType.equals("code")) {
+                final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
+                        .withClientId(reportProvider.getClientId())
+                        .withStudyInstanceUIDs(studyInstanceUID)
+                        .withSubject(assertion.getSubject())
+                        .generate(600);
+
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
                 final UriBuilder reportProviderUrlBuilder = UriBuilder.fromUri(getRedirectUri(reportProvider))
                         .queryParam("code", token)
@@ -212,36 +216,9 @@ public class ReportProviderResource {
                     reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, UTF_8.toString()));
                 }
 
-                final String reportProviderUrl = reportProviderUrlBuilder.toString();
+                reportProviderUrl = reportProviderUrlBuilder.toString();
 
-                KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
-                        .action(ActionType.NEW_REPORT)
-                        .album(albumId)
-                        .clientID(clientId);
-                for (String studyUID:studyInstanceUID) {
-                    kheopsLogBuilder.study(studyUID);
-                }
-                kheopsLogBuilder.log();
-
-                final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">    \n" +
-                        "  <head>      \n" +
-                        "    <title>"+reportProvider.getName()+"</title>      \n" +
-                        "    <meta http-equiv=\"refresh\" content=\"0;URL='"+reportProviderUrl+"'\" />    \n" +
-                        "  </head>    \n" +
-                        "  <body> \n" +
-                        "    <p>This page has moved to <a href=\""+reportProviderUrl+"\">\n" +
-                        "      here</a>.</p> \n" +
-                        "  </body>  \n" +
-                        "</html>     ";
-
-                return Response.status(OK).entity(html).build();
-            } catch (ReportProviderUriNotValidException e) {
-                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
-            } catch (UnsupportedEncodingException e) {
-                return Response.status(FORBIDDEN).entity("ERROR").build();
-            }
-        } else if (responseType.equals("token")) {
-            try {
+            } else if (responseType.equals("token")) {
                 final boolean userHasWriteAccess = principal.hasAlbumPermission(ADD_SERIES, albumId);
                 final String token = ReportProviderAccessTokenGenerator.createGenerator(context)
                         .withClientId(clientId)
@@ -253,7 +230,7 @@ public class ReportProviderResource {
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
                 final String returnUri = URLEncoder.encode(getHostRoot() + "/albums/" + albumId, UTF_8.toString());
 
-                final String reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
+                reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
                         .fragment("access_token=" + token +
                                 "&token_type=" + "bearer" +
                                 "&expires_in=3600" +
@@ -262,40 +239,40 @@ public class ReportProviderResource {
                                 "&conf_uri=" + confUri +
                                 "&return_uri=" + returnUri +
                                 studyInstanceUID.stream()
-                                        .map(uid -> "&studyUID="+uid)
+                                        .map(uid -> "&studyUID=" + uid)
                                         .collect(Collectors.joining()))
                         .toString();
 
-                KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
-                        .action(ActionType.NEW_REPORT)
-                        .album(albumId)
-                        .clientID(clientId);
-                for (String studyUID:studyInstanceUID) {
-                    kheopsLogBuilder.study(studyUID);
-                }
-                kheopsLogBuilder.log();
-
-                final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">    \n" +
-                        "  <head>      \n" +
-                        "    <title>"+reportProvider.getName()+"</title>      \n" +
-                        "    <meta http-equiv=\"refresh\" content=\"0;URL='"+reportProviderUrl+"'\" />    \n" +
-                        "  </head>    \n" +
-                        "  <body> \n" +
-                        "    <p>This page has moved to <a href=\""+reportProviderUrl+"\">\n" +
-                        "      here</a>.</p> \n" +
-                        "  </body>  \n" +
-                        "</html>     ";
-
-                return Response.status(OK).entity(html).build();
-            } catch (AlbumNotFoundException e) {
-                throw new IllegalStateException("Album just found, how could we not have it now", e);
-            } catch (ReportProviderUriNotValidException e) {
-                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
-            } catch (UnsupportedEncodingException e) {
-                return Response.status(FORBIDDEN).entity("ERROR").build();
+            } else {
+                return Response.status(BAD_REQUEST).entity("bad response type").build();
             }
-        } else {
-            return Response.status(BAD_REQUEST).entity("bad response type").build();
+            KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
+                    .action(ActionType.NEW_REPORT)
+                    .album(albumId)
+                    .clientID(clientId);
+            for (String studyUID : studyInstanceUID) {
+                kheopsLogBuilder.study(studyUID);
+            }
+            kheopsLogBuilder.log();
+
+            final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+                    "  <head>\n" +
+                    "    <title>" + reportProvider.getName() + "</title>\n" +
+                    "    <meta http-equiv=\"refresh\" content=\"0;URL='" + reportProviderUrl + "'\" />\n" +
+                    "  </head>\n" +
+                    "  <body>\n" +
+                    "    <p>This page has moved to <a href=\"" + reportProviderUrl + "\">\n" +
+                    "      here</a>.</p> \n" +
+                    "  </body>\n" +
+                    "</html>";
+
+            return Response.status(OK).entity(html).build();
+        } catch (AlbumNotFoundException e) {
+            throw new IllegalStateException("Album just found, how could we not have it now", e);
+        } catch (ReportProviderUriNotValidException e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (UnsupportedEncodingException e) {
+            return Response.status(FORBIDDEN).entity("ERROR").build();
         }
     }
 
