@@ -153,16 +153,16 @@ public class IntrospectResponse {
                 } else {
                     JsonArrayBuilder audienceBuilder = Json.createArrayBuilder();
                     audience.forEach(audienceBuilder::add);
-                    objectBuilder.add("aud", audienceBuilder.build());
+                    objectBuilder.add("aud", audienceBuilder);
                 }
             }
             if (studyUIDs != null && studyUIDs.size() > 0) {
                 if (studyUIDs.size() == 1) {
                     objectBuilder.add("studyUID", studyUIDs.get(0));
                 } else {
-                    JsonArrayBuilder audienceBuilder = Json.createArrayBuilder();
-                    studyUIDs.forEach(audienceBuilder::add);
-                    objectBuilder.add("studyUID", audienceBuilder.build());
+                    JsonArrayBuilder studiesBuilder = Json.createArrayBuilder();
+                    studyUIDs.forEach(studiesBuilder::add);
+                    objectBuilder.add("studyUID", studiesBuilder);
                 }
             }
         }
