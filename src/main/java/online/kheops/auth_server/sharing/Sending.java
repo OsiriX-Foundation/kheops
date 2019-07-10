@@ -279,9 +279,18 @@ public class Sending {
             }
 
             if (allSeriesAlreadyExist) {
+                if(fromAlbumId != null) {
+                    kheopsLogBuilder.fromAlbum(fromAlbumId);
+                } else {
+                    kheopsLogBuilder.fromAlbum("inbox");
+                }
+                kheopsLogBuilder.album(albumId)
+                        .action(ActionType.SHARE_STUDY_WITH_ALBUM)
+                        .study(studyInstanceUID)
+                        .log();
                 return;
             }
-                final Study study = availableSeries.get(0).getStudy();
+            final Study study = availableSeries.get(0).getStudy();
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));

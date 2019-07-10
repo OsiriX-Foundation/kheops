@@ -8,7 +8,6 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
-import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;

@@ -257,7 +257,7 @@ public class ReportProviders {
                 .log();
     }
 
-    public static ReportProviderResponse editReportProvider(User callingUser, String albumId, String clientId, String url, String name, boolean newClientId, KheopsLogBuilder kheopsLogBuilder)
+    public static ReportProviderResponse editReportProvider(User callingUser, String albumId, String clientId, String url, String name, KheopsLogBuilder kheopsLogBuilder)
             throws ClientIdNotFoundException, AlbumNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -280,11 +280,6 @@ public class ReportProviders {
             if (!(name == null || name.isEmpty())) {
                 reportProvider.setName(name);
                 kheopsLogBuilder.scope("name");
-            }
-
-            if (newClientId) {
-                reportProvider.setClientId(new ClientId().getClientId());
-                kheopsLogBuilder.scope("newClientId");
             }
 
             callingUser = em.merge(callingUser);

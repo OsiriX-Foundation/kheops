@@ -4,7 +4,6 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
-import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.ws.rs.POST;
@@ -13,8 +12,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 

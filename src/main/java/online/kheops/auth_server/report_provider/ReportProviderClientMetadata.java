@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReportProviderClientMetadata {
 //https://tools.ietf.org/html/rfc7591
@@ -94,7 +95,7 @@ public class ReportProviderClientMetadata {
         return responseType;
     }
 
-    public ArrayList<String> getContacts() { return contacts; }
+    public List<String> getContacts() { return contacts; }
 
     public Boolean getValid() { return valid; }
     public void setValid(Boolean valid) { this.valid = valid; }

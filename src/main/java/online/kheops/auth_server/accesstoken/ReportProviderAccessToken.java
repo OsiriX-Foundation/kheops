@@ -120,13 +120,13 @@ public class ReportProviderAccessToken implements AccessToken {
 
     }
 
-    private ReportProviderAccessToken(String sub, String actingParty, String capabilityTokenId, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess, Instant exp, Instant iat, Instant nbf,
-                                                    List<String> aud, String iss) {
+    private ReportProviderAccessToken(String sub, String actingParty, String capabilityTokenId, List<String> studyUIDs, String clientId, boolean hasReadAccess, boolean hasWriteAccess,
+                                      Instant exp, Instant iat, Instant nbf, List<String> aud, String iss) {
         this.sub = Objects.requireNonNull(sub);
         this.actingParty = actingParty;
         this.capabilityTokenId = capabilityTokenId;
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
-        this.clientId = Objects.requireNonNull(ClientId);
+        this.clientId = Objects.requireNonNull(clientId);
         this.hasReadAccess = hasReadAccess;
         this.hasWriteAccess = hasWriteAccess;
         this.exp = exp;
