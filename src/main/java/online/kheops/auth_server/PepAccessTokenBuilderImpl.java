@@ -1,6 +1,7 @@
 package online.kheops.auth_server;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
@@ -18,6 +19,7 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     private static final String SERIES_UID = "series_uid";
     private static final String SERIES_ALL_ACCESS = "all_access";
     private static final String SUBJECT = "sub";
+    private static final String ACTING_PARTY = "act";
 
     private Map<String, String> claims;
     private Algorithm algorithm;
@@ -59,8 +61,18 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     }
 
     @Override
-    public PepAccessTokenBuilder withSubject(String subject){
+    public PepAccessTokenBuilder withSubject(String subject) {
         claims.put(SUBJECT, subject);
+        return this;
+    }
+
+    @Override
+    public PepAccessTokenBuilder withActingParty(String actingParty) {
+        if (actingParty == null) {
+            claims.remove(ACTING_PARTY);
+        } else {
+            claims.put(ACTING_PARTY, actingParty);
+        }
         return this;
     }
 
@@ -76,13 +88,19 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
             throw new IllegalStateException("Missing Subject");
         }
 
-        return JWT.create().withIssuer("auth.kheops.online")
+        JWTCreator.Builder jwtBuilder = JWT.create().withIssuer("auth.kheops.online")
                 .withAudience("dicom.kheops.online")
                 .withClaim(STUDY_UID, claims.get(STUDY_UID))
                 .withClaim(SERIES_UID, claims.get(SERIES_UID))
                 .withSubject(claims.get(SUBJECT))
                 .withExpiresAt(Date.from(Instant.now().plus(expiresIn != 0 ? expiresIn : 300, ChronoUnit.SECONDS)))
-                .withNotBefore(new Date()).sign(algorithm);
+                .withNotBefore(new Date());
+
+        if (claims.get(ACTING_PARTY) != null) {
+            jwtBuilder.withClaim(ACTING_PARTY, claims.get(ACTING_PARTY));
+        }
+
+        return jwtBuilder.sign(algorithm);
     }
 
     private void validateUID(String uid) {
