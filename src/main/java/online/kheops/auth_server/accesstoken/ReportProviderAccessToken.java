@@ -17,6 +17,8 @@ public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
     private final List<String> studyUIDs;
     private final String clientId;
+    private final String actingParty;
+    private final String capabilityTokenId;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;
     private final Instant exp;
@@ -79,7 +81,30 @@ public class ReportProviderAccessToken implements AccessToken {
                 final String iss = Objects.requireNonNull(jwt.getIssuer());
                 final List<String> studyUIDs = jwt.getClaim("studyUID").asList(String.class);
 
-                return new ReportProviderAccessToken(jwt.getSubject(), studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss);
+                final String actingParty;
+                Claim actClaim = jwt.getClaim("act");
+                if (!actClaim.isNull()) {
+                    try {
+                        actingParty = (String) actClaim.asMap().get("sub");
+                    } catch (ClassCastException | JWTDecodeException e) {
+                        throw new AccessTokenVerificationException("Unable to read the acting party", e);
+                    }
+                    if (actingParty == null) {
+                        throw new AccessTokenVerificationException("Has acting party, but without a subject");
+                    }
+                } else {
+                    actingParty = null;
+                }
+
+                final String capabilityTokenId;
+                Claim capabilityTokenIdClaim = jwt.getClaim("cap_token");
+                if (!capabilityTokenIdClaim.isNull()) {
+                    capabilityTokenId = capabilityTokenIdClaim.asString();
+                } else {
+                    capabilityTokenId = null;
+                }
+
+                return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss);
             } catch (NullPointerException | JWTDecodeException e) {
                 throw new AccessTokenVerificationException("AccessToken missing fields.", e);
             }
@@ -95,9 +120,11 @@ public class ReportProviderAccessToken implements AccessToken {
 
     }
 
-    private ReportProviderAccessToken(String sub, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess, Instant exp, Instant iat, Instant nbf,
+    private ReportProviderAccessToken(String sub, String actingParty, String capabilityTokenId, List<String> studyUIDs, String ClientId, boolean hasReadAccess, boolean hasWriteAccess, Instant exp, Instant iat, Instant nbf,
                                                     List<String> aud, String iss) {
         this.sub = Objects.requireNonNull(sub);
+        this.actingParty = actingParty;
+        this.capabilityTokenId = capabilityTokenId;
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
         this.clientId = Objects.requireNonNull(ClientId);
         this.hasReadAccess = hasReadAccess;
@@ -173,6 +200,16 @@ public class ReportProviderAccessToken implements AccessToken {
     @Override
     public Optional<String> getAuthorizedParty() {
         return Optional.of(clientId);
+    }
+
+    @Override
+    public Optional<String> getActingParty() {
+        return Optional.ofNullable(actingParty);
+    }
+
+    @Override
+    public Optional<String> getCapabilityTokenId() {
+        return Optional.ofNullable(capabilityTokenId);
     }
 
     @Override

@@ -24,6 +24,8 @@ public class ReportProviderAuthCodeGenerator {
     private List<String> studyInstanceUIDs;
     private String clientId;
     private String subject;
+    private String actingParty;
+    private String capabilityTokenId;
 
     private ReportProviderAuthCodeGenerator(final ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -49,6 +51,16 @@ public class ReportProviderAuthCodeGenerator {
         return this;
     }
 
+    public ReportProviderAuthCodeGenerator withActingParty(final String actingParty) {
+        this.actingParty = Objects.requireNonNull(actingParty);
+        return this;
+    }
+
+    public ReportProviderAuthCodeGenerator withCapabilityTokenId(final String capabilityTokenId) {
+        this.capabilityTokenId = Objects.requireNonNull(capabilityTokenId);
+        return this;
+    }
+
 
     public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
 
@@ -70,6 +82,14 @@ public class ReportProviderAuthCodeGenerator {
                 .withAudience(getHostRoot())
                 .withClaim("azp", Objects.requireNonNull(clientId))
                 .withClaim("type", "report_provider_code");
+
+        if (actingParty != null) {
+            jwtBuilder.withClaim("act", actingParty);
+        }
+
+        if (capabilityTokenId != null) {
+            jwtBuilder.withClaim("cap_token", capabilityTokenId);
+        }
 
         return jwtBuilder.sign(algorithmHMAC);
     }

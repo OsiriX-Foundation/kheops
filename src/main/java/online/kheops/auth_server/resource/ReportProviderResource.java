@@ -194,11 +194,16 @@ public class ReportProviderResource {
 
         final String kheopsConfigUrl = getHostRoot() + "/api/.well-known/report-provider-configuration";
         if (responseType.equals("code")) {
-            final String token = ReportProviderAuthCodeGenerator.createGenerator(context)
+
+            ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context)
                     .withClientId(reportProvider.getClientId())
                     .withStudyInstanceUIDs(studyInstanceUID)
-                    .withSubject(assertion.getSubject())
-                    .generate(600);
+                    .withSubject(assertion.getSubject());
+
+            assertion.getActingParty().ifPresent(generator::withActingParty);
+            assertion.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+
+            final String token = generator.generate(600);
 
             try {
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
@@ -223,12 +228,17 @@ public class ReportProviderResource {
         } else if (responseType.equals("token")) {
             try {
                 final boolean userHasWriteAccess = principal.hasAlbumPermission(ADD_SERIES, albumId);
-                final String token = ReportProviderAccessTokenGenerator.createGenerator(context)
+
+                ReportProviderAccessTokenGenerator generator = ReportProviderAccessTokenGenerator.createGenerator(context)
                         .withClientId(clientId)
                         .withScope(userHasWriteAccess ? "read write" : "read")
                         .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSubject())
-                        .generate(3600);
+                        .withSubject(assertion.getSubject());
+
+                assertion.getActingParty().ifPresent(generator::withActingParty);
+                assertion.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+
+                final String token = generator.generate(3600);
 
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
                 final String returnUri = URLEncoder.encode(getHostRoot() + "/albums/" + albumId, UTF_8.toString());

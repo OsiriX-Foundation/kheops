@@ -1,6 +1,7 @@
 package online.kheops.auth_server.token;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 
@@ -16,6 +17,8 @@ public class ReportProviderAccessTokenGenerator {
 
     private final ServletContext context;
     private String subject;
+    private String actingParty;
+    private String capabilityTokenId;
     private Date authTime;
     private String clientId;
     private String scope;
@@ -46,6 +49,16 @@ public class ReportProviderAccessTokenGenerator {
         return this;
     }
 
+    public ReportProviderAccessTokenGenerator withActingParty(final String actingParty) {
+        this.actingParty = actingParty;
+        return this;
+    }
+
+    public ReportProviderAccessTokenGenerator withCapabilityTokenId(final String capabilityTokenId) {
+        this.capabilityTokenId = capabilityTokenId;
+        return this;
+    }
+
     public ReportProviderAccessTokenGenerator withStudyInstanceUIDs(final Collection<String> studyInstanceUIDs) {
         this.studyInstanceUIDs = new HashSet<>(studyInstanceUIDs);
         return this;
@@ -54,7 +67,7 @@ public class ReportProviderAccessTokenGenerator {
     public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(getHMAC256Secret());
-            return JWT.create()
+            JWTCreator.Builder jwtBuilder = JWT.create()
                     .withIssuer(getIssuerHost())
                     .withSubject(Objects.requireNonNull(subject))
                     .withAudience(getAudienceHost())
@@ -65,8 +78,17 @@ public class ReportProviderAccessTokenGenerator {
                     .withClaim("azp", Objects.requireNonNull(clientId))
                     .withClaim("scope", Objects.requireNonNull(scope))
                     .withClaim("type", "report_generator")
-                    .withArrayClaim("studyUID", studyInstanceUIDs.toArray(new String[0]))
-                    .sign(algorithm);
+                    .withArrayClaim("studyUID", studyInstanceUIDs.toArray(new String[0]));
+
+            if (actingParty != null) {
+                jwtBuilder.withClaim("act", "{\"sub\": \"" + actingParty + "\"}");
+            }
+
+            if (capabilityTokenId != null) {
+                jwtBuilder.withClaim("cap_token", capabilityTokenId);
+            }
+
+             return jwtBuilder.sign(algorithm);
         } catch (JWTCreationException | IllegalArgumentException e) {
             throw new InternalServerErrorException("Error signing the token", e);
         }

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import javax.servlet.ServletContext;
@@ -65,7 +66,23 @@ class AuthorizationCodeValidator {
             throw new TokenRequestException(INVALID_REQUEST, "Can't find subject");
         }
 
-        return DecodedAuthorizationCode.createDecodedAuthorizationCode(subject, new HashSet<>(studyUIs));
+        final String actingParty;
+        Claim actClaim = jwt.getClaim("act");
+        if (!actClaim.isNull()) {
+            actingParty = actClaim.asString();
+        } else {
+            actingParty = null;
+        }
+
+        final String capabilityTokenId;
+        Claim capabilityTokenClaim = jwt.getClaim("cap_token");
+        if (!capabilityTokenClaim.isNull()) {
+            capabilityTokenId = capabilityTokenClaim.asString();
+        } else {
+            capabilityTokenId = null;
+        }
+
+        return DecodedAuthorizationCode.createDecodedAuthorizationCode(subject, actingParty, capabilityTokenId, new HashSet<>(studyUIs));
     }
 
     private String getHMAC256Secret() {
