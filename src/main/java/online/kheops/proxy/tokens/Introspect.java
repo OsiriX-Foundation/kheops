@@ -13,6 +13,7 @@ import javax.ws.rs.core.Form;
 import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_PASSWORD;
@@ -23,6 +24,11 @@ public class Introspect {
 
     private Introspect() {}
 
+    private static class actingPartyResponse {
+        @XmlElement(name = "sub")
+        String subject;
+    }
+
     public static class Response {
         @XmlElement(name = "active")
         boolean active;
@@ -30,6 +36,9 @@ public class Introspect {
         String scope;
         @XmlElement(name = "sub")
         String subject;
+        @XmlElement(name = "act")
+        actingPartyResponse actingPartyResponse;
+
 
         public boolean isActive() {
             return active;
@@ -51,6 +60,13 @@ public class Introspect {
                 }
             }
             return false;
+        }
+
+        public Optional<String> getActingParty() {
+            if (actingPartyResponse != null) {
+                return Optional.of(actingPartyResponse.subject);
+            }
+            return Optional.empty();
         }
     }
 

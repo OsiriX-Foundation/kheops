@@ -112,9 +112,9 @@ public final class Resource {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
 
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
-        final String subject;
+        final Introspect.Response introspectResponse;
         try {
-            Introspect.Response introspectResponse = Introspect.endpoint(context, introspectionURI).token(authorizationToken.getToken());
+            introspectResponse = Introspect.endpoint(context, introspectionURI).token(authorizationToken.getToken());
             if (!introspectResponse.isActive()) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
                 throw new NotAuthorizedException("Bearer", "Basic");
@@ -122,11 +122,6 @@ public final class Resource {
             if (!introspectResponse.isValidForScope("write")) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
                 throw new WebApplicationException(Response.status(FORBIDDEN).entity("Authorization is not valid for posting").build());
-            }
-            subject = introspectResponse.getSubject();
-            if (subject == null) {
-                LOG.log(Level.WARNING, "No subject when introspecting the token");
-                throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Unable to get token subject").build());
             }
         } catch (AccessTokenException e) {
             LOG.log(Level.SEVERE, "Unable to introspect the token", e);
@@ -138,7 +133,7 @@ public final class Resource {
 
         try (InputStream inputStream = getConvertedInputStream(request.getInputStream())) {
             final Proxy proxy = new Proxy(providers, getConvertedContentType(), inputStream, authorizationManager, fetchRequester::addStudies);
-            return processProxy(proxy, authorizationManager, studyInstanceUID, subject);
+            return processProxy(proxy, authorizationManager, studyInstanceUID, introspectResponse);
         } catch (IOException e) {
             LOG.log(Level.WARNING, "", e);
             throw new WebApplicationException(BAD_REQUEST);
@@ -181,7 +176,7 @@ public final class Resource {
         }
     }
 
-    private Response processProxy(Proxy proxy, AuthorizationManager authorizationManager, String studyInstanceUID, String subject) {
+    private Response processProxy(Proxy proxy, AuthorizationManager authorizationManager, String studyInstanceUID, Introspect.Response introspectResponse) {
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
         if (studyInstanceUID != null) {
@@ -209,7 +204,7 @@ public final class Resource {
 
         try (final Response gatewayResponse = CLIENT.target(stowServiceURI)
                     .request()
-                    .header(AUTHORIZATION, "Bearer " + getPostBearerToken(subject))
+                    .header(AUTHORIZATION, "Bearer " + getPostBearerToken(introspectResponse))
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, getGatewayContentType()));
              final InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
@@ -245,15 +240,17 @@ public final class Resource {
         }
     }
 
-    private String getPostBearerToken(String subject) {
+    private String getPostBearerToken(Introspect.Response introspectResponse) {
         final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecretpost");
         final Algorithm algorithmHMAC = Algorithm.HMAC256(authSecret);
 
         JWTCreator.Builder jwtBuilder = JWT.create()
                 .withIssuer("auth.kheops.online")
                 .withAudience("dicom.kheops.online")
-                .withSubject(subject)
+                .withSubject(introspectResponse.getSubject())
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+
+        introspectResponse.getActingParty().ifPresent(actingParty -> jwtBuilder.withClaim("act", actingParty));
 
         return jwtBuilder.sign(algorithmHMAC);
     }
