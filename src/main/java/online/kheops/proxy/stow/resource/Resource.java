@@ -252,6 +252,7 @@ public final class Resource {
 
         introspectResponse.getActingParty().ifPresent(actingParty -> jwtBuilder.withClaim("act", actingParty));
         introspectResponse.getAuthorizedParty().ifPresent(authorizedParty -> jwtBuilder.withClaim("azp", authorizedParty));
+        introspectResponse.getCapabilityTokenId().ifPresent(capabilityTokenId -> jwtBuilder.withClaim("cap_token", capabilityTokenId));
 
         return jwtBuilder.sign(algorithmHMAC);
     }

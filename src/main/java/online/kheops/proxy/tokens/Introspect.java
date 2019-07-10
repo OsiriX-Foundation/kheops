@@ -38,6 +38,8 @@ public class Introspect {
         String subject;
         @XmlElement(name = "azp")
         String authorizedParty;
+        @XmlElement(name = "cap_token")
+        String capabilityTokenId;
         @XmlElement(name = "act")
         actingPartyResponse actingPartyResponse;
 
@@ -73,6 +75,10 @@ public class Introspect {
 
         public Optional<String> getAuthorizedParty() {
             return Optional.ofNullable(authorizedParty);
+        }
+
+        public Optional<String> getCapabilityTokenId() {
+            return Optional.ofNullable(capabilityTokenId);
         }
     }
 
