@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import javax.servlet.ServletContext;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
@@ -42,7 +41,7 @@ class AuthorizationCodeValidator {
                     .withClaim("type", "report_provider_code")
                     .build()
                     .verify(authorizationCode);
-        } catch (JWTVerificationException | UnsupportedEncodingException e) {
+        } catch (JWTVerificationException | IllegalArgumentException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Unable to validate the authorization code", e);
         }
 

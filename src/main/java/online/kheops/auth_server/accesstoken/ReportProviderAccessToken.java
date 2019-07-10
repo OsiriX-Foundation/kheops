@@ -10,7 +10,6 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.*;
 
 import javax.servlet.ServletContext;
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.*;
 
@@ -41,7 +40,7 @@ public class ReportProviderAccessToken implements AccessToken {
             final Algorithm algorithm;
             try {
                 algorithm = Algorithm.HMAC256(authorizationSecret());
-            } catch (UnsupportedEncodingException e) {
+            } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("authorizationSecret is not a valid HMAC256 secret", e);
             }
             final DecodedJWT jwt;

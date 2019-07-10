@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -29,7 +28,7 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
         claims = new HashMap<>();
         try {
             algorithm = Algorithm.HMAC256(secret);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Bad secret", e);
         }
     }

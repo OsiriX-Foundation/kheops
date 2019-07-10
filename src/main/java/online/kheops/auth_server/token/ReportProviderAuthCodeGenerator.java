@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import javax.servlet.ServletContext;
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -57,7 +56,7 @@ public class ReportProviderAuthCodeGenerator {
         final Algorithm algorithmHMAC;
         try {
             algorithmHMAC = Algorithm.HMAC256(authSecret);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IllegalArgumentException e) {
             LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
             throw new IllegalStateException("online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
         }

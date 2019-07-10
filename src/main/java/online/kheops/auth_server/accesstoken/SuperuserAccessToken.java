@@ -9,7 +9,6 @@ import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.principal.UserPrincipal;
 
 import javax.servlet.ServletContext;
-import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ final class SuperuserAccessToken implements AccessToken {
             final Algorithm algorithm;
             try {
                 algorithm = Algorithm.HMAC256(getSuperuserSecret());
-            } catch (UnsupportedEncodingException e) {
+            } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("superuserSecret is not a valid HMAC256 secret", e);
             }
             final DecodedJWT jwt;

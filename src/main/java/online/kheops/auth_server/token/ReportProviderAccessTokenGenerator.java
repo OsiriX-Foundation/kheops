@@ -6,7 +6,6 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.InternalServerErrorException;
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -68,7 +67,7 @@ public class ReportProviderAccessTokenGenerator {
                     .withClaim("type", "report_generator")
                     .withArrayClaim("studyUID", studyInstanceUIDs.toArray(new String[0]))
                     .sign(algorithm);
-        } catch (JWTCreationException | UnsupportedEncodingException e) {
+        } catch (JWTCreationException | IllegalArgumentException e) {
             throw new InternalServerErrorException("Error signing the token", e);
         }
     }

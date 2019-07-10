@@ -10,7 +10,6 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
 
 import javax.servlet.ServletContext;
-import java.io.UnsupportedEncodingException;
 
 final class PepAccessToken implements AccessToken {
 
@@ -38,7 +37,7 @@ final class PepAccessToken implements AccessToken {
                 }
                 return new PepAccessToken(jwt.getSubject());
 
-            } catch (JWTVerificationException | UnsupportedEncodingException e) {
+            } catch (JWTVerificationException | IllegalArgumentException e) {
                 throw new AccessTokenVerificationException("Verification of the access token failed", e);
             }
         }
