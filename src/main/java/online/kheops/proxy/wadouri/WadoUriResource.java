@@ -116,6 +116,11 @@ public class WadoUriResource {
             throw new InternalServerErrorException("unknown error while getting from upstream");
         }
 
+        if (upstreamResponse.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
+            LOG.log(WARNING, "Sever error from upstream: status" + upstreamResponse.getStatus());
+            throw new WebApplicationException(BAD_GATEWAY);
+        }
+
         StreamingOutput streamingOutput = output -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class)) {
                 byte[] buffer = new byte[4096];
