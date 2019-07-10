@@ -101,4 +101,8 @@ final class CapabilityAccessToken implements AccessToken {
         return new CapabilityPrincipal(capability, user);
     }
 
+    @Override
+    public Optional<String> getCapabilityTokenId() {
+        return Optional.of(capability.getId());
+    }
 }

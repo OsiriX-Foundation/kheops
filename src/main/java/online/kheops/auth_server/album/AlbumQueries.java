@@ -164,7 +164,7 @@ public class AlbumQueries {
             albumQueryParams.getLimit().ifPresent(query::addLimit);
             albumQueryParams.getOffset().ifPresent(query::addOffset);
 
-            query.addOrderBy(getOrderBy(albumQueryParams.getOrderBy(), albumQueryParams.isDescending(), create));
+            query.addOrderBy(getOrderBy(albumQueryParams.getOrderBy(), albumQueryParams.isDescending()));
 
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
@@ -317,7 +317,7 @@ public class AlbumQueries {
         return (int) query.fetchOne().getValue(0);
     }
 
-    private static SortField getOrderBy(String orderByParameter, boolean descending, DSLContext create) throws  BadQueryParametersException{
+    private static SortField getOrderBy(String orderByParameter, boolean descending) throws  BadQueryParametersException{
 
             Field ord;
 

@@ -47,4 +47,7 @@ public interface AccessToken {
     default Optional<String> getActingParty() {
         return Optional.empty();
     }
+    default Optional<String> getCapabilityTokenId() {
+        return Optional.empty();
+    }
 }

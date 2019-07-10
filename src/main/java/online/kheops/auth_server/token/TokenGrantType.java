@@ -8,7 +8,6 @@ import online.kheops.auth_server.report_provider.ReportProviders;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import java.util.List;
@@ -50,13 +49,16 @@ public enum TokenGrantType {
                     .withClientId(clientId)
                     .validate(code);
 
-            final String token;
-            token = ReportProviderAccessTokenGenerator.createGenerator(servletContext)
+            ReportProviderAccessTokenGenerator generator = ReportProviderAccessTokenGenerator.createGenerator(servletContext)
                     .withSubject(authorizationCode.getSubject())
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
-                    .withScope("read write")
-                    .generate(REPORT_PROVIDER_TOKEN_LIFETIME);
+                    .withScope("read write");
+
+            authorizationCode.getActingParty().ifPresent(generator::withActingParty);
+            authorizationCode.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+
+            final String token = generator.generate(REPORT_PROVIDER_TOKEN_LIFETIME);
 
             return new TokenGrantResult(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME), authorizationCode.getSubject());
         }

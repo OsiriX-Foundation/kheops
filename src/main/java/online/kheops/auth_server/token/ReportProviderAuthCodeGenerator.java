@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import javax.servlet.ServletContext;
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -25,6 +24,8 @@ public class ReportProviderAuthCodeGenerator {
     private List<String> studyInstanceUIDs;
     private String clientId;
     private String subject;
+    private String actingParty;
+    private String capabilityTokenId;
 
     private ReportProviderAuthCodeGenerator(final ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -50,6 +51,16 @@ public class ReportProviderAuthCodeGenerator {
         return this;
     }
 
+    public ReportProviderAuthCodeGenerator withActingParty(final String actingParty) {
+        this.actingParty = Objects.requireNonNull(actingParty);
+        return this;
+    }
+
+    public ReportProviderAuthCodeGenerator withCapabilityTokenId(final String capabilityTokenId) {
+        this.capabilityTokenId = Objects.requireNonNull(capabilityTokenId);
+        return this;
+    }
+
 
     public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
 
@@ -57,7 +68,7 @@ public class ReportProviderAuthCodeGenerator {
         final Algorithm algorithmHMAC;
         try {
             algorithmHMAC = Algorithm.HMAC256(authSecret);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IllegalArgumentException e) {
             LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
             throw new IllegalStateException("online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
         }
@@ -71,6 +82,14 @@ public class ReportProviderAuthCodeGenerator {
                 .withAudience(getHostRoot())
                 .withClaim("azp", Objects.requireNonNull(clientId))
                 .withClaim("type", "report_provider_code");
+
+        if (actingParty != null) {
+            jwtBuilder.withClaim("act", actingParty);
+        }
+
+        if (capabilityTokenId != null) {
+            jwtBuilder.withClaim("cap_token", capabilityTokenId);
+        }
 
         return jwtBuilder.sign(algorithmHMAC);
     }

@@ -18,7 +18,11 @@ public abstract class PepAccessTokenBuilder {
     public abstract PepAccessTokenBuilder withSeriesUID(String seriesUID);
     public abstract PepAccessTokenBuilder withAllSeries();
 
-    abstract public PepAccessTokenBuilder withSubject(String sub);
+    public abstract  PepAccessTokenBuilder withSubject(String sub);
+
+    public abstract PepAccessTokenBuilder withActingParty(String actingParty);
+    public abstract PepAccessTokenBuilder withAuthorizedParty(String actingParty);
+    public abstract PepAccessTokenBuilder withCapabilityTokenId(String capabilityTokenID);
 
     public abstract String build();
 }

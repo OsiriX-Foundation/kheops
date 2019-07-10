@@ -4,7 +4,9 @@ import com.auth0.jwk.JwkException;
 import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.entity.User;
@@ -34,7 +36,8 @@ final class KeycloakAccessToken implements AccessToken {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
-    private final String sub;
+    private final String subject;
+    private final String actingParty;
 
     private static final String JWKS_CACHE_ALIAS = "jwksCache";
     private static final String PUBLIC_KEY_CACHE_ALIAS = "publicKeyCache";
@@ -102,7 +105,22 @@ final class KeycloakAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("Missing scope claim");
             }
 
-            return new KeycloakAccessToken(jwt.getSubject());
+            final String actingParty;
+            Claim actClaim = jwt.getClaim("act");
+            if (!actClaim.isNull()) {
+                try {
+                    actingParty = (String) actClaim.asMap().get("sub");
+                } catch (ClassCastException | JWTDecodeException e) {
+                    throw new AccessTokenVerificationException("Unable to read the acting party", e);
+                }
+                if (actingParty == null) {
+                    throw new AccessTokenVerificationException("Has acting party, but without a subject");
+                }
+            } else {
+                actingParty = null;
+            }
+
+            return new KeycloakAccessToken(jwt.getSubject(), actingParty);
         }
 
         private String getIssuer() {
@@ -147,13 +165,14 @@ final class KeycloakAccessToken implements AccessToken {
         return publicKey;
     }
 
-    private KeycloakAccessToken(String sub) {
-        this.sub = sub;
+    private KeycloakAccessToken(String subject, String actingParty) {
+        this.subject = subject;
+        this.actingParty = actingParty;
     }
 
     @Override
     public String getSubject() {
-        return sub;
+        return subject;
     }
 
     @Override
@@ -164,6 +183,11 @@ final class KeycloakAccessToken implements AccessToken {
     @Override
     public Optional<String> getScope() {
         return Optional.of("read write downloadbutton send");
+    }
+
+    @Override
+    public Optional<String> getActingParty() {
+        return Optional.ofNullable(actingParty);
     }
 
     @Override

@@ -20,6 +20,7 @@ public class IntrospectResponse {
     private String authorizedParty;
     private String actingParty;
     private String clientId;
+    private String capabilityTokenId;
     private Long expiresAt;
     private Long issuedAt;
     private Long notBefore;
@@ -54,6 +55,10 @@ public class IntrospectResponse {
 
     private void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public void setCapabilityTokenId(String capabilityTokenId) {
+        this.capabilityTokenId = capabilityTokenId;
     }
 
     private void setExpiresAt(Long expiresAt) {
@@ -98,6 +103,7 @@ public class IntrospectResponse {
         accessToken.getActingParty().ifPresent(response::setActingParty);
         accessToken.getScope().ifPresent(response::setScope);
         accessToken.getClientId().ifPresent(response::setClientId);
+        accessToken.getCapabilityTokenId().ifPresent(response::setCapabilityTokenId);
         accessToken.getAuthorizedParty().ifPresent(response::setAuthorizedParty);
         accessToken.getExpiresAt().ifPresent(instant -> response.setExpiresAt(instant.getEpochSecond()));
         accessToken.getIssuedAt().ifPresent(instant -> response.setIssuedAt(instant.getEpochSecond()));
@@ -124,11 +130,11 @@ public class IntrospectResponse {
             if (authorizedParty != null) {
                 objectBuilder.add("azp", authorizedParty);
             }
-            if (actingParty != null) {
-                objectBuilder.add("act", actingParty);
-            }
             if (clientId != null) {
                 objectBuilder.add("client_id", clientId);
+            }
+            if (capabilityTokenId != null) {
+                objectBuilder.add("cap_token", capabilityTokenId);
             }
             if (expiresAt != null) {
                 objectBuilder.add("exp", expiresAt);
@@ -146,22 +152,26 @@ public class IntrospectResponse {
                 objectBuilder.add("album_id", albumId);
             }
 
+            if (actingParty != null) {
+                objectBuilder.add("act", Json.createObjectBuilder().add("sub", actingParty));
+            }
+
             if (audience != null && audience.size() > 0) {
                 if (audience.size() == 1) {
                     objectBuilder.add("aud", audience.get(0));
                 } else {
                     JsonArrayBuilder audienceBuilder = Json.createArrayBuilder();
                     audience.forEach(audienceBuilder::add);
-                    objectBuilder.add("aud", audienceBuilder.build());
+                    objectBuilder.add("aud", audienceBuilder);
                 }
             }
             if (studyUIDs != null && studyUIDs.size() > 0) {
                 if (studyUIDs.size() == 1) {
                     objectBuilder.add("studyUID", studyUIDs.get(0));
                 } else {
-                    JsonArrayBuilder audienceBuilder = Json.createArrayBuilder();
-                    studyUIDs.forEach(audienceBuilder::add);
-                    objectBuilder.add("studyUID", audienceBuilder.build());
+                    JsonArrayBuilder studiesBuilder = Json.createArrayBuilder();
+                    studyUIDs.forEach(studiesBuilder::add);
+                    objectBuilder.add("studyUID", studiesBuilder);
                 }
             }
         }

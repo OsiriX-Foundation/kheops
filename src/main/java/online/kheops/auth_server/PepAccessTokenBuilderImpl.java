@@ -1,11 +1,11 @@
 package online.kheops.auth_server;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -18,6 +18,9 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     private static final String SERIES_UID = "series_uid";
     private static final String SERIES_ALL_ACCESS = "all_access";
     private static final String SUBJECT = "sub";
+    private static final String ACTING_PARTY = "act";
+    private static final String AUTHORIZED_PARTY = "azp";
+    private static final String CAPABILITY_TOKEN_ID = "cap_token";
 
     private Map<String, String> claims;
     private Algorithm algorithm;
@@ -27,7 +30,7 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
         claims = new HashMap<>();
         try {
             algorithm = Algorithm.HMAC256(secret);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Bad secret", e);
         }
     }
@@ -59,8 +62,38 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     }
 
     @Override
-    public PepAccessTokenBuilder withSubject(String subject){
+    public PepAccessTokenBuilder withSubject(String subject) {
         claims.put(SUBJECT, subject);
+        return this;
+    }
+
+    @Override
+    public PepAccessTokenBuilder withActingParty(String actingParty) {
+        if (actingParty == null) {
+            claims.remove(ACTING_PARTY);
+        } else {
+            claims.put(ACTING_PARTY, actingParty);
+        }
+        return this;
+    }
+
+    @Override
+    public PepAccessTokenBuilder withAuthorizedParty(String authorizedParty) {
+        if (authorizedParty == null) {
+            claims.remove(AUTHORIZED_PARTY);
+        } else {
+            claims.put(AUTHORIZED_PARTY, authorizedParty);
+        }
+        return this;
+    }
+
+    @Override
+    public PepAccessTokenBuilder withCapabilityTokenId(String capabilityTokenId) {
+        if (capabilityTokenId == null) {
+            claims.remove(CAPABILITY_TOKEN_ID);
+        } else {
+            claims.put(CAPABILITY_TOKEN_ID, capabilityTokenId);
+        }
         return this;
     }
 
@@ -76,13 +109,14 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
             throw new IllegalStateException("Missing Subject");
         }
 
-        return JWT.create().withIssuer("auth.kheops.online")
+        JWTCreator.Builder jwtBuilder = JWT.create().withIssuer("auth.kheops.online")
                 .withAudience("dicom.kheops.online")
-                .withClaim(STUDY_UID, claims.get(STUDY_UID))
-                .withClaim(SERIES_UID, claims.get(SERIES_UID))
-                .withSubject(claims.get(SUBJECT))
                 .withExpiresAt(Date.from(Instant.now().plus(expiresIn != 0 ? expiresIn : 300, ChronoUnit.SECONDS)))
-                .withNotBefore(new Date()).sign(algorithm);
+                .withNotBefore(new Date());
+
+        claims.forEach(jwtBuilder::withClaim);
+
+        return jwtBuilder.sign(algorithm);
     }
 
     private void validateUID(String uid) {
