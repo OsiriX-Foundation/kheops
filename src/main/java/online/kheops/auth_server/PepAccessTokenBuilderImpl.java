@@ -20,6 +20,7 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     private static final String SUBJECT = "sub";
     private static final String ACTING_PARTY = "act";
     private static final String AUTHORIZED_PARTY = "azp";
+    private static final String CAPABILITY_TOKEN_ID = "cap_token";
 
     private Map<String, String> claims;
     private Algorithm algorithm;
@@ -82,6 +83,16 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
             claims.remove(AUTHORIZED_PARTY);
         } else {
             claims.put(AUTHORIZED_PARTY, authorizedParty);
+        }
+        return this;
+    }
+
+    @Override
+    public PepAccessTokenBuilder withCapabilityTokenId(String capabilityTokenId) {
+        if (capabilityTokenId == null) {
+            claims.remove(CAPABILITY_TOKEN_ID);
+        } else {
+            claims.put(CAPABILITY_TOKEN_ID, capabilityTokenId);
         }
         return this;
     }

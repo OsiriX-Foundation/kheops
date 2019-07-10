@@ -20,6 +20,7 @@ public class IntrospectResponse {
     private String authorizedParty;
     private String actingParty;
     private String clientId;
+    private String capabilityTokenId;
     private Long expiresAt;
     private Long issuedAt;
     private Long notBefore;
@@ -54,6 +55,10 @@ public class IntrospectResponse {
 
     private void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public void setCapabilityTokenId(String capabilityTokenId) {
+        this.capabilityTokenId = capabilityTokenId;
     }
 
     private void setExpiresAt(Long expiresAt) {
@@ -98,6 +103,7 @@ public class IntrospectResponse {
         accessToken.getActingParty().ifPresent(response::setActingParty);
         accessToken.getScope().ifPresent(response::setScope);
         accessToken.getClientId().ifPresent(response::setClientId);
+        accessToken.getCapabilityTokenId().ifPresent(response::setCapabilityTokenId);
         accessToken.getAuthorizedParty().ifPresent(response::setAuthorizedParty);
         accessToken.getExpiresAt().ifPresent(instant -> response.setExpiresAt(instant.getEpochSecond()));
         accessToken.getIssuedAt().ifPresent(instant -> response.setIssuedAt(instant.getEpochSecond()));
@@ -126,6 +132,9 @@ public class IntrospectResponse {
             }
             if (clientId != null) {
                 objectBuilder.add("client_id", clientId);
+            }
+            if (capabilityTokenId != null) {
+                objectBuilder.add("cap_token", capabilityTokenId);
             }
             if (expiresAt != null) {
                 objectBuilder.add("exp", expiresAt);
