@@ -40,6 +40,7 @@ class AuthorizationCodeValidator {
                     .withAudience(getIssuerHost())
                     .withClaim("azp", Objects.requireNonNull(clientId))
                     .withClaim("type", "report_provider_code")
+                    .acceptLeeway(60)
                     .build()
                     .verify(authorizationCode);
         } catch (JWTVerificationException | IllegalArgumentException e) {

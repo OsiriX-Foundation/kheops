@@ -27,6 +27,7 @@ final class PepAccessToken implements AccessToken {
                 final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
                         .withIssuer("auth.kheops.online")
                         .withAudience("dicom.kheops.online")
+                        .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
 

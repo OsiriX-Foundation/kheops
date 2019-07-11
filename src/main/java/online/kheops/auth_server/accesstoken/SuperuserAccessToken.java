@@ -35,6 +35,7 @@ final class SuperuserAccessToken implements AccessToken {
             try {
                 jwt = JWT.require(algorithm)
                         .withIssuer("authorization.kheops.online")
+                        .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
