@@ -51,6 +51,7 @@ public class ReportProviderAccessToken implements AccessToken {
                         .withIssuer(getIssuerHost())
                         .withAudience(getIssuerHost())
                         .withClaim("type", "report_generator")
+                        .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
