@@ -301,6 +301,11 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
+    public Optional<String> getCapabilityTokenId() {
+        return Optional.of(capability.getId());
+    }
+
+    @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
         return new KheopsLogBuilder().user(user.getKeycloakId()).capabilityID(capability.getId()).scope(capability.getScopeType()).tokenType(TokenType.CAPABILITY_TOKEN);
     }

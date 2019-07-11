@@ -194,6 +194,6 @@ final class KeycloakAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        return new UserPrincipal(user);
+        return new UserPrincipal(user, actingParty);
     }
 }

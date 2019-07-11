@@ -39,6 +39,18 @@ public interface KheopsPrincipalInterface extends java.security.Principal{
 
     default Optional<String> getClientId() {return Optional.empty();}
 
+    default Optional<String> getActingParty() {
+        return Optional.empty();
+    }
+
+    default Optional<String> getAuthorizedParty() {
+        return Optional.empty();
+    }
+
+    default Optional<String> getCapabilityTokenId() {
+        return Optional.empty();
+    }
+
     User getUser();
 
     ScopeType getScope();

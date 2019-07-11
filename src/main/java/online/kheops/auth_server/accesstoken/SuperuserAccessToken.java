@@ -72,7 +72,12 @@ final class SuperuserAccessToken implements AccessToken {
     }
 
     @Override
+    public Optional<String> getActingParty() {
+        return Optional.of("Superuser");
+    }
+
+    @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        return new UserPrincipal(user);
+        return new UserPrincipal(user, null);
     }
 }
