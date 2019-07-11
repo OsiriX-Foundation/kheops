@@ -1,14 +1,13 @@
 package online.kheops.auth_server.token;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
+import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.keys.HmacKey;
+import org.jose4j.lang.JoseException;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.InternalServerErrorException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class ReportProviderAccessTokenGenerator {
@@ -19,7 +18,6 @@ public class ReportProviderAccessTokenGenerator {
     private String subject;
     private String actingParty;
     private String capabilityTokenId;
-    private Date authTime;
     private String clientId;
     private String scope;
     private Set<String> studyInstanceUIDs;
@@ -33,12 +31,6 @@ public class ReportProviderAccessTokenGenerator {
         return this;
     }
 
-    @SuppressWarnings("unused")
-    public ReportProviderAccessTokenGenerator withAuthTime(final Date authTime) {
-        this.authTime = authTime;
-        return this;
-    }
-
     public ReportProviderAccessTokenGenerator withScope(final String scope) {
         this.scope = Objects.requireNonNull(scope);
         return this;
@@ -49,11 +41,13 @@ public class ReportProviderAccessTokenGenerator {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public ReportProviderAccessTokenGenerator withActingParty(final String actingParty) {
         this.actingParty = actingParty;
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public ReportProviderAccessTokenGenerator withCapabilityTokenId(final String capabilityTokenId) {
         this.capabilityTokenId = capabilityTokenId;
         return this;
@@ -65,31 +59,36 @@ public class ReportProviderAccessTokenGenerator {
     }
 
     public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
+
+        JwtClaims claims = new JwtClaims();
+        claims.setIssuer(getIssuerHost());
+        claims.setSubject(Objects.requireNonNull(subject));
+        claims.setAudience(getAudienceHost());
+        claims.setExpirationTimeMinutesInTheFuture(expiresIn / 60f);
+        claims.setIssuedAtToNow();
+        claims.setNotBeforeMinutesInThePast(0);
+        claims.setClaim("azp", Objects.requireNonNull(clientId));
+        claims.setClaim("scope", Objects.requireNonNull(scope));
+        claims.setClaim("type", "report_generator");
+        claims.setClaim("studyUID", studyInstanceUIDs.toArray(new String[0]));
+
+        if (actingParty != null) {
+            claims.setClaim("act", Collections.singletonMap("sub", actingParty));
+        }
+
+        if (capabilityTokenId != null) {
+            claims.setClaim("cap_token", capabilityTokenId);
+        }
+
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+        jws.setKey(new HmacKey(getHMAC256Secret().getBytes()));
+
         try {
-            Algorithm algorithm = Algorithm.HMAC256(getHMAC256Secret());
-            JWTCreator.Builder jwtBuilder = JWT.create()
-                    .withIssuer(getIssuerHost())
-                    .withSubject(Objects.requireNonNull(subject))
-                    .withAudience(getAudienceHost())
-                    .withExpiresAt(Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)))
-                    .withIssuedAt(Date.from(Instant.now()))
-                    .withNotBefore(new Date())
-                    .withClaim("auth_time", authTime != null ? authTime : Date.from(Instant.now()))
-                    .withClaim("azp", Objects.requireNonNull(clientId))
-                    .withClaim("scope", Objects.requireNonNull(scope))
-                    .withClaim("type", "report_generator")
-                    .withArrayClaim("studyUID", studyInstanceUIDs.toArray(new String[0]));
-
-            if (actingParty != null) {
-                jwtBuilder.withClaim("act", "{\"sub\": \"" + actingParty + "\"}");
-            }
-
-            if (capabilityTokenId != null) {
-                jwtBuilder.withClaim("cap_token", capabilityTokenId);
-            }
-
-             return jwtBuilder.sign(algorithm);
-        } catch (JWTCreationException | IllegalArgumentException e) {
+            return jws.getCompactSerialization();
+        } catch (JoseException e) {
             throw new InternalServerErrorException("Error signing the token", e);
         }
     }
