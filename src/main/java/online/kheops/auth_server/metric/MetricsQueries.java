@@ -1,0 +1,89 @@
+package online.kheops.auth_server.metric;
+
+import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+class MetricsQueries {
+
+    static Long getNumberOfAlbumsIncludeInbox(EntityManager em) {
+        return em.createQuery("SELECT COUNT(a) FROM Album a", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfAlbumsFav(EntityManager em) {
+        return em.createQuery("SELECT COUNT(au) FROM AlbumUser au WHERE au.favorite = true", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfUsers(EntityManager em) {
+        return em.createQuery("SELECT COUNT(u) FROM User u", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfReportProviders(EntityManager em) {
+        return em.createQuery("SELECT COUNT(rp) FROM ReportProvider rp", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfStudies(EntityManager em) {
+        return em.createQuery("SELECT COUNT(s) FROM Study s", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfSeries(EntityManager em) {
+        return em.createQuery("SELECT COUNT(s) FROM Series s", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfInstances(EntityManager em) {
+        return em.createQuery("SELECT SUM(s.numberOfSeriesRelatedInstances) FROM Series s", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfSeriesFav(EntityManager em) {
+        return em.createQuery("SELECT COUNT(als) FROM AlbumSeries als WHERE als.favorite = true", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfComments(EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Comment c WHERE c.album = NULL", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfCommentsPublic(EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Comment c WHERE c.album = NULL AND c.privateTargetUser = NULL", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfCommentsPrivate(EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Comment c WHERE c.album = NULL AND c.privateTargetUser <> NULL", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfToken(EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Capability c", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfToken(String scopeType, EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType", Long.class)
+                .setParameter("scopeType", scopeType)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfActiveToken(String scopeType, EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType AND c.revokedTime = NULL AND c.expirationTime > :now AND c.notBeforeTime < :now", Long.class)
+                .setParameter("now", LocalDateTime.now(ZoneOffset.UTC))
+                .setParameter("scopeType", scopeType)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfUnactiveToken(String scopeType, EntityManager em) {
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType AND (c.revokedTime <> NULL OR c.expirationTime < :now OR c.notBeforeTime > :now)", Long.class)
+                .setParameter("now", LocalDateTime.now(ZoneOffset.UTC))
+                .setParameter("scopeType", scopeType)
+                .getSingleResult();
+    }
+
+}
