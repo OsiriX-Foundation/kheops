@@ -17,7 +17,8 @@ public class KheopsLogBuilder {
         POST_COMMENT, LIST_EVENTS,
         FETCH, TEST_USER, USER_INFO,
         NEW_REPORT_PROVIDER, NEW_REPORT, REPORT_PROVIDER_CONFIGURATION, LIST_REPORT_PROVIDERS, GET_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, REPORT_PROVIDER_METADATA,
-        NEW_TOKEN, INTROSPECT_TOKEN}
+        NEW_TOKEN, INTROSPECT_TOKEN,
+        NEW_USER}
 
     private ArrayList<LogEntry> logEntry;
     private static final Logger LOG = Logger.getLogger(KheopsLogBuilder.class.getName());

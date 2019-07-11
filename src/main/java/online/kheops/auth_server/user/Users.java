@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -68,7 +69,9 @@ public class Users {
         }
 
         //the user is in keycloak but not in kheops => add the user in kheops
-        LOG.log(INFO, "Adding new user: " + userReference);
+        new KheopsLogBuilder().user(userReference)
+                .action(KheopsLogBuilder.ActionType.NEW_USER)
+                .log();
 
         final User newUser;
         final EntityManager em = EntityManagerListener.createEntityManager();
