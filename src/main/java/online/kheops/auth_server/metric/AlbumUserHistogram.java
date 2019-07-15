@@ -23,11 +23,11 @@ import java.util.List;
    class AlbumUserHistogram {
        @Id
        @Column(name = "nb_user")
-       @XmlElement
-       Long nb_user;
+       @XmlElement(name = "nb_users")
+       Long nbUsers;
        @Column(name = "nb_album")
-       @XmlElement
-       Long nb_album;
+       @XmlElement(name = "nb_albums")
+       Long nbAlbums;
 
        static List<AlbumUserHistogram> getAlbumUserHistogram(EntityManager em) {
            return em.createNamedQuery("AlbumUserHistogram.Query", AlbumUserHistogram.class).getResultList();

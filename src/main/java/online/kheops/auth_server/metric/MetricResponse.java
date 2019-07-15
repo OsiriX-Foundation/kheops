@@ -6,7 +6,6 @@ import online.kheops.auth_server.capability.ScopeType;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.HashMap;
 import java.util.List;
 
 import static online.kheops.auth_server.metric.AlbumSeriesHistogram.getAlbumSeriesHistogram;
@@ -23,21 +22,21 @@ public class MetricResponse {
     @XmlElement(name = "number_of_report_providers")
     public Long numberOfReportProviders;
 
-    @XmlElement(name = "number_of_active_user_capability_token")
-    public Long numberOfUserActiveCapabilityToken;
-    @XmlElement(name = "number_of_unactive_user_capability_token")
-    public Long numberOfUserUnactiveCapabilityToken;
-    @XmlElement(name = "number_of_user_capability_token")
-    public Long numberOfUserCapabilityToken;
+    @XmlElement(name = "number_of_active_user_capability_tokens")
+    public Long numberOfActiveUserCapabilityTokens;
+    @XmlElement(name = "number_of_inactive_user_capability_tokens")
+    public Long numberOfIactiveUserCapabilityTokens;
+    @XmlElement(name = "number_of_user_capability_tokens")
+    public Long numberOfUserCapabilityTokens;
 
-    @XmlElement(name = "number_of_active_album_capability_token")
-    public Long numberOfAlbumActiveCapabilityToken;
-    @XmlElement(name = "number_of_unactive_album_capability_token")
-    public Long numberOfAlbumUnactiveCapabilityToken;
-    @XmlElement(name = "number_of_album_capability_token")
-    public Long numberOfAlbumCapabilityToken;
-    @XmlElement(name = "number_of_capability_token")
-    public Long numberOfCapabilityToken;
+    @XmlElement(name = "number_of_active_album_capability_tokens")
+    public Long numberOfActiveAlbumCapabilityTokens;
+    @XmlElement(name = "number_of_inactive_album_capability_tokens")
+    public Long numberOfInactiveAlbumCapabilityTokens;
+    @XmlElement(name = "number_of_album_capability_tokens")
+    public Long numberOfAlbumCapabilityTokens;
+    @XmlElement(name = "number_of_capability_tokens")
+    public Long numberOfCapabilityTokens;
 
     @XmlElement(name = "number_of_studies")
     public Long numberOfStudies;
@@ -46,23 +45,23 @@ public class MetricResponse {
     @XmlElement(name = "number_of_instances")
     public Long numberOfInstances;
 
-    @XmlElement(name = "repartition_of_user_album")
-    public List<AlbumUserHistogram> repartitionOfUserAlbum;
-    @XmlElement(name = "repartition_of_series_album")
-    public List<AlbumSeriesHistogram> repartitionOfSeriesAlbum;
-    @XmlElement(name = "repartition_of_study_series")
-    public List<StudySeriesHistogram> repartitionOfStudySeries;
+    @XmlElement(name = "users_in_album_histogram")
+    public List<AlbumUserHistogram> usersInAlbumHistogram;
+    @XmlElement(name = "series_in_album_histogram")
+    public List<AlbumSeriesHistogram> seriesInAlbumHistogram;
+    @XmlElement(name = "series_in_study_histogram")
+    public List<StudySeriesHistogram> seriesInStudyHistogram;
 
-    @XmlElement(name = "number_of_fav_album")
+    @XmlElement(name = "number_of_fav_albums")
     public Long numberOfFavAlbum;
     @XmlElement(name = "number_of_fav_series")
     public Long numberOfFavSeries;
-    @XmlElement(name = "number_of_comments_study_public")
-    public Long numberOfCommentsStudyPublic;
-    @XmlElement(name = "number_of_comments_study_private")
-    public Long numberOfCommentsStudyPrivate;
-    @XmlElement(name = "number_of_comments_study")
-    public Long numberOfCommentsStudy;
+    @XmlElement(name = "number_of_public_study_comments")
+    public Long numberOfPublicStudyComments;
+    @XmlElement(name = "number_of_private_study_comments")
+    public Long numberOfPrivateStudyComments;
+    @XmlElement(name = "number_of_study_comments")
+    public Long numberOfStudyComments;
 
     public MetricResponse() {
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -81,26 +80,26 @@ public class MetricResponse {
             numberOfFavAlbum = getNumberOfAlbumsFav(em);
             numberOfFavSeries = getNumberOfSeriesFav(em);
 
-            numberOfCommentsStudy = getNumberOfComments(em);
-            numberOfCommentsStudyPrivate = getNumberOfCommentsPrivate(em);
-            numberOfCommentsStudyPublic = getNumberOfCommentsPublic(em);
+            numberOfStudyComments = getNumberOfComments(em);
+            numberOfPrivateStudyComments = getNumberOfCommentsPrivate(em);
+            numberOfPublicStudyComments = getNumberOfCommentsPublic(em);
 
-            numberOfUserActiveCapabilityToken = getNumberOfActiveToken(ScopeType.USER.name().toLowerCase(), em);
-            numberOfUserUnactiveCapabilityToken = getNumberOfUnactiveToken(ScopeType.USER.name().toLowerCase(), em);
-            numberOfUserCapabilityToken = getNumberOfToken(ScopeType.USER.name().toLowerCase(), em);
-            numberOfAlbumActiveCapabilityToken = getNumberOfActiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
-            numberOfAlbumUnactiveCapabilityToken = getNumberOfUnactiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
-            numberOfAlbumCapabilityToken = getNumberOfToken(ScopeType.ALBUM.name().toLowerCase(), em);
-            numberOfCapabilityToken = getNumberOfToken(em);
-            repartitionOfUserAlbum = getAlbumUserHistogram(em);
-            repartitionOfStudySeries = getStudySeriesHistogram(em);
-            repartitionOfSeriesAlbum = getAlbumSeriesHistogram(em);
+            numberOfActiveUserCapabilityTokens = getNumberOfActiveToken(ScopeType.USER.name().toLowerCase(), em);
+            numberOfIactiveUserCapabilityTokens = getNumberOfUnactiveToken(ScopeType.USER.name().toLowerCase(), em);
+            numberOfUserCapabilityTokens = getNumberOfToken(ScopeType.USER.name().toLowerCase(), em);
+            numberOfActiveAlbumCapabilityTokens = getNumberOfActiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
+            numberOfInactiveAlbumCapabilityTokens = getNumberOfUnactiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
+            numberOfAlbumCapabilityTokens = getNumberOfToken(ScopeType.ALBUM.name().toLowerCase(), em);
+            numberOfCapabilityTokens = getNumberOfToken(em);
+            usersInAlbumHistogram = getAlbumUserHistogram(em);
+            seriesInStudyHistogram = getStudySeriesHistogram(em);
+            seriesInAlbumHistogram = getAlbumSeriesHistogram(em);
 
             tx.commit();
 
-            for (AlbumUserHistogram albumUserHistogram : repartitionOfUserAlbum) {
-                if (albumUserHistogram.nb_user == 1) {
-                    albumUserHistogram.nb_album = albumUserHistogram.nb_album - numberOfUsers; //remove all inbox
+            for (AlbumUserHistogram albumUserHistogram : usersInAlbumHistogram) {
+                if (albumUserHistogram.nbUsers == 1) {
+                    albumUserHistogram.nbAlbums = albumUserHistogram.nbAlbums - numberOfUsers; //remove all inbox
                     break;
                 }
             }
