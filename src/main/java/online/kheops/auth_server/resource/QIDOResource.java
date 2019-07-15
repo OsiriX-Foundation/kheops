@@ -227,7 +227,7 @@ public class QIDOResource {
         queryParameters.remove(QUERY_PARAMETER_SORT);
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
-        String authToken = PepAccessTokenBuilder.newBuilder()
+        String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getKeycloakId())
@@ -364,7 +364,7 @@ public class QIDOResource {
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
-        String authToken = PepAccessTokenBuilder.newBuilder()
+        String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getKeycloakId())

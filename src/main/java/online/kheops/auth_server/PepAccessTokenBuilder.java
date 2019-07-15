@@ -1,5 +1,7 @@
 package online.kheops.auth_server;
 
+import online.kheops.auth_server.token.TokenProvenance;
+
 public abstract class PepAccessTokenBuilder {
     private static String secret = null;
 
@@ -7,8 +9,8 @@ public abstract class PepAccessTokenBuilder {
         PepAccessTokenBuilder.secret = secret;
     }
 
-    public static PepAccessTokenBuilder newBuilder() {
-        return new PepAccessTokenBuilderImpl(secret);
+    public static PepAccessTokenBuilder newBuilder(TokenProvenance provenance) {
+        return new PepAccessTokenBuilderImpl(secret, provenance);
     }
 
     public abstract PepAccessTokenBuilder withExpiresIn(long seconds);
@@ -19,10 +21,6 @@ public abstract class PepAccessTokenBuilder {
     public abstract PepAccessTokenBuilder withAllSeries();
 
     public abstract  PepAccessTokenBuilder withSubject(String sub);
-
-    public abstract PepAccessTokenBuilder withActingParty(String actingParty);
-    public abstract PepAccessTokenBuilder withAuthorizedParty(String actingParty);
-    public abstract PepAccessTokenBuilder withCapabilityTokenId(String capabilityTokenID);
 
     public abstract String build();
 }

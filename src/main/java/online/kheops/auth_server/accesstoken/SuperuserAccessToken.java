@@ -78,6 +78,6 @@ final class SuperuserAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        return new UserPrincipal(user, null);
+        return new UserPrincipal(user, "Superuser");
     }
 }
