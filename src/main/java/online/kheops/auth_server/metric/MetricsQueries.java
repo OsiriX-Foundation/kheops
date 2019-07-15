@@ -1,8 +1,9 @@
 package online.kheops.auth_server.metric;
 
-import javax.persistence.EntityManager;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 class MetricsQueries {
 

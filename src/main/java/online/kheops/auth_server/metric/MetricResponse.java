@@ -7,8 +7,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
+import java.util.List;
 
+import static online.kheops.auth_server.metric.AlbumSeriesHistogram.getAlbumSeriesHistogram;
+import static online.kheops.auth_server.metric.AlbumUserHistogram.getAlbumUserHistogram;
 import static online.kheops.auth_server.metric.MetricsQueries.*;
+import static online.kheops.auth_server.metric.StudySeriesHistogram.getStudySeriesHistogram;
 
 public class MetricResponse {
 
@@ -43,11 +47,11 @@ public class MetricResponse {
     public Long numberOfInstances;
 
     @XmlElement(name = "repartition_of_user_album")
-    public HashMap<Long,Long> repartitionOfUserAlbum;
+    public List<AlbumUserHistogram> repartitionOfUserAlbum;
     @XmlElement(name = "repartition_of_series_album")
-    public HashMap<Long,Long> repartitionOfSeriesAlbum;
+    public List<AlbumSeriesHistogram> repartitionOfSeriesAlbum;
     @XmlElement(name = "repartition_of_study_series")
-    public HashMap<Long,Long> repartitionOfStudySeries;
+    public List<StudySeriesHistogram> repartitionOfStudySeries;
 
     @XmlElement(name = "number_of_fav_album")
     public Long numberOfFavAlbum;
@@ -88,8 +92,19 @@ public class MetricResponse {
             numberOfAlbumUnactiveCapabilityToken = getNumberOfUnactiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
             numberOfAlbumCapabilityToken = getNumberOfToken(ScopeType.ALBUM.name().toLowerCase(), em);
             numberOfCapabilityToken = getNumberOfToken(em);
+            repartitionOfUserAlbum = getAlbumUserHistogram(em);
+            repartitionOfStudySeries = getStudySeriesHistogram(em);
+            repartitionOfSeriesAlbum = getAlbumSeriesHistogram(em);
 
             tx.commit();
+
+            for (AlbumUserHistogram albumUserHistogram : repartitionOfUserAlbum) {
+                if (albumUserHistogram.nb_user == 1) {
+                    albumUserHistogram.nb_album = albumUserHistogram.nb_album - numberOfUsers; //remove all inbox
+                    break;
+                }
+            }
+
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

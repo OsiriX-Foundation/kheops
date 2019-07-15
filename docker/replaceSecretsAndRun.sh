@@ -27,6 +27,12 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_client_zippersecret ]; then
     echo "Missing kheops_client_zippersecret secret"
     missing_env_var_secret=true
 fi
+if ! [ -f ${SECRET_FILE_PATH}/kheops_metric_ressource_password ]; then
+    echo "Missing kheops_metric_ressource_password secret"
+    missing_env_var_secret=true
+fi
+
+
 
 #Verify environment variables
 if [ -z "$KHEOPS_AUTHDB_USER" ]; then
