@@ -1,7 +1,7 @@
 package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.UserAccessSecured;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -19,7 +19,7 @@ public class UserAccessSecuredFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)requestContext.getSecurityContext().getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)requestContext.getSecurityContext().getUserPrincipal());
 
         if (!kheopsPrincipal.hasUserAccess()) {
             requestContext.abortWith(Response.status(FORBIDDEN).build());

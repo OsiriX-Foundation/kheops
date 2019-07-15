@@ -214,7 +214,7 @@ public class ReportProviderAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
         return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, clientId, hasReadAccess, hasWriteAccess);
     }
 }

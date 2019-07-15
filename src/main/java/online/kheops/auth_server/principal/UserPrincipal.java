@@ -23,7 +23,7 @@ import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 
-public class UserPrincipal implements KheopsPrincipalInterface {
+public class UserPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
     private EntityTransaction tx;

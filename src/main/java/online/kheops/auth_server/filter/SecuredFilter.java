@@ -5,7 +5,7 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.annotation.Priority;
@@ -71,7 +71,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         final User finalUser = user;
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
-            public KheopsPrincipalInterface getUserPrincipal() {
+            public KheopsPrincipal getUserPrincipal() {
                 return accessToken.newPrincipal(servletContext, finalUser);
             }
 

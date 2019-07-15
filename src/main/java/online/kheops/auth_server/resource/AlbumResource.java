@@ -6,7 +6,7 @@ import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.user.UsersPermission;
@@ -62,7 +62,7 @@ public class AlbumResource {
             return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         final UsersPermission usersPermission = new UsersPermission();
 
@@ -97,7 +97,7 @@ public class AlbumResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getAlbums() {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
 
         try {
@@ -129,7 +129,7 @@ public class AlbumResource {
     public Response getAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                              @QueryParam("includeUsers") @DefaultValue("false") boolean includeUsers) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface) securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal) securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         final AlbumResponse albumResponse;
@@ -182,7 +182,7 @@ public class AlbumResource {
             return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         final AlbumResponse albumResponse;
@@ -224,7 +224,7 @@ public class AlbumResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         try {
@@ -253,7 +253,7 @@ public class AlbumResource {
                                   @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                   @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         final PairListXTotalCount<UserAlbumResponse> pair;
@@ -283,7 +283,7 @@ public class AlbumResource {
     public Response addUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                             @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User targetUser;
 
         try {
@@ -314,7 +314,7 @@ public class AlbumResource {
     public Response addAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                              @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User targetUser;
 
         try {
@@ -345,7 +345,7 @@ public class AlbumResource {
     public Response removeAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                 @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User targetUser;
 
         try {
@@ -373,7 +373,7 @@ public class AlbumResource {
     public Response deleteUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User targetUser;
 
         try {
@@ -403,7 +403,7 @@ public class AlbumResource {
     public Response addFavorites(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
 
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         try {
             Albums.setFavorites(kheopsPrincipal.getUser(), albumId, true);
@@ -427,7 +427,7 @@ public class AlbumResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteFavorites(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         try {
             Albums.setFavorites(kheopsPrincipal.getUser(), albumId, false);

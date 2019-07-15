@@ -5,7 +5,7 @@ import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -105,7 +105,7 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
         return new CapabilityPrincipal(capability, user);
     }
 

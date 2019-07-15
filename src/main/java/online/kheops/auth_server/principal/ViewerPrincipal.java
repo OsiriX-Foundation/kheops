@@ -27,12 +27,12 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
-public class ViewerPrincipal implements KheopsPrincipalInterface {
+public class ViewerPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
     private EntityTransaction tx;
     private final ViewerAccessToken viewerAccessToken;
-    private final KheopsPrincipalInterface kheopsPrincipal;
+    private final KheopsPrincipal kheopsPrincipal;
 
 
     public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken) {

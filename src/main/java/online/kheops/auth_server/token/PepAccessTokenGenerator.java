@@ -3,7 +3,7 @@ package online.kheops.auth_server.token;
 import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 
@@ -73,7 +73,7 @@ class PepAccessTokenGenerator {
         }
 
         try {
-            final KheopsPrincipalInterface principal = accessToken.newPrincipal(context, callingUser);
+            final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
             if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 throw new SeriesNotFoundException("");
             }

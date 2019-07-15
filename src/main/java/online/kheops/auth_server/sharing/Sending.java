@@ -5,7 +5,7 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
@@ -98,7 +98,7 @@ public class Sending {
         }
     }
 
-    public static void deleteStudyFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+    public static void deleteStudyFromAlbum(KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -145,7 +145,7 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+    public static void deleteSeriesFromAlbum(KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -184,7 +184,7 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+    public static void putSeriesInAlbum(KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, ClientIdNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -253,7 +253,7 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(KheopsPrincipalInterface kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
+    public static void putStudyInAlbum(KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();

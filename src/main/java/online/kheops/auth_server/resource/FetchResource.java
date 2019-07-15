@@ -3,7 +3,7 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.fetch.Fetcher;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.ws.rs.POST;
@@ -27,7 +27,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @Context SecurityContext securityContext) {
         Fetcher.fetchStudy(studyInstanceUID);
-        ((KheopsPrincipalInterface) securityContext.getUserPrincipal()).getKheopsLogBuilder()
+        ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .study(studyInstanceUID)
                 .action(ActionType.FETCH)
                 .log();

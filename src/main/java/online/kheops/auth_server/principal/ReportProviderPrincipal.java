@@ -20,7 +20,7 @@ import static online.kheops.auth_server.report_provider.ReportProviders.getRepor
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
-public class ReportProviderPrincipal implements KheopsPrincipalInterface {
+public class ReportProviderPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
     private EntityTransaction tx;

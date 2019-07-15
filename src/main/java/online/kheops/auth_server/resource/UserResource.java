@@ -7,7 +7,7 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponseBuilder;
@@ -80,7 +80,7 @@ public class UserResource {
                                 @QueryParam("studyInstanceUID") @UIDValidator String studyInstanceUID) {
 
         final UserResponseBuilder userResponseBuilder;
-        KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+        KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .action(ActionType.TEST_USER);
 
         try {

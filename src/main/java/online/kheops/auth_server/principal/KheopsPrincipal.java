@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface KheopsPrincipalInterface extends Principal, TokenProvenance {
+public interface KheopsPrincipal extends Principal, TokenProvenance {
 
     long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;

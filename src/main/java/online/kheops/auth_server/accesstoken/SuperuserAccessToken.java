@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.UserPrincipal;
 
 import javax.servlet.ServletContext;
@@ -77,7 +77,7 @@ final class SuperuserAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
+    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
         return new UserPrincipal(user, "Superuser");
     }
 }

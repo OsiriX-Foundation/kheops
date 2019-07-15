@@ -24,7 +24,7 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 
 
-public class CapabilityPrincipal implements KheopsPrincipalInterface {
+public class CapabilityPrincipal implements KheopsPrincipal {
     private final Capability capability;
     private final User user;
 

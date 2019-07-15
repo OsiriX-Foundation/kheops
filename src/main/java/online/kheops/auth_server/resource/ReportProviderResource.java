@@ -9,7 +9,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.report_provider.*;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
 import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -84,7 +84,7 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity("'url' formparam is not valid").build();
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         final ReportProviderResponse dicomSrResponse;
         try {
@@ -146,7 +146,7 @@ public class ReportProviderResource {
             return Response.status(UNAUTHORIZED).entity("User not found").build();
         }
 
-        final KheopsPrincipalInterface principal = accessToken.newPrincipal(context, callingUser);
+        final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -301,7 +301,7 @@ public class ReportProviderResource {
 
         final PairListXTotalCount<ReportProviderResponse> pair;
 
-        pair = ReportProviders.getReportProviders(albumId, limit, offset, ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder());
+        pair = ReportProviders.getReportProviders(albumId, limit, offset, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
 
         final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<List<ReportProviderResponse>>(pair.getAttributesList()) {};
         return  Response.status(OK).entity(genericReportProvidersResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
@@ -319,7 +319,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse reportProvider;
         try {
-            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder());
+            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -336,7 +336,7 @@ public class ReportProviderResource {
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
         try {
             deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
@@ -369,7 +369,7 @@ public class ReportProviderResource {
             }
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
 
         final ReportProviderResponse reportProvider;
@@ -405,7 +405,7 @@ public class ReportProviderResource {
             clientMetadataResponse.setErrorDescription(e.getMessage());
         }
 
-        ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+        ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .action(ActionType.REPORT_PROVIDER_METADATA)
                 .log();
         return  Response.status(OK).entity(clientMetadataResponse).build();
