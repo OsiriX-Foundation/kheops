@@ -3,6 +3,7 @@ package online.kheops.auth_server.accesstoken;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipalInterface;
 import online.kheops.auth_server.principal.ViewerPrincipal;
+import online.kheops.auth_server.util.Consts;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -11,10 +12,10 @@ import javax.servlet.ServletContext;
 import java.io.StringReader;
 import java.util.Optional;
 
-final class ViewerAccessToken implements AccessToken {
+public final class ViewerAccessToken implements AccessToken {
 
     private final JsonObject jwe;
-    private final String sub;
+    private final AccessToken accessToken;
 
     static final class Builder {
         private final ServletContext servletContext;
@@ -40,13 +41,28 @@ final class ViewerAccessToken implements AccessToken {
 
         this.jwe = jwe;
 
-        AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString("token"));
-        this.sub = accessToken.getSubject();
+        this.accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
+    }
+
+    public AccessToken getAccessToken() {
+        return accessToken;
+    }
+
+    public boolean isInbox() {
+        return jwe.getBoolean(Consts.JWE.IS_INBOX);
+    }
+
+    public String getSourceId() {
+        return jwe.getString(Consts.JWE.SOURCE_ID);
+    }
+
+    public String getStudyInstanceUID() {
+        return jwe.getString(Consts.JWE.STUDY_INSTANCE_UID);
     }
 
     @Override
     public String getSubject() {
-        return sub;
+        return accessToken.getSubject();
     }
 
     @Override
@@ -58,8 +74,23 @@ final class ViewerAccessToken implements AccessToken {
     }
 
     @Override
+    public Optional<String> getActingParty() {
+        return accessToken.getActingParty();
+    }
+
+    @Override
+    public Optional<String> getAuthorizedParty() {
+        return accessToken.getAuthorizedParty();
+    }
+
+    @Override
+    public Optional<String> getCapabilityTokenId() {
+        return accessToken.getCapabilityTokenId();
+    }
+
+    @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        return new ViewerPrincipal(servletContext, jwe);
+        return new ViewerPrincipal(servletContext, this);
     }
 
 }

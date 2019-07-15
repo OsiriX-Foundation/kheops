@@ -6,14 +6,16 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
 
-public interface KheopsPrincipalInterface extends java.security.Principal{
+public interface KheopsPrincipalInterface extends Principal, TokenProvenance {
 
     long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;

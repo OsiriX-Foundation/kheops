@@ -98,6 +98,7 @@ class PrivateKeyJWTAuthenticator {
                     .withIssuer(clientId)
                     .withSubject(clientId)
                     .withAudience(getRootHost() + requestPath)
+                    .acceptLeeway(60)
                     .build().verify(clientJWT);
         } catch (JWTVerificationException e) {
             throw new TokenRequestException(INVALID_REQUEST, "Unable to verify the JWT. " + e.getMessage() , e);

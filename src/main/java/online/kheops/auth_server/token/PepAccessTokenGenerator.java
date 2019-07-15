@@ -82,13 +82,11 @@ class PepAccessTokenGenerator {
         }
 
         LOG.info(() -> "Returning pep token for user: " + accessToken.getSubject() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        PepAccessTokenBuilder tokenBuilder =  PepAccessTokenBuilder.newBuilder()
+        PepAccessTokenBuilder tokenBuilder =  PepAccessTokenBuilder.newBuilder(accessToken)
                 .withExpiresIn(expiresIn)
                 .withStudyUID(studyInstanceUID)
                 .withSeriesUID(seriesInstanceUID)
                 .withSubject(accessToken.getSubject());
-        accessToken.getActingParty().ifPresent(tokenBuilder::withActingParty);
-        accessToken.getAuthorizedParty().ifPresent(tokenBuilder::withAuthorizedParty);
         return tokenBuilder.build();
     }
 }

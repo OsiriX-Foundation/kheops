@@ -51,6 +51,7 @@ public class ReportProviderAccessToken implements AccessToken {
                         .withIssuer(getIssuerHost())
                         .withAudience(getIssuerHost())
                         .withClaim("type", "report_generator")
+                        .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
@@ -214,6 +215,6 @@ public class ReportProviderAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        return new ReportProviderPrincipal(user, studyUIDs, clientId, hasReadAccess, hasWriteAccess);
+        return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, clientId, hasReadAccess, hasWriteAccess);
     }
 }

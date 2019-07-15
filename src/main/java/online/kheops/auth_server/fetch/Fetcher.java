@@ -5,6 +5,7 @@ import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +56,9 @@ public abstract class Fetcher {
 
         final Attributes attributes;
         try {
-            String authToken = PepAccessTokenBuilder.newBuilder().withStudyUID(studyInstanceUID).withAllSeries().withSubject("Fetcher").build();
+            String authToken = PepAccessTokenBuilder.newBuilder(new TokenProvenance() {})
+                    .withStudyUID(studyInstanceUID).withAllSeries()
+                    .withSubject("Fetcher").build();
             List<Attributes> studyList = CLIENT.target(studyUri).request().accept("application/dicom+json").header("Authorization", "Bearer "+authToken).get(new GenericType<List<Attributes>>() {});
             if (studyList == null || studyList.isEmpty()) {
                 throw new WebApplicationException("GET to fetch study returned nothing");
@@ -99,7 +103,11 @@ public abstract class Fetcher {
 
         final Attributes attributes;
         try {
-            String authToken = PepAccessTokenBuilder.newBuilder().withStudyUID(studyUID).withSeriesUID(seriesUID).withSubject("Fetcher").build();
+            String authToken = PepAccessTokenBuilder.newBuilder(new TokenProvenance() {})
+                    .withStudyUID(studyUID)
+                    .withSeriesUID(seriesUID)
+                    .withSubject("Fetcher")
+                    .build();
             List<Attributes> seriesList = CLIENT.target(uri).request().accept("application/dicom+json").header("Authorization", "Bearer " + authToken).get(new GenericType<List<Attributes>>() {
             });
             if (seriesList == null || seriesList.isEmpty()) {
