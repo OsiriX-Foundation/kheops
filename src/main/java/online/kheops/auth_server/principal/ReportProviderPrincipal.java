@@ -20,13 +20,15 @@ import static online.kheops.auth_server.report_provider.ReportProviders.getRepor
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
-public class ReportProviderPrincipal implements KheopsPrincipalInterface {
+public class ReportProviderPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
     private EntityTransaction tx;
     private final User user;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;
+    private final String actingParty;
+    private final String capabilityTokenId;
 
     private List<String> studyUids;
     private String clientId;
@@ -34,7 +36,8 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
 
     //old version
     private final Long dbid;
-    public ReportProviderPrincipal(User user, List<String> studyUids, String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess) {
+    public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids,
+                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess) {
         try {
             album = getReportProvider(clientId).getAlbum();
         } catch (ClientIdNotFoundException e) {
@@ -44,6 +47,8 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
         this.studyUids = studyUids;
         this.dbid = user.getPk();
         this.user = user;
+        this.actingParty = actingParty;
+        this.capabilityTokenId = capabilityTokenId;
         this.hasReadAccess = hasReadAccessAccess;
         this.hasWriteAccess = hasWriteAccess;
     }
@@ -195,6 +200,21 @@ public class ReportProviderPrincipal implements KheopsPrincipalInterface {
     @Override
     public Optional<List<String>> getStudyList() {
         return Optional.of(studyUids);
+    }
+
+    @Override
+    public Optional<String> getActingParty() {
+        return Optional.ofNullable(actingParty);
+    }
+
+    @Override
+    public Optional<String> getAuthorizedParty() {
+        return Optional.of(clientId);
+    }
+
+    @Override
+    public Optional<String> getCapabilityTokenId() {
+        return Optional.ofNullable(capabilityTokenId);
     }
 
     private boolean hasStudyAccess(String studyInstanceUID) {

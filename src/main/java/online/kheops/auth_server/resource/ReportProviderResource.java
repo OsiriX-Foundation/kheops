@@ -9,7 +9,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.report_provider.*;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
 import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -84,7 +84,7 @@ public class ReportProviderResource {
             return Response.status(BAD_REQUEST).entity("'url' formparam is not valid").build();
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         final ReportProviderResponse dicomSrResponse;
         try {
@@ -100,23 +100,23 @@ public class ReportProviderResource {
     @Path("report")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response newReport(@FormParam("access_token") final String accessToken,
+    public Response newReport(@FormParam("access_token") final String tokenParam,
                               @FormParam("client_id") final String clientId,
-                              @FormParam("studyUID") List<String> studyInstanceUID) {//Edit UidValidator for work with @FormParam
+                              @FormParam("studyUID") List<String> studyInstanceUIDs) {//Edit UidValidator for work with @FormParam
 
-        if (studyInstanceUID == null || studyInstanceUID.isEmpty()) {
+        if (studyInstanceUIDs == null || studyInstanceUIDs.isEmpty()) {
             return Response.status(BAD_REQUEST).entity(StudyInstanceUID + " param must be set").build();
         }
 
-        for (String uid : studyInstanceUID) {
+        for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
                 return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
             }
         }
 
-        final AccessToken assertion;
+        final AccessToken accessToken;
         try {
-            assertion = AccessTokenVerifier.authenticateAccessToken(context, accessToken);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
@@ -126,29 +126,27 @@ public class ReportProviderResource {
         }
 
         try {
-            getOrCreateUser(assertion.getSubject());
+            getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).build();
         }
 
-        //vérifier la permission de créer report_provider_code (user) pas capability token
-        if (!(assertion.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
-                assertion.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN)) {
-
+        if (!  (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
             return Response.status(FORBIDDEN).build();
         }
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(assertion.getSubject());
+            callingUser = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(UNAUTHORIZED).entity("User not found").build();
         }
 
-        //vérifier l'acces a l'album
-        final KheopsPrincipalInterface principal = assertion.newPrincipal(context, callingUser);
+        final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -176,7 +174,7 @@ public class ReportProviderResource {
             }
 
             album = getAlbum(albumId);
-            for (String uid : studyInstanceUID) {
+            for (String uid : studyInstanceUIDs) {
                 if (!canAccessStudy(album, uid)) {
                     return Response.status(NOT_FOUND).entity("Study uid: " + uid + "not found").build();
                 }
@@ -201,11 +199,11 @@ public class ReportProviderResource {
 
                 ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context)
                         .withClientId(reportProvider.getClientId())
-                        .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSubject());
+                        .withStudyInstanceUIDs(studyInstanceUIDs)
+                        .withSubject(accessToken.getSubject());
 
-                assertion.getActingParty().ifPresent(generator::withActingParty);
-                assertion.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+                accessToken.getActingParty().ifPresent(generator::withActingParty);
+                accessToken.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
 
                 final String token = generator.generate(600);
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
@@ -215,7 +213,7 @@ public class ReportProviderResource {
                         .queryParam("client_id", reportProvider.getClientId())
                         .queryParam("return_uri", getHostRoot() + "/albums/" + albumId);
 
-                for (String uid : studyInstanceUID) {
+                for (String uid : studyInstanceUIDs) {
                     reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, UTF_8.toString()));
                 }
 
@@ -227,11 +225,11 @@ public class ReportProviderResource {
                 ReportProviderAccessTokenGenerator generator = ReportProviderAccessTokenGenerator.createGenerator(context)
                         .withClientId(clientId)
                         .withScope(userHasWriteAccess ? "read write" : "read")
-                        .withStudyInstanceUIDs(studyInstanceUID)
-                        .withSubject(assertion.getSubject());
+                        .withStudyInstanceUIDs(studyInstanceUIDs)
+                        .withSubject(accessToken.getSubject());
 
-                assertion.getActingParty().ifPresent(generator::withActingParty);
-                assertion.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
+                accessToken.getActingParty().ifPresent(generator::withActingParty);
+                accessToken.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);
 
                 final String token = generator.generate(3600);
 
@@ -246,7 +244,7 @@ public class ReportProviderResource {
                                 "&client_id=" + clientId +
                                 "&conf_uri=" + confUri +
                                 "&return_uri=" + returnUri +
-                                studyInstanceUID.stream()
+                                studyInstanceUIDs.stream()
                                         .map(uid -> "&studyUID=" + uid)
                                         .collect(Collectors.joining()))
                         .toString();
@@ -258,9 +256,7 @@ public class ReportProviderResource {
                     .action(ActionType.NEW_REPORT)
                     .album(albumId)
                     .clientID(clientId);
-            for (String studyUID : studyInstanceUID) {
-                kheopsLogBuilder.study(studyUID);
-            }
+            studyInstanceUIDs.forEach(kheopsLogBuilder::study);
             kheopsLogBuilder.log();
 
             final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
@@ -305,7 +301,7 @@ public class ReportProviderResource {
 
         final PairListXTotalCount<ReportProviderResponse> pair;
 
-        pair = ReportProviders.getReportProviders(albumId, limit, offset, ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder());
+        pair = ReportProviders.getReportProviders(albumId, limit, offset, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
 
         final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<List<ReportProviderResponse>>(pair.getAttributesList()) {};
         return  Response.status(OK).entity(genericReportProvidersResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
@@ -323,7 +319,7 @@ public class ReportProviderResource {
 
         final ReportProviderResponse reportProvider;
         try {
-            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder());
+            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -340,7 +336,7 @@ public class ReportProviderResource {
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
         try {
             deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
@@ -373,7 +369,7 @@ public class ReportProviderResource {
             }
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
 
         final ReportProviderResponse reportProvider;
@@ -409,7 +405,7 @@ public class ReportProviderResource {
             clientMetadataResponse.setErrorDescription(e.getMessage());
         }
 
-        ((KheopsPrincipalInterface)securityContext.getUserPrincipal()).getKheopsLogBuilder()
+        ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .action(ActionType.REPORT_PROVIDER_METADATA)
                 .log();
         return  Response.status(OK).entity(clientMetadataResponse).build();

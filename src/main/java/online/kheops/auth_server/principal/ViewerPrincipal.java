@@ -2,10 +2,9 @@ package online.kheops.auth_server.principal;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.accesstoken.ViewerAccessToken;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.accesstoken.AccessToken;
-import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
@@ -13,15 +12,12 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.KheopsLogBuilder;
-import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
-import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,22 +27,17 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
-public class ViewerPrincipal implements KheopsPrincipalInterface {
+public class ViewerPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
     private EntityTransaction tx;
-    private final JsonObject jwe;
-    private final KheopsPrincipalInterface kheopsPrincipal;
+    private final ViewerAccessToken viewerAccessToken;
+    private final KheopsPrincipal kheopsPrincipal;
 
 
-    public ViewerPrincipal(ServletContext servletContext, JsonObject jwe) {
+    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken) {
 
-        final AccessToken accessToken;
-        try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
-        } catch (AccessTokenVerificationException e) {
-            throw new IllegalStateException(e);
-        }
+        final AccessToken accessToken = viewerAccessToken.getAccessToken();
 
         final User user;
         try {
@@ -56,7 +47,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         }
         kheopsPrincipal = accessToken.newPrincipal(servletContext, user);
 
-        this.jwe = jwe;
+        this.viewerAccessToken = viewerAccessToken;
     }
 
     @Override
@@ -81,10 +72,10 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
             tx.begin();
 
             final List<Series> seriesList;
-            if(jwe.getBoolean(Consts.JWE.IS_INBOX)) {
+            if(viewerAccessToken.isInbox()) {
                 seriesList = findSeriesListByStudyUIDFromInbox(getUser(), studyInstanceUID, em);
             } else {
-                final Album album = getAlbum(jwe.getString(Consts.JWE.SOURCE_ID), em);
+                final Album album = getAlbum(viewerAccessToken.getSourceId(), em);
                 seriesList = findSeriesListByStudyUIDFromAlbum(getUser(), album, studyInstanceUID, em);
             }
 
@@ -109,7 +100,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
             return false;
         }
 
-        if (studyInstanceUID.equals(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID))) {
+        if (studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID())) {
             return true;
         } else {
             return false;
@@ -161,7 +152,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     @Override
     public boolean hasAlbumAccess(String albumId){
         try {
-            return kheopsPrincipal.hasAlbumAccess(albumId) && !jwe.getBoolean(Consts.JWE.IS_INBOX) && jwe.getString(Consts.JWE.SOURCE_ID).equals(albumId);
+            return kheopsPrincipal.hasAlbumAccess(albumId) && !viewerAccessToken.isInbox() && viewerAccessToken.getSourceId().equals(albumId);
         } catch (AlbumNotFoundException e) {
             return false;
         }
@@ -169,7 +160,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public boolean hasInboxAccess() {
-        return jwe.getBoolean(Consts.JWE.IS_INBOX);
+        return viewerAccessToken.isInbox();
     }
 
     @Override
@@ -177,7 +168,7 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public ScopeType getScope() {
-        if(!jwe.getBoolean(Consts.JWE.IS_INBOX) || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        if(!viewerAccessToken.isInbox() || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             return ScopeType.ALBUM;
         } else {
             return ScopeType.USER;
@@ -188,8 +179,8 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
     @Override
     public String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException {
         final String albumID;
-        if(!jwe.getBoolean(Consts.JWE.IS_INBOX)) {
-            albumID = jwe.getString(Consts.JWE.SOURCE_ID);
+        if(!viewerAccessToken.isInbox()) {
+            albumID = viewerAccessToken.getSourceId();
         } else {
             throw new NotAlbumScopeTypeException("");
         }
@@ -199,6 +190,21 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
         } else {
             throw new AlbumNotFoundException("");
         }
+    }
+
+    @Override
+    public Optional<String> getActingParty() {
+        return kheopsPrincipal.getActingParty();
+    }
+
+    @Override
+    public Optional<String> getAuthorizedParty() {
+        return kheopsPrincipal.getAuthorizedParty();
+    }
+
+    @Override
+    public Optional<String> getCapabilityTokenId() {
+        return kheopsPrincipal.getCapabilityTokenId();
     }
 
     @Override
@@ -213,8 +219,6 @@ public class ViewerPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public Optional<List<String>> getStudyList() {
-        final List<String> studyList = new ArrayList<>();
-        studyList.add(jwe.getString(Consts.JWE.STUDY_INSTANCE_UID));
-        return Optional.of(studyList);
+        return Optional.of(Collections.singletonList(viewerAccessToken.getStudyInstanceUID()));
     }
 }

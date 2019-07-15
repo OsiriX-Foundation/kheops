@@ -3,6 +3,7 @@ package online.kheops.auth_server;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import online.kheops.auth_server.token.TokenProvenance;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
@@ -26,13 +27,16 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
     private Algorithm algorithm;
     private long expiresIn;
 
-    PepAccessTokenBuilderImpl(String secret) {
+    PepAccessTokenBuilderImpl(String secret, TokenProvenance provenance) {
         claims = new HashMap<>();
         try {
             algorithm = Algorithm.HMAC256(secret);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Bad secret", e);
         }
+        provenance.getActingParty().ifPresent(this::withActingParty);
+        provenance.getAuthorizedParty().ifPresent(this::withAuthorizedParty);
+        provenance.getCapabilityTokenId().ifPresent(this::withCapabilityTokenId);
     }
 
     @Override
@@ -67,34 +71,28 @@ public class PepAccessTokenBuilderImpl extends PepAccessTokenBuilder {
         return this;
     }
 
-    @Override
-    public PepAccessTokenBuilder withActingParty(String actingParty) {
+    private void withActingParty(String actingParty) {
         if (actingParty == null) {
             claims.remove(ACTING_PARTY);
         } else {
             claims.put(ACTING_PARTY, actingParty);
         }
-        return this;
     }
 
-    @Override
-    public PepAccessTokenBuilder withAuthorizedParty(String authorizedParty) {
+    private void withAuthorizedParty(String authorizedParty) {
         if (authorizedParty == null) {
             claims.remove(AUTHORIZED_PARTY);
         } else {
             claims.put(AUTHORIZED_PARTY, authorizedParty);
         }
-        return this;
     }
 
-    @Override
-    public PepAccessTokenBuilder withCapabilityTokenId(String capabilityTokenId) {
+    private void withCapabilityTokenId(String capabilityTokenId) {
         if (capabilityTokenId == null) {
             claims.remove(CAPABILITY_TOKEN_ID);
         } else {
             claims.put(CAPABILITY_TOKEN_ID, capabilityTokenId);
         }
-        return this;
     }
 
     @Override

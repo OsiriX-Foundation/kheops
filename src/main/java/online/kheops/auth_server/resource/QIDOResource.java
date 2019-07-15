@@ -8,7 +8,7 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
@@ -78,7 +78,7 @@ public class QIDOResource {
             return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
         if(fromInbox != null && fromInbox && !kheopsPrincipal.hasUserAccess()) {
@@ -187,7 +187,7 @@ public class QIDOResource {
             limit = Integer.MAX_VALUE;
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY)
                 .study(studyInstanceUID);
@@ -227,7 +227,7 @@ public class QIDOResource {
         queryParameters.remove(QUERY_PARAMETER_SORT);
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
-        String authToken = PepAccessTokenBuilder.newBuilder()
+        String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getKeycloakId())
@@ -333,7 +333,7 @@ public class QIDOResource {
 
         fromInbox = fromInbox != null;
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY_METADATA)
                 .study(studyInstanceUID);
@@ -364,7 +364,7 @@ public class QIDOResource {
         //END kheopsPrincipal
 
         URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/metadata").build(studyInstanceUID);
-        String authToken = PepAccessTokenBuilder.newBuilder()
+        String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getKeycloakId())

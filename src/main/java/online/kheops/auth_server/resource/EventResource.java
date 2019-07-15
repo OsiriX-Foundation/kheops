@@ -8,7 +8,7 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.event.EventResponse;
 import online.kheops.auth_server.event.Events;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
@@ -51,7 +51,7 @@ public class EventResource {
                               @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                               @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutation")) {
             types.remove("mutation");
@@ -112,7 +112,7 @@ public class EventResource {
             return Response.status(BAD_REQUEST).entity("Param 'comment' is too long. max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length()).build();
         }
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         try {
             Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
@@ -139,7 +139,7 @@ public class EventResource {
                                 @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                 @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
@@ -175,7 +175,7 @@ public class EventResource {
                                        @FormParam("to_user") String user,
                                        @FormParam("comment") @NotNull @NotEmpty String comment) {
 
-        final KheopsPrincipalInterface kheopsPrincipal = ((KheopsPrincipalInterface)securityContext.getUserPrincipal());
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             return Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();

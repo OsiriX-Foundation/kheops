@@ -3,7 +3,7 @@ package online.kheops.auth_server.token;
 import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 
@@ -73,7 +73,7 @@ class PepAccessTokenGenerator {
         }
 
         try {
-            final KheopsPrincipalInterface principal = accessToken.newPrincipal(context, callingUser);
+            final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
             if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 throw new SeriesNotFoundException("");
             }
@@ -82,13 +82,11 @@ class PepAccessTokenGenerator {
         }
 
         LOG.info(() -> "Returning pep token for user: " + accessToken.getSubject() + "for studyInstanceUID " + studyInstanceUID +" seriesInstanceUID " + seriesInstanceUID);
-        PepAccessTokenBuilder tokenBuilder =  PepAccessTokenBuilder.newBuilder()
+        PepAccessTokenBuilder tokenBuilder =  PepAccessTokenBuilder.newBuilder(accessToken)
                 .withExpiresIn(expiresIn)
                 .withStudyUID(studyInstanceUID)
                 .withSeriesUID(seriesInstanceUID)
                 .withSubject(accessToken.getSubject());
-        accessToken.getActingParty().ifPresent(tokenBuilder::withActingParty);
-        accessToken.getAuthorizedParty().ifPresent(tokenBuilder::withAuthorizedParty);
         return tokenBuilder.build();
     }
 }

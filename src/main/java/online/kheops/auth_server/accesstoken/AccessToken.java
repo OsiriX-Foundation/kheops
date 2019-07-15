@@ -1,21 +1,22 @@
 package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.token.TokenProvenance;
 
 import javax.servlet.ServletContext;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-public interface AccessToken {
+public interface AccessToken extends TokenProvenance {
 
-    enum TokenType  {KEYCLOAK_TOKEN, CAPABILITY_TOKEN, SUPER_USER_TOKEN, PEP_TOKEN, VIEWER_TOKEN, REPORT_PROVIDER_TOKEN}
+    enum TokenType  {KEYCLOAK_TOKEN, ALBUM_CAPABILITY_TOKEN, USER_CAPABILITY_TOKEN, SUPER_USER_TOKEN, PEP_TOKEN, VIEWER_TOKEN, REPORT_PROVIDER_TOKEN}
 
     String getSubject();
     TokenType getTokenType();
 
-    KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user);
+    KheopsPrincipal newPrincipal(ServletContext servletContext, User user);
 
     default Optional<String> getScope() {
         return Optional.empty();
@@ -39,15 +40,6 @@ public interface AccessToken {
         return Optional.empty();
     }
     default Optional<String> getIssuer() {
-        return Optional.empty();
-    }
-    default Optional<String> getAuthorizedParty() {
-        return Optional.empty();
-    }
-    default Optional<String> getActingParty() {
-        return Optional.empty();
-    }
-    default Optional<String> getCapabilityTokenId() {
         return Optional.empty();
     }
 }

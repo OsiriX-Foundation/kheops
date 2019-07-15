@@ -5,7 +5,7 @@ import online.kheops.auth_server.album.AlbumForbiddenException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import org.dcm4che3.data.Tag;
 
@@ -49,7 +49,7 @@ public final class StudyQIDOParams {
     private final boolean commentField;
     private final boolean studyDescriptionField;
 
-    public StudyQIDOParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
+    public StudyQIDOParams(KheopsPrincipal kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException , NoResultException {
 
         String albumIDLocal = null;

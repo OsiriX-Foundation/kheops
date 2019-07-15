@@ -11,7 +11,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.keycloak.KeycloakContextListener;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.UserPrincipal;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -193,7 +193,7 @@ final class KeycloakAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipalInterface newPrincipal(ServletContext servletContext, User user) {
-        return new UserPrincipal(user);
+    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
+        return new UserPrincipal(user, actingParty);
     }
 }

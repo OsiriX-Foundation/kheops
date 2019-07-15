@@ -24,7 +24,7 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 
 
-public class CapabilityPrincipal implements KheopsPrincipalInterface {
+public class CapabilityPrincipal implements KheopsPrincipal {
     private final Capability capability;
     private final User user;
 
@@ -301,8 +301,17 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
     }
 
     @Override
+    public Optional<String> getCapabilityTokenId() {
+        return Optional.of(capability.getId());
+    }
+
+    @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder().user(user.getKeycloakId()).capabilityID(capability.getId()).scope(capability.getScopeType()).tokenType(TokenType.CAPABILITY_TOKEN);
+        return new KheopsLogBuilder()
+                .user(user.getKeycloakId())
+                .capabilityID(capability.getId())
+                .scope(capability.getScopeType())
+                .tokenType(getTokenType());
     }
 
     @Override
@@ -312,4 +321,14 @@ public class CapabilityPrincipal implements KheopsPrincipalInterface {
 
     @Override
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
+
+    private TokenType getTokenType() {
+        if (getScope() == ScopeType.ALBUM) {
+            return TokenType.ALBUM_CAPABILITY_TOKEN;
+        } else if (getScope() == ScopeType.USER) {
+            return TokenType.USER_CAPABILITY_TOKEN;
+        } else {
+            throw new IllegalStateException("unknown scope type");
+        }
+    }
 }

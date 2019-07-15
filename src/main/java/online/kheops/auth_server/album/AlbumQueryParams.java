@@ -1,7 +1,7 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipalInterface;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.util.JOOQTools;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -36,7 +36,7 @@ public final class AlbumQueryParams {
 
     private final User user;
 
-    public AlbumQueryParams(KheopsPrincipalInterface kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
+    public AlbumQueryParams(KheopsPrincipal kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
 
         name = extractName(queryParameters);

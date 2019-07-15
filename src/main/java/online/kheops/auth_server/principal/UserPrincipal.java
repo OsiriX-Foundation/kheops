@@ -15,23 +15,27 @@ import online.kheops.auth_server.util.KheopsLogBuilder;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import java.util.Optional;
+
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 
-public class UserPrincipal implements KheopsPrincipalInterface {
+public class UserPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
     private EntityTransaction tx;
     private final User user;
+    private final String actingParty;
 
     //old version
     private final Long dbid;
-    public UserPrincipal(User user) {
+    public UserPrincipal(User user, String actingParty) {
         this.dbid = user.getPk();
         this.user = user;
+        this.actingParty = actingParty;
     }
     @Override
     public long getDBID() {
@@ -187,6 +191,11 @@ public class UserPrincipal implements KheopsPrincipalInterface {
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
         return new KheopsLogBuilder().user(getUser().getKeycloakId()).tokenType(TokenType.KEYCLOAK_TOKEN);
+    }
+
+    @Override
+    public Optional<String> getActingParty() {
+        return Optional.ofNullable(actingParty);
     }
 
     @Override
