@@ -308,8 +308,8 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
         return new KheopsLogBuilder()
+                .provenance(this)
                 .user(user.getKeycloakId())
-                .capabilityID(capability.getId())
                 .scope(capability.getScopeType())
                 .tokenType(getTokenType());
     }

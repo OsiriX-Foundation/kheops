@@ -136,6 +136,7 @@ public class UserResource {
 
         try {
             new KheopsLogBuilder().user(accessToken.getSubject())
+                    .provenance(accessToken)
                     .action(ActionType.USER_INFO)
                     .tokenType(accessToken.getTokenType())
                     .log();
