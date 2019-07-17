@@ -37,7 +37,7 @@ public final class TokenBasicAuthenticator {
         }
     }
 
-    final private ServletContext context;
+    private final ServletContext context;
     private String clientId;
     private String password;
 

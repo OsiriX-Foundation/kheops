@@ -5,7 +5,6 @@ import org.dcm4che3.io.SAXTransformer;
 import org.xml.sax.SAXException;
 
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -26,7 +25,8 @@ public class XMLAttributesWriter implements MessageBodyWriter<Attributes> {
     }
 
     @Override
-    public void writeTo(Attributes attributes, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo(Attributes attributes, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException
+    {
         try {
             SAXTransformer.getSAXWriter(new StreamResult(entityStream)).write(attributes);
         } catch (TransformerConfigurationException | SAXException e) {
