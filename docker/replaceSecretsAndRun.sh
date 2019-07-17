@@ -128,7 +128,7 @@ sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCL
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 
 
-echo "Ending setup NGINX secrets and env var"
+echo "Ending setup secrets and env var"
 
 #######################################################################################
 #ELASTIC SEARCH
@@ -136,7 +136,7 @@ echo "Ending setup NGINX secrets and env var"
 if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
     if [ "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" = true ]; then
 
-        echo "Start init filebeat"
+        echo "Start init filebeat and metricbeat"
         missing_env_var_secret=false
 
         if [ -z "$KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE" ]; then
@@ -145,6 +145,7 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         else
            echo "environment variable KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE \e[92mOK\e[0m"
            sed -i "s|\${instance}|$KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE|" /etc/filebeat/filebeat.yml
+           sed -i "s|\${instance}|$KHEOPS_AUTHORIZATION_ELASTIC_INSTANCE|" /etc/metricbeat/metricbeat.yml
         fi
 
         if [ -z "$KHEOPS_AUTHORIZATION_LOGSTASH_URL" ]; then
@@ -153,6 +154,15 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
         else
            echo "environment variable KHEOPS_AUTHORIZATION_LOGSTASH_URL \e[92mOK\e[0m"
            sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_LOGSTASH_URL|" /etc/filebeat/filebeat.yml
+           sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_LOGSTASH_URL|" /etc/metricbeat/metricbeat.yml
+        fi
+
+        kheops_metric_ressource_password=/run/secrets/kheops_metric_ressource_password
+        if [ -f $kheops_metric_ressource_password ]; then
+          sed -i "s|\${metrics_password}|$(cat $kheops_metric_ressource_password)|" /etc/metricbeat/modules.d/http.yml
+        else
+           echo "Missing kheops_metric_ressource_password secret"
+           missing_env_var_secret=true
         fi
 
         #if missing env var or secret => exit
@@ -164,8 +174,10 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
 
         filebeat modules disable system
         service filebeat restart
+        metricbeat modules disable system
+        service metricbeat restart
 
-        echo "Ending setup FILEBEAT"
+        echo "Ending setup FILEBEAT and METRICBEAT"
     fi
 else
     echo "[INFO] : Missing KHEOPS_AUTHORIZATION_ENABLE_ELASTIC environment variable. Elastic is not enable."
