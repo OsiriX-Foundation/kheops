@@ -24,7 +24,7 @@ public class Introspect {
 
     private Introspect() {}
 
-    private static class actingPartyResponse {
+    private static class ActingPartyResponse {
         @XmlElement(name = "sub")
         String subject;
     }
@@ -41,7 +41,7 @@ public class Introspect {
         @XmlElement(name = "cap_token")
         String capabilityTokenId;
         @XmlElement(name = "act")
-        actingPartyResponse actingPartyResponse;
+        ActingPartyResponse actingPartyResponse;
 
 
         public boolean isActive() {
