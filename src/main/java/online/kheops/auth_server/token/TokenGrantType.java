@@ -183,7 +183,7 @@ public enum TokenGrantType {
 
     public abstract TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form);
 
-    private static void verifySingleHeader(final MultivaluedMap<String, String> form, final String param) throws TokenRequestException {
+    private static void verifySingleHeader(final MultivaluedMap<String, String> form, final String param) {
         final List<String> params = form.get(param);
         if (params == null || form.get(param).size() != 1) {
             throw new TokenRequestException(INVALID_REQUEST, "Must have a single " + param);

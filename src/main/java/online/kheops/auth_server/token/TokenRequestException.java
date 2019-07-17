@@ -23,6 +23,7 @@ public class TokenRequestException extends BadRequestException {
             this.errorString = errorString;
         }
 
+        @Override
         public String toString() {
             return errorString;
         }

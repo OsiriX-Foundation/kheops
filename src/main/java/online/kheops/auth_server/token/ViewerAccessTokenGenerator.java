@@ -84,7 +84,6 @@ class ViewerAccessTokenGenerator {
         } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
-            LOG.log(Level.SEVERE, "Error downloading the public key", e);
             throw new WebApplicationException(e, Response.status(BAD_GATEWAY).entity("Error downloading the public key").build());
         }
 
