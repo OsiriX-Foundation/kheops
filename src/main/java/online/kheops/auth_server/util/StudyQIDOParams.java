@@ -7,6 +7,7 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
 
 import javax.persistence.NoResultException;
@@ -234,8 +235,8 @@ public final class StudyQIDOParams {
     public boolean includeStudyDescriptionField() { return studyDescriptionField; }
 
     private static Optional<String> getFilter(int tag, MultivaluedMap<String, String> queryParameters) {
-        if (queryParameters.containsKey(org.dcm4che3.data.Keyword.valueOf(tag))) {
-            return Optional.ofNullable(queryParameters.get(org.dcm4che3.data.Keyword.valueOf(tag)).get(0));
+        if (queryParameters.containsKey(Keyword.valueOf(tag))) {
+            return Optional.ofNullable(queryParameters.get(Keyword.valueOf(tag)).get(0));
         } else if (queryParameters.containsKey(String.format("%08X", tag))) {
             return Optional.ofNullable(queryParameters.get(String.format("%08X", tag)).get(0));
         } else {
@@ -272,7 +273,7 @@ public final class StudyQIDOParams {
 
     private static boolean getStudyDescriptionField(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(INCLUDE_FIELD)) {
-            return queryParameters.get(INCLUDE_FIELD).contains(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDescription)) ||
+            return queryParameters.get(INCLUDE_FIELD).contains(Keyword.valueOf(Tag.StudyDescription)) ||
                     queryParameters.get(INCLUDE_FIELD).contains(String.format("%08X", Tag.StudyDescription));
         } else {
             return false;
