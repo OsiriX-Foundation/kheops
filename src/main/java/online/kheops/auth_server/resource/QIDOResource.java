@@ -235,8 +235,8 @@ public class QIDOResource {
 
         WebTarget webTarget = CLIENT.target(uri);
 
-        for (Map.Entry<String, List<String>> queryParameterEntry: queryParameters.entrySet()) {
-            webTarget = webTarget.queryParam(queryParameterEntry.getKey(), queryParameterEntry.getValue().toArray());
+        for (String parameter: queryParameters.keySet()) {
+            webTarget = webTarget.queryParam(parameter, queryParameters.get(parameter).toArray());
         }
 
         final Set<String> availableSeriesUIDs;
@@ -280,12 +280,14 @@ public class QIDOResource {
                 }
 
                 if (skipped >= offset) {
-                    if(!(favoriteFilter != null && favoriteValue != favoriteFilter) && availableSeries.size() < limit) {
-                        if (includeFieldFavorite) {
-                            series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
+                    if(!(favoriteFilter != null && favoriteValue != favoriteFilter)) {
+                        if (availableSeries.size() < limit) {
+                            if (includeFieldFavorite) {
+                                series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
+                            }
+                            availableSeries.add(series);
+                            kheopsLogBuilder.series(seriesInstanceUID);
                         }
-                        availableSeries.add(series);
-                        kheopsLogBuilder.series(seriesInstanceUID);
                     }
                 } else {
                     skipped++;
@@ -407,7 +409,7 @@ public class QIDOResource {
                 generator.flush();
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Error while processing metadata", e);
-                throw new WebApplicationException("Error while processing metadata", e);
+                throw new WebApplicationException(e);
             } finally {
                 upstreamResponse.close();
             }

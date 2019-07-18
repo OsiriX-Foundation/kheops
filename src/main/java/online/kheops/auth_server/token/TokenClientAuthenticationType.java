@@ -52,14 +52,6 @@ public enum TokenClientAuthenticationType {
                     .requestPath(requestPath)
                     .authenticate();
         }
-
-        private void verifySingleHeader(MultivaluedMap<String, String> formParams, String header) {
-            final List<String> headers = formParams.get(header);
-
-            if (headers == null || headers.size() != 1) {
-                throw new TokenRequestException(INVALID_REQUEST, "There isn't a single " + header + " header");
-            }
-        }
     },
 
     PUBLIC("public") {
@@ -110,10 +102,10 @@ public enum TokenClientAuthenticationType {
                 throw new TokenRequestException(INVALID_REQUEST, "Only one Authorization Header can be present");
             }
             try {
-                if (authorizationHeaders.get(0).substring(0, 6).equalsIgnoreCase("Basic ")) {
+                if (authorizationHeaders.get(0).substring(0, 6).toUpperCase().equals("BASIC ")) {
                     return TokenClientAuthenticationType.CLIENT_SECRET_BASIC;
                 }
-                if (authorizationHeaders.get(0).substring(0, 7).equalsIgnoreCase("Bearer ")) {
+                if (authorizationHeaders.get(0).substring(0, 7).toUpperCase().equals("BEARER ")) {
                     return TokenClientAuthenticationType.PUBLIC;
                 }
             } catch (IndexOutOfBoundsException e) {
@@ -141,6 +133,14 @@ public enum TokenClientAuthenticationType {
         }
 
         return TokenClientAuthenticationType.PUBLIC;
+    }
+
+    private static void verifySingleHeader(MultivaluedMap<String, String> formParams, String header) {
+        final List<String> headers = formParams.get(header);
+
+        if (headers == null || headers.size() != 1) {
+            throw new TokenRequestException(INVALID_REQUEST, "There isn't a single " + header + " header");
+        }
     }
 
     public abstract TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form);

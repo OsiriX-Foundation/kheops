@@ -102,8 +102,12 @@ public class KheopsLogBuilder {
         for (LogEntry pair: logEntry) {
             logString.append(pair.getKey()).append("=").append(pair.getValue()).append(" ");
         }
-        LOG.log(KheopsLevel.KHEOPS, logString::toString);
+        LOG.log(KheopsLevel.KHEOPS, logString.toString());
     }
+
+
+
+
 
     private final class LogEntry implements Map.Entry<String, String> {
         private final String key;

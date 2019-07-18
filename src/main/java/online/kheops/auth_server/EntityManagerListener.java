@@ -20,6 +20,7 @@ public class EntityManagerListener implements ServletContextListener {
         properties.put("javax.persistence.jdbc.user", event.getServletContext().getInitParameter("online.kheops.jdbc.user"));
         properties.put("javax.persistence.jdbc.password", event.getServletContext().getInitParameter("online.kheops.jdbc.password"));
         properties.put("javax.persistence.jdbc.url", event.getServletContext().getInitParameter("online.kheops.jdbc.url"));
+//        properties.put("javax.persistence.jdbc.url", event.getServletContext().getInitParameter("online.kheops.jdbc.url") + "?useSSL=false&useUnicode=yes&amp;characterEncoding=UTF-8");
 
         emf = Persistence.createEntityManagerFactory("online.kheops", properties);
     }

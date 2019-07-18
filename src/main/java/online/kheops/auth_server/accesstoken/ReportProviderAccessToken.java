@@ -85,7 +85,11 @@ public class ReportProviderAccessToken implements AccessToken {
                 final String actingParty;
                 Claim actClaim = jwt.getClaim("act");
                 if (!actClaim.isNull()) {
-                    actingParty = (String) actClaim.asMap().get("sub");
+                    try {
+                        actingParty = (String) actClaim.asMap().get("sub");
+                    } catch (ClassCastException | JWTDecodeException e) {
+                        throw new AccessTokenVerificationException("Unable to read the acting party", e);
+                    }
                     if (actingParty == null) {
                         throw new AccessTokenVerificationException("Has acting party, but without a subject");
                     }
@@ -104,8 +108,6 @@ public class ReportProviderAccessToken implements AccessToken {
                 return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss);
             } catch (NullPointerException | JWTDecodeException e) {
                 throw new AccessTokenVerificationException("AccessToken missing fields.", e);
-            } catch (ClassCastException e) {
-                throw new AccessTokenVerificationException("Unable to read the acting party", e);
             }
         }
 

@@ -113,6 +113,10 @@ public class ReportProviders {
             throw new ReportProviderUriNotValidException("Unable to get issuer from the report provider configuration URL", e);
         }
 
+//        if (!configurationUri.getScheme().equals("https") && !configurationUri.getHost().equals("localhost")) {
+//            throw new ReportProviderUriNotValidException("Non https configuration URIs are only allowed for localhost");
+//        }
+
         return configurationUri.getScheme() + "://" + configurationUri.getAuthority();
     }
 

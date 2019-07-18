@@ -31,7 +31,7 @@ class PrivateKeyJWTAuthenticator {
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String RS256 = "RS256";
 
-    private final ServletContext context;
+    final private ServletContext context;
     private String clientId;
     private String requestPath;
     private String clientJWT;

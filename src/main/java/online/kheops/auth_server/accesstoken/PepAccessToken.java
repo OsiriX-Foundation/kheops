@@ -23,25 +23,24 @@ final class PepAccessToken implements AccessToken {
         }
 
         public PepAccessToken build(String assertionToken) throws AccessTokenVerificationException {
-            final DecodedJWT jwt;
             try {
-                jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
+                final DecodedJWT jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
                         .withIssuer("auth.kheops.online")
                         .withAudience("dicom.kheops.online")
                         .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
+
+                try {
+                    Users.getOrCreateUser(jwt.getSubject());
+                } catch (UserNotFoundException e) {
+                    throw new AccessTokenVerificationException("Can't find user");
+                }
+                return new PepAccessToken(jwt.getSubject());
+
             } catch (JWTVerificationException | IllegalArgumentException e) {
                 throw new AccessTokenVerificationException("Verification of the access token failed", e);
             }
-
-            try {
-                Users.getOrCreateUser(jwt.getSubject());
-            } catch (UserNotFoundException e) {
-                throw new AccessTokenVerificationException("Can't find user");
-            }
-
-            return new PepAccessToken(jwt.getSubject());
         }
 
         private String authorizationSecret() {

@@ -25,7 +25,7 @@ public class CachingFeature implements Feature {
 
     @Override
     public boolean configure(FeatureContext context) {
-        final Map<String, CacheEntry> cacheStore = new ConcurrentHashMap<>();
+        final Map<String, CacheEntry> cacheStore = new ConcurrentHashMap<String, CacheEntry>();
         context.register(new CacheEntryLocator(cacheStore)).register(new CacheResponseFilter(cacheStore));
 
         return true;
