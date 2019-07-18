@@ -110,7 +110,7 @@ public abstract class JOOQTools {
         Iterator iterator = C3P0Registry.getPooledDataSources().iterator();
 
         if (!iterator.hasNext()) {
-            throw new RuntimeException("No C3P0 DataSource available");
+            throw new IllegalStateException("No C3P0 DataSource available");
         }
         DataSource dataSource = (DataSource) iterator.next();
         if (iterator.hasNext()) {

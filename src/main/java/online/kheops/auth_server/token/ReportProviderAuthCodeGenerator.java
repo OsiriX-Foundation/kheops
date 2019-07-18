@@ -10,12 +10,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ReportProviderAuthCodeGenerator {
-    private static final Logger LOG = Logger.getLogger(ReportProviderAuthCodeGenerator.class.getName());
-
     private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
@@ -69,7 +65,6 @@ public class ReportProviderAuthCodeGenerator {
         try {
             algorithmHMAC = Algorithm.HMAC256(authSecret);
         } catch (IllegalArgumentException e) {
-            LOG.log(Level.SEVERE, "online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
             throw new IllegalStateException("online.kheops.auth.hmacsecret is not a valid HMAC secret", e);
         }
 

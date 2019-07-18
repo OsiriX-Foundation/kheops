@@ -12,8 +12,10 @@ import java.util.Set;
 
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_SORT;
 
-public class SeriesQIDOSortParams {
+public final class SeriesQIDOSortParams {
     private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(Tag.Modality, Tag.SeriesInstanceUID, Tag.SeriesNumber, Tag.NumberOfSeriesRelatedInstances));
+
+    private SeriesQIDOSortParams() {}
 
     public static Comparator<Attributes> sortComparator(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
 

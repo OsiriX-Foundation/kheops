@@ -11,7 +11,6 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
@@ -57,7 +56,6 @@ class PepAccessTokenGenerator {
         } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {
-            LOG.log(Level.SEVERE, "Error downloading the public key", e);
             throw new WebApplicationException(Response.status(BAD_GATEWAY).entity("Error downloading the public key").build());
         }
 
