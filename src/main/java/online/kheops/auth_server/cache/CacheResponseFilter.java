@@ -63,7 +63,7 @@ public class CacheResponseFilter implements ClientResponseFilter {
             try {
                 wasRead = entityStream.read(buffer);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
             if (wasRead > 0) {
                 baos.write(buffer, 0, wasRead);

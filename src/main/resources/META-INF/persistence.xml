@@ -15,6 +15,9 @@
         <class>online.kheops.auth_server.entity.Mutation</class>
         <class>online.kheops.auth_server.entity.ReportProvider</class>
         <class>online.kheops.auth_server.entity.Version</class>
+        <class>online.kheops.auth_server.metric.AlbumUserHistogram</class>
+        <class>online.kheops.auth_server.metric.StudySeriesHistogram</class>
+        <class>online.kheops.auth_server.metric.AlbumSeriesHistogram</class>
         <properties>
             <property name="javax.persistence.lock.timeout" value="2000"/>
 

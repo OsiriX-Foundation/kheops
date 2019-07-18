@@ -12,6 +12,7 @@ import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.jooq.*;
@@ -319,7 +320,7 @@ public class Studies {
 
         public void check(String time) throws BadQueryParametersException {
             if (! time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$") ) {
-                throw new BadQueryParametersException(org.dcm4che3.data.Keyword.valueOf(Tag.StudyTime) + " :" + time);
+                throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyTime) + " :" + time);
             }
         }
     }
@@ -336,10 +337,10 @@ public class Studies {
                 try {
                     dateFormat.parse(date);
                 } catch (ParseException e) {
-                    throw new BadQueryParametersException(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate) + " :" + date);
+                    throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
                 }
             } else {
-                throw new BadQueryParametersException(org.dcm4che3.data.Keyword.valueOf(Tag.StudyDate) + " :" + date);
+                throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
             }
         }
     }

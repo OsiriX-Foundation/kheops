@@ -18,7 +18,6 @@ import javax.persistence.EntityTransaction;
 import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
@@ -29,8 +28,6 @@ import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class Sending {
-
-    private static final Logger LOG = Logger.getLogger(Sending.class.getName());
 
     private Sending() {
         throw new IllegalStateException("Utility class");
@@ -319,7 +316,7 @@ public class Sending {
     }
 
     public static void shareStudyWithUser(User callingUser, String targetUsername, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
-            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException, BadRequestException {
+            throws UserNotFoundException, AlbumNotFoundException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 

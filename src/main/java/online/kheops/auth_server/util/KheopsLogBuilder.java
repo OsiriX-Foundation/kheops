@@ -1,6 +1,7 @@
 package online.kheops.auth_server.util;
 
 import online.kheops.auth_server.accesstoken.AccessToken;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.UsersPermission;
 
 import java.util.ArrayList;
@@ -52,6 +53,14 @@ public class KheopsLogBuilder {
         logEntry.add(new LogEntry("user", userId));
         return this;
     }
+
+    public KheopsLogBuilder provenance(TokenProvenance tokenProvenance) {
+        tokenProvenance.getActingParty().ifPresent(actingParty -> logEntry.add(new LogEntry("actingParty", actingParty)));
+        tokenProvenance.getAuthorizedParty().ifPresent(authorizedParty -> logEntry.add(new LogEntry("authorizedParty", authorizedParty)));
+        tokenProvenance.getCapabilityTokenId().ifPresent(capabilityTokenId -> logEntry.add(new LogEntry("authorizedCapabilityTokenId", capabilityTokenId)));
+        return this;
+    }
+
     public KheopsLogBuilder targetUser(String userId) {
         logEntry.add(new LogEntry("target_user", userId));
         return this;
@@ -93,12 +102,8 @@ public class KheopsLogBuilder {
         for (LogEntry pair: logEntry) {
             logString.append(pair.getKey()).append("=").append(pair.getValue()).append(" ");
         }
-        LOG.log(KheopsLevel.KHEOPS, logString.toString());
+        LOG.log(KheopsLevel.KHEOPS, logString::toString);
     }
-
-
-
-
 
     private final class LogEntry implements Map.Entry<String, String> {
         private final String key;

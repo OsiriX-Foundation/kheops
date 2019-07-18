@@ -40,7 +40,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) {
         final List<Attributes> list = new ArrayList<>();
 
-        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { @Override public void close(/* close shield */) {} })) {
+        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { @Override public void close() {/* close shield */} })) {
             final JSONReader jsonReader = new JSONReader(parser);
             jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
         } catch (Exception e){
@@ -62,7 +62,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     @Override
     public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
-        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { public void close() {} })) {
+        try (final JsonGenerator generator = Json.createGenerator(new FilterOutputStream(entityStream) { @Override public void close() {/* close shield */} })) {
             final JSONWriter jsonWriter = new JSONWriter(generator);
 
             generator.writeStartArray();

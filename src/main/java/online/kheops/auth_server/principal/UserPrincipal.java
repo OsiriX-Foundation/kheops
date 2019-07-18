@@ -190,7 +190,10 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder().user(getUser().getKeycloakId()).tokenType(TokenType.KEYCLOAK_TOKEN);
+        return new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .tokenType(TokenType.KEYCLOAK_TOKEN);
     }
 
     @Override

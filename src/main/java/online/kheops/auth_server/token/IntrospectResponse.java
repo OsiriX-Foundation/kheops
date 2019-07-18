@@ -156,7 +156,7 @@ public class IntrospectResponse {
                 objectBuilder.add("act", Json.createObjectBuilder().add("sub", actingParty));
             }
 
-            if (audience != null && audience.size() > 0) {
+            if (audience != null && !audience.isEmpty()) {
                 if (audience.size() == 1) {
                     objectBuilder.add("aud", audience.get(0));
                 } else {
@@ -165,7 +165,7 @@ public class IntrospectResponse {
                     objectBuilder.add("aud", audienceBuilder);
                 }
             }
-            if (studyUIDs != null && studyUIDs.size() > 0) {
+            if (studyUIDs != null && !studyUIDs.isEmpty()) {
                 if (studyUIDs.size() == 1) {
                     objectBuilder.add("studyUID", studyUIDs.get(0));
                 } else {

@@ -20,12 +20,12 @@ public class Consts {
     public static final String ALBUM = "album";
     public static final String INBOX = "inbox";
 
-    public static class USER_IN_ROLE {
+    public abstract static class USER_IN_ROLE {
+        private USER_IN_ROLE() {}
         public static final String CAPABILITY = "capability";
         public static final String VIEWER_TOKEN = "viewerToken";
         public static final String RP_TOKEN = "reportProviderToken";
     }
-
 
     //AlbumQueryParams.java
     public static final String FAVORITE = "favorite";

@@ -184,7 +184,11 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder().user(getUser().getKeycloakId()).clientID(clientId).tokenType(TokenType.REPORT_PROVIDER_TOKEN);
+        return new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .clientID(clientId)
+                .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
     }
 
     @Override
