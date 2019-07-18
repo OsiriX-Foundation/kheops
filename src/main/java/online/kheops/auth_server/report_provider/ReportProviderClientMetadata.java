@@ -108,7 +108,7 @@ public class ReportProviderClientMetadata {
         this.errorDescription = errorDescription;
     }
 
-    public ValidationResult validateForConfigUri(String configUriString) {
+    public ValidationResult validateForConfigUri(String configUriString) throws ReportProviderUriNotValidException {
         final URI configUri;
         try {
             configUri = new URI(configUriString);

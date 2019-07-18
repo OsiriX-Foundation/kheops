@@ -1,5 +1,6 @@
 package online.kheops.auth_server.user;
 
+import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.Consts.CACHE_USER;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -11,9 +12,8 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 public class CacheUserName {
 
     private static CacheUserName instance = null;
+    private static Cache<String, String> userCache;
     private static final String CACHE_ALIAS = "userCache";
-
-    private Cache<String, String> userCache;
 
     private CacheUserName() {
         CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()

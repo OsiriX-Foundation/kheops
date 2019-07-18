@@ -21,7 +21,7 @@ public class KeycloakToken {
     private static final Logger LOG = Logger.getLogger(KeycloakToken.class.getName());
 
     private static final long MINIMUM_VALIDITY = 60;
-    private static final Client CLIENT = ClientBuilder.newClient();
+    private static Client CLIENT = ClientBuilder.newClient();
 
     private static URI tokenUri;
     private static KeycloakToken instance = null;

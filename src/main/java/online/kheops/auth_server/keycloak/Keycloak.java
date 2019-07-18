@@ -18,6 +18,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.logging.Logger;
 
 public class Keycloak {
 
@@ -28,6 +29,8 @@ public class Keycloak {
     private static URI usersUri;
 
     private static KeycloakToken token;
+
+    private static final Logger LOG = Logger.getLogger(Keycloak.class.getName());
 
     private static Keycloak instance = null;
 

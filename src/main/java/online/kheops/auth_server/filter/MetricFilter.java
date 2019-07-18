@@ -4,6 +4,7 @@ package online.kheops.auth_server.filter;
 import online.kheops.auth_server.annotation.MetricSecured;
 
 import javax.annotation.Priority;
+import javax.persistence.Tuple;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;

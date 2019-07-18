@@ -125,46 +125,46 @@ final class KeycloakAccessToken implements AccessToken {
             return new KeycloakAccessToken(jwt.getSubject(), actingParty);
         }
 
-        private static synchronized URL getJwksURL(String configurationUrl) {
-            URL jwksURL = jwksURLCache.get(configurationUrl);
-
-            if (jwksURL == null) {
-                final ConfigurationEntity configurationEntity;
-                try {
-                    configurationEntity = CLIENT.target(configurationUrl).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
-                } catch (RuntimeException e) {
-                    throw new DownloadKeyException("Unable to download the jwks_uri, configuration URL:" + configurationUrl, e);
-                }
-
-                try {
-                    jwksURL = new URL(configurationEntity.jwksURI);
-                } catch (MalformedURLException e) {
-                    throw new DownloadKeyException("jwks_uri is not a valid URI, configuration URL:\" + configurationUrl", e);
-                }
-                jwksURLCache.put(configurationUrl, jwksURL);
-            }
-            return jwksURL;
-        }
-
-        private static synchronized RSAPublicKey getRSAPublicKey(URL jwksURL, String keyId) {
-            RSAPublicKey publicKey = publicKeyCache.get(jwksURL.toString() + "_" + keyId);
-
-            if (publicKey == null) {
-                try {
-                    publicKey = (RSAPublicKey) new UrlJwkProvider(jwksURL).get(keyId).getPublicKey();
-                } catch (JwkException e) {
-                    throw new DownloadKeyException("Can't download the public RSA key, jwks URL:" + jwksURL, e);
-                }
-                publicKeyCache.put(jwksURL.toString() + "_" + keyId, publicKey);
-            }
-
-            return publicKey;
-        }
-
         private String getIssuer() {
             return servletContext.getInitParameter("online.kheops.keycloak.uri") + "/auth/realms/" +
                     servletContext.getInitParameter("online.kheops.keycloak.realms");
         }
+    }
+
+    private static synchronized URL getJwksURL(String configurationUrl) {
+        URL jwksURL = jwksURLCache.get(configurationUrl);
+
+        if (jwksURL == null) {
+            final ConfigurationEntity configurationEntity;
+            try {
+                configurationEntity = CLIENT.target(configurationUrl).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
+            } catch (RuntimeException e) {
+                throw new DownloadKeyException("Unable to download the jwks_uri, configuration URL:" + configurationUrl, e);
+            }
+
+            try {
+                jwksURL = new URL(configurationEntity.jwksURI);
+            } catch (MalformedURLException e) {
+                throw new DownloadKeyException("jwks_uri is not a valid URI, configuration URL:\" + configurationUrl", e);
+            }
+            jwksURLCache.put(configurationUrl, jwksURL);
+        }
+        return jwksURL;
+    }
+
+    private static synchronized RSAPublicKey getRSAPublicKey(URL jwksURL, String keyId) {
+        RSAPublicKey publicKey = publicKeyCache.get(jwksURL.toString() + "_" + keyId);
+
+        if (publicKey == null) {
+            try {
+                publicKey = (RSAPublicKey) new UrlJwkProvider(jwksURL).get(keyId).getPublicKey();
+            } catch (JwkException e) {
+                throw new DownloadKeyException("Can't download the public RSA key, jwks URL:" + jwksURL, e);
+            }
+            publicKeyCache.put(jwksURL.toString() + "_" + keyId, publicKey);
+        }
+
+        return publicKey;
     }
 
     private KeycloakAccessToken(String subject, String actingParty) {

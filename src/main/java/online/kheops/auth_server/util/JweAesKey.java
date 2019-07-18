@@ -6,9 +6,9 @@ import org.jose4j.lang.ByteUtil;
 import java.security.Key;
 
 public class JweAesKey {
+    private static Key key;
     private static JweAesKey instance = null;
 
-    private final Key key;
 
     private JweAesKey() {
         key = new AesKey(ByteUtil.randomBytes(16));
