@@ -7,7 +7,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,8 +14,6 @@ import java.util.logging.Logger;
 public class FetchContextListener implements ServletContextListener {
 
     private static final Logger LOG = Logger.getLogger(FetchContextListener.class.getName());
-
-    private ScheduledThreadPoolExecutor executor = null;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -31,7 +28,5 @@ public class FetchContextListener implements ServletContextListener {
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        executor.shutdown();
-    }
+    public void contextDestroyed(ServletContextEvent sce) { }
 }
