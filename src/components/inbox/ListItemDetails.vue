@@ -59,18 +59,26 @@
     >
       <div
         v-if="study.flag.view === 'series'"
-        class="row"
       >
         <div
-          v-for="serie in study.series"
-          :key="serie.id"
-          class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
+          v-if="study.series !== undefined && study.series.length > 0"
+          class="row"
         >
-          <series-summary-data-model
-            :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
-            :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
-          />
+          <div
+            v-for="serie in study.series"
+            :key="serie.id"
+            class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
+          >
+            <series-summary-data-model
+              :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
+              :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
+            />
+          </div>
         </div>
+        <pulse-loader
+          :loading="study.series === undefined || study.series.length === 0"
+          color="white"
+        />
       </div>
 
       <comments-and-notifications-data-model
@@ -91,10 +99,11 @@
 import commentsAndNotificationsDataModel from '@/components/comments/commentsAndNotificationsDataModel'
 import seriesSummaryDataModel from '@/components/inbox/seriesSummaryDataModel'
 import studyMetadataDataModel from '@/components/study/studyMetadataDataModel'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
 	name: 'ListItemDetails',
-	components: { seriesSummaryDataModel, commentsAndNotificationsDataModel, studyMetadataDataModel },
+	components: { seriesSummaryDataModel, commentsAndNotificationsDataModel, studyMetadataDataModel, PulseLoader },
 	props: {
 		studyUID: {
 			type: String,
