@@ -32,6 +32,16 @@ class MetricsQueries {
                 .getSingleResult();
     }
 
+    static Long getNumberOfOrphanSeries(EntityManager em) {
+        return em.createQuery("SELECT COUNT(s.pk) FROM Series s LEFT JOIN s.albumsSeries als WHERE als.album = null", Long.class)
+                .getSingleResult();
+    }
+
+    static Long getNumberOfUnpopulatedSeries (EntityManager em) {
+        return em.createQuery("SELECT COUNT(s) FROM Series s WHERE s.populated = false", Long.class)
+                .getSingleResult();
+    }
+
     static Long getNumberOfSeries(EntityManager em) {
         return em.createQuery("SELECT COUNT(s) FROM Series s", Long.class)
                 .getSingleResult();
