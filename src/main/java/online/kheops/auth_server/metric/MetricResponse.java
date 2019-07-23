@@ -40,6 +40,8 @@ public class MetricResponse {
 
     @XmlElement(name = "number_of_studies")
     public Long numberOfStudies;
+    @XmlElement(name = "number_of_unpopulated_studies")
+    public Long numberOfUnpopulatedStudies;
     @XmlElement(name = "number_of_series")
     public Long numberOfSeries;
     @XmlElement(name = "number_of_orphan_series")
@@ -78,6 +80,7 @@ public class MetricResponse {
             numberOfReportProviders = getNumberOfReportProviders(em);
 
             numberOfStudies = getNumberOfStudies(em);
+            numberOfUnpopulatedStudies = getNumberOfUnpopulatedStudies(em);
             numberOfSeries = getNumberOfSeries(em);
             numberOfOrphanSeries = getNumberOfOrphanSeries(em);
             numberOfUnpopulatedSeries = getNumberOfUnpopulatedSeries(em);
