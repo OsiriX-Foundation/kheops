@@ -51,6 +51,7 @@ public final class WadoRsResource {
 
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}")
+    @Produces("multipart/related;type=\"application/dicom\"")
     public Response wadoSeries(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                                @PathParam("studyInstanceUID") String studyInstanceUID,
                                @PathParam("seriesInstanceUID") String seriesInstanceUID) {
@@ -170,8 +171,9 @@ public final class WadoRsResource {
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setNoCache(true);
 
-        return Response.status(upstreamResponse.getStatus()).entity(streamingOutput)
-                .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
+        return Response.status(upstreamResponse.getStatus())
+                .type(upstreamResponse.getHeaderString(CONTENT_TYPE))
+                .entity(streamingOutput)
                 .cacheControl(cacheControl)
                 .build();
     }
