@@ -66,7 +66,7 @@ public final class WadoRSStudy {
 
     @GET
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
-    @Produces("multipart/related;type=\"application/dicom\"")
+    @Produces("multipart/related")
     public Response wado(@PathParam("StudyInstanceUID") String studyInstanceUID,
                          @QueryParam("album") String fromAlbumPk,
                          @QueryParam("inbox") Boolean fromInbox) {
