@@ -11,5 +11,5 @@ public class Version {
     @Id
     @Basic(optional = false)
     @Column(name = "version")
-    private String version;
+    private String versionString;
 }

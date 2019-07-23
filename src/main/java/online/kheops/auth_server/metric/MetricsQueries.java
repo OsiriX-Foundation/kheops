@@ -41,6 +41,10 @@ class MetricsQueries {
         return em.createQuery("SELECT COUNT(s) FROM Series s WHERE s.populated = false", Long.class)
                 .getSingleResult();
     }
+    static Long getNumberOfUnpopulatedStudies (EntityManager em) {
+        return em.createQuery("SELECT COUNT(s) FROM Study s WHERE s.populated = false", Long.class)
+                .getSingleResult();
+    }
 
     static Long getNumberOfSeries(EntityManager em) {
         return em.createQuery("SELECT COUNT(s) FROM Series s", Long.class)
