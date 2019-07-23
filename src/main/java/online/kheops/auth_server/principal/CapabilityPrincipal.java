@@ -249,12 +249,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         if (getScope() == ScopeType.ALBUM) {
-            if (albumId  == null) {
-                albumId = capability.getAlbum().getId();
-            } else  if (!albumId.equals(capability.getAlbum().getId())) {
-                return false;
-            }
-            return true;
+            return albumId.equals(capability.getAlbum().getId());
         } else if (getScope() == ScopeType.USER) {
             if (albumId == null) {
                 return false;
