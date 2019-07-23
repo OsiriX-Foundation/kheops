@@ -27,9 +27,7 @@ import static java.lang.Math.min;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static javax.ws.rs.core.Response.Status.*;
 
 @Path("/")
 public final class WadoRSStudyInstance {
@@ -91,6 +89,9 @@ public final class WadoRSStudyInstance {
             if (e.getResponse().getStatus() == UNAUTHORIZED.getStatusCode()) {
                 LOG.log(WARNING, "User Unauthorized", e);
                 throw new WebApplicationException(UNAUTHORIZED);
+            } else if (e.getResponse().getStatus() == NOT_FOUND.getStatusCode()) {
+                LOG.log(WARNING, "Study Not Found", e);
+                throw new WebApplicationException(NOT_FOUND);
             } else {
                 LOG.log(WARNING, "Unexpected response", e);
                 throw new WebApplicationException(BAD_GATEWAY);
