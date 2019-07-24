@@ -168,24 +168,6 @@ public class CapabilitiesResource {
         return Response.status(OK).entity(genericCapabilityResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
-
-    @GET
-    @Path("capabilities/{capability_token:" + TOKEN_PATTERN + "}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCapabilityInfo(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token") String capabilityToken) {
-
-        final CapabilitiesResponse capabilityResponses;
-
-        try {
-            capabilityResponses = Capabilities.getCapabilityInfo(capabilityToken);
-        } catch (CapabilityNotFoundException e) {
-            LOG.log(Level.WARNING, "Not Found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
-        return Response.status(OK).entity(capabilityResponses).build();
-    }
-
     @GET
     @Secured
     @UserAccessSecured
