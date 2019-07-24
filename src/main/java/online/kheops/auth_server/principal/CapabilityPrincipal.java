@@ -64,7 +64,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
                 }
             } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
-                if (!albumUser.isAdmin()) {
+                if (!albumUser.isAdmin()) { //the user who created the token is not longer an admin => normally the token should be removed
                     return false;
                 }
                 return canAccessSeries(capability.getAlbum(), studyInstanceUID, seriesInstanceUID, em);
