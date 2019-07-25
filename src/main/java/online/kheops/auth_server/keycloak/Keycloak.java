@@ -18,6 +18,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Keycloak {
 
@@ -157,6 +159,41 @@ public class Keycloak {
                 }
             }
         }
+        throw new KeycloakException("ERROR:");
+    }
+
+    public List<UserResponseBuilder> getUsers(String find, Integer limit, Integer offset)
+            throws KeycloakException {
+
+
+        final Response response;
+        final String findLowerCase = find.toLowerCase();
+        try {
+            response = ClientBuilder.newClient().target(usersUri)
+                    .queryParam("email", findLowerCase)
+                    .queryParam("first", offset).queryParam("max", limit)
+                    .queryParam("briefRepresentation", "true")
+                    .request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+        } catch (ProcessingException e) {
+            throw new KeycloakException("Error during introspect token", e);
+        }
+
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            String output = response.readEntity(String.class);
+            try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                JsonArray reply = jsonReader.readArray();
+                List<UserResponseBuilder> userResponseBuilders = new ArrayList<>();
+                final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
+                for(int i = 0;i < keycloakUser.size(); i++) {
+                    if(!keycloakUser.getEmail(i).startsWith("service-account-") && !keycloakUser.getEmail(i).endsWith("@placeholder.org")) {
+                        userResponseBuilders.add(new UserResponseBuilder().setEmail(keycloakUser.getEmail(i)).setSub(keycloakUser.getId(i)));
+                    }
+                }
+                return userResponseBuilders;
+            }
+        }
+
+
         throw new KeycloakException("ERROR:");
     }
 }

@@ -31,6 +31,10 @@ public class AlbumResponse {
     private Integer numberOfComments;
     @XmlElement(name = "number_of_studies")
     private Integer numberOfStudies;
+    @XmlElement(name = "number_of_series")
+    private Integer numberOfSeries;
+    @XmlElement(name = "number_of_instances")
+    private Integer numberOfInstances;
     @XmlElement(name = "add_user")
     private Boolean addUser;
     @XmlElement(name = "download_series")
@@ -65,6 +69,8 @@ public class AlbumResponse {
         numberOfUsers=albumResponseBuilder.getNumberOfUsers();
         numberOfComments=albumResponseBuilder.getNumberOfComments();
         numberOfStudies=albumResponseBuilder.getNumberOfStudies();
+        numberOfSeries=albumResponseBuilder.getNumberOfSeries();
+        numberOfInstances=albumResponseBuilder.getNumberOfInstances();
         addUser=albumResponseBuilder.getAddUser();
         downloadSeries=albumResponseBuilder.getDownloadSeries();
         sendSeries=albumResponseBuilder.getSendSeries();

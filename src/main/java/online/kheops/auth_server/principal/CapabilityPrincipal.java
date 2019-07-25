@@ -64,7 +64,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
                 }
             } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
-                if (!albumUser.isAdmin()) {
+                if (!albumUser.isAdmin()) { //the user who created the token is not longer an admin => normally the token should be removed
                     return false;
                 }
                 return canAccessSeries(capability.getAlbum(), studyInstanceUID, seriesInstanceUID, em);
@@ -249,12 +249,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         if (getScope() == ScopeType.ALBUM) {
-            if (albumId  == null) {
-                albumId = capability.getAlbum().getId();
-            } else  if (!albumId.equals(capability.getAlbum().getId())) {
-                return false;
-            }
-            return true;
+            return albumId.equals(capability.getAlbum().getId());
         } else if (getScope() == ScopeType.USER) {
             if (albumId == null) {
                 return false;

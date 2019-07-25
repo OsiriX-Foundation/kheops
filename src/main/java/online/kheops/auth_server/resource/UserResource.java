@@ -1,5 +1,6 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.album.AlbumResponse;
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
@@ -15,10 +16,12 @@ import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.servlet.ServletContext;
+import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +29,7 @@ import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT_PROVIDER_TOKEN;
 import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
-import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.util.Consts.*;
 
 @Path("/")
 public class UserResource {
@@ -77,36 +80,67 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getUserInfo(@QueryParam("reference") String reference,
                                 @QueryParam(ALBUM) String albumId,
-                                @QueryParam("studyInstanceUID") @UIDValidator String studyInstanceUID) {
+                                @QueryParam("studyInstanceUID") @UIDValidator String studyInstanceUID,
+                                @QueryParam("search") String search,
+                                @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
-        final UserResponseBuilder userResponseBuilder;
-        KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                .action(ActionType.TEST_USER);
+        final KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder();
 
-        try {
-            final Keycloak keycloak = Keycloak.getInstance();
-            userResponseBuilder = keycloak.getUser(reference);
-
-            if(albumId != null) {
-                kheopsLogBuilder.album(albumId);
-                userResponseBuilder.setAlbumAccess(Albums.isMemberOfAlbum(userResponseBuilder.getSub(), albumId));
+        if(reference == null && search != null) {
+            if (search.length() < 3) {
+                return Response.status(BAD_REQUEST).entity("'search' query param must have minimum 3 characters").build();
             }
 
-            if(studyInstanceUID != null) {
-                userResponseBuilder.setStudyAccess(Studies.canAccessStudy(userResponseBuilder.getSub(), studyInstanceUID));
-                kheopsLogBuilder.study(studyInstanceUID);
-            }
+            kheopsLogBuilder.action(ActionType.USERS_LIST);
 
-            kheopsLogBuilder.log();
-            return Response.status(OK).entity(userResponseBuilder.build()).build();
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(NO_CONTENT).build();
-        } catch (KeycloakException e) {
-            LOG.log(Level.WARNING, "Keycloak error", e);
-            return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
+            try {
+                final Keycloak keycloak = Keycloak.getInstance();
+                final List<UserResponseBuilder> result = keycloak.getUsers(search, limit, offset);
+                kheopsLogBuilder.log();
+
+                if(result.isEmpty()) {
+                    return Response.status(NO_CONTENT).build();
+                }
+
+                final GenericEntity<List<UserResponseBuilder>> genericUsersResponsesList = new GenericEntity<List<UserResponseBuilder>>(result) {};
+                return Response.status(OK).entity(genericUsersResponsesList).build();
+            } catch (KeycloakException e) {
+                LOG.log(Level.WARNING, "Keycloak error", e);
+                return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
+            }
+        } else if(reference != null && search == null) {
+            final UserResponseBuilder userResponseBuilder;
+            kheopsLogBuilder.action(ActionType.TEST_USER);
+
+            try {
+                final Keycloak keycloak = Keycloak.getInstance();
+                userResponseBuilder = keycloak.getUser(reference);
+
+                if(albumId != null) {
+                    kheopsLogBuilder.album(albumId);
+                    userResponseBuilder.setAlbumAccess(Albums.isMemberOfAlbum(userResponseBuilder.getSub(), albumId));
+                }
+
+                if(studyInstanceUID != null) {
+                    userResponseBuilder.setStudyAccess(Studies.canAccessStudy(userResponseBuilder.getSub(), studyInstanceUID));
+                    kheopsLogBuilder.study(studyInstanceUID);
+                }
+
+                kheopsLogBuilder.log();
+                return Response.status(OK).entity(userResponseBuilder.build()).build();
+            } catch (UserNotFoundException e) {
+                LOG.log(Level.WARNING, "User not found", e);
+                return Response.status(NO_CONTENT).build();
+            } catch (KeycloakException e) {
+                LOG.log(Level.WARNING, "Keycloak error", e);
+                return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
+            }
+        } else {
+            return Response.status(BAD_REQUEST).build();
         }
     }
+
 
     @GET
     @Path("userinfo")

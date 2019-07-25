@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Provider
-@Consumes("application/dicom+json,application/json")
+@Consumes("application/dicom+json,application/json,text/plain")
 @Produces("application/dicom+json,application/json")
 public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
@@ -37,16 +37,27 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
     }
 
     @Override
-    public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) {
+    public List<Attributes> readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream)
+            throws IOException {
         final List<Attributes> list = new ArrayList<>();
 
-        try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) { @Override public void close() {/* close shield */} })) {
-            final JSONReader jsonReader = new JSONReader(parser);
-            jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
-        } catch (Exception e){
-            throw new WebApplicationException("Error while reading JSON datasets", e);
-        }
+        if(mediaType.isCompatible(MediaType.TEXT_PLAIN_TYPE)) {
+            if(inputStream.read() != -1) {
+                throw new IOException("Expected empty inputstream");
+            }
+        } else {
 
+            try (final JsonParser parser = Json.createParser(new FilterInputStream(inputStream) {
+                @Override
+                public void close() {/* close shield */}
+            })) {
+                final JSONReader jsonReader = new JSONReader(parser);
+                jsonReader.readDatasets((fmi, dataset) -> list.add(dataset));
+            } catch (Exception e) {
+                throw new WebApplicationException("Error while reading JSON datasets", e);
+            }
+
+        }
         return list;
     }
 

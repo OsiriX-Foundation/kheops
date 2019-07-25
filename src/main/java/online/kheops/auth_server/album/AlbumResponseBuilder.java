@@ -3,12 +3,15 @@ package online.kheops.auth_server.album;
 import online.kheops.auth_server.entity.AlbumUser;
 import org.jooq.Record;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
+
+import static online.kheops.auth_server.generated.tables.Series.SERIES;
 
 public class AlbumResponseBuilder {
 
@@ -22,6 +25,8 @@ public class AlbumResponseBuilder {
     private List<UserAlbumResponse> users;
     private Integer numberOfComments;
     private Integer numberOfStudies;
+    private Integer numberOfSeries;
+    private Integer numberOfInstances;
     private Boolean addUser;
     private Boolean downloadSeries;
     private Boolean sendSeries;
@@ -45,6 +50,12 @@ public class AlbumResponseBuilder {
         this.lastEventTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_last_event_time")).getTime()), TimeZone.getDefault().toZoneId());
         this.numberOfUsers = (Integer) r.getValue("number_of_users");
         this.numberOfStudies = (Integer) r.getValue("number_of_studies");
+        this.numberOfSeries = (Integer) r.getValue("number_of_series");
+        try {
+            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
+        } catch(NullPointerException e) {
+            this.numberOfInstances = 0;
+        }
 
         this.addSeries = (boolean) (r.getValue("add_series_permission"));
         this.addUser = ((boolean) r.getValue("add_user_permission"));
@@ -123,9 +134,11 @@ public class AlbumResponseBuilder {
         return numberOfComments;
     }
 
-    public Integer getNumberOfStudies() {
-        return numberOfStudies;
-    }
+    public Integer getNumberOfStudies() { return numberOfStudies; }
+
+    public Integer getNumberOfSeries() { return numberOfSeries; }
+
+    public Integer getNumberOfInstances() { return numberOfInstances; }
 
     public Boolean getAddUser() {
         return addUser;
