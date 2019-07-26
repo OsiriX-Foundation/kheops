@@ -160,7 +160,7 @@ public class UserResource {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.INFO, "bad accesstoken", e);
-            throw new ForbiddenException("Bad AccessToken");
+            throw new NotAuthorizedException("Bad AccessToken");
         }
 
         if (!accessToken.getTokenType().equals(REPORT_PROVIDER_TOKEN)) {
