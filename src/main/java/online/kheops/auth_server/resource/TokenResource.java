@@ -132,9 +132,9 @@ public class TokenResource
             introspectResponse.setAlbumId(albumId);
             introspectResponse.setRedirectUri(redirectUri);
             return Response.status(OK).entity(introspectResponse.toJson()).build();
-        }
-
-        if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString())) {
+        } else if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString()) ||
+                accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN ||
+                accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) {
             new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
