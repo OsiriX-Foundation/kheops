@@ -12,7 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class IntrospectResponse {
     private static final IntrospectResponse INACTIVE = new IntrospectResponse();
 
-    private boolean active;
+    private Boolean active;
     private String issuer;
     private List<String> audience;
     private String subject;
@@ -85,7 +85,9 @@ public class IntrospectResponse {
         this.albumId = albumId;
     }
 
-    private IntrospectResponse() {}
+    private IntrospectResponse() {
+        this.active = Boolean.FALSE;
+    }
 
     public static IntrospectResponse getInactiveResponse() {
         return INACTIVE;
