@@ -59,6 +59,9 @@ const getters = {
 
 // actions
 const actions = {
+	initStudiesTest ({ commit, dispatch }, params) {
+		commit('INIT_STUDIES_TEST')
+	},
 	getStudiesTest ({ commit, dispatch }, params) {
 		const request = 'studies'
 		let queries = ''
@@ -80,6 +83,7 @@ const actions = {
 				params.studies = studies
 				commit('SET_STUDIES_TEST', params.studies)
 			}
+			return res
 		})
 	},
 	getSeriesTest ({ commit, dispatch }, params) {
@@ -254,7 +258,9 @@ const mutations = {
 		state.studies = []
 	},
 	SET_STUDIES_TEST (state, studies) {
-		state.studies = studies
+		studies.forEach(study => {
+			state.studies.push(study)
+		})
 	},
 	SET_SERIES_TEST (state, params) {
 		state.studies[params.index].series = params.series
@@ -262,7 +268,7 @@ const mutations = {
 	SET_STUDY_FLAG_TEST (state, params) {
 		let study = state.studies[params.index]
 		study.flag[params.flag] = params.value
-		Vue.set(state.studies, params.indexStudy, study)
+		Vue.set(state.studies, params.index, study)
 	},
 	SET_SERIE_FLAG_TEST (state, params) {
 		let study = state.studies[params.indexStudy]
