@@ -89,7 +89,7 @@ final class CapabilityAccessToken implements AccessToken {
                 return Optional.empty();
             }
         } else {
-            return Optional.of("read write downloadbutton send");
+            return Optional.of("user read write downloadbutton send");
         }
     }
 

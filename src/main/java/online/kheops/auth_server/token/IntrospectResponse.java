@@ -10,7 +10,7 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class IntrospectResponse {
-    private static final IntrospectResponse INACTIVE = new IntrospectResponse();
+    private static final String INACTIVE_JSON = new IntrospectResponse().toJson();
 
     private boolean active;
     private String issuer;
@@ -87,8 +87,8 @@ public class IntrospectResponse {
 
     private IntrospectResponse() {}
 
-    public static IntrospectResponse getInactiveResponse() {
-        return INACTIVE;
+    public static String getInactiveResponseJson() {
+        return INACTIVE_JSON;
     }
 
     public static IntrospectResponse from(AccessToken accessToken) {
