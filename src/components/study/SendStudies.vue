@@ -11,7 +11,11 @@
 		"titleBoxSending": "Sending files",
 		"titleBoxSended": "Files sent",
 		"titleBoxDicomize": "Waiting for your input",
-		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :"
+		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
+		"errorcode": "Error code",
+		"authorizationerror": "Authorization Error",
+		"nondicomfile": "Non DICOM file",
+		"unknownerror": "Unknown Error"
 	},
 	"fr": {
 		"filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -24,7 +28,11 @@
 		"titleBoxSending": "Fichiers en cours d'envois",
 		"titleBoxSended": "Fichiers envoyés",
 		"titleBoxDicomize": "En attente d'informations",
-		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :"
+		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
+		"errorcode": "Code d'erreur",
+		"authorizationerror": "Erreur d'authorisation",
+		"nondicomfile": "Fichier non DICOM",
+		"unknownerror": "Erreur inconnue"
 	}
 }
 </i18n>
@@ -339,8 +347,9 @@ export default {
 				}
 			},
 			errorValues: {
-				292: 'Authorization Error',
-				272: 'Non DICOM file'
+				292: 'authorizationerror',
+				272: 'nondicomfile',
+				0: 'unknownerror'
 			},
 			errorDicom: {
 				'0008119A': '00041500',
@@ -539,11 +548,11 @@ export default {
 					this.currentFilesLength = files.length
 					const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
 					HTTP.post(request, formData, this.config['formData']).then(res => {
-						this.manageResult(files, res.data)
+						this.manageResult(files, res.data, res.status)
 						resolve(res)
-					}).catch(res => {
-						this.manageResult(files, res)
-						resolve(res)
+					}).catch(error => {
+						this.manageResult(files, error !== undefined ? error.data : {}, error !== undefined ? error.status : 0)
+						resolve(error)
 					})
 				} else if (this.files.length > 0) {
 					this.$store.dispatch('initFiles')
@@ -553,8 +562,13 @@ export default {
 				}
 			})
 		},
-		manageResult (files, data) {
-			this.getErrorsDicomFromResponse(data)
+		manageResult (files, data, status) {
+			if (status !== 200) {
+				let result = this.getErrorsDicomFromResponse(data)
+				if (result < 0) {
+					this.generateErrorNonDicom(files, status)
+				}
+			}
 			this.$store.dispatch('removeFilesId', { files: files })
 			this.countSentFiles += files.length
 		},
@@ -565,20 +579,30 @@ export default {
 			})
 			return formData
 		},
-		getErrorsDicomFromResponse (res) {
+		getErrorsDicomFromResponse (data) {
 			for (var key in this.errorDicom) {
-				if (res.hasOwnProperty(key)) {
-					const errorInResponse = this.dicom2map(res[key].Value, this.errorDicom[key])
-					this.generateListError(res[key].Value, this.errorDicom[key])
+				if (data.hasOwnProperty(key)) {
+					const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key])
+					this.generateListError(data[key].Value, this.errorDicom[key])
 					this.createListError(errorInResponse)
+					return 0
 				}
 			}
+			return -1
+		},
+		generateErrorNonDicom (files, status = 0) {
+			let map = new Map()
+			files.forEach(file => {
+				map.set(file.id, status)
+			})
+			this.createListError(map)
 		},
 		createListError (error) {
 			error.forEach((errorCode, id) => {
 				const fileError = this.copyFiles.find(file => { return file.id === id })
 				if (fileError) {
-					this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, this.errorValues[errorCode]) })
+					let textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`
+					this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, textError) })
 				}
 			})
 		},

@@ -15,7 +15,8 @@
       "tos_uri": "terms of service document",
       "policy_uri": "Privacy policy document",
       "software_version": "Software version",
-      "contacts": "Contact"
+      "contacts": "Contact",
+      "supported_modalities": "Supported modalities"
 		},
 		"fr": {
 			"url": "URL de configuration",
@@ -32,7 +33,8 @@
       "tos_uri": "Document de conditions d'utilisation",
       "policy_uri": "Document de la politique de confidentialité",
       "software_version": "Version du logiciel",
-      "contacts": "Contact"
+      "contacts": "Contact",
+      "supported_modalities": "Modalités supportées"
 		}
 	}
 </i18n>
@@ -49,7 +51,6 @@
           {{ provider.name }}
         </span>
       </h4>
-
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
           <dt>{{ $t('url') }}</dt>
@@ -197,6 +198,24 @@
           <div class="col-xs-12 col-sm-9">
             <dd>
               {{ provider.data.software_version }}
+            </dd>
+          </div>
+        </div>
+        <div
+          v-if="provider.data.supported_modalities"
+          class="row mb-2"
+        >
+          <div class="col-xs-12 col-sm-3">
+            <dt>{{ $t('supported_modalities') }}</dt>
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <dd>
+              <li
+                v-for="modality in provider.data.supported_modalities"
+                :key="modality.id"
+              >
+                {{ modality }}
+              </li>
             </dd>
           </div>
         </div>
