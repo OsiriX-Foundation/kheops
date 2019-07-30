@@ -47,6 +47,8 @@ public class ReportProviderClientMetadata {
     private String softwareId;
     @XmlElement(name = "software_version")
     private String softwareVersion;
+    @XmlElement(name = "supported_modalities")
+    private ArrayList<String> supportedModalities;
 
     @XmlElement(name = "token_endpoint_auth_signing_alg")
     private String tokenEndpointAuthSigningAlg;
