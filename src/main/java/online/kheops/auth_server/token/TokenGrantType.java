@@ -5,6 +5,7 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.report_provider.ReportProviders;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
@@ -17,12 +18,12 @@ import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Tools.checkValidUID;
 
 public enum TokenGrantType {
-    REFRESH_TOKEN("refresh_token") {
+    REFRESH_TOKEN("refresh_token", KheopsLogBuilder.ActionType.REFRESH_TOKEN_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
-    AUTHORIZATION_CODE("authorization_code") {
+    AUTHORIZATION_CODE("authorization_code", KheopsLogBuilder.ActionType.AUTHORIZATION_CODE_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             verifySingleHeader(form, "code");
             verifySingleHeader(form, "client_id");
@@ -63,27 +64,27 @@ public enum TokenGrantType {
             return new TokenGrantResult(TokenResponseEntity.createEntity(token, REPORT_PROVIDER_TOKEN_LIFETIME), authorizationCode.getSubject());
         }
     },
-    PASSWORD("password") {
+    PASSWORD("password", KheopsLogBuilder.ActionType.PASSWORD_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
-    CLIENT_CREDENTIALS("client_credentials") {
+    CLIENT_CREDENTIALS("client_credentials", KheopsLogBuilder.ActionType.CLIENT_CREDENTIALS_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
-    JWT_ASSERTION("urn:ietf:params:oauth:grant-type:jwt-bearer") {
+    JWT_ASSERTION("urn:ietf:params:oauth:grant-type:jwt-bearer", KheopsLogBuilder.ActionType.JWT_ASSERTION_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
-    SAML_ASSERTION("urn:ietf:params:oauth:grant-type:saml2-bearer") {
+    SAML_ASSERTION("urn:ietf:params:oauth:grant-type:saml2-bearer", KheopsLogBuilder.ActionType.SAML_ASSERTION_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
         }
     },
-    TOKEN_EXCHANGE("urn:ietf:params:oauth:grant-type:token-exchange") {
+    TOKEN_EXCHANGE("urn:ietf:params:oauth:grant-type:token-exchange", KheopsLogBuilder.ActionType.TOKEN_EXCHANGE_GRANT) {
         public TokenGrantResult processGrant(SecurityContext securityContext, ServletContext servletContext, MultivaluedMap<String, String> form) {
             verifySingleHeader(form, "scope");
             verifySingleHeader(form, "subject_token");
@@ -126,7 +127,7 @@ public enum TokenGrantType {
                         .withSeriesInstanceUID(seriesInstanceUID)
                         .generate(PEP_TOKEN_LIFETIME);
 
-                return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject);
+                return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject, "pep", studyInstanceUID, seriesInstanceUID);
             } else if (scope.equals("viewer")) {
                 verifySingleHeader(form, "source_type");
                 final String sourceType = form.getFirst("source_type");
@@ -149,7 +150,7 @@ public enum TokenGrantType {
                         .withSourceId(sourceId)
                         .generate(VIEWER_TOKEN_LIFETIME);
 
-                return new TokenGrantResult(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME), subject);
+                return new TokenGrantResult(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME), subject, "viewer", studyInstanceUID, null);
             } else {
                 throw new TokenRequestException(INVALID_SCOPE);
             }
@@ -161,9 +162,11 @@ public enum TokenGrantType {
     private static final long VIEWER_TOKEN_LIFETIME = 60L * 60L * 5L; // 5 hours
 
     private final String grantType;
+    private final KheopsLogBuilder.ActionType logActionType;
 
-    TokenGrantType(final String grantType) {
+    TokenGrantType(final String grantType, KheopsLogBuilder.ActionType logActionType) {
         this.grantType = grantType;
+        this.logActionType = logActionType;
     }
 
     @Override
@@ -188,5 +191,9 @@ public enum TokenGrantType {
         if (params == null || form.get(param).size() != 1) {
             throw new TokenRequestException(INVALID_REQUEST, "Must have a single " + param);
         }
+    }
+
+    public KheopsLogBuilder.ActionType getLogActionType() {
+        return logActionType;
     }
 }

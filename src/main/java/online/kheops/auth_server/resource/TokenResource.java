@@ -61,11 +61,15 @@ public class TokenResource
 
         try {
             final TokenGrantResult result = grantType.processGrant(securityContext, context, form);
-            new KheopsLogBuilder()
+            final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(ActionType.INTROSPECT_TOKEN)
-                    .log();
+                    .action(grantType.getLogActionType());
+            result.getScope().ifPresent(logBuilder::scope);
+            result.getStudyInstanceUID().ifPresent(logBuilder::study);
+            result.getSeriesInstanceUID().ifPresent(logBuilder::series);
+            logBuilder.log();
+
             return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
