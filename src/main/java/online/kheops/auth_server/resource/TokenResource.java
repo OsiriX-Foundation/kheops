@@ -82,7 +82,7 @@ public class TokenResource
 
         if (assertionToken == null) {
             LOG.log(WARNING, "Missing token");
-            return Response.status(OK).entity(IntrospectResponse.getInactiveResponse()).build();
+            return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
         }
 
         final AccessToken accessToken;
@@ -90,10 +90,10 @@ public class TokenResource
             accessToken = AccessTokenVerifier.authenticateIntrospectableAccessToken(context, assertionToken);
         } catch (AccessTokenVerificationException e) {
             LOG.log(WARNING, "Error validating a token", e);
-            return Response.status(OK).entity(IntrospectResponse.getInactiveResponse()).build();
+            return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
         } catch (DownloadKeyException e) {
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
-            return Response.status(OK).entity(IntrospectResponse.getInactiveResponse()).build();
+            return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
         }
 
         if (accessToken.getTokenType() == AccessToken.TokenType.REPORT_PROVIDER_TOKEN) {
@@ -112,10 +112,10 @@ public class TokenResource
                 redirectUri = getRedirectUri(reportProvider);
             } catch (ReportProviderUriNotValidException e) {
                 LOG.log(WARNING, "Unable to get the Report Provider's redirect_uri", e);
-                return Response.status(OK).entity(IntrospectResponse.getInactiveResponse()).build();
+                return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
             } catch (NoResultException e){
                 LOG.log(WARNING, "ClientId: "+ clientId + " Not Found", e);
-                return Response.status(OK).entity(IntrospectResponse.getInactiveResponse()).build();
+                return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -143,7 +143,7 @@ public class TokenResource
             return Response.status(OK).entity(IntrospectResponse.from(accessToken).toJson()).build();
         } else {
             LOG.log(WARNING, "Public or Report Provider attempting to introspect a valid non-report provider token");
-            return Response.status(OK).entity(IntrospectResponse.getInactiveResponse()).build();
+            return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
         }
     }
 }

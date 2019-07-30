@@ -10,9 +10,9 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class IntrospectResponse {
-    private static final IntrospectResponse INACTIVE = new IntrospectResponse();
+    private static final String INACTIVE_JSON = new IntrospectResponse().toJson();
 
-    private Boolean active;
+    private boolean active;
     private String issuer;
     private List<String> audience;
     private String subject;
@@ -85,12 +85,10 @@ public class IntrospectResponse {
         this.albumId = albumId;
     }
 
-    private IntrospectResponse() {
-        this.active = Boolean.FALSE;
-    }
+    private IntrospectResponse() {}
 
-    public static IntrospectResponse getInactiveResponse() {
-        return INACTIVE;
+    public static String getInactiveResponseJson() {
+        return INACTIVE_JSON;
     }
 
     public static IntrospectResponse from(AccessToken accessToken) {
