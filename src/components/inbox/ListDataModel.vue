@@ -88,11 +88,15 @@
       :no-local-sorting="true"
       :no-sort-reset="true"
       :tbody-class="'table-wrapper-scroll-y link'"
+			:busy="UI.loading"
       @sort-changed="sortingChanged"
       @row-hovered="setItemHover"
       @row-unhovered="setItemHover"
       @row-clicked="showRowDetails"
     >
+			<div slot="table-busy" class="text-center my-2">
+        <strong>Loading...</strong>
+      </div>
       <template
         slot="is_selected"
         slot-scope="row"
@@ -139,18 +143,37 @@
         </b-card>
       </template>
     </b-table>
+    <infinite-loading spinner="spiral" @infinite="infiniteHandler">
+      <div slot="no-more">
+      </div>
+      <div slot="no-results">
+      </div>
+			<!--
+      <div
+        slot="error"
+        slot-scope="{ trigger }"
+      >
+        Error message, click <a
+          href="javascript:;"
+          @click="trigger"
+        >here</a> to retry
+      </div>
+			-->
+    </infinite-loading>
   </div>
 </template>
 
 <script>
+// https://peachscript.github.io/vue-infinite-loading/guide/start-with-hn.html
 import { mapGetters } from 'vuex'
 import ListHeadersDataModel from '@/components/inbox/ListHeadersDataModel'
 import ListIcons from '@/components/inbox/ListIcons'
 import ListItemDetails from '@/components/inbox/ListItemDetails.vue'
+import InfiniteLoading from 'vue-infinite-loading'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { ListHeadersDataModel, ListIcons, ListItemDetails },
+	components: { ListHeadersDataModel, ListIcons, ListItemDetails, InfiniteLoading },
 	mixins: [ ],
 	props: {
 		album: {
@@ -163,7 +186,11 @@ export default {
 		return {
 			UI: {
 				loading: false,
-				studiesFlag: []
+				studiesFlag: [],
+				offset: 0,
+				limit: 10,
+				sortDesc: true,
+				sortBy: 'StudyDate'
 			},
 			fields: {
 				isSelected: {
@@ -228,27 +255,31 @@ export default {
 		}
 	},
 	watch: {
-		studies: {
-			handler: function (studies) {
-				if (studies.length > 0) {
-					this.UI.loading = false
-				}
-			}
-		}
 	},
 	created () {
-		this.UI.loading = true
-		let params = {
-			limit: 100,
-			offset: 0,
-			inbox: true,
-			includefield: ['favorite', 'comments', '00081030']
-		}
-		this.$store.dispatch('getStudiesTest', { queries: params })
+		this.$store.dispatch('initStudiesTest', { })
 	},
 	mounted () {
 	},
 	methods: {
+		// https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
+		infiniteHandler ($state) {
+			let params = {
+				limit: this.UI.limit,
+				offset: this.UI.offset,
+				inbox: true,
+				includefield: ['favorite', 'comments', '00081030'],
+				sort: (this.UI.sortDesc ? '-' : '') + this.UI.sortBy
+			}
+			this.$store.dispatch('getStudiesTest', { queries: params }).then(res => {
+				if (res.status === 200 && res.data.length > 0) {
+					this.UI.offset += this.UI.limit
+					$state.loaded()
+				} else {
+					$state.complete()
+				}
+			})
+		},
 		setItemHover (item, index, event) {
 			let params = {
 				StudyInstanceUID: item.StudyInstanceUID.Value[0],
@@ -302,14 +333,19 @@ export default {
 		},
 		sortingChanged (ctx) {
 			this.UI.loading = true
+			this.UI.sortDesc = ctx.sortDesc
+			this.UI.sortBy = ctx.sortBy
 			let params = {
-				limit: 100,
+				limit: this.UI.offset,
 				offset: 0,
 				inbox: true,
 				includefield: ['favorite', 'comments', '00081030'],
 				sort: (ctx.sortDesc ? '-' : '') + ctx.sortBy
 			}
-			this.$store.dispatch('getStudiesTest', { queries: params })
+			this.$store.dispatch('initStudiesTest', { })
+			this.$store.dispatch('getStudiesTest', { queries: params }).then(res => {
+				this.UI.loading = false
+			})
 		},
 		showRowDetails (item, index, event) {
 			if (!item._showDetails) {
