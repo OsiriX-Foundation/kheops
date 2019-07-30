@@ -59,4 +59,48 @@ sed -i "s|\${kheops_auth_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZ
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 
+#######################################################################################
+#ELASTIC SEARCH
+
+if ! [ -z "$KHEOPS_ZIPPER_ENABLE_ELASTIC" ]; then
+    if [ "$KHEOPS_ZIPPER_ENABLE_ELASTIC" = true ]; then
+
+        echo "Start init filebeat"
+        missing_env_var_secret=false
+
+        if [[ -z $KHEOPS_ZIPPER_ELASTIC_INSTANCE ]]; then
+          echo "Missing KHEOPS_ZIPPER_ELASTIC_INSTANCE environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_ZIPPER_ELASTIC_INSTANCE \e[92mOK\e[0m"
+           sed -i "s|\${instance}|$KHEOPS_ZIPPER_ELASTIC_INSTANCE|" /etc/filebeat/filebeat.yml
+        fi
+
+        if [[ -z $KHEOPS_ZIPPER_LOGSTASH_URL ]]; then
+          echo "Missing KHEOPS_ZIPPER_LOGSTASH_URL environment variable"
+          missing_env_var_secret=true
+        else
+           echo -e "environment variable KHEOPS_ZIPPER_LOGSTASH_URL \e[92mOK\e[0m"
+           sed -i "s|\${logstash_url}|$KHEOPS_ZIPPER_LOGSTASH_URL|" /etc/filebeat/filebeat.yml
+        fi
+
+
+        #if missing env var or secret => exit
+        if [[ $missing_env_var_secret = true ]]; then
+          exit 1
+        else
+           echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
+        fi
+
+        filebeat modules disable system
+        service filebeat restart
+
+        echo "Ending setup FILEBEAT"
+    fi
+else
+    echo "[INFO] : Missing KHEOPS_ZIPPER_ENABLE_ELASTIC environment variable. Elastic is not enable."
+fi
+
+#######################################################################################
+
 catalina.sh run;
