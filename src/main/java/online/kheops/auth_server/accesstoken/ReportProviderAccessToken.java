@@ -73,8 +73,8 @@ public class ReportProviderAccessToken implements AccessToken {
             }
 
             try {
-                final boolean hasReadAccess = scopeClaim.asString().matches(".*\\bread\\b.*");
-                final boolean hasWriteAccess = scopeClaim.asString().matches(".*\\bwrite\\b.*");
+                final boolean hasReadAccess = AccessTokenUtils.StringContainsScope(scopeClaim.asString(), "read");
+                final boolean hasWriteAccess = AccessTokenUtils.StringContainsScope(scopeClaim.asString(), "write");
                 final Instant exp = jwt.getExpiresAt().toInstant();
                 final Instant iat = jwt.getIssuedAt().toInstant();
                 final Instant nbf = jwt.getNotBefore().toInstant();
@@ -102,7 +102,7 @@ public class ReportProviderAccessToken implements AccessToken {
                 }
 
                 return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss);
-            } catch (NullPointerException | JWTDecodeException e) {
+            } catch (NullPointerException | JWTDecodeException | IllegalArgumentException e) {
                 throw new AccessTokenVerificationException("AccessToken missing fields.", e);
             } catch (ClassCastException e) {
                 throw new AccessTokenVerificationException("Unable to read the acting party", e);

@@ -100,10 +100,10 @@ final class KeycloakAccessToken implements AccessToken {
             }
 
             try {
-                if (!jwt.getClaim("scope").asString().matches(".*\\bkheops\\b.*")) {
+                if (!AccessTokenUtils.StringContainsScope(jwt.getClaim("scope").asString(), "kheops")) {
                     throw new AccessTokenVerificationException("Token not valid for kheops");
                 }
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | IllegalArgumentException e) {
                 throw new AccessTokenVerificationException("Missing scope claim");
             }
 
