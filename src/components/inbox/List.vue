@@ -671,7 +671,7 @@
                   />
                 </label>
                 <b-dropdown
-                  v-if="providersEnable.length > 0"
+                  v-if="providersEnable.length > 0 && checkProvidersModalities(row.item)"
                   size="sm"
                   variant="link"
                   no-caret
@@ -692,24 +692,28 @@
                     method="post"
                   >
                     <b-form-input
+                      v-if="checkProviderModalities(row.item, provider)"
                       type="text"
                       hidden
                       name="access_token"
                       :value="access_token"
                     />
                     <b-form-input
+                      v-if="checkProviderModalities(row.item, provider)"
                       type="text"
                       hidden
                       name="client_id"
                       :value="provider.client_id"
                     />
                     <b-form-input
+                      v-if="checkProviderModalities(row.item, provider)"
                       type="text"
                       hidden
                       name="studyUID"
                       :value="row.item.StudyInstanceUID[0]"
                     />
                     <button
+                      v-if="checkProviderModalities(row.item, provider)"
                       style="cursor: pointer"
                       type="submit"
                       class="dropdown-item"
@@ -1302,7 +1306,41 @@ export default {
 		},
 		initStudyUIDadd () {
 			this.studyUIDadd = ''
-		}
+    },
+    checkProvidersModalities (study) {
+      let allModalities = this.providersEnable.find(provider => {
+        return provider.data.supported_modalities === undefined
+      })
+      if (allModalities === Object(allModalities)) {
+        return true
+      }
+      
+      let modalitiesInStudy = study.ModalitiesInStudy[0].split(",")
+      let supportedModalities = this.providersEnable.flatMap(provider => provider.data.supported_modalities)
+
+      let result = false
+      modalitiesInStudy.forEach(modality =>  {
+        if (supportedModalities.includes(modality)) {
+          result = true
+        }
+      })
+
+      return result
+    },
+    checkProviderModalities (study, provider) {
+      if (provider.data.supported_modalities === undefined) {
+        return true
+      }
+      let result = false
+      let modalitiesInStudy = study.ModalitiesInStudy[0].split(",")
+      modalitiesInStudy.forEach(modality =>  {
+        if (provider.data.supported_modalities.includes(modality)) {
+          result = true
+        }
+      })
+
+      return result
+    }
 	}
 }
 
