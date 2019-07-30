@@ -57,7 +57,7 @@ const actions = {
 				}
 			} else if (filterName.indexOf('StudyDate') === -1) {
 				if (value) {
-					requestParams += '&' + filterName + '=' + value + (filterName !== 'ModalitiesInStudy' ? '*' : '')
+					requestParams += '&' + encodeURIComponent(filterName) + '=' + encodeURIComponent(value) + (filterName !== 'ModalitiesInStudy' ? '*' : '')
 				}
 			}
 		})
@@ -84,7 +84,8 @@ const actions = {
 			reset = true
 		} else offset = (params.pageNb - 1) * params.limit
 		let sortSense = (params.sortDesc) ? '-' : ''
-		var request = 'studies?limit=' + params.limit + '&offset=' + offset + (params.sortBy ? '&sort=' + sortSense + params.sortBy : '') + requestParams
+		var queryParam = '?limit=' + params.limit + '&offset=' + offset + (params.sortBy ? '&sort=' + sortSense + params.sortBy : '') + requestParams
+		var request = 'studies' + queryParam
 		return HTTP.get(request, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 			commit('SET_TOTAL', res.headers['x-total-count'])
 			let data = []
