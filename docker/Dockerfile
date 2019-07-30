@@ -14,7 +14,9 @@ COPY context.xml /usr/local/tomcat/conf/context.xml
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
 RUN dpkg -i filebeat-amd64.deb && \
- rm filebeat-amd64.deb
+ rm filebeat-amd64.deb && \
+ rm /etc/filebeat/filebeat.reference.yml && \
+ rm /etc/filebeat/modules.d/*
 
 COPY filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
