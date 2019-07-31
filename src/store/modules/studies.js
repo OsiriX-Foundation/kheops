@@ -57,7 +57,7 @@ const actions = {
 				}
 			} else if (filterName.indexOf('StudyDate') === -1) {
 				if (value) {
-					requestParams += '&' + encodeURIComponent(filterName) + '=' + encodeURIComponent(value) + (filterName !== 'ModalitiesInStudy' ? '*' : '')
+					requestParams += '&' + encodeURIComponent(filterName) + '=' + (filterName === 'PatientName' || filterName === 'StudyDescription' ? '*' : '') + encodeURIComponent(value.trim()) + (filterName !== 'ModalitiesInStudy' ? '*' : '')
 				}
 			}
 		})
@@ -93,7 +93,7 @@ const actions = {
 				let t = { series: [], comments: [] }
 				_.forEach(d, (v, k) => {
 					if (dicom.dicom2name[k] !== undefined) {
-						if (dicom.dicom2name[k] === 'PatientName' || dicom.dicom2name[k] === 'ReferringPhysicianName') v.Value = v.Value[0].Alphabetic
+						if (dicom.dicom2name[k] === 'ReferringPhysicianName') v.Value = v.Value[0].Alphabetic
 						t[dicom.dicom2name[k]] = v.Value
 					} else if (customdicom.customdicom2name[k] !== undefined) {
 						t[customdicom.customdicom2name[k]] = v.Value
