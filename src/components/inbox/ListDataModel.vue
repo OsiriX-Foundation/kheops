@@ -35,7 +35,8 @@
     "importdir": "Import directory",
     "importfiles": "Import files",
     "draganddrop": "Or drag and drop",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+		"nomorestudies": "No more studies"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -68,7 +69,8 @@
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+		"nomorestudies": "Plus d'études"
 	}
 }
 </i18n>
@@ -88,13 +90,16 @@
       :no-local-sorting="true"
       :no-sort-reset="true"
       :tbody-class="'table-wrapper-scroll-y link'"
-			:busy="UI.loading"
+      :busy="UI.loading"
       @sort-changed="sortingChanged"
       @row-hovered="setItemHover"
       @row-unhovered="setItemHover"
       @row-clicked="showRowDetails"
     >
-			<div slot="table-busy" class="text-center my-2">
+      <div
+        slot="table-busy"
+        class="text-center my-2"
+      >
         <strong>Loading...</strong>
       </div>
       <template
@@ -143,12 +148,15 @@
         </b-card>
       </template>
     </b-table>
-    <infinite-loading spinner="spiral" @infinite="infiniteHandler">
+    <infinite-loading
+      spinner="spiral"
+      @infinite="infiniteHandler"
+    >
       <div slot="no-more">
+        {{ $t('nomorestudies') }}
       </div>
-      <div slot="no-results">
-      </div>
-			<!--
+      <div slot="no-results" />
+      <!--
       <div
         slot="error"
         slot-scope="{ trigger }"
@@ -186,9 +194,11 @@ export default {
 		return {
 			UI: {
 				loading: false,
-				studiesFlag: [],
+				studiesFlag: []
+			},
+			studiesParams: {
 				offset: 0,
-				limit: 10,
+				limit: 15,
 				sortDesc: true,
 				sortBy: 'StudyDate'
 			},
@@ -197,7 +207,10 @@ export default {
 					key: 'is_selected',
 					label: '',
 					sortable: false,
-					class: 'td_checkbox breakword'
+					class: ['td_checkbox', 'breakword'],
+					thStyle: {
+						'width': '100px'
+					}
 				},
 				PatientName: {
 					label: this.$t('PatientName'),
@@ -205,6 +218,9 @@ export default {
 					tdClass: 'breakwork',
 					formatter: (value, key, item) => {
 						return value.Value[0]['Alphabetic']
+					},
+					thStyle: {
+						'width': '250px'
 					}
 				},
 				PatientID: {
@@ -214,6 +230,9 @@ export default {
 					class: 'breakword d-none d-md-table-cell d-lg-table-cell',
 					formatter: (value, key, item) => {
 						return value.Value[0]
+					},
+					thStyle: {
+						'width': '250px'
 					}
 				},
 				StudyDescription: {
@@ -223,6 +242,9 @@ export default {
 					class: 'breakword d-none d-lg-table-cell',
 					formatter: (value, key, item) => {
 						return value.Value[0]
+					},
+					thStyle: {
+						'width': '400px'
 					}
 				},
 				StudyDate: {
@@ -232,6 +254,9 @@ export default {
 					class: 'breakword d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
 					formatter: (value, key, item) => {
 						return value.Value[0]
+					},
+					thStyle: {
+						'width': '150px'
 					}
 				},
 				ModalitiesInStudy: {
@@ -241,6 +266,9 @@ export default {
 					class: 'breakword d-none d-sm-table-cell',
 					formatter: (value, key, item) => {
 						return value.Value[0]
+					},
+					thStyle: {
+						'width': '150px'
 					}
 				}
 			}
@@ -265,15 +293,15 @@ export default {
 		// https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
 		infiniteHandler ($state) {
 			let params = {
-				limit: this.UI.limit,
-				offset: this.UI.offset,
+				limit: this.studiesParams.limit,
+				offset: this.studiesParams.offset,
 				inbox: true,
 				includefield: ['favorite', 'comments', '00081030'],
-				sort: (this.UI.sortDesc ? '-' : '') + this.UI.sortBy
+				sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy
 			}
 			this.$store.dispatch('getStudiesTest', { queries: params }).then(res => {
 				if (res.status === 200 && res.data.length > 0) {
-					this.UI.offset += this.UI.limit
+					this.studiesParams.offset += this.studiesParams.limit
 					$state.loaded()
 				} else {
 					$state.complete()
@@ -333,14 +361,14 @@ export default {
 		},
 		sortingChanged (ctx) {
 			this.UI.loading = true
-			this.UI.sortDesc = ctx.sortDesc
-			this.UI.sortBy = ctx.sortBy
+			this.studiesParams.sortDesc = ctx.sortDesc
+			this.studiesParams.sortBy = ctx.sortBy
 			let params = {
-				limit: this.UI.offset,
+				limit: this.studiesParams.offset,
 				offset: 0,
 				inbox: true,
 				includefield: ['favorite', 'comments', '00081030'],
-				sort: (ctx.sortDesc ? '-' : '') + ctx.sortBy
+				sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy
 			}
 			this.$store.dispatch('initStudiesTest', { })
 			this.$store.dispatch('getStudiesTest', { queries: params }).then(res => {

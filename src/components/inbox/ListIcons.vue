@@ -3,6 +3,7 @@
   <span>
     <span
       :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
+      class="ml-1"
       @click.stop="toggleFavorite()"
     >
       <v-icon
@@ -14,6 +15,7 @@
     </span>
     <span
       :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
+      class="ml-1"
       @click.stop="showComments(study, 'comments')"
     >
       <v-icon
@@ -25,6 +27,7 @@
     </span>
     <span
       :class="classIconPN(study.flag.is_hover)"
+      class="ml-1"
     >
       <a
         href="#"
@@ -39,6 +42,7 @@
       </a>
       <span
         v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
+        class="ml-1"
         @click.stop="openViewer('Osirix')"
       >
         <osirix-icon
@@ -48,6 +52,7 @@
       </span>
       <span
         v-if="study.ModalitiesInStudy[0] !== 'SR'"
+        class="ml-1"
         @click.stop="openViewer('Ohif')"
       >
         <visibility-icon
@@ -59,6 +64,7 @@
       <label
         for="file"
         style="cursor:pointer; display: inline;"
+        class="ml-1"
         @click="studyUIDadd=study.StudyInstanceUID[0]"
       >
         <add-icon
