@@ -587,7 +587,10 @@
           <div class="patientNameContainer">
             <div class="row">
               <div class="patientName col-md-auto">
-                {{ row.item.PatientName }}
+                {{ row.item.PatientName[0]['Alphabetic'] }}
+                <span v-if="row.item.PatientName[0]['Ideographic'] !== undefined">
+                  - {{ row.item.PatientName[0]['Ideographic'] }}
+                </span>
               </div>
               <div class="patientName_ct col-md-auto d-block d-sm-none">
                 {{ row.item.ModalitiesInStudy [0] | formatModality }}
