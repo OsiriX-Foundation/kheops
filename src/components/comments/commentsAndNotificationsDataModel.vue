@@ -379,9 +379,10 @@ export default {
 		}
 	},
 	created () {
-		// this.getComments()
 		if (this.album.album_id) this.$store.dispatch('getUsers')
-		this.$store.dispatch('getCommentsStudy', { StudyInstanceUID: this.id })
+		this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
+			this.scrollBottom()
+		})
 	},
 	methods: {
 		checkUserFromTextarea () {
@@ -402,9 +403,33 @@ export default {
 			}
 		},
 		addComment () {
-			let queries = {
-				comment: this.newComment
+			if (this.newComment.comment.length >= 1) {
+				let queries = {
+					comment: this.newComment.comment
+				}
+				if (this.enablePrivate) {
+					queries.to_user = this.privateUser
+				}
+
+				let params = {
+					'StudyInstanceUID': this.id,
+					'queries': queries
+				}
+
+				this.$store.dispatch('postStudyComment', params).then(res => {
+					if (res.status === 204) {
+						this.$snotify.success(this.$t('commentpostsuccess'))
+						this.newComment.comment = ''
+						this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
+							this.scrollBottom()
+						})
+					}
+				}).catch(res => {
+					this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+					this.newComment.comment = ''
+				})
 			}
+			/*
 			if (this.newComment.comment.length >= 1) {
 				if (this.enablePrivate) {
 					this.newComment.to_user = this.privateUser
@@ -437,15 +462,16 @@ export default {
 					})
 				}
 			}
+      */
 		},
 		getComments () {
 			let type = (this.includeNotifications) ? '' : 'comments'
 			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumComments', { type: type }).then(() => {
+				this.$store.dispatch('getStudyComments', { type: type }).then(() => {
 					this.scrollBottom()
 				})
 			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then(() => {
+				this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id, type: type }).then(() => {
 					this.scrollBottom()
 				})
 			}

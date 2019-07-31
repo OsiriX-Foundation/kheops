@@ -26,7 +26,7 @@ const getters = {
 
 // actions
 const actions = {
-	getCommentsStudy ({ commit, dispatch }, params) {
+	getStudyComments ({ commit, dispatch }, params) {
 		const request = `studies/${params.StudyInstanceUID}/comments`
 		let queries = ''
 
@@ -36,22 +36,22 @@ const actions = {
 
 		return HTTP.get(`${request}${queries}`, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() })
+			return res
 		}).catch(err => {
 			console.log(err)
 		})
 	},
-	postComment ({ dispatch }, params) {
+	postStudyComment ({ dispatch }, params) {
 		const request = `studies/${params.StudyInstanceUID}/comments`
 		let queries = ''
 
 		if (params.queries !== undefined) {
-			queries = httpoperations.getQueriesParameters(params.queries)
+			queries = httpoperations.getFormData(params.queries)
 		}
-		console.log(queries)
-		return HTTP.post(request, 'comment=' + params.queries.comment, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
-			if (res.status === 204) {
-				dispatch('getStudiesComments', { StudyInstanceUID: params.StudyInstanceUID })
-			} else return res
+		return HTTP.post(request, queries, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+			return res
+		}).catch(err => {
+			return err
 		})
 	}
 }
