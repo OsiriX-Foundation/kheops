@@ -54,6 +54,32 @@
             {{ $t("send") }}
           </button>
         </div>
+				<!--
+					v-if="!albumId || (album.send_series || album.is_admin)"
+				-->
+        <b-dropdown
+					:disabled="selectedStudiesNb === 0"
+          variant="link"
+          size="sm"
+          no-caret
+        >
+          <template slot="button-content">
+            <span>
+              <v-icon
+                class="align-middle"
+                name="book"
+              />
+            </span><br>
+						<span>{{ $t("addalbum") }}</span>
+          </template>
+          <b-dropdown-item
+            v-for="allowedAlbum in allowedAlbums"
+            :key="allowedAlbum.id"
+            @click.stop="addToAlbum(allowedAlbum.album_id)"
+          >
+            {{ allowedAlbum.name }}
+          </b-dropdown-item>
+        </b-dropdown>
         <div
           class="align-self-center"
         >
@@ -122,6 +148,11 @@ export default {
 	components: { formGetUser, ConfirmButton },
 	props: {
 		studies: {
+			type: Array,
+			required: true,
+			default: () => ([])
+		},
+		allowedAlbums: {
 			type: Array,
 			required: true,
 			default: () => ([])
@@ -204,13 +235,14 @@ export default {
 			this.selectedStudies.forEach(study => {
 				params.StudyInstanceUID = study.StudyInstanceUID.Value[0]
 				this.$store.dispatch('setFlagByStudyUID', params)
-				if (study.series !== undefined) {
-					study.series.forEach(serie => {
-						params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
-						this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
-					})
-				}
 			})
+			for (let studyUID in this.selectedSeries) {
+				params.StudyInstanceUID = studyUID
+				this.selectedSeries[studyUID].forEach(serie => {
+					params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
+					this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
+				})
+			}
 		},
 		favoriteSelectedStudies () {
 			let favorites = this.allSelectedStudies.every(s => { return s.flag.is_favorite === true })
@@ -256,6 +288,30 @@ export default {
 					this.$store.dispatch('deleteSerieTest', params)
 				})
 			}
+		},
+		addToAlbum (albumId) {
+			let queries = {
+				inbox: true
+			}
+			let data = []
+			this.selectedStudies.forEach(study => {
+				data.push({
+					album_id: albumId,
+					study_id: study.StudyInstanceUID.Value[0]
+				})
+			})
+			for (let studyUID in this.selectedSeries) {
+				this.selectedSeries[studyUID].forEach(serie => {
+					data.push({
+						album_id: albumId,
+						study_id: studyUID,
+						serie_id: serie.SeriesInstanceUID.Value[0]
+					})
+				})
+			}
+			this.$store.dispatch('putStudiesInAlbumTest', {'queries': queries, 'data': data}).then(res => {
+				this.deselectStudySeries()
+			})
 		}
 	}
 }

@@ -8,6 +8,7 @@ import sending from './modules/sending'
 import providers from './modules/providers'
 import studiesTest from './modules/studies_test'
 import comments from './modules/comments'
+import albumsTest from './modules/albums_test'
 
 Vue.use(Vuex)
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
 		sending,
 		providers,
 		studiesTest,
-		comments
+		comments,
+		albumsTest
 	}
 })

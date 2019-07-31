@@ -79,6 +79,7 @@
   <div>
     <list-headers-data-model
       :studies="studies"
+			:allowed-albums="albums"
     />
     <b-table
       class="container-fluid"
@@ -276,7 +277,8 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studiesTest'
+			studies: 'studiesTest',
+			albums: 'albumsTest'
 		}),
 		OS () {
 			return navigator.platform
@@ -285,7 +287,11 @@ export default {
 	watch: {
 	},
 	created () {
-		this.$store.dispatch('initStudiesTest', { })
+		this.$store.dispatch('initStudiesTest', {})
+		let queriesAlbums = {
+			canAddSeries: true
+		}
+		this.$store.dispatch('getAlbumsTest', {'queries': queriesAlbums})
 	},
 	mounted () {
 	},
