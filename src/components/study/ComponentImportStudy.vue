@@ -68,6 +68,7 @@
         <div
           :class="['dropzone-area', classDragIn]"
         >
+          <!--
           <list
             ref="list"
             :album="album"
@@ -75,6 +76,7 @@
             @loaddirectories="inputLoadFiles"
             @demohover="demoHover"
           />
+		  -->
 
           <list-data-model
             ref="list"
@@ -201,8 +203,7 @@ export default {
 				return objFile
 			}
 		},
-		inputLoadFiles (filesFromInput, studyUID) {
-			this.$store.dispatch('setStudyUIDtoSend', { studyUID: studyUID })
+		inputLoadFiles (filesFromInput) {
 			let arrayFiles = []
 			for (let i = 0; i < filesFromInput.length; i++) {
 				const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name

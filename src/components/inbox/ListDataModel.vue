@@ -77,9 +77,18 @@
 
 <template>
   <div>
+    <input
+      id="file"
+      ref="inputfiles"
+      type="file"
+      name="file"
+      class="inputfile"
+      multiple
+      @change="inputLoadFiles"
+    >
     <list-headers-data-model
       :studies="studies"
-			:allowed-albums="albums"
+      :allowed-albums="albums"
     />
     <b-table
       class="container-fluid"
@@ -291,7 +300,7 @@ export default {
 		let queriesAlbums = {
 			canAddSeries: true
 		}
-		this.$store.dispatch('getAlbumsTest', {'queries': queriesAlbums})
+		this.$store.dispatch('getAlbumsTest', { 'queries': queriesAlbums })
 	},
 	mounted () {
 	},
@@ -387,6 +396,12 @@ export default {
 				item._showDetails = true
 			} else {
 				item._showDetails = false
+			}
+		},
+		inputLoadFiles () {
+			if (this.$refs.inputfiles.files.length > 0) {
+				const filesFromInput = this.$refs.inputfiles.files
+				this.$emit('loadfiles', filesFromInput)
 			}
 		}
 	}

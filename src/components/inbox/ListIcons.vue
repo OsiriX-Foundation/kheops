@@ -32,7 +32,7 @@
       <a
         href="#"
         class="download"
-        @click.stop="getURLDownload(study.StudyInstanceUID)"
+        @click.stop="getURLDownload()"
       >
         <v-icon
           class="align-middle"
@@ -60,12 +60,11 @@
           height="24px"
         />
       </span>
-
       <label
         for="file"
         style="cursor:pointer; display: inline;"
         class="ml-1"
-        @click="studyUIDadd=study.StudyInstanceUID[0]"
+        @click="setStudyUID()"
       >
         <add-icon
           width="24px"
@@ -187,6 +186,10 @@ export default {
 				StudyInstanceUID: study.StudyInstanceUID.Value[0],
 				value: !study._showDetails
 			})
+		},
+		setStudyUID () {
+			const StudyInstanceUID = this.study.StudyInstanceUID.Value[0]
+			this.$store.dispatch('setStudyUIDtoSend', { studyUID: StudyInstanceUID })
 		}
 	}
 }
