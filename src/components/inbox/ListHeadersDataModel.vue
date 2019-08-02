@@ -400,7 +400,7 @@ export default {
 			this.$emit('setFilters', this.showFilters)
 		},
 		showDragAndDrop () {
-			this.$emit('demohover')
+			this.$store.dispatch('setDemoDragAndDrop', true)
 		}
 	}
 }

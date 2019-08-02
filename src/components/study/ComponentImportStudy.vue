@@ -121,7 +121,8 @@ export default {
 	computed: {
 		...mapGetters({
 			sending: 'sending',
-			files: 'files'
+			files: 'files',
+			demoDragAndDrop: 'demoDragAndDrop'
 		}),
 		albumNoPermission () {
 			return !(this.album.is_admin || this.album.add_series) && this.scope === 'album'
@@ -139,6 +140,15 @@ export default {
 		}
 	},
 	watch: {
+		demoDragAndDrop () {
+			if (this.demoDragAndDrop) {
+				this.hover = true
+				setTimeout(() => {
+					this.hover = false
+					this.$store.dispatch('setDemoDragAndDrop', false)
+				}, 1500)
+			}
+		}
 	},
 	created () {
 	},
@@ -181,10 +191,6 @@ export default {
 		}
 	},
 	methods: {
-		demoHover () {
-			this.hover = true
-			setTimeout(() => { this.hover = false }, 1500)
-		},
 		storeFiles (files) {
 			this.$store.dispatch('setSending', { sending: true })
 			this.$store.dispatch('setFiles', { files: files })

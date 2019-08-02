@@ -6,7 +6,8 @@ const state = {
 	totalSize: 0,
 	error: [],
 	source: '',
-	studyUIDToSend: ''
+	studyUIDToSend: '',
+	demoDragAndDrop: false
 }
 
 const getters = {
@@ -16,7 +17,8 @@ const getters = {
 	totalSize: state => state.totalSize,
 	error: state => state.error,
 	source: state => state.source,
-	studyUIDToSend: state => state.studyUIDToSend
+	studyUIDToSend: state => state.studyUIDToSend,
+	demoDragAndDrop: state => state.demoDragAndDrop
 }
 
 const actions = {
@@ -38,6 +40,9 @@ const actions = {
 	},
 	setStudyUIDtoSend ({ commit }, params) {
 		commit('SET_STUDYUID', params)
+	},
+	setDemoDragAndDrop ({ commit }, value) {
+		commit('SET_DEMODRAGANDDROP', value)
 	},
 	initErrorFiles ({ commit }) {
 		commit('INIT_ERROR')
@@ -82,6 +87,9 @@ const mutations = {
 	},
 	SET_STUDYUID (state, params) {
 		state.studyUIDToSend = params.studyUID
+	},
+	SET_DEMODRAGANDDROP (state, value) {
+		state.demoDragAndDrop = value
 	},
 	INIT_ERROR (state) {
 		state.error = []
