@@ -116,6 +116,65 @@
             {{ $t("delete") }}
           </button>
         </div>
+
+        <div
+          class="ml-auto align-self-center"
+        >
+          <!--
+          <div>
+            <b-dropdown
+              id="dropdown-divider"
+              class="m-2"
+              variant="link"
+              right
+            >
+              <template slot="button-content">
+                <add-icon
+                  width="30px"
+                  height="30px"
+                />
+              </template>
+              <b-dropdown-item-button
+                :disabled="sendingFiles"
+              >
+                <label for="file">
+                  {{ $t("importfiles") }}
+                </label>
+              </b-dropdown-item-button>
+              <b-dropdown-item-button
+                v-if="determineWebkitDirectory()"
+                :disabled="sendingFiles"
+              >
+                <label for="directory">
+                  {{ $t("importdir") }}
+                </label>
+              </b-dropdown-item-button>
+              <b-dropdown-divider />
+              <b-dropdown-item-button
+                v-if="determineWebkitDirectory()"
+                @click="showDragAndDrop"
+              >
+                {{ $t("draganddrop") }}
+              </b-dropdown-item-button>
+            </b-dropdown>
+          </div>
+					-->
+        </div>
+
+        <div
+          class="d-none d-sm-block align-self-center"
+        >
+          <button
+            type="button"
+            class=" btn btn-link btn-lg"
+            @click="setFilters()"
+          >
+            <v-icon
+              name="search"
+              scale="2"
+            />
+          </button>
+        </div>
       </div>
     </div>
     <confirm-button
@@ -161,7 +220,8 @@ export default {
 	data () {
 		return {
 			formSendStudy: false,
-			confirmDelete: false
+			confirmDelete: false,
+			showFilters: false
 		}
 	},
 	computed: {
@@ -235,6 +295,12 @@ export default {
 			this.selectedStudies.forEach(study => {
 				params.StudyInstanceUID = study.StudyInstanceUID.Value[0]
 				this.$store.dispatch('setFlagByStudyUID', params)
+				if (study.series !== undefined) {
+					study.series.forEach(serie => {
+						params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
+						this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
+					})
+				}
 			})
 			for (let studyUID in this.selectedSeries) {
 				params.StudyInstanceUID = studyUID
@@ -312,6 +378,17 @@ export default {
 			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
 				this.deselectStudySeries()
 			})
+		},
+		determineWebkitDirectory () {
+			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+			var tmpInput = document.createElement('input')
+			if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true
+
+			return false
+		},
+		setFilters () {
+			this.showFilters = !this.showFilters
+			this.$emit('setFilters', this.showFilters)
 		}
 	}
 }

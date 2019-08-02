@@ -3,7 +3,7 @@ import moment from 'moment'
 
 Vue.filter('formatDate', value => {
 	if (value) {
-		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY') : 'Invalid Date'
+		return moment(String(value)).isValid() ? moment(String(value)).format('MMM Do YYYY') : value
 	}
 	return value
 })

@@ -36,7 +36,8 @@
     "importfiles": "Import files",
     "draganddrop": "Or drag and drop",
     "favorites": "Favorites",
-		"nomorestudies": "No more studies"
+		"nomorestudies": "No more studies",
+		"noresults": "No results"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -70,7 +71,8 @@
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
     "favorites": "Favorites",
-		"nomorestudies": "Plus d'études"
+		"nomorestudies": "Plus d'études",
+		"noresults": "Aucun resultats"
 	}
 }
 </i18n>
@@ -86,9 +88,33 @@
       multiple
       @change="inputLoadFiles"
     >
+    <!--
+		<input
+			id="file"
+			ref="inputfiles"
+			type="file"
+			name="file"
+			class="inputfile"
+			multiple
+			:disabled="sendingFiles"
+			@change="inputLoadFiles"
+		>
+
+		<input
+			id="directory"
+			ref="inputdir"
+			type="file"
+			name="file"
+			class="inputfile"
+			webkitdirectory
+			:disabled="sendingFiles"
+			@change="inputLoadDirectories"
+		>
+		-->
     <list-headers-data-model
       :studies="studies"
       :allowed-albums="albums"
+      @setFilters="changeFilterValue"
     />
     <b-table
       class="container-fluid"
@@ -100,7 +126,6 @@
       :no-local-sorting="true"
       :no-sort-reset="true"
       :tbody-class="'table-wrapper-scroll-y link'"
-      :busy="UI.loading"
       @sort-changed="sortingChanged"
       @row-hovered="setItemHover"
       @row-unhovered="setItemHover"
@@ -112,6 +137,121 @@
       >
         <strong>Loading...</strong>
       </div>
+
+      <!--
+				HEADER TABLE
+			-->
+      <template
+        slot="HEAD_PatientName"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.PatientName"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ data.label }}
+      </template>
+
+      <template
+        slot="HEAD_PatientID"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.PatientID"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ data.label }}
+      </template>
+
+      <template
+        slot="HEAD_StudyDescription"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.StudyDescription"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          > <br>
+        </div>
+        {{ data.label }}
+      </template>
+
+      <template
+        slot="HEAD_StudyDate"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          class="form-row"
+          @click.stop=""
+        >
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.StudyDateFrom"
+                :disabled-dates="disabledFromDates"
+                input-class="form-control form-control-sm  search-calendar"
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('fromDate')"
+              />
+            </div>
+          </div>
+
+          <div class="col form-inline">
+            <div class="form-group">
+              <datepicker
+                v-model="filters.StudyDateTo"
+                :disabled-dates="disabledToDates"
+                input-class="form-control form-control-sm search-calendar"
+                wrapper-class="calendar-wrapper"
+                :placeholder="$t('toDate')"
+              />
+            </div>
+          </div>
+        </div>
+        <br v-if="showFilters">
+        {{ data.label }}
+      </template>
+
+      <template
+        slot="HEAD_ModalitiesInStudy"
+        slot-scope="data"
+      >
+        <div
+          v-if="showFilters"
+          @click.stop=""
+        >
+          <input
+            v-model="filters.ModalitiesInStudy"
+            type="search"
+            class="form-control form-control-sm"
+            :placeholder="$t('filter')"
+          ><br>
+        </div>
+        {{ $t(data.label) }}
+      </template>
+      <!--
+				CONTENT TABLE
+			-->
       <template
         slot="is_selected"
         slot-scope="row"
@@ -146,6 +286,12 @@
           :study="row.item"
         />
       </template>
+      <template
+        slot="StudyDate"
+        slot-scope="row"
+      >
+        {{ row.value | formatDate }}
+      </template>
       <!--Infos study (Series / Comments / Study Metadata) -->
       <template
         slot="row-details"
@@ -160,23 +306,15 @@
     </b-table>
     <infinite-loading
       spinner="spiral"
+      :identifier="infiniteId"
       @infinite="infiniteHandler"
     >
       <div slot="no-more">
         {{ $t('nomorestudies') }}
       </div>
-      <div slot="no-results" />
-      <!--
-      <div
-        slot="error"
-        slot-scope="{ trigger }"
-      >
-        Error message, click <a
-          href="javascript:;"
-          @click="trigger"
-        >here</a> to retry
+      <div slot="no-results">
+        {{ $t('noresults') }}
       </div>
-			-->
     </infinite-loading>
   </div>
 </template>
@@ -188,10 +326,12 @@ import ListHeadersDataModel from '@/components/inbox/ListHeadersDataModel'
 import ListIcons from '@/components/inbox/ListIcons'
 import ListItemDetails from '@/components/inbox/ListItemDetails.vue'
 import InfiniteLoading from 'vue-infinite-loading'
+import Datepicker from 'vuejs-datepicker'
+import moment from 'moment'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { ListHeadersDataModel, ListIcons, ListItemDetails, InfiniteLoading },
+	components: { ListHeadersDataModel, ListIcons, ListItemDetails, InfiniteLoading, Datepicker },
 	mixins: [ ],
 	props: {
 		album: {
@@ -202,14 +342,12 @@ export default {
 	},
 	data () {
 		return {
-			UI: {
-				loading: false,
-				studiesFlag: []
-			},
+			infiniteId: 0,
+			showFilters: false,
 			studiesParams: {
 				offset: 0,
 				limit: 15,
-				sortDesc: true,
+				sortDesc: false,
 				sortBy: 'StudyDate'
 			},
 			fields: {
@@ -281,6 +419,14 @@ export default {
 						'width': '150px'
 					}
 				}
+			},
+			filters: {
+				PatientName: '',
+				PatientID: '',
+				StudyDescription: '',
+				StudyDateFrom: '',
+				StudyDateTo: '',
+				ModalitiesInStudy: ''
 			}
 		}
 	},
@@ -291,9 +437,40 @@ export default {
 		}),
 		OS () {
 			return navigator.platform
+		},
+		disabledToDates: function () {
+			return {
+				to: this.filters.StudyDateFrom,
+				from: new Date()
+			}
+		},
+		disabledFromDates: function () {
+			return {
+				from: new Date()
+			}
 		}
 	},
 	watch: {
+		filters: {
+			handler: function (filters) {
+				this.searchStudies()
+			},
+			deep: true
+		},
+		showFilters: {
+			handler: function (showFilters) {
+				if (!showFilters) {
+					this.filters = {
+						PatientName: '',
+						PatientID: '',
+						StudyDescription: '',
+						StudyDateFrom: '',
+						StudyDateTo: '',
+						ModalitiesInStudy: ''
+					}
+				}
+			}
+		}
 	},
 	created () {
 		this.$store.dispatch('initStudiesTest', {})
@@ -308,14 +485,7 @@ export default {
 	methods: {
 		// https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
 		infiniteHandler ($state) {
-			let params = {
-				limit: this.studiesParams.limit,
-				offset: this.studiesParams.offset,
-				inbox: true,
-				includefield: ['favorite', 'comments', '00081030'],
-				sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy
-			}
-			this.$store.dispatch('getStudiesTest', { queries: params }).then(res => {
+			this.getStudies(this.studiesParams.offset).then(res => {
 				if (res.status === 200 && res.data.length > 0) {
 					this.studiesParams.offset += this.studiesParams.limit
 					$state.loaded()
@@ -376,20 +546,52 @@ export default {
 			})
 		},
 		sortingChanged (ctx) {
-			this.UI.loading = true
 			this.studiesParams.sortDesc = ctx.sortDesc
 			this.studiesParams.sortBy = ctx.sortBy
+			this.searchStudies()
+		},
+		searchStudies () {
+			this.studiesParams.offset = 0
+			this.$store.dispatch('initStudiesTest', { })
+			this.infiniteId += 1
+			this.getStudies()
+		},
+		getStudies (offset = 0) {
 			let params = {
-				limit: this.studiesParams.offset,
-				offset: 0,
+				limit: this.studiesParams.limit,
+				offset: offset,
 				inbox: true,
 				includefield: ['favorite', 'comments', '00081030'],
 				sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy
 			}
-			this.$store.dispatch('initStudiesTest', { })
-			this.$store.dispatch('getStudiesTest', { queries: params }).then(res => {
-				this.UI.loading = false
-			})
+			const queries = Object.assign(params, this.prepareFilters())
+			return this.$store.dispatch('getStudiesTest', { queries: queries })
+		},
+		prepareFilters () {
+			let filtersToSend = {}
+			for (let id in this.filters) {
+				if (this.filters[id] !== '') {
+					if (id === 'PatientName' || id === 'StudyDescription' || id === 'PatientID') {
+						filtersToSend[id] = `*${this.filters[id]}*`
+					} else if (id === 'StudyDateFrom') {
+						if (this.filters['StudyDateTo'] === '') {
+							filtersToSend['StudyDate'] = `${this.transformDate(this.filters[id])}-`
+						} else {
+							filtersToSend['StudyDate'] = `${this.transformDate(this.filters[id])}-${this.transformDate(this.filters['StudyDateTo'])}`
+						}
+					} else if (id === 'StudyDateTo') {
+						if (this.filters['StudyDateFrom'] === '') {
+							filtersToSend['StudyDate'] = `-${this.transformDate(this.filters[id])}`
+						}
+					} else {
+						filtersToSend[id] = this.filters[id]
+					}
+				}
+			}
+			return filtersToSend
+		},
+		transformDate (date) {
+			return moment(date).format('YYYYMMDD')
 		},
 		showRowDetails (item, index, event) {
 			if (!item._showDetails) {
@@ -404,6 +606,9 @@ export default {
 				const filesFromInput = this.$refs.inputfiles.files
 				this.$emit('loadfiles', filesFromInput)
 			}
+		},
+		changeFilterValue (value) {
+			this.showFilters = value
 		}
 	}
 }
