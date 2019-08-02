@@ -86,19 +86,19 @@
       name="file"
       class="inputfile"
       multiple
-			:disabled="sendingFiles"
+      :disabled="sendingFiles"
       @change="inputLoadFiles"
     >
-		<input
-			id="directory"
-			ref="inputdir"
-			type="file"
-			name="file"
-			class="inputfile"
-			webkitdirectory
-			:disabled="sendingFiles"
-			@change="inputLoadDirectories"
-		>
+    <input
+      id="directory"
+      ref="inputdir"
+      type="file"
+      name="file"
+      class="inputfile"
+      webkitdirectory
+      :disabled="sendingFiles"
+      @change="inputLoadDirectories"
+    >
     <list-headers-data-model
       :studies="studies"
       :allowed-albums="albums"
