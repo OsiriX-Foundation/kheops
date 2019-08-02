@@ -300,6 +300,7 @@ export default {
 		let queriesAlbums = {
 			canAddSeries: true
 		}
+		this.$store.dispatch('initAlbumsTest', {})
 		this.$store.dispatch('getAlbumsTest', { 'queries': queriesAlbums })
 	},
 	mounted () {

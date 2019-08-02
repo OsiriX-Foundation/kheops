@@ -14,6 +14,9 @@ const getters = {
 
 // actions
 const actions = {
+	initAlbumsTest ({ commit }, params) {
+		commit('INIT_ALBUMS_TEST')
+	},
 	getAlbumsTest ({ commit }, params) {
 		let request = 'albums'
 		let queries = ''

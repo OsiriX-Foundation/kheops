@@ -54,11 +54,11 @@
             {{ $t("send") }}
           </button>
         </div>
-				<!--
+        <!--
 					v-if="!albumId || (album.send_series || album.is_admin)"
 				-->
         <b-dropdown
-					:disabled="selectedStudiesNb === 0"
+          :disabled="selectedStudiesNb === 0"
           variant="link"
           size="sm"
           no-caret
@@ -70,7 +70,7 @@
                 name="book"
               />
             </span><br>
-						<span>{{ $t("addalbum") }}</span>
+            <span>{{ $t("addalbum") }}</span>
           </template>
           <b-dropdown-item
             v-for="allowedAlbum in allowedAlbums"
@@ -309,7 +309,7 @@ export default {
 					})
 				})
 			}
-			this.$store.dispatch('putStudiesInAlbumTest', {'queries': queries, 'data': data}).then(res => {
+			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
 				this.deselectStudySeries()
 			})
 		}
