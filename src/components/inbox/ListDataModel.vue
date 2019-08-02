@@ -86,6 +86,7 @@
       name="file"
       class="inputfile"
       multiple
+			:disabled="sendingFiles"
       @change="inputLoadFiles"
     >
     <!--
@@ -433,7 +434,8 @@ export default {
 	computed: {
 		...mapGetters({
 			studies: 'studiesTest',
-			albums: 'albumsTest'
+			albums: 'albumsTest',
+			sendingFiles: 'sending'
 		}),
 		OS () {
 			return navigator.platform
@@ -451,6 +453,12 @@ export default {
 		}
 	},
 	watch: {
+		sendingFiles () {
+			if (!this.sendingFiles) {
+				this.$store.dispatch('initStudiesTest', { })
+				this.getStudies(0, this.studiesParams.offset)
+			}
+		},
 		filters: {
 			handler: function (filters) {
 				this.searchStudies()
@@ -485,7 +493,7 @@ export default {
 	methods: {
 		// https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
 		infiniteHandler ($state) {
-			this.getStudies(this.studiesParams.offset).then(res => {
+			this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then(res => {
 				if (res.status === 200 && res.data.length > 0) {
 					this.studiesParams.offset += this.studiesParams.limit
 					$state.loaded()
@@ -554,11 +562,10 @@ export default {
 			this.studiesParams.offset = 0
 			this.$store.dispatch('initStudiesTest', { })
 			this.infiniteId += 1
-			this.getStudies()
 		},
-		getStudies (offset = 0) {
+		getStudies (offset = 0, limit = 0) {
 			let params = {
-				limit: this.studiesParams.limit,
+				limit: limit,
 				offset: offset,
 				inbox: true,
 				includefield: ['favorite', 'comments', '00081030'],
