@@ -89,18 +89,6 @@
 			:disabled="sendingFiles"
       @change="inputLoadFiles"
     >
-    <!--
-		<input
-			id="file"
-			ref="inputfiles"
-			type="file"
-			name="file"
-			class="inputfile"
-			multiple
-			:disabled="sendingFiles"
-			@change="inputLoadFiles"
-		>
-
 		<input
 			id="directory"
 			ref="inputdir"
@@ -111,7 +99,6 @@
 			:disabled="sendingFiles"
 			@change="inputLoadDirectories"
 		>
-		-->
     <list-headers-data-model
       :studies="studies"
       :allowed-albums="albums"
@@ -456,7 +443,7 @@ export default {
 		sendingFiles () {
 			if (!this.sendingFiles) {
 				this.$store.dispatch('initStudiesTest', { })
-				this.getStudies(0, this.studiesParams.offset)
+				this.getStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit)
 			}
 		},
 		filters: {
@@ -612,6 +599,12 @@ export default {
 			if (this.$refs.inputfiles.files.length > 0) {
 				const filesFromInput = this.$refs.inputfiles.files
 				this.$emit('loadfiles', filesFromInput)
+			}
+		},
+		inputLoadDirectories () {
+			if (this.$refs.inputdir.files.length > 0) {
+				const filesFromInput = this.$refs.inputdir.files
+				this.$emit('loaddirectories', filesFromInput)
 			}
 		},
 		changeFilterValue (value) {

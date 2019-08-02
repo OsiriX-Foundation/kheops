@@ -9,7 +9,10 @@
 		"addfavorites": "Add too favorites",
 		"addfavorites": "Remove too favorites",
     "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
-    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them."
+    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+    "importdir": "Import directory",
+    "importfiles": "Import files",
+    "draganddrop": "Or drag and drop"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -20,7 +23,10 @@
 		"addfavorites": "Ajouter aux favoris",
 		"addfavorites": "Supprimer des favoris",
 		"confirmDelete": "Etes vous de sûr de vouloir supprimer {count} étude | Etes vous de sûr de vouloir supprimer {count} études",
-    "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries."
+    "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
+    "importdir": "Importer un dossier",
+    "importfiles": "Importer des fichiers",
+    "draganddrop": "Ou Drag and Drop"
 	}
 }
 </i18n>
@@ -120,7 +126,6 @@
         <div
           class="ml-auto align-self-center"
         >
-          <!--
           <div>
             <b-dropdown
               id="dropdown-divider"
@@ -158,7 +163,6 @@
               </b-dropdown-item-button>
             </b-dropdown>
           </div>
-					-->
         </div>
 
         <div
@@ -196,15 +200,17 @@
 <script>
 import ToggleButton from 'vue-js-toggle-button'
 import Vue from 'vue'
+import { mapGetters } from 'vuex'
 import formGetUser from '@/components/user/getUser'
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
 import { HTTP } from '@/router/http'
+import AddIcon from '@/components/kheopsSVG/AddIcon'
 
 Vue.use(ToggleButton)
 
 export default {
 	name: 'ListHeadersDataModel',
-	components: { formGetUser, ConfirmButton },
+	components: { formGetUser, ConfirmButton, AddIcon },
 	props: {
 		studies: {
 			type: Array,
@@ -225,6 +231,9 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters({
+			sendingFiles: 'sending'
+		}),
 		selectedStudiesNb () {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) }).length
 		},
@@ -389,6 +398,9 @@ export default {
 		setFilters () {
 			this.showFilters = !this.showFilters
 			this.$emit('setFilters', this.showFilters)
+		},
+		showDragAndDrop () {
+			this.$emit('demohover')
 		}
 	}
 }
