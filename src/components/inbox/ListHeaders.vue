@@ -12,7 +12,9 @@
     "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
     "importdir": "Import directory",
     "importfiles": "Import files",
-    "draganddrop": "Or drag and drop"
+    "draganddrop": "Or drag and drop",
+		"studiessharedsuccess": "studies sent successfully",
+		"studiessharederror": "studies could not be sent"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -26,7 +28,9 @@
     "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
-    "draganddrop": "Ou Drag and Drop"
+    "draganddrop": "Ou Drag and Drop",
+	"studiessharedsuccess": "études ont été envoyées avec succès",
+	"studiessharederror": "études n'ont pas pu être envoyée"
 	}
 }
 </i18n>
