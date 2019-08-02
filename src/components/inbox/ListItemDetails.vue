@@ -86,7 +86,7 @@
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
       />
-      <study-metadata-data-model
+      <study-metadata
         v-if="study.flag.view === 'study'"
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
