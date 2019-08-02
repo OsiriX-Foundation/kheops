@@ -23,20 +23,20 @@
 <template>
   <div class="seriesSummaryContainer">
     <div class="row justify-content-center">
-      {{ series.is_selected }}
       <div class="mb-2">
         <b-form-checkbox
-          v-if="series.SeriesDescription"
           v-model="isSelected"
         >
-          {{ series.SeriesDescription[0] }}
-        </b-form-checkbox>
-
-        <b-form-checkbox
-          v-else
-          v-model="isSelected"
-        >
-          No description
+          <span
+            v-if="serie.SeriesDescription"
+          >
+            {{ serie.SeriesDescription.Value[0] }}
+          </span>
+          <span
+            v-else
+          >
+            No description
+          </span>
         </b-form-checkbox>
       </div>
     </div>
@@ -44,39 +44,39 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <img
-          :class="!series.Modality.includes('SR') ? 'cursor-img' : ''"
-          :src="series.imgSrc"
+          :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
+          :src="serie.imgSrc"
           width="250"
           height="250"
-          @click="openTab(series)"
+          @click="openTab(serie)"
         >
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
         <table class="table table-striped">
           <tbody>
-            <tr v-if="series.Modality">
+            <tr v-if="serie.Modality">
               <th>{{ $t('modality') }}</th>
-              <td>{{ series.Modality[0] }}</td>
+              <td>{{ serie.Modality.Value[0] }}</td>
             </tr>
-            <tr v-if="series.RetrieveAETitle">
+            <tr v-if="serie.RetrieveAETitle">
               <th>{{ $t('applicationentity') }}</th>
-              <td>{{ series.RetrieveAETitle[0] }}</td>
+              <td>{{ serie.RetrieveAETitle.Value[0] }}</td>
             </tr>
-            <tr v-if="series.NumberOfSeriesRelatedInstances">
+            <tr v-if="serie.NumberOfSeriesRelatedInstances">
               <th>{{ $t('numberimages') }}</th>
-              <td>{{ series.NumberOfSeriesRelatedInstances[0] }}</td>
+              <td>{{ serie.NumberOfSeriesRelatedInstances.Value[0] }}</td>
             </tr>
-            <tr v-if="series.SeriesDescription">
+            <tr v-if="serie.SeriesDescription">
               <th>{{ $t('description') }}</th>
-              <td>{{ series.SeriesDescription[0] }}</td>
+              <td>{{ serie.SeriesDescription.Value[0] }}</td>
             </tr>
-            <tr v-if="series.SeriesDate">
+            <tr v-if="serie.SeriesDate">
               <th>{{ $t('seriesdate') }}</th>
-              <td>{{ series.SeriesDate[0]|formatDate }}</td>
+              <td>{{ serie.SeriesDate.Value[0]|formatDate }}</td>
             </tr>
-            <tr v-if="series.SeriesTime">
+            <tr v-if="serie.SeriesTime">
               <th>{{ $t('seriestime') }}</th>
-              <td>{{ series.SeriesTime[0] }}</td>
+              <td>{{ serie.SeriesTime.Value[0] }}</td>
             </tr>
           </tbody>
         </table>
@@ -96,36 +96,47 @@ export default {
 	props: {
 		seriesInstanceUID: {
 			type: String,
-			required: true
+			required: true,
+			default: ''
 		},
 		studyInstanceUID: {
-			type: String,
-			required: true
-		},
-		selected: {
-			type: Boolean,
-			required: true
-		},
-		source: {
 			type: String,
 			required: true,
 			default: ''
 		}
 	},
 	data () {
-		return {}
+		return {
+		}
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studies'
+			studies: 'studiesTest'
 		}),
-		series () {
-			let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
-			if (studyIndex > -1) {
-				let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
-				if (seriesIndex > -1) return this.studies[studyIndex].series[seriesIndex]
+		serie () {
+			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID).serie
+		},
+		infoSerie () {
+			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)
+		},
+		index () {
+			let idx = _.findIndex(this.studies, s => { return s.StudyInstanceUID.Value[0] === this.studyInstanceUID })
+			if (idx > -1) {
+				let sidx = _.findIndex(this.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === this.seriesInstanceUID })
+				if (sidx > -1) {
+					return {
+						study: idx,
+						serie: sidx
+					}
+				}
 			}
 			return {}
+		},
+		selected () {
+			return this.serie.flag.is_selected
+		},
+		source () {
+			return this.$route.params.album_id ? this.$route.params.album_id : 'inbox'
 		},
 		isSelected: {
 			// getter
@@ -134,21 +145,70 @@ export default {
 			},
 			// setter
 			set: function (newValue) {
-				let studyIndex = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.studyInstanceUID })
-				if (studyIndex > -1) {
-					let seriesIndex = _.findIndex(this.studies[studyIndex].series, d => { return d.SeriesInstanceUID[0] === this.seriesInstanceUID })
-					if (seriesIndex > -1) {
-						this.$store.dispatch('toggleSelected', { type: 'series', index: studyIndex + ':' + seriesIndex, selected: newValue }).then(res => {
-							this.$emit('selectedSeries')
-						})
-					}
+				let params = {
+					StudyInstanceUID: this.studyInstanceUID,
+					SeriesInstanceUID: this.seriesInstanceUID,
+					studyIndex: this.infoSerie.studyIndex,
+					serieIndex: this.infoSerie.serieIndex,
+					flag: 'is_selected',
+					value: newValue
 				}
+				this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(res => {
+					this.setCheckBoxStudy(newValue)
+				})
 			}
 		}
 	},
+	watch: {
+	},
+	created () {
+	},
 	methods: {
-		toggleChecked () {
-			this.isSelected = !this.isSelected
+		setCheckBoxStudy (value) {
+			if (this.allSerieSelected(this.studies[this.infoSerie.studyIndex])) {
+				this.$store.dispatch('setFlagByStudyUID', {
+					StudyInstanceUID: this.studyInstanceUID,
+					flag: 'is_indeterminate',
+					value: false
+				})
+				this.$store.dispatch('setFlagByStudyUID', {
+					StudyInstanceUID: this.studyInstanceUID,
+					flag: 'is_selected',
+					value: true
+				})
+			} else if (this.noSeriesSelected(this.studies[this.infoSerie.studyIndex])) {
+				this.$store.dispatch('setFlagByStudyUID', {
+					StudyInstanceUID: this.studyInstanceUID,
+					flag: 'is_indeterminate',
+					value: false
+				})
+				this.$store.dispatch('setFlagByStudyUID', {
+					StudyInstanceUID: this.studyInstanceUID,
+					flag: 'is_selected',
+					value: false
+				})
+			} else {
+				this.$store.dispatch('setFlagByStudyUID', {
+					StudyInstanceUID: this.studyInstanceUID,
+					flag: 'is_indeterminate',
+					value: true
+				})
+				this.$store.dispatch('setFlagByStudyUID', {
+					StudyInstanceUID: this.studyInstanceUID,
+					flag: 'is_selected',
+					value: false
+				})
+			}
+		},
+		allSerieSelected (study) {
+			return study.series.every(serie => {
+				return serie.flag.is_selected === true
+			})
+		},
+		noSeriesSelected (study) {
+			return study.series.every(serie => {
+				return serie.flag.is_selected === false
+			})
 		},
 		openTab (series) {
 			const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1'
@@ -160,13 +220,6 @@ export default {
 			} else if (series.Modality[0] !== 'SR') {
 				this.openViewer()
 			}
-			/*
-			if (series.Modality[0] === 'DOC' && series.NumberOfSeriesRelatedInstances[0] === 1) {
-				this.openWADO(series)
-			} else if (series.Modality[0] !== 'SR') {
-				this.openViewer()
-			}
-			*/
 		},
 		openViewer () {
 			let ohifWindow = window.open('', 'OHIFViewer')

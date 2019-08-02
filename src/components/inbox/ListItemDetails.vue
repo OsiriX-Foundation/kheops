@@ -69,7 +69,7 @@
             :key="serie.id"
             class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
           >
-            <series-summary-data-model
+            <series-summary
               :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
               :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
             />
@@ -97,13 +97,13 @@
 
 <script>
 import commentsAndNotificationsDataModel from '@/components/comments/commentsAndNotificationsDataModel'
-import seriesSummaryDataModel from '@/components/inbox/seriesSummaryDataModel'
-import studyMetadataDataModel from '@/components/study/studyMetadataDataModel'
+import seriesSummary from '@/components/inbox/seriesSummary'
+import studyMetadata from '@/components/study/studyMetadata'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
 	name: 'ListItemDetails',
-	components: { seriesSummaryDataModel, commentsAndNotificationsDataModel, studyMetadataDataModel, PulseLoader },
+	components: { seriesSummary, commentsAndNotificationsDataModel, studyMetadata, PulseLoader },
 	props: {
 		studyUID: {
 			type: String,

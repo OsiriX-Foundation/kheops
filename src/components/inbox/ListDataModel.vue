@@ -99,7 +99,7 @@
       :disabled="sendingFiles"
       @change="inputLoadDirectories"
     >
-    <list-headers-data-model
+    <list-headers
       :studies="studies"
       :allowed-albums="albums"
       @setFilters="changeFilterValue"
@@ -310,7 +310,7 @@
 <script>
 // https://peachscript.github.io/vue-infinite-loading/guide/start-with-hn.html
 import { mapGetters } from 'vuex'
-import ListHeadersDataModel from '@/components/inbox/ListHeadersDataModel'
+import ListHeaders from '@/components/inbox/ListHeaders'
 import ListIcons from '@/components/inbox/ListIcons'
 import ListItemDetails from '@/components/inbox/ListItemDetails.vue'
 import InfiniteLoading from 'vue-infinite-loading'
@@ -319,7 +319,7 @@ import moment from 'moment'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { ListHeadersDataModel, ListIcons, ListItemDetails, InfiniteLoading, Datepicker },
+	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker },
 	mixins: [ ],
 	props: {
 		album: {

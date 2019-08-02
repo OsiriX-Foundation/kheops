@@ -83,7 +83,6 @@
             :album="album"
             @loadfiles="inputLoadFiles"
             @loaddirectories="inputLoadFiles"
-            @demohover="demoHover"
           />
         </div>
       </div>

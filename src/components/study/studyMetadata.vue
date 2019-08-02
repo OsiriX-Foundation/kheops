@@ -46,19 +46,19 @@
           <tbody>
             <tr v-if="metadata.PatientName">
               <th>{{ $t('patientname') }}</th>
-              <td>{{ metadata.PatientName }}</td>
+              <td>{{ metadata.PatientName.Value[0]['Alphabetic'] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.PatientBirthDate)">
+            <tr v-if="metadata.PatientBirthDate && matchNumbers(metadata.PatientBirthDate.Value[0])">
               <th>{{ $t('patientbirthdate') }}</th>
-              <td>{{ getDate(metadata.PatientBirthDate[0]) }}</td>
+              <td>{{ getDate(metadata.PatientBirthDate.Value[0]) }}</td>
             </tr>
             <tr v-if="metadata.PatientID">
               <th>{{ $t('patientid') }}</th>
-              <td>{{ metadata.PatientID[0] }}</td>
+              <td>{{ metadata.PatientID.Value[0] }}</td>
             </tr>
-            <tr v-if="matchSex(metadata.PatientSex[0])">
+            <tr v-if="matchSex(metadata.PatientSex)">
               <th>{{ $t('patientsex') }}</th>
-              <td>{{ metadata.PatientSex[0] }}</td>
+              <td>{{ metadata.PatientSex.Value[0] }}</td>
             </tr>
           </tbody>
         </table>
@@ -73,27 +73,27 @@
           <tbody>
             <tr v-if="metadata.ModalitiesInStudy">
               <th>{{ $t('modalitiesinstudy') }}</th>
-              <td>{{ metadata.ModalitiesInStudy[0] }}</td>
+              <td>{{ metadata.ModalitiesInStudy.Value[0] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.StudyDate)">
+            <tr v-if="metadata.StudyDate && matchNumbers(metadata.StudyDate.Value[0])">
               <th>{{ $t('studydate') }}</th>
-              <td>{{ metadata.StudyDate[0]|formatDate }}</td>
+              <td>{{ metadata.StudyDate.Value[0]|formatDate }}</td>
             </tr>
             <tr v-if="metadata.StudyID">
               <th>{{ $t('studyid') }}</th>
-              <td>{{ metadata.StudyID[0] }}</td>
+              <td>{{ metadata.StudyID.Value[0] }}</td>
             </tr>
             <tr v-if="metadata.StudyInstanceUID">
               <th>{{ $t('StudyInstanceUID') }}</th>
-              <td>{{ metadata.StudyInstanceUID[0] }}</td>
+              <td>{{ metadata.StudyInstanceUID.Value[0] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.StudyTime)">
+            <tr v-if="metadata.StudyTime && matchNumbers(metadata.StudyTime.Value[0])">
               <th>{{ $t('studytime') }}</th>
-              <td>{{ metadata.StudyTime[0] }}</td>
+              <td>{{ metadata.StudyTime.Value[0] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.NumberOfStudyRelatedSeries)">
+            <tr v-if="metadata.NumberOfStudyRelatedSeries && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
               <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
-              <td>{{ metadata.NumberOfStudyRelatedSeries[0] }}</td>
+              <td>{{ metadata.NumberOfStudyRelatedSeries.Value[0] }}</td>
             </tr>
           </tbody>
         </table>
@@ -117,11 +117,11 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studies'
+			studies: 'studiesTest'
 		}),
 		metadata () {
 			let studyIdx = _.findIndex(this.studies, s => {
-				return s.StudyInstanceUID[0] === this.id
+				return s.StudyInstanceUID.Value[0] === this.id
 			})
 			if (studyIdx > -1) {
 				return this.studies[studyIdx]
