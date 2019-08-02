@@ -587,7 +587,10 @@
           <div class="patientNameContainer">
             <div class="row">
               <div class="patientName col-md-auto">
-                {{ row.item.PatientName }}
+                {{ row.item.PatientName[0]['Alphabetic'] }}
+                <span v-if="row.item.PatientName[0]['Ideographic'] !== undefined">
+                  - {{ row.item.PatientName[0]['Ideographic'] }}
+                </span>
               </div>
               <div class="patientName_ct col-md-auto d-block d-sm-none">
                 {{ row.item.ModalitiesInStudy [0] | formatModality }}
@@ -1306,41 +1309,41 @@ export default {
 		},
 		initStudyUIDadd () {
 			this.studyUIDadd = ''
-    },
-    checkProvidersModalities (study) {
-      let allModalities = this.providersEnable.find(provider => {
-        return provider.data.supported_modalities === undefined
-      })
-      if (allModalities === Object(allModalities)) {
-        return true
-      }
-      
-      let modalitiesInStudy = study.ModalitiesInStudy[0].split(",")
-      let supportedModalities = this.providersEnable.flatMap(provider => provider.data.supported_modalities)
+		},
+		checkProvidersModalities (study) {
+			let allModalities = this.providersEnable.find(provider => {
+				return provider.data.supported_modalities === undefined
+			})
+			if (allModalities === Object(allModalities)) {
+				return true
+			}
 
-      let result = false
-      modalitiesInStudy.forEach(modality =>  {
-        if (supportedModalities.includes(modality)) {
-          result = true
-        }
-      })
+			let modalitiesInStudy = study.ModalitiesInStudy[0].split(',')
+			let supportedModalities = this.providersEnable.flatMap(provider => provider.data.supported_modalities)
 
-      return result
-    },
-    checkProviderModalities (study, provider) {
-      if (provider.data.supported_modalities === undefined) {
-        return true
-      }
-      let result = false
-      let modalitiesInStudy = study.ModalitiesInStudy[0].split(",")
-      modalitiesInStudy.forEach(modality =>  {
-        if (provider.data.supported_modalities.includes(modality)) {
-          result = true
-        }
-      })
+			let result = false
+			modalitiesInStudy.forEach(modality => {
+				if (supportedModalities.includes(modality)) {
+					result = true
+				}
+			})
 
-      return result
-    }
+			return result
+		},
+		checkProviderModalities (study, provider) {
+			if (provider.data.supported_modalities === undefined) {
+				return true
+			}
+			let result = false
+			let modalitiesInStudy = study.ModalitiesInStudy[0].split(',')
+			modalitiesInStudy.forEach(modality => {
+				if (provider.data.supported_modalities.includes(modality)) {
+					result = true
+				}
+			})
+
+			return result
+		}
 	}
 }
 
