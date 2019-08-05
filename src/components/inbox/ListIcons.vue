@@ -76,7 +76,6 @@
 </template>
 <script>
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
-import mobiledetect from '@/mixins/mobiledetect.js'
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 import { ViewerToken } from '@/mixins/tokens.js'
@@ -91,23 +90,23 @@ export default {
 			type: Object,
 			required: true,
 			default: () => ({})
+		},
+		mobiledetect: {
+			type: Boolean,
+			required: true,
+			default: false
 		}
 	},
-
 	data () {
 		return {
 		}
 	},
-
 	computed: {
 		OS () {
 			return navigator.platform
 		},
 		access_token () {
 			return Vue.prototype.$keycloak.token
-		},
-		mobiledetect () {
-			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
 

@@ -266,8 +266,10 @@
         slot-scope="row"
       >
         {{ row.value }}
+        <br v-if="mobiledetect===true">
         <list-icons
           :study="row.item"
+          :mobiledetect="mobiledetect"
         />
       </template>
       <template
@@ -312,6 +314,7 @@ import ListItemDetails from '@/components/inbox/ListItemDetails.vue'
 import InfiniteLoading from 'vue-infinite-loading'
 import Datepicker from 'vuejs-datepicker'
 import moment from 'moment'
+import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'StudiesDataModel',
@@ -433,6 +436,9 @@ export default {
 			return {
 				from: new Date()
 			}
+		},
+		mobiledetect () {
+			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
 	watch: {
