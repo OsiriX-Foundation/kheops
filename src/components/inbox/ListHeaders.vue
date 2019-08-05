@@ -6,6 +6,7 @@
 		"infoFavorites": "Favorites",
 		"send": "Send",
 		"delete": "Delete",
+		"cancel": "Cancel",
 		"addfavorites": "Add too favorites",
 		"addfavorites": "Remove too favorites",
     "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
@@ -22,6 +23,7 @@
 		"infoFavorites": "Favoris",
 		"send": "Send",
 		"delete": "Delete",
+		"cancel": "Annuler",
 		"addfavorites": "Ajouter aux favoris",
 		"addfavorites": "Supprimer des favoris",
 		"confirmDelete": "Etes vous de sûr de vouloir supprimer {count} étude | Etes vous de sûr de vouloir supprimer {count} études",
@@ -29,8 +31,8 @@
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
-	"studiessharedsuccess": "études ont été envoyées avec succès",
-	"studiessharederror": "études n'ont pas pu être envoyée"
+		"studiessharedsuccess": "études ont été envoyées avec succès",
+		"studiessharederror": "études n'ont pas pu être envoyée"
 	}
 }
 </i18n>
@@ -300,28 +302,39 @@ export default {
 				})
 			}
 		},
-		deselectStudySeries () {
-			let params = {
-				flag: 'is_selected',
-				value: false
+		setObjectFlagStudy (StudyInstanceUID, flag, value) {
+			let paramsIsSelected = {
+				StudyInstanceUID: StudyInstanceUID,
+				flag: flag,
+				value: value
 			}
-			this.selectedStudies.forEach(study => {
-				params.StudyInstanceUID = study.StudyInstanceUID.Value[0]
-				this.$store.dispatch('setFlagByStudyUID', params)
+			return paramsIsSelected
+		},
+		setObjectFlagSerie (StudyInstanceUID, SeriesInstanceUID, flag, value) {
+			let paramsIsIndeterminate = {
+				StudyInstanceUID: StudyInstanceUID,
+				SeriesInstanceUID: SeriesInstanceUID,
+				flag: flag,
+				value: value
+			}
+			return paramsIsIndeterminate
+		},
+		deselectStudySeries () {
+			this.allSelectedStudies.forEach(study => {
+				let StudyInstanceUID = study.StudyInstanceUID.Value[0]
+				if (study.flag.is_selected === true) {
+					this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_selected', false))
+				}
 				if (study.series !== undefined) {
 					study.series.forEach(serie => {
-						params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
-						this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
+						if (serie.flag.is_selected) {
+							let SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
+							this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_indeterminate', false))
+							this.$store.dispatch('setFlagByStudyUIDSerieUID', this.setObjectFlagSerie(StudyInstanceUID, SeriesInstanceUID, 'is_selected', false))
+						}
 					})
 				}
 			})
-			for (let studyUID in this.selectedSeries) {
-				params.StudyInstanceUID = studyUID
-				this.selectedSeries[studyUID].forEach(serie => {
-					params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
-					this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
-				})
-			}
 		},
 		favoriteSelectedStudies () {
 			let favorites = this.allSelectedStudies.every(s => { return s.flag.is_favorite === true })
