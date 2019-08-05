@@ -330,7 +330,7 @@ export default {
 			showFilters: false,
 			studiesParams: {
 				offset: 0,
-				limit: 15,
+				limit: 16,
 				sortDesc: false,
 				sortBy: 'StudyDate'
 			},
