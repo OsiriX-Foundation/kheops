@@ -76,6 +76,7 @@
 </template>
 <script>
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue'
+import mobiledetect from '@/mixins/mobiledetect.js'
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 import { ViewerToken } from '@/mixins/tokens.js'
@@ -104,6 +105,9 @@ export default {
 		},
 		access_token () {
 			return Vue.prototype.$keycloak.token
+		},
+		mobiledetect () {
+			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
 
@@ -123,7 +127,7 @@ export default {
 	},
 	methods: {
 		classIconPN (visibility) {
-			if (visibility) {
+			if (visibility || this.mobiledetect) {
 				return 'iconsHover'
 			} else {
 				return 'iconsUnhover'
