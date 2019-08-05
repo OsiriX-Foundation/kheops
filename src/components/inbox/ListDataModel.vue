@@ -334,7 +334,7 @@ export default {
 			studiesParams: {
 				offset: 0,
 				limit: 16,
-				sortDesc: false,
+				sortDesc: true,
 				sortBy: 'StudyDate'
 			},
 			fields: {
