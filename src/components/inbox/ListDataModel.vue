@@ -517,30 +517,35 @@ export default {
 			this.setViewDetails(row.item.StudyInstanceUID.Value[0], row.item.flag.view)
 			row.toggleDetails()
 		},
+		createObjectFlag (StudyInstanceUID, studyIndex, flag, value) {
+			return {
+				StudyInstanceUID: StudyInstanceUID,
+				studyIndex: studyIndex,
+				flag: flag,
+				value: value
+			}
+		},
 		setChecked (row) {
 			let value = row.item.flag.is_selected
 			let StudyInstanceUID = row.item.StudyInstanceUID.Value[0]
 			let studyIndex = this.studies.findIndex(study => {
 				return study.StudyInstanceUID.Value[0] === StudyInstanceUID
 			})
-			let params = {
-				StudyInstanceUID: StudyInstanceUID,
-				studyIndex: studyIndex,
-				flag: 'is_selected',
-				value: !value
-			}
-			this.$store.dispatch('setFlagByStudyUID', params)
+
+			let paramsSelected = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_selected', !value)
+			this.$store.dispatch('setFlagByStudyUID', paramsSelected)
+			let paramsIndeterminate = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_indeterminate', false)
+			this.$store.dispatch('setFlagByStudyUID', paramsIndeterminate)
+
 			if (row.item.series !== undefined) {
-				this.setSeriesCheck(row.item.series, params)
+				this.setSeriesCheck(row.item.series, paramsSelected)
 			}
 		},
 		setSeriesCheck (series, params) {
-			series.forEach((serie, index) => {
-				params.SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
-				params.serieIndex = index
-				this.$store.dispatch('setFlagByStudyUID', params)
+			for (let serieUID in series) {
+				params.SeriesInstanceUID = serieUID
 				this.$store.dispatch('setFlagByStudyUIDSerieUID', params)
-			})
+			}
 		},
 		sortingChanged (ctx) {
 			this.studiesParams.sortDesc = ctx.sortDesc

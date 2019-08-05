@@ -44,14 +44,7 @@ const getters = {
 	getSerieByUID: state => (studyUID, serieUID) => {
 		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === studyUID })
 		if (idx > -1) {
-			let sidx = _.findIndex(state.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === serieUID })
-			if (sidx > -1) {
-				return {
-					serie: state.studies[idx].series[sidx],
-					studyIndex: idx,
-					serieIndex: sidx
-				}
-			}
+			return state.studies[idx].series[serieUID]
 		}
 		return {}
 	}
@@ -96,37 +89,19 @@ const actions = {
 		}
 		const request = `/studies/${params.StudyInstanceUID}/series`
 		return HTTP.get(request + queries, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
-			const series = dicomoperations.translateDICOM(res.data)
-			let indexSerie
-			series.forEach(serie => {
-				indexSerie = state.studies[index].series === undefined ? -1 : state.studies[index].series.findIndex(serieState => {
-					return serieState.SeriesInstanceUID.Value[0] === serie.SeriesInstanceUID.Value[0]
-				})
-				serie.flag = JSON.parse(JSON.stringify(state.defaultFlagSerie))
-				serie.flag.is_selected = indexSerie !== -1 ? state.studies[index].series[indexSerie].flag.is_selected : state.studies[index].flag.is_selected
-				dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: serie.SeriesInstanceUID.Value[0] }).then(res => {
+			let objSeries = dicomoperations.translateObjectDICOM(res.data, '0020000E')
+			for (let serieUID in objSeries) {
+				objSeries[serieUID].flag = JSON.parse(JSON.stringify(state.defaultFlagSerie))
+				let seriesAlreadyExist = (state.studies[index].series !== undefined && state.studies[index].series[serieUID] !== undefined)
+				objSeries[serieUID].flag.is_selected = seriesAlreadyExist ? state.studies[index].series[serieUID].flag.is_selected : state.studies[index].flag.is_selected
+				let serie = objSeries[serieUID]
+				dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: serieUID }).then(res => {
 					if (res.data !== undefined) {
-						const tagSOPClassUID = '00080016'
-						const SOPClassUID = {
-							'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
-							'encapsulatedPDFStorage': '1.2.840.10008.5.1.4.1.1.104.1'
-						}
-						if (res.data[0]['00080060'].Value[0].includes('SR')) {
-							serie.imgSrc = SRImage
-						} else if (res.data[0][tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {
-							serie.imgSrc = VideoImage
-						} else if (res.data[0][tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
-							serie.imgSrc = PDFImage
-						} else {
-							dispatch('getImageTest', {
-								StudyInstanceUID: params.StudyInstanceUID,
-								SeriesInstanceUID: serie.SeriesInstanceUID.Value[0]
-							})
-						}
+						dispatch('setImageTest', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, indexStudy: index, serieUID: serieUID, data: res.data })
 					}
 				})
-			})
-			commit('SET_SERIES_TEST', { index: index, series: series })
+			}
+			commit('SET_SERIES_TEST', { index: index, series: objSeries })
 			return res
 		})
 	},
@@ -141,6 +116,26 @@ const actions = {
 		}).catch(err => {
 			console.log(err)
 		})
+	},
+	setImageTest ({ dispatch, commit }, params) {
+		const tagSOPClassUID = '00080016'
+		const SOPClassUID = {
+			'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
+			'encapsulatedPDFStorage': '1.2.840.10008.5.1.4.1.1.104.1'
+		}
+		if (params.data[0]['00080060'].Value[0].includes('SR')) {
+			params.serie.imgSrc = SRImage
+		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {
+			params.serie.imgSrc = VideoImage
+		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
+			params.serie.imgSrc = PDFImage
+		} else {
+			dispatch('getImageTest', {
+				StudyInstanceUID: params.StudyInstanceUID,
+				SeriesInstanceUID: params.serieUID
+			})
+		}
+		commit('SET_SERIE_TEST', { indexStudy: params.indexStudy, serie: params.serie, indexSerie: params.serieUID })
 	},
 	getImageTest ({ commit }, params) {
 		let request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`
@@ -158,9 +153,9 @@ const actions = {
 				var mimeType = resp.headers['content-type'].toLowerCase()
 				img = 'data:' + mimeType + ';base64,' + b64
 			}
-			commit('SET_IMAGE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: img })
+			commit('SET_SERIE_IMAGE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: img })
 		}).catch(() => {
-			commit('SET_IMAGE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: DicomLogo })
+			commit('SET_SERIE_IMAGE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: DicomLogo })
 		})
 	},
 	setShowDetails ({ commit }, params) {
@@ -182,13 +177,7 @@ const actions = {
 				return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 			})
 		}
-		let indexSerie = params.serieIndex
-		if (indexSerie === undefined || state.studies[indexStudy].series[indexSerie].SeriesInstanceUID.Value[0] !== params.SeriesInstanceUID) {
-			indexSerie = state.studies[indexStudy].series.findIndex(serie => {
-				return serie.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID
-			})
-		}
-		commit('SET_SERIE_FLAG_TEST', { indexStudy: indexStudy, indexSerie: indexSerie, flag: params.flag, value: params.value })
+		commit('SET_SERIE_FLAG_TEST', { indexStudy: indexStudy, SeriesInstanceUID: params.SeriesInstanceUID, flag: params.flag, value: params.value })
 		return true
 	},
 	favoriteStudy ({ commit, dispatch }, params) {
@@ -265,6 +254,11 @@ const mutations = {
 	SET_SERIES_TEST (state, params) {
 		state.studies[params.index].series = params.series
 	},
+	SET_SERIE_TEST (state, params) {
+		let study = state.studies[params.indexStudy]
+		study.series[params.indexSerie] = params.serie
+		Vue.set(state.studies, params.indexStudy, study)
+	},
 	SET_STUDY_FLAG_TEST (state, params) {
 		let study = state.studies[params.index]
 		study.flag[params.flag] = params.value
@@ -272,18 +266,15 @@ const mutations = {
 	},
 	SET_SERIE_FLAG_TEST (state, params) {
 		let study = state.studies[params.indexStudy]
-		study.series[params.indexSerie].flag[params.flag] = params.value
+		study.series[params.SeriesInstanceUID].flag[params.flag] = params.value
 		Vue.set(state.studies, params.indexStudy, study)
 	},
-	SET_IMAGE_TEST (state, params) {
+	SET_SERIE_IMAGE (state, params) {
 		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
 		if (idx > -1) {
-			let sidx = _.findIndex(state.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID })
-			if (sidx > -1) {
-				let study = state.studies[idx]
-				study.series[sidx].imgSrc = params.img
-				Vue.set(state.studies, idx, study)
-			}
+			let study = state.studies[idx]
+			study.series[params.SeriesInstanceUID].imgSrc = params.img
+			Vue.set(state.studies, idx, study)
 		}
 	},
 	UPDATE_STUDIES_TEST (state, params) {

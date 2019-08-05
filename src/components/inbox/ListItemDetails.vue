@@ -61,7 +61,7 @@
         v-if="study.flag.view === 'series'"
       >
         <div
-          v-if="study.series !== undefined && study.series.length > 0"
+          v-if="study.series !== undefined"
           class="row"
         >
           <div

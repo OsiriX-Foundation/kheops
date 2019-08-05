@@ -251,9 +251,14 @@ export default {
 			let notAllSeriesSelected = this.studies.filter(study => { return (study.flag.is_indeterminate === true) })
 			notAllSeriesSelected.forEach(study => {
 				if (study.series !== undefined) {
-					let serieNeed = study.series.filter(serie => { return serie.flag.is_selected === true })
-					if (serieNeed.length > 0) {
-						series[study.StudyInstanceUID.Value[0]] = serieNeed
+					let seriesSelected = []
+					for (let serieUID in study.series) {
+						if (study.series[serieUID].flag.is_selected === true) {
+							seriesSelected.push(study.series[serieUID])
+						}
+					}
+					if (seriesSelected.length > 0) {
+						series[study.StudyInstanceUID.Value[0]] = seriesSelected
 					}
 				}
 			})
@@ -326,13 +331,14 @@ export default {
 					this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_selected', false))
 				}
 				if (study.series !== undefined) {
-					study.series.forEach(serie => {
+					for (let serieUID in study.series) {
+						let serie = study.series[serieUID]
 						if (serie.flag.is_selected) {
 							let SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
 							this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_indeterminate', false))
 							this.$store.dispatch('setFlagByStudyUIDSerieUID', this.setObjectFlagSerie(StudyInstanceUID, SeriesInstanceUID, 'is_selected', false))
 						}
-					})
+					}
 				}
 			})
 		},
@@ -368,7 +374,6 @@ export default {
 		},
 		deleteSelectedSeries () {
 			for (let studyUID in this.selectedSeries) {
-				console.log('here')
 				this.selectedSeries[studyUID].forEach(serie => {
 					let serieUID = serie.SeriesInstanceUID.Value[0]
 					let params = {

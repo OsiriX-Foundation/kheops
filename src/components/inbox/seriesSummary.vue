@@ -114,23 +114,14 @@ export default {
 			studies: 'studiesTest'
 		}),
 		serie () {
-			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID).serie
-		},
-		infoSerie () {
 			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)
 		},
-		index () {
+		study () {
+			return this.$store.getters.getStudyByUID(this.studyInstanceUID)
+		},
+		studyIndex () {
 			let idx = _.findIndex(this.studies, s => { return s.StudyInstanceUID.Value[0] === this.studyInstanceUID })
-			if (idx > -1) {
-				let sidx = _.findIndex(this.studies[idx].series, s => { return s.SeriesInstanceUID.Value[0] === this.seriesInstanceUID })
-				if (sidx > -1) {
-					return {
-						study: idx,
-						serie: sidx
-					}
-				}
-			}
-			return {}
+			return idx
 		},
 		selected () {
 			return this.serie.flag.is_selected
@@ -148,14 +139,15 @@ export default {
 				let params = {
 					StudyInstanceUID: this.studyInstanceUID,
 					SeriesInstanceUID: this.seriesInstanceUID,
-					studyIndex: this.infoSerie.studyIndex,
-					serieIndex: this.infoSerie.serieIndex,
+					studyIndex: this.studyIndex,
 					flag: 'is_selected',
 					value: newValue
 				}
-				this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(res => {
-					this.setCheckBoxStudy(newValue)
-				})
+				if (this.serie.flag['is_selected'] !== newValue) {
+					this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(res => {
+						this.setCheckBoxStudy(newValue)
+					})
+				}
 			}
 		}
 	},
@@ -165,7 +157,7 @@ export default {
 	},
 	methods: {
 		setCheckBoxStudy (value) {
-			if (this.allSerieSelected(this.studies[this.infoSerie.studyIndex])) {
+			if (this.checkAllSerieSelected(this.study, true)) {
 				this.$store.dispatch('setFlagByStudyUID', {
 					StudyInstanceUID: this.studyInstanceUID,
 					flag: 'is_indeterminate',
@@ -176,7 +168,7 @@ export default {
 					flag: 'is_selected',
 					value: true
 				})
-			} else if (this.noSeriesSelected(this.studies[this.infoSerie.studyIndex])) {
+			} else if (this.checkAllSerieSelected(this.study, false)) {
 				this.$store.dispatch('setFlagByStudyUID', {
 					StudyInstanceUID: this.studyInstanceUID,
 					flag: 'is_indeterminate',
@@ -200,15 +192,12 @@ export default {
 				})
 			}
 		},
-		allSerieSelected (study) {
-			return study.series.every(serie => {
-				return serie.flag.is_selected === true
-			})
-		},
-		noSeriesSelected (study) {
-			return study.series.every(serie => {
-				return serie.flag.is_selected === false
-			})
+		checkAllSerieSelected (study, value) {
+			let allSelected = true
+			for (let serieUID in study.series) {
+				allSelected = allSelected && (study.series[serieUID].flag.is_selected === value)
+			}
+			return allSelected
 		},
 		openTab (series) {
 			const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1'
