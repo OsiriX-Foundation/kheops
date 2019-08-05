@@ -147,6 +147,8 @@ public class Keycloak {
                     } else {
                         throw new UserNotFoundException();
                     }
+                } catch (Exception e) {
+                    throw new KeycloakException("error during parsing response : " + output, e);
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
