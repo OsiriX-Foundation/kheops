@@ -168,6 +168,7 @@ public class Studies {
 
         selectQuery.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
 
+
         qidoParams.getLimit().ifPresent(selectQuery::addLimit);
         qidoParams.getOffset().ifPresent(selectQuery::addOffset);
 
@@ -255,7 +256,11 @@ public class Studies {
         else
             ord = STUDIES.STUDY_DATE;
 
-        return descending ? ord.desc() : ord.asc();
+        SortField sortField = descending ? ord.desc() : ord.asc();
+        if (orderBy == Tag.StudyDate) {
+            sortField.nullsLast();
+        }
+        return sortField;
     }
 
     private static Condition createConditionModality(String filter) {
