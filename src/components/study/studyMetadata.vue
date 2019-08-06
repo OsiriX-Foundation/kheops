@@ -118,7 +118,7 @@ export default {
 	computed: {
 		metadata () {
 			return this.$store.getters.getStudyByUID(this.id)
-		},
+		}
 	},
 	methods: {
 		getDate (date) {

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Albums from '@/components/albums/List'
+import ListAlbums from '@/components/albumsdatamodel/ListAlbums'
 import NewAlbum from '@/components/albums/NewAlbum'
 import Album from '@/components/albums/Album'
 import User from '@/components/user/user'
@@ -30,7 +30,7 @@ const router = new Router({
 	{
 		path: '/albums',
 		name: 'albums',
-		component: Albums,
+		component: ListAlbums,
 		beforeEnter: requireAuth,
 		meta: { permissions: 'active', condition: 'any' }
 	},

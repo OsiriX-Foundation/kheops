@@ -1,10 +1,14 @@
 import { HTTP } from '@/router/http'
 import httpoperations from '@/mixins/httpoperations'
 import axios from 'axios'
+import Vue from 'vue'
 
 // initial state
 const state = {
-	albums: []
+	albums: [],
+	defaultFlagAlbum: {
+		is_selected: false
+	}
 }
 
 // getters
@@ -24,7 +28,12 @@ const actions = {
 			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		return HTTP.get(`${request}${queries}`, { headers: { 'Accept': 'application/json' } }).then(res => {
-			commit('SET_ALBUMS_TEST', res.data)
+			let albums = []
+			res.data.forEach(album => {
+				Object.assign(album, { flag: state.defaultFlagAlbum })
+				albums.push(album)
+			})
+			commit('SET_ALBUMS_TEST', albums)
 			return res
 		}).catch(err => {
 			return err
@@ -47,6 +56,22 @@ const actions = {
 		axios.all(promises).then(results => {
 			console.log(results)
 		})
+	},
+	addUser ({ commit }, params) {
+		let request = `albums/${params.album_id}/users/${params.user_id}`
+		return HTTP.put(request).then(res => {
+			console.log(res)
+			return res
+		}).catch(err => {
+			console.log(err)
+			return err
+		})
+	},
+	setFlagAlbum ({ commit }, params) {
+		let index = state.albums.findIndex(album => {
+			return album.album_id === params.album_id
+		})
+		commit('SET_ALBUM_FLAG_TEST', { index: index, flag: params.flag, value: params.value })
 	}
 }
 
@@ -59,6 +84,11 @@ const mutations = {
 		albums.forEach(album => {
 			state.albums.push(album)
 		})
+	},
+	SET_ALBUM_FLAG_TEST (state, params) {
+		let album = state.albums[params.index]
+		album.flag[params.flag] = params.value
+		Vue.set(state.albums, params.index, album)
 	}
 }
 
