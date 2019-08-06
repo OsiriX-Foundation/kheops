@@ -170,20 +170,20 @@
             </b-dropdown>
           </div>
         </div>
-				<div
+        <div
           class="d-none d-sm-block align-self-center"
-				>
+        >
           <button
             type="button"
             class=" btn btn-link btn-lg"
             @click="reloadStudies()"
           >
-						<v-icon
-							name="refresh"
+            <v-icon
+              name="refresh"
               scale="2"
-						/>
+            />
           </button>
-				</div>
+        </div>
         <div
           class="d-none d-sm-block align-self-center"
         >
