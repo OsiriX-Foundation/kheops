@@ -29,7 +29,7 @@ public class InboxResource {
     @Path("inboxinfo")
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeStudyFromFavorites() {
-        
+
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final InboxInfoResponse inboxInfoResponse;
 
