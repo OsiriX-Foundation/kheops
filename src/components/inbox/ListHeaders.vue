@@ -135,7 +135,7 @@
           <div>
             <b-dropdown
               id="dropdown-divider"
-              class="m-2"
+              class="m-1"
               variant="link"
               right
             >
@@ -170,7 +170,20 @@
             </b-dropdown>
           </div>
         </div>
-
+				<div
+          class="d-none d-sm-block align-self-center"
+				>
+          <button
+            type="button"
+            class=" btn btn-link btn-lg"
+            @click="reloadStudies()"
+          >
+						<v-icon
+							name="refresh"
+              scale="2"
+						/>
+          </button>
+				</div>
         <div
           class="d-none d-sm-block align-self-center"
         >
@@ -424,6 +437,9 @@ export default {
 		},
 		showDragAndDrop () {
 			this.$store.dispatch('setDemoDragAndDrop', true)
+		},
+		reloadStudies () {
+			this.$emit('reloadStudies')
 		}
 	}
 }
