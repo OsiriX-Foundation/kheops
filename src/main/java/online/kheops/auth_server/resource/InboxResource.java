@@ -6,7 +6,7 @@ import online.kheops.auth_server.inbox.Inbox;
 import online.kheops.auth_server.inbox.InboxInfoResponse;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 
-import javax.ws.rs.*;spl
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
