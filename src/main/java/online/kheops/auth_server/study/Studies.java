@@ -130,16 +130,16 @@ public class Studies {
 
         final SelectQuery<? extends Record> selectQuery = create.selectQuery();
         selectQuery.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
-                isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
-                isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
-                isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
-                isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
-                isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
-                isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
-                isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
-                isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
-                isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
-                isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
+                isnull(STUDIES.STUDY_DATE, "").as(STUDIES.STUDY_DATE.getName()),
+                isnull(STUDIES.STUDY_TIME, "").as(STUDIES.STUDY_TIME.getName()),
+                STUDIES.TIMEZONE_OFFSET_FROM_UTC.as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
+                isnull(STUDIES.ACCESSION_NUMBER, "").as(STUDIES.ACCESSION_NUMBER.getName()),
+                STUDIES.REFERRING_PHYSICIAN_NAME.as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
+                isnull(STUDIES.PATIENT_NAME, "").as(STUDIES.PATIENT_NAME.getName()),
+                isnull(STUDIES.PATIENT_ID, "").as(STUDIES.PATIENT_ID.getName()),
+                isnull(STUDIES.PATIENT_BIRTH_DATE, "").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
+                isnull(STUDIES.PATIENT_SEX, "").as(STUDIES.PATIENT_SEX.getName()),
+                isnull(STUDIES.STUDY_ID, "").as(STUDIES.STUDY_ID.getName()),
                 countDistinct(SERIES.PK).as("count:" + SERIES.PK.getName()),
                 sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
@@ -147,7 +147,7 @@ public class Studies {
                 countDistinct(EVENTS).as("sum_comments"));
 
         if(qidoParams.includeStudyDescriptionField()) {
-            selectQuery.addSelect(isnull(STUDIES.STUDY_DESCRIPTION, "NULL").as(STUDIES.STUDY_DESCRIPTION.getName()));
+            selectQuery.addSelect(STUDIES.STUDY_DESCRIPTION.as(STUDIES.STUDY_DESCRIPTION.getName()));
         }
 
         selectQuery.addFrom(USERS);
@@ -206,9 +206,13 @@ public class Studies {
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
-            safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
+            if(r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()) != null) {
+                safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
+            }
             safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, r.getValue(STUDIES.ACCESSION_NUMBER.getName()).toString());
-            safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
+            if(r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()) != null) {
+                safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
+            }
             safeAttributeSetString(attributes, Tag.PatientName, VR.PN, r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
             safeAttributeSetString(attributes, Tag.PatientID, VR.LO, r.getValue(STUDIES.PATIENT_ID.getName()).toString());
             safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, r.getValue(STUDIES.PATIENT_BIRTH_DATE.getName()).toString());
@@ -223,7 +227,7 @@ public class Studies {
             if(qidoParams.includeCommentField()) {
                 attributes.setInt(0x00012346, VR.IS, ((Integer)r.getValue("sum_comments")));
             }
-            if(qidoParams.includeStudyDescriptionField()) {
+            if(qidoParams.includeStudyDescriptionField() && r.getValue(STUDIES.STUDY_DESCRIPTION.getName()) != null) {
                 safeAttributeSetString(attributes, Tag.StudyDescription, VR.CS, r.getValue(STUDIES.STUDY_DESCRIPTION.getName()).toString());
             }
 
