@@ -202,11 +202,10 @@ export default {
 		openTab (series) {
 			const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1'
 			const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1'
-
-			if (series.SOPClassUID !== undefined && (series.SOPClassUID[0] === SOPPdf || series.SOPClassUID[0] === SOPVideo)) {
-				let contentType = series.SOPClassUID[0] === SOPPdf ? 'application/pdf' : 'video/mp4'
+			if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
+				let contentType = series.SOPClassUID.Value[0] === SOPPdf ? 'application/pdf' : 'video/mp4'
 				this.openWADO(series, contentType)
-			} else if (series.Modality[0] !== 'SR') {
+			} else if (series.Modality.Value[0] !== 'SR') {
 				this.openViewer()
 			}
 		},
