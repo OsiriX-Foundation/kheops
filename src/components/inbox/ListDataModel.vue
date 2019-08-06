@@ -99,6 +99,7 @@
       :studies="studies"
       :allowed-albums="albums"
       @setFilters="changeFilterValue"
+      @reloadStudies="searchStudies"
     />
     <b-table
       class="container-fluid"
@@ -140,7 +141,12 @@
             :placeholder="$t('filter')"
           > <br>
         </div>
-        {{ data.label }}
+		<sort-list
+			:sort-desc="studiesParams.sortDesc"
+			:current-header="data.field.key"
+			:sort-by="studiesParams.sortBy"
+		/>
+		{{ data.label }}
       </template>
 
       <template
@@ -158,6 +164,11 @@
             :placeholder="$t('filter')"
           > <br>
         </div>
+		<sort-list
+			:sort-desc="studiesParams.sortDesc"
+			:current-header="data.field.key"
+			:sort-by="studiesParams.sortBy"
+		/>
         {{ data.label }}
       </template>
 
@@ -213,6 +224,11 @@
           </div>
         </div>
         <br v-if="showFilters">
+		<sort-list
+			:sort-desc="studiesParams.sortDesc"
+			:current-header="data.field.key"
+			:sort-by="studiesParams.sortBy"
+		/>
         {{ data.label }}
       </template>
 
@@ -265,7 +281,7 @@
         slot="PatientName"
         slot-scope="row"
       >
-        {{ row.value }}
+        {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
         <br v-if="mobiledetect===true">
         <list-icons
           :study="row.item"
@@ -315,10 +331,11 @@ import InfiniteLoading from 'vue-infinite-loading'
 import Datepicker from 'vuejs-datepicker'
 import moment from 'moment'
 import mobiledetect from '@/mixins/mobiledetect.js'
+import SortList from '@/components/inbox/SortList.vue'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker },
+	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList },
 	mixins: [ ],
 	props: {
 		album: {
@@ -352,7 +369,7 @@ export default {
 					sortable: true,
 					tdClass: 'breakwork',
 					formatter: (value, key, item) => {
-						return value.Value[0]['Alphabetic']
+						return value.Value[0]
 					},
 					thStyle: {
 						'width': '250px'
