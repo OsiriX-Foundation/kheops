@@ -48,15 +48,15 @@
               <th>{{ $t('patientname') }}</th>
               <td>{{ metadata.PatientName.Value[0]['Alphabetic'] }}</td>
             </tr>
-            <tr v-if="metadata.PatientBirthDate && matchNumbers(metadata.PatientBirthDate.Value[0])">
+            <tr v-if="metadata.PatientBirthDate.Value !== undefined && matchNumbers(metadata.PatientBirthDate.Value[0])">
               <th>{{ $t('patientbirthdate') }}</th>
               <td>{{ getDate(metadata.PatientBirthDate.Value[0]) }}</td>
             </tr>
             <tr v-if="metadata.PatientID">
               <th>{{ $t('patientid') }}</th>
-              <td>{{ metadata.PatientID.Value[0] }}</td>
+              <td>{{ metadata.PatientID.Value[0] }} {{ metadata.PatientSex.Value }}</td>
             </tr>
-            <tr v-if="matchSex(metadata.PatientSex)">
+            <tr v-if="metadata.PatientSex.Value !== undefined && matchSex(metadata.PatientSex)">
               <th>{{ $t('patientsex') }}</th>
               <td>{{ metadata.PatientSex.Value[0] }}</td>
             </tr>
@@ -71,27 +71,27 @@
           style="word-break: break-word;"
         >
           <tbody>
-            <tr v-if="metadata.ModalitiesInStudy">
+            <tr v-if="metadata.ModalitiesInStudy.Value !== undefined">
               <th>{{ $t('modalitiesinstudy') }}</th>
               <td>{{ metadata.ModalitiesInStudy.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyDate && matchNumbers(metadata.StudyDate.Value[0])">
+            <tr v-if="metadata.StudyDate.Value !== undefined && matchNumbers(metadata.StudyDate.Value[0])">
               <th>{{ $t('studydate') }}</th>
               <td>{{ metadata.StudyDate.Value[0]|formatDate }}</td>
             </tr>
-            <tr v-if="metadata.StudyID">
+            <tr v-if="metadata.StudyID.Value !== undefined">
               <th>{{ $t('studyid') }}</th>
               <td>{{ metadata.StudyID.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyInstanceUID">
+            <tr v-if="metadata.StudyInstanceUID.Value !== undefined">
               <th>{{ $t('StudyInstanceUID') }}</th>
               <td>{{ metadata.StudyInstanceUID.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyTime && matchNumbers(metadata.StudyTime.Value[0])">
+            <tr v-if="metadata.StudyTime.Value !== undefined && matchNumbers(metadata.StudyTime.Value[0])">
               <th>{{ $t('studytime') }}</th>
               <td>{{ metadata.StudyTime.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.NumberOfStudyRelatedSeries && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
+            <tr v-if="metadata.NumberOfStudyRelatedSeries.Value !== undefined && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
               <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
               <td>{{ metadata.NumberOfStudyRelatedSeries.Value[0] }}</td>
             </tr>
@@ -116,18 +116,9 @@ export default {
 		return {}
 	},
 	computed: {
-		...mapGetters({
-			studies: 'studiesTest'
-		}),
 		metadata () {
-			let studyIdx = _.findIndex(this.studies, s => {
-				return s.StudyInstanceUID.Value[0] === this.id
-			})
-			if (studyIdx > -1) {
-				return this.studies[studyIdx]
-			}
-			return {}
-		}
+			return this.$store.getters.getStudyByUID(this.id)
+		},
 	},
 	methods: {
 		getDate (date) {

@@ -141,12 +141,12 @@
             :placeholder="$t('filter')"
           > <br>
         </div>
-		<sort-list
-			:sort-desc="studiesParams.sortDesc"
-			:current-header="data.field.key"
-			:sort-by="studiesParams.sortBy"
-		/>
-		{{ data.label }}
+        <sort-list
+          :sort-desc="studiesParams.sortDesc"
+          :current-header="data.field.key"
+          :sort-by="studiesParams.sortBy"
+        />
+        {{ data.label }}
       </template>
 
       <template
@@ -164,11 +164,11 @@
             :placeholder="$t('filter')"
           > <br>
         </div>
-		<sort-list
-			:sort-desc="studiesParams.sortDesc"
-			:current-header="data.field.key"
-			:sort-by="studiesParams.sortBy"
-		/>
+        <sort-list
+          :sort-desc="studiesParams.sortDesc"
+          :current-header="data.field.key"
+          :sort-by="studiesParams.sortBy"
+        />
         {{ data.label }}
       </template>
 
@@ -224,11 +224,11 @@
           </div>
         </div>
         <br v-if="showFilters">
-		<sort-list
-			:sort-desc="studiesParams.sortDesc"
-			:current-header="data.field.key"
-			:sort-by="studiesParams.sortBy"
-		/>
+        <sort-list
+          :sort-desc="studiesParams.sortDesc"
+          :current-header="data.field.key"
+          :sort-by="studiesParams.sortBy"
+        />
         {{ data.label }}
       </template>
 
@@ -369,7 +369,11 @@ export default {
 					sortable: true,
 					tdClass: 'breakwork',
 					formatter: (value, key, item) => {
-						return value.Value[0]
+						if (value !== null && value.Value !== undefined) {
+							return value.Value[0]
+						} else {
+							""
+						}
 					},
 					thStyle: {
 						'width': '250px'
@@ -393,7 +397,11 @@ export default {
 					tdClass: 'breakwork',
 					class: 'breakword d-none d-lg-table-cell',
 					formatter: (value, key, item) => {
-						return value.Value[0]
+						if (value !== null && value.Value !== undefined) {
+							return value.Value[0]
+						} else {
+							""
+						}
 					},
 					thStyle: {
 						'width': '400px'
@@ -405,7 +413,11 @@ export default {
 					tdClass: 'breakwork',
 					class: 'breakword d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
 					formatter: (value, key, item) => {
-						return value.Value[0]
+						if (value !== null && value.Value !== undefined) {
+							return value.Value[0]
+						} else {
+							""
+						}
 					},
 					thStyle: {
 						'width': '150px'
