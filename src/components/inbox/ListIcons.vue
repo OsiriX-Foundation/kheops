@@ -2,6 +2,7 @@
 <template>
   <span>
     <span
+			v-if="showFavoriteIcon"
       :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
       class="ml-1"
       @click.stop="toggleFavorite()"
@@ -14,6 +15,7 @@
       />
     </span>
     <span
+			v-if="showCommentIcon"
       :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
       class="ml-1"
       @click.stop="showComments(study, 'comments')"
@@ -30,6 +32,7 @@
       class="ml-1"
     >
       <a
+				v-if="showDownloadIcon"
         href="#"
         class="download"
         @click.stop="getURLDownload()"
@@ -41,7 +44,7 @@
         />
       </a>
       <span
-        v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i)"
+        v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i) && showViewerIcon"
         class="ml-1"
         @click.stop="openViewer('Osirix')"
       >
@@ -51,7 +54,7 @@
         />
       </span>
       <span
-        v-if="study.ModalitiesInStudy[0] !== 'SR'"
+        v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
         class="ml-1"
         @click.stop="openViewer('Ohif')"
       >
@@ -61,6 +64,7 @@
         />
       </span>
       <label
+				v-if="showImportIcon"
         for="file"
         style="cursor:pointer; display: inline;"
         class="ml-1"
@@ -95,6 +99,36 @@ export default {
 			type: Boolean,
 			required: true,
 			default: false
+		},
+		albumId: {
+			type: String,
+			required: true,
+			default: ''
+		},
+		showFavoriteIcon: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showCommentIcon: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showDownloadIcon: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showViewerIcon: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showImportIcon: {
+			type: Boolean,
+			required: false,
+			default: true
 		}
 	},
 	data () {
@@ -125,6 +159,17 @@ export default {
 	mounted () {
 	},
 	methods: {
+		getSource () {
+			if (this.albumId === '') {
+				return {
+					inbox: true
+				}
+			} else {
+				return {
+					album: this.albumId
+				}
+			}
+		},
 		classIconPN (visibility) {
 			if (visibility || this.mobiledetect) {
 				return 'iconsHover'
@@ -135,15 +180,13 @@ export default {
 		toggleFavorite () {
 			let params = {
 				StudyInstanceUID: this.study.StudyInstanceUID.Value[0],
-				queries: {
-					inbox: true
-				},
+				queries: this.getSource(),
 				value: !this.study.flag.is_favorite
 			}
 			this.$store.dispatch('favoriteStudy', params)
 		},
 		getURLDownload () {
-			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
+			const source = this.albumId === '' ? 'inbox' : this.albumId
 			const StudyInstanceUID = this.study.StudyInstanceUID.Value[0]
 			this.getViewerToken(this.access_token, StudyInstanceUID, source).then(res => {
 				const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : 'album=' + source}`
@@ -155,7 +198,7 @@ export default {
 		},
 		openViewer (viewer) {
 			const StudyInstanceUID = this.study.StudyInstanceUID.Value[0]
-			const source = this.$route.params.album_id === undefined ? 'inbox' : this.$route.params.album_id
+			const source = this.albumId === '' ? 'inbox' : this.albumId
 			let ohifWindow
 			if (viewer === 'Ohif') {
 				ohifWindow = window.open('', 'OHIFViewer')

@@ -15,7 +15,8 @@
 		"name": "Name",
 		"nomorealbums": "No more albums",
 		"noresults": "No results",
-		"albumshared": "Album shared"
+		"albumshared": "Album shared",
+		"error": "An error occur please reload the albums."
 	},
 	"fr": {
 		"newalbum": "Nouvel album",
@@ -32,7 +33,8 @@
 		"name": "Nom",
 		"nomorealbums": "Pas d'albums en plus",
 		"noresults": "Aucun results",
-		"albumshared": "Album partagé"
+		"albumshared": "Album partagé",
+		"error": "Une erreur s'est produite, veuillez recharger les albums."
 	}
 }
 </i18n>
@@ -250,6 +252,16 @@
       <div slot="no-results">
         {{ $t('noresults') }}
       </div>
+      <div slot="error">
+        {{ $t('error') }}
+				<button
+					type="button"
+					class=" btn btn-md"
+					@click="searchAlbums()"
+				>
+					Reload
+				</button>
+      </div>
     </infinite-loading>
   </div>
 </template>
@@ -446,6 +458,8 @@ export default {
 				} else {
 					$state.complete()
 				}
+			}).catch(err => {
+				$state.error()
 			})
 		},
 		getAlbums (offset = 0, limit = 0) {

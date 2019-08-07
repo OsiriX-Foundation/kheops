@@ -68,16 +68,6 @@
         <div
           :class="['dropzone-area', classDragIn]"
         >
-          <!--
-          <list
-            ref="list"
-            :album="album"
-            @loadfiles="inputLoadFiles"
-            @loaddirectories="inputLoadFiles"
-            @demohover="demoHover"
-          />
-		  -->
-
           <list-data-model
             ref="list"
             :album="album"

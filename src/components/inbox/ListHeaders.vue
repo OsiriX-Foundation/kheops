@@ -15,7 +15,8 @@
     "importfiles": "Import files",
     "draganddrop": "Or drag and drop",
 		"studiessharedsuccess": "studies sent successfully",
-		"studiessharederror": "studies could not be sent"
+		"studiessharederror": "studies could not be sent",
+		"addInbox": "Add to inbox"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -32,6 +33,7 @@
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
 		"studiessharedsuccess": "études ont été envoyées avec succès",
+		"addInbox": "Ajouter à la boite de réception",
 		"studiessharederror": "études n'ont pas pu être envoyée"
 	}
 }
@@ -50,6 +52,7 @@
         </div>
         <div
           class="align-self-center"
+		  v-if="showSendButton === true"
         >
           <button
             type="button"
@@ -70,6 +73,7 @@
 					v-if="!albumId || (album.send_series || album.is_admin)"
 				-->
         <b-dropdown
+		  v-if="showAlbumButton === true"
           :disabled="selectedStudiesNb === 0"
           variant="link"
           size="sm"
@@ -92,7 +96,28 @@
             {{ allowedAlbum.name }}
           </b-dropdown-item>
         </b-dropdown>
+
         <div
+          v-if="showInboxButton === true"
+          class="align-self-center"
+        >
+          <button
+            type="button"
+            class="btn btn-link btn-sm text-center"
+            :disabled="selectedStudiesNb === 0"
+            @click="addToInbox()"
+          >
+            <span>
+              <v-icon
+                class="align-middle"
+                name="bars"
+              />
+            </span><br>
+            {{ $t("addInbox") }}
+          </button>
+        </div>
+        <div
+		  v-if="showFavoriteButton === true"
           class="align-self-center"
         >
           <button
@@ -111,6 +136,7 @@
           </button>
         </div>
         <div
+		  v-if="showDeleteButton === true"
           class="align-self-center"
         >
           <button
@@ -128,9 +154,10 @@
             {{ $t("delete") }}
           </button>
         </div>
-
+		<div class="ml-auto"></div>
         <div
-          class="ml-auto align-self-center"
+		  v-if="showImportButton === true"
+          class="align-self-center"
         >
           <div>
             <b-dropdown
@@ -240,6 +267,41 @@ export default {
 			type: Array,
 			required: true,
 			default: () => ([])
+		},
+		albumId: {
+			type: String,
+			required: true,
+			default: ''
+		},
+		showSendButton: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showAlbumButton: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showInboxButton: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showFavoriteButton: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showDeleteButton: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showImportButton: {
+			type: Boolean,
+			required: false,
+			default: true
 		}
 	},
 	data () {
@@ -359,9 +421,7 @@ export default {
 			let favorites = this.allSelectedStudies.every(s => { return s.flag.is_favorite === true })
 			let params = {
 				StudyInstanceUID: '',
-				queries: {
-					inbox: true
-				},
+				queries: this.getSource(),
 				value: !favorites
 			}
 			this.allSelectedStudies.forEach(study => {
@@ -374,13 +434,22 @@ export default {
 			this.deleteSelectedSeries()
 			this.confirmDelete = false
 		},
+		getSource () {
+			if (this.albumId === '') {
+				return {
+					inbox: true
+				}
+			} else {
+				return {
+					album: this.albumId
+				}
+			}
+		},
 		deleteSelectedStudies () {
 			this.selectedStudies.forEach(study => {
 				let params = {
 					StudyInstanceUID: study.StudyInstanceUID.Value[0],
-					queries: {
-						inbox: true
-					}
+					queries: this.getSource()
 				}
 				this.$store.dispatch('deleteStudyTest', params)
 			})
@@ -401,9 +470,7 @@ export default {
 			}
 		},
 		addToAlbum (albumId) {
-			let queries = {
-				inbox: true
-			}
+			let queries = this.getSource()
 			let data = []
 			this.selectedStudies.forEach(study => {
 				data.push({
@@ -424,11 +491,13 @@ export default {
 				this.deselectStudySeries()
 			})
 		},
+		addToInbox () {
+			alert('Not done !!!')
+		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
 			var tmpInput = document.createElement('input')
 			if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true
-
 			return false
 		},
 		setFilters () {

@@ -109,6 +109,11 @@ export default {
 			type: String,
 			required: true,
 			default: ''
+		},
+		albumId: {
+			type: String,
+			required: true,
+			default: ''
 		}
 	},
 	data () {
@@ -125,15 +130,25 @@ export default {
 	created () {
 		let params = {
 			StudyInstanceUID: this.studyUID,
-			queries: {
-				inbox: true,
-				includefield: ['00080021', '00080031']
-			}
+			queries: {}
 		}
+    params.queries = this.getSource()
+    params.queries.includefield = ['00080021', '00080031']
 		this.$store.dispatch('getSeriesTest', params)
 	},
 	methods: {
-		setViewDetails (StudyInstanceUID, flagView) {
+		getSource () {
+			if (this.albumId === '') {
+				return {
+					inbox: true
+				}
+			} else {
+				return {
+					album: this.albumId
+				}
+			}
+		},
+    setViewDetails (StudyInstanceUID, flagView) {
 			let viewSelected = flagView === '' ? 'series' : flagView
 			let params = {
 				StudyInstanceUID: StudyInstanceUID,

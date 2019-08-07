@@ -9,6 +9,7 @@ import providers from './modules/providers'
 import studiesTest from './modules/studies_test'
 import comments from './modules/comments'
 import albumsTest from './modules/albums_test'
+import albumTest from './modules/album_test'
 
 Vue.use(Vuex)
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
 		providers,
 		studiesTest,
 		comments,
-		albumsTest
+		albumsTest,
+		albumTest
 	}
 })

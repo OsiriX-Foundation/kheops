@@ -24,7 +24,6 @@
 		"comments": "comments",
 		"series": "series",
 		"study": "study",
-		"addInbox": "Add to inbox",
 		"nostudy": "No studies found",
 		"studiessend": "studies send to inbox",
     "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
@@ -35,7 +34,8 @@
     "draganddrop": "Or drag and drop",
     "favorites": "Favorites",
 		"nomorestudies": "No more studies",
-		"noresults": "No results"
+		"noresults": "No results",
+		"error": "An error occur please reload the studies."
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -58,7 +58,6 @@
 		"comments": "commentaire",
 		"series": "séries",
 		"study": "étude",
-		"addInbox": "Add to inbox",
     "nostudy": "Aucne étude trouvée",
 		"studiessend": "études envoyées dans votre boîte de réception",
     "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
@@ -68,7 +67,8 @@
     "draganddrop": "Ou Drag and Drop",
     "favorites": "Favorites",
 		"nomorestudies": "Plus d'études",
-		"noresults": "Aucun resultats"
+		"noresults": "Aucun resultats",
+		"error": "Une erreur s'est produite, veuillez recharger les études."
 	}
 }
 </i18n>
@@ -98,6 +98,13 @@
     <list-headers
       :studies="studies"
       :allowed-albums="albums"
+			:show-send-button="permissions.send_series"
+			:show-album-button="permissions.send_series"
+			:show-favorite-button="permissions.add_series"
+			:show-delete-button="permissions.delete_series"
+	  	:show-import-button="permissions.add_series"
+			:show-inbox-button="permissions.add_inbox"
+			:album-id="album.album_id !== undefined ? album.album_id : ''"
       @setFilters="changeFilterValue"
       @reloadStudies="searchStudies"
     />
@@ -286,6 +293,10 @@
         <list-icons
           :study="row.item"
           :mobiledetect="mobiledetect"
+					:show-favorite-icon="permissions.add_series"
+					:show-download-icon="permissions.download_series"
+					:show-import-icon="permissions.add_series"
+					:album-id="album.album_id !== undefined ? album.album_id : ''"
         />
       </template>
       <template
@@ -302,6 +313,7 @@
         <b-card>
           <list-item-details
             :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
+						:album-id="albumID"
           />
         </b-card>
       </template>
@@ -316,6 +328,16 @@
       </div>
       <div slot="no-results">
         {{ $t('noresults') }}
+      </div>
+      <div slot="error">
+        {{ $t('error') }}
+				<button
+					type="button"
+					class=" btn btn-md"
+					@click="searchStudies()"
+				>
+					Reload
+				</button>
       </div>
     </infinite-loading>
   </div>
@@ -468,6 +490,23 @@ export default {
 		},
 		mobiledetect () {
 			return mobiledetect.mobileAndTabletcheck()
+		},
+		albumID () {
+			if (this.album.album_id !== undefined || this.album.album_id !== "") {
+				return this.album.album_id
+			} else {
+				return undefined
+			}
+		},
+		permissions () {
+			return {
+				add_series: this.album.album_id !== undefined ? this.album.add_series || this.album.is_admin : true,
+				delete_series: this.album.album_id !== undefined ? this.album.delete_series || this.album.is_admin : true,
+				download_series: this.album.album_id !== undefined ? this.album.download_series || this.album.is_admin : true,
+				send_series: this.album.album_id !== undefined ? this.album.send_series || this.album.is_admin : true,
+				write_comments: this.album.album_id !== undefined ? this.album.write_comments || this.album.is_admin : true,
+				add_inbox: this.album.album_id !== undefined ? this.album.add_series || this.album.is_admin : false
+			}
 		}
 	},
 	watch: {
@@ -506,6 +545,10 @@ export default {
 		this.$store.dispatch('initAlbumsTest', {})
 		this.$store.dispatch('getAlbumsTest', { 'queries': queriesAlbums })
 	},
+	destroyed () {
+		this.$store.dispatch('initStudiesTest', {})
+		this.$store.dispatch('initAlbumsTest', {})
+	},
 	mounted () {
 	},
 	methods: {
@@ -518,6 +561,8 @@ export default {
 				} else {
 					$state.complete()
 				}
+			}).catch(err => {
+				$state.error()
 			})
 		},
 		setItemHover (item, index, event) {
@@ -590,9 +635,13 @@ export default {
 			let params = {
 				limit: limit,
 				offset: offset,
-				inbox: true,
 				includefield: ['favorite', 'comments', '00081030'],
 				sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy
+			}
+			if (this.albumID === undefined) {
+				params.inbox = true
+			} else {
+				params.album = this.albumID
 			}
 			const queries = Object.assign(params, this.prepareFilters())
 			return this.$store.dispatch('getStudiesTest', { queries: queries })
