@@ -70,14 +70,14 @@
             </a>
             <a
               class="nav-link"
-              :class="(view  === 'comments')?'active':''"
+              :class="(view === 'comments')?'active':''"
               @click.stop="view='comments'"
             >
               Comments
             </a>
             <a
               class="nav-link"
-              :class="(view  === 'settings')?'active':''"
+              :class="(view === 'settings')?'active':''"
               @click.stop="view='settings'"
             >
               Settings
@@ -91,26 +91,26 @@
 			https://fr.vuejs.org/v2/guide/components-dynamic-async.html
     -->
     <span v-if="view === 'studies' || view === '' && loading === false">
-			<div class="container">
-				<div
-					v-if="formattedAlbumDescription[0] !== ''"
-					class="card"
-				>
-					<div class="card-body">
-						<p
-							v-for="(p,idx) in formattedAlbumDescription"
-							:key="idx"
-							class="py-0 my-0"
-							:class="(idx)?'pl-3':''"
-						>
-							{{ p }}
-						</p>
-					</div>
-				</div>
-			</div>
-			<component-import-study
-					:album="album"
-			/>
+      <div class="container">
+        <div
+          v-if="formattedAlbumDescription[0] !== ''"
+          class="card"
+        >
+          <div class="card-body">
+            <p
+              v-for="(p,idx) in formattedAlbumDescription"
+              :key="idx"
+              class="py-0 my-0"
+              :class="(idx)?'pl-3':''"
+            >
+              {{ p }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <component-import-study
+        :album="album"
+      />
     </span>
     <album-comments
       v-if="view=='comments' && loading === false"
@@ -149,12 +149,12 @@ export default {
 			let queryParams = { view: this.view }
 			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
 			this.$router.push({ query: queryParams })
-            
+
 			this.loadAlbum()
 		}
 	},
 	created () {
-        this.loadAlbum()
+		this.loadAlbum()
 	},
 	methods: {
 		loadAlbum () {

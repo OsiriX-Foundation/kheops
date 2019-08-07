@@ -98,13 +98,13 @@
     <list-headers
       :studies="studies"
       :allowed-albums="albums"
-			:show-send-button="permissions.send_series"
-			:show-album-button="permissions.send_series"
-			:show-favorite-button="permissions.add_series"
-			:show-delete-button="permissions.delete_series"
-	  	:show-import-button="permissions.add_series"
-			:show-inbox-button="permissions.add_inbox"
-			:album-id="album.album_id !== undefined ? album.album_id : ''"
+      :show-send-button="permissions.send_series"
+      :show-album-button="permissions.send_series"
+      :show-favorite-button="permissions.add_series"
+      :show-delete-button="permissions.delete_series"
+      :show-import-button="permissions.add_series"
+      :show-inbox-button="permissions.add_inbox"
+      :album-id="album.album_id !== undefined ? album.album_id : ''"
       @setFilters="changeFilterValue"
       @reloadStudies="searchStudies"
     />
@@ -293,10 +293,10 @@
         <list-icons
           :study="row.item"
           :mobiledetect="mobiledetect"
-					:show-favorite-icon="permissions.add_series"
-					:show-download-icon="permissions.download_series"
-					:show-import-icon="permissions.add_series"
-					:album-id="album.album_id !== undefined ? album.album_id : ''"
+          :show-favorite-icon="permissions.add_series"
+          :show-download-icon="permissions.download_series"
+          :show-import-icon="permissions.add_series"
+          :album-id="album.album_id !== undefined ? album.album_id : ''"
         />
       </template>
       <template
@@ -313,7 +313,7 @@
         <b-card>
           <list-item-details
             :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
-						:album-id="albumID"
+            :album-id="albumID"
           />
         </b-card>
       </template>
@@ -331,13 +331,13 @@
       </div>
       <div slot="error">
         {{ $t('error') }}
-				<button
-					type="button"
-					class=" btn btn-md"
-					@click="searchStudies()"
-				>
-					Reload
-				</button>
+        <button
+          type="button"
+          class=" btn btn-md"
+          @click="searchStudies()"
+        >
+          Reload
+        </button>
       </div>
     </infinite-loading>
   </div>
@@ -492,7 +492,7 @@ export default {
 			return mobiledetect.mobileAndTabletcheck()
 		},
 		albumID () {
-			if (this.album.album_id !== undefined || this.album.album_id !== "") {
+			if (this.album.album_id !== undefined || this.album.album_id !== '') {
 				return this.album.album_id
 			} else {
 				return undefined

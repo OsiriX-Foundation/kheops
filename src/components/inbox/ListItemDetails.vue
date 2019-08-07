@@ -132,8 +132,8 @@ export default {
 			StudyInstanceUID: this.studyUID,
 			queries: {}
 		}
-    params.queries = this.getSource()
-    params.queries.includefield = ['00080021', '00080031']
+		params.queries = this.getSource()
+		params.queries.includefield = ['00080021', '00080031']
 		this.$store.dispatch('getSeriesTest', params)
 	},
 	methods: {
@@ -148,7 +148,7 @@ export default {
 				}
 			}
 		},
-    setViewDetails (StudyInstanceUID, flagView) {
+		setViewDetails (StudyInstanceUID, flagView) {
 			let viewSelected = flagView === '' ? 'series' : flagView
 			let params = {
 				StudyInstanceUID: StudyInstanceUID,

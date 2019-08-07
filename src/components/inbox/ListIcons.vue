@@ -2,7 +2,7 @@
 <template>
   <span>
     <span
-			v-if="showFavoriteIcon"
+      v-if="showFavoriteIcon"
       :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
       class="ml-1"
       @click.stop="toggleFavorite()"
@@ -15,7 +15,7 @@
       />
     </span>
     <span
-			v-if="showCommentIcon"
+      v-if="showCommentIcon"
       :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
       class="ml-1"
       @click.stop="showComments(study, 'comments')"
@@ -32,7 +32,7 @@
       class="ml-1"
     >
       <a
-				v-if="showDownloadIcon"
+        v-if="showDownloadIcon"
         href="#"
         class="download"
         @click.stop="getURLDownload()"
@@ -64,7 +64,7 @@
         />
       </span>
       <label
-				v-if="showImportIcon"
+        v-if="showImportIcon"
         for="file"
         style="cursor:pointer; display: inline;"
         class="ml-1"

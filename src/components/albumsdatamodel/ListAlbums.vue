@@ -254,13 +254,13 @@
       </div>
       <div slot="error">
         {{ $t('error') }}
-				<button
-					type="button"
-					class=" btn btn-md"
-					@click="searchAlbums()"
-				>
-					Reload
-				</button>
+        <button
+          type="button"
+          class=" btn btn-md"
+          @click="searchAlbums()"
+        >
+          Reload
+        </button>
       </div>
     </infinite-loading>
   </div>

@@ -51,8 +51,8 @@
           <span>{{ $tc("selectednbstudies", selectedStudiesNb, { count: selectedStudiesNb }) }}</span>
         </div>
         <div
+          v-if="showSendButton === true"
           class="align-self-center"
-		  v-if="showSendButton === true"
         >
           <button
             type="button"
@@ -73,7 +73,7 @@
 					v-if="!albumId || (album.send_series || album.is_admin)"
 				-->
         <b-dropdown
-		  v-if="showAlbumButton === true"
+          v-if="showAlbumButton === true"
           :disabled="selectedStudiesNb === 0"
           variant="link"
           size="sm"
@@ -117,7 +117,7 @@
           </button>
         </div>
         <div
-		  v-if="showFavoriteButton === true"
+          v-if="showFavoriteButton === true"
           class="align-self-center"
         >
           <button
@@ -136,7 +136,7 @@
           </button>
         </div>
         <div
-		  v-if="showDeleteButton === true"
+          v-if="showDeleteButton === true"
           class="align-self-center"
         >
           <button
@@ -154,9 +154,9 @@
             {{ $t("delete") }}
           </button>
         </div>
-		<div class="ml-auto"></div>
+        <div class="ml-auto" />
         <div
-		  v-if="showImportButton === true"
+          v-if="showImportButton === true"
           class="align-self-center"
         >
           <div>
@@ -461,9 +461,7 @@ export default {
 					let params = {
 						StudyInstanceUID: studyUID,
 						SeriesInstanceUID: serieUID,
-						queries: {
-							inbox: true
-						}
+						queries: this.getSource()
 					}
 					this.$store.dispatch('deleteSerieTest', params)
 				})
