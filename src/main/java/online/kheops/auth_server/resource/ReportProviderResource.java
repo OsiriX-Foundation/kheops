@@ -321,7 +321,7 @@ public class ReportProviderResource {
         try {
             reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         return  Response.status(OK).entity(reportProvider).build();
@@ -340,9 +340,7 @@ public class ReportProviderResource {
         final User callingUser = kheopsPrincipal.getUser();
         try {
             deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
@@ -375,9 +373,7 @@ public class ReportProviderResource {
         final ReportProviderResponse reportProvider;
         try {
             reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (AlbumNotFoundException e) {
+        } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
