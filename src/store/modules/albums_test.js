@@ -72,6 +72,28 @@ const actions = {
 			return album.album_id === params.album_id
 		})
 		commit('SET_ALBUM_FLAG_TEST', { index: index, flag: params.flag, value: params.value })
+	},
+	setValueAlbum ({ commit }, params) {
+		let index = state.albums.findIndex(album => {
+			return album.album_id === params.album_id
+		})
+		commit('UPDATE_ALBUM_TEST', { index: index, flag: params.flag, value: params.value })
+	},
+	manageFavoriteAlbum ({ commit }, params) {
+		let request = `albums/${params.album_id}/favorites`
+		if (params.value === true) {
+			return HTTP.put(`${request}`).then(res => {
+				return res
+			}).catch(err => {
+				return err
+			})
+		} else if (params.value === false) {
+			return HTTP.delete(`${request}`).then(res => {
+				return res
+			}).catch(err => {
+				return err
+			})
+		}
 	}
 }
 
@@ -88,6 +110,11 @@ const mutations = {
 	SET_ALBUM_FLAG_TEST (state, params) {
 		let album = state.albums[params.index]
 		album.flag[params.flag] = params.value
+		Vue.set(state.albums, params.index, album)
+	},
+	UPDATE_ALBUM_TEST (state, params) {
+		let album = state.albums[params.index]
+		album[params.flag] = params.value
 		Vue.set(state.albums, params.index, album)
 	}
 }
