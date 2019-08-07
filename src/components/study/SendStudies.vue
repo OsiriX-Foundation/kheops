@@ -580,15 +580,16 @@ export default {
 			return formData
 		},
 		getErrorsDicomFromResponse (data) {
+			let error = -1
 			for (var key in this.errorDicom) {
 				if (data.hasOwnProperty(key)) {
 					const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key])
 					this.generateListError(data[key].Value, this.errorDicom[key])
 					this.createListError(errorInResponse)
-					return 0
+					error = 0
 				}
 			}
-			return -1
+			return error
 		},
 		generateErrorNonDicom (files, status = 0) {
 			let map = new Map()

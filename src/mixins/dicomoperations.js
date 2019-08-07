@@ -183,7 +183,6 @@ export const DicomOperations = {
 					dicomGenerated[currentTag] = value
 				}
 			})
-
 			createTag.forEach(value => {
 				if (value.value !== '') {
 					if (value.tag === this.tagSeriesUID) {

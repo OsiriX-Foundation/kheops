@@ -91,9 +91,26 @@
 			https://fr.vuejs.org/v2/guide/components-dynamic-async.html
     -->
     <span v-if="view === 'studies' || view === '' && loading === false">
-        <component-import-study
-            :album="album"
-        />
+			<div class="container">
+				<div
+					v-if="formattedAlbumDescription[0] !== ''"
+					class="card"
+				>
+					<div class="card-body">
+						<p
+							v-for="(p,idx) in formattedAlbumDescription"
+							:key="idx"
+							class="py-0 my-0"
+							:class="(idx)?'pl-3':''"
+						>
+							{{ p }}
+						</p>
+					</div>
+				</div>
+			</div>
+			<component-import-study
+					:album="album"
+			/>
     </span>
     <album-comments
       v-if="view=='comments' && loading === false"
@@ -122,7 +139,10 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'albumTest'
-		})
+		}),
+		formattedAlbumDescription () {
+			return this.album.description.split('\n')
+		}
 	},
 	watch: {
 		view () {

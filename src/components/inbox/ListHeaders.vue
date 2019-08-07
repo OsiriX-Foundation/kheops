@@ -471,6 +471,12 @@ export default {
 		},
 		addToAlbum (albumId) {
 			let queries = this.getSource()
+			let data = this.generateStudySerie(albumId)
+			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
+				this.deselectStudySeries()
+			})
+		},
+		generateStudySerie (albumId) {
 			let data = []
 			this.selectedStudies.forEach(study => {
 				data.push({
@@ -487,12 +493,12 @@ export default {
 					})
 				})
 			}
-			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
-				this.deselectStudySeries()
-			})
+			return data
 		},
 		addToInbox () {
 			alert('Not done !!!')
+			let queries = this.getSource()
+			let data = this.generateStudySerie(albumId)
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
