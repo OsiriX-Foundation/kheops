@@ -104,6 +104,10 @@ public class ReportProviderResource {
                               @FormParam("client_id") final String clientId,
                               @FormParam("studyUID") List<String> studyInstanceUIDs) {//Edit UidValidator for work with @FormParam
 
+        if (tokenParam == null) {
+            return Response.status(BAD_REQUEST).entity("Missing 'access_token'").build();
+        }
+
         if (studyInstanceUIDs == null || studyInstanceUIDs.isEmpty()) {
             return Response.status(BAD_REQUEST).entity(StudyInstanceUID + " param must be set").build();
         }
