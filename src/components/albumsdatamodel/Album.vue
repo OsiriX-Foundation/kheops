@@ -31,15 +31,6 @@
 <template>
   <div>
     <div
-      v-if="loading && album !== {}"
-      class="container"
-    >
-      <p class="text-center fade">
-        loading...
-      </p>
-    </div>
-    <div
-      v-if="!loading"
       class="container"
     >
       <div class="row">
