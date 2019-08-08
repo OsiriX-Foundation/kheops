@@ -85,10 +85,8 @@ public abstract class Fetcher {
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
 
             Study study = queryStudy.getSingleResult();
-            if (!study.isPopulated()) {
-                study.mergeAttributes(attributes);
-                study.setPopulated(true);
-            }
+            study.mergeAttributes(attributes);
+            study.setPopulated(true);
 
             tx.commit();
         } finally {
