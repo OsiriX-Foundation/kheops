@@ -372,7 +372,6 @@ export default {
 				})
 				for (let studyUID in this.selectedSeries) {
 					this.selectedSeries[studyUID].forEach(serie => {
-
 						let params = {
 							StudyInstanceUID: studyUID,
 							SeriesInstanceUID: serie.SeriesInstanceUID.Value[0],
@@ -513,10 +512,9 @@ export default {
 			return data
 		},
 		addToInbox () {
-			alert('Not done !!!')
 			let queries = this.getSource()
 			let data = this.generateStudySerieData(this.albumId)
-			console.log(data)
+			this.$store.dispatch('selfAppropriateStudy', { data: data, queries: queries })
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser

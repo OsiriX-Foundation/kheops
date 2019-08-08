@@ -6,6 +6,7 @@ import PDFImage from '@/assets/pdf-240x240.png'
 import VideoImage from '@/assets/video.png'
 import DicomLogo from '@/assets/dicom_logo.png'
 import Vue from 'vue'
+import axios from 'axios'
 
 // initial state
 const state = {
@@ -267,7 +268,22 @@ const actions = {
 		})
 	},
 	selfAppropriateStudy ({ commit }, params) {
-
+		let request = 'studies'
+		let queries = ''
+		if (params.queries !== undefined) {
+			queries = httpoperations.getQueriesParameters(params.queries)
+		}
+		let promises = []
+		params.data.forEach(d => {
+			if (d.serie_id) {
+				promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`))
+			} else {
+				promises.push(HTTP.put(`${request}/${d.study_id}${queries}`))
+			}
+		})
+		axios.all(promises).then(results => {
+			console.log(results)
+		})
 	}
 }
 
