@@ -120,7 +120,7 @@
       :tbody-class="'table-wrapper-scroll-y link'"
       @sort-changed="sortingChanged"
       @row-hovered="setItemHover"
-      @row-unhovered="setItemHover"
+      @row-unhovered="setItemUnhover"
       @row-clicked="showRowDetails"
     >
       <div
@@ -512,8 +512,10 @@ export default {
 	watch: {
 		sendingFiles () {
 			if (!this.sendingFiles) {
+				/*
 				this.$store.dispatch('initStudiesTest', { })
 				this.getStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit)
+				*/
 			}
 		},
 		filters: {
@@ -569,7 +571,15 @@ export default {
 			let params = {
 				StudyInstanceUID: item.StudyInstanceUID.Value[0],
 				flag: 'is_hover',
-				value: !item.flag.is_hover
+				value: true
+			}
+			this.$store.dispatch('setFlagByStudyUID', params)
+		},
+		setItemUnhover (item, index, event) {
+			let params = {
+				StudyInstanceUID: item.StudyInstanceUID.Value[0],
+				flag: 'is_hover',
+				value: false
 			}
 			this.$store.dispatch('setFlagByStudyUID', params)
 		},
