@@ -362,14 +362,24 @@ export default {
 		sendToUser (userSub) {
 			if (this.selectedStudiesNb > 0) {
 				let promises = []
-
 				this.selectedStudies.forEach(study => {
-					promises.push(HTTP.put(`studies/${study.StudyInstanceUID.Value[0]}/users/${userSub}?inbox=true`))
+					let params = {
+						StudyInstanceUID: study.StudyInstanceUID.Value[0],
+						userSub: userSub,
+						queries: this.getSource()
+					}
+					promises.push(this.$store.dispatch('sendStudy', params))
 				})
 				for (let studyUID in this.selectedSeries) {
 					this.selectedSeries[studyUID].forEach(serie => {
-						let serieUID = serie.SeriesInstanceUID.Value[0]
-						promises.push(HTTP.put(`studies/${studyUID}/series/${serieUID}/users/${userSub}?inbox=true`))
+
+						let params = {
+							StudyInstanceUID: studyUID,
+							SeriesInstanceUID: serie.SeriesInstanceUID.Value[0],
+							userSub: userSub,
+							queries: this.getSource()
+						}
+						promises.push(this.$store.dispatch('sendSerie', params))
 					})
 				}
 
@@ -429,11 +439,6 @@ export default {
 				this.$store.dispatch('favoriteStudy', params)
 			})
 		},
-		deleteStudies () {
-			this.deleteSelectedStudies()
-			this.deleteSelectedSeries()
-			this.confirmDelete = false
-		},
 		getSource () {
 			if (this.albumId === '') {
 				return {
@@ -445,13 +450,23 @@ export default {
 				}
 			}
 		},
+		deleteStudies () {
+			this.deleteSelectedStudies()
+			this.deleteSelectedSeries()
+			this.confirmDelete = false
+			this.deselectStudySeries()
+		},
 		deleteSelectedStudies () {
 			this.selectedStudies.forEach(study => {
 				let params = {
-					StudyInstanceUID: study.StudyInstanceUID.Value[0],
-					queries: this.getSource()
+					StudyInstanceUID: study.StudyInstanceUID.Value[0]
 				}
-				this.$store.dispatch('deleteStudyTest', params)
+				if (this.albumId === '') {
+					this.$store.dispatch('deleteStudyTest', params)
+				} else {
+					params.album_id = this.albumId
+					this.$store.dispatch('removeStudyInAlbum', params)
+				}
 			})
 		},
 		deleteSelectedSeries () {
@@ -460,21 +475,25 @@ export default {
 					let serieUID = serie.SeriesInstanceUID.Value[0]
 					let params = {
 						StudyInstanceUID: studyUID,
-						SeriesInstanceUID: serieUID,
-						queries: this.getSource()
+						SeriesInstanceUID: serieUID
 					}
-					this.$store.dispatch('deleteSerieTest', params)
+					if (this.albumId === '') {
+						this.$store.dispatch('deleteSerieTest', params)
+					} else {
+						params.album_id = this.albumId
+						this.$store.dispatch('removeSerieInAlbum', params)
+					}
 				})
 			}
 		},
 		addToAlbum (albumId) {
 			let queries = this.getSource()
-			let data = this.generateStudySerie(albumId)
+			let data = this.generateStudySerieData(albumId)
 			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
 				this.deselectStudySeries()
 			})
 		},
-		generateStudySerie (albumId) {
+		generateStudySerieData (albumId) {
 			let data = []
 			this.selectedStudies.forEach(study => {
 				data.push({
@@ -496,7 +515,8 @@ export default {
 		addToInbox () {
 			alert('Not done !!!')
 			let queries = this.getSource()
-			let data = this.generateStudySerie(albumId)
+			let data = this.generateStudySerieData(this.albumId)
+			console.log(data)
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser

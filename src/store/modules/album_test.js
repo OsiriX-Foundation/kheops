@@ -20,6 +20,28 @@ const actions = {
 		}).catch(err => {
 			return err
 		})
+	},
+	removeStudyInAlbum ({ commit }, params) {
+		let request = `studies/${params.StudyInstanceUID}/albums/${params.album_id}`
+		return HTTP.delete(request).then(res => {
+			if (res.status === 204) {
+				commit('DELETE_STUDY_TEST', params)
+			}
+			return res
+		}).catch(err => {
+			return err
+		})
+	},
+	removeSerieInAlbum ({ commit }, params) {
+		let request = `studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/albums/${params.album_id}`
+		return HTTP.delete(request).then(res => {
+			if (res.status === 204) {
+				commit('DELETE_SERIE_TEST', params)
+			}
+			return res
+		}).catch(err => {
+			return err
+		})
 	}
 
 }

@@ -241,6 +241,33 @@ const actions = {
 			console.log(err)
 			return false
 		})
+	},
+	sendStudy ({ commit }, params) {
+		let queries = ''
+		if (params.queries !== undefined) {
+			queries = httpoperations.getQueriesParameters(params.queries)
+		}
+		const request = `/studies/${params.StudyInstanceUID}/users/${params.userSub}`
+		return HTTP.put(request + queries).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
+	},
+	sendSerie ({ commit }, params) {
+		let queries = ''
+		if (params.queries !== undefined) {
+			queries = httpoperations.getQueriesParameters(params.queries)
+		}
+		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/users/${params.userSub}`
+		return HTTP.put(request + queries).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
+	},
+	selfAppropriateStudy ({ commit }, params) {
+
 	}
 }
 
@@ -292,11 +319,14 @@ const mutations = {
 	DELETE_SERIE_TEST (state, params) {
 		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
 		if (studyIdx > -1) {
+			delete state.studies[studyIdx].series[params.SeriesInstanceUID]
+			/*
 			let seriesIdx = _.findIndex(state.studies[studyIdx].series, s => { return s.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID })
 			if (seriesIdx > -1) {
 				Vue.delete(state.studies[studyIdx].series, seriesIdx)
 				Vue.set(state.studies, studyIdx, state.studies[studyIdx])
 			}
+			*/
 		}
 	},
 	SET_STUDY_SHOW_DETAILS (state, params) {
