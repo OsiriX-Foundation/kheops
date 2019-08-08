@@ -465,7 +465,9 @@ export default {
 							this.$store.dispatch('removeFileId', { id: file.id })
 							this.countSentFiles++
 						}).catch(err => {
-							console.log(err)
+							this.generateErrorNonDicom(files, err.status)
+							this.$store.dispatch('removeFileId', { id: file.id })
+							this.countSentFiles++
 						})
 					} else {
 						this.$store.dispatch('removeFileId', { id: file.id })
@@ -475,7 +477,7 @@ export default {
 			})
 		},
 		sendDicomizeDataPromise (idFile, data) {
-			return new Promise((resolve) => {
+			return new Promise((resolve, reject) => {
 				let formData = new FormData()
 				formData.append(idFile, data)
 
@@ -483,8 +485,8 @@ export default {
 
 				HTTP.post(request, data, this.config['dicomizeData']).then(res => {
 					resolve(res)
-				}).catch(res => {
-					resolve(res)
+				}).catch(err => {
+					reject(err)
 				})
 			})
 		},
