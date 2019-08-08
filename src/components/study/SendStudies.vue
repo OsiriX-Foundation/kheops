@@ -465,7 +465,7 @@ export default {
 							this.$store.dispatch('removeFileId', { id: file.id })
 							this.countSentFiles++
 						}).catch(err => {
-							this.generateErrorNonDicom(files, err.status)
+							this.generateErrorNonDicom([file], err.status)
 							this.$store.dispatch('removeFileId', { id: file.id })
 							this.countSentFiles++
 						})
