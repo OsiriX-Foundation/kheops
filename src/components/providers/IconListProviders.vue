@@ -10,7 +10,7 @@
       <template slot="button-content">
         <v-icon
           class="align-middle"
-          style="margin-right:1"
+          style="margin-right:1; color: white"
           name="build"
         />
       </template>
@@ -25,7 +25,7 @@
           v-if="checkProviderModalities(study, provider)"
           type="text"
           hidden
-          name="accessToken"
+          name="access_token"
           :value="accessToken"
         />
         <b-form-input
