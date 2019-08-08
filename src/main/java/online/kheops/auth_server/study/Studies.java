@@ -197,7 +197,8 @@ public class Studies {
                         .and(fromCondition)
                         .groupBy(STUDIES.STUDY_UID)
                         .fetch().get(0).getValue(0).toString();
-                attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
+                //attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
+                attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.split(","));
             });
             if (!qidoParams.getModalityFilter().isPresent()) {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
