@@ -296,8 +296,18 @@
           :show-favorite-icon="permissions.add_series"
           :show-download-icon="permissions.download_series"
           :show-import-icon="permissions.add_series"
+          :show-report-provider-icon="album.album_id !== undefined ? true : false"
           :album-id="album.album_id !== undefined ? album.album_id : ''"
-        />
+        >
+          <template
+            slot="reportprovider"
+          >
+            <icon-list-providers
+              :study="row.item"
+              :providers="providersEnable"
+            />
+          </template>
+        </list-icons>
       </template>
       <template
         slot="StudyDate"
@@ -354,10 +364,11 @@ import Datepicker from 'vuejs-datepicker'
 import moment from 'moment'
 import mobiledetect from '@/mixins/mobiledetect.js'
 import SortList from '@/components/inbox/SortList.vue'
+import IconListProviders from '@/components/providers/IconListProviders.vue'
 
 export default {
 	name: 'StudiesDataModel',
-	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList },
+	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders },
 	mixins: [ ],
 	props: {
 		album: {
@@ -472,7 +483,8 @@ export default {
 		...mapGetters({
 			studies: 'studiesTest',
 			albums: 'albumsTest',
-			sendingFiles: 'sending'
+			sendingFiles: 'sending',
+			providers: 'providers'
 		}),
 		OS () {
 			return navigator.platform
@@ -507,6 +519,11 @@ export default {
 				write_comments: this.album.album_id !== undefined ? this.album.write_comments || this.album.is_admin : true,
 				add_inbox: this.album.album_id !== undefined ? this.album.add_series || this.album.is_admin : false
 			}
+		},
+		providersEnable () {
+			return this.providers.filter(function (provider) {
+				return provider.stateURL['checkURL'] === true
+			})
 		}
 	},
 	watch: {
@@ -546,6 +563,9 @@ export default {
 		}
 		this.$store.dispatch('initAlbumsTest', {})
 		this.$store.dispatch('getAlbumsTest', { 'queries': queriesAlbums })
+		if (this.albumID !== undefined) {
+			this.$store.dispatch('getProviders', { albumID: this.albumID })
+		}
 	},
 	destroyed () {
 		this.$store.dispatch('initStudiesTest', {})

@@ -75,6 +75,11 @@
           height="24px"
         />
       </label>
+      <span
+        v-if="showReportProviderIcon"
+      >
+        <slot name="reportprovider" />
+      </span>
     </span>
   </span>
 </template>
@@ -126,6 +131,11 @@ export default {
 			default: true
 		},
 		showImportIcon: {
+			type: Boolean,
+			required: false,
+			default: true
+		},
+		showReportProviderIcon: {
 			type: Boolean,
 			required: false,
 			default: true
