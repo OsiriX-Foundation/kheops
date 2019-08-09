@@ -65,7 +65,6 @@ const actions = {
 		return HTTP.get(`${request}${queries}`, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
 			if (res.data !== '') {
 				const studies = dicomoperations.translateDICOM(res.data)
-				let params = {}
 				studies.forEach(study => {
 					study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy))
 					study.flag.is_favorite = study.SumFavorites['Value'][0] > 0
@@ -74,8 +73,13 @@ const actions = {
 					// chapter - Row details support
 					study._showDetails = false
 				})
-				params.studies = studies
-				commit('SET_STUDIES_TEST', params.studies)
+				if (params.queries.offset === 0) {
+					dispatch('initStudiesTest')
+				}
+				commit('SET_STUDIES_TEST', studies)
+			}
+			if (res.status === 204) {
+				commit('SET_STUDIES_TEST', [])
 			}
 			return res
 		})
