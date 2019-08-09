@@ -220,12 +220,8 @@ const actions = {
 		})
 	},
 	deleteStudyTest ({ commit }, params) {
-		let queries = ''
-		if (params.queries !== undefined) {
-			queries = httpoperations.getQueriesParameters(params.queries)
-		}
 		const request = `/studies/${params.StudyInstanceUID}`
-		return HTTP.delete(request + queries).then(res => {
+		return HTTP.delete(request).then(res => {
 			commit('DELETE_STUDY_TEST', { StudyInstanceUID: params.StudyInstanceUID })
 			return true
 		}).catch(err => {
@@ -234,12 +230,8 @@ const actions = {
 		})
 	},
 	deleteSerieTest ({ commit }, params) {
-		let queries = ''
-		if (params.queries !== undefined) {
-			queries = httpoperations.getQueriesParameters(params.queries)
-		}
 		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}`
-		return HTTP.delete(request + queries).then(res => {
+		return HTTP.delete(request).then(res => {
 			commit('DELETE_SERIE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 			return true
 		}).catch(err => {

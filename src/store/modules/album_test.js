@@ -43,7 +43,6 @@ const actions = {
 			return err
 		})
 	}
-
 }
 
 // mutations
