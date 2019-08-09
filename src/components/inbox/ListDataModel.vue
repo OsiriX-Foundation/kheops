@@ -97,7 +97,7 @@
     >
     <list-headers
       :studies="studies"
-      :allowed-albums="albums"
+      :albums="albums"
       :show-send-button="permissions.send_series"
       :show-album-button="permissions.send_series"
       :show-favorite-button="permissions.add_series"

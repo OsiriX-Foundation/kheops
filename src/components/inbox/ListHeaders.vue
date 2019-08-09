@@ -263,7 +263,7 @@ export default {
 			required: true,
 			default: () => ([])
 		},
-		allowedAlbums: {
+		albums: {
 			type: Array,
 			required: true,
 			default: () => ([])
@@ -341,6 +341,13 @@ export default {
 		},
 		allSelectedStudies () {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) })
+		},
+		allowedAlbums () {
+			if (this.albumId === '') {
+				return this.albums
+			} else {
+				return this.albums.filter(album => {return album.album_id !== this.albumId})
+			}
 		}
 	},
 
