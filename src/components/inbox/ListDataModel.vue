@@ -462,7 +462,7 @@ export default {
 					tdClass: 'breakwork',
 					class: 'breakword d-none d-sm-table-cell',
 					formatter: (value, key, item) => {
-						return value.Value[0]
+						return value.Value.join(', ')
 					},
 					thStyle: {
 						'width': '150px'
