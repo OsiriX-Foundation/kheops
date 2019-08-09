@@ -272,14 +272,47 @@ const actions = {
 		let promises = []
 		params.data.forEach(d => {
 			if (d.serie_id) {
-				promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`))
+				promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`)
+					.then(res => {
+						return {
+							res: res,
+							studyId: d.study_id,
+							serieId: d.serie_id,
+							albumId: d.album_id
+						}
+					})
+					.catch(err => {
+						return {
+							res: err,
+							studyId: d.study_id,
+							serieId: d.serie_id,
+							albumId: d.album_id
+						}
+					})
+				)
 			} else {
-				promises.push(HTTP.put(`${request}/${d.study_id}${queries}`))
+				promises.push(HTTP.put(`${request}/${d.study_id}${queries}`)
+					.then(res => {
+						return {
+							res: res,
+							studyId: d.study_id,
+							albumId: d.album_id
+						}
+					})
+					.catch(err => {
+						return {
+							res: err,
+							studyId: d.study_id,
+							albumId: d.album_id
+						}
+					})
+				)
 			}
 		})
-		axios.all(promises).then(results => {
-			console.log(results)
-		})
+		return axios.all(promises)
+			.then(res => {
+				return res
+			})
 	}
 }
 

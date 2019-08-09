@@ -492,10 +492,45 @@ export default {
 				})
 			}
 		},
+		checkErrorStatus(status, message) {
+			if (status === 403) {
+				this.$snotify.error(message[403])
+			} else if (status === 404) {
+				this.$snotify.error(message[404])
+			} else {
+				this.$snotify.error(message['unknown'])
+			}
+
+		},
 		addToAlbum (albumId) {
 			let queries = this.getSource()
+			let sendSerie = 0
+			let sendStudy = 0
+			let error = 0
 			let data = this.generateStudySerieData(albumId)
+			let message = {
+				403: '',
+				404: '',
+				'unknown': ''
+			}
 			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
+				res.forEach(data => {
+					if (data.res !== undefined && data.res.status === 201) {
+						if (data.serieId !== undefined) {
+							sendSerie += 1
+						} else {
+							sendStudy += 1
+						}
+					} else {
+						message[403] = `Forbidden to send in album ${data.albumId}`
+						message[404] = `Not found`
+						message['unknown'] = `Error unknown for the study ${data.studyId}`
+						this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message)
+					}
+				})
+				if (sendStudy > 0 || sendSerie > 0) {
+					this.$snotify.success(`${sendStudy} studies send ${sendSerie > 0 ? 'and ' + sendSerie + ' series send ' : ''} to the album`)
+				}
 				this.deselectStudySeries()
 			})
 		},
@@ -521,7 +556,33 @@ export default {
 		addToInbox () {
 			let queries = this.getSource()
 			let data = this.generateStudySerieData(this.albumId)
-			this.$store.dispatch('selfAppropriateStudy', { data: data, queries: queries })
+			let sendStudy = 0
+			let sendSerie = 0
+			let message = {
+				403: '',
+				404: '',
+				'unknown': ''
+			}
+			this.$store.dispatch('selfAppropriateStudy', { data: data, queries: queries }).then(res => {
+				res.forEach(data => {
+					if (data.res !== undefined && data.res.status === 201) {
+						if (data.serieId !== undefined) {
+							sendSerie += 1
+						} else {
+							sendStudy += 1
+						}
+					} else {
+						message[403] = `Forbidden to send in your inbox`
+						message[404] = `Not found`
+						message['unknown'] = `Error unknown for the study ${data.studyId}`
+						this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message)
+					}
+				})
+				if (sendStudy > 0 || sendSerie > 0) {
+					this.$snotify.success(`${sendStudy} studies send ${sendSerie > 0 ? 'and ' + sendSerie + ' series send ' : ''} to the inbox`)
+				}
+				this.deselectStudySeries()
+			})
 		},
 		determineWebkitDirectory () {
 			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
