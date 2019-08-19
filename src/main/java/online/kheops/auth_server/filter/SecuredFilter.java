@@ -78,8 +78,7 @@ public class SecuredFilter implements ContainerRequestFilter {
             @Override
             public boolean isUserInRole(String role) {
                 if (role.equals(USER_IN_ROLE.CAPABILITY)) {
-                    return accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
-                            accessToken.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN;
+                    return accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN;
                 } else if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
                     return accessToken.getTokenType() == AccessToken.TokenType.VIEWER_TOKEN;
                 }

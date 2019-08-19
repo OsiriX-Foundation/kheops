@@ -137,7 +137,6 @@ public class ReportProviderResource {
         }
 
         if (!  (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
-                accessToken.getTokenType() == AccessToken.TokenType.SUPER_USER_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
             return Response.status(FORBIDDEN).build();
         }
