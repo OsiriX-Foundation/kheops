@@ -13,8 +13,7 @@ public abstract class AccessTokenVerifier {
             Arrays.asList(ReportProviderAccessToken.Builder.class,
                           CapabilityAccessToken.CapabilityAccessTokenBuilder.class,
                           ViewerAccessTokenBuilder.class,
-                          KeycloakAccessToken.Builder.class,
-                          SuperuserAccessToken.Builder.class);
+                          KeycloakAccessToken.Builder.class);
 
     private static final Class<PepAccessToken.Builder> pepAccessTokenClass = PepAccessToken.Builder.class;
 

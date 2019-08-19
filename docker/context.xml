@@ -1,6 +1,4 @@
 <Context>
-    <Parameter name="online.kheops.superuser.hmacsecret" value="${kheops_superuser_hmasecret}"
-               override="false"/>
     <Parameter name="online.kheops.auth.hmacsecret" value="${kheops_auth_hmasecret}"
                override="false"/>
     <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
