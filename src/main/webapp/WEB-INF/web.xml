@@ -17,7 +17,7 @@
     <listener>
         <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
     </listener>
-    
+
     <context-param>
         <description>HMAC shared secret used to sign tokens</description>
         <param-name>online.kheops.auth.hmacsecret</param-name>
