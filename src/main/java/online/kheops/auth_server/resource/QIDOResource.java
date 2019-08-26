@@ -293,6 +293,10 @@ public class QIDOResource {
                         if(kheopsPrincipal.isLink()) {
                             retrieveURL.append("/link/").append(kheopsPrincipal.getOriginalToken()).append("/");
                         }
+                        retrieveURL.append("/studies");
+                        retrieveURL.append(series.getString(Tag.SeriesInstanceUID));
+                        retrieveURL.append("/series");
+                        retrieveURL.append(series.getString(Tag.SeriesInstanceUID));
                         series.setString(Tag.RetrieveURL, VR.UR, retrieveURL.toString());
                         availableSeries.add(series);
                         kheopsLogBuilder.series(seriesInstanceUID);
