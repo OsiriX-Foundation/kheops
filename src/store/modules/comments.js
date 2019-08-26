@@ -48,6 +48,33 @@ const actions = {
 		}).catch(err => {
 			return err
 		})
+	},
+	getAlbumCommentsDataModel ({ commit, dispatch }, params) {
+		const request = `albums/${params.album_id}/events`
+		let queries = ''
+
+		if (params.queries !== undefined) {
+			queries = httpoperations.getQueriesParameters(params.queries)
+		}
+		return HTTP.get(`${request}${queries}`, { headers: { 'Accept': 'application/json' } }).then(res => {
+			commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.album_id, comments: res.data.reverse() })
+			return res
+		}).catch(err => {
+			console.log(err)
+		})
+	},
+	postAlbumCommentDatamodel ({ commit, dispatch }, params) {
+		const request = `albums/${params.album_id}/comments`
+		let queries = ''
+
+		if (params.queries !== undefined) {
+			queries = httpoperations.getFormData(params.queries)
+		}
+		return HTTP.post(request, queries, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
 	}
 }
 

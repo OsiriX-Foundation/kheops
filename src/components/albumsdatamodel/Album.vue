@@ -113,13 +113,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import albumComments from '@/components/albums/albumComments'
+import AlbumComments from '@/components/albumsdatamodel/AlbumComments'
 import albumSettings from '@/components/albums/albumSettings'
 import ComponentImportStudy from '@/components/study/ComponentImportStudy'
 
 export default {
 	name: 'Album',
-	components: { ComponentImportStudy, albumSettings, albumComments },
+	components: { ComponentImportStudy, albumSettings, AlbumComments },
 	data () {
 		return {
 			view: '',
