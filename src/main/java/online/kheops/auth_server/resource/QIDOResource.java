@@ -52,6 +52,8 @@ import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 @Path("/")
 public class QIDOResource {
 
+    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
+
     private static final Logger LOG = Logger.getLogger(QIDOResource.class.getName());
 
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
@@ -284,6 +286,15 @@ public class QIDOResource {
                         if (includeFieldFavorite) {
                             series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
                         }
+                        //todo modifier le champs 00081190 (Retrieve URL) qui est actuellement "http://172.17.255.3:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/UID/series/UID
+                        //todo par  http://172.17.255.3:8080/api/studies/UIS/series/UID
+                        //todo et si la requetes est venu en /api/link/{token} il faut la retourner en /api/link/{token}
+                        final StringBuilder retrieveURL = new StringBuilder();
+                        retrieveURL.append(context.getInitParameter(HOST_ROOT_PARAMETER));
+                        if(kheopsPrincipal.isLink()) {
+                            retrieveURL.append("/link/").append(kheopsPrincipal.getOriginalToken()).append("/");
+                        }
+                        series.setString(Tag.RetrieveURL, VR.UR, retrieveURL.toString());
                         availableSeries.add(series);
                         kheopsLogBuilder.series(seriesInstanceUID);
                     }
