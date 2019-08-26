@@ -291,6 +291,7 @@ public class QIDOResource {
                         //todo et si la requetes est venu en /api/link/{token} il faut la retourner en /api/link/{token}
                         final StringBuilder retrieveURL = new StringBuilder();
                         retrieveURL.append(context.getInitParameter(HOST_ROOT_PARAMETER));
+                        retrieveURL.append("/api");
                         if(kheopsPrincipal.isLink()) {
                             retrieveURL.append("/link/").append(kheopsPrincipal.getOriginalToken()).append("/");
                         }
