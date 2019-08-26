@@ -60,6 +60,7 @@ public class KheopsLogBuilder {
         tokenProvenance.getActingParty().ifPresent(actingParty -> logEntry.add(new LogEntry("actingParty", actingParty)));
         tokenProvenance.getAuthorizedParty().ifPresent(authorizedParty -> logEntry.add(new LogEntry("authorizedParty", authorizedParty)));
         tokenProvenance.getCapabilityTokenId().ifPresent(capabilityTokenId -> logEntry.add(new LogEntry("authorizedCapabilityTokenId", capabilityTokenId)));
+        logEntry.add(new LogEntry("link", String.valueOf(tokenProvenance.isLink())));
         return this;
     }
 

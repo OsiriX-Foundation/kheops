@@ -49,14 +49,22 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
+        boolean linkAuthorization;
+        try {
+            linkAuthorization = Boolean.valueOf(requestContext.getHeaderString("X-Link-Authorization"));
+        } catch (Exception e) {
+            linkAuthorization = false;
+        }
+
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token, linkAuthorization);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Received bad accesstoken" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
+
 
         final User user;
         try {
@@ -69,6 +77,7 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final User finalUser = user;
+        final boolean isLinkAuthorization = linkAuthorization;
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public KheopsPrincipal getUserPrincipal() {

@@ -9,6 +9,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -29,13 +30,17 @@ public class UserPrincipal implements KheopsPrincipal {
     private EntityTransaction tx;
     private final User user;
     private final String actingParty;
+    private final boolean linkAuthorization;
+    private final String originalToken;
 
     //old version
     private final Long dbid;
-    public UserPrincipal(User user, String actingParty) {
+    public UserPrincipal(User user, String actingParty, boolean linkAuthorization, String originalToken) {
         this.dbid = user.getPk();
         this.user = user;
         this.actingParty = actingParty;
+        this.linkAuthorization = linkAuthorization;
+        this.originalToken = originalToken;
     }
     @Override
     public long getDBID() {
@@ -204,5 +209,13 @@ public class UserPrincipal implements KheopsPrincipal {
     @Override
     public String toString() {
         return "[UserPrincipal user:" + getUser() + " dbid:" + getDBID() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
+
+    @Override
+    public boolean isLink() { return linkAuthorization; }
+
+    @Override
+    public String getOriginalToken() {
+        return originalToken;
     }
 }

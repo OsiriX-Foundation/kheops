@@ -6,6 +6,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -33,11 +34,13 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private List<String> studyUids;
     private String clientId;
     private Album album;
+    private final boolean linkAuthorization;
+    private final String originalToken;
 
     //old version
     private final Long dbid;
     public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids,
-                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess) {
+                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, boolean linkAuthorization, String originalToken) {
         try {
             album = getReportProvider(clientId).getAlbum();
         } catch (ClientIdNotFoundException e) {
@@ -51,6 +54,8 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         this.capabilityTokenId = capabilityTokenId;
         this.hasReadAccess = hasReadAccessAccess;
         this.hasWriteAccess = hasWriteAccess;
+        this.linkAuthorization = linkAuthorization;
+        this.originalToken = originalToken;
     }
     @Override
     public long getDBID() {
@@ -219,6 +224,14 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     @Override
     public Optional<String> getCapabilityTokenId() {
         return Optional.ofNullable(capabilityTokenId);
+    }
+
+    @Override
+    public boolean isLink() { return linkAuthorization;  }
+
+    @Override
+    public String getOriginalToken() {
+        return originalToken;
     }
 
     private boolean hasStudyAccess(String studyInstanceUID) {

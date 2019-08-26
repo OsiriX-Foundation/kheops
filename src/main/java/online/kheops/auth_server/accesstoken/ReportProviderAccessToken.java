@@ -26,6 +26,8 @@ public class ReportProviderAccessToken implements AccessToken {
     private final Instant nbf;
     private final List<String> aud;
     private final String iss;
+    private boolean linkAuthorization;
+    private final String token;
 
     static class Builder implements AccessTokenBuilder{
         private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
@@ -36,7 +38,7 @@ public class ReportProviderAccessToken implements AccessToken {
             this.servletContext = Objects.requireNonNull(servletContext);
         }
 
-        public ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public ReportProviderAccessToken build(String assertionToken, boolean linkAuthorization) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
@@ -101,7 +103,7 @@ public class ReportProviderAccessToken implements AccessToken {
                     capabilityTokenId = null;
                 }
 
-                return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss);
+                return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss, linkAuthorization, assertionToken);
             } catch (NullPointerException | JWTDecodeException | IllegalArgumentException e) {
                 throw new AccessTokenVerificationException("AccessToken missing fields.", e);
             } catch (ClassCastException e) {
@@ -120,7 +122,7 @@ public class ReportProviderAccessToken implements AccessToken {
     }
 
     private ReportProviderAccessToken(String sub, String actingParty, String capabilityTokenId, List<String> studyUIDs, String clientId, boolean hasReadAccess, boolean hasWriteAccess,
-                                      Instant exp, Instant iat, Instant nbf, List<String> aud, String iss) {
+                                      Instant exp, Instant iat, Instant nbf, List<String> aud, String iss, boolean linkAuthorization, String token) {
         this.sub = Objects.requireNonNull(sub);
         this.actingParty = actingParty;
         this.capabilityTokenId = capabilityTokenId;
@@ -133,6 +135,8 @@ public class ReportProviderAccessToken implements AccessToken {
         this.nbf = nbf;
         this.aud = aud;
         this.iss = iss;
+        this.linkAuthorization = linkAuthorization;
+        this.token = token;
     }
 
     @Override
@@ -213,6 +217,9 @@ public class ReportProviderAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, clientId, hasReadAccess, hasWriteAccess);
+        return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, clientId, hasReadAccess, hasWriteAccess, linkAuthorization, token);
     }
+
+    @Override
+    public boolean isLink() { return linkAuthorization; }
 }
