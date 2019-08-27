@@ -140,14 +140,19 @@ export default {
 	},
 	watch: {
 		view () {
-      let queryParams = { view: this.view }
-			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
-			this.$router.push({ query: queryParams })
-      this.loadAlbum()
+      if (this.view !== '' && this.view !== undefined) {
+        let queryParams = { view: this.view }
+        if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
+        this.$router.push({ query: queryParams })
+        this.loadAlbum()
+      }
     },
-    '$route' (to, from) {
-      console.log('update ?')
-			// this.view = to.query.view
+		'$route.query' () {
+      if (this.$route.query.view !== undefined) {
+        this.view = this.$route.query.view
+      } else {
+        this.view = ''
+      }
     }
 	},
 	created () {
@@ -156,9 +161,9 @@ export default {
 	methods: {
 		loadAlbum () {
 			this.loading = true
-			this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => {
+      this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => {
 				this.loading = false
-        this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
+        // this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
 			})
 		}
 	},
