@@ -107,19 +107,22 @@
       v-if="view=='comments' && loading === false"
       :id="album.album_id"
     />
-    <album-settings v-if="view=='settings' && loading === false" />
+    <album-settings
+      v-if="view=='settings' && loading === false"
+      :album="album"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import AlbumComments from '@/components/albumsdatamodel/AlbumComments'
-import albumSettings from '@/components/albums/albumSettings'
+import AlbumSettings from '@/components/albumsdatamodel/AlbumSettings'
 import ComponentImportStudy from '@/components/study/ComponentImportStudy'
 
 export default {
 	name: 'Album',
-	components: { ComponentImportStudy, albumSettings, AlbumComments },
+	components: { ComponentImportStudy, AlbumSettings, AlbumComments },
 	data () {
 		return {
 			view: '',
@@ -137,12 +140,15 @@ export default {
 	},
 	watch: {
 		view () {
-			let queryParams = { view: this.view }
+      let queryParams = { view: this.view }
 			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
 			this.$router.push({ query: queryParams })
-
-			this.loadAlbum()
-		}
+      this.loadAlbum()
+    },
+    '$route' (to, from) {
+      console.log('update ?')
+			// this.view = to.query.view
+    }
 	},
 	created () {
 		this.loadAlbum()
@@ -152,9 +158,13 @@ export default {
 			this.loading = true
 			this.$store.dispatch('getAlbumTest', { album_id: this.$route.params.album_id }).then((res) => {
 				this.loading = false
-				this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
+        this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
 			})
 		}
+	},
+	beforeDestroy () {
+		this.$store.commit('INIT_ALBUM')
+		this.$store.commit('INIT_ALBUM_USERS')
 	}
 }
 </script>

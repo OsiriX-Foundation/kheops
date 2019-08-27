@@ -348,8 +348,7 @@ export default {
 		...mapGetters({
 			album: 'album',
 			studies: 'studies',
-			albumComments: 'albumComments',
-			users: 'users'
+			users: 'usersTest'
 		}),
 		comments () {
 			return this.$store.getters.getCommentsByUID(this.id)
@@ -379,10 +378,8 @@ export default {
 		}
 	},
 	created () {
-		if (this.album.album_id) this.$store.dispatch('getUsers')
-		this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
-			this.scrollBottom()
-		})
+		if (this.album.album_id) this.$store.dispatch('getUsersAlbum', { album_id: this.id })
+		this.getComments()
 	},
 	methods: {
 		checkUserFromTextarea () {
@@ -411,67 +408,57 @@ export default {
 					queries.to_user = this.privateUser
 				}
 
-				let params = {
-					'StudyInstanceUID': this.id,
-					'queries': queries
+				if (this.scope === 'studies') {
+					this.addStudyComment(queries)
+				} else if (this.scope === 'album') {
+					this.addAlbumComment(queries)
 				}
+			}
+		},
+		addStudyComment (queries) {
+			let params = {
+				'StudyInstanceUID': this.id,
+				'queries': queries
+			}
 
-				this.$store.dispatch('postStudyComment', params).then(res => {
-					if (res.status === 204) {
-						this.$snotify.success(this.$t('commentpostsuccess'))
-						this.newComment.comment = ''
-						this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
-							this.scrollBottom()
-						})
-					}
-				}).catch(res => {
-					this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+			this.$store.dispatch('postStudyComment', params).then(res => {
+				if (res.status === 204) {
+					this.$snotify.success(this.$t('commentpostsuccess'))
 					this.newComment.comment = ''
-				})
-			}
-			/*
-			if (this.newComment.comment.length >= 1) {
-				if (this.enablePrivate) {
-					this.newComment.to_user = this.privateUser
+					this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
+						this.scrollBottom()
+					})
 				}
+			}).catch(res => {
+				this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+				this.newComment.comment = ''
+			})
+		},
+		addAlbumComment (queries) {
+			let params = {
+				'album_id': this.id,
+				'queries': queries
+			}
 
-				if (this.scope === 'album') {
-					let params = {
-						type: (this.includeNotifications) ? '' : 'comments',
-						query: this.newComment
-					}
-					this.$store.dispatch('postAlbumComment', params).then(() => {
-						this.$snotify.success(this.$t('commentpostsuccess'))
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					})
-				} else if (this.scope === 'studies') {
-					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(() => {
-						// this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, queries: queries }).then(() => {
-						this.$snotify.success(this.$t('commentpostsuccess'))
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					})
+			this.$store.dispatch('postAlbumCommentDatamodel', params).then(res => {
+				if (res.status === 204) {
+					this.$snotify.success(this.$t('commentpostsuccess'))
+					this.newComment.comment = ''
+					this.getComments()
 				}
-			}
-      */
+			}).catch(res => {
+				this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+				this.newComment.comment = ''
+			})
 		},
 		getComments () {
-			let type = (this.includeNotifications) ? '' : 'comments'
+			let types = (this.includeNotifications) ? undefined : { types: 'comments' }
 			if (this.scope === 'album') {
-				this.$store.dispatch('getStudyComments', { type: type }).then(() => {
+				this.$store.dispatch('getAlbumCommentsDataModel', { album_id: this.id, queries: types }).then(() => {
 					this.scrollBottom()
 				})
 			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id, type: type }).then(() => {
+				this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
 					this.scrollBottom()
 				})
 			}
