@@ -3,13 +3,15 @@ import httpoperations from '@/mixins/httpoperations'
 // initial state
 const state = {
 	album: {},
-	users: []
+	users: [],
+	tokens: []
 }
 
 // getters
 const getters = {
 	albumTest: state => state.album,
-	albumUsers: state => state.users
+	albumUsers: state => state.users,
+	albumTokens: state => state.tokens
 }
 
 // actions
@@ -125,6 +127,21 @@ const actions = {
 		}).catch(err => {
 			return err
 		})
+	},
+	getAlbumTokens ({ commit }, params) {
+		const request = `capabilities`
+		let queries = ''
+		if (params.queries !== undefined) {
+			queries = httpoperations.getQueriesParameters(params.queries)
+		}
+		return HTTP.get(request + queries, '', { headers: { 'Accept': 'application/json' } }).then(res => {
+			if (res.status === 200) {
+				commit('SET_TOKENS', res.data)
+			}
+			return res
+		}).catch(err => {
+			return err
+		})
 	}
 }
 
@@ -141,6 +158,12 @@ const mutations = {
 	},
 	SET_ALBUM_USERS (state, users) {
 		state.users = users
+	},
+	INIT_TOKENS (state) {
+		state.tokens = []
+	},
+	SET_TOKENS (state, tokens) {
+		state.tokens = tokens
 	}
 }
 
