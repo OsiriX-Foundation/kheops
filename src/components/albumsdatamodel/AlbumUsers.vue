@@ -270,7 +270,6 @@ export default {
         if (res.status === 204) {
           let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
           this.$snotify.success(message)
-          this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
         } else {
 				  this.$snotify.error(this.$t('sorryerror'))
         }
@@ -289,7 +288,6 @@ export default {
           if (res.status === 204) {
             this.$snotify.success(this.$t('albumuserdeletesuccess'))
             this.confirmDelete = ''
-            this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
           } else {
 					  this.$snotify.error(this.$t('sorryerror'))
           }

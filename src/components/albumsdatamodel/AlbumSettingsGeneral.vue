@@ -171,7 +171,6 @@ export default {
 
       this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries: queries }).then(res => {
         if (res.status === 200) {
-          this.$store.dispatch('getAlbumTest', { album_id: this.album.album_id })
           this.edit.description = '-1'
           this.edit.name = '-1'
         }

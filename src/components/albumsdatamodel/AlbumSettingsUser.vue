@@ -112,7 +112,7 @@
         <div>
           <toggle-button
             v-if="album.is_admin"
-            v-model="album[label]"
+            :value="album[label]"
             :labels="{checked: 'Yes', unchecked: 'No'}"
             :disabled="(!album.download_series && !album.send_series && label=='send_series')"
             :sync="true"
@@ -162,7 +162,15 @@ export default {
 				'download_series',
 				'send_series',
 				'write_comments'
-			]
+      ],
+      dictSettings: {
+				'add_user': 'addUser',
+				'add_series': 'addSeries',
+				'delete_series': 'deleteSeries',
+				'download_series': 'downloadSeries',
+				'send_series': 'sendSeries',
+				'write_comments': 'writeComments'
+      }
 		}
 	},
 	computed: {
@@ -192,7 +200,6 @@ export default {
               this.new_user_name = ''
               this.form_add_user = false
               this.confirm_delete = ''
-		          this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
             } else {
 						  this.$snotify.error(this.$t('sorryerror'))
             }
@@ -208,16 +215,13 @@ export default {
 			return re.test(email)
 		},
 		patchAlbum (field) {
-			let params = {}
-			params[field] = this.album[field]
-      console.log(field)
-      console.log(this.album[field])
-      /*
-      this.$store.dispatch('patchAlbum', params).catch(err => {
-				console.error(err)
-				this.$snotify.error(this.$t('sorryerror'))
-      })
-      */
+      let queries = {}
+      queries[this.dictSettings[field]] = !this.album[field]
+      let params = {
+        album_id: this.album.album_id,
+        queries: queries
+      }
+      this.$store.dispatch('editAlbum', params)
 		}
 	}
 }
