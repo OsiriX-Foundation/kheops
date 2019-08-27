@@ -9,13 +9,13 @@ const state = {
 // getters
 const getters = {
 	albumTest: state => state.album,
-	usersTest: state => state.users
+	albumUsers: state => state.users
 }
 
 // actions
 const actions = {
 	getAlbumTest ({ commit }, params) {
-		let request = `albums/${params.album_id}`
+		const request = `albums/${params.album_id}`
 		return HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_ALBUM_TEST', res.data)
 			return res
@@ -23,8 +23,23 @@ const actions = {
 			return err
 		})
 	},
+	createAlbumTest({ commit, dispatch }, params) {
+		const request = `albums`
+		let formData = ''
+		if (params.formData !== undefined) {
+			formData = httpoperations.getFormData(params.formData)
+		}
+		return HTTP.post(request, formData, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
+			if (res.status === 201) {
+				commit('SET_ALBUM_TEST', res.data)
+			}
+			return res
+		}).catch(err => {
+			return err
+		})
+	},
 	removeStudyInAlbum ({ commit }, params) {
-		let request = `studies/${params.StudyInstanceUID}/albums/${params.album_id}`
+		const request = `studies/${params.StudyInstanceUID}/albums/${params.album_id}`
 		return HTTP.delete(request).then(res => {
 			if (res.status === 204) {
 				commit('DELETE_STUDY_TEST', params)
@@ -35,7 +50,7 @@ const actions = {
 		})
 	},
 	removeSerieInAlbum ({ commit }, params) {
-		let request = `studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/albums/${params.album_id}`
+		const request = `studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/albums/${params.album_id}`
 		return HTTP.delete(request).then(res => {
 			if (res.status === 204) {
 				commit('DELETE_SERIE_TEST', params)
