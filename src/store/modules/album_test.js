@@ -60,6 +60,9 @@ const actions = {
 			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		return HTTP.patch(request + queries, '', { headers: { 'Accept': 'application/json' } }).then(res => {
+			if (res.status === 200) {
+				commit('SET_ALBUM_TEST', res.data)
+			}
 			return res
 		}).catch(err => {
 			return err
@@ -74,26 +77,35 @@ const actions = {
 			}
 		})
 	},
-	addAlbumUser ({ commit }, params) {
+	addAlbumUser ({ dispatch }, params) {
 		const request = `albums/${params.album_id}/users/${params.user}`
 		return HTTP.put(request).then(res => {
+			if (res.status === 201) {
+				dispatch('getUsersAlbum', { album_id: params.album_id })
+			}
 			return res
 		}).catch(err => {
 			return err
 		})
 	},
-	removeAlbumUser ({ commit }, params) {
+	removeAlbumUser ({ dispatch }, params) {
 		const request = `albums/${params.album_id}/users/${params.user}`
 		return HTTP.delete(request).then(res => {
+			if (res.status === 204) {
+				dispatch('getUsersAlbum', { album_id: params.album_id })
+			}
 			return res
 		}).catch(err => {
 			return err
 		})
 	},
-	manageAlbumUserAdmin ({ commit }, params) {
+	manageAlbumUserAdmin ({ dispatch }, params) {
 		const request = `albums/${params.album_id}/users/${params.user_name}/admin`
 		let method = (params.user_is_admin) ? 'put' : 'delete'
 		return HTTP[method](request).then(res => {
+			if (res.status === 204) {
+				dispatch('getUsersAlbum', { album_id: params.album_id })
+			}
 			return res
 		}).catch(err => {
 			return err
