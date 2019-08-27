@@ -156,7 +156,7 @@ export default {
 	methods: {
 		loadAlbum () {
 			this.loading = true
-			this.$store.dispatch('getAlbumTest', { album_id: this.$route.params.album_id }).then((res) => {
+			this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => {
 				this.loading = false
         this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
 			})

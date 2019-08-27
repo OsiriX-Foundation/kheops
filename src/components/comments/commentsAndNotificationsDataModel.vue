@@ -346,9 +346,9 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			album: 'album',
+			album: 'albumTest',
 			studies: 'studies',
-			users: 'usersTest'
+			users: 'albumUsers'
 		}),
 		comments () {
 			return this.$store.getters.getCommentsByUID(this.id)

@@ -226,7 +226,7 @@ export default {
 				addSeries: this.album.userSettings.addSeries,
 				writeComments: this.album.userSettings.writeComments
 			}
-			this.$store.dispatch('createAlbumTest', { formData: formData }).then(res => {
+			this.$store.dispatch('createAlbum', { formData: formData }).then(res => {
         if (res.status === 201) {
           let albumCreated = res.data
           this.album.users.forEach(user => {

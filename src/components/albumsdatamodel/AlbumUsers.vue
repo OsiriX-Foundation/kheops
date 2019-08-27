@@ -243,14 +243,6 @@ export default {
 			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
-	watch: {
-		users: {
-			handler: function () {
-				this.getAlbum()
-			},
-			deep: true
-		}
-	},
 	created () {
 	},
 	methods: {

@@ -14,7 +14,7 @@ const getters = {
 
 // actions
 const actions = {
-	getAlbumTest ({ commit }, params) {
+	getAlbum ({ commit }, params) {
 		const request = `albums/${params.album_id}`
 		return HTTP.get(request, { headers: { 'Accept': 'application/json' } }).then(res => {
 			commit('SET_ALBUM_TEST', res.data)
@@ -23,7 +23,7 @@ const actions = {
 			return err
 		})
 	},
-	createAlbumTest({ commit, dispatch }, params) {
+	createAlbum ({ commit, dispatch }, params) {
 		const request = `albums`
 		let formData = ''
 		if (params.formData !== undefined) {
