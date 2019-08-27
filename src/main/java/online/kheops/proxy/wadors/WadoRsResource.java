@@ -89,13 +89,13 @@ public final class WadoRsResource {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
     
-    @GET
-    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
-    public Response wadoInstances(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-                                 @PathParam("studyInstanceUID") String studyInstanceUID,
-                                 @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
-    }    
+    //@GET
+    //@Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
+    //public Response wadoInstances(@HeaderParam(AUTHORIZATION) String authorizationHeader,
+    //                             @PathParam("studyInstanceUID") String studyInstanceUID,
+    //                             @PathParam("seriesInstanceUID") String seriesInstanceUID) {
+    //    return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+    //}    
     
     private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
