@@ -79,6 +79,15 @@ const actions = {
 		return HTTP.delete(request).then(res => {
 			return res
 		})
+	},
+	manageAlbumUserAdmin ({ commit }, params) {
+		const request = `albums/${params.album_id}/users/${params.user_name}/admin`
+		let method = (params.user_is_admin) ? 'put' : 'delete'
+		return HTTP[method](request).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
 	}
 }
 

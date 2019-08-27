@@ -259,14 +259,20 @@ export default {
 			if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
 				this.confirmResetAdmin = user.user_name
 				return
-			}
-			user.is_admin = !user.is_admin
-			this.$store.dispatch('toggleAlbumUserAdmin', user).then(() => {
+      }
+
+      let params = {
+        album_id: this.album.album_id,
+        user_name: user.user_name,
+        user_is_admin: !user.is_admin
+      }
+      this.$store.dispatch('manageAlbumUserAdmin', params).then(() => {
 				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
-				this.$snotify.success(message)
+        this.$snotify.success(message)
+		    this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
 			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
-			})
+      })
 		},
 		deleteUser (user) {
 			if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name

@@ -113,7 +113,7 @@ Props :
 </template>
 
 <script>
-import AlbumUsers from '@/components/albums/AlbumUsers'
+import AlbumUsers from '@/components/albumsdatamodel/AlbumUsers'
 import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
