@@ -143,7 +143,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			users: 'usersTest'
+			users: 'albumUsers'
 		}),
 		formattedAlbumDescription () {
       if (this.album.description !== undefined) {

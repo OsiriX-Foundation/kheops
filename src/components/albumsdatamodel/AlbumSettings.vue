@@ -70,8 +70,14 @@
           v-if="view=='user'"
           :album="album"
         />
-        <album-settings-token v-if="view=='token'" />
-        <album-settings-report-provider v-if="view=='providerSR'" />
+        <album-settings-token
+          v-if="view=='token'"
+          :album="album"  
+        />
+        <album-settings-report-provider
+          v-if="view=='providerSR'"
+          :album="album"
+        />
       </div>
     </div>
   </div>
@@ -79,16 +85,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { AlbumRedirect } from '../../mixins/redirect.js'
 import AlbumSettingsGeneral from '@/components/albumsdatamodel/AlbumSettingsGeneral'
 import AlbumSettingsUser from '@/components/albumsdatamodel/AlbumSettingsUser'
-import albumSettingsToken from '@/components/albums/albumSettingsToken'
-import albumSettingsReportProvider from '@/components/albums/albumSettingsReportProvider'
+import AlbumSettingsToken from '@/components/albumsdatamodel/AlbumSettingsToken'
+import AlbumSettingsReportProvider from '@/components/albumsdatamodel/AlbumSettingsReportProvider'
 
 export default {
 	name: 'AlbumSettings',
-	components: { AlbumSettingsGeneral, AlbumSettingsUser, albumSettingsToken, albumSettingsReportProvider },
-	mixins: [ AlbumRedirect ],
+	components: { AlbumSettingsGeneral, AlbumSettingsUser, AlbumSettingsToken, AlbumSettingsReportProvider },
 	props: {
 		album: {
 			type: Object,

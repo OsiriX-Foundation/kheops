@@ -205,12 +205,11 @@ Props :
 </template>
 <script>
 import mobiledetect from '@/mixins/mobiledetect.js'
-import { AlbumRedirect } from '@/mixins/redirect.js'
 import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'AlbumUsers',
-	mixins: [ AlbumRedirect, CurrentUser ],
+	mixins: [ CurrentUser ],
 	props: {
 		album: {
 			type: Object,

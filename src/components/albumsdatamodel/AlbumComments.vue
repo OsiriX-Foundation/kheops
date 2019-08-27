@@ -44,11 +44,9 @@
 
 <script>
 import commentsAndNotifications from '@/components/comments/commentsAndNotificationsDataModel'
-import { AlbumRedirect } from '../../mixins/redirect.js'
 export default {
 	name: 'AlbumComments',
 	components: { commentsAndNotifications },
-	mixins: [ AlbumRedirect ],
 	props: {
 		id: {
 			type: String,

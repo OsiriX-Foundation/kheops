@@ -175,7 +175,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			users: 'usersTest'
+			users: 'albumUsers'
 		})
 	},
 	created () {
@@ -205,7 +205,6 @@ export default {
             }
           }).catch(err => {
 						this.$snotify.error(this.$t('sorryerror'))
-
           })
         }
       }
