@@ -85,10 +85,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import AlbumSettingsGeneral from '@/components/albumsdatamodel/AlbumSettingsGeneral'
-import AlbumSettingsUser from '@/components/albumsdatamodel/AlbumSettingsUser'
-import AlbumSettingsToken from '@/components/albumsdatamodel/AlbumSettingsToken'
-import AlbumSettingsReportProvider from '@/components/albumsdatamodel/AlbumSettingsReportProvider'
+import AlbumSettingsGeneral from '@/components/albums/AlbumSettingsGeneral'
+import AlbumSettingsUser from '@/components/albums/AlbumSettingsUser'
+import AlbumSettingsToken from '@/components/albums/AlbumSettingsToken'
+import AlbumSettingsReportProvider from '@/components/albums/AlbumSettingsReportProvider'
 
 export default {
 	name: 'AlbumSettings',

@@ -270,7 +270,7 @@
 import { mapGetters } from 'vuex'
 import Datepicker from 'vuejs-datepicker'
 import formGetUser from '@/components/user/getUser'
-import ListAlbumsHeaders from '@/components/albumsdatamodel/ListAlbumsHeaders'
+import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders'
 import InfiniteLoading from 'vue-infinite-loading'
 import SortList from '@/components/inbox/SortList.vue'
 import moment from 'moment'
@@ -386,7 +386,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			albums: 'albumsTest'
+			albums: 'albums'
 		}),
 		albumsSelected () {
 			return this.albums.filter(album => { return album.is_selected === true })
@@ -442,7 +442,7 @@ export default {
 		}
 	},
 	created () {
-		this.$store.dispatch('initAlbumsTest', {})
+		this.$store.dispatch('initAlbums', {})
 	},
 	methods: {
 		clickAlbum (item) {
@@ -469,7 +469,7 @@ export default {
 				sort: (this.albumsParams.sortDesc ? '-' : '') + this.albumsParams.sortBy
 			}
 			const queries = Object.assign(params, this.prepareFilters())
-			return this.$store.dispatch('getAlbumsTest', { queries: queries })
+			return this.$store.dispatch('getAlbums', { queries: queries })
 		},
 		prepareFilters () {
 			let filtersToSend = {}
@@ -521,7 +521,7 @@ export default {
 		},
 		searchAlbums () {
 			this.albumsParams.offset = 0
-			this.$store.dispatch('initAlbumsTest', { })
+			this.$store.dispatch('initAlbums', { })
 			this.infiniteId += 1
 		},
 		toggleFavorite (albumID, isFavorite) {

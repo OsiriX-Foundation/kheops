@@ -121,7 +121,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import AlbumButtons from '@/components/albumsdatamodel/AlbumButtons'
+import AlbumButtons from '@/components/albums/AlbumButtons'
 
 export default {
 	name: 'AlbumSettingsGeneral',

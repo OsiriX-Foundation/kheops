@@ -346,23 +346,12 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			album: 'albumTest',
-			studies: 'studies',
-			users: 'albumUsers'
+			album: 'album',
+			studies: 'studies'
 		}),
 		comments () {
 			return this.$store.getters.getCommentsByUID(this.id)
 		},
-		/*
-		comments () {
-			if (this.scope === 'album') return this.albumComments
-			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
-			if (studyIdx > -1) {
-				return this.studies[studyIdx].comments
-			}
-			return []
-    },
-    */
 		container_id () {
 			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
 		}
@@ -378,7 +367,6 @@ export default {
 		}
 	},
 	created () {
-		if (this.album.album_id) this.$store.dispatch('getUsersAlbum', { album_id: this.id })
 		this.getComments()
 	},
 	methods: {

@@ -205,12 +205,11 @@ Props :
 </template>
 <script>
 import mobiledetect from '@/mixins/mobiledetect.js'
-import { AlbumRedirect } from '@/mixins/redirect.js'
 import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'AlbumUsers',
-	mixins: [ AlbumRedirect, CurrentUser ],
+	mixins: [ CurrentUser ],
 	props: {
 		album: {
 			type: Object,
@@ -244,14 +243,6 @@ export default {
 			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
-	watch: {
-		users: {
-			handler: function () {
-				this.getAlbum()
-			},
-			deep: true
-		}
-	},
 	created () {
 	},
 	methods: {
@@ -259,21 +250,38 @@ export default {
 			if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
 				this.confirmResetAdmin = user.user_name
 				return
-			}
-			user.is_admin = !user.is_admin
-			this.$store.dispatch('toggleAlbumUserAdmin', user).then(() => {
-				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
-				this.$snotify.success(message)
+      }
+
+      let params = {
+        album_id: this.album.album_id,
+        user_name: user.user_name,
+        user_is_admin: !user.is_admin
+      }
+      this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
+        if (res.status === 204) {
+          let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
+          this.$snotify.success(message)
+        } else {
+				  this.$snotify.error(this.$t('sorryerror'))
+        }
 			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
-			})
+      })
 		},
 		deleteUser (user) {
 			if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name
 			else {
-				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(() => {
-					this.$snotify.success(this.$t('albumuserdeletesuccess'))
-					this.confirmDelete = ''
+        let params = {
+          album_id: this.album.album_id,
+          user: user.user_name
+        }
+				this.$store.dispatch('removeAlbumUser', params).then(res => {
+          if (res.status === 204) {
+            this.$snotify.success(this.$t('albumuserdeletesuccess'))
+            this.confirmDelete = ''
+          } else {
+					  this.$snotify.error(this.$t('sorryerror'))
+          }
 				}).catch(() => {
 					this.$snotify.error(this.$t('sorryerror'))
 				})

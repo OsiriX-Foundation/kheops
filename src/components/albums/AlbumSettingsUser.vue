@@ -139,7 +139,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import AlbumUsers from '@/components/albumsdatamodel/AlbumUsers'
+import AlbumUsers from '@/components/albums/AlbumUsers'
 
 export default {
 	name: 'AlbumSettingsUser',

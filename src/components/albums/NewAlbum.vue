@@ -158,7 +158,6 @@
 import { HTTP } from '@/router/http'
 export default {
 	name: 'NewAlbum',
-
 	data () {
 		return {
 			album: {
@@ -217,7 +216,7 @@ export default {
 			}
 		},
 		createAlbum () {
-			let postValues = {
+			let formData = {
 				name: this.album.name,
 				description: this.album.description,
 				addUser: this.album.userSettings.addUser,
@@ -225,12 +224,29 @@ export default {
 				sendSeries: this.album.userSettings.sendSeries,
 				deleteSeries: this.album.userSettings.deleteSeries,
 				addSeries: this.album.userSettings.addSeries,
-				writeComments: this.album.userSettings.writeComments,
-				users: this.album.users
+				writeComments: this.album.userSettings.writeComments
 			}
-			this.$store.dispatch('createAlbum', postValues).then(album => {
-				this.$router.push('/albums/' + album.album_id)
-			})
+			this.$store.dispatch('createAlbum', { formData: formData }).then(res => {
+        if (res.status === 201) {
+          let albumCreated = res.data
+          this.album.users.forEach(user => {
+            let paramsUser = {
+              album_id: albumCreated.album_id,
+              user: user.email
+            }
+            this.$store.dispatch('addAlbumUser', paramsUser).then(res => {
+              if (res.status !== 201) {
+                this.$snotify.error(this.$t('sorryerror'))
+              }
+            }).catch(err => {
+              this.$snotify.error(this.$t('sorryerror'))
+            })
+          })
+          this.$router.push('/albums/' + albumCreated.album_id)
+        }
+			}).catch(err => {
+        console.log(err)
+      })
 		}
 	}
 }
