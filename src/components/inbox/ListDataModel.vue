@@ -482,7 +482,7 @@ export default {
 	computed: {
 		...mapGetters({
 			studies: 'studiesTest',
-			albums: 'albumsTest',
+			albums: 'albums',
 			sendingFiles: 'sending',
 			providers: 'providers'
 		}),
@@ -561,15 +561,15 @@ export default {
 		let queriesAlbums = {
 			canAddSeries: true
 		}
-		this.$store.dispatch('initAlbumsTest', {})
-		this.$store.dispatch('getAlbumsTest', { 'queries': queriesAlbums })
+		this.$store.dispatch('initAlbums', {})
+		this.$store.dispatch('getAlbums', { 'queries': queriesAlbums })
 		if (this.albumID !== undefined) {
 			this.$store.dispatch('getProviders', { albumID: this.albumID })
 		}
 	},
 	destroyed () {
 		this.$store.dispatch('initStudiesTest', {})
-		this.$store.dispatch('initAlbumsTest', {})
+		this.$store.dispatch('initAlbums', {})
 	},
 	mounted () {
 	},
