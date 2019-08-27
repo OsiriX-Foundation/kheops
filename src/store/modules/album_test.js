@@ -74,6 +74,14 @@ const actions = {
 			}
 		})
 	},
+	addAlbumUser ({ commit }, params) {
+		const request = `albums/${params.album_id}/users/${params.user}`
+		return HTTP.put(request).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
+	},
 	removeAlbumUser ({ commit }, params) {
 		const request = `albums/${params.album_id}/users/${params.user}`
 		return HTTP.delete(request).then(res => {
