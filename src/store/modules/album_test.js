@@ -78,6 +78,8 @@ const actions = {
 		const request = `albums/${params.album_id}/users/${params.user}`
 		return HTTP.delete(request).then(res => {
 			return res
+		}).catch(err => {
+			return err
 		})
 	},
 	manageAlbumUserAdmin ({ commit }, params) {
