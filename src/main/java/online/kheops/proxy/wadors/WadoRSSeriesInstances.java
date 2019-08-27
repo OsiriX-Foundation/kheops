@@ -116,7 +116,7 @@ public class WadoRSSeriesInstances {
         for (final Attributes instanceAttributes: attributes) {
             instanceAttributes.remove(Tag.RetrieveURL);
             String retrieveURL = retrieveULRBuilder.build(studyInstanceUID,seriesInstanceUID, instanceAttributes.getString(Tag.SOPInstanceUID)).toString();
-            instanceAttributes.setString(Tag.RetrieveURL, VR.UI, retrieveURL);
+            instanceAttributes.setString(Tag.RetrieveURL, VR.UR, retrieveURL);
         }
 
         final CacheControl cacheControl = new CacheControl();
