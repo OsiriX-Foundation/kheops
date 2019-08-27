@@ -1,13 +1,15 @@
 import { HTTP } from '@/router/http'
+import httpoperations from '@/mixins/httpoperations'
 // initial state
 const state = {
-	album: {}
-
+	album: {},
+	users: []
 }
 
 // getters
 const getters = {
-	albumTest: state => state.album
+	albumTest: state => state.album,
+	usersTest: state => state.users
 }
 
 // actions
@@ -42,6 +44,41 @@ const actions = {
 		}).catch(err => {
 			return err
 		})
+	},
+	getUsersAlbum ({ commit }, params) {
+		const request = `albums/${params.album_id}/users`
+		return HTTP.get(request, '', { headers: { 'Accept': 'application/json' } }).then(res => {
+			if (res.status === 200) {
+				commit('SET_ALBUM_USERS', res.data)
+			}
+		})
+	},
+	editAlbum ({ commit }, params) {
+		const request = `albums/${params.album_id}`
+		let queries = ''
+		if (params.queries !== undefined) {
+			queries = httpoperations.getQueriesParameters(params.queries)
+		}
+		return HTTP.patch(request + queries, '', { headers: { 'Accept': 'application/json' } }).then(res => {
+			return res
+		}).catch(err => {
+			return err
+		})
+	},
+	deleteAlbumTest ({ commit }, params) {
+		const request = `albums/${params.album_id}`
+		return HTTP.delete(request).then(res => {
+			if (res.status === 204) {
+				commit('INIT_ALBUM')
+				commit('INIT_ALBUM_USERS')
+			}
+		})
+	},
+	removeAlbumUser ({ commit }, params) {
+		const request = `albums/${params.album_id}/users/${params.user}`
+		return HTTP.delete(request).then(res => {
+			return res
+		})
 	}
 }
 
@@ -52,6 +89,12 @@ const mutations = {
 	},
 	SET_ALBUM_TEST (state, album) {
 		state.album = album
+	},
+	INIT_ALBUM_USERS (state) {
+		state.users = []
+	},
+	SET_ALBUM_USERS (state, users) {
+		state.users = users
 	}
 }
 
