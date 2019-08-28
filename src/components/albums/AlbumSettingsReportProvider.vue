@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import Providers from '@/components/providers/Providers'
 
 export default {

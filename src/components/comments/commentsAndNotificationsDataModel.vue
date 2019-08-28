@@ -428,7 +428,7 @@ export default {
 				'queries': queries
 			}
 
-			this.$store.dispatch('postAlbumCommentDatamodel', params).then(res => {
+			this.$store.dispatch('postAlbumComment', params).then(res => {
 				if (res.status === 204) {
 					this.$snotify.success(this.$t('commentpostsuccess'))
 					this.newComment.comment = ''
@@ -442,7 +442,7 @@ export default {
 		getComments () {
 			let types = (this.includeNotifications) ? undefined : { types: 'comments' }
 			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumCommentsDataModel', { album_id: this.id, queries: types }).then(() => {
+				this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
 					this.scrollBottom()
 				})
 			} else if (this.scope === 'studies') {

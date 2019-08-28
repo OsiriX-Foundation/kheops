@@ -49,7 +49,7 @@ const actions = {
 			return err
 		})
 	},
-	getAlbumCommentsDataModel ({ commit, dispatch }, params) {
+	getAlbumComments ({ commit, dispatch }, params) {
 		const request = `albums/${params.album_id}/events`
 		let queries = ''
 
@@ -63,7 +63,7 @@ const actions = {
 			console.log(err)
 		})
 	},
-	postAlbumCommentDatamodel ({ commit, dispatch }, params) {
+	postAlbumComment ({ commit, dispatch }, params) {
 		const request = `albums/${params.album_id}/comments`
 		let queries = ''
 
