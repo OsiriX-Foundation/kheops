@@ -606,7 +606,7 @@ export default {
 			this.$emit('reloadStudies')
 		},
 		goToCreateAlbum () {
-			this.$routers.push('/newAlbum')
+			this.$router.push('/albums/new')
 		}
 	}
 }
