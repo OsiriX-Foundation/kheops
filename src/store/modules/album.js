@@ -22,7 +22,7 @@ const actions = {
 			commit('SET_ALBUM', res.data)
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	createAlbum ({ commit, dispatch }, params) {
@@ -37,7 +37,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	removeStudyInAlbum ({ commit }, params) {
@@ -48,7 +48,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	removeSerieInAlbum ({ commit }, params) {
@@ -59,7 +59,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	getUsersAlbum ({ commit }, params) {
@@ -68,6 +68,8 @@ const actions = {
 			if (res.status === 200) {
 				commit('SET_ALBUM_USERS', res.data)
 			}
+		}).catch(err => {
+			return Promise.reject(err)
 		})
 	},
 	editAlbum ({ commit }, params) {
@@ -82,7 +84,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	deleteAlbum ({ commit }, params) {
@@ -92,6 +94,8 @@ const actions = {
 				commit('INIT_ALBUM')
 				commit('INIT_ALBUM_USERS')
 			}
+		}).catch(err => {
+			return Promise.reject(err)
 		})
 	},
 	addAlbumUser ({ dispatch }, params) {
@@ -102,7 +106,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	removeAlbumUser ({ dispatch }, params) {
@@ -113,7 +117,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	manageAlbumUserAdmin ({ dispatch }, params) {
@@ -125,7 +129,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	getAlbumTokens ({ commit }, params) {
@@ -140,7 +144,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	}
 }

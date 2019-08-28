@@ -116,7 +116,10 @@ export default {
 			this.$router.push({ query: { view: 'settings', cat: this.view } })
 		},
 		'$route.query' () {
-			this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
+      this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
+      this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
+					this.$router.push('/albums')
+      })
 		}
 	},
 	created () {
