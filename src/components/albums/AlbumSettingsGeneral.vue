@@ -125,12 +125,12 @@ import AlbumButtons from '@/components/albums/AlbumButtons'
 
 export default {
 	name: 'AlbumSettingsGeneral',
-  components: { AlbumButtons },
-  props: {
+	components: { AlbumButtons },
+	props: {
 		album: {
 			type: Object,
 			required: true,
-      default: () => {}
+			default: () => {}
 		}
 	},
 	data () {
@@ -146,11 +146,11 @@ export default {
 			users: 'albumUsers'
 		}),
 		formattedAlbumDescription () {
-      if (this.album.description !== undefined) {
-        return this.album.description.split('\n')
-      } else {
-        return ''
-      }
+			if (this.album.description !== undefined) {
+				return this.album.description.split('\n')
+			} else {
+				return ''
+			}
 		}
 	},
 	created () {
@@ -161,20 +161,20 @@ export default {
 			if (!this.album.is_admin) {
 				this.$snotify.error(this.$t('permissiondenied'))
 				return
-      }
-      let queries = {}
-      for (let id in this.edit) {
-        if (this.edit[id] !== '-1') {
-          queries[id] = this.edit[id]
-        }
-      }
+			}
+			let queries = {}
+			for (let id in this.edit) {
+				if (this.edit[id] !== '-1') {
+					queries[id] = this.edit[id]
+				}
+			}
 
-      this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries: queries }).then(res => {
-        if (res.status === 200) {
-          this.edit.description = '-1'
-          this.edit.name = '-1'
-        }
-      })
+			this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries: queries }).then(res => {
+				if (res.status === 200) {
+					this.edit.description = '-1'
+					this.edit.name = '-1'
+				}
+			})
 		}
 	}
 }

@@ -144,13 +144,13 @@ import AlbumUsers from '@/components/albums/AlbumUsers'
 export default {
 	name: 'AlbumSettingsUser',
 	components: { AlbumUsers },
-  props: {
-    album: {
-      type: Object,
-      required: true,
-      default: () => {}
-    }
-  },
+	props: {
+		album: {
+			type: Object,
+			required: true,
+			default: () => {}
+		}
+	},
 	data () {
 		return {
 			form_add_user: false,
@@ -162,15 +162,15 @@ export default {
 				'download_series',
 				'send_series',
 				'write_comments'
-      ],
-      dictSettings: {
+			],
+			dictSettings: {
 				'add_user': 'addUser',
 				'add_series': 'addSeries',
 				'delete_series': 'deleteSeries',
 				'download_series': 'downloadSeries',
 				'send_series': 'sendSeries',
 				'write_comments': 'writeComments'
-      }
+			}
 		}
 	},
 	computed: {
@@ -183,44 +183,44 @@ export default {
 	},
 	methods: {
 		addUser () {
-      const sameUserName = this.users.filter(user => {
-        return user.user_name === this.new_user_name
-      })
-      if (sameUserName.length > 0) {
+			const sameUserName = this.users.filter(user => {
+				return user.user_name === this.new_user_name
+			})
+			if (sameUserName.length > 0) {
 				this.$snotify.error(this.$t('allreadypresent'))
-      } else {
-        if (this.validEmail(this.new_user_name)) {
-          let params = {
-            album_id: this.album.album_id,
-            user: this.new_user_name
-          }
-          this.$store.dispatch('addAlbumUser', params).then(res => {
-            if (res.status === 201) {
-              this.$snotify.success(this.$t('albumuseraddsuccess'))
-              this.new_user_name = ''
-              this.form_add_user = false
-              this.confirm_delete = ''
-            } else {
+			} else {
+				if (this.validEmail(this.new_user_name)) {
+					let params = {
+						album_id: this.album.album_id,
+						user: this.new_user_name
+					}
+					this.$store.dispatch('addAlbumUser', params).then(res => {
+						if (res.status === 201) {
+							this.$snotify.success(this.$t('albumuseraddsuccess'))
+							this.new_user_name = ''
+							this.form_add_user = false
+							this.confirm_delete = ''
+						} else {
 						  this.$snotify.error(this.$t('sorryerror'))
-            }
-          }).catch(err => {
+						}
+					}).catch(err => {
 						this.$snotify.error(this.$t('sorryerror'))
-          })
-        }
-      }
+					})
+				}
+			}
 		},
 		validEmail (email) {
 			var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 			return re.test(email)
 		},
 		patchAlbum (field) {
-      let queries = {}
-      queries[this.dictSettings[field]] = !this.album[field]
-      let params = {
-        album_id: this.album.album_id,
-        queries: queries
-      }
-      this.$store.dispatch('editAlbum', params)
+			let queries = {}
+			queries[this.dictSettings[field]] = !this.album[field]
+			let params = {
+				album_id: this.album.album_id,
+				queries: queries
+			}
+			this.$store.dispatch('editAlbum', params)
 		}
 	}
 }

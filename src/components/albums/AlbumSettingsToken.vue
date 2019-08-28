@@ -19,18 +19,17 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import tokens from '@/components/tokens/tokens'
 export default {
 	name: 'AlbumSettingsToken',
 	components: { tokens },
-    props: {
-        album: {
-        type: Object,
-        required: true,
-        default: () => {}
-        }
-    }
+	props: {
+		album: {
+			type: Object,
+			required: true,
+			default: () => {}
+		}
+	}
 }
 
 </script>

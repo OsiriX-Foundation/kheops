@@ -372,15 +372,15 @@ export default {
 			this.view = 'list'
 		},
 		getTokens () {
-      let queries = {
-        valid: !this.showInvalid, 
-        album: this.albumid
-      }
+			let queries = {
+				valid: !this.showInvalid,
+				album: this.albumid
+			}
 			if (this.scope === 'album' && this.albumid) {
-        let queries = {
-          valid: !this.showInvalid, 
-          album: this.albumid
-        }
+				let queries = {
+					valid: !this.showInvalid,
+					album: this.albumid
+				}
 				this.$store.dispatch('getAlbumTokens', { queries: queries })
 			} else if (this.scope === 'user') {
 				this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })

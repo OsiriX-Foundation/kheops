@@ -227,26 +227,26 @@ export default {
 				writeComments: this.album.userSettings.writeComments
 			}
 			this.$store.dispatch('createAlbum', { formData: formData }).then(res => {
-        if (res.status === 201) {
-          let albumCreated = res.data
-          this.album.users.forEach(user => {
-            let paramsUser = {
-              album_id: albumCreated.album_id,
-              user: user.email
-            }
-            this.$store.dispatch('addAlbumUser', paramsUser).then(res => {
-              if (res.status !== 201) {
-                this.$snotify.error(this.$t('sorryerror'))
-              }
-            }).catch(err => {
-              this.$snotify.error(this.$t('sorryerror'))
-            })
-          })
-          this.$router.push('/albums/' + albumCreated.album_id)
-        }
+				if (res.status === 201) {
+					let albumCreated = res.data
+					this.album.users.forEach(user => {
+						let paramsUser = {
+							album_id: albumCreated.album_id,
+							user: user.email
+						}
+						this.$store.dispatch('addAlbumUser', paramsUser).then(res => {
+							if (res.status !== 201) {
+								this.$snotify.error(this.$t('sorryerror'))
+							}
+						}).catch(err => {
+							this.$snotify.error(this.$t('sorryerror'))
+						})
+					})
+					this.$router.push('/albums/' + albumCreated.album_id)
+				}
 			}).catch(err => {
-        console.log(err)
-      })
+				console.log(err)
+			})
 		}
 	}
 }

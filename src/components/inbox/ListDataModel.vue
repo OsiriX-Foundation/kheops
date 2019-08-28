@@ -405,7 +405,7 @@ export default {
 						if (value !== null && value.Value !== undefined) {
 							return value.Value[0]
 						} else {
-							''
+							return ''
 						}
 					},
 					thStyle: {
@@ -433,7 +433,7 @@ export default {
 						if (value !== null && value.Value !== undefined) {
 							return value.Value[0]
 						} else {
-							''
+							return ''
 						}
 					},
 					thStyle: {
@@ -449,7 +449,7 @@ export default {
 						if (value !== null && value.Value !== undefined) {
 							return value.Value[0]
 						} else {
-							''
+							return ''
 						}
 					},
 					thStyle: {

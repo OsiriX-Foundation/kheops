@@ -63,8 +63,8 @@
       </div>
       <div class="col-sm-12 col-md-10">
         <album-settings-general
-          :album="album"
           v-if="view=='general'"
+          :album="album"
         />
         <album-settings-user
           v-if="view=='user'"
@@ -72,7 +72,7 @@
         />
         <album-settings-token
           v-if="view=='token'"
-          :album="album"  
+          :album="album"
         />
         <album-settings-report-provider
           v-if="view=='providerSR'"
@@ -84,7 +84,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import AlbumSettingsGeneral from '@/components/albums/AlbumSettingsGeneral'
 import AlbumSettingsUser from '@/components/albums/AlbumSettingsUser'
 import AlbumSettingsToken from '@/components/albums/AlbumSettingsToken'
@@ -96,8 +95,8 @@ export default {
 	props: {
 		album: {
 			type: Object,
-      required: true,
-      default: () => {}
+			required: true,
+			default: () => {}
 		}
 	},
 	data () {
@@ -116,10 +115,10 @@ export default {
 			this.$router.push({ query: { view: 'settings', cat: this.view } })
 		},
 		'$route.query' () {
-      this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
-      this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
-					this.$router.push('/albums')
-      })
+			this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
+			this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
+				this.$router.push('/albums')
+			})
 		}
 	},
 	created () {

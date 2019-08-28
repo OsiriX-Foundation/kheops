@@ -250,38 +250,38 @@ export default {
 			if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
 				this.confirmResetAdmin = user.user_name
 				return
-      }
+			}
 
-      let params = {
-        album_id: this.album.album_id,
-        user_name: user.user_name,
-        user_is_admin: !user.is_admin
-      }
-      this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
-        if (res.status === 204) {
-          let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
-          this.$snotify.success(message)
-        } else {
+			let params = {
+				album_id: this.album.album_id,
+				user_name: user.user_name,
+				user_is_admin: !user.is_admin
+			}
+			this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
+				if (res.status === 204) {
+					let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
+					this.$snotify.success(message)
+				} else {
 				  this.$snotify.error(this.$t('sorryerror'))
-        }
+				}
 			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
-      })
+			})
 		},
 		deleteUser (user) {
 			if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name
 			else {
-        let params = {
-          album_id: this.album.album_id,
-          user: user.user_name
-        }
+				let params = {
+					album_id: this.album.album_id,
+					user: user.user_name
+				}
 				this.$store.dispatch('removeAlbumUser', params).then(res => {
-          if (res.status === 204) {
-            this.$snotify.success(this.$t('albumuserdeletesuccess'))
-            this.confirmDelete = ''
-          } else {
+					if (res.status === 204) {
+						this.$snotify.success(this.$t('albumuserdeletesuccess'))
+						this.confirmDelete = ''
+					} else {
 					  this.$snotify.error(this.$t('sorryerror'))
-          }
+					}
 				}).catch(() => {
 					this.$snotify.error(this.$t('sorryerror'))
 				})
