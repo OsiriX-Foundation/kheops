@@ -134,7 +134,7 @@ export default {
 		}
 		params.queries = this.getSource()
 		params.queries.includefield = ['00080021', '00080031']
-		this.$store.dispatch('getSeriesTest', params)
+		this.$store.dispatch('getSeries', params)
 	},
 	methods: {
 		getSource () {

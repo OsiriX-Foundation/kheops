@@ -530,7 +530,7 @@ export default {
 		sendingFiles () {
 			if (!this.sendingFiles) {
 				/*
-				this.$store.dispatch('initStudiesTest', { })
+				this.$store.dispatch('initStudies', { })
 				this.getStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit)
 				*/
 			}
@@ -557,7 +557,7 @@ export default {
 		}
 	},
 	created () {
-		this.$store.dispatch('initStudiesTest', {})
+		this.$store.dispatch('initStudies', {})
 		let queriesAlbums = {
 			canAddSeries: true
 		}
@@ -568,7 +568,7 @@ export default {
 		}
 	},
 	destroyed () {
-		this.$store.dispatch('initStudiesTest', {})
+		this.$store.dispatch('initStudies', {})
 		this.$store.dispatch('initAlbums', {})
 	},
 	mounted () {
@@ -658,7 +658,7 @@ export default {
 		},
 		searchStudies () {
 			this.studiesParams.offset = 0
-			this.$store.dispatch('initStudiesTest', { })
+			this.$store.dispatch('initStudies', { })
 			this.infiniteId += 1
 		},
 		getStudies (offset = 0, limit = 0) {
@@ -674,7 +674,7 @@ export default {
 				params.album = this.albumID
 			}
 			const queries = Object.assign(params, this.prepareFilters())
-			return this.$store.dispatch('getStudiesTest', { queries: queries })
+			return this.$store.dispatch('getStudies', { queries: queries })
 		},
 		prepareFilters () {
 			let filtersToSend = {}

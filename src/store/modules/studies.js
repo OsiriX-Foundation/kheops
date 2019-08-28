@@ -53,10 +53,10 @@ const getters = {
 
 // actions
 const actions = {
-	initStudiesTest ({ commit, dispatch }, params) {
-		commit('INIT_STUDIES_TEST')
+	initStudies ({ commit, dispatch }, params) {
+		commit('INIT_STUDIES')
 	},
-	getStudiesTest ({ commit, dispatch }, params) {
+	getStudies ({ commit, dispatch }, params) {
 		const request = 'studies'
 		let queries = ''
 		if (params.queries !== undefined) {
@@ -74,19 +74,19 @@ const actions = {
 					study._showDetails = false
 				})
 				if (params.queries.offset === 0) {
-					dispatch('initStudiesTest')
+					dispatch('initStudies')
 				}
-				commit('SET_STUDIES_TEST', studies)
+				commit('SET_STUDIES', studies)
 			}
 			if (res.status === 204) {
-				commit('SET_STUDIES_TEST', [])
+				commit('SET_STUDIES', [])
 			}
 			return res
 		}).catch(err => {
 			return Promise.reject(err)
 		})
 	},
-	getSeriesTest ({ commit, dispatch }, params) {
+	getSeries ({ commit, dispatch }, params) {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
@@ -104,11 +104,11 @@ const actions = {
 				let serie = objSeries[serieUID]
 				dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: serieUID }).then(res => {
 					if (res.data !== undefined) {
-						dispatch('setImageTest', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, indexStudy: index, serieUID: serieUID, data: res.data })
+						dispatch('setImage', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, indexStudy: index, serieUID: serieUID, data: res.data })
 					}
 				})
 			}
-			commit('SET_SERIES_TEST', { index: index, series: objSeries })
+			commit('SET_SERIES', { index: index, series: objSeries })
 			return res
 		}).catch(err => {
 			return Promise.reject(err)
@@ -126,7 +126,7 @@ const actions = {
 			return Promise.reject(err)
 		})
 	},
-	setImageTest ({ dispatch, commit }, params) {
+	setImage ({ dispatch, commit }, params) {
 		const tagSOPClassUID = '00080016'
 		const SOPClassUID = {
 			'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
@@ -142,14 +142,14 @@ const actions = {
 		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
 			params.serie.imgSrc = PDFImage
 		} else {
-			dispatch('getImageTest', {
+			dispatch('getImage', {
 				StudyInstanceUID: params.StudyInstanceUID,
 				SeriesInstanceUID: params.serieUID
 			})
 		}
-		commit('SET_SERIE_TEST', { indexStudy: params.indexStudy, serie: params.serie, indexSerie: params.serieUID })
+		commit('SET_SERIE', { indexStudy: params.indexStudy, serie: params.serie, indexSerie: params.serieUID })
 	},
-	getImageTest ({ commit }, params) {
+	getImage ({ commit }, params) {
 		let request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`
 		return HTTP.get(request, {
 			responseType: 'arraybuffer',
@@ -180,7 +180,7 @@ const actions = {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
-		commit('SET_STUDY_FLAG_TEST', { index: index, flag: params.flag, value: params.value })
+		commit('SET_STUDY_FLAG', { index: index, flag: params.flag, value: params.value })
 	},
 	setFlagByStudyUIDSerieUID ({ commit }, params) {
 		let indexStudy = params.studyIndex
@@ -189,7 +189,7 @@ const actions = {
 				return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 			})
 		}
-		commit('SET_SERIE_FLAG_TEST', { indexStudy: indexStudy, SeriesInstanceUID: params.SeriesInstanceUID, flag: params.flag, value: params.value })
+		commit('SET_SERIE_FLAG', { indexStudy: indexStudy, SeriesInstanceUID: params.SeriesInstanceUID, flag: params.flag, value: params.value })
 		return true
 	},
 	favoriteStudy ({ commit, dispatch }, params) {
@@ -203,12 +203,12 @@ const actions = {
 		let request = `/studies/${params.StudyInstanceUID}/favorites`
 		if (params.value === true) {
 			return dispatch('addFavorite', { request: (request + queries) }).then(res => {
-				commit('SET_STUDY_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
+				commit('SET_STUDY_FLAG', { index: index, flag: 'is_favorite', value: params.value })
 				return true
 			})
 		} else {
 			return dispatch('removeFavorite', { request: (request + queries) }).then(res => {
-				commit('SET_STUDY_FLAG_TEST', { index: index, flag: 'is_favorite', value: params.value })
+				commit('SET_STUDY_FLAG', { index: index, flag: 'is_favorite', value: params.value })
 				return true
 			})
 		}
@@ -230,7 +230,7 @@ const actions = {
 	deleteStudyTest ({ commit }, params) {
 		const request = `/studies/${params.StudyInstanceUID}`
 		return HTTP.delete(request).then(res => {
-			commit('DELETE_STUDY_TEST', { StudyInstanceUID: params.StudyInstanceUID })
+			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
 			return true
 		}).catch(err => {
 			console.log(err)
@@ -240,7 +240,7 @@ const actions = {
 	deleteSerieTest ({ commit }, params) {
 		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}`
 		return HTTP.delete(request).then(res => {
-			commit('DELETE_SERIE_TEST', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
+			commit('DELETE_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
 			return true
 		}).catch(err => {
 			console.log(err)
@@ -326,28 +326,28 @@ const actions = {
 
 // mutations
 const mutations = {
-	INIT_STUDIES_TEST (state) {
+	INIT_STUDIES (state) {
 		state.studies = []
 	},
-	SET_STUDIES_TEST (state, studies) {
+	SET_STUDIES (state, studies) {
 		studies.forEach(study => {
 			state.studies.push(study)
 		})
 	},
-	SET_SERIES_TEST (state, params) {
+	SET_SERIES (state, params) {
 		state.studies[params.index].series = params.series
 	},
-	SET_SERIE_TEST (state, params) {
+	SET_SERIE (state, params) {
 		let study = state.studies[params.indexStudy]
 		study.series[params.indexSerie] = params.serie
 		Vue.set(state.studies, params.indexStudy, study)
 	},
-	SET_STUDY_FLAG_TEST (state, params) {
+	SET_STUDY_FLAG (state, params) {
 		let study = state.studies[params.index]
 		study.flag[params.flag] = params.value
 		Vue.set(state.studies, params.index, study)
 	},
-	SET_SERIE_FLAG_TEST (state, params) {
+	SET_SERIE_FLAG (state, params) {
 		let study = state.studies[params.indexStudy]
 		study.series[params.SeriesInstanceUID].flag[params.flag] = params.value
 		Vue.set(state.studies, params.indexStudy, study)
@@ -360,16 +360,16 @@ const mutations = {
 			Vue.set(state.studies, idx, study)
 		}
 	},
-	UPDATE_STUDIES_TEST (state, params) {
+	UPDATE_STUDIES (state, params) {
 		state.studies = params.studies
 	},
-	DELETE_STUDY_TEST (state, params) {
+	DELETE_STUDY (state, params) {
 		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
 		if (studyIdx > -1) {
 			Vue.delete(state.studies, studyIdx)
 		}
 	},
-	DELETE_SERIE_TEST (state, params) {
+	DELETE_SERIE (state, params) {
 		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
 		if (studyIdx > -1) {
 			delete state.studies[studyIdx].series[params.SeriesInstanceUID]

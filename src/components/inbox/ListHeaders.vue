@@ -95,6 +95,13 @@
           >
             {{ allowedAlbum.name }}
           </b-dropdown-item>
+
+          <b-dropdown-item
+            v-if="allowedAlbums.length === 0"
+            @click.stop="goToCreateAlbum()"
+          >
+            Create an album
+          </b-dropdown-item>
         </b-dropdown>
 
         <div
@@ -249,7 +256,6 @@ import Vue from 'vue'
 import { mapGetters } from 'vuex'
 import formGetUser from '@/components/user/getUser'
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
-import { HTTP } from '@/router/http'
 import AddIcon from '@/components/kheopsSVG/AddIcon'
 
 Vue.use(ToggleButton)
@@ -346,7 +352,7 @@ export default {
 			if (this.albumId === '') {
 				return this.albums
 			} else {
-				return this.albums.filter(album => {return album.album_id !== this.albumId})
+				return this.albums.filter(album => { return album.album_id !== this.albumId })
 			}
 		}
 	},
@@ -492,7 +498,7 @@ export default {
 				})
 			}
 		},
-		checkErrorStatus(status, message) {
+		checkErrorStatus (status, message) {
 			if (status === 403) {
 				this.$snotify.error(message[403])
 			} else if (status === 404) {
@@ -500,7 +506,6 @@ export default {
 			} else {
 				this.$snotify.error(message['unknown'])
 			}
-
 		},
 		addToAlbum (albumId) {
 			let queries = this.getSource()
@@ -513,7 +518,7 @@ export default {
 				404: '',
 				'unknown': ''
 			}
-			this.$store.dispatch('putStudiesInAlbumTest', { 'queries': queries, 'data': data }).then(res => {
+			this.$store.dispatch('putStudiesInAlbum', { 'queries': queries, 'data': data }).then(res => {
 				res.forEach(data => {
 					if (data.res !== undefined && data.res.status === 201) {
 						if (data.serieId !== undefined) {
@@ -599,6 +604,8 @@ export default {
 		},
 		reloadStudies () {
 			this.$emit('reloadStudies')
+		},
+		goToCreateAlbum () {
 		}
 	}
 }

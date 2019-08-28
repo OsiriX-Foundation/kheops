@@ -82,14 +82,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import List from '@/components/inbox/List'
 import ListDataModel from '@/components/inbox/ListDataModel'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'ComponentDragAndDrop',
-	components: { List, ClipLoader, ListDataModel },
+	components: { ClipLoader, ListDataModel },
 	props: {
 		album: {
 			type: Object,
