@@ -284,9 +284,6 @@ public class QIDOResource {
                         if (includeFieldFavorite) {
                             series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
                         }
-                        //todo modifier le champs 00081190 (Retrieve URL) qui est actuellement "http://172.17.255.3:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/UID/series/UID
-                        //todo par  http://172.17.255.3:8080/api/studies/UIS/series/UID
-                        //todo et si la requetes est venu en /api/link/{token} il faut la retourner en /api/link/{token}
                         final StringBuilder retrieveURL = new StringBuilder();
                         retrieveURL.append(context.getInitParameter(HOST_ROOT_PARAMETER));
                         retrieveURL.append("/api");
