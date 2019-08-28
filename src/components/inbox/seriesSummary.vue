@@ -103,6 +103,11 @@ export default {
 			type: String,
 			required: true,
 			default: ''
+		},
+		serieObj: {
+			type: Object,
+			required: false,
+			default: () => {}
 		}
 	},
 	data () {
@@ -111,9 +116,13 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studies'
+			studies: 'studies',
+			series: 'series'
 		}),
 		serie () {
+			if (this.serieObj !== undefined) {
+				return this.serieObj
+			}
 			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)
 		},
 		study () {
@@ -144,8 +153,13 @@ export default {
 					value: newValue
 				}
 				if (this.serie.flag['is_selected'] !== newValue) {
+					/*
 					this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(res => {
 						this.setCheckBoxStudy(newValue)
+					})
+					*/
+					this.$store.dispatch('setFlagByStudyUIDSerieUIDObject', params).then(res => {
+					 	this.setCheckBoxStudy(newValue)
 					})
 				}
 			}
@@ -194,9 +208,14 @@ export default {
 		},
 		checkAllSerieSelected (study, value) {
 			let allSelected = true
+			for (let serieUID in this.series[this.studyInstanceUID]) {
+				allSelected = allSelected && (this.series[this.studyInstanceUID][serieUID].flag.is_selected === value)
+			}
+			/*
 			for (let serieUID in study.series) {
 				allSelected = allSelected && (study.series[serieUID].flag.is_selected === value)
 			}
+			*/
 			return allSelected
 		},
 		openTab (series) {

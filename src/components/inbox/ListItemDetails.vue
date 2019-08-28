@@ -65,6 +65,19 @@
           class="row"
         >
           <div
+            v-for="serie in series[studyUID]"
+            :key="serie.id"
+            class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
+          >
+		  	{{ serie.flag }}
+            <series-summary
+              :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
+              :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
+			  :serie-obj="serie"
+            />
+          </div>
+          <!--
+		  <div
             v-for="serie in study.series"
             :key="serie.id"
             class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
@@ -74,6 +87,7 @@
               :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
             />
           </div>
+		  -->
         </div>
         <pulse-loader
           :loading="study.series === undefined || study.series.length === 0"
@@ -96,6 +110,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 import seriesSummary from '@/components/inbox/seriesSummary'
 import studyMetadata from '@/components/study/studyMetadata'
@@ -121,20 +136,33 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters({
+			series: 'series'
+		}),
 		study () {
 			return this.$store.getters.getStudyByUID(this.studyUID)
 		}
 	},
 	watch: {
+		series: {
+			handler: function (series) {
+				console.log(series)
+			},
+			deep: true
+		}
 	},
 	created () {
 		let params = {
 			StudyInstanceUID: this.studyUID,
+			studySelected: this.study.flag.is_selected,
 			queries: {}
 		}
 		params.queries = this.getSource()
 		params.queries.includefield = ['00080021', '00080031']
 		this.$store.dispatch('getSeries', params)
+		this.$store.dispatch('getSeriesObject', params).then(res => {
+			console.log(res)
+		})
 	},
 	methods: {
 		getSource () {
