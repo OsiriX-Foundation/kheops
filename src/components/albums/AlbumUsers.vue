@@ -259,7 +259,7 @@ export default {
       }
       this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
         if (res.status === 204) {
-          let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
+          let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
           this.$snotify.success(message)
         } else {
 				  this.$snotify.error(this.$t('sorryerror'))
