@@ -111,7 +111,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studiesTest'
+			studies: 'studies'
 		}),
 		serie () {
 			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)

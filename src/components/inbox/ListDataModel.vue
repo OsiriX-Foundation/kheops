@@ -481,7 +481,7 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			studies: 'studiesTest',
+			studies: 'studies',
 			albums: 'albums',
 			sendingFiles: 'sending',
 			providers: 'providers'
