@@ -367,7 +367,7 @@ import SortList from '@/components/inbox/SortList.vue'
 import IconListProviders from '@/components/providers/IconListProviders.vue'
 
 export default {
-	name: 'StudiesDataModel',
+	name: 'Studies',
 	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders },
 	mixins: [ ],
 	props: {

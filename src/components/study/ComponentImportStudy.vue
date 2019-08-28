@@ -68,7 +68,7 @@
         <div
           :class="['dropzone-area', classDragIn]"
         >
-          <list-data-model
+          <list
             ref="list"
             :album="album"
             @loadfiles="inputLoadFiles"
@@ -82,13 +82,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import ListDataModel from '@/components/inbox/ListDataModel'
+import List from '@/components/inbox/List'
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'ComponentDragAndDrop',
-	components: { ClipLoader, ListDataModel },
+	components: { ClipLoader, List },
 	props: {
 		album: {
 			type: Object,

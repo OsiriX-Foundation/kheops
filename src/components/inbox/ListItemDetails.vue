@@ -81,7 +81,7 @@
         />
       </div>
 
-      <comments-and-notifications-data-model
+      <comments-and-notifications
         v-if="study.flag.view === 'comments'"
         :id="study.StudyInstanceUID.Value[0]"
         scope="studies"
@@ -96,14 +96,14 @@
 </template>
 
 <script>
-import commentsAndNotificationsDataModel from '@/components/comments/commentsAndNotificationsDataModel'
+import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 import seriesSummary from '@/components/inbox/seriesSummary'
 import studyMetadata from '@/components/study/studyMetadata'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
 	name: 'ListItemDetails',
-	components: { seriesSummary, commentsAndNotificationsDataModel, studyMetadata, PulseLoader },
+	components: { seriesSummary, commentsAndNotifications, studyMetadata, PulseLoader },
 	props: {
 		studyUID: {
 			type: String,

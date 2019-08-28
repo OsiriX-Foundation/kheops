@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import commentsAndNotifications from '@/components/comments/commentsAndNotificationsDataModel'
+import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
 export default {
 	name: 'AlbumComments',
 	components: { commentsAndNotifications },
