@@ -33,7 +33,7 @@ const actions = {
 			commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() })
 			return res
 		}).catch(err => {
-			console.log(err)
+			return Promise.reject(err)
 		})
 	},
 	postStudyComment ({ dispatch }, params) {
@@ -46,7 +46,7 @@ const actions = {
 		return HTTP.post(request, queries, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	getAlbumComments ({ commit, dispatch }, params) {
@@ -60,7 +60,7 @@ const actions = {
 			commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.album_id, comments: res.data.reverse() })
 			return res
 		}).catch(err => {
-			console.log(err)
+			return Promise.reject(err)
 		})
 	},
 	postAlbumComment ({ commit, dispatch }, params) {
@@ -73,7 +73,7 @@ const actions = {
 		return HTTP.post(request, queries, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then(res => {
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	}
 }

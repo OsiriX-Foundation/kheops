@@ -82,6 +82,8 @@ const actions = {
 				commit('SET_STUDIES_TEST', [])
 			}
 			return res
+		}).catch(err => {
+			return Promise.reject(err)
 		})
 	},
 	getSeriesTest ({ commit, dispatch }, params) {
@@ -108,6 +110,8 @@ const actions = {
 			}
 			commit('SET_SERIES_TEST', { index: index, series: objSeries })
 			return res
+		}).catch(err => {
+			return Promise.reject(err)
 		})
 	},
 	getSerieMetadata ({ commit }, params) {
@@ -119,7 +123,7 @@ const actions = {
 		return HTTP.get(request + queries).then(res => {
 			return res
 		}).catch(err => {
-			console.log(err)
+			return Promise.reject(err)
 		})
 	},
 	setImageTest ({ dispatch, commit }, params) {
@@ -212,11 +216,15 @@ const actions = {
 	addFavorite ({ commit }, params) {
 		return HTTP.put(params.request).then(res => {
 			return res
+		}).catch(err => {
+			return Promise.reject(err)
 		})
 	},
 	removeFavorite ({ commit }, params) {
 		return HTTP.delete(params.request).then(res => {
 			return res
+		}).catch(err => {
+			return Promise.reject(err)
 		})
 	},
 	deleteStudyTest ({ commit }, params) {
@@ -248,7 +256,7 @@ const actions = {
 		return HTTP.put(request + queries).then(res => {
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	sendSerie ({ commit }, params) {
@@ -260,7 +268,7 @@ const actions = {
 		return HTTP.put(request + queries).then(res => {
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	selfAppropriateStudy ({ commit }, params) {
