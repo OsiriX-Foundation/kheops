@@ -74,7 +74,7 @@ const actions = {
 					study._showDetails = false
 				})
 				if (params.queries.offset === 0) {
-					dispatch('initStudies')
+					commit('INIT_STUDIES')
 				}
 				commit('SET_STUDIES', studies)
 			}
