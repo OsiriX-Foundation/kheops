@@ -24,6 +24,9 @@ const getters = {
 
 // actions
 const actions = {
+	initSeries ({ commit, dispatch }, params) {
+		commit('INIT_SERIES')
+	},
 	getSeries ({ commit, dispatch }, params) {
 		const request = `/studies/${params.StudyInstanceUID}/series`
 		let queries = ''
@@ -131,10 +134,9 @@ const actions = {
 		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}`
 		return HTTP.delete(request).then(res => {
 			commit('DELETE_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
-			return true
+			return res
 		}).catch(err => {
-			console.log(err)
-			return false
+			return Promise.reject(err)
 		})
 	},
 	sendSerie ({ commit }, params) {
@@ -153,6 +155,9 @@ const actions = {
 
 // mutations
 const mutations = {
+	INIT_SERIES (state) {
+		state.series = {}
+	},
 	SET_SERIES (state, params) {
 		Vue.set(state.series, params.StudyInstanceUID, params.series)
 	},
