@@ -93,10 +93,8 @@ const actions = {
 	addUser ({ commit }, params) {
 		let request = `albums/${params.album_id}/users/${params.user_id}`
 		return HTTP.put(request).then(res => {
-			console.log(res)
 			return res
 		}).catch(err => {
-			console.log(err)
 			return err
 		})
 	},
