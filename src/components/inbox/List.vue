@@ -559,6 +559,7 @@ export default {
 	},
 	created () {
 		this.$store.dispatch('initStudies', {})
+		this.$store.dispatch('initSeries')
 		let queriesAlbums = {
 			canAddSeries: true
 		}
@@ -570,6 +571,7 @@ export default {
 	},
 	destroyed () {
 		this.$store.dispatch('initStudies', {})
+		this.$store.dispatch('initSeries')
 		this.$store.dispatch('initAlbums', {})
 	},
 	mounted () {
@@ -659,6 +661,7 @@ export default {
 		searchStudies () {
 			this.studiesParams.offset = 0
 			this.$store.dispatch('initStudies', { })
+			this.$store.dispatch('initSeries')
 			this.infiniteId += 1
 		},
 		getStudies (offset = 0, limit = 0) {
