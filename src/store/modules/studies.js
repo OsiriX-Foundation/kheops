@@ -1,10 +1,6 @@
 import { HTTP } from '@/router/http'
 import dicomoperations from '@/mixins/dicomoperations'
 import httpoperations from '@/mixins/httpoperations'
-import SRImage from '@/assets/SR_2.png'
-import PDFImage from '@/assets/pdf-240x240.png'
-import VideoImage from '@/assets/video.png'
-import DicomLogo from '@/assets/dicom_logo.png'
 import Vue from 'vue'
 import axios from 'axios'
 
@@ -18,10 +14,6 @@ const state = {
 		is_commented: false,
 		is_indeterminate: false,
 		view: ''
-	},
-	defaultFlagSerie: {
-		is_selected: false,
-		is_favorite: false
 	}
 }
 
@@ -39,13 +31,6 @@ const getters = {
 		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === uid })
 		if (idx > -1) {
 			return state.studies[idx]
-		}
-		return {}
-	},
-	getSerieByUID: state => (studyUID, serieUID) => {
-		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === studyUID })
-		if (idx > -1) {
-			return state.studies[idx].series[serieUID]
 		}
 		return {}
 	}
