@@ -511,7 +511,6 @@ export default {
 			let queries = this.getSource()
 			let sendSerie = 0
 			let sendStudy = 0
-			let error = 0
 			let data = this.generateStudySerieData(albumId)
 			let message = {
 				403: '',

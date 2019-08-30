@@ -201,10 +201,11 @@ export default {
 							this.form_add_user = false
 							this.confirm_delete = ''
 						} else {
-						  this.$snotify.error(this.$t('sorryerror'))
+							this.$snotify.error(this.$t('sorryerror'))
 						}
 					}).catch(err => {
 						this.$snotify.error(this.$t('sorryerror'))
+						return err
 					})
 				}
 			}

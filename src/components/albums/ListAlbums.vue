@@ -460,6 +460,7 @@ export default {
 				}
 			}).catch(err => {
 				$state.error()
+				return err
 			})
 		},
 		getAlbums (offset = 0, limit = 0) {

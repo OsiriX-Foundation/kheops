@@ -588,6 +588,7 @@ export default {
 				}
 			}).catch(err => {
 				$state.error()
+				return err
 			})
 		},
 		setItemHover (item, index, event) {

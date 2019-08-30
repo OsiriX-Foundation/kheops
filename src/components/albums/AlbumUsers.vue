@@ -262,7 +262,7 @@ export default {
 					let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
 					this.$snotify.success(message)
 				} else {
-				  this.$snotify.error(this.$t('sorryerror'))
+					this.$snotify.error(this.$t('sorryerror'))
 				}
 			}).catch(() => {
 				this.$snotify.error(this.$t('sorryerror'))
@@ -280,7 +280,7 @@ export default {
 						this.$snotify.success(this.$t('albumuserdeletesuccess'))
 						this.confirmDelete = ''
 					} else {
-					  this.$snotify.error(this.$t('sorryerror'))
+						this.$snotify.error(this.$t('sorryerror'))
 					}
 				}).catch(() => {
 					this.$snotify.error(this.$t('sorryerror'))

@@ -170,6 +170,7 @@ export default {
 				// this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
 			}).catch(err => {
 				this.$router.push('/albums')
+				return err
 			})
 		}
 	}

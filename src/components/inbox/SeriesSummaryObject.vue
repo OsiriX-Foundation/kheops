@@ -114,13 +114,13 @@ export default {
 		...mapGetters({
 			studies: 'studies',
 			series: 'series'
-        }),
-        seriesInstanceUID () {
-            return this.serie.SeriesInstanceUID.Value[0]
-        },
-        studyInstanceUID () {
-            return this.study.StudyInstanceUID.Value[0]
-        },
+		}),
+		seriesInstanceUID () {
+			return this.serie.SeriesInstanceUID.Value[0]
+		},
+		studyInstanceUID () {
+			return this.study.StudyInstanceUID.Value[0]
+		},
 		selected () {
 			return this.serie.flag.is_selected
 		},
@@ -142,7 +142,7 @@ export default {
 				}
 				if (this.serie.flag['is_selected'] !== newValue) {
 					this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(res => {
-					 	this.setCheckBoxStudy(newValue)
+						this.setCheckBoxStudy(newValue)
 					})
 				}
 			}
@@ -151,21 +151,21 @@ export default {
 	watch: {
 	},
 	created () {
-		this.setImageSerie()
+		// this.setImageSerie()
 	},
 	methods: {
+		/*
 		setImageSerie () {
 			let params = {
 				StudyInstanceUID: this.studyInstanceUID,
 				SeriesInstanceUID: this.seriesInstanceUID
 			}
 			this.loading = true
-			/*
 			this.$store.dispatch('setSerieImage', params).then(res => {
 				this.loading = false
 			})
-			*/
 		},
+		*/
 		setCheckBoxStudy (value) {
 			if (this.checkAllSerieSelected(this.study, true)) {
 				this.$store.dispatch('setFlagByStudyUID', {

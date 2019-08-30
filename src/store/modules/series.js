@@ -6,7 +6,6 @@ import PDFImage from '@/assets/pdf-240x240.png'
 import VideoImage from '@/assets/video.png'
 import DicomLogo from '@/assets/dicom_logo.png'
 import Vue from 'vue'
-import axios from 'axios'
 
 // initial state
 const state = {

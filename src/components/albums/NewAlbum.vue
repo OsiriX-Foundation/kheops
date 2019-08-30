@@ -240,6 +240,7 @@ export default {
 							}
 						}).catch(err => {
 							this.$snotify.error(this.$t('sorryerror'))
+							return err
 						})
 					})
 					this.$router.push('/albums/' + albumCreated.album_id)

@@ -70,8 +70,8 @@
             class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
           >
             <series-summary
-			  :serie="serie"
-			  :study="study"
+              :serie="serie"
+              :study="study"
             />
           </div>
         </div>
@@ -123,13 +123,6 @@ export default {
 			includefield: ['00080021', '00080031']
 		}
 	},
-	watch: {
-		sendingFiles () {
-			if (!this.sendingFiles) {
-				this.getSeries()
-			}
-		}
-	},
 	computed: {
 		...mapGetters({
 			series: 'series',
@@ -137,6 +130,13 @@ export default {
 		}),
 		study () {
 			return this.$store.getters.getStudyByUID(this.studyUID)
+		}
+	},
+	watch: {
+		sendingFiles () {
+			if (!this.sendingFiles) {
+				this.getSeries()
+			}
 		}
 	},
 	created () {
