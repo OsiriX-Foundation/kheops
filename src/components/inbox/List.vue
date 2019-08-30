@@ -482,6 +482,7 @@ export default {
 	computed: {
 		...mapGetters({
 			studies: 'studies',
+			series: 'series',
 			albums: 'albums',
 			sendingFiles: 'sending',
 			providers: 'providers'
@@ -640,9 +641,8 @@ export default {
 			this.$store.dispatch('setFlagByStudyUID', paramsSelected)
 			let paramsIndeterminate = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_indeterminate', false)
 			this.$store.dispatch('setFlagByStudyUID', paramsIndeterminate)
-
-			if (row.item.series !== undefined) {
-				this.setSeriesCheck(row.item.series, paramsSelected)
+			if (this.series[StudyInstanceUID] !== undefined) {
+				this.setSeriesCheck(this.series[StudyInstanceUID], paramsSelected)
 			}
 		},
 		setSeriesCheck (series, params) {

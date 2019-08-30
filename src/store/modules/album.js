@@ -44,7 +44,8 @@ const actions = {
 		const request = `studies/${params.StudyInstanceUID}/albums/${params.album_id}`
 		return HTTP.delete(request).then(res => {
 			if (res.status === 204) {
-				commit('DELETE_STUDY_TEST', params)
+				commit('DELETE_STUDY', params)
+				commit('DELETE_SERIE_STUDY', params)
 			}
 			return res
 		}).catch(err => {
@@ -55,7 +56,7 @@ const actions = {
 		const request = `studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/albums/${params.album_id}`
 		return HTTP.delete(request).then(res => {
 			if (res.status === 204) {
-				commit('DELETE_SERIE_TEST', params)
+				commit('DELETE_SERIE', params)
 			}
 			return res
 		}).catch(err => {

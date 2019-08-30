@@ -218,6 +218,8 @@ export default {
 					this.openOsiriX(StudyInstanceUID, res.data.access_token)
 				} else if (viewer === 'Ohif') {
 					this.openOhif(StudyInstanceUID, res.data.access_token, source === 'inbox' ? 'inbox=true' : 'album=' + source, ohifWindow)
+				} else if (viewer === 'Weasis') {
+					this.openWeasis(StudyInstanceUID, res.data.access_token)
 				}
 			}).catch(err => {
 				console.log(err)
@@ -226,6 +228,10 @@ export default {
 		openOsiriX (StudyInstanceUID, token) {
 			let url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`
 			window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self')
+		},
+		openWeasis (StudyInstanceUID, token) {
+			let url = `$dicom:get --zip ${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`
+			window.open(`weasis://?${encodeURIComponent(url)}`, '_self')
 		},
 		openOhif (StudyInstanceUID, token, queryparams, ohifWindow) {
 			let url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`

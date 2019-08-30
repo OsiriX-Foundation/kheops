@@ -49,7 +49,7 @@ const actions = {
 		params.data.forEach(d => {
 			if (d.serie_id) {
 				promises.push(
-					HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}/albums/2${d.album_id}${queries}`)
+					HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}/albums/${d.album_id}${queries}`)
 						.then(res => {
 							return {
 								res: res,

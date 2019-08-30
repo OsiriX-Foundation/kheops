@@ -86,90 +86,6 @@ const actions = {
 			return Promise.reject(err)
 		})
 	},
-	getSeries ({ commit, dispatch }, params) {
-		let index = state.studies.findIndex(study => {
-			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
-		})
-		let queries = ''
-		if (params.queries !== undefined) {
-			queries = httpoperations.getQueriesParameters(params.queries)
-		}
-		const request = `/studies/${params.StudyInstanceUID}/series`
-		return HTTP.get(request + queries, { headers: { 'Accept': 'application/dicom+json' } }).then(res => {
-			let objSeries = dicomoperations.translateObjectDICOM(res.data, '0020000E')
-			for (let serieUID in objSeries) {
-				objSeries[serieUID].flag = JSON.parse(JSON.stringify(state.defaultFlagSerie))
-				let seriesAlreadyExist = (state.studies[index].series !== undefined && state.studies[index].series[serieUID] !== undefined)
-				objSeries[serieUID].flag.is_selected = seriesAlreadyExist ? state.studies[index].series[serieUID].flag.is_selected : state.studies[index].flag.is_selected
-				let serie = objSeries[serieUID]
-				dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: serieUID }).then(res => {
-					if (res.data !== undefined) {
-						dispatch('setImage', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, indexStudy: index, serieUID: serieUID, data: res.data })
-					}
-				})
-			}
-			commit('SET_SERIES', { index: index, series: objSeries })
-			return res
-		}).catch(err => {
-			return Promise.reject(err)
-		})
-	},
-	getSerieMetadata ({ commit }, params) {
-		let request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/metadata`
-		let queries = ''
-		if (params.queries !== undefined) {
-			queries = httpoperations.getQueriesParameters(params.queries)
-		}
-		return HTTP.get(request + queries).then(res => {
-			return res
-		}).catch(err => {
-			return Promise.reject(err)
-		})
-	},
-	setImage ({ dispatch, commit }, params) {
-		const tagSOPClassUID = '00080016'
-		const SOPClassUID = {
-			'videoPhotographicImageStorage': '1.2.840.10008.5.1.4.1.1.77.1.4.1',
-			'encapsulatedPDFStorage': '1.2.840.10008.5.1.4.1.1.104.1'
-		}
-		if (params.data[0][tagSOPClassUID] !== undefined) {
-			params.serie.SOPClassUID = params.data[0][tagSOPClassUID]
-		}
-		if (params.data[0]['00080060'].Value[0].includes('SR')) {
-			params.serie.imgSrc = SRImage
-		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {
-			params.serie.imgSrc = VideoImage
-		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
-			params.serie.imgSrc = PDFImage
-		} else {
-			dispatch('getImage', {
-				StudyInstanceUID: params.StudyInstanceUID,
-				SeriesInstanceUID: params.serieUID
-			})
-		}
-		commit('SET_SERIE', { indexStudy: params.indexStudy, serie: params.serie, indexSerie: params.serieUID })
-	},
-	getImage ({ commit }, params) {
-		let request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`
-		return HTTP.get(request, {
-			responseType: 'arraybuffer',
-			headers: {
-				'Accept': 'image/jpeg'
-			}
-		}).then(resp => {
-			let img = DicomLogo
-			if (resp.data) {
-				let arr = new Uint8Array(resp.data)
-				let raw = String.fromCharCode.apply(null, arr)
-				let b64 = btoa(raw)
-				var mimeType = resp.headers['content-type'].toLowerCase()
-				img = 'data:' + mimeType + ';base64,' + b64
-			}
-			commit('SET_SERIE_IMAGE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: img })
-		}).catch(() => {
-			commit('SET_SERIE_IMAGE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, img: DicomLogo })
-		})
-	},
 	setShowDetails ({ commit }, params) {
 		let index = state.studies.findIndex(study => {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
@@ -181,16 +97,6 @@ const actions = {
 			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
 		})
 		commit('SET_STUDY_FLAG', { index: index, flag: params.flag, value: params.value })
-	},
-	setFlagByStudyUIDSerieUID ({ commit }, params) {
-		let indexStudy = params.studyIndex
-		if (indexStudy === undefined || state.studies[indexStudy].StudyInstanceUID.Value[0] !== params.StudyInstanceUID) {
-			indexStudy = state.studies.findIndex(study => {
-				return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
-			})
-		}
-		commit('SET_SERIE_FLAG', { indexStudy: indexStudy, SeriesInstanceUID: params.SeriesInstanceUID, flag: params.flag, value: params.value })
-		return true
 	},
 	favoriteStudy ({ commit, dispatch }, params) {
 		let index = state.studies.findIndex(study => {
@@ -227,20 +133,11 @@ const actions = {
 			return Promise.reject(err)
 		})
 	},
-	deleteStudyTest ({ commit }, params) {
+	deleteStudy ({ commit }, params) {
 		const request = `/studies/${params.StudyInstanceUID}`
 		return HTTP.delete(request).then(res => {
 			commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
-			return true
-		}).catch(err => {
-			console.log(err)
-			return false
-		})
-	},
-	deleteSerieTest ({ commit }, params) {
-		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}`
-		return HTTP.delete(request).then(res => {
-			commit('DELETE_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID })
+			commit('DELETE_SERIE_STUDY', { StudyInstanceUID: params.StudyInstanceUID })
 			return true
 		}).catch(err => {
 			console.log(err)
@@ -253,18 +150,6 @@ const actions = {
 			queries = httpoperations.getQueriesParameters(params.queries)
 		}
 		const request = `/studies/${params.StudyInstanceUID}/users/${params.userSub}`
-		return HTTP.put(request + queries).then(res => {
-			return res
-		}).catch(err => {
-			return Promise.reject(err)
-		})
-	},
-	sendSerie ({ commit }, params) {
-		let queries = ''
-		if (params.queries !== undefined) {
-			queries = httpoperations.getQueriesParameters(params.queries)
-		}
-		const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/users/${params.userSub}`
 		return HTTP.put(request + queries).then(res => {
 			return res
 		}).catch(err => {
@@ -334,31 +219,10 @@ const mutations = {
 			state.studies.push(study)
 		})
 	},
-	SET_SERIES (state, params) {
-		state.studies[params.index].series = params.series
-	},
-	SET_SERIE (state, params) {
-		let study = state.studies[params.indexStudy]
-		study.series[params.indexSerie] = params.serie
-		Vue.set(state.studies, params.indexStudy, study)
-	},
 	SET_STUDY_FLAG (state, params) {
 		let study = state.studies[params.index]
 		study.flag[params.flag] = params.value
 		Vue.set(state.studies, params.index, study)
-	},
-	SET_SERIE_FLAG (state, params) {
-		let study = state.studies[params.indexStudy]
-		study.series[params.SeriesInstanceUID].flag[params.flag] = params.value
-		Vue.set(state.studies, params.indexStudy, study)
-	},
-	SET_SERIE_IMAGE (state, params) {
-		let idx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
-		if (idx > -1) {
-			let study = state.studies[idx]
-			study.series[params.SeriesInstanceUID].imgSrc = params.img
-			Vue.set(state.studies, idx, study)
-		}
 	},
 	UPDATE_STUDIES (state, params) {
 		state.studies = params.studies
@@ -367,19 +231,6 @@ const mutations = {
 		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
 		if (studyIdx > -1) {
 			Vue.delete(state.studies, studyIdx)
-		}
-	},
-	DELETE_SERIE (state, params) {
-		let studyIdx = _.findIndex(state.studies, s => { return s.StudyInstanceUID.Value[0] === params.StudyInstanceUID })
-		if (studyIdx > -1) {
-			delete state.studies[studyIdx].series[params.SeriesInstanceUID]
-			/*
-			let seriesIdx = _.findIndex(state.studies[studyIdx].series, s => { return s.SeriesInstanceUID.Value[0] === params.SeriesInstanceUID })
-			if (seriesIdx > -1) {
-				Vue.delete(state.studies[studyIdx].series, seriesIdx)
-				Vue.set(state.studies, studyIdx, state.studies[studyIdx])
-			}
-			*/
 		}
 	},
 	SET_STUDY_SHOW_DETAILS (state, params) {

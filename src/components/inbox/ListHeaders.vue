@@ -319,7 +319,8 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			sendingFiles: 'sending'
+			sendingFiles: 'sending',
+			series: 'series'
 		}),
 		selectedStudiesNb () {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) }).length
@@ -328,22 +329,21 @@ export default {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true) })
 		},
 		selectedSeries () {
-			let series = {}
-			let notAllSeriesSelected = this.studies.filter(study => { return (study.flag.is_indeterminate === true) })
-			notAllSeriesSelected.forEach(study => {
-				if (study.series !== undefined) {
-					let seriesSelected = []
-					for (let serieUID in study.series) {
-						if (study.series[serieUID].flag.is_selected === true) {
-							seriesSelected.push(study.series[serieUID])
-						}
+			let selectedSeries = {}
+			let studiesIndeterminate = this.studies.filter(study => { return (study.flag.is_indeterminate === true) })
+			studiesIndeterminate.forEach(study => {
+				let seriesSelected = []
+				let studyUID = study.StudyInstanceUID.Value[0]
+				for (let serieUID in this.series[studyUID]) {
+					if (this.series[studyUID][serieUID].flag.is_selected === true) {
+						seriesSelected.push(this.series[studyUID][serieUID])
 					}
 					if (seriesSelected.length > 0) {
-						series[study.StudyInstanceUID.Value[0]] = seriesSelected
+						selectedSeries[studyUID] = seriesSelected
 					}
 				}
 			})
-			return series
+			return selectedSeries
 		},
 		allSelectedStudies () {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) })
@@ -427,9 +427,9 @@ export default {
 				if (study.flag.is_selected === true) {
 					this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_selected', false))
 				}
-				if (study.series !== undefined) {
-					for (let serieUID in study.series) {
-						let serie = study.series[serieUID]
+				if (this.series[StudyInstanceUID] !== undefined) {
+					for (let serieUID in this.series[StudyInstanceUID]) {
+						let serie = this.series[StudyInstanceUID][serieUID]
 						if (serie.flag.is_selected) {
 							let SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
 							this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_indeterminate', false))
@@ -474,7 +474,7 @@ export default {
 					StudyInstanceUID: study.StudyInstanceUID.Value[0]
 				}
 				if (this.albumId === '') {
-					this.$store.dispatch('deleteStudyTest', params)
+					this.$store.dispatch('deleteStudy', params)
 				} else {
 					params.album_id = this.albumId
 					this.$store.dispatch('removeStudyInAlbum', params)
@@ -490,7 +490,7 @@ export default {
 						SeriesInstanceUID: serieUID
 					}
 					if (this.albumId === '') {
-						this.$store.dispatch('deleteSerieTest', params)
+						this.$store.dispatch('deleteSerie', params)
 					} else {
 						params.album_id = this.albumId
 						this.$store.dispatch('removeSerieInAlbum', params)

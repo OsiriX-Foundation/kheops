@@ -54,11 +54,11 @@
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
         <table class="table table-striped">
           <tbody>
-            <tr v-if="serie.Modality">
+            <tr v-if="serie.Modality && serie.Modality.Value !== undefined">
               <th>{{ $t('modality') }}</th>
               <td>{{ serie.Modality.Value[0] }}</td>
             </tr>
-            <tr v-if="serie.RetrieveAETitle">
+            <tr v-if="serie.RetrieveAETitle && serie.RetrieveAETitle.Value !== undefined">
               <th>{{ $t('applicationentity') }}</th>
               <td>{{ serie.RetrieveAETitle.Value[0] }}</td>
             </tr>
@@ -66,15 +66,15 @@
               <th>{{ $t('numberimages') }}</th>
               <td>{{ serie.NumberOfSeriesRelatedInstances.Value[0] }}</td>
             </tr>
-            <tr v-if="serie.SeriesDescription">
+            <tr v-if="serie.SeriesDescription && serie.SeriesDescription.Value !== undefined">
               <th>{{ $t('description') }}</th>
               <td>{{ serie.SeriesDescription.Value[0] }}</td>
             </tr>
-            <tr v-if="serie.SeriesDate">
+            <tr v-if="serie.SeriesDate && serie.SeriesDate.Value !== undefined">
               <th>{{ $t('seriesdate') }}</th>
               <td>{{ serie.SeriesDate.Value[0]|formatDate }}</td>
             </tr>
-            <tr v-if="serie.SeriesTime">
+            <tr v-if="serie.SeriesTime && serie.SeriesTime.Value !== undefined">
               <th>{{ $t('seriestime') }}</th>
               <td>{{ serie.SeriesTime.Value[0] }}</td>
             </tr>
@@ -94,36 +94,33 @@ export default {
 	name: 'SeriesSummary',
 	mixins: [ ViewerToken, CurrentUser ],
 	props: {
-		seriesInstanceUID: {
-			type: String,
+		serie: {
+			type: Object,
 			required: true,
-			default: ''
+			default: () => {}
 		},
-		studyInstanceUID: {
-			type: String,
+		study: {
+			type: Object,
 			required: true,
-			default: ''
+			default: () => {}
 		}
 	},
 	data () {
 		return {
+			loading: true
 		}
 	},
 	computed: {
 		...mapGetters({
 			studies: 'studies',
 			series: 'series'
-		}),
-		serie () {
-			return this.$store.getters.getSerieByUID(this.studyInstanceUID, this.seriesInstanceUID)
-		},
-		study () {
-			return this.$store.getters.getStudyByUID(this.studyInstanceUID)
-		},
-		studyIndex () {
-			let idx = _.findIndex(this.studies, s => { return s.StudyInstanceUID.Value[0] === this.studyInstanceUID })
-			return idx
-		},
+        }),
+        seriesInstanceUID () {
+            return this.serie.SeriesInstanceUID.Value[0]
+        },
+        studyInstanceUID () {
+            return this.study.StudyInstanceUID.Value[0]
+        },
 		selected () {
 			return this.serie.flag.is_selected
 		},
@@ -140,13 +137,12 @@ export default {
 				let params = {
 					StudyInstanceUID: this.studyInstanceUID,
 					SeriesInstanceUID: this.seriesInstanceUID,
-					studyIndex: this.studyIndex,
 					flag: 'is_selected',
 					value: newValue
 				}
 				if (this.serie.flag['is_selected'] !== newValue) {
 					this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(res => {
-						this.setCheckBoxStudy(newValue)
+					 	this.setCheckBoxStudy(newValue)
 					})
 				}
 			}
@@ -155,8 +151,21 @@ export default {
 	watch: {
 	},
 	created () {
+		this.setImageSerie()
 	},
 	methods: {
+		setImageSerie () {
+			let params = {
+				StudyInstanceUID: this.studyInstanceUID,
+				SeriesInstanceUID: this.seriesInstanceUID
+			}
+			this.loading = true
+			/*
+			this.$store.dispatch('setSerieImage', params).then(res => {
+				this.loading = false
+			})
+			*/
+		},
 		setCheckBoxStudy (value) {
 			if (this.checkAllSerieSelected(this.study, true)) {
 				this.$store.dispatch('setFlagByStudyUID', {
@@ -195,8 +204,8 @@ export default {
 		},
 		checkAllSerieSelected (study, value) {
 			let allSelected = true
-			for (let serieUID in study.series) {
-				allSelected = allSelected && (study.series[serieUID].flag.is_selected === value)
+			for (let serieUID in this.series[this.studyInstanceUID]) {
+				allSelected = allSelected && (this.series[this.studyInstanceUID][serieUID].flag.is_selected === value)
 			}
 			return allSelected
 		},

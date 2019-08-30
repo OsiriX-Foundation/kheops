@@ -61,7 +61,7 @@
         v-if="study.flag.view === 'series'"
       >
         <div
-          v-if="study.series !== undefined"
+          v-if="loadingSerie === false"
           class="row"
         >
           <div
@@ -69,28 +69,14 @@
             :key="serie.id"
             class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
           >
-		  	{{ serie.flag }}
             <series-summary
-              :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
-              :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
-			  :serie-obj="serie"
+			  :serie="serie"
+			  :study="study"
             />
           </div>
-          <!--
-		  <div
-            v-for="serie in study.series"
-            :key="serie.id"
-            class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
-          >
-            <series-summary
-              :series-instance-u-i-d="serie.SeriesInstanceUID.Value[0]"
-              :study-instance-u-i-d="study.StudyInstanceUID.Value[0]"
-            />
-          </div>
-		  -->
         </div>
         <pulse-loader
-          :loading="study.series === undefined || study.series.length === 0"
+          :loading="loadingSerie"
           color="white"
         />
       </div>
@@ -112,13 +98,13 @@
 <script>
 import { mapGetters } from 'vuex'
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications'
-import seriesSummary from '@/components/inbox/seriesSummary'
 import studyMetadata from '@/components/study/studyMetadata'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import SeriesSummary from '@/components/inbox/SeriesSummaryObject'
 
 export default {
 	name: 'ListItemDetails',
-	components: { seriesSummary, commentsAndNotifications, studyMetadata, PulseLoader },
+	components: { commentsAndNotifications, studyMetadata, PulseLoader, SeriesSummary },
 	props: {
 		studyUID: {
 			type: String,
@@ -133,38 +119,45 @@ export default {
 	},
 	data () {
 		return {
+			loadingSerie: true,
+			includefield: ['00080021', '00080031']
+		}
+	},
+	watch: {
+		sendingFiles () {
+			if (!this.sendingFiles) {
+				this.getSeries()
+			}
 		}
 	},
 	computed: {
 		...mapGetters({
-			series: 'series'
+			series: 'series',
+			sendingFiles: 'sending'
 		}),
 		study () {
 			return this.$store.getters.getStudyByUID(this.studyUID)
 		}
 	},
-	watch: {
-		series: {
-			handler: function (series) {
-				console.log(series)
-			},
-			deep: true
-		}
-	},
 	created () {
-		let params = {
-			StudyInstanceUID: this.studyUID,
-			studySelected: this.study.flag.is_selected,
-			queries: {}
-		}
-		params.queries = this.getSource()
-		params.queries.includefield = ['00080021', '00080031']
-		this.$store.dispatch('getSeries', params)
-		this.$store.dispatch('getSeriesObject', params).then(res => {
-			console.log(res)
-		})
+		this.getSeries()
 	},
 	methods: {
+		getSeries () {
+			let params = {
+				StudyInstanceUID: this.studyUID,
+				studySelected: this.study.flag.is_selected,
+				queries: {}
+			}
+			params.queries = this.getSource()
+			params.queries.includefield = this.includefield
+			this.loadingSerie = true
+			this.$store.dispatch('getSeries', params).then(res => {
+				if (res.status === 200) {
+					this.loadingSerie = false
+				}
+			})
+		},
 		getSource () {
 			if (this.albumId === '') {
 				return {
