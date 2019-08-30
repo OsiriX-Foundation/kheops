@@ -61,5 +61,8 @@ a.navbar-brand {
 	color: #CCC;
 	font-size: 11pt;
 }
+body {
+  overflow-y: scroll;
+}
 </style>
 
