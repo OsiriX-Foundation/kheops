@@ -7,10 +7,6 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_authdb_pass ]; then
     echo "Missing kheops_authdb_pass secret"
     missing_env_var_secret=true
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_superuser_hmasecret ]; then
-    echo "Missing kheops_superuser_hmasecret secret"
-    missing_env_var_secret=true
-fi
 if ! [ -f ${SECRET_FILE_PATH}/kheops_auth_hmasecret ]; then
     echo "Missing kheops kheops_auth_hmasecret secret"
     missing_env_var_secret=true
