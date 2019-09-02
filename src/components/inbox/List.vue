@@ -279,35 +279,62 @@
           <b-form-checkbox
             v-model="row.item.flag.is_selected"
             :indeterminate="row.item.flag.is_indeterminate"
+            class="mr-0"
             inline
             @change="setChecked(row)"
           />
+          <!--
+          <b-button
+            variant="link"
+            size="sm"
+            class="mr-1 pt-0"
+          >
+            <v-icon
+              class="align-middle"
+              style="margin-right:1"
+              name="star"
+              :color="(!row.item.flag.is_favorite) ? 'grey' : ''"
+            />
+          </b-button>
+          -->
         </b-button-group>
       </template>
       <template
         slot="PatientName"
         slot-scope="row"
       >
+	  	<div
+        :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
+	  	>
+        <div class="">
         {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
+        </div>
         <br v-if="mobiledetect===true">
-        <list-icons
-          :study="row.item"
-          :mobiledetect="mobiledetect"
-          :show-favorite-icon="permissions.add_series"
-          :show-download-icon="permissions.download_series"
-          :show-import-icon="permissions.add_series"
-          :show-report-provider-icon="album.album_id !== undefined ? true : false"
-          :album-id="album.album_id !== undefined ? album.album_id : ''"
-        >
-          <template
-            slot="reportprovider"
+        <div :class="mobiledetect===true ? '' : 'ml-auto'">
+          <!--
+            :show-favorite-icon="permissions.add_series"
+          -->
+          <list-icons
+            :study="row.item"
+            :mobiledetect="mobiledetect"
+            :show-favorite-icon="permissions.add_series"
+            :showCommentIcon="true"
+            :show-download-icon="permissions.download_series"
+            :show-import-icon="permissions.add_series"
+            :show-report-provider-icon="album.album_id !== undefined ? true : false"
+            :album-id="album.album_id !== undefined ? album.album_id : ''"
           >
-            <icon-list-providers
-              :study="row.item"
-              :providers="providersEnable"
-            />
-          </template>
-        </list-icons>
+            <template
+              slot="reportprovider"
+            >
+              <icon-list-providers
+                :study="row.item"
+                :providers="providersEnable"
+              />
+            </template>
+          </list-icons>
+        </div>
+      </div>
       </template>
       <template
         slot="StudyDate"

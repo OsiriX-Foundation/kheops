@@ -1,32 +1,7 @@
 
 <template>
   <span>
-    <span
-      v-if="showFavoriteIcon"
-      :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
-      class="ml-1"
-      @click.stop="toggleFavorite()"
-    >
-      <v-icon
-        class="align-middle"
-        style="margin-right:1"
-        name="star"
-        :color="(!study.flag.is_favorite) ? 'grey' : ''"
-      />
-    </span>
-    <span
-      v-if="showCommentIcon"
-      :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
-      class="ml-1"
-      @click.stop="showComments(study, 'comments')"
-    >
-      <v-icon
-        class="align-middle"
-        style="margin-right:1"
-        name="comment-dots"
-        :color="study.flag.is_commented ? '' : 'grey'"
-      />
-    </span>
+
     <span
       :class="classIconPN(study.flag.is_hover)"
       class="ml-1"
@@ -80,6 +55,32 @@
       >
         <slot name="reportprovider" />
       </span>
+    </span>
+		<span
+      v-if="showCommentIcon"
+      :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
+      class="ml-1"
+      @click.stop="showComments(study, 'comments')"
+    >
+      <v-icon
+        class="align-middle"
+        style="margin-right:1"
+        name="comment-dots"
+        :color="study.flag.is_commented ? '' : 'grey'"
+      />
+    </span>
+    <span
+      v-if="showFavoriteIcon"
+      :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
+      class="ml-1"
+      @click.stop="toggleFavorite()"
+    >
+      <v-icon
+        class="align-middle"
+        style="margin-right:1"
+        name="star"
+        :color="(!study.flag.is_favorite) ? 'grey' : ''"
+      />
     </span>
   </span>
 </template>
