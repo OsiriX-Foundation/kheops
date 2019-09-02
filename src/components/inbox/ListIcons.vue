@@ -56,7 +56,7 @@
         <slot name="reportprovider" />
       </span>
     </span>
-		<span
+    <span
       v-if="showCommentIcon"
       :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
       class="ml-1"

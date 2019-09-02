@@ -303,38 +303,38 @@
         slot="PatientName"
         slot-scope="row"
       >
-	  	<div
-        :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
-	  	>
-        <div class="">
-        {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
-        </div>
-        <br v-if="mobiledetect===true">
-        <div :class="mobiledetect===true ? '' : 'ml-auto'">
-          <!--
+        <div
+          :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
+        >
+          <div class="">
+            {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
+          </div>
+          <br v-if="mobiledetect===true">
+          <div :class="mobiledetect===true ? '' : 'ml-auto'">
+            <!--
             :show-favorite-icon="permissions.add_series"
           -->
-          <list-icons
-            :study="row.item"
-            :mobiledetect="mobiledetect"
-            :show-favorite-icon="permissions.add_series"
-            :showCommentIcon="true"
-            :show-download-icon="permissions.download_series"
-            :show-import-icon="permissions.add_series"
-            :show-report-provider-icon="album.album_id !== undefined ? true : false"
-            :album-id="album.album_id !== undefined ? album.album_id : ''"
-          >
-            <template
-              slot="reportprovider"
+            <list-icons
+              :study="row.item"
+              :mobiledetect="mobiledetect"
+              :show-favorite-icon="permissions.add_series"
+              :show-comment-icon="true"
+              :show-download-icon="permissions.download_series"
+              :show-import-icon="permissions.add_series"
+              :show-report-provider-icon="album.album_id !== undefined ? true : false"
+              :album-id="album.album_id !== undefined ? album.album_id : ''"
             >
-              <icon-list-providers
-                :study="row.item"
-                :providers="providersEnable"
-              />
-            </template>
-          </list-icons>
+              <template
+                slot="reportprovider"
+              >
+                <icon-list-providers
+                  :study="row.item"
+                  :providers="providersEnable"
+                />
+              </template>
+            </list-icons>
+          </div>
         </div>
-      </div>
       </template>
       <template
         slot="StudyDate"
