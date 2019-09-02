@@ -12,7 +12,7 @@ ENV LIQUIBASE_PROPERTIES_FILE_PATH=/usr/local/liquibase/liquibase.properties
 COPY KheopsAuthorization.war /usr/local/tomcat/webapps/authorization.war
 COPY context.xml /usr/local/tomcat/conf/context.xml
 COPY liquibase /usr/local/liquibase
-RUN chmod +x /usr/local/liquibase/liquidbase-3.8.0-bin/liquibase
+RUN chmod +x /usr/local/liquibase/liquibase-3.8.0-bin/liquibase
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
