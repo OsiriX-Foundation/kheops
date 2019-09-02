@@ -7,6 +7,7 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 
 ENV SECRET_FILE_PATH=/run/secrets
 ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
+ENV LIQUIBASE_PROPERTIES_FILE_PATH=/usr/local/liquibase/liquibase.properties
 
 COPY KheopsAuthorization.war /usr/local/tomcat/webapps/authorization.war
 COPY context.xml /usr/local/tomcat/conf/context.xml
