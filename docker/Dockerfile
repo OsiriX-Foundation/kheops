@@ -10,6 +10,7 @@ ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
 
 COPY KheopsAuthorization.war /usr/local/tomcat/webapps/authorization.war
 COPY context.xml /usr/local/tomcat/conf/context.xml
+COPY liquibase /usr/local/liquibase
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
