@@ -43,13 +43,25 @@
 
     <div class="row justify-content-center">
       <div class="mb-2 preview">
-        <img
-          :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
-          :src="serie.imgSrc"
-          width="250"
-          height="250"
-          @click="openTab(serie)"
+        <div
+          class="d-flex flex-row justify-content-center align-items-center"
+          style="height: 100%;"
         >
+          <div class="p-2">
+            <img
+              v-if="serie.imgSrc !== ''"
+              :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
+              :src="serie.imgSrc"
+              width="250"
+              height="250"
+              @click="openTab(serie)"
+            >
+            <bounce-loader
+              :loading="serie.imgSrc === ''"
+              color="white"
+            />
+          </div>
+        </div>
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
         <table class="table table-striped">
@@ -89,9 +101,11 @@
 import { mapGetters } from 'vuex'
 import { ViewerToken } from '../../mixins/tokens.js'
 import { CurrentUser } from '../../mixins/currentuser.js'
+import BounceLoader from 'vue-spinner/src/BounceLoader.vue'
 
 export default {
 	name: 'SeriesSummary',
+	components: { BounceLoader },
 	mixins: [ ViewerToken, CurrentUser ],
 	props: {
 		serie: {
@@ -106,9 +120,7 @@ export default {
 		}
 	},
 	data () {
-		return {
-			loading: true
-		}
+		return {}
 	},
 	computed: {
 		...mapGetters({
