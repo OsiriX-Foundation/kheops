@@ -49,7 +49,7 @@
         >
           <div class="p-2">
             <img
-              v-if="serie.imgSrc !== ''"
+              v-if="!loadingImage"
               :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
               :src="serie.imgSrc"
               width="250"
@@ -57,7 +57,7 @@
               @click="openTab(serie)"
             >
             <bounce-loader
-              :loading="serie.imgSrc === ''"
+              :loading="loadingImage"
               color="white"
             />
           </div>
@@ -158,6 +158,9 @@ export default {
 					})
 				}
 			}
+		},
+		loadingImage () {
+			return (this.serie.imgSrc === '')
 		}
 	},
 	watch: {
