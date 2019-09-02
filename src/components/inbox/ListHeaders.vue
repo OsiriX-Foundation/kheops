@@ -9,8 +9,7 @@
 		"cancel": "Cancel",
 		"addfavorites": "Add too favorites",
 		"addfavorites": "Remove too favorites",
-    "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
-    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+    "confirmDelete": "Are you sure you want to delete {countStudies} study containing {countSeries} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countStudies} studies containing {countSeries} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
     "importdir": "Import directory",
     "importfiles": "Import files",
     "draganddrop": "Or drag and drop",
@@ -27,8 +26,7 @@
 		"cancel": "Annuler",
 		"addfavorites": "Ajouter aux favoris",
 		"addfavorites": "Supprimer des favoris",
-		"confirmDelete": "Etes vous de sûr de vouloir supprimer {count} étude | Etes vous de sûr de vouloir supprimer {count} études",
-    "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
+		"confirmDelete": "Etes vous de sûr de vouloir supprimer {countStudies} étude contenant {countSeries} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série.| Etes vous de sûr de vouloir supprimer {countStudies} études contenant {countSeries} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
@@ -236,11 +234,11 @@
     </div>
     <confirm-button
       v-if="confirmDelete && selectedStudiesNb"
-      :btn-primary-text="$t('delete')"
-      :btn-danger-text="$t('cancel')"
-      :text="$tc('confirmDelete',selectedStudiesNb,{count: selectedStudiesNb})"
-      :method-confirm="deleteStudies"
-      :method-cancel="() => confirmDelete=false"
+      :btn-danger-text="$t('delete')"
+      :btn-primary-text="$t('cancel')"
+      :text="$tc('confirmDelete', selectedStudiesNb, {countStudies: selectedStudiesNb, countSeries: selectedSeriesNb})"
+      :method-confirm="() => confirmDelete=false"
+      :method-cancel="deleteStudies"
     />
     <form-get-user
       v-if="formSendStudy && selectedStudiesNb"
@@ -324,6 +322,18 @@ export default {
 		}),
 		selectedStudiesNb () {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) }).length
+		},
+		selectedSeriesNb () {
+			let selectedStudiesSeriesNb = 0
+			this.selectedStudies.forEach(study => {
+				selectedStudiesSeriesNb += study.NumberOfStudyRelatedSeries.Value[0]
+			})
+
+			let selectedSerieNb = 0
+			for (let studyUID in this.selectedSeries) {
+				selectedSerieNb += Object.keys(this.selectedSeries[studyUID]).length
+			}
+			return selectedSerieNb + selectedStudiesSeriesNb
 		},
 		selectedStudies () {
 			return _.filter(this.studies, s => { return (s.flag.is_selected === true) })
