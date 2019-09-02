@@ -10,7 +10,9 @@
 		"confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
 		"series": "Series",
 		"comments": "Comments",
-		"study": "Study"
+		"study": "Study",
+		"errorSeries": "An error occured, please reload the series list",
+		"reload": "Reload"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -22,7 +24,9 @@
 		"confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
 		"series": "Séries",
 		"comments": "Commentaires",
-		"study": "Etude"
+		"study": "Etude",
+		"errorSeries": "Une erreur est survenue, veuillez recharger les séries.",
+		"reload": "Recharger"
 	}
 }
 </i18n>
@@ -61,7 +65,7 @@
         v-if="study.flag.view === 'series'"
       >
         <div
-          v-if="loadingSerie === false"
+          v-if="loadingSerie === false && errorSeries === false"
           class="row"
         >
           <div
@@ -79,6 +83,27 @@
           :loading="loadingSerie"
           color="white"
         />
+		<div
+			v-if="loadingSerie === false && errorSeries === true"
+		>
+			<div
+				class="d-flex flex-column justify-content-center align-items-center"
+				style="height: 100%;"
+			>
+				<div class="mb-3">
+					{{ $t('errorSeries') }}
+				</div>
+				<div class="">
+					<button
+						type="button"
+						class=" btn btn-md"
+						@click="getSeries()"
+					>
+						{{ $t('reload') }}
+					</button>
+				</div>
+			</div>
+		</div>
       </div>
 
       <comments-and-notifications
@@ -120,6 +145,7 @@ export default {
 	data () {
 		return {
 			loadingSerie: true,
+			errorSeries: false,
 			includefield: ['00080021', '00080031']
 		}
 	},
@@ -155,7 +181,11 @@ export default {
 			this.$store.dispatch('getSeries', params).then(res => {
 				if (res.status === 200) {
 					this.loadingSerie = false
+					this.errorSeries = false
 				}
+			}).catch (err => {
+				this.loadingSerie = false
+				this.errorSeries = true
 			})
 		},
 		getSource () {
