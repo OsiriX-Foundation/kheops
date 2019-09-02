@@ -108,6 +108,7 @@ do
 
   value=$(cat ${f})
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
+  sed -i "s|\${$filename}|$value|" ${LIQUIBASE_PROPERTIES_FILE_PATH}
 done
 
 
@@ -126,6 +127,10 @@ sed -i "s|\${kheops_keycloak_clientid}|$KHEOPS_KEYCLOAK_CLIENTID|" ${REPLACE_FIL
 sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
+
+#liquibase
+sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${LIQUIBASE_PROPERTIES_FILE_PATH}
+sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${LIQUIBASE_PROPERTIES_FILE_PATH}
 
 
 echo "Ending setup secrets and env var"
