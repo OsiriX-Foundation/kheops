@@ -149,6 +149,7 @@ else
         ./liquibase updateToTag $KHEOPS_DATABASE_VERSION
     fi
 fi
+cd ../tomcat
 
 #######################################################################################
 #ELASTIC SEARCH
