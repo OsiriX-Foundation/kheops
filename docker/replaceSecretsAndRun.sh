@@ -137,16 +137,16 @@ echo "Ending setup secrets and env var"
 
 #######################################################################################
 #LIQUIBASE
-
+cd ../liquibase
 if [ "$KHEOPS_DATABASE_UPDATE_ROLLBACK" == "rollback" ]; then
-    ./../liquibase/liquibase tagExists $KHEOPS_DATABASE_VERSION
-    ./../liquibase/liquibase rollback $KHEOPS_DATABASE_VERSION
+    ./liquibase tagExists $KHEOPS_DATABASE_VERSION
+    ./liquibase rollback $KHEOPS_DATABASE_VERSION
 else
     if [ -z "$KHEOPS_DATABASE_VERSION" ]; then
-        ./../liquibase/liquibase update
+        ./liquibase update
     else
-        ./../liquibase/liquibase tagExists $KHEOPS_DATABASE_VERSION
-        ./../liquibase/liquibase updateToTag $KHEOPS_DATABASE_VERSION
+        ./liquibase tagExists $KHEOPS_DATABASE_VERSION
+        ./liquibase updateToTag $KHEOPS_DATABASE_VERSION
     fi
 fi
 
