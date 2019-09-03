@@ -83,27 +83,27 @@
           :loading="loadingSerie"
           color="white"
         />
-		<div
-			v-if="loadingSerie === false && errorSeries === true"
-		>
-			<div
-				class="d-flex flex-column justify-content-center align-items-center"
-				style="height: 100%;"
-			>
-				<div class="mb-3">
-					{{ $t('errorSeries') }}
-				</div>
-				<div class="">
-					<button
-						type="button"
-						class=" btn btn-md"
-						@click="getSeries()"
-					>
-						{{ $t('reload') }}
-					</button>
-				</div>
-			</div>
-		</div>
+        <div
+          v-if="loadingSerie === false && errorSeries === true"
+        >
+          <div
+            class="d-flex flex-column justify-content-center align-items-center"
+            style="height: 100%;"
+          >
+            <div class="mb-3">
+              {{ $t('errorSeries') }}
+            </div>
+            <div class="">
+              <button
+                type="button"
+                class=" btn btn-md"
+                @click="getSeries()"
+              >
+                {{ $t('reload') }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <comments-and-notifications
@@ -183,7 +183,7 @@ export default {
 					this.loadingSerie = false
 					this.errorSeries = false
 				}
-			}).catch (err => {
+			}).catch(err => {
 				this.loadingSerie = false
 				this.errorSeries = true
 			})
