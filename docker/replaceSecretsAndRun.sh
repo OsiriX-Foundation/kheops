@@ -136,6 +136,21 @@ sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${L
 echo "Ending setup secrets and env var"
 
 #######################################################################################
+#LIQUIBASE
+
+if [ "$KHEOPS_DATABASE_UPDATE_ROLLBACK" == "rollback" ]; then
+    ./../liquibase/liquibase tagExists $KHEOPS_DATABASE_VERSION
+    ./../liquibase/liquibase rollback $KHEOPS_DATABASE_VERSION
+else
+    if [ -z "$KHEOPS_DATABASE_VERSION" ]; then
+        ./../liquibase/liquibase update
+    else
+        ./../liquibase/liquibase tagExists $KHEOPS_DATABASE_VERSION
+        ./../liquibase/liquibase updateToTag $KHEOPS_DATABASE_VERSION
+    fi
+fi
+
+#######################################################################################
 #ELASTIC SEARCH
 
 if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
