@@ -61,6 +61,8 @@ const actions = {
 			if (res.data !== undefined) {
 				return dispatch('setImageSrc', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, serieUID: params.SeriesInstanceUID, data: res.data })
 			}
+		}).catch(err => {
+			Promise.reject(err)
 		})
 	},
 	getSerieMetadata ({ commit }, params) {
@@ -87,10 +89,13 @@ const actions = {
 		}
 		if (params.data[0][tagModality].Value[0].includes('SR')) {
 			params.serie.imgSrc = SRImage
+			commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID })
 		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['videoPhotographicImageStorage']) {
 			params.serie.imgSrc = VideoImage
+			commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID })
 		} else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID['encapsulatedPDFStorage']) {
 			params.serie.imgSrc = PDFImage
+			commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID })
 		} else {
 			dispatch('getImage', {
 				StudyInstanceUID: params.StudyInstanceUID,
@@ -98,7 +103,6 @@ const actions = {
 				serie: params.serie
 			})
 		}
-		commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID })
 		return true
 	},
 	getImage ({ commit }, params) {
