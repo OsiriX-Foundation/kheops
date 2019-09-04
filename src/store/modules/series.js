@@ -166,7 +166,9 @@ const mutations = {
 		Vue.set(state.series, params.StudyInstanceUID, params.series)
 	},
 	SET_SERIE (state, params) {
-		Vue.set(state.series[params.StudyInstanceUID], params.SeriesInstanceUID, params.serie)
+		if (state.series[params.StudyInstanceUID] !== undefined) {
+			Vue.set(state.series[params.StudyInstanceUID], params.SeriesInstanceUID, params.serie)
+		}
 	},
 	DELETE_SERIE (state, params) {
 		delete state.series[params.StudyInstanceUID][params.SeriesInstanceUID]
