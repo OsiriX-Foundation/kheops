@@ -287,6 +287,7 @@ public class SendingResource
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
+    @AlbumPermissionSecured(AlbumUserPermissions.ADD_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}")
     public Response putStudyInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,

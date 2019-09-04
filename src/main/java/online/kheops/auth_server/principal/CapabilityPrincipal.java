@@ -9,6 +9,7 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -27,17 +28,21 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 public class CapabilityPrincipal implements KheopsPrincipal {
     private final Capability capability;
     private final User user;
+    private final boolean linkAuthorization;
+    private final String originalToken;
 
     private EntityManager em;
     private EntityTransaction tx;
 
     //old version
     private final Long dbid;
-    public CapabilityPrincipal(Capability capability, User user) {
+    public CapabilityPrincipal(Capability capability, User user, boolean linkAuthorization, String originalToken) {
         this.capability = capability;
         this.dbid=user.getPk();
         this.user = user;
         this.em = EntityManagerListener.createEntityManager();
+        this.linkAuthorization = linkAuthorization;
+        this.originalToken = originalToken;
     }
     @Override
     public long getDBID() {
@@ -316,6 +321,14 @@ public class CapabilityPrincipal implements KheopsPrincipal {
 
     @Override
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
+
+    @Override
+    public boolean isLink() { return linkAuthorization;  }
+
+    @Override
+    public String getOriginalToken() {
+        return originalToken;
+    }
 
     private TokenType getTokenType() {
         if (getScope() == ScopeType.ALBUM) {

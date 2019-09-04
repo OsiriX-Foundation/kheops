@@ -20,7 +20,8 @@ public class KheopsLogBuilder {
         NEW_REPORT_PROVIDER, NEW_REPORT, REPORT_PROVIDER_CONFIGURATION, LIST_REPORT_PROVIDERS, GET_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, REPORT_PROVIDER_METADATA,
         NEW_TOKEN, INTROSPECT_TOKEN,
         REFRESH_TOKEN_GRANT, AUTHORIZATION_CODE_GRANT, PASSWORD_GRANT, CLIENT_CREDENTIALS_GRANT, JWT_ASSERTION_GRANT, SAML_ASSERTION_GRANT, TOKEN_EXCHANGE_GRANT,
-        NEW_USER}
+        NEW_USER,
+        INBOX_INFO}
 
     private ArrayList<LogEntry> logEntry;
     private static final Logger LOG = Logger.getLogger(KheopsLogBuilder.class.getName());
@@ -59,6 +60,7 @@ public class KheopsLogBuilder {
         tokenProvenance.getActingParty().ifPresent(actingParty -> logEntry.add(new LogEntry("actingParty", actingParty)));
         tokenProvenance.getAuthorizedParty().ifPresent(authorizedParty -> logEntry.add(new LogEntry("authorizedParty", authorizedParty)));
         tokenProvenance.getCapabilityTokenId().ifPresent(capabilityTokenId -> logEntry.add(new LogEntry("authorizedCapabilityTokenId", capabilityTokenId)));
+        logEntry.add(new LogEntry("link", String.valueOf(tokenProvenance.isLink())));
         return this;
     }
 

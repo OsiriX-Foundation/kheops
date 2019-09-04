@@ -12,4 +12,5 @@ public interface TokenProvenance {
     default Optional<String> getCapabilityTokenId() {
         return Optional.empty();
     }
+    default boolean isLink() { return false; }
 }

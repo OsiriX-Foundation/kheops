@@ -16,6 +16,7 @@ public final class ViewerAccessToken implements AccessToken {
 
     private final JsonObject jwe;
     private final AccessToken accessToken;
+    private final boolean linkAuthorization;
 
     static final class Builder {
         private final ServletContext servletContext;
@@ -24,23 +25,23 @@ public final class ViewerAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        ViewerAccessToken build(String assertionToken)
+        ViewerAccessToken build(String assertionToken, boolean linkAuthorization)
                 throws AccessTokenVerificationException {
 
             try(JsonReader jsonReader = Json.createReader(new StringReader(assertionToken))) {
                 JsonObject jwe = jsonReader.readObject();
-                return new ViewerAccessToken(servletContext, jwe);
+                return new ViewerAccessToken(servletContext, jwe, linkAuthorization);
             }
         }
     }
 
     static Builder getBuilder(ServletContext servletContext) { return new Builder(servletContext); }
 
-    private ViewerAccessToken(ServletContext servletContext, JsonObject jwe)
+    private ViewerAccessToken(ServletContext servletContext, JsonObject jwe, boolean linkAuthorization)
             throws AccessTokenVerificationException {
 
         this.jwe = jwe;
-
+        this.linkAuthorization = linkAuthorization;
         this.accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
     }
 
@@ -90,7 +91,9 @@ public final class ViewerAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new ViewerPrincipal(servletContext, this);
+        return new ViewerPrincipal(servletContext, this, linkAuthorization, jwe.toString());
     }
 
+    @Override
+    public boolean isLink() { return linkAuthorization; }
 }

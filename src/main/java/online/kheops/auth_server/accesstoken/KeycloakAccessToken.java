@@ -38,6 +38,8 @@ final class KeycloakAccessToken implements AccessToken {
 
     private final String subject;
     private final String actingParty;
+    private final boolean linkAuthorization;
+    private final String token;
 
     private static final String JWKS_CACHE_ALIAS = "jwksCache";
     private static final String PUBLIC_KEY_CACHE_ALIAS = "publicKeyCache";
@@ -70,7 +72,7 @@ final class KeycloakAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        public KeycloakAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public KeycloakAccessToken build(String assertionToken, boolean linkAuthorization) throws AccessTokenVerificationException {
             URL jwksURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -122,7 +124,7 @@ final class KeycloakAccessToken implements AccessToken {
                 actingParty = null;
             }
 
-            return new KeycloakAccessToken(jwt.getSubject(), actingParty);
+            return new KeycloakAccessToken(jwt.getSubject(), actingParty, linkAuthorization, assertionToken);
         }
 
         private static synchronized URL getJwksURL(String configurationUrl) {
@@ -167,9 +169,11 @@ final class KeycloakAccessToken implements AccessToken {
         }
     }
 
-    private KeycloakAccessToken(String subject, String actingParty) {
+    private KeycloakAccessToken(String subject, String actingParty, boolean linkAuthorization, String token) {
         this.subject = subject;
         this.actingParty = actingParty;
+        this.linkAuthorization = linkAuthorization;
+        this.token = token;
     }
 
     @Override
@@ -194,6 +198,9 @@ final class KeycloakAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new UserPrincipal(user, actingParty);
+        return new UserPrincipal(user, actingParty, linkAuthorization, token);
     }
+
+    @Override
+    public boolean isLink() { return linkAuthorization; }
 }

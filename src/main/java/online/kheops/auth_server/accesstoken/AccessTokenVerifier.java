@@ -13,8 +13,7 @@ public abstract class AccessTokenVerifier {
             Arrays.asList(ReportProviderAccessToken.Builder.class,
                           CapabilityAccessToken.CapabilityAccessTokenBuilder.class,
                           ViewerAccessTokenBuilder.class,
-                          KeycloakAccessToken.Builder.class,
-                          SuperuserAccessToken.Builder.class);
+                          KeycloakAccessToken.Builder.class);
 
     private static final Class<PepAccessToken.Builder> pepAccessTokenClass = PepAccessToken.Builder.class;
 
@@ -22,7 +21,12 @@ public abstract class AccessTokenVerifier {
 
     public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
             throws AccessTokenVerificationException {
-        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken);
+        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken, false);
+    }
+
+    public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken, boolean linkAuthorization)
+            throws AccessTokenVerificationException {
+        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken, linkAuthorization);
     }
 
     public static AccessToken authenticateIntrospectableAccessToken(ServletContext servletContext, String accessToken)
@@ -31,10 +35,10 @@ public abstract class AccessTokenVerifier {
         List<Class<?>> introspectableAccessTokenBuilderClasses = new ArrayList<>(accessTokenBuilderClasses);
         introspectableAccessTokenBuilderClasses.add(pepAccessTokenClass);
 
-        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken);
+        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken, false);
     }
 
-    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken)
+    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken, boolean linkAuthorization)
             throws AccessTokenVerificationException {
 
         List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
@@ -59,7 +63,7 @@ public abstract class AccessTokenVerifier {
             }
 
             try {
-                return accessTokenBuilder.build(accessToken);
+                return accessTokenBuilder.build(accessToken, linkAuthorization);
             } catch (AccessTokenVerificationException e) {
                 exceptionList.add(e);
             }

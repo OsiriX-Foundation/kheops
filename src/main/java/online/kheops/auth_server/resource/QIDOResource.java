@@ -52,8 +52,8 @@ import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 @Path("/")
 public class QIDOResource {
 
+    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final Logger LOG = Logger.getLogger(QIDOResource.class.getName());
-
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
     @Context
@@ -282,8 +282,19 @@ public class QIDOResource {
                 if (skipped >= offset) {
                     if(!(favoriteFilter != null && favoriteValue != favoriteFilter) && availableSeries.size() < limit) {
                         if (includeFieldFavorite) {
-                            series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
+                            series.setString(CUSTOM_DICOM_TAG_FAVORITE, VR.SH, String.valueOf(favoriteValue));
                         }
+                        final StringBuilder retrieveURL = new StringBuilder();
+                        retrieveURL.append(context.getInitParameter(HOST_ROOT_PARAMETER));
+                        retrieveURL.append("/api");
+                        if(kheopsPrincipal.isLink()) {
+                            retrieveURL.append("/link/").append(kheopsPrincipal.getOriginalToken());
+                        }
+                        retrieveURL.append("/studies/");
+                        retrieveURL.append(series.getString(Tag.StudyInstanceUID));
+                        retrieveURL.append("/series/");
+                        retrieveURL.append(series.getString(Tag.SeriesInstanceUID));
+                        series.setString(Tag.RetrieveURL, VR.UR, retrieveURL.toString());
                         availableSeries.add(series);
                         kheopsLogBuilder.series(seriesInstanceUID);
                     }

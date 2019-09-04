@@ -41,6 +41,8 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
+import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_COMMENTS;
+import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_FAVORITE;
 import static org.jooq.impl.DSL.*;
 
 public class Studies {
@@ -130,16 +132,16 @@ public class Studies {
 
         final SelectQuery<? extends Record> selectQuery = create.selectQuery();
         selectQuery.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
-                isnull(STUDIES.STUDY_DATE, "NULL").as(STUDIES.STUDY_DATE.getName()),
-                isnull(STUDIES.STUDY_TIME, "NULL").as(STUDIES.STUDY_TIME.getName()),
-                isnull(STUDIES.TIMEZONE_OFFSET_FROM_UTC, "NULL").as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
-                isnull(STUDIES.ACCESSION_NUMBER, "NULL").as(STUDIES.ACCESSION_NUMBER.getName()),
-                isnull(STUDIES.REFERRING_PHYSICIAN_NAME, "NULL").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
-                isnull(STUDIES.PATIENT_NAME, "NULL").as(STUDIES.PATIENT_NAME.getName()),
-                isnull(STUDIES.PATIENT_ID, "NULL").as(STUDIES.PATIENT_ID.getName()),
-                isnull(STUDIES.PATIENT_BIRTH_DATE, "NULL").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
-                isnull(STUDIES.PATIENT_SEX, "NULL").as(STUDIES.PATIENT_SEX.getName()),
-                isnull(STUDIES.STUDY_ID, "NULL").as(STUDIES.STUDY_ID.getName()),
+                isnull(STUDIES.STUDY_DATE, "").as(STUDIES.STUDY_DATE.getName()),
+                isnull(STUDIES.STUDY_TIME, "").as(STUDIES.STUDY_TIME.getName()),
+                STUDIES.TIMEZONE_OFFSET_FROM_UTC.as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
+                isnull(STUDIES.ACCESSION_NUMBER, "").as(STUDIES.ACCESSION_NUMBER.getName()),
+                STUDIES.REFERRING_PHYSICIAN_NAME.as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
+                isnull(STUDIES.PATIENT_NAME, "").as(STUDIES.PATIENT_NAME.getName()),
+                isnull(STUDIES.PATIENT_ID, "").as(STUDIES.PATIENT_ID.getName()),
+                isnull(STUDIES.PATIENT_BIRTH_DATE, "").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
+                isnull(STUDIES.PATIENT_SEX, "").as(STUDIES.PATIENT_SEX.getName()),
+                isnull(STUDIES.STUDY_ID, "").as(STUDIES.STUDY_ID.getName()),
                 countDistinct(SERIES.PK).as("count:" + SERIES.PK.getName()),
                 sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
                 isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
@@ -147,7 +149,7 @@ public class Studies {
                 countDistinct(EVENTS).as("sum_comments"));
 
         if(qidoParams.includeStudyDescriptionField()) {
-            selectQuery.addSelect(isnull(STUDIES.STUDY_DESCRIPTION, "NULL").as(STUDIES.STUDY_DESCRIPTION.getName()));
+            selectQuery.addSelect(STUDIES.STUDY_DESCRIPTION.as(STUDIES.STUDY_DESCRIPTION.getName()));
         }
 
         selectQuery.addFrom(USERS);
@@ -167,6 +169,7 @@ public class Studies {
         selectQuery.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
 
         selectQuery.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
+
 
         qidoParams.getLimit().ifPresent(selectQuery::addLimit);
         qidoParams.getOffset().ifPresent(selectQuery::addOffset);
@@ -196,16 +199,19 @@ public class Studies {
                         .and(fromCondition)
                         .groupBy(STUDIES.STUDY_UID)
                         .fetch().get(0).getValue(0).toString();
-                attributes.setString(Tag.ModalitiesInStudy, VR.CS, modalities);
+
+                attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.split(","));
             });
-            if (!qidoParams.getModalityFilter().isPresent()) {
-                attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString());
+            if (!qidoParams.getModalityFilter().isPresent()) { //todo maybe use ifPresentOrElse(...)
+                attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString().split(","));
             }
 
+            //Tag Type (1) Required
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
+
+            //Tag Type (2) Required, Empty if Unknown
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
-            safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
             safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, r.getValue(STUDIES.ACCESSION_NUMBER.getName()).toString());
             safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
             safeAttributeSetString(attributes, Tag.PatientName, VR.PN, r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
@@ -216,16 +222,22 @@ public class Studies {
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer) r.getValue("count:" + SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal) r.getValue("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
 
-            if(qidoParams.includeFavoriteField()) {
-                attributes.setInt(0x00012345, VR.IS, ((Integer)r.getValue("sum_fav")));
-            }
-            if(qidoParams.includeCommentField()) {
-                attributes.setInt(0x00012346, VR.IS, ((Integer)r.getValue("sum_comments")));
-            }
-            if(qidoParams.includeStudyDescriptionField()) {
+            //Tag Type (3) Optional
+            if(qidoParams.includeStudyDescriptionField() && r.getValue(STUDIES.STUDY_DESCRIPTION.getName()) != null) {
                 safeAttributeSetString(attributes, Tag.StudyDescription, VR.CS, r.getValue(STUDIES.STUDY_DESCRIPTION.getName()).toString());
             }
+            if(r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()) != null) {
+                safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
+            }
+            //Tag Custom
+            if(qidoParams.includeFavoriteField()) {
+                attributes.setInt(CUSTOM_DICOM_TAG_FAVORITE, VR.IS, ((Integer)r.getValue("sum_fav")));
+            }
+            if(qidoParams.includeCommentField()) {
+                attributes.setInt(CUSTOM_DICOM_TAG_COMMENTS, VR.IS, ((Integer)r.getValue("sum_comments")));
+            }
 
+            //Others
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
             attributesList.add(attributes);
@@ -255,7 +267,11 @@ public class Studies {
         else
             ord = STUDIES.STUDY_DATE;
 
-        return descending ? ord.desc() : ord.asc();
+        SortField sortField = descending ? ord.desc() : ord.asc();
+        if (orderBy == Tag.StudyDate) {
+            sortField.nullsLast();
+        }
+        return sortField;
     }
 
     private static Condition createConditionModality(String filter) {
@@ -346,10 +362,7 @@ public class Studies {
     }
 
     private static Condition createCondition(String filter, TableField<? extends Record, String> column, Boolean isFuzzyMatching) {
-        String parameterNoStar = filter.replace("*", "")
-                .replace(", ", "^")
-                .replace(" ","^")
-                .replace(",", "^");
+        String parameterNoStar = filter.replace("*", "");
 
         if (parameterNoStar.length() == 0) {
             return null;
