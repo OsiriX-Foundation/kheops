@@ -74,7 +74,7 @@
               <th>{{ $t('applicationentity') }}</th>
               <td>{{ serie.RetrieveAETitle.Value[0] }}</td>
             </tr>
-            <tr v-if="serie.NumberOfSeriesRelatedInstances.Value !== undefined">
+            <tr v-if="serie.NumberOfSeriesRelatedInstances && serie.NumberOfSeriesRelatedInstances.Value !== undefined">
               <th>{{ $t('numberimages') }}</th>
               <td>{{ serie.NumberOfSeriesRelatedInstances.Value[0] }}</td>
             </tr>
