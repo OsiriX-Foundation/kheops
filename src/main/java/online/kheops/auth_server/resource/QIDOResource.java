@@ -282,7 +282,7 @@ public class QIDOResource {
                 if (skipped >= offset) {
                     if(!(favoriteFilter != null && favoriteValue != favoriteFilter) && availableSeries.size() < limit) {
                         if (includeFieldFavorite) {
-                            series.setString(0x00012345, VR.SH, String.valueOf(favoriteValue));
+                            series.setString(CUSTOM_DICOM_TAG_FAVORITE, VR.SH, String.valueOf(favoriteValue));
                         }
                         final StringBuilder retrieveURL = new StringBuilder();
                         retrieveURL.append(context.getInitParameter(HOST_ROOT_PARAMETER));
