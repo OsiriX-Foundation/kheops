@@ -41,6 +41,8 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
+import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_COMMENTS;
+import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_FAVORITE;
 import static org.jooq.impl.DSL.*;
 
 public class Studies {
@@ -204,16 +206,14 @@ public class Studies {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString().split(","));
             }
 
+            //Tag Type (1) Required
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
+
+            //Tag Type (2) Required, Empty if Unknown
             safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
             safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
-            if(r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()) != null) {
-                safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
-            }
             safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, r.getValue(STUDIES.ACCESSION_NUMBER.getName()).toString());
-            if(r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()) != null) {
-                safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
-            }
+            safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
             safeAttributeSetString(attributes, Tag.PatientName, VR.PN, r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
             safeAttributeSetString(attributes, Tag.PatientID, VR.LO, r.getValue(STUDIES.PATIENT_ID.getName()).toString());
             safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, r.getValue(STUDIES.PATIENT_BIRTH_DATE.getName()).toString());
@@ -222,16 +222,22 @@ public class Studies {
             attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer) r.getValue("count:" + SERIES.PK.getName())));
             attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal) r.getValue("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
 
-            if(qidoParams.includeFavoriteField()) {
-                attributes.setInt(0x00012345, VR.IS, ((Integer)r.getValue("sum_fav")));
-            }
-            if(qidoParams.includeCommentField()) {
-                attributes.setInt(0x00012346, VR.IS, ((Integer)r.getValue("sum_comments")));
-            }
+            //Tag Type (3) Optional
             if(qidoParams.includeStudyDescriptionField() && r.getValue(STUDIES.STUDY_DESCRIPTION.getName()) != null) {
                 safeAttributeSetString(attributes, Tag.StudyDescription, VR.CS, r.getValue(STUDIES.STUDY_DESCRIPTION.getName()).toString());
             }
+            if(r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()) != null) {
+                safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
+            }
+            //Tag Custom
+            if(qidoParams.includeFavoriteField()) {
+                attributes.setInt(CUSTOM_DICOM_TAG_FAVORITE, VR.IS, ((Integer)r.getValue("sum_fav")));
+            }
+            if(qidoParams.includeCommentField()) {
+                attributes.setInt(CUSTOM_DICOM_TAG_COMMENTS, VR.IS, ((Integer)r.getValue("sum_comments")));
+            }
 
+            //Others
             safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
 
             attributesList.add(attributes);
