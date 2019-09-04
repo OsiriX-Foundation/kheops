@@ -359,11 +359,11 @@
       :identifier="infiniteId"
       @infinite="infiniteHandler"
     >
-			<div slot="spinner">
+      <div slot="spinner">
         <pulse-loader
           color="white"
         />
-			</div>
+      </div>
       <div slot="no-more">
         {{ $t('nomorestudies') }}
       </div>
@@ -371,7 +371,7 @@
         {{ $t('noresults') }}
       </div>
       <div slot="error">
-        {{ $t('error') }} <br/> <br/>
+        {{ $t('error') }} <br> <br>
         <button
           type="button"
           class=" btn btn-md"

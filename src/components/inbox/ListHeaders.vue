@@ -93,7 +93,7 @@
           >
             {{ allowedAlbum.name }}
           </b-dropdown-item>
-					<b-dropdown-divider />
+          <b-dropdown-divider />
           <b-dropdown-item
             @click.stop="goToCreateAlbum()"
           >
@@ -620,22 +620,22 @@ export default {
 			this.selectedStudies.forEach(study => {
 				StudiesUID.push(study.StudyInstanceUID.Value[0])
 			})
-			
+
 			let SeriesUID = []
 			for (let studyUID in this.selectedSeries) {
 				this.selectedSeries[studyUID].forEach(serie => {
 					SeriesUID.push(`${studyUID},${serie.SeriesInstanceUID.Value[0]}`)
 				})
 			}
-			
+
 			let query = {}
 			if (StudiesUID.length > 0) query['StudyInstanceUID'] = StudiesUID
 			if (SeriesUID.length > 0) query['SeriesInstanceUID'] = SeriesUID
 			if (Object.keys(query).length > 0) {
 				query['source'] = this.albumId === '' ? 'inbox' : this.albumId
-				this.$router.push({  path: '/albums/new', query: query })
+				this.$router.push({ path: '/albums/new', query: query })
 			} else {
-				this.$router.push({  path: '/albums/new' })
+				this.$router.push({ path: '/albums/new' })
 			}
 		}
 	}

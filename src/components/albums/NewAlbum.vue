@@ -274,7 +274,7 @@ export default {
 					})
 				})
 			}
-			if (this.$route.query  && this.$route.query['SeriesInstanceUID']) {
+			if (this.$route.query && this.$route.query['SeriesInstanceUID']) {
 				this.$route.query['SeriesInstanceUID'].forEach(serie => {
 					let infoSerie = serie.split(',')
 					if (infoSerie.length === 2) {
