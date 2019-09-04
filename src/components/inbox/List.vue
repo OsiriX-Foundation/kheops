@@ -359,6 +359,11 @@
       :identifier="infiniteId"
       @infinite="infiniteHandler"
     >
+			<div slot="spinner">
+        <pulse-loader
+          color="white"
+        />
+			</div>
       <div slot="no-more">
         {{ $t('nomorestudies') }}
       </div>
@@ -391,10 +396,11 @@ import moment from 'moment'
 import mobiledetect from '@/mixins/mobiledetect.js'
 import SortList from '@/components/inbox/SortList.vue'
 import IconListProviders from '@/components/providers/IconListProviders.vue'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
 	name: 'Studies',
-	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders },
+	components: { ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders, PulseLoader },
 	mixins: [ ],
 	props: {
 		album: {
