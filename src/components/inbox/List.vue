@@ -309,7 +309,6 @@
           <div class="">
             {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
           </div>
-          <br v-if="mobiledetect===true">
           <div :class="mobiledetect===true ? '' : 'ml-auto'">
             <!--
             :show-favorite-icon="permissions.add_series"
@@ -367,7 +366,7 @@
         {{ $t('noresults') }}
       </div>
       <div slot="error">
-        {{ $t('error') }}
+        {{ $t('error') }} <br/> <br/>
         <button
           type="button"
           class=" btn btn-md"
