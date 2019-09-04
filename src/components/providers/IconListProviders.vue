@@ -98,8 +98,8 @@ export default {
 			if (provider.data.supported_modalities === undefined) {
 				return true
 			}
-			let result = false
-			let modalitiesInStudy = study.ModalitiesInStudy.Value[0].split(',')
+      let result = false
+      let modalitiesInStudy = study.ModalitiesInStudy.Value
 			modalitiesInStudy.forEach(modality => {
 				if (provider.data.supported_modalities.includes(modality)) {
 					result = true
