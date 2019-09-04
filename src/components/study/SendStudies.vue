@@ -553,7 +553,7 @@ export default {
 						this.manageResult(files, res.data, res.status)
 						resolve(res)
 					}).catch(error => {
-						this.manageResult(files, error !== undefined ? error.data : {}, error !== undefined ? error.status : 0)
+						this.manageResult(files, error !== undefined ? error.response.data : {}, error !== undefined ? error.response.status : 0)
 						resolve(error)
 					})
 				} else if (this.files.length > 0) {
