@@ -57,13 +57,21 @@ const actions = {
 	},
 	setSerieImage ({ commit, dispatch }, params) {
 		let serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID]
-		return dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then(res => {
-			if (res.data !== undefined) {
-				return dispatch('setImageSrc', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, serieUID: params.SeriesInstanceUID, data: res.data })
-			}
-		}).catch(err => {
-			Promise.reject(err)
-		})
+		if (serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
+			return dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then(res => {
+				if (res.data !== undefined) {
+					return dispatch('setImageSrc', { StudyInstanceUID: params.StudyInstanceUID, serie: serie, serieUID: params.SeriesInstanceUID, data: res.data })
+				}
+			}).catch(err => {
+				Promise.reject(err)
+			})
+		} else {
+			dispatch('getImage', {
+				StudyInstanceUID: params.StudyInstanceUID,
+				SeriesInstanceUID: params.SeriesInstanceUID,
+				serie: serie
+			})
+		}
 	},
 	getSerieMetadata ({ commit }, params) {
 		let request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/metadata`
