@@ -4,6 +4,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+
+
     <servlet>
         <display-name>Kheops Authentication</display-name>
         <!--suppress ServletWithoutMappingInspection -->
@@ -16,6 +18,9 @@
 
     <listener>
         <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>online.kheops.auth_server.liquibase.LiquibaseContextListener</listener-class>
     </listener>
 
     <context-param>

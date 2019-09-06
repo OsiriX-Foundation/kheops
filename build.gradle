@@ -66,6 +66,10 @@ repositories {
 
 
 dependencies {
+
+    // https://mvnrepository.com/artifact/org.liquibase/liquibase-core
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.0'
+
     compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.26'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.26'
