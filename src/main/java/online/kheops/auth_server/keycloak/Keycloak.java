@@ -117,8 +117,9 @@ public class Keycloak {
                         throw new UserNotFoundException();
                     }
                 }
+            } else {
+                throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
             }
-
         } else {
 
             String userEmail = cacheUserName.getCachedValue(user);
@@ -161,7 +162,6 @@ public class Keycloak {
                 }
             }
         }
-        throw new KeycloakException("ERROR:");
     }
 
     public List<UserResponseBuilder> getUsers(String find, Integer limit, Integer offset)
