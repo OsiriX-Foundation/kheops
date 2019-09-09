@@ -25,35 +25,54 @@ const router = new Router({
 		name: 'studies',
 		component: Inbox,
 		beforeEnter: requireAuth,
-		meta: { permissions: 'active', condition: 'any' }
+		meta: {
+			permissions: 'active',
+			condition: 'any'
+		}
 	},
 	{
 		path: '/albums',
 		name: 'albums',
 		component: ListAlbums,
 		beforeEnter: requireAuth,
-		meta: { permissions: 'active', condition: 'any' }
+		meta: {
+			permissions: 'active',
+			condition: 'any',
+			title: 'albums'
+		}
 	},
 	{
 		path: '/albums/new',
 		name: 'newAlbum',
 		component: NewAlbum,
 		beforeEnter: requireAuth,
-		meta: { permissions: 'active', condition: 'any' }
+		meta: {
+			permissions: 'active',
+			condition: 'any',
+			title: 'newalbum'
+		}
 	},
 	{
 		path: '/albums/:album_id',
 		name: 'album',
 		component: Album,
 		beforeEnter: requireAuth,
-		meta: { permissions: 'active', condition: 'any' }
+		meta: {
+			permissions: 'active',
+			condition: 'any',
+			title: 'album'
+		}
 	},
 	{
 		path: '/user',
 		name: 'user',
 		component: User,
 		beforeEnter: requireAuth,
-		meta: { permissions: 'active', condition: 'any' }
+		meta: {
+			permissions: 'active',
+			condition: 'any',
+			title: 'user'
+		}
 	},
 	{
 		path: '*',
@@ -70,7 +89,6 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-	document.title = 'Kheops'
 	next()
 })
 
