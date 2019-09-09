@@ -54,7 +54,7 @@
             </tr>
             <tr v-if="metadata.PatientID">
               <th>{{ $t('patientid') }}</th>
-              <td>{{ metadata.PatientID.Value[0] }} {{ metadata.PatientSex.Value }}</td>
+              <td>{{ metadata.PatientID.Value[0] }}</td>
             </tr>
             <tr v-if="metadata.PatientSex.Value !== undefined && matchSex(metadata.PatientSex)">
               <th>{{ $t('patientsex') }}</th>
