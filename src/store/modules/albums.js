@@ -7,7 +7,8 @@ import Vue from 'vue'
 const state = {
 	albums: [],
 	defaultFlagAlbum: {
-		is_selected: false
+		is_selected: false,
+		is_hover: false
 	}
 }
 
@@ -30,7 +31,7 @@ const actions = {
 		return HTTP.get(`${request}${queries}`, { headers: { 'Accept': 'application/json' } }).then(res => {
 			let albums = []
 			res.data.forEach(album => {
-				Object.assign(album, { flag: state.defaultFlagAlbum })
+				Object.assign(album, { flag: JSON.parse(JSON.stringify(state.defaultFlagAlbum)) })
 				albums.push(album)
 			})
 			commit('SET_ALBUMS', albums)
@@ -141,6 +142,7 @@ const mutations = {
 	SET_ALBUM_FLAG (state, params) {
 		let album = state.albums[params.index]
 		album.flag[params.flag] = params.value
+		console.log(params.index)
 		Vue.set(state.albums, params.index, album)
 	},
 	UPDATE_ALBUM (state, params) {

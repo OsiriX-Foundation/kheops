@@ -43,11 +43,15 @@
             <span class="p-2">
               {{ album.name }}
             </span>
-            <v-icon
-              v-if="album.is_favorite"
-              name="star"
-              scale="2"
-            />
+            <span
+              @click.stop="toggleFavorite(album.album_id, album.is_favorite)"
+            >
+              <v-icon
+                name="star"
+                scale="2"
+                :color="(!album.is_favorite) ? 'grey' : ''"
+              />
+            </span>
           </h3>
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
@@ -171,6 +175,12 @@ export default {
 			}).catch(err => {
 				this.$router.push('/albums')
 				return err
+			})
+		},
+		toggleFavorite (albumID, isFavorite) {
+			let value = !isFavorite
+			this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value: value }).then(res => {
+				this.$store.dispatch('setKeyValueAlbum', { key: 'is_favorite', value: value })
 			})
 		}
 	}

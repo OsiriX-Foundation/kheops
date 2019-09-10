@@ -63,6 +63,8 @@
       :tbody-class="'link'"
       @row-clicked="clickAlbum"
       @sort-changed="sortingChanged"
+      @row-hovered="setItemHover"
+      @row-unhovered="setItemUnhover"
     >
       <template
         slot="HEAD_name"
@@ -217,16 +219,23 @@
         slot="name"
         slot-scope="row"
       >
-        {{ row.value }}
-        <span
-          class="ml-1"
-          @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
+        <div
+          :class="'d-flex flex-wrap'"
         >
-          <v-icon
-            name="star"
-            :color="(!row.item.is_favorite) ? 'grey' : ''"
-          />
-        </span>
+          <div class="">
+            {{ row.value }}
+          </div>
+          <span
+            class="ml-auto"
+            @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
+          >
+            <v-icon
+              v-if="row.item.flag.is_hover || mobiledetect || row.item.is_favorite"
+              name="star"
+              :color="(!row.item.is_favorite) ? 'grey' : ''"
+            />
+          </span>
+        </div>
       </template>
       <template
         slot="created_time"
@@ -274,6 +283,7 @@ import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders'
 import InfiniteLoading from 'vue-infinite-loading'
 import SortList from '@/components/inbox/SortList.vue'
 import moment from 'moment'
+import mobiledetect from '@/mixins/mobiledetect.js'
 
 export default {
 	name: 'Albums',
@@ -414,6 +424,9 @@ export default {
 			return {
 				from: new Date()
 			}
+		},
+		mobiledetect () {
+			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
 	watch: {
@@ -530,6 +543,12 @@ export default {
 			this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value: value }).then(res => {
 				this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value: value })
 			})
+		},
+		setItemHover (row) {
+			this.$store.dispatch('setFlagAlbum', { album_id: row.album_id, flag: 'is_hover', value: true })
+		},
+		setItemUnhover (row) {
+			this.$store.dispatch('setFlagAlbum', { album_id: row.album_id, flag: 'is_hover', value: false })
 		}
 	}
 }

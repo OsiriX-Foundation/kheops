@@ -63,6 +63,9 @@ const actions = {
 			return Promise.reject(err)
 		})
 	},
+	setKeyValueAlbum ({ commit }, params) {
+		state.album[params.key] = params.value
+	},
 	getUsersAlbum ({ commit }, params) {
 		const request = `albums/${params.album_id}/users`
 		return HTTP.get(request, '', { headers: { 'Accept': 'application/json' } }).then(res => {
