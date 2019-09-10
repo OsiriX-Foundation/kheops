@@ -42,8 +42,8 @@ public class LiquibaseContextListener implements ServletContextListener {
         final Configuration cfg = new Configuration();
         cfg.setProperties(properties);
 
-        int i = 0;
-        while(i<100) {
+        //int i = 0;
+        //while(i<100) {
             try {
 
                 // Prepare the Hibernate configuration
@@ -66,20 +66,20 @@ public class LiquibaseContextListener implements ServletContextListener {
                     liquibase.update(version, "");
                 }
                 liquibase.validate();
-                break;
+                //break;
 
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Unable to use liquibase", e);
-                LOG.log(Level.WARNING, "\\n i = " + i);
+                //LOG.log(Level.WARNING, "\\n i = " + i);
                 //System.exit(1);
-                i++;
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e2) {
-                    LOG.log(Level.WARNING, "Sleep error", e2);
-                }
+                //i++;
+                //try {
+                //    Thread.sleep(1000);
+                //} catch (Exception e2) {
+                //    LOG.log(Level.WARNING, "Sleep error", e2);
+               // }
             }
-        }
+       // }
         LOG.log(Level.INFO, "Liquibase : database version : " + getJDBCVersion());
     }
 
