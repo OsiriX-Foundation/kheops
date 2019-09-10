@@ -615,7 +615,7 @@ export default {
 				if (res.status === 200 && res.data.length > 0) {
 					this.studiesParams.offset += this.studiesParams.limit
 					$state.loaded()
-				} else {
+				} else if (this.studies.length === parseInt(res.headers['x-total-count'])) {
 					$state.complete()
 				}
 			}).catch(err => {
