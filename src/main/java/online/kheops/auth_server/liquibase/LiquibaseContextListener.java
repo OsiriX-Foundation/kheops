@@ -36,7 +36,7 @@ public class LiquibaseContextListener implements ServletContextListener {
         properties.setProperty(Environment.PASS, getJDBCPassword());
         properties.setProperty(Environment.URL, getJDBCUrl());
         //properties.setProperty(Environment.DRIVER, "org.postgresql.Driver");
-        //properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+        properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         properties.setProperty(Environment.SHOW_SQL, "false");
 
         final Configuration cfg = new Configuration();
