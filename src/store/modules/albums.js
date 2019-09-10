@@ -87,7 +87,6 @@ const actions = {
 			}
 		})
 		return axios.all(promises).then(results => {
-			console.log(results)
 			return results
 		})
 	},
@@ -142,7 +141,6 @@ const mutations = {
 	SET_ALBUM_FLAG (state, params) {
 		let album = state.albums[params.index]
 		album.flag[params.flag] = params.value
-		console.log(params.index)
 		Vue.set(state.albums, params.index, album)
 	},
 	UPDATE_ALBUM (state, params) {

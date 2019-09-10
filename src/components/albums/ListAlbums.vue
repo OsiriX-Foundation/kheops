@@ -457,6 +457,9 @@ export default {
 	created () {
 		this.$store.dispatch('initAlbums', {})
 	},
+	destroyed () {
+		this.$store.dispatch('initAlbums', {})
+	},
 	methods: {
 		clickAlbum (item) {
 			if (item.album_id) {

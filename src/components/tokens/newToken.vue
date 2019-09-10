@@ -258,7 +258,12 @@ export default {
 		}
 	},
 	created () {
-		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 100, sortBy: 'created_time', sortDesc: true, canCreateCapabilityToken: 'true' })
+		this.$store.dispatch('getAlbums', { queries: { canCreateCapabilityToken: 'true' } })
+	},
+	destroyed () {
+		if (this.albums.length > 0) {
+			this.$store.dispatch('initAlbums', {})
+		}
 	},
 	methods: {
 		createToken () {
