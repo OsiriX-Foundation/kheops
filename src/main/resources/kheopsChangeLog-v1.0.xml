@@ -367,34 +367,56 @@
 
     <changeSet author="kheops" id="v1.0-20">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="album_series_unique" schemaName="public"/>
-            </not>
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='album_series_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="album_fk, series_fk" constraintName="album_series_unique" tableName="album_series"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-21">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='album_user_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="album_fk, user_fk" constraintName="album_user_unique" tableName="album_user"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-22">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='albums_id_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="id" constraintName="albums_id_unique" tableName="albums"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-23">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='capabilities_id_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="id" constraintName="capabilities_id_unique" tableName="capabilities"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-24">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='capabilities_secret_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="secret" constraintName="capabilities_secret_unique" tableName="capabilities"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-25">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='keycloak_id_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="keycloak_id" constraintName="keycloak_id_unique" tableName="users"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-26">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='report_providers_client_id_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="client_id" constraintName="report_providers_client_id_unique" tableName="report_providers"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-27">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='series_uid_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="series_uid" constraintName="series_uid_unique" tableName="series"/>
     </changeSet>
     <changeSet author="kheops" id="v1.0-28">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='study_uid_unique'</sqlCheck>
+        </preConditions>
         <addUniqueConstraint columnNames="study_uid" constraintName="study_uid_unique" tableName="studies"/>
     </changeSet>
 

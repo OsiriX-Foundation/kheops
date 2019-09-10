@@ -55,24 +55,19 @@ public class LiquibaseContextListener implements ServletContextListener {
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
             Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
             final String version = getJDBCVersion();
-            //List<ChangeSetStatus> changeSetStatuses = liquibase.getChangeSetStatuses(new Contexts(), new LabelExpression());
-
-           // if (changeSetStatuses.get(0).getRanChangeSet() == null){
-          //      liquibase.changeLogSync("");
-          //  }
 
             if (liquibase.tagExists(version)) {
                 liquibase.rollback(version, "");
                 liquibase.update(version, "");
             } else {
-                liquibase.update(version, "l");
+                liquibase.update(version, "");
             }
             liquibase.validate();
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Unable to use liquibase",e);
             System.exit(1);
         }
-
+        LOG.log(Level.INFO, "Liquibase : database version : " + getJDBCVersion());
 
     }
 
