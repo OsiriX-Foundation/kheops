@@ -30,45 +30,55 @@ public class LiquibaseContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
 
         servletContext = sce.getServletContext();
-        try {
 
-            final Properties properties = new Properties();
-            properties.setProperty(Environment.USER, getJDBCUser());
-            properties.setProperty(Environment.PASS, getJDBCPassword());
-            properties.setProperty(Environment.URL, getJDBCUrl());
-            //properties.setProperty(Environment.DRIVER, "org.postgresql.Driver");
-            //properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
-            properties.setProperty(Environment.SHOW_SQL, "false");
+        final Properties properties = new Properties();
+        properties.setProperty(Environment.USER, getJDBCUser());
+        properties.setProperty(Environment.PASS, getJDBCPassword());
+        properties.setProperty(Environment.URL, getJDBCUrl());
+        //properties.setProperty(Environment.DRIVER, "org.postgresql.Driver");
+        //properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+        properties.setProperty(Environment.SHOW_SQL, "false");
 
-            final Configuration cfg = new Configuration();
-            cfg.setProperties(properties);
+        final Configuration cfg = new Configuration();
+        cfg.setProperties(properties);
 
-            // Prepare the Hibernate configuration
-            StandardServiceRegistry reg = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties()).build();
-            MetadataSources metaDataSrc = new MetadataSources(reg);
+        int i = 0;
+        while(i<100) {
+            try {
 
-            // Get database connection
-            Connection con = metaDataSrc.getServiceRegistry().getService(ConnectionProvider.class).getConnection();
-            JdbcConnection jdbcCon = new JdbcConnection(con);
+                // Prepare the Hibernate configuration
+                StandardServiceRegistry reg = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties()).build();
+                MetadataSources metaDataSrc = new MetadataSources(reg);
 
-            // Initialize Liquibase and run the update
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
-            Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
-            final String version = getJDBCVersion();
+                // Get database connection
+                Connection con = metaDataSrc.getServiceRegistry().getService(ConnectionProvider.class).getConnection();
+                JdbcConnection jdbcCon = new JdbcConnection(con);
 
-            if (liquibase.tagExists(version)) {
-                liquibase.rollback(version, "");
-                liquibase.update(version, "");
-            } else {
-                liquibase.update(version, "");
+                // Initialize Liquibase and run the update
+                Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
+                Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
+                final String version = getJDBCVersion();
+
+                if (liquibase.tagExists(version)) {
+                    liquibase.rollback(version, "");
+                    liquibase.update(version, "");
+                } else {
+                    liquibase.update(version, "");
+                }
+                liquibase.validate();
+
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Unable to use liquibase", e);
+                //System.exit(1);
+                i++;
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e2) {
+                    LOG.log(Level.WARNING, "Sleep error", e2);
+                }
             }
-            liquibase.validate();
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Unable to use liquibase",e);
-            System.exit(1);
         }
         LOG.log(Level.INFO, "Liquibase : database version : " + getJDBCVersion());
-
     }
 
     @Override
