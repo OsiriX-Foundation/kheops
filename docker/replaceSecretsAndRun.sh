@@ -108,7 +108,6 @@ do
 
   value=$(cat ${f})
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
-  sed -i "s|\${$filename}|$value|" ${LIQUIBASE_PROPERTIES_FILE_PATH}
 done
 
 
@@ -119,7 +118,7 @@ else
     sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:$KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
 fi
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_postgresql_}|$KHEOPS_AUTHDB_VERSION|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_postgresql_version}|$KHEOPS_AUTHDB_VERSION|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
 
@@ -129,9 +128,6 @@ sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PA
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 
-#liquibase
-sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${LIQUIBASE_PROPERTIES_FILE_PATH}
-sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${LIQUIBASE_PROPERTIES_FILE_PATH}
 
 
 echo "Ending setup secrets and env var"
