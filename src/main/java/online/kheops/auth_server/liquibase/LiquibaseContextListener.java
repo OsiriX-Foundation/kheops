@@ -69,6 +69,7 @@ public class LiquibaseContextListener implements ServletContextListener {
 
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Unable to use liquibase", e);
+                LOG.log(Level.WARNING, "\\n i = " + i);
                 //System.exit(1);
                 i++;
                 try {
