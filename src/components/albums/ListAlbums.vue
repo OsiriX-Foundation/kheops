@@ -262,7 +262,7 @@
         {{ $t('noresults') }}
       </div>
       <div slot="error">
-        {{ $t('error') }}
+        {{ $t('error') }}<br>
         <button
           type="button"
           class=" btn btn-md"

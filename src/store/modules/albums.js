@@ -37,7 +37,7 @@ const actions = {
 			commit('SET_ALBUMS', albums)
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	putStudiesInAlbum ({ commit }, params) {
