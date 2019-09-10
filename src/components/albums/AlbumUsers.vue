@@ -260,11 +260,16 @@ export default {
 			this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
 				if (res.status === 204) {
 					let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
+					if (this.confirmResetAdmin === user.user_name) {
+						this.getAlbum()
+					}
 					this.$snotify.success(message)
 				} else {
 					this.$snotify.error(this.$t('sorryerror'))
 				}
+				this.confirmResetAdmin = ''
 			}).catch(() => {
+				this.confirmResetAdmin = ''
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
@@ -278,14 +283,21 @@ export default {
 				this.$store.dispatch('removeAlbumUser', params).then(res => {
 					if (res.status === 204) {
 						this.$snotify.success(this.$t('albumuserdeletesuccess'))
-						this.confirmDelete = ''
 					} else {
 						this.$snotify.error(this.$t('sorryerror'))
 					}
+					this.confirmDelete = ''
 				}).catch(() => {
+					this.confirmDelete = ''
 					this.$snotify.error(this.$t('sorryerror'))
 				})
 			}
+		},
+		getAlbum () {
+			this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
+				this.$router.push('/albums')
+				return err
+			})
 		}
 	}
 }
@@ -299,13 +311,4 @@ div.user-table-container{
 a {
 	cursor: pointer;
 }
-/*
-td.showOnTrHover div.user_actions{
-	visibility: hidden;
-}
-
-tr:hover  td.showOnTrHover div.user_actions {
-	visibility: visible;
-}
-*/
 </style>
