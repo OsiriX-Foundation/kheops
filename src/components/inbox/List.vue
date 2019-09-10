@@ -247,12 +247,21 @@
           v-if="showFilters"
           @click.stop=""
         >
-          <input
+          <select
             v-model="filters.ModalitiesInStudy"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          ><br>
+            class="form-control"
+          >
+            <option value="" />
+            <option
+              v-for="modality in modalities"
+              :key="modality.id"
+              :value="modality"
+            >
+              {{ modality }}
+            </option>
+          </select>
+          <br>
+          <br>
         </div>
         {{ $t(data.label) }}
       </template>
@@ -503,7 +512,8 @@ export default {
 			series: 'series',
 			albums: 'albums',
 			sendingFiles: 'sending',
-			providers: 'providers'
+			providers: 'providers',
+			modalities: 'modalities'
 		}),
 		OS () {
 			return navigator.platform
@@ -578,6 +588,7 @@ export default {
 	created () {
 		this.$store.dispatch('initStudies', {})
 		this.$store.dispatch('initSeries')
+		this.$store.dispatch('initModalities')
 		let queriesAlbums = {
 			canAddSeries: true
 		}
@@ -585,6 +596,9 @@ export default {
 		this.$store.dispatch('getAlbums', { 'queries': queriesAlbums })
 		if (this.albumID !== undefined) {
 			this.$store.dispatch('getProviders', { albumID: this.albumID })
+			this.$store.commit('SET_MODALITIES', this.album.modalities)
+		} else {
+			this.$store.dispatch('getInboxInfo')
 		}
 	},
 	destroyed () {

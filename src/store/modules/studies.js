@@ -14,7 +14,8 @@ const state = {
 		is_commented: false,
 		is_indeterminate: false,
 		view: ''
-	}
+	},
+	modalities: []
 }
 
 // getters
@@ -33,7 +34,8 @@ const getters = {
 			return state.studies[idx]
 		}
 		return {}
-	}
+	},
+	modalities: state => state.modalities
 }
 
 // actions
@@ -191,6 +193,23 @@ const actions = {
 			.then(res => {
 				return res
 			})
+	},
+	initModalities ({ commit }) {
+		commit('INIT_MODALITIES')
+	},
+	getInboxInfo ({ commit }, params) {
+		const request = 'inboxinfo'
+		return HTTP.get(request).then(res => {
+			if (res.status === 200) {
+				commit('SET_MODALITIES', res.data.modalities)
+			} else {
+				commit('SET_MODALITIES', [])
+			}
+			return res
+		}).catch(err => {
+			commit('SET_MODALITIES', [])
+			Promise.reject(err)
+		})
 	}
 }
 
@@ -222,6 +241,12 @@ const mutations = {
 		let study = state.studies[params.index]
 		study._showDetails = params.value
 		Vue.set(state.studies, params.indexStudy, study)
+	},
+	INIT_MODALITIES (state) {
+		state.modalities = []
+	},
+	SET_MODALITIES (state, newModalities) {
+		state.modalities = newModalities
 	}
 }
 
