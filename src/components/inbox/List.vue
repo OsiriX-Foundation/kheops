@@ -106,7 +106,7 @@
       :show-inbox-button="permissions.add_inbox"
       :album-id="album.album_id !== undefined ? album.album_id : ''"
       @setFilters="changeFilterValue"
-      @reloadStudies="searchStudies"
+      @reloadStudies="reloadStudies"
     />
     <b-table
       class="container-fluid"
@@ -586,20 +586,12 @@ export default {
 		}
 	},
 	created () {
-		this.$store.dispatch('initStudies', {})
-		this.$store.dispatch('initSeries')
-		this.$store.dispatch('initModalities')
+		this.initData()
 		let queriesAlbums = {
 			canAddSeries: true
 		}
-		this.$store.dispatch('initAlbums', {})
 		this.$store.dispatch('getAlbums', { 'queries': queriesAlbums })
-		if (this.albumID !== undefined) {
-			this.$store.dispatch('getProviders', { albumID: this.albumID })
-			this.$store.commit('SET_MODALITIES', this.album.modalities)
-		} else {
-			this.$store.dispatch('getInboxInfo')
-		}
+		this.setAlbumInbox()
 	},
 	destroyed () {
 		this.$store.dispatch('initStudies', {})
@@ -612,16 +604,49 @@ export default {
 		// https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
 		infiniteHandler ($state) {
 			this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then(res => {
+				if (this.studies.length === parseInt(res.headers['x-total-count'])) {
+					$state.complete()
+				}
 				if (res.status === 200 && res.data.length > 0) {
 					this.studiesParams.offset += this.studiesParams.limit
 					$state.loaded()
-				} else if (this.studies.length === parseInt(res.headers['x-total-count'])) {
+				} else if (res.status === 204 && res.data.length === 0) {
 					$state.complete()
 				}
 			}).catch(err => {
 				$state.error()
 				return err
 			})
+		},
+		initData () {
+			this.$store.dispatch('initStudies', {})
+			this.$store.dispatch('initSeries')
+			this.$store.dispatch('initModalities')
+			this.$store.dispatch('initAlbums', {})
+		},
+		reloadStudies () {
+			this.searchStudies()
+			if (this.albumID !== undefined) {
+				this.getAlbum().then(res => {
+					this.setAlbumInbox()
+				})
+			} else {
+				this.setAlbumInbox()
+			}
+		},
+		getAlbum () {
+			return this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
+				this.$router.push('/albums')
+				return err
+			})
+		},
+		setAlbumInbox () {
+			if (this.albumID !== undefined) {
+				this.$store.dispatch('getProviders', { albumID: this.albumID })
+				this.$store.commit('SET_MODALITIES', this.album.modalities)
+			} else {
+				this.$store.dispatch('getInboxInfo')
+			}
 		},
 		setItemHover (item, index, event) {
 			let params = {
