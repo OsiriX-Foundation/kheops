@@ -157,7 +157,7 @@ public class Keycloak {
             } else {
                 try {
                     String responseString = response.readEntity(String.class);
-                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "\n" + responseString);
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString + "\n" + responseString);
                 } catch (ProcessingException e) {
                     throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString, e);
                 }
