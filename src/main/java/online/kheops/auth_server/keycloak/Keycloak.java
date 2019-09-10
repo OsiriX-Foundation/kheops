@@ -129,8 +129,9 @@ public class Keycloak {
 
             final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
             final Response response;
+            final String tokenString;
             try {
-                String tokenString = token.getToken();
+                tokenString = token.getToken();
                 Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
                 response = builder.get();
             } catch (ProcessingException e) {
@@ -158,7 +159,7 @@ public class Keycloak {
                     String responseString = response.readEntity(String.class);
                     throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "\n" + responseString);
                 } catch (ProcessingException e) {
-                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus(), e);
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString, e);
                 }
             }
         }
