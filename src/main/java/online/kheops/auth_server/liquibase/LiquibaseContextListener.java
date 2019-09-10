@@ -5,29 +5,46 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import online.kheops.auth_server.util.JOOQTools;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.sql.Connection;
-
-import static online.kheops.auth_server.util.JOOQTools.getDataSource;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LiquibaseContextListener implements ServletContextListener {
 
     private static ServletContext servletContext;
+    private final String changeLogFile = "kheopsChangeLog-master.xml";
+    private static final java.util.logging.Logger LOG = Logger.getLogger(LiquibaseContextListener.class.getName());
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+
         servletContext = sce.getServletContext();
         try {
+
+            final Properties properties = new Properties();
+            properties.setProperty(Environment.USER, getJDBCUser());
+            properties.setProperty(Environment.PASS, getJDBCPassword());
+            properties.setProperty(Environment.URL, getJDBCUrl());
+            //properties.setProperty(Environment.DRIVER, "org.postgresql.Driver");
+            //properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+            properties.setProperty(Environment.SHOW_SQL, "false");
+
+            final Configuration cfg = new Configuration();
+            cfg.setProperties(properties);
+
             // Prepare the Hibernate configuration
-            StandardServiceRegistry reg = new StandardServiceRegistryBuilder().configure().build();
+            StandardServiceRegistry reg = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties()).build();
             MetadataSources metaDataSrc = new MetadataSources(reg);
 
             // Get database connection
@@ -36,10 +53,24 @@ public class LiquibaseContextListener implements ServletContextListener {
 
             // Initialize Liquibase and run the update
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
-            Liquibase liquibase = new Liquibase("kheopsChangeLog-master.xml", new ClassLoaderResourceAccessor(), database);
-            liquibase.update("v1");
+            Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
+            final String version = getJDBCVersion();
+            //List<ChangeSetStatus> changeSetStatuses = liquibase.getChangeSetStatuses(new Contexts(), new LabelExpression());
+
+           // if (changeSetStatuses.get(0).getRanChangeSet() == null){
+          //      liquibase.changeLogSync("");
+          //  }
+
+            if (liquibase.tagExists(version)) {
+                liquibase.rollback(version, "");
+                liquibase.update(version, "");
+            } else {
+                liquibase.update(version, "l");
+            }
+            liquibase.validate();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.log(Level.WARNING, "Unable to use liquibase",e);
+            System.exit(1);
         }
 
 
@@ -67,6 +98,10 @@ public class LiquibaseContextListener implements ServletContextListener {
     private static String getJDBCUser() {
         verifyState();
         return servletContext.getInitParameter("online.kheops.jdbc.user");
+    }
+    private static String getJDBCVersion() {
+        verifyState();
+        return servletContext.getInitParameter("online.kheops.jdbc.version");
     }
 
 }
