@@ -66,6 +66,7 @@ public class LiquibaseContextListener implements ServletContextListener {
                     liquibase.update(version, "");
                 }
                 liquibase.validate();
+                break;
 
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Unable to use liquibase", e);
