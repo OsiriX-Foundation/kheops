@@ -62,9 +62,10 @@
               <v-icon
                 class="align-middle"
                 name="paper-plane"
+                color="white"
               />
             </span><br>
-            {{ $t("send") }}
+            <span style="color: white">{{ $t("send") }}</span>
           </button>
         </div>
         <!--
@@ -82,9 +83,10 @@
               <v-icon
                 class="align-middle"
                 name="book"
+                color="white"
               />
             </span><br>
-            <span>{{ $t("addalbum") }}</span>
+            <span style="color: white">{{ $t("addalbum") }}</span>
           </template>
           <b-dropdown-item
             v-for="allowedAlbum in allowedAlbums"
@@ -115,9 +117,10 @@
               <v-icon
                 class="align-middle"
                 name="bars"
+                color="white"
               />
             </span><br>
-            {{ $t("addInbox") }}
+            <span style="color: white">{{ $t("addInbox") }}</span>
           </button>
         </div>
         <div
@@ -134,9 +137,10 @@
               <v-icon
                 class="align-middle"
                 name="star"
+                color="white"
               />
             </span><br>
-            {{ $t("infoFavorites") }}
+            <span style="color: white">{{ $t("infoFavorites") }}</span>
           </button>
         </div>
         <div
@@ -153,9 +157,10 @@
               <v-icon
                 class="align-middle"
                 name="trash"
+                color="white"
               />
             </span><br>
-            {{ $t("delete") }}
+            <span style="color: white">{{ $t("delete") }}</span>
           </button>
         </div>
         <div class="ml-auto" />
