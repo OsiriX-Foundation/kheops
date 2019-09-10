@@ -30,8 +30,8 @@ RUN dpkg -i metricbeat-amd64.deb && \
 
 COPY metricbeat/metricbeat.yml /etc/metricbeat/metricbeat.yml
 COPY metricbeat/http.yml /etc/metricbeat/modules.d/http.yml
-RUN chmod go-w /etc/metricbeat/metricbeat.yml \
-    chmod go-w /etc/metricbeat/modules.d/http.yml
+RUN chmod go-w /etc/metricbeat/metricbeat.yml
+RUN chmod go-w /etc/metricbeat/modules.d/http.yml
 
 COPY replaceSecretsAndRun.sh replaceSecretsAndRun.sh
 
