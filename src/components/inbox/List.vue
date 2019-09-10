@@ -283,20 +283,6 @@
             inline
             @change="setChecked(row)"
           />
-          <!--
-          <b-button
-            variant="link"
-            size="sm"
-            class="mr-1 pt-0"
-          >
-            <v-icon
-              class="align-middle"
-              style="margin-right:1"
-              name="star"
-              :color="(!row.item.flag.is_favorite) ? 'grey' : ''"
-            />
-          </b-button>
-          -->
         </b-button-group>
       </template>
       <template
