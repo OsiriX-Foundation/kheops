@@ -240,7 +240,7 @@ export default {
 					}
 				}
 			}).catch(err => {
-				console.log(err)
+				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
 		addAlbumUser (albumCreated) {
