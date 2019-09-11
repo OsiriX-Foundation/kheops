@@ -29,12 +29,17 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 public class OHIFMetadataResource {
     private static final Logger LOG = Logger.getLogger(OHIFMetadataResource.class.getName());
 
+    private static final String LINK_AUTHORIZATION = "X-Link-Authorization";
+
     private static final Client CLIENT = ClientBuilder.newClient()
             .register(JSONAttributesListMarshaller.class)
             .register(MoxyJsonFeature.class);
 
     @Context
     ServletContext context;
+
+    @HeaderParam(LINK_AUTHORIZATION)
+    String linkAuthorizationHeader;
 
     @GET
     @Produces(APPLICATION_JSON)
@@ -62,6 +67,15 @@ public class OHIFMetadataResource {
         final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
 
+        final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
+
+        final URI wadoUri;
+        if (linkAuthorization) {
+            wadoUri = UriBuilder.fromUri(rootURI).path("/api/link/" + authorizationToken.getToken() + "/wado").build();
+        } else {
+            wadoUri = UriBuilder.fromUri(rootURI).path("/api/wado").build();
+        }
+
         final UriBuilder metadataServiceUriBuilder = UriBuilder.fromUri(authorizationServerURI).path("/studies/{StudyInstanceUID}/metadata");
 
         if (inbox != null && inbox) {
@@ -74,7 +88,7 @@ public class OHIFMetadataResource {
         final URI metadataServiceURI = metadataServiceUriBuilder.build(studyInstanceUID);
 
         try {
-            return MetadataDTO.from(rootURI, firstSeriesInstanceUID,
+            return MetadataDTO.from(wadoUri, firstSeriesInstanceUID,
                     CLIENT.target(metadataServiceURI)
                             .request(APPLICATION_DICOM_JSON)
                             .header(AUTHORIZATION, "Bearer " + authorizationToken)

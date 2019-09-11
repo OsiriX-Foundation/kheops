@@ -13,7 +13,7 @@ import java.util.TreeMap;
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 class SeriesDTO {
     @XmlTransient
-    private final URI rootURI;
+    private final URI wadoURI;
 
     @XmlTransient
     private final SortedMap<UIDKey, InstanceDTO> instanceMap;
@@ -33,8 +33,8 @@ class SeriesDTO {
         throw new UnsupportedOperationException();
     }
 
-    SeriesDTO(final URI rootURI, final Attributes attributes) {
-        this.rootURI = rootURI;
+    SeriesDTO(final URI wadoURI, final Attributes attributes) {
+        this.wadoURI = wadoURI;
         instanceMap = new TreeMap<>();
 
         seriesInstanceUid = attributes.getString(Tag.SeriesInstanceUID);
@@ -44,6 +44,6 @@ class SeriesDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        instanceMap.computeIfAbsent(UIDKey.fromInstance(attributes), instanceNumber -> InstanceDTO.from(rootURI, attributes));
+        instanceMap.computeIfAbsent(UIDKey.fromInstance(attributes), instanceNumber -> InstanceDTO.from(wadoURI, attributes));
     }
 }

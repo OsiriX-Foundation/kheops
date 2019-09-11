@@ -13,7 +13,7 @@ import java.util.*;
 @XmlRootElement
 class StudyDTO {
     @XmlTransient
-    private final URI rootURI;
+    private final URI wadoURI;
 
     @XmlTransient
     private final SortedMap<UIDKey, SeriesDTO> seriesMap;
@@ -33,8 +33,8 @@ class StudyDTO {
         throw new UnsupportedOperationException();
     }
 
-    StudyDTO(final URI rootURI, final String firstSeriesInstanceUID, final Attributes attributes) {
-        this.rootURI = Objects.requireNonNull(rootURI);
+    StudyDTO(final URI wadoURI, final String firstSeriesInstanceUID, final Attributes attributes) {
+        this.wadoURI = Objects.requireNonNull(wadoURI);
         Objects.requireNonNull(attributes);
 
         if (firstSeriesInstanceUID == null) {
@@ -50,7 +50,7 @@ class StudyDTO {
     }
 
     void addInstance(final Attributes attributes) {
-        seriesMap.computeIfAbsent(UIDKey.fromSeries(attributes), seriesUID -> new SeriesDTO(rootURI, attributes))
+        seriesMap.computeIfAbsent(UIDKey.fromSeries(attributes), seriesUID -> new SeriesDTO(wadoURI, attributes))
                 .addInstance(attributes);
     }
 

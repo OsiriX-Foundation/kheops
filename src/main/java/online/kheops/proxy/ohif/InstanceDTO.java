@@ -22,11 +22,11 @@ class InstanceDTO {
     @XmlElement
     private final String url;
 
-    static InstanceDTO from(final URI rootURI, Attributes attributes) {
+    static InstanceDTO from(final URI wadoURI, Attributes attributes) {
         return new InstanceDTO(attributes.getString(Tag.SOPInstanceUID),
                 attributes.getInt(Tag.Columns, 0),
                 attributes.getInt(Tag.Rows, 0),
-                getURL(rootURI, attributes));
+                getURL(wadoURI, attributes));
     }
 
     private InstanceDTO() {
@@ -41,7 +41,7 @@ class InstanceDTO {
     }
 
     private static String getURL(final URI rootURI, Attributes attributes) {
-        return "wadouri:" + UriBuilder.fromUri(rootURI).path("/api/wado")
+        return "wadouri:" + UriBuilder.fromUri(rootURI)
                 .queryParam("studyUID", attributes.getString(Tag.StudyInstanceUID))
                 .queryParam("seriesUID", attributes.getString(Tag.SeriesInstanceUID))
                 .queryParam("objectUID", attributes.getString(Tag.SOPInstanceUID))

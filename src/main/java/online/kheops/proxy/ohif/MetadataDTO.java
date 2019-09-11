@@ -12,7 +12,7 @@ import java.util.*;
 @XmlRootElement
 class MetadataDTO {
     @XmlTransient
-    private final URI rootURI;
+    private final URI wadoURI;
 
     @XmlTransient
     private final String firstSeriesInstanceUID;
@@ -33,15 +33,15 @@ class MetadataDTO {
         throw new UnsupportedOperationException();
     }
 
-    private MetadataDTO(final URI rootURI, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
+    private MetadataDTO(final URI wadoURI, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
         studyMap = new TreeMap<>();
-        this.rootURI = rootURI;
+        this.wadoURI = wadoURI;
         this.firstSeriesInstanceUID = firstSeriesInstanceUID;
         attributesList.forEach(this::addInstance);
     }
 
     private void addInstance(final Attributes attributes) {
-        studyMap.computeIfAbsent(UIDKey.fromStudy(attributes), studyUID -> new StudyDTO(rootURI, firstSeriesInstanceUID, attributes))
+        studyMap.computeIfAbsent(UIDKey.fromStudy(attributes), studyUID -> new StudyDTO(wadoURI, firstSeriesInstanceUID, attributes))
                 .addInstance(attributes);
     }
 }
