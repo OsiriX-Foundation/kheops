@@ -139,7 +139,10 @@ export default {
 			album: 'album'
 		}),
 		formattedAlbumDescription () {
-			return this.album.description.split('\n')
+			if (this.album !== undefined && this.album.description !== undefined) {
+				return this.album.description.split('\n')
+			}
+			return ''
 		}
 	},
 	watch: {
