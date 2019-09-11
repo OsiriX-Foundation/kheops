@@ -251,10 +251,14 @@
       </template>
     </b-table>
     <infinite-loading
-      spinner="spiral"
       :identifier="infiniteId"
       @infinite="infiniteHandler"
     >
+      <div slot="spinner">
+        <pulse-loader
+          color="white"
+        />
+      </div>
       <div slot="no-more">
         {{ $t('nomorealbums') }}
       </div>
@@ -284,10 +288,11 @@ import InfiniteLoading from 'vue-infinite-loading'
 import SortList from '@/components/inbox/SortList.vue'
 import moment from 'moment'
 import mobiledetect from '@/mixins/mobiledetect.js'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
 export default {
 	name: 'Albums',
-	components: { InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList },
+	components: { InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, PulseLoader },
 	data () {
 		return {
 			form_send_album: false,

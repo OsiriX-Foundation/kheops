@@ -350,7 +350,6 @@
       </template>
     </b-table>
     <infinite-loading
-      spinner="spiral"
       :identifier="infiniteId"
       @infinite="infiniteHandler"
     >
