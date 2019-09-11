@@ -160,6 +160,7 @@ export default {
 		}
 	},
 	created () {
+		this.view = this.$route.query.view === undefined ? '' : this.$route.query.view
 		this.loadAlbum()
 	},
 	beforeDestroy () {
