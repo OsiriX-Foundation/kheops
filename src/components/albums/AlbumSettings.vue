@@ -62,27 +62,43 @@
         </b-dropdown>
       </div>
       <div class="col-sm-12 col-md-10">
-        <album-settings-general v-if="view=='general'" />
-        <album-settings-user v-if="view=='user'" />
-        <album-settings-token v-if="view=='token'" />
-        <album-settings-report-provider v-if="view=='providerSR'" />
+        <album-settings-general
+          v-if="view=='general'"
+          :album="album"
+        />
+        <album-settings-user
+          v-if="view=='user'"
+          :album="album"
+        />
+        <album-settings-token
+          v-if="view=='token'"
+          :album="album"
+        />
+        <album-settings-report-provider
+          v-if="view=='providerSR'"
+          :album="album"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { AlbumRedirect } from '../../mixins/redirect.js'
-import albumSettingsGeneral from '@/components/albums/albumSettingsGeneral'
-import albumSettingsUser from '@/components/albums/albumSettingsUser'
-import albumSettingsToken from '@/components/albums/albumSettingsToken'
-import albumSettingsReportProvider from '@/components/albums/albumSettingsReportProvider'
+import AlbumSettingsGeneral from '@/components/albums/AlbumSettingsGeneral'
+import AlbumSettingsUser from '@/components/albums/AlbumSettingsUser'
+import AlbumSettingsToken from '@/components/albums/AlbumSettingsToken'
+import AlbumSettingsReportProvider from '@/components/albums/AlbumSettingsReportProvider'
 
 export default {
 	name: 'AlbumSettings',
-	components: { albumSettingsGeneral, albumSettingsUser, albumSettingsToken, albumSettingsReportProvider },
-	mixins: [ AlbumRedirect ],
+	components: { AlbumSettingsGeneral, AlbumSettingsUser, AlbumSettingsToken, AlbumSettingsReportProvider },
+	props: {
+		album: {
+			type: Object,
+			required: true,
+			default: () => {}
+		}
+	},
 	data () {
 		return {
 			view: 'general',
@@ -90,9 +106,6 @@ export default {
 		}
 	},
 	computed: {
-		...mapGetters({
-			album: 'album'
-		}),
 		categories () {
 			return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories
 		}
@@ -103,6 +116,10 @@ export default {
 		},
 		'$route.query' () {
 			this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
+			this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
+				this.$router.push('/albums')
+				return err
+			})
 		}
 	},
 	created () {

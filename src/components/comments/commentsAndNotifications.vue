@@ -346,18 +346,10 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			album: 'album',
-			studies: 'studies',
-			albumComments: 'albumComments',
-			users: 'users'
+			album: 'album'
 		}),
 		comments () {
-			if (this.scope === 'album') return this.albumComments
-			let studyIdx = _.findIndex(this.studies, s => { return s.StudyInstanceUID[0] === this.id })
-			if (studyIdx > -1) {
-				return this.studies[studyIdx].comments
-			}
-			return []
+			return this.$store.getters.getCommentsByUID(this.id)
 		},
 		container_id () {
 			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
@@ -375,7 +367,6 @@ export default {
 	},
 	created () {
 		this.getComments()
-		if (this.album.album_id) this.$store.dispatch('getUsers')
 	},
 	methods: {
 		checkUserFromTextarea () {
@@ -397,45 +388,64 @@ export default {
 		},
 		addComment () {
 			if (this.newComment.comment.length >= 1) {
+				let queries = {
+					comment: this.newComment.comment
+				}
 				if (this.enablePrivate) {
-					this.newComment.to_user = this.privateUser
+					queries.to_user = this.privateUser
 				}
 
-				if (this.scope === 'album') {
-					let params = {
-						type: (this.includeNotifications) ? '' : 'comments',
-						query: this.newComment
-					}
-					this.$store.dispatch('postAlbumComment', params).then(() => {
-						this.$snotify.success(this.$t('commentpostsuccess'))
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					})
-				} else if (this.scope === 'studies') {
-					this.$store.dispatch('postStudiesComment', { StudyInstanceUID: this.id, comment: this.newComment }).then(() => {
-						this.$snotify.success(this.$t('commentpostsuccess'))
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					}).catch(res => {
-						this.$snotify.error(this.$t('sorryerror') + ': ' + res)
-						this.newComment.comment = ''
-						this.newComment.to_user = ''
-					})
+				if (this.scope === 'studies') {
+					this.addStudyComment(queries)
+				} else if (this.scope === 'album') {
+					this.addAlbumComment(queries)
 				}
 			}
 		},
+		addStudyComment (queries) {
+			let params = {
+				'StudyInstanceUID': this.id,
+				'queries': queries
+			}
+
+			this.$store.dispatch('postStudyComment', params).then(res => {
+				if (res.status === 204) {
+					this.$snotify.success(this.$t('commentpostsuccess'))
+					this.newComment.comment = ''
+					this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
+						this.scrollBottom()
+					})
+				}
+			}).catch(res => {
+				this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+				this.newComment.comment = ''
+			})
+		},
+		addAlbumComment (queries) {
+			let params = {
+				'album_id': this.id,
+				'queries': queries
+			}
+
+			this.$store.dispatch('postAlbumComment', params).then(res => {
+				if (res.status === 204) {
+					this.$snotify.success(this.$t('commentpostsuccess'))
+					this.newComment.comment = ''
+					this.getComments()
+				}
+			}).catch(res => {
+				this.$snotify.error(this.$t('sorryerror') + ': ' + res)
+				this.newComment.comment = ''
+			})
+		},
 		getComments () {
-			let type = (this.includeNotifications) ? '' : 'comments'
+			let types = (this.includeNotifications) ? undefined : { types: 'comments' }
 			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumComments', { type: type }).then(() => {
+				this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
 					this.scrollBottom()
 				})
 			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudiesComments', { StudyInstanceUID: this.id, type: type }).then(() => {
+				this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
 					this.scrollBottom()
 				})
 			}

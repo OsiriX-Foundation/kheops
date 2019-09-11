@@ -329,14 +329,14 @@ export default {
 	computed: {
 		...mapGetters({
 			user: 'currentUser',
-			album: 'album'
+			albumTokens: 'albumTokens'
 		}),
 		tokens () {
 			let tokens = []
 			if (this.scope === 'user') {
 				tokens = this.user.tokens
 			} else if (this.scope === 'album') {
-				tokens = this.album.tokens
+				tokens = this.albumTokens
 			}
 			return tokens
 		}
@@ -373,7 +373,11 @@ export default {
 		},
 		getTokens () {
 			if (this.scope === 'album' && this.albumid) {
-				this.$store.dispatch('getAlbumTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
+				let queries = {
+					valid: !this.showInvalid,
+					album: this.albumid
+				}
+				this.$store.dispatch('getAlbumTokens', { queries: queries })
 			} else if (this.scope === 'user') {
 				this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
 			}

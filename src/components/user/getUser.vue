@@ -3,12 +3,14 @@
 	"en": {
 		"username": "User name",
 		"user": "user",
-    "send": "Send"
+    "send": "Send",
+    "cancel": "Cancel"
 	},
 	"fr": {
 		"username": "Utilisateur",
     "user": "Utilisateur",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "cancel": "Annuler"
 	}
 }
 </i18n>

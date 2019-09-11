@@ -165,7 +165,7 @@ export default {
 			if (!this.confirmDeletion) {
 				this.confirmDeletion = true
 			} else {
-				this.$store.dispatch('deleteAlbum').then(() => {
+				this.$store.dispatch('deleteAlbum', { album_id: this.album.album_id }).then(() => {
 					this.$snotify.success(this.$t('albumdeletesuccess'))
 					this.$router.push('/albums')
 				}).catch(() => {
@@ -177,7 +177,7 @@ export default {
 			if (!this.confirmQuit) {
 				this.confirmQuit = true
 			} else {
-				this.$store.dispatch('quitAlbum', this.currentuserSub).then(() => {
+				this.$store.dispatch('removeAlbumUser', { album_id: this.album.album_id, user: this.currentuserSub }).then(() => {
 					this.$snotify.success(this.$t('albumquitsuccess'))
 					this.$router.push('/albums')
 				}).catch(() => {

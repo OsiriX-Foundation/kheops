@@ -46,19 +46,19 @@
           <tbody>
             <tr v-if="metadata.PatientName">
               <th>{{ $t('patientname') }}</th>
-              <td>{{ metadata.PatientName }}</td>
+              <td>{{ metadata.PatientName.Value[0]['Alphabetic'] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.PatientBirthDate)">
+            <tr v-if="metadata.PatientBirthDate.Value !== undefined && matchNumbers(metadata.PatientBirthDate.Value[0])">
               <th>{{ $t('patientbirthdate') }}</th>
-              <td>{{ getDate(metadata.PatientBirthDate[0]) }}</td>
+              <td>{{ getDate(metadata.PatientBirthDate.Value[0]) }}</td>
             </tr>
             <tr v-if="metadata.PatientID">
               <th>{{ $t('patientid') }}</th>
-              <td>{{ metadata.PatientID[0] }}</td>
+              <td>{{ metadata.PatientID.Value[0] }}</td>
             </tr>
-            <tr v-if="matchSex(metadata.PatientSex[0])">
+            <tr v-if="metadata.PatientSex.Value !== undefined && matchSex(metadata.PatientSex)">
               <th>{{ $t('patientsex') }}</th>
-              <td>{{ metadata.PatientSex[0] }}</td>
+              <td>{{ metadata.PatientSex.Value[0] }}</td>
             </tr>
           </tbody>
         </table>
@@ -71,29 +71,29 @@
           style="word-break: break-word;"
         >
           <tbody>
-            <tr v-if="metadata.ModalitiesInStudy">
+            <tr v-if="metadata.ModalitiesInStudy.Value !== undefined">
               <th>{{ $t('modalitiesinstudy') }}</th>
-              <td>{{ metadata.ModalitiesInStudy[0] }}</td>
+              <td>{{ metadata.ModalitiesInStudy.Value[0] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.StudyDate)">
+            <tr v-if="metadata.StudyDate.Value !== undefined && matchNumbers(metadata.StudyDate.Value[0])">
               <th>{{ $t('studydate') }}</th>
-              <td>{{ metadata.StudyDate[0]|formatDate }}</td>
+              <td>{{ metadata.StudyDate.Value[0]|formatDate }}</td>
             </tr>
-            <tr v-if="metadata.StudyID">
+            <tr v-if="metadata.StudyID.Value !== undefined">
               <th>{{ $t('studyid') }}</th>
-              <td>{{ metadata.StudyID[0] }}</td>
+              <td>{{ metadata.StudyID.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyInstanceUID">
+            <tr v-if="metadata.StudyInstanceUID.Value !== undefined">
               <th>{{ $t('StudyInstanceUID') }}</th>
-              <td>{{ metadata.StudyInstanceUID[0] }}</td>
+              <td>{{ metadata.StudyInstanceUID.Value[0] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.StudyTime)">
+            <tr v-if="metadata.StudyTime.Value !== undefined && matchNumbers(metadata.StudyTime.Value[0])">
               <th>{{ $t('studytime') }}</th>
-              <td>{{ metadata.StudyTime[0] }}</td>
+              <td>{{ metadata.StudyTime.Value[0] }}</td>
             </tr>
-            <tr v-if="matchNumbers(metadata.NumberOfStudyRelatedSeries)">
+            <tr v-if="metadata.NumberOfStudyRelatedSeries.Value !== undefined && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
               <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
-              <td>{{ metadata.NumberOfStudyRelatedSeries[0] }}</td>
+              <td>{{ metadata.NumberOfStudyRelatedSeries.Value[0] }}</td>
             </tr>
           </tbody>
         </table>
@@ -103,7 +103,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
 	name: 'StudyMetadata',
 	props: {
@@ -116,17 +115,8 @@ export default {
 		return {}
 	},
 	computed: {
-		...mapGetters({
-			studies: 'studies'
-		}),
 		metadata () {
-			let studyIdx = _.findIndex(this.studies, s => {
-				return s.StudyInstanceUID[0] === this.id
-			})
-			if (studyIdx > -1) {
-				return this.studies[studyIdx]
-			}
-			return {}
+			return this.$store.getters.getStudyByUID(this.id)
 		}
 	},
 	methods: {
