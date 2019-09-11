@@ -95,260 +95,284 @@
       :disabled="sendingFiles"
       @change="inputLoadDirectories"
     >
-    <list-headers
-      :studies="studies"
-      :albums="albums"
-      :show-send-button="permissions.send_series"
-      :show-album-button="permissions.send_series"
-      :show-favorite-button="permissions.add_series"
-      :show-delete-button="permissions.delete_series"
-      :show-import-button="permissions.add_series"
-      :show-inbox-button="permissions.add_inbox"
-      :album-id="album.album_id !== undefined ? album.album_id : ''"
-      @setFilters="changeFilterValue"
-      @reloadStudies="reloadStudies"
-    />
-    <b-table
-      class="container-fluid"
-      striped
-      hover
-      :items="studies"
-      :fields="fields"
-      :sort-desc="true"
-      :no-local-sorting="true"
-      :no-sort-reset="true"
-      :tbody-class="'table-wrapper-scroll-y link'"
-      @sort-changed="sortingChanged"
-      @row-hovered="setItemHover"
-      @row-unhovered="setItemUnhover"
-      @row-clicked="showRowDetails"
-    >
-      <div
-        slot="table-busy"
-        class="text-center my-2"
-      >
-        <strong>Loading...</strong>
-      </div>
+	<list-headers
+		:studies="studies"
+		:albums="albums"
+		:show-send-button="permissions.send_series"
+		:show-album-button="permissions.send_series"
+		:show-favorite-button="permissions.add_series"
+		:show-delete-button="permissions.delete_series"
+		:show-import-button="permissions.add_series"
+		:show-inbox-button="permissions.add_inbox"
+		:album-id="album.album_id !== undefined ? album.album_id : ''"
+		@setFilters="changeFilterValue"
+		@reloadStudies="reloadStudies"
+	/>
+	<div
+		id="myHeader"
+		ref="myHeader"
+		:class="isActive ? 'pt-2 sticky' : ''"
+	>
+		<list-headers
+			:studies="studies"
+			:albums="albums"
+			:show-send-button="permissions.send_series"
+			:show-album-button="permissions.send_series"
+			:show-favorite-button="permissions.add_series"
+			:show-delete-button="permissions.delete_series"
+			:show-import-button="permissions.add_series"
+			:show-inbox-button="permissions.add_inbox"
+			:album-id="album.album_id !== undefined ? album.album_id : ''"
+			@setFilters="changeFilterValue"
+			@reloadStudies="reloadStudies"
+			v-if="isActive"
+		/>
+	</div>
+	<div
+		ref="studiesList"
+	>
+		<b-table
+		class="container-fluid"
+		striped
+		hover
+		:items="studies"
+		:fields="fields"
+		:sort-desc="true"
+		:no-local-sorting="true"
+		:no-sort-reset="true"
+		:tbody-class="'table-wrapper-scroll-y link'"
+		@sort-changed="sortingChanged"
+		@row-hovered="setItemHover"
+		@row-unhovered="setItemUnhover"
+		@row-clicked="showRowDetails"
+		>
+		<div
+			slot="table-busy"
+			class="text-center my-2"
+		>
+			<strong>Loading...</strong>
+		</div>
 
-      <!--
-				HEADER TABLE
+		<!--
+					HEADER TABLE
+				-->
+		<template
+			slot="HEAD_PatientName"
+			slot-scope="data"
+		>
+			<div
+			v-if="showFilters"
+			@click.stop=""
+			>
+			<input
+				v-model="filters.PatientName"
+				type="search"
+				class="form-control form-control-sm"
+				:placeholder="$t('filter')"
+			> <br>
+			</div>
+			<sort-list
+			:sort-desc="studiesParams.sortDesc"
+			:current-header="data.field.key"
+			:sort-by="studiesParams.sortBy"
+			/>
+			{{ data.label }}
+		</template>
+
+		<template
+			slot="HEAD_PatientID"
+			slot-scope="data"
+		>
+			<div
+			v-if="showFilters"
+			@click.stop=""
+			>
+			<input
+				v-model="filters.PatientID"
+				type="search"
+				class="form-control form-control-sm"
+				:placeholder="$t('filter')"
+			> <br>
+			</div>
+			<sort-list
+			:sort-desc="studiesParams.sortDesc"
+			:current-header="data.field.key"
+			:sort-by="studiesParams.sortBy"
+			/>
+			{{ data.label }}
+		</template>
+
+		<template
+			slot="HEAD_StudyDescription"
+			slot-scope="data"
+		>
+			<div
+			v-if="showFilters"
+			@click.stop=""
+			>
+			<input
+				v-model="filters.StudyDescription"
+				type="search"
+				class="form-control form-control-sm"
+				:placeholder="$t('filter')"
+			> <br>
+			</div>
+			{{ data.label }}
+		</template>
+
+		<template
+			slot="HEAD_StudyDate"
+			slot-scope="data"
+		>
+			<div
+			v-if="showFilters"
+			class="form-row"
+			@click.stop=""
+			>
+			<div class="col form-inline">
+				<div class="form-group">
+				<datepicker
+					v-model="filters.StudyDateFrom"
+					:disabled-dates="disabledFromDates"
+					input-class="form-control form-control-sm  search-calendar"
+					wrapper-class="calendar-wrapper"
+					:placeholder="$t('fromDate')"
+				/>
+				</div>
+			</div>
+
+			<div class="col form-inline">
+				<div class="form-group">
+				<datepicker
+					v-model="filters.StudyDateTo"
+					:disabled-dates="disabledToDates"
+					input-class="form-control form-control-sm search-calendar"
+					wrapper-class="calendar-wrapper"
+					:placeholder="$t('toDate')"
+				/>
+				</div>
+			</div>
+			</div>
+			<br v-if="showFilters">
+			<sort-list
+			:sort-desc="studiesParams.sortDesc"
+			:current-header="data.field.key"
+			:sort-by="studiesParams.sortBy"
+			/>
+			{{ data.label }}
+		</template>
+
+		<template
+			slot="HEAD_ModalitiesInStudy"
+			slot-scope="data"
+		>
+			<div
+			v-if="showFilters"
+			@click.stop=""
+			>
+			<select
+				v-model="filters.ModalitiesInStudy"
+				class="form-control"
+			>
+				<option value="" />
+				<option
+				v-for="modality in modalities"
+				:key="modality.id"
+				:value="modality"
+				>
+				{{ modality }}
+				</option>
+			</select>
+			<br>
+			<br>
+			</div>
+			{{ $t(data.label) }}
+		</template>
+		<!--
+					CONTENT TABLE
+				-->
+		<template
+			slot="is_selected"
+			slot-scope="row"
+		>
+			<b-button-group>
+			<b-button
+				variant="link"
+				size="sm"
+				class="mr-1 pt-0"
+				@click.stop="showSeries(row)"
+			>
+				<v-icon
+				class="align-middle"
+				:name="row.detailsShowing ? 'chevron-down' : 'chevron-right'"
+				@click.stop="row.toggleDetails"
+				/>
+			</b-button>
+			<b-form-checkbox
+				v-model="row.item.flag.is_selected"
+				:indeterminate="row.item.flag.is_indeterminate"
+				class="mr-0"
+				inline
+				@change="setChecked(row)"
+			/>
+			</b-button-group>
+		</template>
+		<template
+			slot="PatientName"
+			slot-scope="row"
+		>
+			<div
+			:class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
+			>
+			<div class="">
+				{{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
+			</div>
+			<div :class="mobiledetect===true ? '' : 'ml-auto'">
+				<!--
+				:show-favorite-icon="permissions.add_series"
 			-->
-      <template
-        slot="HEAD_PatientName"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.PatientName"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
-        <sort-list
-          :sort-desc="studiesParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="studiesParams.sortBy"
-        />
-        {{ data.label }}
-      </template>
-
-      <template
-        slot="HEAD_PatientID"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.PatientID"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
-        <sort-list
-          :sort-desc="studiesParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="studiesParams.sortBy"
-        />
-        {{ data.label }}
-      </template>
-
-      <template
-        slot="HEAD_StudyDescription"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <input
-            v-model="filters.StudyDescription"
-            type="search"
-            class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
-        </div>
-        {{ data.label }}
-      </template>
-
-      <template
-        slot="HEAD_StudyDate"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          class="form-row"
-          @click.stop=""
-        >
-          <div class="col form-inline">
-            <div class="form-group">
-              <datepicker
-                v-model="filters.StudyDateFrom"
-                :disabled-dates="disabledFromDates"
-                input-class="form-control form-control-sm  search-calendar"
-                wrapper-class="calendar-wrapper"
-                :placeholder="$t('fromDate')"
-              />
-            </div>
-          </div>
-
-          <div class="col form-inline">
-            <div class="form-group">
-              <datepicker
-                v-model="filters.StudyDateTo"
-                :disabled-dates="disabledToDates"
-                input-class="form-control form-control-sm search-calendar"
-                wrapper-class="calendar-wrapper"
-                :placeholder="$t('toDate')"
-              />
-            </div>
-          </div>
-        </div>
-        <br v-if="showFilters">
-        <sort-list
-          :sort-desc="studiesParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="studiesParams.sortBy"
-        />
-        {{ data.label }}
-      </template>
-
-      <template
-        slot="HEAD_ModalitiesInStudy"
-        slot-scope="data"
-      >
-        <div
-          v-if="showFilters"
-          @click.stop=""
-        >
-          <select
-            v-model="filters.ModalitiesInStudy"
-            class="form-control"
-          >
-            <option value="" />
-            <option
-              v-for="modality in modalities"
-              :key="modality.id"
-              :value="modality"
-            >
-              {{ modality }}
-            </option>
-          </select>
-          <br>
-          <br>
-        </div>
-        {{ $t(data.label) }}
-      </template>
-      <!--
-				CONTENT TABLE
-			-->
-      <template
-        slot="is_selected"
-        slot-scope="row"
-      >
-        <b-button-group>
-          <b-button
-            variant="link"
-            size="sm"
-            class="mr-1 pt-0"
-            @click.stop="showSeries(row)"
-          >
-            <v-icon
-              class="align-middle"
-              :name="row.detailsShowing ? 'chevron-down' : 'chevron-right'"
-              @click.stop="row.toggleDetails"
-            />
-          </b-button>
-          <b-form-checkbox
-            v-model="row.item.flag.is_selected"
-            :indeterminate="row.item.flag.is_indeterminate"
-            class="mr-0"
-            inline
-            @change="setChecked(row)"
-          />
-        </b-button-group>
-      </template>
-      <template
-        slot="PatientName"
-        slot-scope="row"
-      >
-        <div
-          :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
-        >
-          <div class="">
-            {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
-          </div>
-          <div :class="mobiledetect===true ? '' : 'ml-auto'">
-            <!--
-            :show-favorite-icon="permissions.add_series"
-          -->
-            <list-icons
-              :study="row.item"
-              :mobiledetect="mobiledetect"
-              :show-favorite-icon="permissions.add_series"
-              :show-comment-icon="true"
-              :show-download-icon="permissions.download_series"
-              :show-import-icon="permissions.add_series"
-              :show-report-provider-icon="album.album_id !== undefined ? true : false"
-              :album-id="album.album_id !== undefined ? album.album_id : ''"
-            >
-              <template
-                slot="reportprovider"
-              >
-                <icon-list-providers
-                  :study="row.item"
-                  :providers="providersEnable"
-                />
-              </template>
-            </list-icons>
-          </div>
-        </div>
-      </template>
-      <template
-        slot="StudyDate"
-        slot-scope="row"
-      >
-        {{ row.value | formatDate }}
-      </template>
-      <!--Infos study (Series / Comments / Study Metadata) -->
-      <template
-        slot="row-details"
-        slot-scope="row"
-      >
-        <b-card>
-          <list-item-details
-            :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
-            :album-id="albumID"
-          />
-        </b-card>
-      </template>
-    </b-table>
+				<list-icons
+				:study="row.item"
+				:mobiledetect="mobiledetect"
+				:show-favorite-icon="permissions.add_series"
+				:show-comment-icon="true"
+				:show-download-icon="permissions.download_series"
+				:show-import-icon="permissions.add_series"
+				:show-report-provider-icon="album.album_id !== undefined ? true : false"
+				:album-id="album.album_id !== undefined ? album.album_id : ''"
+				>
+				<template
+					slot="reportprovider"
+				>
+					<icon-list-providers
+					:study="row.item"
+					:providers="providersEnable"
+					/>
+				</template>
+				</list-icons>
+			</div>
+			</div>
+		</template>
+		<template
+			slot="StudyDate"
+			slot-scope="row"
+		>
+			{{ row.value | formatDate }}
+		</template>
+		<!--Infos study (Series / Comments / Study Metadata) -->
+		<template
+			slot="row-details"
+			slot-scope="row"
+		>
+			<b-card>
+			<list-item-details
+				:study-u-i-d="row.item.StudyInstanceUID.Value[0]"
+				:album-id="albumID"
+			/>
+			</b-card>
+		</template>
+		</b-table>
+	</div>
     <infinite-loading
       :identifier="infiniteId"
       @infinite="infiniteHandler"
@@ -407,6 +431,7 @@ export default {
 		return {
 			infiniteId: 0,
 			showFilters: false,
+			isActive: false,
 			studiesParams: {
 				offset: 0,
 				limit: 16,
@@ -598,8 +623,24 @@ export default {
 		this.$store.dispatch('initAlbums', {})
 	},
 	mounted () {
+		this.scroll()
 	},
 	methods: {
+		scroll () {
+			const _this = this
+			window.onscroll = () => {
+				let sticky = _this.$refs.myHeader.offsetTop
+				let heightSticky = _this.$refs.myHeader.clientHeight
+				let studiesList = _this.$refs.studiesList.offsetTop
+				console.log(window.pageYOffset)
+				console.log(sticky)
+				if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
+					this.isActive = true
+				} else if (window.pageYOffset < studiesList - heightSticky) {
+					this.isActive = false
+				}
+			}
+		},
 		// https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
 		infiniteHandler ($state) {
 			this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then(res => {
