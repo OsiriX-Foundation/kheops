@@ -434,7 +434,7 @@ export default {
 			isActive: false,
 			studiesParams: {
 				offset: 0,
-				limit: 16,
+				limit: 50,
 				sortDesc: true,
 				sortBy: 'StudyDate'
 			},
@@ -632,8 +632,6 @@ export default {
 				let sticky = _this.$refs.myHeader.offsetTop
 				let heightSticky = _this.$refs.myHeader.clientHeight
 				let studiesList = _this.$refs.studiesList.offsetTop
-				console.log(window.pageYOffset)
-				console.log(sticky)
 				if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
 					this.isActive = true
 				} else if (window.pageYOffset < studiesList - heightSticky) {
