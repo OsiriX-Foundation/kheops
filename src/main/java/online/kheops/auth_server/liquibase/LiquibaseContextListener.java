@@ -41,7 +41,7 @@ public class LiquibaseContextListener implements ServletContextListener {
 
         final Configuration cfg = new Configuration();
         cfg.setProperties(properties);
-        
+
             try {
 
                 // Prepare the Hibernate configuration
@@ -64,7 +64,8 @@ public class LiquibaseContextListener implements ServletContextListener {
                     liquibase.update(version, "");
                 }
                 liquibase.validate();
-
+                jdbcCon.close();
+                con.close();
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Unable to use liquibase", e);
             }
