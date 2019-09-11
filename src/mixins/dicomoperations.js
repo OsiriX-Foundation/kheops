@@ -1,5 +1,7 @@
 import { HTTP } from '@/router/http'
 import { uuid } from 'vue-uuid'
+import dicom from '@/mixins/dicom'
+import customdicom from '@/mixins/customdicom'
 
 export const DicomOperations = {
 	data: function () {
@@ -181,7 +183,6 @@ export const DicomOperations = {
 					dicomGenerated[currentTag] = value
 				}
 			})
-
 			createTag.forEach(value => {
 				if (value.value !== '') {
 					if (value.tag === this.tagSeriesUID) {
@@ -279,5 +280,48 @@ export const DicomOperations = {
 				fr.readAsArrayBuffer(file)
 			})
 		}
+	}
+}
+export default {
+	translateDICOM: function (studies) {
+		let translate = []
+		studies.forEach(study => {
+			let objStudy = {}
+			for (let dicomID in study) {
+				if (dicom.dicom2name[dicomID] !== undefined) {
+					objStudy[dicom.dicom2name[dicomID]] = study[dicomID]
+				} else if (customdicom.customdicom2name[dicomID] !== undefined) {
+					objStudy[customdicom.customdicom2name[dicomID]] = study[dicomID]
+				} else {
+					objStudy[dicomID] = study[dicomID]
+				}
+			}
+			translate.push(objStudy)
+		})
+		return translate
+	},
+	translateObjectDICOM: function (studies, TagID) {
+		let translate = {}
+		const id = (dicom.dicom2name[TagID] !== undefined ? dicom.dicom2name[TagID] : TagID)
+		studies.forEach(study => {
+			let objDicom = {}
+			for (let dicomID in study) {
+				if (dicom.dicom2name[dicomID] !== undefined) {
+					objDicom[dicom.dicom2name[dicomID]] = study[dicomID]
+				} else if (customdicom.customdicom2name[dicomID] !== undefined) {
+					objDicom[customdicom.customdicom2name[dicomID]] = study[dicomID]
+				} else {
+					objDicom[dicomID] = study[dicomID]
+				}
+			}
+			if (objDicom[id] === undefined) {
+				throw 'Your tagID is not present in all studies'
+			} else if (translate[objDicom[id].Value[0]] !== undefined) {
+				throw 'Your tagID is not unique'
+			} else {
+				translate[objDicom[id].Value[0]] = objDicom
+			}
+		})
+		return translate
 	}
 }

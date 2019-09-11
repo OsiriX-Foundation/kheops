@@ -110,21 +110,6 @@
         </div>
       </dd>
     </dl>
-    <!--
-		<dl>
-			<dt>{{$t('notification')}}</dt>
-			<dd style = 'margin-top: 10px'>
-				<div class = 'row'>
-					<div class = 'col'>
-						<toggle-button v-model="album.notification_new_series" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true" @change='updateAlbum'/> <label>New Study</label>
-					</div>
-					<div class = 'col'>
-						<toggle-button v-model="album.notification_new_comment" :labels="{checked: 'Yes', unchecked: 'No'}" :sync="true"  @change='updateAlbum'/> <label>New comment</label>
-					</div>
-				</div>
-			</dd>
-		</dl>
-		-->
     <album-buttons
       :album="album"
       :users="users"
@@ -141,6 +126,13 @@ import AlbumButtons from '@/components/albums/AlbumButtons'
 export default {
 	name: 'AlbumSettingsGeneral',
 	components: { AlbumButtons },
+	props: {
+		album: {
+			type: Object,
+			required: true,
+			default: () => {}
+		}
+	},
 	data () {
 		return {
 			edit: {
@@ -151,16 +143,18 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			album: 'album',
-			users: 'users'
+			users: 'albumUsers'
 		}),
 		formattedAlbumDescription () {
-			return this.album.description.split('\n')
+			if (this.album.description !== undefined) {
+				return this.album.description.split('\n')
+			} else {
+				return ''
+			}
 		}
 	},
 	created () {
-		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
-		this.$store.dispatch('getUsers')
+		this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
 	},
 	methods: {
 		updateAlbum () {
@@ -168,22 +162,18 @@ export default {
 				this.$snotify.error(this.$t('permissiondenied'))
 				return
 			}
-			let params = {}
-			_.forEach(this.edit, (v, k) => {
-				if (v === '-1') return
-				if (this.album[k] !== v) {
-					params[k] = v
+			let queries = {}
+			for (let id in this.edit) {
+				if (this.edit[id] !== '-1') {
+					queries[id] = this.edit[id]
 				}
-			})
-			params.notificationNewComment = this.album.notification_new_comment
-			params.notificationNewSeries = this.album.notification_new_series
+			}
 
-			this.$store.dispatch('patchAlbum', params).then(() => {
-				this.$snotify.success(this.$t('albumupdatesuccess'))
-				this.edit.name = '-1'
-				this.edit.description = '-1'
-			}).catch(() => {
-				this.$snotify.error(this.$t('sorryerror'))
+			this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries: queries }).then(res => {
+				if (res.status === 200) {
+					this.edit.description = '-1'
+					this.edit.name = '-1'
+				}
 			})
 		}
 	}

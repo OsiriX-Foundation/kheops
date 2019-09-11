@@ -31,15 +31,6 @@
 <template>
   <div>
     <div
-      v-if="loading"
-      class="container"
-    >
-      <p class="text-center fade">
-        loading...
-      </p>
-    </div>
-    <div
-      v-if="!loading"
       class="container"
     >
       <div class="row">
@@ -52,32 +43,36 @@
             <span class="p-2">
               {{ album.name }}
             </span>
-            <v-icon
-              v-if="album.is_favorite"
-              name="star"
-              scale="2"
-            />
+            <span
+              @click.stop="toggleFavorite(album.album_id, album.is_favorite)"
+            >
+              <v-icon
+                name="star"
+                scale="2"
+                :color="(!album.is_favorite) ? 'grey' : ''"
+              />
+            </span>
           </h3>
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
           <nav class="nav nav-pills nav-fill flex-column flex-lg-row text-center justify-content-lg-end">
             <a
               class="nav-link"
-              :class="(view=='studies')?'active':''"
+              :class="(view === 'studies' || view === '')?'active':''"
               @click.stop="view='studies'"
             >
               Studies
             </a>
             <a
               class="nav-link"
-              :class="(view=='comments')?'active':''"
+              :class="(view === 'comments')?'active':''"
               @click.stop="view='comments'"
             >
               Comments
             </a>
             <a
               class="nav-link"
-              :class="(view=='settings')?'active':''"
+              :class="(view === 'settings')?'active':''"
               @click.stop="view='settings'"
             >
               Settings
@@ -90,27 +85,51 @@
     <!--
 			https://fr.vuejs.org/v2/guide/components-dynamic-async.html
     -->
-    <album-studies v-if="view=='studies'" />
+    <span v-if="view === 'studies' || view === '' && loading === false">
+      <div class="container">
+        <div
+          v-if="formattedAlbumDescription[0] !== ''"
+          class="card"
+        >
+          <div class="card-body">
+            <p
+              v-for="(p,idx) in formattedAlbumDescription"
+              :key="idx"
+              class="py-0 my-0"
+              :class="(idx)?'pl-3':''"
+            >
+              {{ p }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <component-import-study
+        :album="album"
+      />
+    </span>
     <album-comments
-      v-if="view=='comments'"
+      v-if="view=='comments' && loading === false"
       :id="album.album_id"
     />
-    <album-settings v-if="view=='settings'" />
+    <album-settings
+      v-if="view=='settings' && loading === false"
+      :album="album"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import albumStudies from '@/components/albums/albumStudies'
-import albumComments from '@/components/albums/albumComments'
-import albumSettings from '@/components/albums/albumSettings'
+import AlbumComments from '@/components/albums/AlbumComments'
+import AlbumSettings from '@/components/albums/AlbumSettings'
+import ComponentImportStudy from '@/components/study/ComponentImportStudy'
 
 export default {
 	name: 'Album',
-	components: { albumStudies, albumSettings, albumComments },
+	components: { ComponentImportStudy, AlbumSettings, AlbumComments },
 	data () {
 		return {
-			view: 'studies',
+			view: '',
 			newUserName: '',
 			loading: false
 		}
@@ -118,30 +137,52 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'album'
-		})
+		}),
+		formattedAlbumDescription () {
+			return this.album.description.split('\n')
+		}
 	},
 	watch: {
 		view () {
-			let queryParams = { view: this.view }
-			if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
-			this.$router.push({ query: queryParams })
+			if (this.view !== '' && this.view !== undefined) {
+				let queryParams = { view: this.view }
+				if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
+				this.$router.push({ query: queryParams })
+				this.loadAlbum()
+			}
 		},
 		'$route.query' () {
-			this.view = this.$route.query.view !== undefined ? this.$route.query.view : 'studies'
+			if (this.$route.query.view !== undefined) {
+				this.view = this.$route.query.view
+			} else {
+				this.view = ''
+			}
 		}
 	},
 	created () {
-		this.loading = true
-		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
-			this.loading = false
-			if (!this.$route.query.view) {
-				this.$router.push({ query: { view: 'studies' } })
-			}
-			this.view = this.$route.query.view
-		})
-		this.$store.dispatch('getAlbums', { pageNb: 1, limit: 40, sortBy: 'created_time', sortDesc: true })
+		this.loadAlbum()
+	},
+	beforeDestroy () {
+		this.$store.commit('INIT_ALBUM')
+		this.$store.commit('INIT_ALBUM_USERS')
 	},
 	methods: {
+		loadAlbum () {
+			this.loading = true
+			this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => {
+				this.loading = false
+				// this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
+			}).catch(err => {
+				this.$router.push('/albums')
+				return err
+			})
+		},
+		toggleFavorite (albumID, isFavorite) {
+			let value = !isFavorite
+			this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value: value }).then(res => {
+				this.$store.dispatch('setKeyValueAlbum', { key: 'is_favorite', value: value })
+			})
+		}
 	}
 }
 </script>

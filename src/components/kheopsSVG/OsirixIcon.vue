@@ -69,6 +69,6 @@ export default {
 	}
 
 	.icon:hover{
-		fill: #fd7e14;
+		fill: grey;
 	}
 </style>

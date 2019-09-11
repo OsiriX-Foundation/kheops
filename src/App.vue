@@ -1,3 +1,19 @@
+<i18n>
+{
+	"en": {
+    "albums": "Kheops - Albums",
+    "album": "Kheops - Album",
+		"newalbum": "Kheops - New album",
+    "user": "Kheops - User"
+	},
+	"fr": {
+    "albums": "Kheops - Albums",
+    "album": "Kheops - Album",
+		"newalbum": "Kheops - Nouvel album",
+    "user": "Kheops - Utilisateur"
+	}
+}
+</i18n>
 <template>
   <div id="app">
     <vue-snotify />
@@ -36,10 +52,23 @@ import SendStudies from '@/components/study/SendStudies'
 export default {
 	name: 'App',
 	components: { navHeader, navBar, SendStudies },
+	data () {
+		return {
+			appTitle: 'Kheops'
+		}
+	},
 	computed: {
 		year () {
 			return new Date().getFullYear()
 		}
+	},
+	watch: {
+		'$route' (to, from) {
+			document.title = this.$t(to.meta.title) || this.appTitle
+		}
+	},
+	created () {
+		document.title = 'Kheops'
 	}
 }
 </script>
@@ -60,6 +89,9 @@ export default {
 a.navbar-brand {
 	color: #CCC;
 	font-size: 11pt;
+}
+body {
+  overflow-y: scroll;
 }
 </style>
 

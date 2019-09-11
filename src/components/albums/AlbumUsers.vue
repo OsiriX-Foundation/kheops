@@ -147,7 +147,7 @@ Props :
               </a>
               <br>
               <a
-                v-if="album.is_admin && showDeleteUser"
+                v-if="album.is_admin && showDeleteUser && user.user_id !== currentuserSub"
                 class="text-danger"
                 @click.stop="deleteUser(user)"
               >
@@ -205,12 +205,11 @@ Props :
 </template>
 <script>
 import mobiledetect from '@/mixins/mobiledetect.js'
-import { AlbumRedirect } from '@/mixins/redirect.js'
 import { CurrentUser } from '@/mixins/currentuser.js'
 
 export default {
 	name: 'AlbumUsers',
-	mixins: [ AlbumRedirect, CurrentUser ],
+	mixins: [ CurrentUser ],
 	props: {
 		album: {
 			type: Object,
@@ -244,14 +243,6 @@ export default {
 			return mobiledetect.mobileAndTabletcheck()
 		}
 	},
-	watch: {
-		users: {
-			handler: function () {
-				this.getAlbum()
-			},
-			deep: true
-		}
-	},
 	created () {
 	},
 	methods: {
@@ -260,24 +251,53 @@ export default {
 				this.confirmResetAdmin = user.user_name
 				return
 			}
-			user.is_admin = !user.is_admin
-			this.$store.dispatch('toggleAlbumUserAdmin', user).then(() => {
-				let message = (user.is_admin) ? this.$t('usersettoadmin') : this.$t('usernotsettoadmin')
-				this.$snotify.success(message)
+
+			let params = {
+				album_id: this.album.album_id,
+				user_name: user.user_name,
+				user_is_admin: !user.is_admin
+			}
+			this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
+				if (res.status === 204) {
+					let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
+					if (this.confirmResetAdmin === user.user_name) {
+						this.getAlbum()
+					}
+					this.$snotify.success(message)
+				} else {
+					this.$snotify.error(this.$t('sorryerror'))
+				}
+				this.confirmResetAdmin = ''
 			}).catch(() => {
+				this.confirmResetAdmin = ''
 				this.$snotify.error(this.$t('sorryerror'))
 			})
 		},
 		deleteUser (user) {
 			if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name
 			else {
-				this.$store.dispatch('remove_user_from_album', { user_name: user.user_name }).then(() => {
-					this.$snotify.success(this.$t('albumuserdeletesuccess'))
+				let params = {
+					album_id: this.album.album_id,
+					user: user.user_name
+				}
+				this.$store.dispatch('removeAlbumUser', params).then(res => {
+					if (res.status === 204) {
+						this.$snotify.success(this.$t('albumuserdeletesuccess'))
+					} else {
+						this.$snotify.error(this.$t('sorryerror'))
+					}
 					this.confirmDelete = ''
 				}).catch(() => {
+					this.confirmDelete = ''
 					this.$snotify.error(this.$t('sorryerror'))
 				})
 			}
+		},
+		getAlbum () {
+			this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
+				this.$router.push('/albums')
+				return err
+			})
 		}
 	}
 }
@@ -291,13 +311,4 @@ div.user-table-container{
 a {
 	cursor: pointer;
 }
-/*
-td.showOnTrHover div.user_actions{
-	visibility: hidden;
-}
-
-tr:hover  td.showOnTrHover div.user_actions {
-	visibility: visible;
-}
-*/
 </style>

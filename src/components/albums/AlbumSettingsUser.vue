@@ -46,7 +46,7 @@
       <button
         v-if="album.add_user||album.is_admin"
         class="btn btn-secondary"
-        @click="addUser()"
+        @click="form_add_user=true"
       >
         <v-icon
           name="user-plus"
@@ -112,7 +112,7 @@
         <div>
           <toggle-button
             v-if="album.is_admin"
-            v-model="album[label]"
+            :value="album[label]"
             :labels="{checked: 'Yes', unchecked: 'No'}"
             :disabled="(!album.download_series && !album.send_series && label=='send_series')"
             :sync="true"
@@ -144,6 +144,13 @@ import AlbumUsers from '@/components/albums/AlbumUsers'
 export default {
 	name: 'AlbumSettingsUser',
 	components: { AlbumUsers },
+	props: {
+		album: {
+			type: Object,
+			required: true,
+			default: () => {}
+		}
+	},
 	data () {
 		return {
 			form_add_user: false,
@@ -155,40 +162,50 @@ export default {
 				'download_series',
 				'send_series',
 				'write_comments'
-			]
+			],
+			dictSettings: {
+				'add_user': 'addUser',
+				'add_series': 'addSeries',
+				'delete_series': 'deleteSeries',
+				'download_series': 'downloadSeries',
+				'send_series': 'sendSeries',
+				'write_comments': 'writeComments'
+			}
 		}
 	},
 	computed: {
 		...mapGetters({
-			album: 'album',
-			users: 'users'
+			users: 'albumUsers'
 		})
 	},
 	created () {
-		this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id })
-		this.$store.dispatch('getUsers', { album_id: this.$route.params.album_id })
+		this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
 	},
 	methods: {
 		addUser () {
-			let allreadyPresent = false
-			for (var i = 0; i < this.users.length; i++) {
-				if (this.users[i].user_name === this.new_user_name) {
-					allreadyPresent = true
-				}
-			}
-
-			if (!this.form_add_user) this.form_add_user = true
-			else if (allreadyPresent) {
+			const sameUserName = this.users.filter(user => {
+				return user.user_name === this.new_user_name
+			})
+			if (sameUserName.length > 0) {
 				this.$snotify.error(this.$t('allreadypresent'))
 			} else {
-				if (this.new_user_name && this.validEmail(this.new_user_name)) {
-					this.$store.dispatch('add_user_to_album', { user_name: this.new_user_name }).then(() => {
-						this.$snotify.success(this.$t('albumuseraddsuccess'))
-						this.new_user_name = ''
-						this.form_add_user = false
-						this.confirm_delete = ''
-					}).catch(res => {
-						this.$snotify.error(this.$t(res))
+				if (this.validEmail(this.new_user_name)) {
+					let params = {
+						album_id: this.album.album_id,
+						user: this.new_user_name
+					}
+					this.$store.dispatch('addAlbumUser', params).then(res => {
+						if (res.status === 201) {
+							this.$snotify.success(this.$t('albumuseraddsuccess'))
+							this.new_user_name = ''
+							this.form_add_user = false
+							this.confirm_delete = ''
+						} else {
+							this.$snotify.error(this.$t('sorryerror'))
+						}
+					}).catch(err => {
+						this.$snotify.error(this.$t('sorryerror'))
+						return err
 					})
 				}
 			}
@@ -198,12 +215,13 @@ export default {
 			return re.test(email)
 		},
 		patchAlbum (field) {
-			let params = {}
-			params[field] = this.album[field]
-			this.$store.dispatch('patchAlbum', params).catch(err => {
-				console.error(err)
-				this.$snotify.error(this.$t('sorryerror'))
-			})
+			let queries = {}
+			queries[this.dictSettings[field]] = !this.album[field]
+			let params = {
+				album_id: this.album.album_id,
+				queries: queries
+			}
+			this.$store.dispatch('editAlbum', params)
 		}
 	}
 }

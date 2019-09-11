@@ -465,7 +465,9 @@ export default {
 							this.$store.dispatch('removeFileId', { id: file.id })
 							this.countSentFiles++
 						}).catch(err => {
-							console.log(err)
+							this.generateErrorNonDicom([file], err.status)
+							this.$store.dispatch('removeFileId', { id: file.id })
+							this.countSentFiles++
 						})
 					} else {
 						this.$store.dispatch('removeFileId', { id: file.id })
@@ -475,7 +477,7 @@ export default {
 			})
 		},
 		sendDicomizeDataPromise (idFile, data) {
-			return new Promise((resolve) => {
+			return new Promise((resolve, reject) => {
 				let formData = new FormData()
 				formData.append(idFile, data)
 
@@ -483,8 +485,8 @@ export default {
 
 				HTTP.post(request, data, this.config['dicomizeData']).then(res => {
 					resolve(res)
-				}).catch(res => {
-					resolve(res)
+				}).catch(err => {
+					reject(err)
 				})
 			})
 		},
@@ -551,7 +553,7 @@ export default {
 						this.manageResult(files, res.data, res.status)
 						resolve(res)
 					}).catch(error => {
-						this.manageResult(files, error !== undefined ? error.data : {}, error !== undefined ? error.status : 0)
+						this.manageResult(files, error !== undefined && error.response !== undefined && error.response.data !== undefined ? error.response.data : {}, error !== undefined && error.response !== undefined && error.response.status !== undefined ? error.response.status : 0)
 						resolve(error)
 					})
 				} else if (this.files.length > 0) {
@@ -580,15 +582,16 @@ export default {
 			return formData
 		},
 		getErrorsDicomFromResponse (data) {
+			let error = -1
 			for (var key in this.errorDicom) {
 				if (data.hasOwnProperty(key)) {
 					const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key])
 					this.generateListError(data[key].Value, this.errorDicom[key])
 					this.createListError(errorInResponse)
-					return 0
+					error = 0
 				}
 			}
-			return -1
+			return error
 		},
 		generateErrorNonDicom (files, status = 0) {
 			let map = new Map()
