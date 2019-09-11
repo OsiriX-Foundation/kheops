@@ -114,7 +114,7 @@
             v-if="album.is_admin"
             :value="album[label]"
             :labels="{checked: 'Yes', unchecked: 'No'}"
-            :disabled="(!album.download_series && !album.send_series && label=='send_series')"
+            :disabled="(!album.download_series && label=='send_series')"
             :sync="true"
             @change="patchAlbum(label)"
           />
@@ -217,6 +217,9 @@ export default {
 		patchAlbum (field) {
 			let queries = {}
 			queries[this.dictSettings[field]] = !this.album[field]
+			if (field === 'download_series' && this.album['download_series']) {
+				queries[this.dictSettings['send_series']] = false
+			}
 			let params = {
 				album_id: this.album.album_id,
 				queries: queries
