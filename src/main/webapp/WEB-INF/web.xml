@@ -4,6 +4,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+
+
     <servlet>
         <display-name>Kheops Authentication</display-name>
         <!--suppress ServletWithoutMappingInspection -->
@@ -17,13 +19,10 @@
     <listener>
         <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
     </listener>
+    <listener>
+        <listener-class>online.kheops.auth_server.liquibase.LiquibaseContextListener</listener-class>
+    </listener>
 
-
-    <context-param>
-        <description>All JWT Assertions signed by issuer superuser.kheops.online are considered valid</description>
-        <param-name>online.kheops.superuser.hmacsecret</param-name>
-        <param-value>P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==</param-value>
-    </context-param>
     <context-param>
         <description>HMAC shared secret used to sign tokens</description>
         <param-name>online.kheops.auth.hmacsecret</param-name>

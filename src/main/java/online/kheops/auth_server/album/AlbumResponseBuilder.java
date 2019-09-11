@@ -69,7 +69,7 @@ public class AlbumResponseBuilder {
         this.notificationNewSeries = ((boolean) r.getValue("new_series_notifications"));
         this.isAdmin = ((boolean) r.getValue("admin"));
         if(r.getValue("modalities") != null) {
-            this.modalities = r.getValue("modalities").toString().split("/");
+            this.modalities = r.getValue("modalities").toString().split(",");
         } else {
             this.modalities = new String[0];
         }
@@ -83,7 +83,7 @@ public class AlbumResponseBuilder {
         this.numberOfStudies = (Integer) r.getValue("number_of_studies");
         this.numberOfComments = (Integer) r.getValue("number_of_comments");
         if(r.getValue("modalities") != null) {
-            this.modalities = r.getValue("modalities").toString().split("/");
+            this.modalities = r.getValue("modalities").toString().split(",");
         } else {
             this.modalities = new String[0];
         }

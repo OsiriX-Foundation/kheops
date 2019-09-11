@@ -117,8 +117,9 @@ public class Keycloak {
                         throw new UserNotFoundException();
                     }
                 }
+            } else {
+                throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
             }
-
         } else {
 
             String userEmail = cacheUserName.getCachedValue(user);
@@ -128,8 +129,9 @@ public class Keycloak {
 
             final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
             final Response response;
+            final String tokenString;
             try {
-                String tokenString = token.getToken();
+                tokenString = token.getToken();
                 Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
                 response = builder.get();
             } catch (ProcessingException e) {
@@ -147,19 +149,20 @@ public class Keycloak {
                     } else {
                         throw new UserNotFoundException();
                     }
+                } catch (Exception e) {
+                    throw new KeycloakException("error during parsing response : " + output, e);
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
             } else {
                 try {
                     String responseString = response.readEntity(String.class);
-                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "\n" + responseString);
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString + "\n" + responseString);
                 } catch (ProcessingException e) {
-                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus(), e);
+                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString, e);
                 }
             }
         }
-        throw new KeycloakException("ERROR:");
     }
 
     public List<UserResponseBuilder> getUsers(String find, Integer limit, Integer offset)

@@ -10,6 +10,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -33,9 +34,11 @@ public class ViewerPrincipal implements KheopsPrincipal {
     private EntityTransaction tx;
     private final ViewerAccessToken viewerAccessToken;
     private final KheopsPrincipal kheopsPrincipal;
+    private final boolean linkAuthorization;
+    private final String originalToken;
 
 
-    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken) {
+    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, boolean linkAuthorization, String originalToken) {
 
         final AccessToken accessToken = viewerAccessToken.getAccessToken();
 
@@ -48,6 +51,8 @@ public class ViewerPrincipal implements KheopsPrincipal {
         kheopsPrincipal = accessToken.newPrincipal(servletContext, user);
 
         this.viewerAccessToken = viewerAccessToken;
+        this.linkAuthorization = linkAuthorization;
+        this.originalToken = originalToken;
     }
 
     @Override
@@ -223,5 +228,13 @@ public class ViewerPrincipal implements KheopsPrincipal {
     @Override
     public Optional<List<String>> getStudyList() {
         return Optional.of(Collections.singletonList(viewerAccessToken.getStudyInstanceUID()));
+    }
+
+    @Override
+    public boolean isLink() { return linkAuthorization;  }
+
+    @Override
+    public String getOriginalToken() {
+        return originalToken;
     }
 }

@@ -1,6 +1,4 @@
 <Context>
-    <Parameter name="online.kheops.superuser.hmacsecret" value="${kheops_superuser_hmasecret}"
-               override="false"/>
     <Parameter name="online.kheops.auth.hmacsecret" value="${kheops_auth_hmasecret}"
                override="false"/>
     <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
@@ -10,6 +8,8 @@
     <Parameter name="online.kheops.jdbc.user" value="${kheops_postgresql_user}"
                override="false"/>
     <Parameter name="online.kheops.jdbc.password" value="${kheops_authdb_pass}"
+               override="false"/>
+    <Parameter name="online.kheops.jdbc.version" value="${kheops_postgresql_version}"
                override="false"/>
     <Parameter name="online.kheops.keycloak.clientsecret" value="${kheops_keycloak_clientsecret}"
                override="false"/>

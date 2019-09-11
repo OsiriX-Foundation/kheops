@@ -7,10 +7,6 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_authdb_pass ]; then
     echo "Missing kheops_authdb_pass secret"
     missing_env_var_secret=true
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_superuser_hmasecret ]; then
-    echo "Missing kheops_superuser_hmasecret secret"
-    missing_env_var_secret=true
-fi
 if ! [ -f ${SECRET_FILE_PATH}/kheops_auth_hmasecret ]; then
     echo "Missing kheops kheops_auth_hmasecret secret"
     missing_env_var_secret=true
@@ -45,6 +41,10 @@ if [ -z "$KHEOPS_AUTHDB_URL" ]; then
 fi
 if [ -z "$KHEOPS_AUTHDB_NAME" ]; then
     echo "Missing KHEOPS_AUTHDB_NAME environment variable"
+    missing_env_var_secret=true
+fi
+if [ -z "$KHEOPS_AUTHDB_VERSION" ]; then
+    echo "Missing $KHEOPS_AUTHDB_VERSION environment variable"
     missing_env_var_secret=true
 fi
 if [ -z "KHEOPS_ROOT_SCHEME" ]; then
@@ -118,6 +118,7 @@ else
     sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:$KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
 fi
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_postgresql_version}|$KHEOPS_AUTHDB_VERSION|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
 
@@ -126,6 +127,7 @@ sed -i "s|\${kheops_keycloak_clientid}|$KHEOPS_KEYCLOAK_CLIENTID|" ${REPLACE_FIL
 sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
+
 
 
 echo "Ending setup secrets and env var"

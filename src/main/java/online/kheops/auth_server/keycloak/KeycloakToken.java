@@ -20,7 +20,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 public class KeycloakToken {
     private static final Logger LOG = Logger.getLogger(KeycloakToken.class.getName());
 
-    private static final long MINIMUM_VALIDITY = 60;
+    private static final long MINIMUM_VALIDITY = 60;  //secondes
     private static final Client CLIENT = ClientBuilder.newClient();
 
     private static URI tokenUri;

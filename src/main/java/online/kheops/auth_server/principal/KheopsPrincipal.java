@@ -41,6 +41,10 @@ public interface KheopsPrincipal extends Principal, TokenProvenance {
 
     default Optional<String> getClientId() {return Optional.empty();}
 
+    boolean isLink();
+
+    String getOriginalToken();
+
     User getUser();
 
     ScopeType getScope();

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface AccessToken extends TokenProvenance {
 
-    enum TokenType  {KEYCLOAK_TOKEN, ALBUM_CAPABILITY_TOKEN, USER_CAPABILITY_TOKEN, SUPER_USER_TOKEN, PEP_TOKEN, VIEWER_TOKEN, REPORT_PROVIDER_TOKEN}
+    enum TokenType  {KEYCLOAK_TOKEN, ALBUM_CAPABILITY_TOKEN, USER_CAPABILITY_TOKEN, PEP_TOKEN, VIEWER_TOKEN, REPORT_PROVIDER_TOKEN}
 
     String getSubject();
     TokenType getTokenType();

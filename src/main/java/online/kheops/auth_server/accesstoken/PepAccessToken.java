@@ -22,7 +22,7 @@ final class PepAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        public PepAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public PepAccessToken build(String assertionToken, boolean linkAuthorization) throws AccessTokenVerificationException {
             final DecodedJWT jwt;
             try {
                 jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))
@@ -67,4 +67,5 @@ final class PepAccessToken implements AccessToken {
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
         throw new UnsupportedOperationException("Can't make a KheopsPrincipal from a PEP Access Token");
     }
+
 }
