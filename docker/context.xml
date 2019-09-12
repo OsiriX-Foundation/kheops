@@ -9,8 +9,6 @@
                override="false"/>
     <Parameter name="online.kheops.jdbc.password" value="${kheops_authdb_pass}"
                override="false"/>
-    <Parameter name="online.kheops.jdbc.version" value="${kheops_postgresql_version}"
-               override="false"/>
     <Parameter name="online.kheops.keycloak.clientsecret" value="${kheops_keycloak_clientsecret}"
                override="false"/>
     <Parameter name="online.kheops.keycloak.clientid" value="${kheops_keycloak_clientid}"
