@@ -630,13 +630,15 @@ export default {
 		scroll () {
 			const _this = this
 			window.onscroll = () => {
-				let sticky = _this.$refs.myHeader.offsetTop
-				let heightSticky = _this.$refs.myHeader.clientHeight
-				let studiesList = _this.$refs.studiesList.offsetTop
-				if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
-					this.isActive = true
-				} else if (window.pageYOffset < studiesList - heightSticky) {
-					this.isActive = false
+				if (_this.$refs.myHeader !== undefined && _this.$refs.studiesList !== undefined) {
+					let sticky = _this.$refs.myHeader.offsetTop
+					let heightSticky = _this.$refs.myHeader.clientHeight
+					let studiesList = _this.$refs.studiesList.offsetTop
+					if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
+						this.isActive = true
+					} else if (window.pageYOffset < studiesList - heightSticky) {
+						this.isActive = false
+					}
 				}
 			}
 		},
@@ -688,20 +690,10 @@ export default {
 			}
 		},
 		setItemHover (item, index, event) {
-			let params = {
-				StudyInstanceUID: item.StudyInstanceUID.Value[0],
-				flag: 'is_hover',
-				value: true
-			}
-			this.$store.dispatch('setFlagByStudyUID', params)
+			this.studies[index].flag.is_hover = true
 		},
 		setItemUnhover (item, index, event) {
-			let params = {
-				StudyInstanceUID: item.StudyInstanceUID.Value[0],
-				flag: 'is_hover',
-				value: false
-			}
-			this.$store.dispatch('setFlagByStudyUID', params)
+			this.studies[index].flag.is_hover = false
 		},
 		showSeries (row) {
 			if (!row.item.detailsShowing) {
