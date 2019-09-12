@@ -629,13 +629,15 @@ export default {
 		scroll () {
 			const _this = this
 			window.onscroll = () => {
-				let sticky = _this.$refs.myHeader.offsetTop
-				let heightSticky = _this.$refs.myHeader.clientHeight
-				let studiesList = _this.$refs.studiesList.offsetTop
-				if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
-					this.isActive = true
-				} else if (window.pageYOffset < studiesList - heightSticky) {
-					this.isActive = false
+				if (_this.$refs.myHeader !== undefined && _this.$refs.studiesList !== undefined) {
+					let sticky = _this.$refs.myHeader.offsetTop
+					let heightSticky = _this.$refs.myHeader.clientHeight
+					let studiesList = _this.$refs.studiesList.offsetTop
+					if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
+						this.isActive = true
+					} else if (window.pageYOffset < studiesList - heightSticky) {
+						this.isActive = false
+					}
 				}
 			}
 		},
