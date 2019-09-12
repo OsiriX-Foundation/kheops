@@ -168,7 +168,7 @@ public class Studies {
 
         selectQuery.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
 
-        selectQuery.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()));
+        selectQuery.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()), STUDIES.PK);
 
 
         qidoParams.getLimit().ifPresent(selectQuery::addLimit);
