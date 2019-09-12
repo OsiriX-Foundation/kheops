@@ -689,20 +689,10 @@ export default {
 			}
 		},
 		setItemHover (item, index, event) {
-			let params = {
-				StudyInstanceUID: item.StudyInstanceUID.Value[0],
-				flag: 'is_hover',
-				value: true
-			}
-			this.$store.dispatch('setFlagByStudyUID', params)
+			this.studies[index].flag.is_hover = true
 		},
 		setItemUnhover (item, index, event) {
-			let params = {
-				StudyInstanceUID: item.StudyInstanceUID.Value[0],
-				flag: 'is_hover',
-				value: false
-			}
-			this.$store.dispatch('setFlagByStudyUID', params)
+			this.studies[index].flag.is_hover = false
 		},
 		showSeries (row) {
 			if (!row.item.detailsShowing) {

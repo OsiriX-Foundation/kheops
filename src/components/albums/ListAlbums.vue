@@ -300,7 +300,7 @@ export default {
 			infiniteId: 0,
 			albumsParams: {
 				offset: 0,
-				limit: 16,
+				limit: 50,
 				sortDesc: true,
 				sortBy: 'last_event_time'
 			},
@@ -552,11 +552,11 @@ export default {
 				this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value: value })
 			})
 		},
-		setItemHover (row) {
-			this.$store.dispatch('setFlagAlbum', { album_id: row.album_id, flag: 'is_hover', value: true })
+		setItemHover (item, index, event) {
+			this.albums[index].flag.is_hover = true
 		},
-		setItemUnhover (row) {
-			this.$store.dispatch('setFlagAlbum', { album_id: row.album_id, flag: 'is_hover', value: false })
+		setItemUnhover (item, index, event) {
+			this.albums[index].flag.is_hover = false
 		}
 	}
 }

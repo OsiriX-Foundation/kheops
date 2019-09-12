@@ -80,9 +80,12 @@ const actions = {
 		commit('SET_STUDY_SHOW_DETAILS', { index: index, value: params.value })
 	},
 	setFlagByStudyUID ({ commit }, params) {
-		let index = state.studies.findIndex(study => {
-			return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
-		})
+		let index = params.index
+		if (index === undefined) {
+			index = state.studies.findIndex(study => {
+				return study.StudyInstanceUID.Value[0] === params.StudyInstanceUID
+			})
+		}
 		commit('SET_STUDY_FLAG', { index: index, flag: params.flag, value: params.value })
 	},
 	favoriteStudy ({ commit, dispatch }, params) {
