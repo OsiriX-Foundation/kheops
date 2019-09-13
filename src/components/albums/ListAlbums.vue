@@ -230,9 +230,9 @@
             @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
           >
             <v-icon
-              v-if="row.item.flag.is_hover || mobiledetect || row.item.is_favorite"
               name="star"
               :color="(!row.item.is_favorite) ? 'grey' : ''"
+			  :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
             />
           </span>
         </div>
@@ -597,5 +597,15 @@ div.calendar-wrapper{
 
 .breakword {
 	word-break: break-word;
+}
+.iconsHover{
+	visibility: visible;
+	display: inline;
+	cursor: pointer;
+}
+.iconsUnhover{
+	visibility: hidden;
+	display: inline;
+	cursor: pointer;
 }
 </style>
