@@ -272,7 +272,7 @@
 			>
 			<select
 				v-model="filters.ModalitiesInStudy"
-				class="form-control"
+				class="form-control form-control-sm"
 			>
 				<option value="" />
 				<option
@@ -429,6 +429,7 @@ export default {
 	},
 	data () {
 		return {
+			selectedDate: null,
 			infiniteId: 0,
 			showFilters: false,
 			isActive: false,
@@ -770,17 +771,17 @@ export default {
 		prepareFilters () {
 			let filtersToSend = {}
 			for (let id in this.filters) {
-				if (this.filters[id] !== '') {
+				if (this.filters[id] !== '' && this.filters[id] !== null) {
 					if (id === 'PatientName' || id === 'StudyDescription' || id === 'PatientID') {
 						filtersToSend[id] = `*${this.filters[id]}*`
 					} else if (id === 'StudyDateFrom') {
-						if (this.filters['StudyDateTo'] === '') {
+						if (this.filters['StudyDateTo'] === '' || this.filters['StudyDateTo'] === null) {
 							filtersToSend['StudyDate'] = `${this.transformDate(this.filters[id])}-`
 						} else {
 							filtersToSend['StudyDate'] = `${this.transformDate(this.filters[id])}-${this.transformDate(this.filters['StudyDateTo'])}`
 						}
 					} else if (id === 'StudyDateTo') {
-						if (this.filters['StudyDateFrom'] === '') {
+						if (this.filters['StudyDateFrom'] === '' || this.filters['StudyDateFrom'] === null) {
 							filtersToSend['StudyDate'] = `-${this.transformDate(this.filters[id])}`
 						}
 					} else {
