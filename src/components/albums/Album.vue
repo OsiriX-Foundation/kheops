@@ -95,8 +95,7 @@
             <p
               v-for="(p,idx) in formattedAlbumDescription"
               :key="idx"
-              class="py-0 my-0"
-              :class="(idx)?'pl-3':''"
+              class="pl-3 py-0 my-0"
             >
               {{ p }}
             </p>
