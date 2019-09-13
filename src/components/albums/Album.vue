@@ -88,7 +88,7 @@
     <span v-if="view === 'studies' || view === '' && loading === false">
       <div class="container">
         <div
-          v-if="formattedAlbumDescription[0] !== ''"
+          v-if="formattedAlbumDescription.length > 0"
           class="card"
         >
           <div class="card-body">
@@ -139,10 +139,10 @@ export default {
 			album: 'album'
 		}),
 		formattedAlbumDescription () {
-			if (this.album !== undefined && this.album.description !== undefined) {
+			if (this.album !== undefined && this.album.description !== undefined && this.album.description.length > 0) {
 				return this.album.description.split('\n')
 			}
-			return ''
+			return []
 		}
 	},
 	watch: {
