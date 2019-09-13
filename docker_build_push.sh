@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z $1]
+if [ -z $1 ]
 then
 	echo "missing tag"
 	exit 1
