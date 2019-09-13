@@ -235,8 +235,11 @@
 					v-model="filters.StudyDateFrom"
 					:disabled-dates="disabledFromDates"
 					input-class="form-control form-control-sm  search-calendar"
-					wrapper-class="calendar-wrapper"
+					wrapper-class="wrapper-class"
+					calendar-class="calendar-class"
 					:placeholder="$t('fromDate')"
+					:clear-button="true"
+					:typeable="true"
 				/>
 				</div>
 			</div>
@@ -247,9 +250,13 @@
 					v-model="filters.StudyDateTo"
 					:disabled-dates="disabledToDates"
 					input-class="form-control form-control-sm search-calendar"
-					wrapper-class="calendar-wrapper"
+					wrapper-class="wrapper-class"
+					calendar-class="calendar-class"
 					:placeholder="$t('toDate')"
-				/>
+					:clear-button="true"
+					:typeable="true"
+				>
+				</datepicker>
 				</div>
 			</div>
 			</div>
@@ -889,7 +896,11 @@ export default {
 		width: 100px !important;
 	}
 
-	div.calendar-wrapper{
+	div.wrapper-class{
+		color: #333;
+	}
+
+	div.calendar-class{
 		color: #333;
 	}
 
