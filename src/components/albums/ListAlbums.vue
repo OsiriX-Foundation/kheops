@@ -44,6 +44,7 @@
       :disabled-btn-share="albumsSelected.length === 0"
       @inviteClick="form_send_album = true"
       @searchClick="showFilters = !showFilters"
+	  @reloadAlbums="searchAlbums"
     />
 
     <form-get-user
@@ -473,6 +474,9 @@ export default {
 		},
 		infiniteHandler ($state) {
 			this.getAlbums(this.albumsParams.offset, this.albumsParams.limit).then(res => {
+				if (this.albums.length === parseInt(res.headers['x-total-count'])) {
+					$state.complete()
+				}
 				if (res.status === 200 && res.data.length > 0) {
 					this.albumsParams.offset += this.albumsParams.limit
 					$state.loaded()
