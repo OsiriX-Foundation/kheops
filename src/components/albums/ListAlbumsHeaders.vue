@@ -101,7 +101,7 @@ export default {
 		},
 		inviteClick () {
 			this.$emit('inviteClick')
-    },
+		},
 		reloadAlbums () {
 			this.$emit('reloadAlbums')
 		}

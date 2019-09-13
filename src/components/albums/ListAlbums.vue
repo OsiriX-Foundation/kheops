@@ -44,7 +44,7 @@
       :disabled-btn-share="albumsSelected.length === 0"
       @inviteClick="form_send_album = true"
       @searchClick="showFilters = !showFilters"
-	  @reloadAlbums="searchAlbums"
+      @reloadAlbums="searchAlbums"
     />
 
     <form-get-user
@@ -233,7 +233,7 @@
             <v-icon
               name="star"
               :color="(!row.item.is_favorite) ? 'grey' : ''"
-			  :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
+              :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
             />
           </span>
         </div>
