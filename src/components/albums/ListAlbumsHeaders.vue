@@ -49,9 +49,22 @@
         {{ $t("share") }}
       </button>
     </div>
+    <div class="ml-auto" />
     <div
-      class="ml-auto"
+      class="d-none d-sm-block align-self-center"
     >
+      <button
+        type="button"
+        class=" btn btn-link btn-lg"
+        @click="reloadAlbums()"
+      >
+        <v-icon
+          name="refresh"
+          scale="2"
+        />
+      </button>
+    </div>
+    <div>
       <button
         type="button"
         class="btn btn-link btn-lg"
@@ -88,6 +101,9 @@ export default {
 		},
 		inviteClick () {
 			this.$emit('inviteClick')
+		},
+		reloadAlbums () {
+			this.$emit('reloadAlbums')
 		}
 	}
 }
