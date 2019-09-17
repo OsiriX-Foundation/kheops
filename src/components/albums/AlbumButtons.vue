@@ -36,12 +36,43 @@ Props :
 </i18n>
 
 <template>
-  <div>
+  <div
+    class="container"
+  >
+    <div
+      v-if="showQuit && confirmQuit"
+      class="row"
+    >
+      <div class="col-lg-4 d-none d-sm-none d-md-block"></div>
+      <div
+        class="col-lg-8 d-none d-sm-none d-md-block"
+        align="right"
+      >
+        <p v-if="confirmQuit && !lastAdmin && !lastUser">
+          {{ $t("quitalbum") }}
+        </p>
+        <p v-else-if="confirmQuit && lastUser">
+          {{ $t('lastuser') }}
+        </p>
+      </div>
+      <div
+        class="d-md-none"
+      >
+        <p v-if="confirmQuit && !lastAdmin && !lastUser">
+          {{ $t("quitalbum") }}
+        </p>
+        <p v-else-if="confirmQuit && lastUser">
+          {{ $t('lastuser') }}
+        </p>
+      </div>
+    </div>
     <div
       v-if="showQuit"
+      class="row"
     >
       <div
         v-if="album.is_admin && lastAdmin && confirmQuit && listUsers.length > 0"
+        class="col-12"
       >
         <p
           style="color:red;"
@@ -55,19 +86,14 @@ Props :
           :show-change-role="true"
         />
       </div>
+
+      <div class="col-md-8 col-lg-9"></div>
       <div
-        align="right"
-        class="btnalbum"
+        class="btnalbum col-md-4 col-lg-3"
       >
-        <p v-if="confirmQuit && !lastAdmin && !lastUser">
-          {{ $t("quitalbum") }}
-        </p>
-        <p v-else-if="confirmQuit && lastUser">
-          {{ $t('lastuser') }}
-        </p>
         <button
           type="button"
-          class="btn btn-danger"
+          class="btn btn-danger btn-block"
           @click="quitAlbum"
         >
           {{ confirmQuit?$t('confirm'):$t('quit') }}
@@ -75,7 +101,7 @@ Props :
         <button
           v-if="confirmQuit"
           type="button"
-          class="btn btn-secondary"
+          class="btn btn-secondary btn-block"
           @click="confirmQuit=!confirmQuit"
         >
           {{ $t('cancel') }}
@@ -83,18 +109,39 @@ Props :
       </div>
     </div>
     <div
-      v-if="showDelete"
+      v-if="showDelete && confirmDeletion"
+      class="row"
     >
+      <div class="col-md-4 col-lg-6 d-none d-sm-none d-md-block"></div>
       <div
-        class="btnalbum"
-        align="right"
+        class="btnalbum col-md-8 col-lg-6 d-none d-sm-none d-md-block"
+      >
+        <p
+          v-if="confirmDeletion"
+          align="right"
+        >
+          {{ $t("delalbum") }}
+        </p>
+      </div>
+      <div
+        class="btnalbum d-md-none"
       >
         <p v-if="confirmDeletion">
           {{ $t("delalbum") }}
         </p>
+      </div>
+    </div>
+    <div
+      v-if="showDelete"
+      class="row"
+    >
+      <div class="col-md-8 col-lg-9"></div>
+      <div
+        class="btnalbum col-md-4 col-lg-3"
+      >
         <button
           type="button"
-          class="btn btn-danger"
+          class="btn btn-danger btn-block"
           @click="deleteAlbum"
         >
           {{ confirmDeletion?$t('confirm'):$t('delete') }}
@@ -102,7 +149,7 @@ Props :
         <button
           v-if="confirmDeletion"
           type="button"
-          class="btn btn-secondary"
+          class="btn btn-secondary btn-block"
           @click="confirmDeletion=!confirmDeletion"
         >
           {{ $t('cancel') }}
