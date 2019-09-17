@@ -28,7 +28,7 @@
           v-model="isSelected"
         >
           <span
-            v-if="serie.SeriesDescription"
+            v-if="serie.SeriesDescription && serie.SeriesDescription.Value"
           >
             {{ serie.SeriesDescription.Value[0] }}
           </span>
