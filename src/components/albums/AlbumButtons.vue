@@ -43,7 +43,7 @@ Props :
       v-if="showQuit && confirmQuit"
       class="row"
     >
-      <div class="col-lg-4 d-none d-sm-none d-md-block"></div>
+      <div class="col-lg-4 d-none d-sm-none d-md-block" />
       <div
         class="col-lg-8 d-none d-sm-none d-md-block"
         align="right"
@@ -87,7 +87,7 @@ Props :
         />
       </div>
 
-      <div class="col-md-8 col-lg-9"></div>
+      <div class="col-md-8 col-lg-9" />
       <div
         class="btnalbum col-md-4 col-lg-3"
       >
@@ -112,7 +112,7 @@ Props :
       v-if="showDelete && confirmDeletion"
       class="row"
     >
-      <div class="col-md-4 col-lg-6 d-none d-sm-none d-md-block"></div>
+      <div class="col-md-4 col-lg-6 d-none d-sm-none d-md-block" />
       <div
         class="btnalbum col-md-8 col-lg-6 d-none d-sm-none d-md-block"
       >
@@ -135,7 +135,7 @@ Props :
       v-if="showDelete"
       class="row"
     >
-      <div class="col-md-8 col-lg-9"></div>
+      <div class="col-md-8 col-lg-9" />
       <div
         class="btnalbum col-md-4 col-lg-3"
       >
