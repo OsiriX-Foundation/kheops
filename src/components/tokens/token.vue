@@ -46,6 +46,18 @@
       style=" position: relative;"
     >
       <h4>
+        <button
+          type="button"
+          class="btn btn-link btn-sm d-md-none"
+          @click.stop="cancel"
+        >
+          <span>
+            <v-icon
+              name="arrow-left"
+              color="white"
+            />
+          </span>
+        </button>
         {{ token.title }}
       </h4>
     </div>
@@ -75,7 +87,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            <router-link :to="`/albums/${token.album.id}?view=studies`">
+            <router-link :to="`/albums/${token.album.album_id}?view=studies`">
               {{ token.album.name }}
             </router-link>
           </dd>
@@ -149,7 +161,7 @@
         </div>
       </div>
       <div class="row mt-3">
-        <div class="col-xs-12 offset-sm-3 col-sm-9">
+        <div class="offset-sm-3 col-sm-9 d-none d-sm-none d-md-block">
           <button
             type="button"
             class="btn btn-secondary mr-3"
@@ -161,6 +173,17 @@
             v-if="!token.revoked"
             type="button"
             class="btn btn-danger ml-3"
+            @click="revoke"
+          >
+            {{ $t('revoke') }}
+          </button>
+        </div>
+
+        <div class="col-12 d-md-none">
+          <button
+            v-if="!token.revoked"
+            type="button"
+            class="btn btn-danger btn-block"
             @click="revoke"
           >
             {{ $t('revoke') }}
