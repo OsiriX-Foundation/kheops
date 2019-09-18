@@ -13,7 +13,7 @@
 <template>
   <div>
     <div
-      v-if="view=='list' && writePermission"
+      v-if="(view === undefined || view === 'list') && writePermission"
       class="my-3 selection-button-container"
       style=" position: relative;"
     >
@@ -51,7 +51,7 @@
       @done="view='list'"
     />
     <list-providers
-      v-if="view === 'list'"
+      v-if="view === 'list' || view === undefined"
       :album-i-d="albumID"
       :write-permission="writePermission"
       @providerselectedshow="showProvider"
@@ -87,7 +87,31 @@ export default {
 			clientIdSelected: ''
 		}
 	},
+	watch: {
+		view () {
+			let query = JSON.parse(JSON.stringify(this.$route.query))
+			query['settingview'] = this.view
+			if (this.view === 'provider' || this.view === 'edit') {
+				query['object'] = this.clientIdSelected
+			}
+			this.$router.push({ query: query })
+		},
+		'$route.query' () {
+			this.manageView(this.$route.query.settingview)
+		}
+	},
+	created: function () {
+	},
 	methods: {
+		manageView (view) {
+			if (view === 'edit') {
+				this.editProvider(this.$route.query['object'])
+			} else if (view === 'provider') {
+				this.showProvider(this.$route.query['object'])
+			} else {
+				this.view = view
+			}
+		},
 		showProvider (clientId) {
 			this.$store.dispatch('initProvider')
 			this.clientIdSelected = clientId

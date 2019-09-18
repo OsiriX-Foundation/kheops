@@ -45,6 +45,18 @@
       style=" position: relative;"
     >
       <h4>
+        <button
+          type="button"
+          class="btn btn-link btn-sm d-md-none"
+          @click.stop="back"
+        >
+          <span>
+            <v-icon
+              name="arrow-left"
+              color="white"
+            />
+          </span>
+        </button>
         <span
           class="breakwork"
         >
@@ -222,13 +234,21 @@
       </span>
     </div>
     <div class="row mb-2">
-      <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
+      <div class="offset-md-3 col-md-9 d-none d-sm-none d-md-block">
         <button
           v-if="writePermission"
           class="btn btn-primary"
           @click.stop="edit()"
         >
           {{ $t('edit') }}
+        </button>
+        <button
+          type="submit"
+          class="btn btn-secondary"
+          :class="writePermission ? 'ml-3': ''"
+          @click="back"
+        >
+          {{ $t('back') }}
         </button>
         <button
           v-if="writePermission"
@@ -238,13 +258,22 @@
         >
           {{ $t('remove') }}
         </button>
+      </div>
+      <div class="col-12 d-md-none">
         <button
-          type="submit"
-          class="btn btn-secondary"
-          :class="writePermission ? 'ml-3': ''"
-          @click="back"
+          v-if="writePermission"
+          class="btn btn-primary btn-block"
+          @click.stop="edit()"
         >
-          {{ $t('back') }}
+          {{ $t('edit') }}
+        </button>
+        <button
+          v-if="writePermission"
+          type="button"
+          class="btn btn-danger btn-block"
+          @click="deleteProvider"
+        >
+          {{ $t('remove') }}
         </button>
       </div>
     </div>
@@ -287,12 +316,23 @@ export default {
 		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
 			if (res.status !== 200) {
 				this.$snotify.error('Sorry, an error occured')
+				this.redirect()
 			}
 		}).catch(err => {
-			console.log(err)
+			if (err.response.status === 404) {
+				this.$snotify.error('Report provider not found')
+			} else {
+				this.$snotify.error('Sorry, an error occured')
+			}
+			this.redirect()
 		})
 	},
 	methods: {
+		redirect () {
+			let query = JSON.parse(JSON.stringify(this.$route.query))
+			query['settingview'] = 'list'
+			this.$router.push({ query: query })
+		},
 		back () {
 			this.$emit('done')
 		},

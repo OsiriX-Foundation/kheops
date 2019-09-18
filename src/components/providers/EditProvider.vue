@@ -26,6 +26,18 @@
       style=" position: relative;"
     >
       <h4>
+        <button
+          type="button"
+          class="btn btn-link btn-sm d-md-none"
+          @click.stop="cancel"
+        >
+          <span>
+            <v-icon
+              name="arrow-left"
+              color="white"
+            />
+          </span>
+        </button>
         {{ $t('editprovider') }}
       </h4>
     </div>
@@ -87,7 +99,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
+        <div class="offset-md-3 col-md-9 d-none d-sm-none d-md-block">
           <button
             type="submit"
             class="btn btn-primary"
@@ -108,6 +120,22 @@
             @click="cancel"
           >
             {{ $t('cancel') }}
+          </button>
+        </div>
+        <div class="col-12 d-md-none">
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            :disabled="loading"
+          >
+            {{ $t('edit') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger btn-block"
+            @click="deleteProvider"
+          >
+            {{ $t('remove') }}
           </button>
         </div>
       </div>
@@ -150,12 +178,23 @@ export default {
 		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
 			if (res.status !== 200) {
 				this.$snotify.error('Sorry, an error occured')
+				this.redirect()
 			}
 		}).catch(err => {
-			console.log(err)
+			if (err.response.status === 404) {
+				this.$snotify.error('Report provider not found')
+			} else {
+				this.$snotify.error('Sorry, an error occured')
+			}
+			this.redirect()
 		})
 	},
 	methods: {
+		redirect () {
+			let query = JSON.parse(JSON.stringify(this.$route.query))
+			query['settingview'] = 'list'
+			this.$router.push({ query: query })
+		},
 		updateProvider () {
 			this.setStateProvider(false, true, true)
 			const paramsURL = {
