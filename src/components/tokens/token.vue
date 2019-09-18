@@ -16,7 +16,8 @@
 		"revokeddate": "revoke date",
 		"revoke": "revoke",
 		"thistokenrevoked": "this token is revoked",
-		"lastuse": "last use date"
+		"lastuse": "last use date",
+    "back": "back"
 	},
 	"fr": {
 		"token": "token",
@@ -34,7 +35,8 @@
 		"revokeddate": "date de révoquation",
 		"revoke": "révoquer",
 		"thistokenrevoked": "ce token a été revoqué",
-		"lastuse": "dernière utilisation"
+		"lastuse": "dernière utilisation",
+    "back": "retour"
 	}
 }
 </i18n>
@@ -195,19 +197,38 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
 	name: 'Token',
 	props: {
-		token: {
-			type: Object,
-			required: true
+		tokenId: {
+			type: String,
+			required: false,
+			default: ''
 		}
 	},
 	data () {
 		return {
 		}
 	},
+	created: function () {
+		this.$store.dispatch('initToken')
+		let capabilityId = this.defineCapabilityId()
+		this.$store.dispatch('getToken', { capabilityId: capabilityId }).then(res => {
+			if (res.status !== 200) {
+				this.redirect()
+				this.$snotify.error('Sorry, an error occur')
+			}
+		}).catch(err => {
+			this.redirect()
+			this.$snotify.error('Sorry, an error occur')
+		})
+	},
 	computed: {
+		...mapGetters({
+			token: 'token'
+		}),
 		permissions () {
 			let perms = []
 			_.forEach(this.token, (value, key) => {
@@ -219,6 +240,13 @@ export default {
 		}
 	},
 	methods: {
+		redirect () {
+			this.$router.push({ query: { view: 'settings', cat: 'token' } })
+		},
+		defineCapabilityId () {
+			let tokenId = this.tokenId === '0' ? this.$route.query.object : this.tokenId
+			return tokenId
+		},
 		revoke () {
 			this.$emit('revoke', this.token.id)
 			this.cancel()
