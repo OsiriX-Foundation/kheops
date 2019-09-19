@@ -92,14 +92,14 @@ fi
 #get secrets and verify content
 for f in ${SECRET_FILE_PATH}/*
 do
-  if [[$(basename $a) == "kubernetes.io" ]]; then
+  filename=$(basename "$f")
+  
+  if [[filename == "kubernetes.io" ]]; then
     continue
   fi
-
+  
   word_count=$(wc -w $f | cut -f1 -d" ")
   line_count=$(wc -l $f | cut -f1 -d" ")
-
-  filename=$(basename "$f")
 
   if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
     echo Error with secret $filename. He contains $word_count word and $line_count line
