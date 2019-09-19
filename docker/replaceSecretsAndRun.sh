@@ -92,6 +92,10 @@ fi
 #get secrets and verify content
 for f in ${SECRET_FILE_PATH}/*
 do
+  if [[$(basename $a) == "kubernetes.io" ]]; then
+    continue
+  fi
+
   word_count=$(wc -w $f | cut -f1 -d" ")
   line_count=$(wc -l $f | cut -f1 -d" ")
 
