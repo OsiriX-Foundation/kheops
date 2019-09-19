@@ -20,10 +20,6 @@
     id="navbar_container"
     class="container"
   >
-    <div class="buttons-container">
-      <p />
-    </div>
-
     <div class="nav-container">
       <ul class="nav nav-pills nav-fill">
         <li class="nav-item">
@@ -76,7 +72,7 @@ export default {
 
 <style scoped>
 #navbar_container{
-	margin-top: 125px;
+	margin-top: 100px;
 }
 svg.fa-icon{
 	margin-right: 10px;

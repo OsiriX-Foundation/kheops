@@ -2,15 +2,15 @@
   <v-icon
     v-if="currentHeader !== sortBy"
     class="align-middle"
-	:width="width"
-	:height="height"
+    :width="width"
+    :height="height"
     name="unfold_more"
   />
   <v-icon
     v-else
     class="align-middle"
-	:width="width"
-	:height="height"
+    :width="width"
+    :height="height"
     :name="sortDesc ? 'unfold_up' : 'unfold_down'"
   />
 </template>

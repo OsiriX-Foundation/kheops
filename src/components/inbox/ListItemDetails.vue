@@ -10,7 +10,7 @@
 		"confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
 		"series": "Series",
 		"comments": "Comments",
-		"study": "Study",
+		"metadata": "Metadata",
 		"errorSeries": "An error occured, please reload the series list",
 		"reload": "Reload"
 	},
@@ -24,7 +24,7 @@
 		"confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
 		"series": "Séries",
 		"comments": "Commentaires",
-		"study": "Etude",
+		"metadata": "Métadonnées",
 		"errorSeries": "Une erreur est survenue, veuillez recharger les séries.",
 		"reload": "Recharger"
 	}
@@ -54,7 +54,7 @@
           :class="(study.flag.view === 'study')?'active':''"
           @click="setViewDetails(study.StudyInstanceUID.Value[0], 'study')"
         >
-          {{ $t('study') }}
+          {{ $t('metadata') }}
         </a>
       </nav>
     </div>

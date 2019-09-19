@@ -16,7 +16,10 @@
       "policy_uri": "Privacy policy document",
       "software_version": "Software version",
       "contacts": "Contact",
-      "supported_modalities": "Supported modalities"
+      "supported_modalities": "Supported modalities",
+      "warningremove": "Are you sure to remove this report provider ?",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
 		},
 		"fr": {
 			"url": "URL de configuration",
@@ -34,7 +37,10 @@
       "policy_uri": "Document de la politique de confidentialité",
       "software_version": "Version du logiciel",
       "contacts": "Contact",
-      "supported_modalities": "Modalités supportées"
+      "supported_modalities": "Modalités supportées",
+      "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
+      "confirm": "Confirmer",
+      "cancel": "Annuler"
 		}
 	}
 </i18n>
@@ -45,6 +51,18 @@
       style=" position: relative;"
     >
       <h4>
+        <button
+          type="button"
+          class="btn btn-link btn-sm d-md-none"
+          @click.stop="back"
+        >
+          <span>
+            <v-icon
+              name="arrow-left"
+              color="white"
+            />
+          </span>
+        </button>
         <span
           class="breakwork"
         >
@@ -222,29 +240,56 @@
       </span>
     </div>
     <div class="row mb-2">
-      <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
+      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
         <button
           v-if="writePermission"
-          class="btn btn-primary"
+          class="btn btn-primary btn-block"
           @click.stop="edit()"
         >
           {{ $t('edit') }}
         </button>
         <button
-          v-if="writePermission"
+          v-if="writePermission && !confirmDelete"
           type="button"
-          class="btn btn-danger ml-3"
+          class="btn btn-danger btn-block"
           @click="deleteProvider"
         >
           {{ $t('remove') }}
         </button>
-        <button
-          type="submit"
-          class="btn btn-secondary"
-          :class="writePermission ? 'ml-3': ''"
-          @click="back"
+      </div>
+    </div>
+    <div
+      v-if="writePermission && confirmDelete"
+      class="row mb-2"
+    >
+      <div class="offset-md-3 col-12 col-md-9">
+        <p
+          class="mt-2"
         >
-          {{ $t('back') }}
+          {{ $t('warningremove') }}
+        </p>
+      </div>
+    </div>
+    <div
+      v-if="writePermission && confirmDelete"
+      class="row mb-2"
+    >
+      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
+        <button
+          v-if="writePermission && confirmDelete"
+          type="button"
+          class="btn btn-danger btn-block"
+          @click="deleteProvider"
+        >
+          {{ $t('confirm') }}
+        </button>
+        <button
+          v-if="writePermission && confirmDelete"
+          type="button"
+          class="btn btn-secondary btn-block"
+          @click="confirmDelete=false"
+        >
+          {{ $t('cancel') }}
         </button>
       </div>
     </div>
@@ -276,6 +321,7 @@ export default {
 	},
 	data () {
 		return {
+			confirmDelete: false
 		}
 	},
 	computed: {
@@ -287,12 +333,23 @@ export default {
 		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
 			if (res.status !== 200) {
 				this.$snotify.error('Sorry, an error occured')
+				this.redirect()
 			}
 		}).catch(err => {
-			console.log(err)
+			if (err.response.status === 404) {
+				this.$snotify.error('Report provider not found')
+			} else {
+				this.$snotify.error('Sorry, an error occured')
+			}
+			this.redirect()
 		})
 	},
 	methods: {
+		redirect () {
+			let query = JSON.parse(JSON.stringify(this.$route.query))
+			query['settingview'] = 'list'
+			this.$router.push({ query: query })
+		},
 		back () {
 			this.$emit('done')
 		},
@@ -300,16 +357,20 @@ export default {
 			this.$emit('providerselectededit', this.clientID)
 		},
 		deleteProvider () {
-			this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-				if (res.status !== 204) {
-					this.$snotify.error('Sorry, an error occured')
-				} else {
-					this.$snotify.success('Provider remove')
-					this.$emit('done')
-				}
-			}).catch(err => {
-				console.log(err)
-			})
+			if (this.confirmDelete === false) {
+				this.confirmDelete = true
+			} else {
+				this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
+					if (res.status !== 204) {
+						this.$snotify.error('Sorry, an error occured')
+					} else {
+						this.$snotify.success('Provider remove')
+						this.$emit('done')
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+			}
 		}
 	}
 }

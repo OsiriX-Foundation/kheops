@@ -21,6 +21,18 @@
       style=" position: relative;"
     >
       <h4>
+        <button
+          type="button"
+          class="btn btn-link btn-sm d-md-none"
+          @click.stop="cancel"
+        >
+          <span>
+            <v-icon
+              name="arrow-left"
+              color="white"
+            />
+          </span>
+        </button>
         {{ $t('newprovider') }}
       </h4>
     </div>
@@ -68,19 +80,29 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
+        <div class="offset-md-3 col-md-9 d-none d-sm-none d-md-block">
           <button
             type="submit"
             class="btn btn-primary"
             :disabled="loading"
           >
             {{ $t('create') }}
-          </button><button
+          </button>
+          <button
             type="reset"
             class="btn btn-secondary ml-3"
             @click="cancel"
           >
             {{ $t('cancel') }}
+          </button>
+        </div>
+        <div class="col-12 d-md-none">
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            :disabled="loading"
+          >
+            {{ $t('create') }}
           </button>
         </div>
       </div>

@@ -88,16 +88,19 @@
     <span v-if="view === 'studies' || view === '' && loading === false">
       <div class="container">
         <div
-          v-if="formattedAlbumDescription.length > 0"
+          v-if="album.description !== undefined && album.description.length > 0"
           class="card"
         >
-          <div class="card-body">
+          <div
+            class="card-body"
+            style="max-height: 135px; overflow-y: auto"
+          >
             <p
-              v-for="(p,idx) in formattedAlbumDescription"
-              :key="idx"
+              v-for="line in album.description.split('\n')"
+              :key="line.id"
               class="pl-3 py-0 my-0"
             >
-              {{ p }}
+              {{ line }}
             </p>
           </div>
         </div>
@@ -136,13 +139,7 @@ export default {
 	computed: {
 		...mapGetters({
 			album: 'album'
-		}),
-		formattedAlbumDescription () {
-			if (this.album !== undefined && this.album.description !== undefined && this.album.description.length > 0) {
-				return this.album.description.split('\n')
-			}
-			return []
-		}
+		})
 	},
 	watch: {
 		view () {

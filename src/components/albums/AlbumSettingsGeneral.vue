@@ -60,7 +60,8 @@
         </div>
       </dd>
       <dt>
-        {{ $t('albumdescription') }}<span
+        {{ $t('albumdescription') }}
+        <span
           v-if="album.is_admin && edit.description === '-1'"
           class="icon-edit float-right"
           @click="edit.description=album.description"
@@ -68,12 +69,15 @@
           <v-icon name="pencil-alt" />
         </span>
       </dt>
-      <dd class="album_description">
+      <dd
+        class="album_description"
+      >
         <div v-if="edit.description === '-1'">
           <p
             v-for="(p,pidx) in formattedAlbumDescription"
             :key="pidx"
             class="my-0"
+            style="word-break: break-all;"
           >
             {{ p }}
           </p>
@@ -84,8 +88,10 @@
               <div>
                 <textarea
                   v-model="edit.description"
-                  rows="6"
+                  rows="5"
                   class="form-control"
+                  style="resize: none;"
+                  maxlength="2048"
                 />
               </div>
               <div>
@@ -199,6 +205,7 @@ dd.album_description{
 	border: 1px solid #333;
 	height: 10em;
 	padding: 10px;
+  overflow-y: auto;
 }
 
 </style>

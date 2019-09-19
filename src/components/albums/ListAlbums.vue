@@ -14,9 +14,10 @@
     "nomodality": "No modality",
 		"name": "Name",
 		"nomorealbums": "No more albums",
-		"noresults": "No results",
+		"noresults": "No album found",
 		"albumshared": "Album shared",
-		"error": "An error occur please reload the albums."
+		"error": "An error occur please reload the albums.",
+		"reload": "Reload"
 	},
 	"fr": {
 		"newalbum": "Nouvel album",
@@ -32,9 +33,10 @@
     "nomodality": "Aucune modalité",
 		"name": "Nom",
 		"nomorealbums": "Pas d'albums en plus",
-		"noresults": "Aucun results",
+		"noresults": "Aucun album trouvé",
 		"albumshared": "Album partagé",
-		"error": "Une erreur s'est produite, veuillez recharger les albums."
+		"error": "Une erreur s'est produite, veuillez recharger les albums.",
+		"reload": "Recharger"
 	}
 }
 </i18n>
@@ -273,7 +275,7 @@
           class=" btn btn-md"
           @click="searchAlbums()"
         >
-          Reload
+          {{ $t('reload') }}
         </button>
       </div>
     </infinite-loading>

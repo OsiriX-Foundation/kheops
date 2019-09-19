@@ -76,7 +76,7 @@ Props :
                 </a>
                 <br>
                 <a
-                  v-if="album.is_admin && showDeleteUser"
+                  v-if="album.is_admin && showDeleteUser && user.user_id !== currentuserSub"
                   class="text-danger"
                   @click.stop="deleteUser(user)"
                 >

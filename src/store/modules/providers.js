@@ -49,7 +49,7 @@ const actions = {
 			}
 			return res
 		}).catch(err => {
-			return err
+			return Promise.reject(err)
 		})
 	},
 	postProvider ({ dispatch }, params) {

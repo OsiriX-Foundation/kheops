@@ -8,6 +8,7 @@ import series from './modules/series'
 import comments from './modules/comments'
 import albums from './modules/albums'
 import album from './modules/album'
+import tokens from './modules/tokens'
 
 Vue.use(Vuex)
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
 		series,
 		comments,
 		albums,
-		album
+		album,
+		tokens
 	}
 })
