@@ -31,12 +31,17 @@
 
 <template>
   <div class="container">
-    <h3>{{ displayName }}</h3>
+    <h3>
+      {{ displayName }}
+    </h3>
     <form @submit.prevent="createAlbum">
       <fieldset>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('albumName') }}</dt>
+            <dt class="d-none d-sm-block">
+              {{ $t('albumName') }}
+            </dt>
+            <b class="d-block d-sm-none">{{ $t('albumName') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -52,7 +57,10 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('albumDescription') }}</dt>
+            <dt class="d-none d-sm-block">
+              {{ $t('albumDescription') }}
+            </dt>
+            <b class="d-block d-sm-none">{{ $t('albumDescription') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -68,17 +76,24 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('users') }}</dt>
+            <dt class="d-none d-sm-block">
+              {{ $t('users') }}
+            </dt>
+            <b class="d-block d-sm-none">{{ $t('users') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
-              <h5 class="user">
+              <h5
+                v-if="album.users.length > 0"
+                class="user"
+              >
                 <span
                   v-for="user in album.users"
                   :key="user.user_name"
                   class="badge badge-secondary"
                 >
-                  {{ user.email }} <span
+                  {{ user.email }}
+                  <span
                     class="icon pointer"
                     @click="deleteUser(user)"
                   >
@@ -135,19 +150,36 @@
       </fieldset>
       <fieldset>
         <div class="row">
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :disabled="!album.name"
-          >
-            {{ $t('create') }}
-          </button>
-          <router-link
-            to="/albums"
-            class="btn btn-secondary"
-          >
-            {{ $t('cancel') }}
-          </router-link>
+          <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="!album.name"
+            >
+              {{ $t('create') }}
+            </button>
+            <router-link
+              to="/albums"
+              class="btn btn-secondary"
+            >
+              {{ $t('cancel') }}
+            </router-link>
+          </div>
+          <div class="col-12 mt-1 d-md-none">
+            <button
+              type="submit"
+              class="btn btn-primary btn-block"
+              :disabled="!album.name"
+            >
+              {{ $t('create') }}
+            </button>
+            <router-link
+              to="/albums"
+              class="btn btn-secondary btn-block"
+            >
+              {{ $t('cancel') }}
+            </router-link>
+          </div>
         </div>
       </fieldset>
     </form>
