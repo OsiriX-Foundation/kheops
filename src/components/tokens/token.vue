@@ -17,7 +17,10 @@
 		"revoke": "revoke",
 		"thistokenrevoked": "this token is revoked",
 		"lastuse": "last use date",
-    "back": "back"
+    "back": "back",
+    "warningrevoke": "Are you sure you want to revoke this token ?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
 	},
 	"fr": {
 		"token": "token",
@@ -36,7 +39,10 @@
 		"revoke": "révoquer",
 		"thistokenrevoked": "ce token a été revoqué",
 		"lastuse": "dernière utilisation",
-    "back": "retour"
+    "back": "retour",
+    "warningrevoke": "Etes-vous sûr de vouloir revoquer ce token ?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
 	}
 }
 </i18n>
@@ -165,30 +171,65 @@
       <div class="row mt-3">
         <div class="offset-sm-3 col-sm-9 d-none d-sm-none d-md-block">
           <button
+            v-if="!token.revoked && !confirmRevoke"
             type="button"
-            class="btn btn-secondary mr-3"
-            @click="cancel"
-          >
-            {{ $t('back') }}
-          </button>
-          <button
-            v-if="!token.revoked"
-            type="button"
-            class="btn btn-danger ml-3"
+            class="btn btn-danger"
             @click="revoke"
           >
             {{ $t('revoke') }}
+          </button>
+          <p
+            v-if="!token.revoked && confirmRevoke"
+          >
+            {{ $t('warningrevoke') }}
+          </p>
+          <button
+            v-if="!token.revoked && confirmRevoke"
+            type="button"
+            class="btn btn-danger"
+            @click="revoke"
+          >
+            {{ $t('confirm') }}
+          </button>
+          <button
+            v-if="!token.revoked && confirmRevoke"
+            type="button"
+            class="btn btn-secondary"
+            @click="confirmRevoke=false"
+          >
+            {{ $t('cancel') }}
           </button>
         </div>
 
         <div class="col-12 d-md-none">
           <button
-            v-if="!token.revoked"
+            v-if="!token.revoked && !confirmRevoke"
             type="button"
             class="btn btn-danger btn-block"
             @click="revoke"
           >
             {{ $t('revoke') }}
+          </button>
+          <p
+            v-if="!token.revoked && confirmRevoke"
+          >
+            {{ $t('warningrevoke') }}
+          </p>
+          <button
+            v-if="!token.revoked && confirmRevoke"
+            type="button"
+            class="btn btn-danger btn-block"
+            @click="revoke"
+          >
+            {{ $t('confirm') }}
+          </button>
+          <button
+            v-if="!token.revoked && confirmRevoke"
+            type="button"
+            class="btn btn-secondary btn-block"
+            @click="confirmRevoke=false"
+          >
+            {{ $t('cancel') }}
           </button>
         </div>
       </div>
@@ -210,20 +251,8 @@ export default {
 	},
 	data () {
 		return {
+			confirmRevoke: false
 		}
-	},
-	created: function () {
-		this.$store.dispatch('initToken')
-		let capabilityId = this.defineCapabilityId()
-		this.$store.dispatch('getToken', { capabilityId: capabilityId }).then(res => {
-			if (res.status !== 200) {
-				this.redirect()
-				this.$snotify.error('Sorry, an error occur')
-			}
-		}).catch(err => {
-			this.redirect()
-			this.$snotify.error('Sorry, an error occur')
-		})
 	},
 	computed: {
 		...mapGetters({
@@ -239,6 +268,20 @@ export default {
 			return perms.length ? perms.join(', ') : '-'
 		}
 	},
+	created: function () {
+		this.$store.dispatch('initToken')
+		let capabilityId = this.defineCapabilityId()
+		this.$store.dispatch('getToken', { capabilityId: capabilityId }).then(res => {
+			if (res.status !== 200) {
+				this.redirect()
+				this.$snotify.error('Sorry, an error occur')
+			}
+		}).catch(err => {
+			console.log(err)
+			this.redirect()
+			this.$snotify.error('Sorry, an error occur')
+		})
+	},
 	methods: {
 		redirect () {
 			this.$router.push({ query: { view: 'settings', cat: 'token' } })
@@ -248,8 +291,12 @@ export default {
 			return tokenId
 		},
 		revoke () {
-			this.$emit('revoke', this.token.id)
-			this.cancel()
+			if (this.confirmRevoke === false) {
+				this.confirmRevoke = true
+			} else {
+				this.$emit('revoke', this.token.id)
+				this.cancel()
+			}
 		},
 		cancel () {
 			this.$emit('done')

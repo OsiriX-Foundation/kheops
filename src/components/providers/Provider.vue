@@ -16,7 +16,10 @@
       "policy_uri": "Privacy policy document",
       "software_version": "Software version",
       "contacts": "Contact",
-      "supported_modalities": "Supported modalities"
+      "supported_modalities": "Supported modalities",
+      "warningremove": "Are you sure to remove this report provider ?",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
 		},
 		"fr": {
 			"url": "URL de configuration",
@@ -34,7 +37,10 @@
       "policy_uri": "Document de la politique de confidentialité",
       "software_version": "Version du logiciel",
       "contacts": "Contact",
-      "supported_modalities": "Modalités supportées"
+      "supported_modalities": "Modalités supportées",
+      "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
+      "confirm": "Confirmer",
+      "cancel": "Annuler"
 		}
 	}
 </i18n>
@@ -234,32 +240,7 @@
       </span>
     </div>
     <div class="row mb-2">
-      <div class="offset-md-3 col-md-9 d-none d-sm-none d-md-block">
-        <button
-          v-if="writePermission"
-          class="btn btn-primary"
-          @click.stop="edit()"
-        >
-          {{ $t('edit') }}
-        </button>
-        <button
-          type="submit"
-          class="btn btn-secondary"
-          :class="writePermission ? 'ml-3': ''"
-          @click="back"
-        >
-          {{ $t('back') }}
-        </button>
-        <button
-          v-if="writePermission"
-          type="button"
-          class="btn btn-danger ml-3"
-          @click="deleteProvider"
-        >
-          {{ $t('remove') }}
-        </button>
-      </div>
-      <div class="col-12 d-md-none">
+      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
         <button
           v-if="writePermission"
           class="btn btn-primary btn-block"
@@ -268,12 +249,47 @@
           {{ $t('edit') }}
         </button>
         <button
-          v-if="writePermission"
+          v-if="writePermission && !confirmDelete"
           type="button"
           class="btn btn-danger btn-block"
           @click="deleteProvider"
         >
           {{ $t('remove') }}
+        </button>
+      </div>
+    </div>
+    <div
+      v-if="writePermission && confirmDelete"
+      class="row mb-2"
+    >
+      <div class="offset-md-3 col-12 col-md-9">
+        <p
+          class="mt-2"
+        >
+          {{ $t('warningremove') }}
+        </p>
+      </div>
+    </div>
+    <div
+      v-if="writePermission && confirmDelete"
+      class="row mb-2"
+    >
+      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
+        <button
+          v-if="writePermission && confirmDelete"
+          type="button"
+          class="btn btn-danger btn-block"
+          @click="deleteProvider"
+        >
+          {{ $t('confirm') }}
+        </button>
+        <button
+          v-if="writePermission && confirmDelete"
+          type="button"
+          class="btn btn-secondary btn-block"
+          @click="confirmDelete=false"
+        >
+          {{ $t('cancel') }}
         </button>
       </div>
     </div>
@@ -305,6 +321,7 @@ export default {
 	},
 	data () {
 		return {
+			confirmDelete: false
 		}
 	},
 	computed: {
@@ -340,16 +357,20 @@ export default {
 			this.$emit('providerselectededit', this.clientID)
 		},
 		deleteProvider () {
-			this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-				if (res.status !== 204) {
-					this.$snotify.error('Sorry, an error occured')
-				} else {
-					this.$snotify.success('Provider remove')
-					this.$emit('done')
-				}
-			}).catch(err => {
-				console.log(err)
-			})
+			if (this.confirmDelete === false) {
+				this.confirmDelete = true
+			} else {
+				this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
+					if (res.status !== 204) {
+						this.$snotify.error('Sorry, an error occured')
+					} else {
+						this.$snotify.success('Provider remove')
+						this.$emit('done')
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+			}
 		}
 	}
 }
