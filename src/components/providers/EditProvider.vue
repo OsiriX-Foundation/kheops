@@ -6,7 +6,10 @@
     "urlProvider": "Configuration URL of the provider",
     "newClientId": "Generate a new client ID",
     "edit": "Confirm",
-    "remove": "Remove"
+    "remove": "Remove",
+    "warningremove": "Are you sure to remove this report provider ?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
 	},
 	"fr": {
 		"editprovider": "Edition d'un provider",
@@ -14,7 +17,10 @@
     "urlProvider": "URL de configuration",
     "newClientId": "Generer un nouveau client ID",
     "edit": "Confirmer",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
 	}
 }
 </i18n>
@@ -26,6 +32,18 @@
       style=" position: relative;"
     >
       <h4>
+        <button
+          type="button"
+          class="btn btn-link btn-sm d-md-none"
+          @click.stop="cancel"
+        >
+          <span>
+            <v-icon
+              name="arrow-left"
+              color="white"
+            />
+          </span>
+        </button>
         {{ $t('editprovider') }}
       </h4>
     </div>
@@ -87,25 +105,54 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12 col-sm-12 offset-md-3 col-md-9">
+        <div class="offset-md-3 col-12 col-sm-12 col-md-3">
           <button
             type="submit"
-            class="btn btn-primary"
+            class="btn btn-primary btn-block"
             :disabled="loading"
           >
             {{ $t('edit') }}
           </button>
           <button
+            v-if="!confirmDelete"
             type="button"
-            class="btn btn-danger ml-3"
+            class="btn btn-danger btn-block"
             @click="deleteProvider"
           >
             {{ $t('remove') }}
           </button>
+        </div>
+      </div>
+      <div
+        v-if="confirmDelete"
+        class="row mb-2"
+      >
+        <div class="offset-md-3 col-12 col-md-9">
+          <p
+            class="mt-2"
+          >
+            {{ $t('warningremove') }}
+          </p>
+        </div>
+      </div>
+      <div
+        v-if="confirmDelete"
+        class="row mb-2"
+      >
+        <div class="offset-md-3 col-12 col-sm-12 col-md-3">
           <button
-            type="reset"
-            class="btn btn-secondary ml-3"
-            @click="cancel"
+            v-if="confirmDelete"
+            type="button"
+            class="btn btn-danger btn-block"
+            @click="deleteProvider"
+          >
+            {{ $t('confirm') }}
+          </button>
+          <button
+            v-if="confirmDelete"
+            type="button"
+            class="btn btn-secondary btn-block"
+            @click="confirmDelete=false"
           >
             {{ $t('cancel') }}
           </button>
@@ -138,7 +185,8 @@ export default {
 			newClientId: false,
 			show: false,
 			checkURL: false,
-			loading: false
+			loading: false,
+			confirmDelete: false
 		}
 	},
 	computed: {
@@ -150,12 +198,23 @@ export default {
 		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
 			if (res.status !== 200) {
 				this.$snotify.error('Sorry, an error occured')
+				this.redirect()
 			}
 		}).catch(err => {
-			console.log(err)
+			if (err.response.status === 404) {
+				this.$snotify.error('Report provider not found')
+			} else {
+				this.$snotify.error('Sorry, an error occured')
+			}
+			this.redirect()
 		})
 	},
 	methods: {
+		redirect () {
+			let query = JSON.parse(JSON.stringify(this.$route.query))
+			query['settingview'] = 'list'
+			this.$router.push({ query: query })
+		},
 		updateProvider () {
 			this.setStateProvider(false, true, true)
 			const paramsURL = {
@@ -189,16 +248,20 @@ export default {
 			this.$emit('done')
 		},
 		deleteProvider () {
-			this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-				if (res.status !== 204) {
-					this.$snotify.error('Sorry, an error occured')
-				} else {
-					this.$snotify.success('Provider remove')
-					this.$emit('done')
-				}
-			}).catch(err => {
-				console.log(err)
-			})
+			if (!this.confirmDelete) {
+				this.confirmDelete = true
+			} else {
+				this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
+					if (res.status !== 204) {
+						this.$snotify.error('Sorry, an error occured')
+					} else {
+						this.$snotify.success('Provider remove')
+						this.$emit('done')
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+			}
 		}
 	}
 }

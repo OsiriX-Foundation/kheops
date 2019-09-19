@@ -39,7 +39,7 @@
 <template>
   <div class="tokens">
     <div
-      v-if="view=='list'"
+      v-if="view=='list' || view === undefined"
       class="my-3 selection-button-container"
       style=" position: relative;"
     >
@@ -65,13 +65,13 @@
     />
     <token
       v-if="view=='token'"
-      :token="token"
+      :token-id="token.id !== undefined ? token.id.toString() : '0'"
       @done="showList"
       @revoke="revoke"
     />
 
     <div
-      v-if="view=='list'"
+      v-if="view=='list' || view === undefined"
       class="tokens"
     >
       <h4>
@@ -324,6 +324,19 @@ export default {
 					sortable: false
 				}
 			]
+		}
+	},
+	watch: {
+		view () {
+			let query = JSON.parse(JSON.stringify(this.$route.query))
+			query['settingview'] = this.view
+			if (this.view === 'token') {
+				query['object'] = this.token.id === 0 ? this.$route.query['object'] : this.token.id
+			}
+			this.$router.push({ query: query })
+		},
+		'$route.query' () {
+			this.view = this.$route.query.settingview
 		}
 	},
 	computed: {

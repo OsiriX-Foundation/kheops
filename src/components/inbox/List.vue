@@ -34,8 +34,9 @@
     "draganddrop": "Or drag and drop",
     "favorites": "Favorites",
 		"nomorestudies": "No more studies",
-		"noresults": "No results",
-		"error": "An error occur please reload the studies."
+		"noresults": "No study found",
+		"error": "An error occur please reload the studies.",
+		"reload": "Reload"
 	},
 	"fr": {
 		"selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -67,8 +68,9 @@
     "draganddrop": "Ou Drag and Drop",
     "favorites": "Favorites",
 		"nomorestudies": "Plus d'études",
-		"noresults": "Aucun resultats",
-		"error": "Une erreur s'est produite, veuillez recharger les études."
+		"noresults": "Aucune étude trouvée.",
+		"error": "Une erreur s'est produite, veuillez recharger les études.",
+		"reload": "Recharger"
 	}
 }
 </i18n>
@@ -401,7 +403,7 @@
           class=" btn btn-md"
           @click="searchStudies()"
         >
-          Reload
+          {{ $t('reload') }}
         </button>
       </div>
     </infinite-loading>
