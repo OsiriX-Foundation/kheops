@@ -94,7 +94,7 @@ for f in ${SECRET_FILE_PATH}/*
 do
   filename=$(basename "$f")
   
-  if [[filename == "kubernetes.io" ]]; then
+  if [ filename == "kubernetes.io" ]; then
     continue
   fi
   
