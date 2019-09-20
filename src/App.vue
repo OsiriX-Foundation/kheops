@@ -45,32 +45,32 @@
 
 <script>
 
-import navHeader from '@/components/navheader'
-import navBar from '@/components/navbar'
-import SendStudies from '@/components/study/SendStudies'
+import navHeader from '@/components/navheader';
+import navBar from '@/components/navbar';
+import SendStudies from '@/components/study/SendStudies';
 
 export default {
-	name: 'App',
-	components: { navHeader, navBar, SendStudies },
-	data () {
-		return {
-			appTitle: 'Kheops'
-		}
-	},
-	computed: {
-		year () {
-			return new Date().getFullYear()
-		}
-	},
-	watch: {
-		'$route' (to, from) {
-			document.title = this.$t(to.meta.title) || this.appTitle
-		}
-	},
-	created () {
-		document.title = 'Kheops'
-	}
-}
+  name: 'App',
+  components: { navHeader, navBar, SendStudies },
+  data() {
+    return {
+      appTitle: 'Kheops',
+    };
+  },
+  computed: {
+    year() {
+      return new Date().getFullYear();
+    },
+  },
+  watch: {
+    $route(to, from) {
+      document.title = this.$t(to.meta.title) || this.appTitle;
+    },
+  },
+  created() {
+    document.title = 'Kheops';
+  },
+};
 </script>
 
 <style>
