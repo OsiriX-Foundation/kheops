@@ -2,18 +2,18 @@
 
 <i18n>
 {
-	"en": {
-		"general": "General",
-		"user": "User",
-		"token": "Token",
-    "providerSR": "Report providers"
-	},
-	"fr": {
-		"general": "Général",
-		"user": "Utilisateur",
+  "en": {
+    "general": "General",
+    "user": "User",
     "token": "Token",
     "providerSR": "Report providers"
-	}
+  },
+  "fr": {
+    "general": "Général",
+    "user": "Utilisateur",
+    "token": "Token",
+    "providerSR": "Report providers"
+  }
 }
 </i18n>
 
@@ -84,59 +84,61 @@
 </template>
 
 <script>
-import AlbumSettingsGeneral from '@/components/albums/AlbumSettingsGeneral'
-import AlbumSettingsUser from '@/components/albums/AlbumSettingsUser'
-import AlbumSettingsToken from '@/components/albums/AlbumSettingsToken'
-import AlbumSettingsReportProvider from '@/components/albums/AlbumSettingsReportProvider'
+import AlbumSettingsGeneral from '@/components/albums/AlbumSettingsGeneral';
+import AlbumSettingsUser from '@/components/albums/AlbumSettingsUser';
+import AlbumSettingsToken from '@/components/albums/AlbumSettingsToken';
+import AlbumSettingsReportProvider from '@/components/albums/AlbumSettingsReportProvider';
 
 export default {
-	name: 'AlbumSettings',
-	components: { AlbumSettingsGeneral, AlbumSettingsUser, AlbumSettingsToken, AlbumSettingsReportProvider },
-	props: {
-		album: {
-			type: Object,
-			required: true,
-			default: () => {}
-		}
-	},
-	data () {
-		return {
-			view: 'general',
-			basicCategories: ['general', 'user', 'providerSR']
-		}
-	},
-	computed: {
-		categories () {
-			return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories
-		}
-	},
-	watch: {
-		view () {
-			this.$router.push({ query: { view: 'settings', cat: this.view } })
-		},
-		'$route.query' () {
-			this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general'
-			this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
-				this.$router.push('/albums')
-				return err
-			})
-		}
-	},
-	created () {
-		if (this.categories.indexOf(this.$route.query.cat) > -1) {
-			this.view = this.$route.query.cat
-		}
-	},
-	beforeDestroy () {
-		let query = Object.assign({}, this.$route.query)
-		delete query.cat
-		this.$router.replace({ query })
-	}
-}
+  name: 'AlbumSettings',
+  components: {
+    AlbumSettingsGeneral, AlbumSettingsUser, AlbumSettingsToken, AlbumSettingsReportProvider,
+  },
+  props: {
+    album: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
+  },
+  data() {
+    return {
+      view: 'general',
+      basicCategories: ['general', 'user', 'providerSR'],
+    };
+  },
+  computed: {
+    categories() {
+      return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories;
+    },
+  },
+  watch: {
+    view() {
+      this.$router.push({ query: { view: 'settings', cat: this.view } });
+    },
+    '$route.query': function () {
+      this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general';
+      this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch((err) => {
+        this.$router.push('/albums');
+        return err;
+      });
+    },
+  },
+  created() {
+    if (this.categories.indexOf(this.$route.query.cat) > -1) {
+      this.view = this.$route.query.cat;
+    }
+  },
+  beforeDestroy() {
+    const query = { ...this.$route.query };
+    delete query.cat;
+    this.$router.replace({ query });
+  },
+};
 </script>
 
 <style scoped>
 a.nav-link{
-	cursor: pointer;
+  cursor: pointer;
 }
 </style>

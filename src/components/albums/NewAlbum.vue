@@ -1,31 +1,31 @@
 <i18n>
 {
-	"en": {
-		"albumName": "Album Name",
-		"albumDescription": "Album Description",
-		"users": "Users",
-		"addUser": "Invite a user",
-		"addSeries": "Add studies / series",
-		"downloadSeries": "Show download button",
-		"sendSeries": "Send to user / album",
-		"deleteSeries": "Remove studies / series",
-		"writeComments": "Write comments",
-		"create": "Create",
-		"cancel": "Cancel"
-	},
-	"fr": {
-		"albumName": "Nom de l'album",
-		"albumDescription": "Description de l'album",
-		"users": "Utilisateurs",
-		"addUser": "Inviter un utilisateur",
-		"addSeries": "Ajouter une étude / série",
-		"downloadSeries": "Télécharger une étude / série",
-		"sendSeries": "Ajouter à un album / inbox",
-		"deleteSeries": "Supprimer une étude / série",
-		"writeComments": "Commenter",
-		"create": "Créer",
-		"cancel": "Annuler"
-	}
+  "en": {
+    "albumName": "Album Name",
+    "albumDescription": "Album Description",
+    "users": "Users",
+    "addUser": "Invite a user",
+    "addSeries": "Add studies / series",
+    "downloadSeries": "Show download button",
+    "sendSeries": "Send to user / album",
+    "deleteSeries": "Remove studies / series",
+    "writeComments": "Write comments",
+    "create": "Create",
+    "cancel": "Cancel"
+  },
+  "fr": {
+    "albumName": "Nom de l'album",
+    "albumDescription": "Description de l'album",
+    "users": "Utilisateurs",
+    "addUser": "Inviter un utilisateur",
+    "addSeries": "Ajouter une étude / série",
+    "downloadSeries": "Télécharger une étude / série",
+    "sendSeries": "Ajouter à un album / inbox",
+    "deleteSeries": "Supprimer une étude / série",
+    "writeComments": "Commenter",
+    "create": "Créer",
+    "cancel": "Annuler"
+  }
 }
 </i18n>
 
@@ -187,174 +187,175 @@
 </template>
 
 <script>
-import { HTTP } from '@/router/http'
+import { HTTP } from '@/router/http';
+
 export default {
-	name: 'NewAlbum',
-	data () {
-		return {
-			album: {
-				album_id: '',
-				name: '',
-				description: '',
-				addUser: false,
-				downloadSeries: true,
-				sendSeries: true,
-				deleteSeries: false,
-				addSeries: true,
-				writeComments: true,
-				users: [],
-				userSettings: {
-					addUser: false,
-					addSeries: true,
-					deleteSeries: false,
-					downloadSeries: true,
-					sendSeries: true,
-					writeComments: true
-				}
-			},
-			newUserName: ''
-		}
-	},
-	computed: {
-		displayName () {
-			return (!this.album.album_id) ? 'New album' : this.album.name
-		}
-	},
-	watch: {
-		'album.userSettings.downloadSeries' () {
-			if (!this.album.userSettings.downloadSeries) {
-				this.album.userSettings.sendSeries = false
-			}
-		}
-	},
-	methods: {
-		deleteUser (user) {
-			let index = this.album.users.findIndex(i => i.email === user.email)
-			if (index > -1) this.album.users.splice(index, 1)
-		},
-		checkUser () {
-			let vm = this
-			let idx = _.findIndex(vm.album.users, u => { return u.email === vm.newUserName })
-			if (vm.newUserName && idx === -1) {
-				HTTP.get('users?reference=' + vm.newUserName, { headers: { 'Accept': 'application/json' } }).then(res => {
-					if (res.status === 204) this.$snotify.error('User unknown')
-					else if (res.status === 200) {
-						this.album.users.push({ email: res.data.email })
-						vm.newUserName = ''
-					}
-				}).catch(() => {
-					console.log('Sorry, an error occured')
-				})
-			}
-		},
-		createAlbum () {
-			let formData = {
-				name: this.album.name,
-				description: this.album.description,
-				addUser: this.album.userSettings.addUser,
-				downloadSeries: this.album.userSettings.downloadSeries,
-				sendSeries: this.album.userSettings.sendSeries,
-				deleteSeries: this.album.userSettings.deleteSeries,
-				addSeries: this.album.userSettings.addSeries,
-				writeComments: this.album.userSettings.writeComments
-			}
-			this.$store.dispatch('createAlbum', { formData: formData }).then(res => {
-				if (res.status === 201) {
-					let albumCreated = res.data
-					this.addAlbumUser(albumCreated)
-					let data = this.dataToUpload(albumCreated.album_id)
-					if (data.length > 0) {
-						this.putStudiesInAlbum(albumCreated, data).then(res => {
-							this.$router.push('/albums/' + albumCreated.album_id)
-						})
-					} else {
-						this.$router.push('/albums/' + albumCreated.album_id)
-					}
-				}
-			}).catch(err => {
-				this.$snotify.error(this.$t('sorryerror'))
-			})
-		},
-		addAlbumUser (albumCreated) {
-			this.album.users.forEach(user => {
-				let paramsUser = {
-					album_id: albumCreated.album_id,
-					user: user.email
-				}
-				this.$store.dispatch('addAlbumUser', paramsUser).then(res => {
-					if (res.status !== 201) {
-						this.$snotify.error(this.$t('sorryerror'))
-					}
-				}).catch(err => {
-					this.$snotify.error(this.$t('sorryerror'))
-					return err
-				})
-			})
-		},
-		putStudiesInAlbum (albumCreated, data) {
-			let queries = {}
-			queries = this.$route.query['source'] === 'inbox' ? { inbox: true } : { album: this.$route.query['source'] }
-			return this.$store.dispatch('putStudiesInAlbum', { 'queries': queries, 'data': data })
-		},
-		dataToUpload (albumId) {
-			let data = []
-			if (this.$route.query && this.$route.query['StudyInstanceUID']) {
-				this.$route.query['StudyInstanceUID'].forEach(study => {
-					data.push({
-						album_id: albumId,
-						study_id: study
-					})
-				})
-			}
-			if (this.$route.query && this.$route.query['SeriesInstanceUID']) {
-				this.$route.query['SeriesInstanceUID'].forEach(serie => {
-					let infoSerie = serie.split(',')
-					if (infoSerie.length === 2) {
-						data.push({
-							album_id: albumId,
-							study_id: infoSerie[0],
-							serie_id: infoSerie[1]
-						})
-					}
-				})
-			}
-			return data
-		}
-	}
-}
+  name: 'NewAlbum',
+  data() {
+    return {
+      album: {
+        album_id: '',
+        name: '',
+        description: '',
+        addUser: false,
+        downloadSeries: true,
+        sendSeries: true,
+        deleteSeries: false,
+        addSeries: true,
+        writeComments: true,
+        users: [],
+        userSettings: {
+          addUser: false,
+          addSeries: true,
+          deleteSeries: false,
+          downloadSeries: true,
+          sendSeries: true,
+          writeComments: true,
+        },
+      },
+      newUserName: '',
+    };
+  },
+  computed: {
+    displayName() {
+      return (!this.album.album_id) ? 'New album' : this.album.name;
+    },
+  },
+  watch: {
+    'album.userSettings.downloadSeries': function () {
+      if (!this.album.userSettings.downloadSeries) {
+        this.album.userSettings.sendSeries = false;
+      }
+    },
+  },
+  methods: {
+    deleteUser(user) {
+      const index = this.album.users.findIndex((i) => i.email === user.email);
+      if (index > -1) this.album.users.splice(index, 1);
+    },
+    checkUser() {
+      const vm = this;
+      const idx = _.findIndex(vm.album.users, (u) => u.email === vm.newUserName);
+      if (vm.newUserName && idx === -1) {
+        HTTP.get(`users?reference=${vm.newUserName}`, { headers: { Accept: 'application/json' } }).then((res) => {
+          if (res.status === 204) this.$snotify.error('User unknown');
+          else if (res.status === 200) {
+            this.album.users.push({ email: res.data.email });
+            vm.newUserName = '';
+          }
+        }).catch(() => {
+          console.log('Sorry, an error occured');
+        });
+      }
+    },
+    createAlbum() {
+      const formData = {
+        name: this.album.name,
+        description: this.album.description,
+        addUser: this.album.userSettings.addUser,
+        downloadSeries: this.album.userSettings.downloadSeries,
+        sendSeries: this.album.userSettings.sendSeries,
+        deleteSeries: this.album.userSettings.deleteSeries,
+        addSeries: this.album.userSettings.addSeries,
+        writeComments: this.album.userSettings.writeComments,
+      };
+      this.$store.dispatch('createAlbum', { formData }).then((res) => {
+        if (res.status === 201) {
+          const albumCreated = res.data;
+          this.addAlbumUser(albumCreated);
+          const data = this.dataToUpload(albumCreated.album_id);
+          if (data.length > 0) {
+            this.putStudiesInAlbum(albumCreated, data).then((res) => {
+              this.$router.push(`/albums/${albumCreated.album_id}`);
+            });
+          } else {
+            this.$router.push(`/albums/${albumCreated.album_id}`);
+          }
+        }
+      }).catch((err) => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    addAlbumUser(albumCreated) {
+      this.album.users.forEach((user) => {
+        const paramsUser = {
+          album_id: albumCreated.album_id,
+          user: user.email,
+        };
+        this.$store.dispatch('addAlbumUser', paramsUser).then((res) => {
+          if (res.status !== 201) {
+            this.$snotify.error(this.$t('sorryerror'));
+          }
+        }).catch((err) => {
+          this.$snotify.error(this.$t('sorryerror'));
+          return err;
+        });
+      });
+    },
+    putStudiesInAlbum(albumCreated, data) {
+      let queries = {};
+      queries = this.$route.query.source === 'inbox' ? { inbox: true } : { album: this.$route.query.source };
+      return this.$store.dispatch('putStudiesInAlbum', { queries, data });
+    },
+    dataToUpload(albumId) {
+      const data = [];
+      if (this.$route.query && this.$route.query.StudyInstanceUID) {
+        this.$route.query.StudyInstanceUID.forEach((study) => {
+          data.push({
+            album_id: albumId,
+            study_id: study,
+          });
+        });
+      }
+      if (this.$route.query && this.$route.query.SeriesInstanceUID) {
+        this.$route.query.SeriesInstanceUID.forEach((serie) => {
+          const infoSerie = serie.split(',');
+          if (infoSerie.length === 2) {
+            data.push({
+              album_id: albumId,
+              study_id: infoSerie[0],
+              serie_id: infoSerie[1],
+            });
+          }
+        });
+      }
+      return data;
+    },
+  },
+};
 
 </script>
 
 <style scoped>
 h3 {
-	margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 h5.user{
-	float: left;
-	margin-right: 10px;
+  float: left;
+  margin-right: 10px;
 }
 
 .icon{
-	margin-left: 10px;
+  margin-left: 10px;
 }
 .pointer{
-	cursor: pointer;
+  cursor: pointer;
 }
 label{
-	margin-left: 10px;
+  margin-left: 10px;
 }
 fieldset.user_settings {
-	border: 1px solid #333;
-	padding: 20px;
-	background-color: #303030 ;
+  border: 1px solid #333;
+  padding: 20px;
+  background-color: #303030 ;
 }
 
 fieldset.user_settings legend{
-	padding: 0 20px;
-	width: auto;
+  padding: 0 20px;
+  width: auto;
 }
 dt{
-	text-align: right;
+  text-align: right;
 }
 </style>

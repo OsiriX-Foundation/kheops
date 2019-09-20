@@ -1,16 +1,16 @@
 /* eslint-disable */
 <i18n>
 {
-	"en":{
-		"albumname": "Album name",
-		"albumdescription": "Album description",
-		"notification": "Notifications"
-	},
-	"fr": {
-		"albumname": "Nom de l'album",
-		"albumdescription": "Description de l'album",
-		"notification": "Notifications"
-	}
+  "en":{
+    "albumname": "Album name",
+    "albumdescription": "Album description",
+    "notification": "Notifications"
+  },
+  "fr": {
+    "albumname": "Nom de l'album",
+    "albumdescription": "Description de l'album",
+    "notification": "Notifications"
+  }
 }
 </i18n>
 
@@ -126,85 +126,84 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AlbumButtons from '@/components/albums/AlbumButtons'
+import { mapGetters } from 'vuex';
+import AlbumButtons from '@/components/albums/AlbumButtons';
 
 export default {
-	name: 'AlbumSettingsGeneral',
-	components: { AlbumButtons },
-	props: {
-		album: {
-			type: Object,
-			required: true,
-			default: () => {}
-		}
-	},
-	data () {
-		return {
-			edit: {
-				name: '-1',
-				description: '-1'
-			}
-		}
-	},
-	computed: {
-		...mapGetters({
-			users: 'albumUsers'
-		}),
-		formattedAlbumDescription () {
-			if (this.album.description !== undefined) {
-				return this.album.description.split('\n')
-			} else {
-				return ''
-			}
-		}
-	},
-	created () {
-		this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id })
-	},
-	methods: {
-		updateAlbum () {
-			if (!this.album.is_admin) {
-				this.$snotify.error(this.$t('permissiondenied'))
-				return
-			}
-			let queries = {}
-			for (let id in this.edit) {
-				if (this.edit[id] !== '-1') {
-					queries[id] = this.edit[id]
-				}
-			}
+  name: 'AlbumSettingsGeneral',
+  components: { AlbumButtons },
+  props: {
+    album: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
+  },
+  data() {
+    return {
+      edit: {
+        name: '-1',
+        description: '-1',
+      },
+    };
+  },
+  computed: {
+    ...mapGetters({
+      users: 'albumUsers',
+    }),
+    formattedAlbumDescription() {
+      if (this.album.description !== undefined) {
+        return this.album.description.split('\n');
+      }
+      return '';
+    },
+  },
+  created() {
+    this.$store.dispatch('getUsersAlbum', { album_id: this.album.album_id });
+  },
+  methods: {
+    updateAlbum() {
+      if (!this.album.is_admin) {
+        this.$snotify.error(this.$t('permissiondenied'));
+        return;
+      }
+      const queries = {};
+      for (const id in this.edit) {
+        if (this.edit[id] !== '-1') {
+          queries[id] = this.edit[id];
+        }
+      }
 
-			this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries: queries }).then(res => {
-				if (res.status === 200) {
-					this.edit.description = '-1'
-					this.edit.name = '-1'
-				}
-			})
-		}
-	}
-}
+      this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries }).then((res) => {
+        if (res.status === 200) {
+          this.edit.description = '-1';
+          this.edit.name = '-1';
+        }
+      });
+    },
+  },
+};
 
 </script>
 
 <style scoped>
 dd span.icon-edit, dt span.icon-edit {
-	margin: 0 10px;
-	cursor: pointer;
+  margin: 0 10px;
+  cursor: pointer;
 }
 
 dl {
-	font-size: 125%;
+  font-size: 125%;
 }
 dl label {
-	font-size: 100%;
-	margin-left: 20px;
+  font-size: 100%;
+  margin-left: 20px;
 }
 
 dd.album_description{
-	border: 1px solid #333;
-	height: 10em;
-	padding: 10px;
+  border: 1px solid #333;
+  height: 10em;
+  padding: 10px;
   overflow-y: auto;
 }
 

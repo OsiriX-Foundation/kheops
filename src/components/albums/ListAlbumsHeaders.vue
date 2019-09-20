@@ -1,13 +1,13 @@
 <i18n>
 {
-	"en": {
-		"newalbum": "New album",
-		"share": "Invite user"
-	},
-	"fr": {
-		"newalbum": "Nouvel album",
-		"share": "Inviter un utilisateur"
-	}
+  "en": {
+    "newalbum": "New album",
+    "share": "Invite user"
+  },
+  "fr": {
+    "newalbum": "Nouvel album",
+    "share": "Inviter un utilisateur"
+  }
 }
 </i18n>
 <template>
@@ -83,43 +83,43 @@
 <script>
 
 export default {
-	name: 'ListAlbumsHeaders',
-	components: { },
-	props: {
-		disabledBtnShare: {
-			type: Boolean,
-			required: false,
-			default: true
-		}
-	},
-	data () {
-		return {}
-	},
-	methods: {
-		searchClick () {
-			this.$emit('searchClick')
-		},
-		inviteClick () {
-			this.$emit('inviteClick')
-		},
-		reloadAlbums () {
-			this.$emit('reloadAlbums')
-		}
-	}
-}
+  name: 'ListAlbumsHeaders',
+  components: { },
+  props: {
+    disabledBtnShare: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    searchClick() {
+      this.$emit('searchClick');
+    },
+    inviteClick() {
+      this.$emit('inviteClick');
+    },
+    reloadAlbums() {
+      this.$emit('reloadAlbums');
+    },
+  },
+};
 
 </script>
 <style scoped>
 .btn-link {
-	font-weight: 400;
-	color: white;
-	background-color: transparent;
+  font-weight: 400;
+  color: white;
+  background-color: transparent;
 }
 
 .btn-link:hover {
-	color: #c7d1db;
-	text-decoration: underline;
-	background-color: transparent;
-	border-color: transparent;
+  color: #c7d1db;
+  text-decoration: underline;
+  background-color: transparent;
+  border-color: transparent;
 }
 </style>
