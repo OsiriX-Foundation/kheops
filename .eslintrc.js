@@ -28,5 +28,6 @@ module.exports = {
     }],
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
+    'max-len': 'off',
   },
 };
