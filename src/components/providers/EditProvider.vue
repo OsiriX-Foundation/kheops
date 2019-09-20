@@ -4,7 +4,6 @@
     "editprovider": "Edit provider",
     "nameProvider": "Name of the provider",
     "urlProvider": "Configuration URL of the provider",
-    "newClientId": "Generate a new client ID",
     "edit": "Confirm",
     "remove": "Remove",
     "warningremove": "Are you sure to remove this report provider ?",
@@ -15,7 +14,6 @@
 		"editprovider": "Edition d'un provider",
     "nameProvider": "Nom du provider",
     "urlProvider": "URL de configuration",
-    "newClientId": "Generer un nouveau client ID",
     "edit": "Confirmer",
     "remove": "Supprimer",
     "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
@@ -87,21 +85,6 @@
               />
             </div>
           </div>
-        </div>
-      </div>
-      <div
-        class="row"
-      >
-        <div class="col-xs-12 col-sm-12 col-md-3">
-          <dt>{{ $t('newClientId') }}</dt>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-9 mb-3">
-          <dd>
-            <toggle-button
-              v-model="newClientId"
-              :labels="{checked: 'Yes', unchecked: 'No'}"
-            />
-          </dd>
         </div>
       </div>
       <div class="row">
@@ -182,7 +165,6 @@ export default {
 	},
 	data () {
 		return {
-			newClientId: false,
 			show: false,
 			checkURL: false,
 			loading: false,
@@ -223,8 +205,7 @@ export default {
 			}
 			const query = {
 				name: this.provider.name,
-				url: this.provider.url,
-				new_client_id: this.newClientId
+				url: this.provider.url
 			}
 
 			this.$store.dispatch('updateProvider', { paramsURL, query }).then(res => {
