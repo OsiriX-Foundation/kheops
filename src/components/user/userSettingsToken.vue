@@ -1,12 +1,3 @@
-<i18n>
-	{
-		"en": {
-		},
-		"fr": {
-		}
-	}
-</i18n>
-
 <template>
   <div id="userSettingsToken">
     <tokens scope="user" />
