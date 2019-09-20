@@ -179,10 +179,10 @@ const mutations = {
 		}
 	},
 	DELETE_SERIE (state, params) {
-		delete state.series[params.StudyInstanceUID][params.SeriesInstanceUID]
+		Vue.delete(state.series[params.StudyInstanceUID], params.SeriesInstanceUID)
 	},
 	DELETE_SERIE_STUDY (state, params) {
-		delete state.series[params.StudyInstanceUID]
+		Vue.delete(state.series, params.StudyInstanceUID)
 	}
 }
 
