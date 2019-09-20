@@ -1,13 +1,13 @@
 <i18n>
-	{
-		"en": {
-			"newprovider": "New report provider"
+  {
+    "en": {
+      "newprovider": "New report provider"
 
-		},
-		"fr": {
-			"newprovider": "Nouveau report provider"
-		}
-	}
+    },
+    "fr": {
+      "newprovider": "Nouveau report provider"
+    }
+  }
 </i18n>
 
 <template>
@@ -61,69 +61,71 @@
 </template>
 
 <script>
-import NewProvider from '@/components/providers/NewProvider'
-import Provider from '@/components/providers/Provider'
-import ListProviders from '@/components/providers/ListProviders'
-import EditProvider from '@/components/providers/EditProvider'
+import NewProvider from '@/components/providers/NewProvider';
+import Provider from '@/components/providers/Provider';
+import ListProviders from '@/components/providers/ListProviders';
+import EditProvider from '@/components/providers/EditProvider';
 
 export default {
-	name: 'Providers',
-	components: { NewProvider, Provider, ListProviders, EditProvider },
-	props: {
-		albumID: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		writePermission: {
-			type: Boolean,
-			required: true,
-			default: false
-		}
-	},
-	data () {
-		return {
-			view: 'list',
-			clientIdSelected: ''
-		}
-	},
-	watch: {
-		view () {
-			let query = JSON.parse(JSON.stringify(this.$route.query))
-			query['settingview'] = this.view
-			if (this.view === 'provider' || this.view === 'edit') {
-				query['object'] = this.clientIdSelected
-			}
-			this.$router.push({ query: query })
-		},
-		'$route.query' () {
-			this.manageView(this.$route.query.settingview)
-		}
-	},
-	created: function () {
-	},
-	methods: {
-		manageView (view) {
-			if (view === 'edit') {
-				this.editProvider(this.$route.query['object'])
-			} else if (view === 'provider') {
-				this.showProvider(this.$route.query['object'])
-			} else {
-				this.view = view
-			}
-		},
-		showProvider (clientId) {
-			this.$store.dispatch('initProvider')
-			this.clientIdSelected = clientId
-			this.view = 'provider'
-		},
-		editProvider (clientId) {
-			this.$store.dispatch('initProvider')
-			this.clientIdSelected = clientId
-			this.view = 'edit'
-		}
-	}
-}
+  name: 'Providers',
+  components: {
+    NewProvider, Provider, ListProviders, EditProvider,
+  },
+  props: {
+    albumID: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    writePermission: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      view: 'list',
+      clientIdSelected: '',
+    };
+  },
+  watch: {
+    view() {
+      const query = JSON.parse(JSON.stringify(this.$route.query));
+      query.settingview = this.view;
+      if (this.view === 'provider' || this.view === 'edit') {
+        query.object = this.clientIdSelected;
+      }
+      this.$router.push({ query });
+    },
+    '$route.query': function () {
+      this.manageView(this.$route.query.settingview);
+    },
+  },
+  created() {
+  },
+  methods: {
+    manageView(view) {
+      if (view === 'edit') {
+        this.editProvider(this.$route.query.object);
+      } else if (view === 'provider') {
+        this.showProvider(this.$route.query.object);
+      } else {
+        this.view = view;
+      }
+    },
+    showProvider(clientId) {
+      this.$store.dispatch('initProvider');
+      this.clientIdSelected = clientId;
+      this.view = 'provider';
+    },
+    editProvider(clientId) {
+      this.$store.dispatch('initProvider');
+      this.clientIdSelected = clientId;
+      this.view = 'edit';
+    },
+  },
+};
 </script>
 
 <style scoped>

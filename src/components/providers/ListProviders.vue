@@ -1,23 +1,23 @@
 <i18n>
 {
-	"en": {
+  "en": {
     "edit": "Edit",
     "urlWorking": "This provider is on",
     "urlNotWorking": "This provider is off",
-		"refresh": "Refresh",
-		"created_time": "Created time",
-		"name_provider": "Name of provider",
-		"url": "Configuration URL"
-	},
-	"fr": {
+    "refresh": "Refresh",
+    "created_time": "Created time",
+    "name_provider": "Name of provider",
+    "url": "Configuration URL"
+  },
+  "fr": {
     "edit": "Editer",
     "urlWorking": "Ce provider est accessible",
     "urlNotWorking": "Ce provider n'est pas accessible",
-		"refresh": "Rafraîchir",
-		"created_time": "Date de création",
-		"name_provider": "Nom du provider",
-		"url": "URL de configuration"
-	}
+    "refresh": "Rafraîchir",
+    "created_time": "Date de création",
+    "name_provider": "Nom du provider",
+    "url": "URL de configuration"
+  }
 }
 </i18n>
 <template>
@@ -74,91 +74,92 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import StateProvider from '@/components/providers/StateProvider'
+import { mapGetters } from 'vuex';
+import StateProvider from '@/components/providers/StateProvider';
+
 export default {
-	name: 'ListProviders',
-	components: { StateProvider },
-	props: {
-		albumID: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		writePermission: {
-			type: Boolean,
-			required: true,
-			default: false
-		}
-	},
-	data () {
-		return {
-			fields: {
-				name: {
-					label: this.$t('name_provider'),
-					sortable: true,
-					tdClass: 'breakwork'
-				},
-				url: {
-					label: this.$t('url'),
-					sortable: true,
-					tdClass: 'breakwork',
-					class: 'd-none d-sm-table-cell'
-				},
-				created_time: {
-					label: this.$t('created_time'),
-					sortable: true,
-					tdClass: 'breakwork',
-					class: 'd-none d-md-table-cell'
-				},
-				btn_edit: {
-					label: '',
-					sortable: false
-				},
-				url_check: {
-					label: '',
-					sortable: false
-				}
-			}
-		}
-	},
-	computed: {
-		...mapGetters({
-			providers: 'providers'
-		})
-	},
-	created: function () {
-		this.$store.dispatch('getProviders', { albumID: this.albumID }).then(res => {
-			if (res.status !== 200) {
-				this.$snotify.error('Sorry, an error occured')
-			}
-		}).catch(err => {
-			console.log(err)
-		})
-	},
-	methods: {
-		selectProvider (rowSelected) {
-			this.$emit('providerselectedshow', rowSelected.client_id)
-		},
-		edit (clientId) {
-			this.$emit('providerselectededit', clientId)
-		},
-		refresh () {
-			this.$store.dispatch('getProviders', { albumID: this.albumID }).then(res => {
-				if (res.status !== 200) {
-					this.$snotify.error('Sorry, an error occured')
-				}
-			}).catch(err => {
-				console.log(err)
-			})
-		}
-	}
-}
+  name: 'ListProviders',
+  components: { StateProvider },
+  props: {
+    albumID: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    writePermission: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      fields: {
+        name: {
+          label: this.$t('name_provider'),
+          sortable: true,
+          tdClass: 'breakwork',
+        },
+        url: {
+          label: this.$t('url'),
+          sortable: true,
+          tdClass: 'breakwork',
+          class: 'd-none d-sm-table-cell',
+        },
+        created_time: {
+          label: this.$t('created_time'),
+          sortable: true,
+          tdClass: 'breakwork',
+          class: 'd-none d-md-table-cell',
+        },
+        btn_edit: {
+          label: '',
+          sortable: false,
+        },
+        url_check: {
+          label: '',
+          sortable: false,
+        },
+      },
+    };
+  },
+  computed: {
+    ...mapGetters({
+      providers: 'providers',
+    }),
+  },
+  created() {
+    this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
+      if (res.status !== 200) {
+        this.$snotify.error('Sorry, an error occured');
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
+  },
+  methods: {
+    selectProvider(rowSelected) {
+      this.$emit('providerselectedshow', rowSelected.client_id);
+    },
+    edit(clientId) {
+      this.$emit('providerselectededit', clientId);
+    },
+    refresh() {
+      this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
+        if (res.status !== 200) {
+          this.$snotify.error('Sorry, an error occured');
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
+    },
+  },
+};
 </script>
 
 <style>
-	.breakwork {
-		word-break: break-word;
-	}
+  .breakwork {
+    word-break: break-word;
+  }
 </style>
 

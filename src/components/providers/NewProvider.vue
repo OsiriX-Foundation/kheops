@@ -1,16 +1,16 @@
 <i18n>
 {
-	"en": {
+  "en": {
     "newprovider": "New provider",
     "nameProvider": "Name of the provider",
     "urlProvider": "Configuration URL of the provider"
 
-	},
-	"fr": {
-		"newprovider": "Nouveau provider",
+  },
+  "fr": {
+    "newprovider": "Nouveau provider",
     "nameProvider": "Nom du provider",
     "urlProvider": "URL de configuration"
-	}
+  }
 }
 </i18n>
 
@@ -111,50 +111,51 @@
 </template>
 
 <script>
-import StateProvider from '@/components/providers/StateProvider'
+import StateProvider from '@/components/providers/StateProvider';
+
 export default {
-	name: 'NewProvider',
-	components: { StateProvider },
-	props: {
-		albumID: {
-			type: String,
-			required: true,
-			default: ''
-		}
-	},
-	data () {
-		return {
-			provider: {
-				name: '',
-				url: ''
-			},
-			show: false,
-			loading: false,
-			checkURL: false
-		}
-	},
-	methods: {
-		createProvider () {
-			this.setStateProvider(false, true, true)
-			this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then(res => {
-				if (res.status !== 201) {
-					this.setStateProvider(false, false, true)
-				} else {
-					this.$emit('done')
-				}
-			}).catch(err => {
-				this.setStateProvider(false, false, true)
-				console.log(err)
-			})
-		},
-		setStateProvider (checkURL, loading, show) {
-			this.checkURL = checkURL
-			this.loading = loading
-			this.show = show
-		},
-		cancel () {
-			this.$emit('done')
-		}
-	}
-}
+  name: 'NewProvider',
+  components: { StateProvider },
+  props: {
+    albumID: {
+      type: String,
+      required: true,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      provider: {
+        name: '',
+        url: '',
+      },
+      show: false,
+      loading: false,
+      checkURL: false,
+    };
+  },
+  methods: {
+    createProvider() {
+      this.setStateProvider(false, true, true);
+      this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then((res) => {
+        if (res.status !== 201) {
+          this.setStateProvider(false, false, true);
+        } else {
+          this.$emit('done');
+        }
+      }).catch((err) => {
+        this.setStateProvider(false, false, true);
+        console.log(err);
+      });
+    },
+    setStateProvider(checkURL, loading, show) {
+      this.checkURL = checkURL;
+      this.loading = loading;
+      this.show = show;
+    },
+    cancel() {
+      this.$emit('done');
+    },
+  },
+};
 </script>
