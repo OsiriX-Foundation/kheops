@@ -423,7 +423,7 @@ export default {
     sendFiles() {
       this.initVariablesForSending();
       this.filesToDicomize = this.copyFiles.filter((file) => (file.type.includes('image/jpeg') || file.type.includes('application/pdf')
-          ||	file.type.includes('video/mp4') || file.type.includes('video/mpeg')));
+          || file.type.includes('video/mp4') || file.type.includes('video/mpeg')));
 
       this.filesFiltered = this.copyFiles.filter((file) => (!file.type.includes('image/jpeg') && !file.type.includes('application/pdf')
           && !file.type.includes('video/mp4') && !file.type.includes('video/mpeg')));
@@ -457,17 +457,17 @@ export default {
         this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then((res) => {
           if (res !== -1) {
             const data = res;
-            this.sendDicomizeDataPromise(file.id, data).then((res) => {
+            this.sendDicomizeDataPromise(file.id, data).then(() => {
               this.$store.dispatch('removeFileId', { id: file.id });
-              this.countSentFiles++;
+              this.countSentFiles += 1;
             }).catch((err) => {
               this.generateErrorNonDicom([file], err.status);
               this.$store.dispatch('removeFileId', { id: file.id });
-              this.countSentFiles++;
+              this.countSentFiles += 1;
             });
           } else {
             this.$store.dispatch('removeFileId', { id: file.id });
-            this.countSentFiles++;
+            this.countSentFiles += 1;
           }
         });
       });
@@ -576,14 +576,14 @@ export default {
     },
     getErrorsDicomFromResponse(data) {
       let error = -1;
-      for (const key in this.errorDicom) {
-        if (data.hasOwnProperty(key)) {
+      Object.keys(this.errorDicom).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
           const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key]);
           this.generateListError(data[key].Value, this.errorDicom[key]);
           this.createListError(errorInResponse);
           error = 0;
         }
-      }
+      });
       return error;
     },
     generateErrorNonDicom(files, status = 0) {
@@ -604,9 +604,9 @@ export default {
     },
     generateListError(dicom, dicomTagFile) {
       dicom.forEach((x) => {
-        if (!x.hasOwnProperty(dicomTagFile)) {
+        if (!Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
           const errorCode = x[this.dicomTagError].Value[0];
-          if (this.listErrorUnknownFiles.hasOwnProperty(errorCode)) {
+          if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
             this.listErrorUnknownFiles[errorCode] += 1;
           } else {
             this.listErrorUnknownFiles[errorCode] = 1;
@@ -618,7 +618,7 @@ export default {
     dicom2map(dicom, dicomTagFile) {
       const map = new Map();
       dicom.forEach((x) => {
-        if (x.hasOwnProperty(dicomTagFile)) {
+        if (Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
           const errorCode = x[this.dicomTagError].Value[0];
           const idFile = x[dicomTagFile].Value[0];
           map.set(idFile, errorCode);

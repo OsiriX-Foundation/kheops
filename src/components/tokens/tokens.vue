@@ -326,19 +326,6 @@ export default {
       ],
     };
   },
-  watch: {
-    view() {
-      const query = JSON.parse(JSON.stringify(this.$route.query));
-      query.settingview = this.view;
-      if (this.view === 'token') {
-        query.object = this.token.id === 0 ? this.$route.query.object : this.token.id;
-      }
-      this.$router.push({ query });
-    },
-    '$route.query': function () {
-      this.view = this.$route.query.settingview;
-    },
-  },
   computed: {
     ...mapGetters({
       user: 'currentUser',
@@ -352,6 +339,19 @@ export default {
         tokens = this.albumTokens;
       }
       return tokens;
+    },
+  },
+  watch: {
+    view() {
+      const query = JSON.parse(JSON.stringify(this.$route.query));
+      query.settingview = this.view;
+      if (this.view === 'token') {
+        query.object = this.token.id === 0 ? this.$route.query.object : this.token.id;
+      }
+      this.$router.push({ query });
+    },
+    '$route.query': function () {
+      this.view = this.$route.query.settingview;
     },
   },
   created() {
@@ -403,12 +403,12 @@ export default {
         this.$snotify.error(this.$t('sorryerror'));
       });
     },
-    tokenStatus(token) {
-      if (token.revoked) {
+    tokenStatus(itemToken) {
+      if (itemToken.revoked) {
         return 'revoked';
-      } if (moment(token.not_before_time) > moment()) {
+      } if (moment(itemToken.not_before_time) > moment()) {
         return 'wait';
-      } if (moment(token.expiration_time) < moment()) {
+      } if (moment(itemToken.expiration_time) < moment()) {
         return 'expired';
       }
       return 'active';
