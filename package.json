@@ -13,6 +13,8 @@
     "bootstrap-vue": "^2.0.0-rc.24",
     "browserslist": "^4.6.3",
     "caniuse-lite": "^1.0.30000976",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "jquery": "^3.4.0",
     "mavon-editor": "^2.7.5",
     "moment": "^2.24.0",
@@ -43,10 +45,10 @@
     "@vue/cli-plugin-eslint": "^3.8.0",
     "@vue/cli-service": "^3.9.2",
     "@vue/eslint-config-standard": "^4.0.0",
-    "babel-eslint": "^10.0.2",
+    "babel-eslint": "^10.0.3",
     "eslint": "^5.16.0",
     "eslint-plugin-lodash": "^5.1.0",
-    "eslint-plugin-vue": "^5.2.2",
+    "eslint-plugin-vue": "^5.2.3",
     "vue-template-compiler": "^2.6.10"
   }
 }
