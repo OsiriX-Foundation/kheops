@@ -19,27 +19,27 @@
 <script>
 
 export default {
-	name: 'BlockIcon',
-	props: {
-		width: {
-			type: String,
-			required: true,
-			default: '0px'
-		},
-		height: {
-			type: String,
-			required: true,
-			default: '0px'
-		}
-	}
-}
+  name: 'BlockIcon',
+  props: {
+    width: {
+      type: String,
+      required: true,
+      default: '0px',
+    },
+    height: {
+      type: String,
+      required: true,
+      default: '0px',
+    },
+  },
+};
 </script>
 <style scoped>
   .icon{
-		fill: red;
-	}
+    fill: red;
+  }
 
-	.icon:hover{
-		fill: #fd7e14;
-	}
+  .icon:hover{
+    fill: #fd7e14;
+  }
 </style>
