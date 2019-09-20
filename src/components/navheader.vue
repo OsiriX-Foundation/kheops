@@ -1,11 +1,11 @@
 <i18n>
 {
-	"en": {
-		"welcome": "Welcome"
-	},
-	"fr": {
-		"welcome": "Bienvenue"
-	}
+  "en": {
+    "welcome": "Welcome"
+  },
+  "fr": {
+    "welcome": "Bienvenue"
+  }
 }
 </i18n>
 
@@ -74,32 +74,32 @@
 </template>
 
 <script>
-import store from '@/store'
-import Vue from 'vue'
-import { CurrentUser } from '@/mixins/currentuser.js'
+import Vue from 'vue';
+import store from '@/store';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
-	name: 'NavHeader',
-	mixins: [ CurrentUser ],
-	data () {
-		return {
-		}
-	},
-	computed: {
-		lang () {
-			return this.$i18n.locale
-		}
-	},
-	methods: {
-		logout () {
-			store.dispatch('logout').then(() => {
-				Vue.prototype.$keycloak.logoutFn()
-			})
-		},
-		changeLang (value) {
-			this.$root.$i18n.locale = value
-		}
-	}
-}
+  name: 'NavHeader',
+  mixins: [CurrentUser],
+  data() {
+    return {
+    };
+  },
+  computed: {
+    lang() {
+      return this.$i18n.locale;
+    },
+  },
+  methods: {
+    logout() {
+      store.dispatch('logout').then(() => {
+        Vue.prototype.$keycloak.logoutFn();
+      });
+    },
+    changeLang(value) {
+      this.$root.$i18n.locale = value;
+    },
+  },
+};
 
 </script>

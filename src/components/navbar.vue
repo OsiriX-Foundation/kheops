@@ -1,17 +1,17 @@
 <i18n>
 {
-	"en" : {
-		"inbox": "Inbox",
-		"albums": "Albums",
-		"favorites": "Favorites",
-		"recents": "Recents"
-	},
-	"fr": {
-		"inbox": "Boîte de réception",
-		"albums": "Albums",
-		"favorites": "Favoris",
-		"recents": "Récents"
-	}
+  "en" : {
+    "inbox": "Inbox",
+    "albums": "Albums",
+    "favorites": "Favorites",
+    "recents": "Recents"
+  },
+  "fr": {
+    "inbox": "Boîte de réception",
+    "albums": "Albums",
+    "favorites": "Favoris",
+    "recents": "Récents"
+  }
 }
 </i18n>
 
@@ -41,13 +41,13 @@
           </router-link>
         </li>
         <!--
-				<li class="nav-item">
-					<router-link to="/favorites" class="nav-link" active-class="active"><v-icon name='star'/>{{ $t("favorites") }}</router-link>
-				</li>
-				<li class="nav-item">
-					<router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock'/>{{ $t("recents") }}</router-link>
-				</li>
-				-->
+        <li class="nav-item">
+          <router-link to="/favorites" class="nav-link" active-class="active"><v-icon name='star'/>{{ $t("favorites") }}</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/recents" class="nav-link" active-class="active"><v-icon name='clock'/>{{ $t("recents") }}</router-link>
+        </li>
+        -->
       </ul>
     </div>
   </div>
@@ -55,26 +55,26 @@
 
 <script>
 export default {
-	name: 'NavBar',
-	data () {
-		return {
-			activePath: 'inbox'
-		}
-	},
-	watch: {
-		'$route' (to) {
-			this.activePath = to.path.split('/')[1]
-		}
-	}
-}
+  name: 'NavBar',
+  data() {
+    return {
+      activePath: 'inbox',
+    };
+  },
+  watch: {
+    $route(to) {
+      this.activePath = to.path.split('/')[1];
+    },
+  },
+};
 
 </script>
 
 <style scoped>
 #navbar_container{
-	margin-top: 100px;
+  margin-top: 100px;
 }
 svg.fa-icon{
-	margin-right: 10px;
+  margin-right: 10px;
 }
 </style>
