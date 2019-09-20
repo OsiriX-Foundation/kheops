@@ -1,13 +1,13 @@
 <i18n>
 {
-	"en": {
-		"description": "Description",
-		"upload": "Send"
-	},
-	"fr": {
-		"description": "Description",
-		"upload": "Envoyer"
-	}
+  "en": {
+    "description": "Description",
+    "upload": "Send"
+  },
+  "fr": {
+    "description": "Description",
+    "upload": "Envoyer"
+  }
 }
 </i18n>
 
@@ -85,100 +85,100 @@
 <script>
 
 export default {
-	name: 'InputDicomize',
-	props: {
-		filesToDicomize: {
-			type: Array,
-			required: true,
-			default: () => []
-		},
-		createStudy: {
-			type: Boolean,
-			required: true,
-			default: false
-		}
-	},
-	data () {
-		return {
-			dicomValue: {
-				description: {
-					tag: '0008103E',
-					value: '',
-					vr: 'LO'
-				},
-				patientName: {
-					tag: '00100010',
-					value: '',
-					vr: 'PN'
-				},
-				patientID: {
-					tag: '00100020',
-					value: '',
-					vr: 'LO'
-				},
-				patientBirthDate: {
-					tag: '00100030',
-					value: '',
-					vr: 'DA'
-				},
-				patientSex: {
-					tag: '00100040',
-					value: '',
-					vr: 'CS'
-				},
-				studyInstanceUID: {
-					tag: '0020000D',
-					value: '',
-					vr: 'UI'
-				},
-				studyDate: {
-					tag: '00080020',
-					value: '',
-					vr: 'DA'
-				},
-				studyTime: {
-					tag: '00080030',
-					value: '',
-					vr: 'TM'
-				},
-				studyPhysician: {
-					tag: '00080090',
-					value: '',
-					vr: 'PN'
-				},
-				studyID: {
-					tag: '00200010',
-					value: '',
-					vr: 'SH'
-				},
-				accessionNumber: {
-					tag: '00080050',
-					value: '',
-					vr: 'SH'
-				}
-			},
-			manageFiles: {}
-		}
-	},
-	computed: {
-	},
-	watch: {
-	},
-	created () {
-		for (var key in this.filesToDicomize) {
-			this.manageFiles[this.filesToDicomize[key].name] = _.cloneDeep(this.dicomValue)
-		}
-	},
-	mounted () {
-	},
-	destroyed () {
-	},
-	methods: {
-		validDicomValue () {
-			this.$emit('valid-dicom-value', this.manageFiles)
-		}
-	}
-}
+  name: 'InputDicomize',
+  props: {
+    filesToDicomize: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
+    createStudy: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      dicomValue: {
+        description: {
+          tag: '0008103E',
+          value: '',
+          vr: 'LO',
+        },
+        patientName: {
+          tag: '00100010',
+          value: '',
+          vr: 'PN',
+        },
+        patientID: {
+          tag: '00100020',
+          value: '',
+          vr: 'LO',
+        },
+        patientBirthDate: {
+          tag: '00100030',
+          value: '',
+          vr: 'DA',
+        },
+        patientSex: {
+          tag: '00100040',
+          value: '',
+          vr: 'CS',
+        },
+        studyInstanceUID: {
+          tag: '0020000D',
+          value: '',
+          vr: 'UI',
+        },
+        studyDate: {
+          tag: '00080020',
+          value: '',
+          vr: 'DA',
+        },
+        studyTime: {
+          tag: '00080030',
+          value: '',
+          vr: 'TM',
+        },
+        studyPhysician: {
+          tag: '00080090',
+          value: '',
+          vr: 'PN',
+        },
+        studyID: {
+          tag: '00200010',
+          value: '',
+          vr: 'SH',
+        },
+        accessionNumber: {
+          tag: '00080050',
+          value: '',
+          vr: 'SH',
+        },
+      },
+      manageFiles: {},
+    };
+  },
+  computed: {
+  },
+  watch: {
+  },
+  created() {
+    for (const key in this.filesToDicomize) {
+      this.manageFiles[this.filesToDicomize[key].name] = _.cloneDeep(this.dicomValue);
+    }
+  },
+  mounted() {
+  },
+  destroyed() {
+  },
+  methods: {
+    validDicomValue() {
+      this.$emit('valid-dicom-value', this.manageFiles);
+    },
+  },
+};
 </script>
 
 <style scoped>

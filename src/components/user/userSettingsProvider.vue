@@ -1,9 +1,9 @@
 <i18n>
 {
-	"en": {
-	},
-	"fr": {
-	}
+  "en": {
+  },
+  "fr": {
+  }
 }
 </i18n>
 
@@ -15,8 +15,8 @@
 
 <script>
 export default {
-	name: 'UserSettingsProvider'
-}
+  name: 'UserSettingsProvider',
+};
 </script>
 
 <style scoped>

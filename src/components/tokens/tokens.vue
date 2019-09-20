@@ -1,39 +1,39 @@
 <i18n>
-	{
-		"en": {
-			"newtoken": "New token",
-			"showrevokedtoken": "Show revoked tokens",
-			"showinvalidtoken": "Show invalid tokens",
-			"revoke": "revoke",
-			"revoked": "revoked",
-			"active": "active",
-			"expired": "expired",
-			"revokedsuccess": "revoked successfully",
-			"expiration date": "expiration date",
-			"status": "status",
-			"description": "description",
-			"scope": "scope",
-			"create date": "create date",
-			"last used": "last used",
-			"permission": "permission"
+  {
+    "en": {
+      "newtoken": "New token",
+      "showrevokedtoken": "Show revoked tokens",
+      "showinvalidtoken": "Show invalid tokens",
+      "revoke": "revoke",
+      "revoked": "revoked",
+      "active": "active",
+      "expired": "expired",
+      "revokedsuccess": "revoked successfully",
+      "expiration date": "expiration date",
+      "status": "status",
+      "description": "description",
+      "scope": "scope",
+      "create date": "create date",
+      "last used": "last used",
+      "permission": "permission"
 
-		},
-		"fr": {
-			"newtoken": "Nouveau token",
-			"showrevokedtoken": "Afficher les tokens révoqués",
-			"showinvalidtoken": "Afficher les tokens invalides",
-			"revoke": "révoquer",
-			"revoked": "révoqué",
-			"active": "actif",
-			"expired": "expiré",
-			"revokedsuccess": "révoqué avec succès",
-			"expiration date": "date d'expiration",
-			"scope": "application",
-			"create date": "créé le",
-			"last used": "dern. utilisation",
-			"permission": "permission"
-		}
-	}
+    },
+    "fr": {
+      "newtoken": "Nouveau token",
+      "showrevokedtoken": "Afficher les tokens révoqués",
+      "showinvalidtoken": "Afficher les tokens invalides",
+      "revoke": "révoquer",
+      "revoked": "révoqué",
+      "active": "actif",
+      "expired": "expiré",
+      "revokedsuccess": "révoqué avec succès",
+      "expiration date": "date d'expiration",
+      "scope": "application",
+      "create date": "créé le",
+      "last used": "dern. utilisation",
+      "permission": "permission"
+    }
+  }
 </i18n>
 
 <template>
@@ -234,188 +234,187 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import VueClipboard from 'vue-clipboard2'
-import { mapGetters } from 'vuex'
-import newToken from '@/components/tokens/newToken'
-import token from '@/components/tokens/token'
-import moment from 'moment'
+import Vue from 'vue';
+import VueClipboard from 'vue-clipboard2';
+import { mapGetters } from 'vuex';
+import moment from 'moment';
+import newToken from '@/components/tokens/newToken';
+import token from '@/components/tokens/token';
 
-VueClipboard.config.autoSetContainer = true // add this line
-Vue.use(VueClipboard)
+VueClipboard.config.autoSetContainer = true; // add this line
+Vue.use(VueClipboard);
 export default {
-	name: 'Tokens',
-	components: { newToken, token },
-	props: {
-		scope: {
-			type: String,
-			required: true
-		},
-		albumid: {
-			type: String,
-			required: false,
-			default: null
-		}
-	},
-	data () {
-		return {
-			showRevoked: false, // not used anymore...
-			showInvalid: false,
-			view: 'list',
-			sortBy: 'expiration_date',
-			token: {
-				album: '',
-				appropriate_permission: false,
-				download_permission: false,
-				expiration_time: '',
-				id: 0,
-				issued_at_time: '',
-				not_before_time: '',
-				read_permission: false,
-				revoked: false,
-				scope_type: '',
-				access_token: '',
-				title: '',
-				write_permission: false
-			},
-			fields: [
-				{
-					key: 'status',
-					label: 'status',
-					sortable: true
-				},
-				{
-					key: 'title',
-					label: 'description',
-					sortable: true
-				},
-				{
-					key: 'scope_type',
-					label: 'scope',
-					sortable: true
-				},
-				{
-					key: 'expiration_time',
-					label: 'expiration date',
-					sortable: true,
-					class: 'd-none d-sm-table-cell'
-				},
-				{
-					key: 'issued_at_time',
-					label: 'create date',
-					sortable: true,
-					class: 'd-none d-md-table-cell'
-				},
-				{
-					key: 'last_used',
-					label: 'last used',
-					sortable: true,
-					class: 'd-none d-md-table-cell'
-				},
-				{
-					key: 'permission',
-					label: 'permission',
-					sortable: true,
-					class: 'd-none d-sm-table-cell'
-				},
-				{
-					key: 'actions',
-					label: '',
-					sortable: false
-				}
-			]
-		}
-	},
-	watch: {
-		view () {
-			let query = JSON.parse(JSON.stringify(this.$route.query))
-			query['settingview'] = this.view
-			if (this.view === 'token') {
-				query['object'] = this.token.id === 0 ? this.$route.query['object'] : this.token.id
-			}
-			this.$router.push({ query: query })
-		},
-		'$route.query' () {
-			this.view = this.$route.query.settingview
-		}
-	},
-	computed: {
-		...mapGetters({
-			user: 'currentUser',
-			albumTokens: 'albumTokens'
-		}),
-		tokens () {
-			let tokens = []
-			if (this.scope === 'user') {
-				tokens = this.user.tokens
-			} else if (this.scope === 'album') {
-				tokens = this.albumTokens
-			}
-			return tokens
-		}
-	},
-	created () {
-		if (this.scope === 'album') {
-			let scopeColIdx = _.findIndex(this.fields, f => { return f.key === 'scope_type' })
-			if (scopeColIdx > -1) this.fields.splice(scopeColIdx, 1)
-		}
-		this.getTokens()
-	},
-	methods: {
-		selectToken (item) {
-			this.token = item
-			this.view = 'token'
-		},
-		showList () {
-			this.token = {
-				album: '',
-				appropriate_permission: false,
-				download_permission: false,
-				expiration_time: '',
-				id: 0,
-				issued_at_time: '',
-				not_before_time: '',
-				read_permission: false,
-				revoked: false,
-				scope_type: '',
-				access_token: '',
-				title: '',
-				write_permission: false
-			}
-			this.view = 'list'
-		},
-		getTokens () {
-			if (this.scope === 'album' && this.albumid) {
-				let queries = {
-					valid: !this.showInvalid,
-					album: this.albumid
-				}
-				this.$store.dispatch('getAlbumTokens', { queries: queries })
-			} else if (this.scope === 'user') {
-				this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid })
-			}
-		},
-		revoke (tokenId) {
-			this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
-				this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`)
-				this.getTokens()
-			}).catch(() => {
-				this.$snotify.error(this.$t('sorryerror'))
-			})
-		},
-		tokenStatus (token) {
-			if (token.revoked) {
-				return 'revoked'
-			} else if (moment(token.not_before_time) > moment()) {
-				return 'wait'
-			} else if (moment(token.expiration_time) < moment()) {
-				return 'expired'
-			}	else {
-				return 'active'
-			}
-		}
-	}
-}
+  name: 'Tokens',
+  components: { newToken, token },
+  props: {
+    scope: {
+      type: String,
+      required: true,
+    },
+    albumid: {
+      type: String,
+      required: false,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      showRevoked: false, // not used anymore...
+      showInvalid: false,
+      view: 'list',
+      sortBy: 'expiration_date',
+      token: {
+        album: '',
+        appropriate_permission: false,
+        download_permission: false,
+        expiration_time: '',
+        id: 0,
+        issued_at_time: '',
+        not_before_time: '',
+        read_permission: false,
+        revoked: false,
+        scope_type: '',
+        access_token: '',
+        title: '',
+        write_permission: false,
+      },
+      fields: [
+        {
+          key: 'status',
+          label: 'status',
+          sortable: true,
+        },
+        {
+          key: 'title',
+          label: 'description',
+          sortable: true,
+        },
+        {
+          key: 'scope_type',
+          label: 'scope',
+          sortable: true,
+        },
+        {
+          key: 'expiration_time',
+          label: 'expiration date',
+          sortable: true,
+          class: 'd-none d-sm-table-cell',
+        },
+        {
+          key: 'issued_at_time',
+          label: 'create date',
+          sortable: true,
+          class: 'd-none d-md-table-cell',
+        },
+        {
+          key: 'last_used',
+          label: 'last used',
+          sortable: true,
+          class: 'd-none d-md-table-cell',
+        },
+        {
+          key: 'permission',
+          label: 'permission',
+          sortable: true,
+          class: 'd-none d-sm-table-cell',
+        },
+        {
+          key: 'actions',
+          label: '',
+          sortable: false,
+        },
+      ],
+    };
+  },
+  watch: {
+    view() {
+      const query = JSON.parse(JSON.stringify(this.$route.query));
+      query.settingview = this.view;
+      if (this.view === 'token') {
+        query.object = this.token.id === 0 ? this.$route.query.object : this.token.id;
+      }
+      this.$router.push({ query });
+    },
+    '$route.query': function () {
+      this.view = this.$route.query.settingview;
+    },
+  },
+  computed: {
+    ...mapGetters({
+      user: 'currentUser',
+      albumTokens: 'albumTokens',
+    }),
+    tokens() {
+      let tokens = [];
+      if (this.scope === 'user') {
+        tokens = this.user.tokens;
+      } else if (this.scope === 'album') {
+        tokens = this.albumTokens;
+      }
+      return tokens;
+    },
+  },
+  created() {
+    if (this.scope === 'album') {
+      const scopeColIdx = _.findIndex(this.fields, (f) => f.key === 'scope_type');
+      if (scopeColIdx > -1) this.fields.splice(scopeColIdx, 1);
+    }
+    this.getTokens();
+  },
+  methods: {
+    selectToken(item) {
+      this.token = item;
+      this.view = 'token';
+    },
+    showList() {
+      this.token = {
+        album: '',
+        appropriate_permission: false,
+        download_permission: false,
+        expiration_time: '',
+        id: 0,
+        issued_at_time: '',
+        not_before_time: '',
+        read_permission: false,
+        revoked: false,
+        scope_type: '',
+        access_token: '',
+        title: '',
+        write_permission: false,
+      };
+      this.view = 'list';
+    },
+    getTokens() {
+      if (this.scope === 'album' && this.albumid) {
+        const queries = {
+          valid: !this.showInvalid,
+          album: this.albumid,
+        };
+        this.$store.dispatch('getAlbumTokens', { queries });
+      } else if (this.scope === 'user') {
+        this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid });
+      }
+    },
+    revoke(tokenId) {
+      this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
+        this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
+        this.getTokens();
+      }).catch(() => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    tokenStatus(token) {
+      if (token.revoked) {
+        return 'revoked';
+      } if (moment(token.not_before_time) > moment()) {
+        return 'wait';
+      } if (moment(token.expiration_time) < moment()) {
+        return 'expired';
+      }
+      return 'active';
+    },
+  },
+};
 </script>
 
 <style scoped>

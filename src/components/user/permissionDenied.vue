@@ -1,17 +1,17 @@
 <i18n>
 {
-	"en": {
-		"permissiondenied": "Permission denied",
-		"sorrynotauthorized": "Sorry, you are not authorized to view this section",
-		"gotohome": "Go To Home Page",
-		"gotologin": "Go To Login Page"
-	},
-	"fr": {
-		"permissiondenied": "Permission refus&eacute;e",
-		"sorrynotauthorized": "D&eacute;sol&eacute;, vous n&#x27;&ecirc;tes pas autoris&eacute; &agrave; acc&eacute;der &agrave; cette section",
-		"gotohome": "Aller &agrave; la page d&#x27;accueil",
-		"gotologin": "Aller &agrave; la page de login"
-	}
+  "en": {
+    "permissiondenied": "Permission denied",
+    "sorrynotauthorized": "Sorry, you are not authorized to view this section",
+    "gotohome": "Go To Home Page",
+    "gotologin": "Go To Login Page"
+  },
+  "fr": {
+    "permissiondenied": "Permission refus&eacute;e",
+    "sorrynotauthorized": "D&eacute;sol&eacute;, vous n&#x27;&ecirc;tes pas autoris&eacute; &agrave; acc&eacute;der &agrave; cette section",
+    "gotohome": "Aller &agrave; la page d&#x27;accueil",
+    "gotologin": "Aller &agrave; la page de login"
+  }
 }
 </i18n>
 
@@ -47,16 +47,16 @@
 
 <script>
 export default {
-	name: 'PermissionDenied',
-	data () {
-		return {
-		}
-	},
-	methods: {
-		changeLocation (path) {
-			var vm = this
-			vm.$router.push('/' + path)
-		}
-	}
-}
+  name: 'PermissionDenied',
+  data() {
+    return {
+    };
+  },
+  methods: {
+    changeLocation(path) {
+      const vm = this;
+      vm.$router.push(`/${path}`);
+    },
+  },
+};
 </script>
