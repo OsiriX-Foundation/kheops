@@ -27,7 +27,9 @@
 </i18n>
 
 <template>
-  <div>
+  <div
+    v-if="!loading"
+  >
     <div
       class="container"
     >
@@ -158,7 +160,10 @@ export default {
   },
   created() {
     this.view = this.$route.query.view === undefined ? '' : this.$route.query.view;
-    this.loadAlbum();
+    this.loading = true;
+    this.loadAlbum().then(() => {
+      this.loading = false;
+    });
   },
   beforeDestroy() {
     this.$store.commit('INIT_ALBUM');
@@ -166,14 +171,11 @@ export default {
   },
   methods: {
     loadAlbum() {
-      this.loading = true;
-      this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
-        this.loading = false;
-        // this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
-      }).catch((err) => {
-        this.$router.push('/albums');
-        return err;
-      });
+      return this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => res)
+        .catch((err) => {
+          this.$router.push('/albums');
+          Promise.reject(err);
+        });
     },
     toggleFavorite(albumID, isFavorite) {
       const value = !isFavorite;
