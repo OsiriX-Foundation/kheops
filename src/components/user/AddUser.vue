@@ -118,7 +118,7 @@ export default {
   },
   watch: {
     enableAdd: {
-      handler(enableAdd) {
+      handler() {
         if (!this.enableAdd) {
           this.deleteUser();
         } else {

@@ -216,7 +216,7 @@ export default {
         if (viewer === 'Osirix') {
           this.openOsiriX(StudyInstanceUID, res.data.access_token);
         } else if (viewer === 'Ohif') {
-          this.openOhif(StudyInstanceUID, res.data.access_token, source === 'inbox' ? 'inbox=true' : `album=${source}`, ohifWindow);
+          ohifWindow.location.href = this.openOhif(StudyInstanceUID, res.data.access_token, source === 'inbox' ? 'inbox=true' : `album=${source}`);
         } else if (viewer === 'Weasis') {
           this.openWeasis(StudyInstanceUID, res.data.access_token);
         }
@@ -232,9 +232,9 @@ export default {
       const url = `$dicom:get --zip ${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`;
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
-    openOhif(StudyInstanceUID, token, queryparams, ohifWindow) {
+    openOhif(StudyInstanceUID, token, queryparams) {
       const url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`;
-      ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`;
+      return `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`;
     },
     showComments(study, flagView) {
       const params = {

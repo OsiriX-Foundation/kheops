@@ -378,7 +378,7 @@ export default {
           key: 'modalities',
           label: this.$t('Modalities'),
           sortable: false,
-          formatter: (value, key, item) => {
+          formatter: (value) => {
             if (value.length > 0) {
               return value.join(', ');
             }
@@ -440,7 +440,7 @@ export default {
   },
   watch: {
     filters: {
-      handler(filters) {
+      handler() {
         this.searchAlbums();
       },
       deep: true,
@@ -477,7 +477,7 @@ export default {
     },
     infiniteHandler($state) {
       this.getAlbums(this.albumsParams.offset, this.albumsParams.limit).then((res) => {
-        if (this.albums.length === parseInt(res.headers['x-total-count'])) {
+        if (this.albums.length === parseInt(res.headers['x-total-count'], 10)) {
           $state.complete();
         }
         if (res.status === 200 && res.data.length > 0) {
@@ -502,7 +502,7 @@ export default {
     },
     prepareFilters() {
       const filtersToSend = {};
-      for (const id in this.filters) {
+      Object.keys(this.filters).forEach((id) => {
         if (this.filters[id] !== '') {
           if (id === 'name') {
             filtersToSend[id] = `*${this.filters[id]}*`;
@@ -530,7 +530,7 @@ export default {
             filtersToSend[id] = this.filters[id];
           }
         }
-      }
+      });
       return filtersToSend;
     },
     transformDate(date) {
@@ -538,7 +538,7 @@ export default {
     },
     sendToUser(userId) {
       this.albumsSelected.forEach((album) => {
-        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then((res) => {
+        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
           this.$snotify.success(this.$t('albumshared'));
         });
       });
@@ -555,14 +555,14 @@ export default {
     },
     toggleFavorite(albumID, isFavorite) {
       const value = !isFavorite;
-      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then((res) => {
+      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
         this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value });
       });
     },
-    setItemHover(item, index, event) {
+    setItemHover(item, index) {
       this.albums[index].flag.is_hover = true;
     },
-    setItemUnhover(item, index, event) {
+    setItemUnhover(item, index) {
       this.albums[index].flag.is_hover = false;
     },
   },

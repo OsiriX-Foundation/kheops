@@ -334,9 +334,9 @@ export default {
       });
 
       let selectedSerieNb = 0;
-      for (const studyUID in this.selectedSeries) {
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
         selectedSerieNb += Object.keys(this.selectedSeries[studyUID]).length;
-      }
+      });
       return selectedSerieNb + selectedStudiesSeriesNb;
     },
     selectedStudies() {
@@ -348,14 +348,14 @@ export default {
       studiesIndeterminate.forEach((study) => {
         const seriesSelected = [];
         const studyUID = study.StudyInstanceUID.Value[0];
-        for (const serieUID in this.series[studyUID]) {
+        Object.keys(this.series[studyUID]).forEach((serieUID) => {
           if (this.series[studyUID][serieUID].flag.is_selected === true) {
             seriesSelected.push(this.series[studyUID][serieUID]);
           }
           if (seriesSelected.length > 0) {
             selectedSeries[studyUID] = seriesSelected;
           }
-        }
+        });
       });
       return selectedSeries;
     },
@@ -396,7 +396,7 @@ export default {
           };
           promises.push(this.$store.dispatch('sendStudy', params));
         });
-        for (const studyUID in this.selectedSeries) {
+        Object.keys(this.selectedSeries).forEach((studyUID) => {
           this.selectedSeries[studyUID].forEach((serie) => {
             const params = {
               StudyInstanceUID: studyUID,
@@ -406,9 +406,9 @@ export default {
             };
             promises.push(this.$store.dispatch('sendSerie', params));
           });
-        }
+        });
 
-        Promise.all(promises).then((res) => {
+        Promise.all(promises).then(() => {
           this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('studiessharedsuccess')}`);
           this.formSendStudy = false;
           this.deselectStudySeries();
@@ -441,14 +441,14 @@ export default {
           this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_selected', false));
         }
         if (this.series[StudyInstanceUID] !== undefined) {
-          for (const serieUID in this.series[StudyInstanceUID]) {
+          Object.keys(this.series[StudyInstanceUID]).forEach((serieUID) => {
             const serie = this.series[StudyInstanceUID][serieUID];
             if (serie.flag.is_selected) {
               const SeriesInstanceUID = serie.SeriesInstanceUID.Value[0];
               this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_indeterminate', false));
               this.$store.dispatch('setFlagByStudyUIDSerieUID', this.setObjectFlagSerie(StudyInstanceUID, SeriesInstanceUID, 'is_selected', false));
             }
-          }
+          });
         }
       });
     },
@@ -460,7 +460,7 @@ export default {
         value: !favorites,
       };
       this.allSelectedStudies.forEach((study) => {
-        params.StudyInstanceUID = study.StudyInstanceUID.Value[0];
+        [params.StudyInstanceUID] = study.StudyInstanceUID.Value;
         this.$store.dispatch('favoriteStudy', params);
       });
     },
@@ -494,7 +494,7 @@ export default {
       });
     },
     deleteSelectedSeries() {
-      for (const studyUID in this.selectedSeries) {
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
         this.selectedSeries[studyUID].forEach((serie) => {
           const serieUID = serie.SeriesInstanceUID.Value[0];
           const params = {
@@ -508,7 +508,7 @@ export default {
             this.$store.dispatch('removeSerieInAlbum', params);
           }
         });
-      }
+      });
     },
     checkErrorStatus(status, message) {
       if (status === 403) {
@@ -523,13 +523,13 @@ export default {
       const queries = this.getSource();
       let sendSerie = 0;
       let sendStudy = 0;
-      const data = this.generateStudySerieData(albumId);
+      const studySerieData = this.generateStudySerieData(albumId);
       const message = {
         403: '',
         404: '',
         unknown: '',
       };
-      this.$store.dispatch('putStudiesInAlbum', { queries, data }).then((res) => {
+      this.$store.dispatch('putStudiesInAlbum', { queries, data: studySerieData }).then((res) => {
         res.forEach((data) => {
           if (data.res !== undefined && data.res.status === 201) {
             if (data.serieId !== undefined) {
@@ -558,7 +558,7 @@ export default {
           study_id: study.StudyInstanceUID.Value[0],
         });
       });
-      for (const studyUID in this.selectedSeries) {
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
         this.selectedSeries[studyUID].forEach((serie) => {
           data.push({
             album_id: albumId,
@@ -566,12 +566,12 @@ export default {
             serie_id: serie.SeriesInstanceUID.Value[0],
           });
         });
-      }
+      });
       return data;
     },
     addToInbox() {
       const queries = this.getSource();
-      const data = this.generateStudySerieData(this.albumId);
+      const studySerieData = this.generateStudySerieData(this.albumId);
       let sendStudy = 0;
       let sendSerie = 0;
       const message = {
@@ -579,7 +579,7 @@ export default {
         404: '',
         unknown: '',
       };
-      this.$store.dispatch('selfAppropriateStudy', { data, queries }).then((res) => {
+      this.$store.dispatch('selfAppropriateStudy', { data: studySerieData, queries }).then((res) => {
         res.forEach((data) => {
           if (data.res !== undefined && data.res.status === 201) {
             if (data.serieId !== undefined) {
@@ -625,11 +625,11 @@ export default {
       });
 
       const SeriesUID = [];
-      for (const studyUID in this.selectedSeries) {
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
         this.selectedSeries[studyUID].forEach((serie) => {
           SeriesUID.push(`${studyUID},${serie.SeriesInstanceUID.Value[0]}`);
         });
-      }
+      });
 
       const query = {};
       if (StudiesUID.length > 0) query.StudyInstanceUID = StudiesUID;

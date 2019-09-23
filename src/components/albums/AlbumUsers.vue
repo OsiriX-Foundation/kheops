@@ -1,10 +1,10 @@
 <!--
 Components : AlbumUsers
 Props :
-  Users						Array
-  album						Object
-  showDeleteUser	Boolean
-  showChangeRole	Boolean
+  Users           Array
+  album           Object
+  showDeleteUser  Boolean
+  showChangeRole  Boolean
 -->
 <i18n>
 {
@@ -72,7 +72,9 @@ Props :
                   @click.stop="toggleAdmin(user)"
                 >
                   {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
-                  <v-icon	name="user" />
+                  <v-icon
+                    name="user"
+                  />
                 </a>
                 <br>
                 <a
@@ -143,7 +145,9 @@ Props :
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
-                <v-icon	name="user" />
+                <v-icon
+                  name="user"
+                />
               </a>
               <br>
               <a

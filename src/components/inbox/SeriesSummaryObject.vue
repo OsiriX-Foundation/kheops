@@ -153,8 +153,8 @@ export default {
           value: newValue,
         };
         if (this.serie.flag.is_selected !== newValue) {
-          this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then((res) => {
-            this.setCheckBoxStudy(newValue);
+          this.$store.dispatch('setFlagByStudyUIDSerieUID', params).then(() => {
+            this.setCheckBoxStudy();
           });
         }
       },
@@ -181,7 +181,7 @@ export default {
       })
     },
     */
-    setCheckBoxStudy(value) {
+    setCheckBoxStudy() {
       if (this.checkAllSerieSelected(this.study, true)) {
         this.$store.dispatch('setFlagByStudyUID', {
           StudyInstanceUID: this.studyInstanceUID,
@@ -219,9 +219,9 @@ export default {
     },
     checkAllSerieSelected(study, value) {
       let allSelected = true;
-      for (const serieUID in this.series[this.studyInstanceUID]) {
+      Object.keys(this.series[this.studyInstanceUID]).forEach((serieUID) => {
         allSelected = allSelected && (this.series[this.studyInstanceUID][serieUID].flag.is_selected === value);
-      }
+      });
       return allSelected;
     },
     openTab(series) {

@@ -165,9 +165,9 @@ export default {
   watch: {
   },
   created() {
-    for (const key in this.filesToDicomize) {
+    Object.keys(this.filesToDicomize).forEach((key) => {
       this.manageFiles[this.filesToDicomize[key].name] = _.cloneDeep(this.dicomValue);
-    }
+    });
   },
   mounted() {
   },

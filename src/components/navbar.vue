@@ -63,7 +63,7 @@ export default {
   },
   watch: {
     $route(to) {
-      this.activePath = to.path.split('/')[1];
+      [, this.activePath] = to.path.split('/');
     },
   },
 };

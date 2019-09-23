@@ -357,7 +357,7 @@ export default {
   },
   watch: {
     disabledText: {
-      handler(disabledText) {
+      handler() {
         if (!this.disabledText) {
           const { textcomment } = this.$refs;
           setTimeout(() => { textcomment.focus(); }, 0);
@@ -412,7 +412,7 @@ export default {
         if (res.status === 204) {
           this.$snotify.success(this.$t('commentpostsuccess'));
           this.newComment.comment = '';
-          this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then((res) => {
+          this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
             this.scrollBottom();
           });
         }

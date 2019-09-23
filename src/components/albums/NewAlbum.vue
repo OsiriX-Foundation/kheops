@@ -265,14 +265,14 @@ export default {
           this.addAlbumUser(albumCreated);
           const data = this.dataToUpload(albumCreated.album_id);
           if (data.length > 0) {
-            this.putStudiesInAlbum(albumCreated, data).then((res) => {
+            this.putStudiesInAlbum(albumCreated, data).then(() => {
               this.$router.push(`/albums/${albumCreated.album_id}`);
             });
           } else {
             this.$router.push(`/albums/${albumCreated.album_id}`);
           }
         }
-      }).catch((err) => {
+      }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
       });
     },

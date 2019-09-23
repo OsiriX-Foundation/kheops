@@ -156,20 +156,20 @@ export default {
           this.loading = true;
           this.manageDataTransfer(e.dataTransfer.items);
         }
-        this.counterDraging--;
+        this.counterDraging -= 1;
       });
 
       /*
       https://stackoverflow.com/questions/7110353/html5-dragleave-fired-when-hovering-a-child-element
       //$refs.dragingcomponenet
       */
-      this.$refs.fileform.addEventListener('dragenter', (e) => {
+      this.$refs.fileform.addEventListener('dragenter', () => {
         this.counterDraging += 1;
         this.hover = true;
       });
 
-      this.$refs.fileform.addEventListener('dragleave', (e) => {
-        this.counterDraging--;
+      this.$refs.fileform.addEventListener('dragleave', () => {
+        this.counterDraging -= 1;
         if (this.counterDraging === 0) {
           this.hover = false;
         }
@@ -191,13 +191,13 @@ export default {
           id: this.count.toString(16),
           type: file.type,
         };
-        this.count++;
+        this.count += 1;
         return objFile;
       }
     },
     inputLoadFiles(filesFromInput) {
       const arrayFiles = [];
-      for (let i = 0; i < filesFromInput.length; i++) {
+      for (let i = 0; i < filesFromInput.length; i += 1) {
         const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name;
         const objFile = this.createObjFiles(filesFromInput[i], pathFile, filesFromInput[i].name);
         if (objFile) {
@@ -209,7 +209,7 @@ export default {
     manageDataTransfer(dataTransferItems) {
       this.$store.dispatch('setStudyUIDtoSend', { studyUID: '' });
       const arrayPromises = [];
-      for (let i = 0; i < dataTransferItems.length; i++) {
+      for (let i = 0; i < dataTransferItems.length; i += 1) {
         const entry = this.determineGetAsEntry(dataTransferItems[i]);
         if (entry && entry.isFile) {
           arrayPromises.push(this.readFilePromise(entry, this));
@@ -231,7 +231,7 @@ export default {
       return array.reduce((arrayFlat, arrayToFlatten) => arrayFlat.concat(Array.isArray(arrayToFlatten) ? this.arrayFlatten(arrayToFlatten) : arrayToFlatten), []);
     },
     readFilePromise(entry, _this) {
-      return new Promise(((resolve, reject) => {
+      return new Promise(((resolve) => {
         entry.file((file) => {
           resolve(_this.createObjFiles(file, entry.fullPath, file.name));
         });
@@ -269,6 +269,7 @@ export default {
       } if (item.webkitGetAsEntry !== undefined) {
         return item.webkitGetAsEntry();
       }
+      return undefined;
     },
     excludeFileName(name) {
       return this.excludeFiles.indexOf(name) > -1;

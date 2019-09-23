@@ -463,7 +463,7 @@ export default {
           label: this.$t('PatientName'),
           sortable: true,
           tdClass: 'breakwork',
-          formatter: (value, key, item) => {
+          formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
               return value.Value[0];
             }
@@ -478,7 +478,7 @@ export default {
           sortable: true,
           tdClass: 'breakwork',
           class: 'breakword d-none d-md-table-cell d-lg-table-cell',
-          formatter: (value, key, item) => value.Value[0],
+          formatter: (value) => value.Value[0],
           thStyle: {
             width: '250px',
           },
@@ -488,7 +488,7 @@ export default {
           sortable: false,
           tdClass: 'breakwork',
           class: 'breakword d-none d-lg-table-cell',
-          formatter: (value, key, item) => {
+          formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
               return value.Value[0];
             }
@@ -503,7 +503,7 @@ export default {
           sortable: true,
           tdClass: 'breakwork',
           class: 'breakword d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
-          formatter: (value, key, item) => {
+          formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
               return value.Value[0];
             }
@@ -518,7 +518,7 @@ export default {
           sortable: false,
           tdClass: 'breakwork',
           class: 'breakword d-none d-sm-table-cell',
-          formatter: (value, key, item) => value.Value.join(', '),
+          formatter: (value) => value.Value.join(', '),
           thStyle: {
             width: '150px',
           },
@@ -590,7 +590,7 @@ export default {
       }
     },
     filters: {
-      handler(filters) {
+      handler() {
         this.searchStudies();
       },
       deep: true,
@@ -628,12 +628,11 @@ export default {
   },
   methods: {
     scroll() {
-      const _this = this;
       window.onscroll = () => {
-        if (_this.$refs.myHeader !== undefined && _this.$refs.studiesList !== undefined) {
-          const sticky = _this.$refs.myHeader.offsetTop;
-          const heightSticky = _this.$refs.myHeader.clientHeight;
-          const studiesList = _this.$refs.studiesList.offsetTop;
+        if (this.$refs.myHeader !== undefined && this.$refs.studiesList !== undefined) {
+          const sticky = this.$refs.myHeader.offsetTop;
+          const heightSticky = this.$refs.myHeader.clientHeight;
+          const studiesList = this.$refs.studiesList.offsetTop;
           if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
             this.isActive = true;
           } else if (window.pageYOffset < studiesList - heightSticky) {
@@ -645,7 +644,7 @@ export default {
     // https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
     infiniteHandler($state) {
       this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then((res) => {
-        if (this.studies.length === parseInt(res.headers['x-total-count'])) {
+        if (this.studies.length === parseInt(res.headers['x-total-count'], 10)) {
           $state.complete();
         }
         if (res.status === 200 && res.data.length > 0) {
@@ -668,7 +667,7 @@ export default {
     reloadStudies() {
       this.searchStudies();
       if (this.albumID !== undefined) {
-        this.getAlbum().then((res) => {
+        this.getAlbum().then(() => {
           this.setAlbumInbox();
         });
       } else {
@@ -689,10 +688,10 @@ export default {
         this.$store.dispatch('getInboxInfo');
       }
     },
-    setItemHover(item, index, event) {
+    setItemHover(item, index) {
       this.studies[index].flag.is_hover = true;
     },
-    setItemUnhover(item, index, event) {
+    setItemUnhover(item, index) {
       this.studies[index].flag.is_hover = false;
     },
     showSeries(row) {
@@ -735,10 +734,11 @@ export default {
       }
     },
     setSeriesCheck(series, params) {
-      for (const serieUID in series) {
-        params.SeriesInstanceUID = serieUID;
-        this.$store.dispatch('setFlagByStudyUIDSerieUID', params);
-      }
+      const paramsSetFlag = params;
+      Object.keys(series).forEach((serieUID) => {
+        paramsSetFlag.SeriesInstanceUID = serieUID;
+        this.$store.dispatch('setFlagByStudyUIDSerieUID', paramsSetFlag);
+      });
     },
     sortingChanged(ctx) {
       this.studiesParams.sortDesc = ctx.sortDesc;
@@ -768,7 +768,7 @@ export default {
     },
     prepareFilters() {
       const filtersToSend = {};
-      for (const id in this.filters) {
+      Object.keys(this.filters).forEach((id) => {
         if (this.filters[id] !== '' && this.filters[id] !== null) {
           if (id === 'PatientName' || id === 'StudyDescription' || id === 'PatientID') {
             filtersToSend[id] = `*${this.filters[id]}*`;
@@ -786,13 +786,13 @@ export default {
             filtersToSend[id] = this.filters[id];
           }
         }
-      }
+      });
       return filtersToSend;
     },
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
     },
-    showRowDetails(item, index, event) {
+    showRowDetails(item) {
       if (!item._showDetails) {
         this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view);
         item._showDetails = true;

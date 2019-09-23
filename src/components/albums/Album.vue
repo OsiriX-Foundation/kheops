@@ -167,7 +167,7 @@ export default {
   methods: {
     loadAlbum() {
       this.loading = true;
-      this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => {
+      this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then(() => {
         this.loading = false;
         // this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
       }).catch((err) => {
@@ -177,7 +177,7 @@ export default {
     },
     toggleFavorite(albumID, isFavorite) {
       const value = !isFavorite;
-      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then((res) => {
+      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
         this.$store.dispatch('setKeyValueAlbum', { key: 'is_favorite', value });
       });
     },

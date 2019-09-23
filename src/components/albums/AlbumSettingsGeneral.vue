@@ -168,11 +168,11 @@ export default {
         return;
       }
       const queries = {};
-      for (const id in this.edit) {
+      Object.keys(this.edit).forEach((id) => {
         if (this.edit[id] !== '-1') {
           queries[id] = this.edit[id];
         }
-      }
+      });
 
       this.$store.dispatch('editAlbum', { album_id: this.album.album_id, queries }).then((res) => {
         if (res.status === 200) {

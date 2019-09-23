@@ -1,10 +1,10 @@
 <!--
 Components : AlbumButtons
 Props :
-  Users				Array
-  album				Object
-  showQuit		Boolean
-  showDelete	Boolean
+  Users       Array
+  album       Object
+  showQuit    Boolean
+  showDelete  Boolean
 -->
 <i18n>
 {
