@@ -5,13 +5,13 @@
   "en": {
     "general": "General",
     "user": "User",
-    "token": "Token",
+    "tokens": "Tokens",
     "providerSR": "Report providers"
   },
   "fr": {
     "general": "Général",
     "user": "Utilisateur",
-    "token": "Token",
+    "tokens": "Tokens",
     "providerSR": "Report providers"
   }
 }
@@ -29,8 +29,8 @@
             v-for="(cat,idx) in categories"
             :key="idx"
             class="nav-link"
-            :class="(view==cat)?'active':''"
-            @click="view=cat"
+            :class="(currentCategory === cat || (cat === 'general' && currentCategory === undefined)) ? 'active' : ''"
+            @click="loadCategory(cat)"
           >
             {{ $t(cat) }}
           </a>
@@ -39,7 +39,7 @@
       <div class="d-block d-sm-block d-md-none col-12 ">
         <b-dropdown
           id="dropdown-right"
-          :text="$t(view)"
+          :text="$t(currentCategory)"
           variant="primary"
           class="m-2 p-2 d-flex justify-content-center"
           toggle-class="col-12"
@@ -49,12 +49,12 @@
             v-for="(cat,idx) in categories"
             :key="idx"
             href="#"
-            :active="view===cat"
+            :active="currentCategory === cat"
           >
             <a
               class="nav-link"
-              :class="(view==cat)?'active':''"
-              @click="view=cat"
+              :class="currentCategory === cat ? 'active' : ''"
+              @click="loadCategory(cat)"
             >
               {{ $t(cat) }}
             </a>
@@ -63,19 +63,19 @@
       </div>
       <div class="col-sm-12 col-md-10">
         <album-settings-general
-          v-if="view=='general'"
+          v-if="currentCategory === 'general' || currentCategory === undefined"
           :album="album"
         />
         <album-settings-user
-          v-if="view=='user'"
+          v-if="currentCategory === 'user'"
           :album="album"
         />
         <album-settings-token
-          v-if="view=='token'"
+          v-if="currentCategory === 'tokens'"
           :album="album"
         />
         <album-settings-report-provider
-          v-if="view=='providerSR'"
+          v-if="currentCategory === 'providerSR'"
           :album="album"
         />
       </div>
@@ -103,36 +103,30 @@ export default {
   },
   data() {
     return {
-      view: 'general',
       basicCategories: ['general', 'user', 'providerSR'],
     };
   },
   computed: {
     categories() {
-      return (this.album.is_admin) ? this.basicCategories.concat('token') : this.basicCategories;
+      return (this.album.is_admin) ? this.basicCategories.concat('tokens') : this.basicCategories;
+    },
+    currentCategory() {
+      return this.$route.params.category !== undefined ? this.$route.params.category : this.basicCategories[0];
     },
   },
   watch: {
-    view() {
-      this.$router.push({ query: { view: 'settings', cat: this.view } });
-    },
-    '$route.query': function () {
-      this.view = this.$route.query.cat !== undefined ? this.$route.query.cat : 'general';
-      this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch((err) => {
-        this.$router.push('/albums');
-        return err;
-      });
-    },
   },
   created() {
-    if (this.categories.indexOf(this.$route.query.cat) > -1) {
-      this.view = this.$route.query.cat;
-    }
   },
   beforeDestroy() {
     const query = { ...this.$route.query };
     delete query.cat;
     this.$router.replace({ query });
+  },
+  methods: {
+    loadCategory(category) {
+      this.$router.push({ name: 'albumsettings', params: { category } });
+    },
   },
 };
 </script>

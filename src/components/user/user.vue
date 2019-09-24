@@ -3,13 +3,13 @@
   "en": {
     "usersettings": "User settings",
     "general": "General",
-    "token": "Token",
+    "tokens": "Tokens",
     "provider": "Provider"
   },
   "fr": {
     "usersettings": "Préférences utilisateur",
     "general": "Général",
-    "token": "Token",
+    "tokens": "Tokens",
     "provider": "Fournisseur"
   }
 }
@@ -30,17 +30,16 @@
             v-for="(cat,idx) in categories"
             :key="idx"
             class="nav-link"
-            :class="(view==cat)?'active':''"
-            @click="view=cat"
+            :class="(currentCategory === cat) ? 'active':''"
+            @click="loadview(cat)"
           >
             {{ $t(cat) }}
           </a>
         </nav>
       </div>
       <div class="col-lg-10 col-sm-12 col-xs-12">
-        <user-settings-general v-if="view=='general'" />
-        <user-settings-token v-if="view=='token'" />
-        <user-settings-provider v-if="view=='provider'" />
+        <user-settings-general v-if="currentCategory === 'general'" />
+        <user-settings-token v-if="currentCategory === 'tokens'" />
       </div>
     </div>
   </div>
@@ -50,31 +49,29 @@
 
 import userSettingsGeneral from '@/components/user/userSettingsGeneral';
 import userSettingsToken from '@/components/user/userSettingsToken';
-import userSettingsProvider from '@/components/user/userSettingsProvider';
 
 export default {
   name: 'User',
-  components: { userSettingsGeneral, userSettingsToken, userSettingsProvider },
+  components: { userSettingsGeneral, userSettingsToken },
   data() {
     return {
-      // categories: ['general', 'token', 'provider'],
-      categories: ['general', 'token'],
-      view: 'general',
+      // categories: ['general', 'tokens', 'provider'],
+      categories: ['general', 'tokens'],
     };
   },
   computed: {
+    currentCategory() {
+      return this.$route.params.category !== undefined ? this.$route.params.category : 'general';
+    },
   },
   watch: {
-    view() {
-      const queryParams = { view: this.view };
-      this.$router.push({ query: queryParams });
-    },
-    '$route.query': function () {
-      this.view = this.$route.query.view;
-    },
   },
   mounted() {
-    this.view = this.$route.query.view || 'general';
+  },
+  methods: {
+    loadview(category) {
+      this.$router.push({ name: 'usercategory', params: { category } });
+    },
   },
 };
 </script>

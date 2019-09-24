@@ -309,11 +309,6 @@ export default {
       required: true,
       default: '',
     },
-    clientID: {
-      type: String,
-      required: true,
-      default: '',
-    },
     writePermission: {
       type: Boolean,
       required: true,
@@ -329,28 +324,26 @@ export default {
     ...mapGetters({
       provider: 'provider',
     }),
+    clientID() {
+      return this.$route.params.id;
+    },
   },
   created() {
     this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
       if (res.status !== 200) {
         this.$snotify.error('Sorry, an error occured');
-        this.redirect();
+        this.back();
       }
     }).catch((err) => {
-      if (err.response.status === 404) {
+      if (err.response !== undefined && err.response.status === 404) {
         this.$snotify.error('Report provider not found');
       } else {
         this.$snotify.error('Sorry, an error occured');
       }
-      this.redirect();
+      this.back();
     });
   },
   methods: {
-    redirect() {
-      const query = JSON.parse(JSON.stringify(this.$route.query));
-      query.settingview = 'list';
-      this.$router.push({ query });
-    },
     back() {
       this.$emit('done');
     },

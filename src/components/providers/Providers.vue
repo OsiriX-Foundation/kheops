@@ -13,14 +13,14 @@
 <template>
   <div>
     <div
-      v-if="(view === undefined || view === 'list') && writePermission"
+      v-if="(currentView === 'listproviders') && writePermission"
       class="my-3 selection-button-container"
       style=" position: relative;"
     >
       <h4>
         <span
           class="link"
-          @click="view='new'"
+          @click="loadAction('newprovider')"
         >
           <v-icon
             name="plus"
@@ -32,26 +32,26 @@
     </div>
 
     <new-provider
-      v-if="view === 'new' && writePermission"
+      v-if="currentView === 'newprovider' && writePermission"
       :album-i-d="albumID"
-      @done="view='list'"
+      @done="loadAction('listproviders')"
     />
     <provider
-      v-if="view === 'provider'"
+      v-if="currentView === 'provider'"
       :album-i-d="albumID"
       :client-i-d="clientIdSelected"
       :write-permission="writePermission"
-      @done="view='list'"
+      @done="loadAction('listproviders')"
       @providerselectededit="editProvider"
     />
     <edit-provider
-      v-if="view === 'edit' && writePermission"
+      v-if="currentView === 'editprovider' && writePermission"
       :album-i-d="albumID"
       :client-i-d="clientIdSelected"
-      @done="view='list'"
+      @done="loadAction('listproviders')"
     />
     <list-providers
-      v-if="view === 'list' || view === undefined"
+      v-if="currentView === 'listproviders'"
       :album-i-d="albumID"
       :write-permission="writePermission"
       @providerselectedshow="showProvider"
@@ -89,17 +89,9 @@ export default {
       clientIdSelected: '',
     };
   },
-  watch: {
-    view() {
-      const query = JSON.parse(JSON.stringify(this.$route.query));
-      query.settingview = this.view;
-      if (this.view === 'provider' || this.view === 'edit') {
-        query.object = this.clientIdSelected;
-      }
-      this.$router.push({ query });
-    },
-    '$route.query': function () {
-      this.manageView(this.$route.query.settingview);
+  computed: {
+    currentView() {
+      return this.$route.params.action !== undefined ? this.$route.params.action : 'listproviders';
     },
   },
   created() {
@@ -117,12 +109,18 @@ export default {
     showProvider(clientId) {
       this.$store.dispatch('initProvider');
       this.clientIdSelected = clientId;
-      this.view = 'provider';
+      this.loadActionId('provider', clientId);
     },
     editProvider(clientId) {
       this.$store.dispatch('initProvider');
       this.clientIdSelected = clientId;
-      this.view = 'edit';
+      this.loadActionId('editprovider', clientId);
+    },
+    loadAction(action) {
+      this.$router.push({ name: 'albumsettingsaction', params: { action } });
+    },
+    loadActionId(action, id) {
+      this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
     },
   },
 };

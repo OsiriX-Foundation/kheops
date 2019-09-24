@@ -243,11 +243,6 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'Token',
   props: {
-    tokenId: {
-      type: String,
-      required: false,
-      default: '',
-    },
   },
   data() {
     return {
@@ -267,24 +262,26 @@ export default {
       });
       return perms.length ? perms.join(', ') : '-';
     },
+    tokenId() {
+      return this.$route.params.id;
+    },
   },
   created() {
     this.$store.dispatch('initToken');
     const capabilityId = this.defineCapabilityId();
     this.$store.dispatch('getToken', { capabilityId }).then((res) => {
       if (res.status !== 200) {
-        this.redirect();
+        this.redirect('listtokens');
         this.$snotify.error('Sorry, an error occur');
       }
-    }).catch((err) => {
-      console.log(err);
-      this.redirect();
+    }).catch(() => {
+      this.redirect('listtokens');
       this.$snotify.error('Sorry, an error occur');
     });
   },
   methods: {
-    redirect() {
-      this.$router.push({ query: { view: 'settings', cat: 'token' } });
+    redirect(action) {
+      this.$router.push({ name: 'albumsettingsaction', params: { action } });
     },
     defineCapabilityId() {
       const tokenId = this.tokenId === '0' ? this.$route.query.object : this.tokenId;
@@ -294,8 +291,12 @@ export default {
       if (this.confirmRevoke === false) {
         this.confirmRevoke = true;
       } else {
-        this.$emit('revoke', this.token.id);
-        this.cancel();
+        this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then((res) => {
+          this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
+          this.cancel();
+        }).catch(() => {
+          this.$snotify.error(this.$t('sorryerror'));
+        });
       }
     },
     cancel() {

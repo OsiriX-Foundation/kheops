@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import ListAlbums from '@/components/albums/ListAlbums';
 import NewAlbum from '@/components/albums/NewAlbum';
+// import Album from '@/components/albums/Album';
 import Album from '@/components/albums/Album';
 import User from '@/components/user/user';
 import store from '@/store';
@@ -87,8 +88,85 @@ const router = new Router({
     },
   },
   {
+    path: '/albums/:album_id/:view',
+    name: 'albumview',
+    component: Album,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'album',
+    },
+  },
+  {
+    path: '/albums/:album_id/:view/:category',
+    name: 'albumsettings',
+    component: Album,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'album',
+    },
+  },
+  {
+    path: '/albums/:album_id/:view/:category/:action',
+    name: 'albumsettingsaction',
+    component: Album,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'album',
+    },
+  },
+  {
+    path: '/albums/:album_id/:view/:category/:action/:id',
+    name: 'albumsettingsactionid',
+    component: Album,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'album',
+    },
+  },
+  {
     path: '/user',
     name: 'user',
+    component: User,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'user',
+    },
+  },
+  {
+    path: '/user/:category',
+    name: 'usercategory',
+    component: User,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'user',
+    },
+  },
+  {
+    path: '/user/:category/:action',
+    name: 'useraction',
+    component: User,
+    beforeEnter: requireAuth,
+    meta: {
+      permissions: 'active',
+      condition: 'any',
+      title: 'user',
+    },
+  },
+  {
+    path: '/user/:category/:action/:id',
+    name: 'useractionid',
     component: User,
     beforeEnter: requireAuth,
     meta: {
