@@ -142,8 +142,17 @@ export default {
     currentView() {
       return this.$route.params.view;
     },
+    albumID() {
+      return this.$route.params.album_id;
+    },
   },
   watch: {
+    albumID() {
+      this.loading = true;
+      this.loadAlbum().then(() => {
+        this.loading = false;
+      });
+    },
   },
   created() {
     this.loading = true;
@@ -157,7 +166,7 @@ export default {
   },
   methods: {
     loadAlbum() {
-      return this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => res)
+      return this.$store.dispatch('getAlbum', { album_id: this.albumID }).then((res) => res)
         .catch((err) => {
           this.$router.push('/albums');
           Promise.reject(err);

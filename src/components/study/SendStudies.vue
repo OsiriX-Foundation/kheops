@@ -401,7 +401,7 @@ export default {
   },
   methods: {
     goToAlbum() {
-      this.$router.push(`/albums/${this.source}?view=studies`);
+      this.$router.push(`/albums/${this.source}`);
     },
     closeWindow() {
       this.UI.show = !this.UI.show;

@@ -85,7 +85,7 @@
       >
         <div v-if="data.value=='album'">
           <router-link
-            :to="`/albums/${data.item.album.id}`"
+            :to="`/albums/${data.item.album.album_id}`"
             @click.stop
           >
             <v-icon
