@@ -231,6 +231,7 @@ export default {
           key: 'scope_type',
           label: this.$t('scope'),
           sortable: true,
+          class: this.scope === 'album' ? 'd-none' : 'd-none d-sm-table-cell'
         },
         {
           key: 'expiration_time',
