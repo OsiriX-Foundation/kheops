@@ -8,8 +8,8 @@
     "permission": "Permission",
     "write": "write",
     "read": "read",
-    "download": "download",
-    "appropriate": "appropriate",
+    "download": "show download button",
+    "appropriate": "add to album / inbox",
     "expirationdate": "Expiration date",
     "tokencopysuccess": "Token successfully copied"
 
@@ -120,7 +120,7 @@
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
             <b>{{ $t('permission') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-12 col-md-3">
+          <div class="col-xs-12 col-sm-12 col-md-10">
             <toggle-button
               v-model="token.write_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
