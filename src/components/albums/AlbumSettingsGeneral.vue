@@ -4,12 +4,16 @@
   "en":{
     "albumname": "Album name",
     "albumdescription": "Album description",
-    "notification": "Notifications"
+    "notification": "Notifications",
+    "cancel": "Cancel",
+    "update": "Update"
   },
   "fr": {
     "albumname": "Nom de l'album",
     "albumdescription": "Description de l'album",
-    "notification": "Notifications"
+    "notification": "Notifications",
+    "cancel": "Annuler",
+    "update": "Mettre à jour"
   }
 }
 </i18n>

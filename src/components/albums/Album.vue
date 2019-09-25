@@ -1,29 +1,11 @@
 <i18n scoped>
 {
   "en": {
-    "albumName": "Album Name",
-    "albumDescription": "Album Description",
-    "users": "Users",
-    "addUser": "Add user",
-    "addSeries": "Add studies / series",
-    "downloadSeries": "Show download button",
-    "sendSeries": "Get studies / series",
-    "deleteSeries": "Remove studies / series",
-    "writeComments": "Write comments",
     "studies": "Studies",
     "comments": "Comments",
     "settings": "Settings"
   },
   "fr": {
-    "albumName": "Nom de l'album",
-    "albumDescription": "Description de l'album",
-    "users": "Utilisateurs",
-    "addUser": "Ajouter un utilisateur",
-    "addSeries": "Ajouter une étude / série",
-    "downloadSeries": "Télécharger une étude / série",
-    "sendSeries": "Ajouter à un album / inbox",
-    "deleteSeries": "Supprimer une étude / série",
-    "writeComments": "Commenter",
     "studies": "Etudes",
     "comments": "Commentaires",
     "settings": "Réglages"
@@ -163,14 +145,14 @@ export default {
     },
     currentView() {
       if (this.currentView !== undefined) {
-        this.loadAlbum()
+        this.loadAlbum();
       }
     },
     currentSettings() {
       if (this.currentSettings !== undefined) {
-        this.loadAlbum()
+        this.loadAlbum();
       }
-    }
+    },
   },
   created() {
     this.loading = true;

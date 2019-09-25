@@ -1,45 +1,7 @@
-<i18n>
-  {
-    "en": {
-      "newtoken": "New token",
-      "showrevokedtoken": "Show revoked tokens",
-      "showinvalidtoken": "Show invalid tokens",
-      "revoke": "revoke",
-      "revoked": "revoked",
-      "active": "active",
-      "expired": "expired",
-      "revokedsuccess": "revoked successfully",
-      "expiration date": "expiration date",
-      "status": "status",
-      "description": "description",
-      "scope": "scope",
-      "create date": "create date",
-      "last used": "last used",
-      "permission": "permission"
-
-    },
-    "fr": {
-      "newtoken": "Nouveau token",
-      "showrevokedtoken": "Afficher les tokens révoqués",
-      "showinvalidtoken": "Afficher les tokens invalides",
-      "revoke": "révoquer",
-      "revoked": "révoqué",
-      "active": "actif",
-      "expired": "expiré",
-      "revokedsuccess": "révoqué avec succès",
-      "expiration date": "date d'expiration",
-      "scope": "application",
-      "create date": "créé le",
-      "last used": "dern. utilisation",
-      "permission": "permission"
-    }
-  }
-</i18n>
-
 <template>
   <div
-    class="tokens"
     v-if="writePermission"
+    class="tokens"
   >
     <div
       v-if="currentView === 'listtokens'"

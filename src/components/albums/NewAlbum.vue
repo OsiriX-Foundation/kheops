@@ -11,7 +11,9 @@
     "deleteSeries": "Remove studies / series",
     "writeComments": "Write comments",
     "create": "Create",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "newalbum": "New album",
+    "usersettings": "Album user settings"
   },
   "fr": {
     "albumName": "Nom de l'album",
@@ -24,7 +26,9 @@
     "deleteSeries": "Supprimer une étude / série",
     "writeComments": "Commenter",
     "create": "Créer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "newalbum": "Nouvel album",
+    "usersettings": "Réglages des utilisateurs de l'album"
   }
 }
 </i18n>
@@ -218,7 +222,7 @@ export default {
   },
   computed: {
     displayName() {
-      return (!this.album.album_id) ? 'New album' : this.album.name;
+      return (!this.album.album_id) ? this.$t('newalbum') : this.album.name;
     },
   },
   watch: {

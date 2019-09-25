@@ -11,7 +11,10 @@
     "albumuseraddsuccess": "User successfully added to the album",
     "Unknown user": "Unknown user",
     "usersettings": "Album user settings",
-    "allreadypresent": "This user is already present in the album"
+    "allreadypresent": "This user is already present in the album",
+    "add": "Add",
+    "cancel": "Cancel",
+    "user": "user"
   },
   "fr": {
     "userlist": "Liste d'utilisateurs",
@@ -24,7 +27,10 @@
     "albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
     "Unknown user": "Utilisateur inconnu",
     "usersettings": "Réglages des utilisateurs de l'album",
-    "allreadypresent": "Cet utilisateur est déjà présent dans l'album"
+    "allreadypresent": "Cet utilisateur est déjà présent dans l'album",
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "user": "utilisateur"
   }
 }
 </i18n>

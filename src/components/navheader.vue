@@ -1,10 +1,12 @@
 <i18n>
 {
   "en": {
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "lang": "lang"
   },
   "fr": {
-    "welcome": "Bienvenue"
+    "welcome": "Bienvenue",
+    "lang": "lang"
   }
 }
 </i18n>
@@ -57,14 +59,20 @@
             </a>
           </b-nav-item>
           <b-nav-item-dropdown
-            :text="'Lang: '+lang"
+            :text="`${$t('lang')}: ${lang}`"
             right
           >
-            <b-dropdown-item @click="changeLang('en')">
-              EN
-            </b-dropdown-item>
-            <b-dropdown-item @click="changeLang('fr')">
-              FR
+            <b-dropdown-item
+              v-for="language in availableLanguage"
+              :key="language.id"
+              :active="lang === language"
+              @click="changeLang(language)"
+            >
+              <span
+                style="text-transform: uppercase;"
+              >
+                {{ language }}
+              </span>
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
@@ -83,6 +91,10 @@ export default {
   mixins: [CurrentUser],
   data() {
     return {
+      availableLanguage: [
+        'en',
+        'fr',
+      ],
     };
   },
   computed: {
@@ -90,14 +102,26 @@ export default {
       return this.$i18n.locale;
     },
   },
+  created() {
+    this.setFromLocalStorage();
+  },
   methods: {
+    setFromLocalStorage() {
+      const language = localStorage.getItem('language');
+      if (language !== null) {
+        this.changeLang(language);
+      }
+    },
     logout() {
       store.dispatch('logout').then(() => {
         Vue.prototype.$keycloak.logoutFn();
       });
     },
     changeLang(value) {
-      this.$root.$i18n.locale = value;
+      if (this.availableLanguage.includes(value)) {
+        localStorage.setItem('language', value);
+        this.$root.$i18n.locale = value;
+      }
     },
   },
 };
