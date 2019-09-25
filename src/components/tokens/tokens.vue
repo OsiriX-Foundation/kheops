@@ -1,7 +1,7 @@
 <template>
   <div
-    class="tokens"
     v-if="writePermission"
+    class="tokens"
   >
     <div
       v-if="currentView === 'listtokens'"

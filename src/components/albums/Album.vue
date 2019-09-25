@@ -145,14 +145,14 @@ export default {
     },
     currentView() {
       if (this.currentView !== undefined) {
-        this.loadAlbum()
+        this.loadAlbum();
       }
     },
     currentSettings() {
       if (this.currentSettings !== undefined) {
-        this.loadAlbum()
+        this.loadAlbum();
       }
-    }
+    },
   },
   created() {
     this.loading = true;
