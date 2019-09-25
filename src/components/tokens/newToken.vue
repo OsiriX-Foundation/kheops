@@ -1,32 +1,32 @@
 <i18n>
 {
-	"en": {
-		"newtoken": "New token",
-		"description": "Description",
-		"scope": "Scope",
-		"album": "album",
-		"permission": "Permission",
-		"write": "write",
-		"read": "read",
-		"download": "download",
-		"appropriate": "appropriate",
-		"expirationdate": "Expiration date",
-		"tokencopysuccess": "Token successfully copied"
+  "en": {
+    "newtoken": "New token",
+    "description": "Description",
+    "scope": "Scope",
+    "album": "album",
+    "permission": "Permission",
+    "write": "write",
+    "read": "read",
+    "download": "show download button",
+    "appropriate": "add to album / inbox",
+    "expirationdate": "Expiration date",
+    "tokencopysuccess": "Token successfully copied"
 
-	},
-	"fr": {
-		"newtoken": "Nouveau token",
-		"description": "Description",
-		"scope": "Applicable à",
-		"album": "album",
-		"permission": "Permission",
-		"write": "écriture",
-		"read": "lecture",
-		"download": "téléchargement",
-		"appropriate": "approprier",
-		"expirationdate": "Date d'expiration",
-		"tokencopysuccess": "Token copié avec succès"
-	}
+  },
+  "fr": {
+    "newtoken": "Nouveau token",
+    "description": "Description",
+    "scope": "Applicable à",
+    "album": "album",
+    "permission": "Permission",
+    "write": "écriture",
+    "read": "lecture",
+    "download": "téléchargement",
+    "appropriate": "approprier",
+    "expirationdate": "Date d'expiration",
+    "tokencopysuccess": "Token copié avec succès"
+  }
 }
 </i18n>
 
@@ -120,7 +120,7 @@
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
             <b>{{ $t('permission') }}</b>
           </div>
-          <div class="col-xs-12 col-sm-12 col-md-3">
+          <div class="col-xs-12 col-sm-12 col-md-10">
             <toggle-button
               v-model="token.write_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
@@ -237,102 +237,103 @@
 </template>
 
 <script>
-import moment from 'moment'
-import Datepicker from 'vuejs-datepicker'
-import { mapGetters } from 'vuex'
+import moment from 'moment';
+import Datepicker from 'vuejs-datepicker';
+import { mapGetters } from 'vuex';
+
 export default {
-	name: 'NewToken',
-	components: { Datepicker },
-	props: {
-		scope: {
-			type: String,
-			required: true
-		},
-		albumid: {
-			type: String,
-			required: false,
-			default: null
-		}
-	},
-	data () {
-		return {
-			token: {
-				title: '',
-				scope_type: this.scope,
-				album: this.albumid,
-				access_token: '',
-				read_permission: false,
-				write_permission: false,
-				appropriate_permission: false,
-				download_permission: false,
-				not_before_time: moment().toDate(),
-				expiration_time: moment().add(1, 'months').toDate()
-			},
-			scopes: ['user', 'album']
-		}
-	},
-	computed: {
-		...mapGetters({
-			albums: 'albums'
-		}),
-		disabledCreateToken () {
-			return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (this.token.scope_type === 'album' && !this.token.read_permission && !this.token.write_permission)
-		}
-	},
-	created () {
-		this.$store.dispatch('getAlbums', { queries: { canCreateCapabilityToken: 'true' } })
-	},
-	destroyed () {
-		if (this.albums.length > 0) {
-			this.$store.dispatch('initAlbums', {})
-		}
-	},
-	methods: {
-		createToken () {
-			if (this.token.scope_type !== 'album') {
-				this.token.read_permission = false
-				this.token.write_permission = false
-			}
-			if (!this.token.read_permission) {
-				this.token.download_permission = false
-				this.token.appropriate_permission = false
-			}
-			let token = this.token
-			token.expiration_time = moment(this.token.expiration_time).format()
-			token.not_before_time = moment(this.token.not_before_time).format()
-			this.$store.dispatch('createToken', { token: token }).then(res => {
-				this.token.access_token = res.data.access_token
-				this.$snotify.success('token created successfully')
-				this.$refs.tokenModal.show()
-			}).catch(() => {
-				this.$snotify.error(this.$t('sorryerror'))
-			})
-		},
-		onCopy () {
-			this.$snotify.success(this.$t('tokencopysuccess'))
-		},
-		onCopyError () {
-			this.$snotify.error(this.$t('sorryerror'))
-		},
-		cancel () {
-			this.$refs.tokenModal.hide()
-			this.$emit('done')
-		}
-	}
-}
+  name: 'NewToken',
+  components: { Datepicker },
+  props: {
+    scope: {
+      type: String,
+      required: true,
+    },
+    albumid: {
+      type: String,
+      required: false,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      token: {
+        title: '',
+        scope_type: this.scope,
+        album: this.albumid,
+        access_token: '',
+        read_permission: false,
+        write_permission: false,
+        appropriate_permission: false,
+        download_permission: false,
+        not_before_time: moment().toDate(),
+        expiration_time: moment().add(1, 'months').toDate(),
+      },
+      scopes: ['user', 'album'],
+    };
+  },
+  computed: {
+    ...mapGetters({
+      albums: 'albums',
+    }),
+    disabledCreateToken() {
+      return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (this.token.scope_type === 'album' && !this.token.read_permission && !this.token.write_permission);
+    },
+  },
+  created() {
+    this.$store.dispatch('getAlbums', { queries: { canCreateCapabilityToken: 'true' } });
+  },
+  destroyed() {
+    if (this.albums.length > 0) {
+      this.$store.dispatch('initAlbums', {});
+    }
+  },
+  methods: {
+    createToken() {
+      if (this.token.scope_type !== 'album') {
+        this.token.read_permission = false;
+        this.token.write_permission = false;
+      }
+      if (!this.token.read_permission) {
+        this.token.download_permission = false;
+        this.token.appropriate_permission = false;
+      }
+      const { token } = this;
+      token.expiration_time = moment(this.token.expiration_time).format();
+      token.not_before_time = moment(this.token.not_before_time).format();
+      this.$store.dispatch('createToken', { token }).then((res) => {
+        this.token.access_token = res.data.access_token;
+        this.$snotify.success('token created successfully');
+        this.$refs.tokenModal.show();
+      }).catch(() => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    onCopy() {
+      this.$snotify.success(this.$t('tokencopysuccess'));
+    },
+    onCopyError() {
+      this.$snotify.error(this.$t('sorryerror'));
+    },
+    cancel() {
+      this.$refs.tokenModal.hide();
+      this.$emit('done');
+    },
+  },
+};
 </script>
 
 <style scoped>
 dt{
-	text-align: right;
-	text-transform: capitalize;
+  text-align: right;
+  text-transform: capitalize;
 }
 label{
-	text-transform: capitalize;
-	margin-left: 1em;
+  text-transform: capitalize;
+  margin-left: 1em;
 }
 div.calendar-wrapper{
-	color: #333;
+  color: #333;
 }
 
 </style>

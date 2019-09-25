@@ -5,33 +5,34 @@
   </div>
 </template>
 <script>
-import VCalendar from 'v-calendar'
-export default {
-	name: 'FilterDate',
-	components: { VCalendar },
-	props: {
-	},
-	data () {
-		return {
-			attrs: [
-				{
-					key: 'today',
-					dates: new Date(2018, 0, 1)
-				}
-			]
-		}
-	},
-	computed: {
-	},
+import VCalendar from 'v-calendar';
 
-	watch: {
-	},
-	created () {
-	},
-	mounted () {
-	},
-	methods: {
-	}
-}
+export default {
+  name: 'FilterDate',
+  components: { VCalendar },
+  props: {
+  },
+  data() {
+    return {
+      attrs: [
+        {
+          key: 'today',
+          dates: new Date(2018, 0, 1),
+        },
+      ],
+    };
+  },
+  computed: {
+  },
+
+  watch: {
+  },
+  created() {
+  },
+  mounted() {
+  },
+  methods: {
+  },
+};
 
 </script>

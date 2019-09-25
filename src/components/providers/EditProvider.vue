@@ -1,6 +1,6 @@
 <i18n>
 {
-	"en": {
+  "en": {
     "editprovider": "Edit provider",
     "nameProvider": "Name of the provider",
     "urlProvider": "Configuration URL of the provider",
@@ -9,9 +9,9 @@
     "warningremove": "Are you sure to remove this report provider ?",
     "confirm": "Confirm",
     "cancel": "Cancel"
-	},
-	"fr": {
-		"editprovider": "Edition d'un provider",
+  },
+  "fr": {
+    "editprovider": "Edition d'un provider",
     "nameProvider": "Nom du provider",
     "urlProvider": "URL de configuration",
     "edit": "Confirmer",
@@ -19,7 +19,7 @@
     "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
     "confirm": "Confirmer",
     "cancel": "Annuler"
-	}
+  }
 }
 </i18n>
 
@@ -145,105 +145,98 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import StateProvider from '@/components/providers/StateProvider'
+import { mapGetters } from 'vuex';
+import StateProvider from '@/components/providers/StateProvider';
 
 export default {
-	name: 'EditProvider',
-	components: { StateProvider },
-	props: {
-		albumID: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		clientID: {
-			type: String,
-			required: true,
-			default: ''
-		}
-	},
-	data () {
-		return {
-			show: false,
-			checkURL: false,
-			loading: false,
-			confirmDelete: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			provider: 'provider'
-		})
-	},
-	created: function () {
-		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-			if (res.status !== 200) {
-				this.$snotify.error('Sorry, an error occured')
-				this.redirect()
-			}
-		}).catch(err => {
-			if (err.response.status === 404) {
-				this.$snotify.error('Report provider not found')
-			} else {
-				this.$snotify.error('Sorry, an error occured')
-			}
-			this.redirect()
-		})
-	},
-	methods: {
-		redirect () {
-			let query = JSON.parse(JSON.stringify(this.$route.query))
-			query['settingview'] = 'list'
-			this.$router.push({ query: query })
-		},
-		updateProvider () {
-			this.setStateProvider(false, true, true)
-			const paramsURL = {
-				albumID: this.albumID,
-				clientID: this.clientID
-			}
-			const query = {
-				name: this.provider.name,
-				url: this.provider.url
-			}
+  name: 'EditProvider',
+  components: { StateProvider },
+  props: {
+    albumID: {
+      type: String,
+      required: true,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      show: false,
+      checkURL: false,
+      loading: false,
+      confirmDelete: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      provider: 'provider',
+    }),
+    clientID() {
+      return this.$route.params.id;
+    },
+  },
+  created() {
+    this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+      if (res.status !== 200) {
+        this.$snotify.error('Sorry, an error occured');
+        this.cancel();
+      }
+    }).catch((err) => {
+      if (err.response !== undefined && err.response.status === 404) {
+        this.$snotify.error('Report provider not found');
+      } else {
+        this.$snotify.error('Sorry, an error occured');
+      }
+      this.cancel();
+    });
+  },
+  methods: {
+    updateProvider() {
+      this.setStateProvider(false, true, true);
+      const paramsURL = {
+        albumID: this.albumID,
+        clientID: this.clientID,
+      };
+      const query = {
+        name: this.provider.name,
+        url: this.provider.url,
+      };
 
-			this.$store.dispatch('updateProvider', { paramsURL, query }).then(res => {
-				if (res.status !== 200) {
-					this.setStateProvider(false, false, true)
-				} else {
-					this.$snotify.success('Provider updated')
-					this.$emit('done')
-				}
-			}).catch(err => {
-				this.setStateProvider(false, false, true)
-				console.log(err)
-			})
-		},
-		setStateProvider (checkURL, loading, show) {
-			this.checkURL = checkURL
-			this.loading = loading
-			this.show = show
-		},
-		cancel () {
-			this.$emit('done')
-		},
-		deleteProvider () {
-			if (!this.confirmDelete) {
-				this.confirmDelete = true
-			} else {
-				this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-					if (res.status !== 204) {
-						this.$snotify.error('Sorry, an error occured')
-					} else {
-						this.$snotify.success('Provider remove')
-						this.$emit('done')
-					}
-				}).catch(err => {
-					console.log(err)
-				})
-			}
-		}
-	}
-}
+      this.$store.dispatch('updateProvider', { paramsURL, query }).then((res) => {
+        if (res.status !== 200) {
+          this.setStateProvider(false, false, true);
+        } else {
+          this.$snotify.success('Provider updated');
+          this.$emit('done');
+        }
+      }).catch((err) => {
+        this.setStateProvider(false, false, true);
+        console.log(err);
+      });
+    },
+    setStateProvider(checkURL, loading, show) {
+      this.checkURL = checkURL;
+      this.loading = loading;
+      this.show = show;
+    },
+    cancel() {
+      this.$emit('done');
+    },
+    deleteProvider() {
+      if (!this.confirmDelete) {
+        this.confirmDelete = true;
+      } else {
+        this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+          if (res.status !== 204) {
+            this.$snotify.error('Sorry, an error occured');
+          } else {
+            this.$snotify.success('Provider remove');
+            this.$emit('done');
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+      }
+    },
+  },
+};
 </script>

@@ -1,39 +1,39 @@
 <!--
 Components : AlbumUsers
 Props :
-	Users						Array
-	album						Object
-	showDeleteUser	Boolean
-	showChangeRole	Boolean
+  Users           Array
+  album           Object
+  showDeleteUser  Boolean
+  showChangeRole  Boolean
 -->
 <i18n>
 {
-	"en": {
-		"username": "User name",
-		"user": "user",
-		"changerole": "change role to",
-		"albumuserdeletesuccess": "Access to the album has been successfully removed",
-		"usernotsettoadmin": "User no longer has admin rights",
-		"usersettoadmin": "User has admin rights",
-		"warningtoggleadmin": "Warning! Do you really want to revoke your admin role? ",
-		"remove": "Remove user",
+  "en": {
+    "username": "User name",
+    "user": "user",
+    "changerole": "change role to",
+    "albumuserdeletesuccess": "Access to the album has been successfully removed",
+    "usernotsettoadmin": "User no longer has admin rights",
+    "usersettoadmin": "User has admin rights",
+    "warningtoggleadmin": "Warning! Do you really want to revoke your admin role? ",
+    "remove": "Remove user",
     "warningtoggledelete": "Do you realy want to delete this user ?",
     "Admin": "Data steward",
     "admin": "data steward"
-	},
-	"fr": {
-		"username": "Utilisateur",
-		"user": "utilisateur",
-		"changerole": "changer le rôle pour",
-		"albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
-		"usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
-		"usersettoadmin": "L'utilisateur a des droits admin",
-		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
-		"remove": "Retirer l'utilisateur",
+  },
+  "fr": {
+    "username": "Utilisateur",
+    "user": "utilisateur",
+    "changerole": "changer le rôle pour",
+    "albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
+    "usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
+    "usersettoadmin": "L'utilisateur a des droits admin",
+    "warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
+    "remove": "Retirer l'utilisateur",
     "warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?",
     "Admin": "Gardien des données",
     "admin": "gardien des données"
-	}
+  }
 }
 </i18n>
 <template>
@@ -72,7 +72,9 @@ Props :
                   @click.stop="toggleAdmin(user)"
                 >
                   {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
-                  <v-icon	name="user" />
+                  <v-icon
+                    name="user"
+                  />
                 </a>
                 <br>
                 <a
@@ -143,7 +145,9 @@ Props :
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
-                <v-icon	name="user" />
+                <v-icon
+                  name="user"
+                />
               </a>
               <br>
               <a
@@ -204,111 +208,111 @@ Props :
   </div>
 </template>
 <script>
-import mobiledetect from '@/mixins/mobiledetect.js'
-import { CurrentUser } from '@/mixins/currentuser.js'
+import mobiledetect from '@/mixins/mobiledetect.js';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
-	name: 'AlbumUsers',
-	mixins: [ CurrentUser ],
-	props: {
-		album: {
-			type: Object,
-			required: true,
-			default: () => ({})
-		},
-		users: {
-			type: Array,
-			required: true,
-			default: () => ([])
-		},
-		showDeleteUser: {
-			type: Boolean,
-			required: true,
-			default: true
-		},
-		showChangeRole: {
-			type: Boolean,
-			required: true,
-			default: true
-		}
-	},
-	data () {
-		return {
-			confirmDelete: '',
-			confirmResetAdmin: ''
-		}
-	},
-	computed: {
-		mobiledetect () {
-			return mobiledetect.mobileAndTabletcheck()
-		}
-	},
-	created () {
-	},
-	methods: {
-		toggleAdmin (user) {
-			if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
-				this.confirmResetAdmin = user.user_name
-				return
-			}
+  name: 'AlbumUsers',
+  mixins: [CurrentUser],
+  props: {
+    album: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    },
+    users: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
+    showDeleteUser: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    showChangeRole: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      confirmDelete: '',
+      confirmResetAdmin: '',
+    };
+  },
+  computed: {
+    mobiledetect() {
+      return mobiledetect.mobileAndTabletcheck();
+    },
+  },
+  created() {
+  },
+  methods: {
+    toggleAdmin(user) {
+      if (this.currentuserSub === user.user_id && !this.confirmResetAdmin) {
+        this.confirmResetAdmin = user.user_name;
+        return;
+      }
 
-			let params = {
-				album_id: this.album.album_id,
-				user_name: user.user_name,
-				user_is_admin: !user.is_admin
-			}
-			this.$store.dispatch('manageAlbumUserAdmin', params).then(res => {
-				if (res.status === 204) {
-					let message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin')
-					if (this.confirmResetAdmin === user.user_name) {
-						this.getAlbum()
-					}
-					this.$snotify.success(message)
-				} else {
-					this.$snotify.error(this.$t('sorryerror'))
-				}
-				this.confirmResetAdmin = ''
-			}).catch(() => {
-				this.confirmResetAdmin = ''
-				this.$snotify.error(this.$t('sorryerror'))
-			})
-		},
-		deleteUser (user) {
-			if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name
-			else {
-				let params = {
-					album_id: this.album.album_id,
-					user: user.user_name
-				}
-				this.$store.dispatch('removeAlbumUser', params).then(res => {
-					if (res.status === 204) {
-						this.$snotify.success(this.$t('albumuserdeletesuccess'))
-					} else {
-						this.$snotify.error(this.$t('sorryerror'))
-					}
-					this.confirmDelete = ''
-				}).catch(() => {
-					this.confirmDelete = ''
-					this.$snotify.error(this.$t('sorryerror'))
-				})
-			}
-		},
-		getAlbum () {
-			this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch(err => {
-				this.$router.push('/albums')
-				return err
-			})
-		}
-	}
-}
+      const params = {
+        album_id: this.album.album_id,
+        user_name: user.user_name,
+        user_is_admin: !user.is_admin,
+      };
+      this.$store.dispatch('manageAlbumUserAdmin', params).then((res) => {
+        if (res.status === 204) {
+          const message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin');
+          if (this.confirmResetAdmin === user.user_name) {
+            this.getAlbum();
+          }
+          this.$snotify.success(message);
+        } else {
+          this.$snotify.error(this.$t('sorryerror'));
+        }
+        this.confirmResetAdmin = '';
+      }).catch(() => {
+        this.confirmResetAdmin = '';
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    deleteUser(user) {
+      if (this.confirmDelete !== user.user_name) this.confirmDelete = user.user_name;
+      else {
+        const params = {
+          album_id: this.album.album_id,
+          user: user.user_name,
+        };
+        this.$store.dispatch('removeAlbumUser', params).then((res) => {
+          if (res.status === 204) {
+            this.$snotify.success(this.$t('albumuserdeletesuccess'));
+          } else {
+            this.$snotify.error(this.$t('sorryerror'));
+          }
+          this.confirmDelete = '';
+        }).catch(() => {
+          this.confirmDelete = '';
+          this.$snotify.error(this.$t('sorryerror'));
+        });
+      }
+    },
+    getAlbum() {
+      this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch((err) => {
+        this.$router.push('/albums');
+        return err;
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>
 div.user-table-container{
-	min-height: 200px;
-	padding: 25px 0;
+  min-height: 200px;
+  padding: 25px 0;
 }
 a {
-	cursor: pointer;
+  cursor: pointer;
 }
 </style>

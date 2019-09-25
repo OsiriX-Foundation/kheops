@@ -56,58 +56,58 @@
 </template>
 <script>
 
-import Vue from 'vue'
-import { serverURL } from '@/app_config'
+import Vue from 'vue';
+import { serverURL } from '@/app_config';
 
 export default {
-	name: 'IconListProviders',
-	components: { },
-	mixins: [ ],
-	props: {
-		providers: {
-			type: Array,
-			required: true,
-			default: () => ([])
-		},
-		study: {
-			type: Object,
-			required: true,
-			default: () => ({})
-		}
-	},
-	data () {
-		return {
-			serverURL: serverURL
-		}
-	},
-	computed: {
-		accessToken () {
-			return Vue.prototype.$keycloak.token
-		}
-	},
+  name: 'IconListProviders',
+  components: { },
+  mixins: [],
+  props: {
+    providers: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
+    study: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    },
+  },
+  data() {
+    return {
+      serverURL,
+    };
+  },
+  computed: {
+    accessToken() {
+      return Vue.prototype.$keycloak.token;
+    },
+  },
 
-	watch: {
-	},
+  watch: {
+  },
 
-	created () {
-	},
-	mounted () {
-	},
-	methods: {
-		checkProviderModalities (study, provider) {
-			if (provider.data.supported_modalities === undefined) {
-				return true
-			}
-			let result = false
-			let modalitiesInStudy = study.ModalitiesInStudy.Value
-			modalitiesInStudy.forEach(modality => {
-				if (provider.data.supported_modalities.includes(modality)) {
-					result = true
-				}
-			})
+  created() {
+  },
+  mounted() {
+  },
+  methods: {
+    checkProviderModalities(study, provider) {
+      if (provider.data.supported_modalities === undefined) {
+        return true;
+      }
+      let result = false;
+      const modalitiesInStudy = study.ModalitiesInStudy.Value;
+      modalitiesInStudy.forEach((modality) => {
+        if (provider.data.supported_modalities.includes(modality)) {
+          result = true;
+        }
+      });
 
-			return result
-		}
-	}
-}
+      return result;
+    },
+  },
+};
 </script>

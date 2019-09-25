@@ -1,7 +1,7 @@
 <i18n>
-	{
-		"en": {
-			"url": "URL provider",
+  {
+    "en": {
+      "url": "URL provider",
       "stateurl": "Access provider",
       "user": "User",
       "clientid": "Client ID",
@@ -20,9 +20,9 @@
       "warningremove": "Are you sure to remove this report provider ?",
       "confirm": "Confirm",
       "cancel": "Cancel"
-		},
-		"fr": {
-			"url": "URL de configuration",
+    },
+    "fr": {
+      "url": "URL de configuration",
       "stateurl": "Etat du provider",
       "user": "Utilisateur",
       "clientid": "Identifiant du provider",
@@ -41,8 +41,8 @@
       "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
       "confirm": "Confirmer",
       "cancel": "Annuler"
-		}
-	}
+    }
+  }
 </i18n>
 <template>
   <div v-if="Object.keys(provider).length > 0">
@@ -297,86 +297,80 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import StateProvider from '@/components/providers/StateProvider'
+import { mapGetters } from 'vuex';
+import StateProvider from '@/components/providers/StateProvider';
+
 export default {
-	name: 'Provider',
-	components: { StateProvider },
-	props: {
-		albumID: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		clientID: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		writePermission: {
-			type: Boolean,
-			required: true,
-			default: false
-		}
-	},
-	data () {
-		return {
-			confirmDelete: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			provider: 'provider'
-		})
-	},
-	created: function () {
-		this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-			if (res.status !== 200) {
-				this.$snotify.error('Sorry, an error occured')
-				this.redirect()
-			}
-		}).catch(err => {
-			if (err.response.status === 404) {
-				this.$snotify.error('Report provider not found')
-			} else {
-				this.$snotify.error('Sorry, an error occured')
-			}
-			this.redirect()
-		})
-	},
-	methods: {
-		redirect () {
-			let query = JSON.parse(JSON.stringify(this.$route.query))
-			query['settingview'] = 'list'
-			this.$router.push({ query: query })
-		},
-		back () {
-			this.$emit('done')
-		},
-		edit () {
-			this.$emit('providerselectededit', this.clientID)
-		},
-		deleteProvider () {
-			if (this.confirmDelete === false) {
-				this.confirmDelete = true
-			} else {
-				this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then(res => {
-					if (res.status !== 204) {
-						this.$snotify.error('Sorry, an error occured')
-					} else {
-						this.$snotify.success('Provider remove')
-						this.$emit('done')
-					}
-				}).catch(err => {
-					console.log(err)
-				})
-			}
-		}
-	}
-}
+  name: 'Provider',
+  components: { StateProvider },
+  props: {
+    albumID: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    writePermission: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      confirmDelete: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      provider: 'provider',
+    }),
+    clientID() {
+      return this.$route.params.id;
+    },
+  },
+  created() {
+    this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+      if (res.status !== 200) {
+        this.$snotify.error('Sorry, an error occured');
+        this.back();
+      }
+    }).catch((err) => {
+      if (err.response !== undefined && err.response.status === 404) {
+        this.$snotify.error('Report provider not found');
+      } else {
+        this.$snotify.error('Sorry, an error occured');
+      }
+      this.back();
+    });
+  },
+  methods: {
+    back() {
+      this.$emit('done');
+    },
+    edit() {
+      this.$emit('providerselectededit', this.clientID);
+    },
+    deleteProvider() {
+      if (this.confirmDelete === false) {
+        this.confirmDelete = true;
+      } else {
+        this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+          if (res.status !== 204) {
+            this.$snotify.error('Sorry, an error occured');
+          } else {
+            this.$snotify.success('Provider remove');
+            this.$emit('done');
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+      }
+    },
+  },
+};
 </script>
 <style>
-	.breakwork {
-		word-break: break-word;
-	}
+  .breakwork {
+    word-break: break-word;
+  }
 </style>

@@ -1,39 +1,39 @@
 <i18n>
 {
-	"en": {
-		"filesSend": "{count} files have been sent | {count} file has been sent | {count} files have been sent",
-		"locationSend": "in your inbox. | in an",
-		"album": "album.",
-		"filesErrors": "{count} files produced an error. | {count} file produced an error. | {count} files produced an error.",
-		"showError": "Show errors",
-		"hideError": "Hide errors",
-		"cancel": "Cancel",
-		"titleBoxSending": "Sending files",
-		"titleBoxSended": "Files sent",
-		"titleBoxDicomize": "Waiting for your input",
-		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
-		"errorcode": "Error code",
-		"authorizationerror": "Authorization Error",
-		"nondicomfile": "Non DICOM file",
-		"unknownerror": "Unknown Error"
-	},
-	"fr": {
-		"filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
-		"locationSend": "dans votre boîte de réception. | dans un",
-		"album": "album.",
-		"filesErrors": "{count} fichier a rencontré une erreur. | {count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
-		"showError": "Montrer les erreurs",
-		"hideError": "Cacher les erreurs",
-		"cancel": "Annuler",
-		"titleBoxSending": "Fichiers en cours d'envois",
-		"titleBoxSended": "Fichiers envoyés",
-		"titleBoxDicomize": "En attente d'informations",
-		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
-		"errorcode": "Code d'erreur",
-		"authorizationerror": "Erreur d'authorisation",
-		"nondicomfile": "Fichier non DICOM",
-		"unknownerror": "Erreur inconnue"
-	}
+  "en": {
+    "filesSend": "{count} files have been sent | {count} file has been sent | {count} files have been sent",
+    "locationSend": "in your inbox. | in an",
+    "album": "album.",
+    "filesErrors": "{count} files produced an error. | {count} file produced an error. | {count} files produced an error.",
+    "showError": "Show errors",
+    "hideError": "Hide errors",
+    "cancel": "Cancel",
+    "titleBoxSending": "Sending files",
+    "titleBoxSended": "Files sent",
+    "titleBoxDicomize": "Waiting for your input",
+    "unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
+    "errorcode": "Error code",
+    "authorizationerror": "Authorization Error",
+    "nondicomfile": "Non DICOM file",
+    "unknownerror": "Unknown Error"
+  },
+  "fr": {
+    "filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
+    "locationSend": "dans votre boîte de réception. | dans un",
+    "album": "album.",
+    "filesErrors": "{count} fichier a rencontré une erreur. | {count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
+    "showError": "Montrer les erreurs",
+    "hideError": "Cacher les erreurs",
+    "cancel": "Annuler",
+    "titleBoxSending": "Fichiers en cours d'envois",
+    "titleBoxSended": "Fichiers envoyés",
+    "titleBoxDicomize": "En attente d'informations",
+    "unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
+    "errorcode": "Code d'erreur",
+    "authorizationerror": "Erreur d'authorisation",
+    "nondicomfile": "Fichier non DICOM",
+    "unknownerror": "Erreur inconnue"
+  }
 }
 </i18n>
 <template>
@@ -96,8 +96,8 @@
           class="ml-auto p-1"
         >
           <!--
-						Reduce / Show icon
-					-->
+            Reduce / Show icon
+          -->
           <button
             type="button"
             class="btn btn-link btn-sm"
@@ -122,8 +122,8 @@
           </button>
         </div>
         <!--
-						Close icon
-					-->
+            Close icon
+          -->
         <div
           class="p-1"
         >
@@ -154,8 +154,8 @@
           />
         </div>
         <!--
-					When sending
-				-->
+          When sending
+        -->
         <div
           v-if="files.length > 0 && sending === true"
         >
@@ -202,8 +202,8 @@
           </div>
         </div>
         <!--
-					When sending finish
-				-->
+          When sending finish
+        -->
         <div
           v-else-if="(UI.show === true) && (countSentFiles === totalSize || sending === false)"
           class="row"
@@ -228,8 +228,8 @@
               v-if="studyUIDToSend!== ''"
             >
               <!--
-								{{ studyUIDToSend }}
-							-->
+                {{ studyUIDToSend }}
+              -->
             </span>
             <div
               v-if="Object.keys(listErrorUnknownFiles).length > 0"
@@ -271,12 +271,12 @@
           </div>
         </div>
         <!--
-					Unknow files error
-				-->
+          Unknow files error
+        -->
 
         <!--
-					Show the errors
-				-->
+          Show the errors
+        -->
         <div
           v-if="error.length > 0 && UI.showErrors"
           class="row"
@@ -296,370 +296,363 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { HTTP } from '@/router/http'
-import ListErrorFiles from '@/components/study/ListErrorFiles'
-import InputDicomize from '@/components/study/InputDicomize'
-import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue'
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
-import BlockIcon from '@/components/kheopsSVG/BlockIcon'
-import CloseIcon from '@/components/kheopsSVG/CloseIcon'
-import AddIcon from '@/components/kheopsSVG/AddIcon'
-import RemoveIcon from '@/components/kheopsSVG/RemoveIcon'
-import DoneIcon from '@/components/kheopsSVG/DoneIcon'
-import { DicomOperations } from '@/mixins/dicomoperations'
+import { mapGetters } from 'vuex';
+import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import { HTTP } from '@/router/http';
+import ListErrorFiles from '@/components/study/ListErrorFiles';
+import InputDicomize from '@/components/study/InputDicomize';
+import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue';
+import BlockIcon from '@/components/kheopsSVG/BlockIcon';
+import CloseIcon from '@/components/kheopsSVG/CloseIcon';
+import AddIcon from '@/components/kheopsSVG/AddIcon';
+import RemoveIcon from '@/components/kheopsSVG/RemoveIcon';
+import DoneIcon from '@/components/kheopsSVG/DoneIcon';
+import { DicomOperations } from '@/mixins/dicomoperations';
 
 export default {
-	name: 'SendStudies',
-	components: { ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize },
-	mixins: [ DicomOperations ],
-	props: {
-	},
-	data () {
-		return {
-			UI: {
-				show: false,
-				hide: false,
-				cancel: false,
-				showErrors: false,
-				SVGheight: '20',
-				SVGwidth: '20',
-				SVGHeaderHeight: '16',
-				SVGHeaderWidth: '16',
-				SpinnerCancelSize: '30px',
-				getInfo: false
-			},
-			maxsize: 10e6,
-			maxsend: 99,
-			config: {
-				formData: {
-					headers: {
-						'Accept': 'application/dicom+json'
-					},
-					onUploadProgress: progressEvent => {
-						this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total)
-					}
-				},
-				dicomizeData: {
-					headers: {
-						'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary'
-					}
-				}
-			},
-			errorValues: {
-				292: 'authorizationerror',
-				272: 'nondicomfile',
-				0: 'unknownerror'
-			},
-			errorDicom: {
-				'0008119A': '00041500',
-				'00081198': '00041500'
-			},
-			dicomTagError: '00081197',
-			listErrorUnknownFiles: {},
-			totalUnknownFilesError: 0,
-			progress: 0,
-			copyFiles: [],
-			countSentFiles: 0,
-			filesToDicomize: [],
-			filesFiltered: []
-		}
-	},
-	computed: {
-		...mapGetters({
-			sending: 'sending',
-			files: 'files',
-			totalSize: 'totalSize',
-			error: 'error',
-			source: 'source',
-			studyUIDToSend: 'studyUIDToSend'
-		}),
-		totalSizeFiles () {
-			return this.copyFiles.reduce(function (total, file) {
-				return total + file.content.size
-			}, 0)
-		}
-	},
-	watch: {
-		sending () {
-			if (this.sending === true) {
-				this.sendFiles()
-			}
-		},
-		files () {
-			if (this.files.length === 0 && (this.countSentFiles === this.totalSize || this.UI.cancel === true)) {
-				this.UI.cancel = false
-				this.$store.dispatch('setSending', { sending: false })
-			}
-		}
-	},
-	created () {
-	},
-	mounted () {
-	},
-	destroyed () {
-	},
-	methods: {
-		goToAlbum () {
-			this.$router.push(`/albums/${this.source}?view=studies`)
-		},
-		closeWindow () {
-			this.UI.show = !this.UI.show
-			this.UI.cancel = true
-			this.initFiles()
-		},
-		setCancel () {
-			this.UI.cancel = !this.UI.cancel
-			this.initFiles()
-		},
-		initFiles () {
-			if (this.UI.getInfo) {
-				this.UI.getInfo = false
-			}
-			if (this.files.length > 0) {
-				this.$store.dispatch('initFiles')
-			}
-		},
-		sendFiles () {
-			this.initVariablesForSending()
-			this.filesToDicomize = this.copyFiles.filter(file => {
-				return (file.type.includes('image/jpeg') || file.type.includes('application/pdf')	||
-					file.type.includes('video/mp4') || file.type.includes('video/mpeg'))
-			})
+  name: 'SendStudies',
+  components: {
+    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize,
+  },
+  mixins: [DicomOperations],
+  props: {
+  },
+  data() {
+    return {
+      UI: {
+        show: false,
+        hide: false,
+        cancel: false,
+        showErrors: false,
+        SVGheight: '20',
+        SVGwidth: '20',
+        SVGHeaderHeight: '16',
+        SVGHeaderWidth: '16',
+        SpinnerCancelSize: '30px',
+        getInfo: false,
+      },
+      maxsize: 10e6,
+      maxsend: 99,
+      config: {
+        formData: {
+          headers: {
+            Accept: 'application/dicom+json',
+          },
+          onUploadProgress: (progressEvent) => {
+            this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total);
+          },
+        },
+        dicomizeData: {
+          headers: {
+            'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary',
+          },
+        },
+      },
+      errorValues: {
+        292: 'authorizationerror',
+        272: 'nondicomfile',
+        0: 'unknownerror',
+      },
+      errorDicom: {
+        '0008119A': '00041500',
+        '00081198': '00041500',
+      },
+      dicomTagError: '00081197',
+      listErrorUnknownFiles: {},
+      totalUnknownFilesError: 0,
+      progress: 0,
+      copyFiles: [],
+      countSentFiles: 0,
+      filesToDicomize: [],
+      filesFiltered: [],
+    };
+  },
+  computed: {
+    ...mapGetters({
+      sending: 'sending',
+      files: 'files',
+      totalSize: 'totalSize',
+      error: 'error',
+      source: 'source',
+      studyUIDToSend: 'studyUIDToSend',
+    }),
+    totalSizeFiles() {
+      return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
+    },
+  },
+  watch: {
+    sending() {
+      if (this.sending === true) {
+        this.sendFiles();
+      }
+    },
+    files() {
+      if (this.files.length === 0 && (this.countSentFiles === this.totalSize || this.UI.cancel === true)) {
+        this.UI.cancel = false;
+        this.$store.dispatch('setSending', { sending: false });
+      }
+    },
+  },
+  created() {
+  },
+  mounted() {
+  },
+  destroyed() {
+  },
+  methods: {
+    goToAlbum() {
+      this.$router.push(`/albums/${this.source}`);
+    },
+    closeWindow() {
+      this.UI.show = !this.UI.show;
+      this.UI.cancel = true;
+      this.initFiles();
+    },
+    setCancel() {
+      this.UI.cancel = !this.UI.cancel;
+      this.initFiles();
+    },
+    initFiles() {
+      if (this.UI.getInfo) {
+        this.UI.getInfo = false;
+      }
+      if (this.files.length > 0) {
+        this.$store.dispatch('initFiles');
+      }
+    },
+    sendFiles() {
+      this.initVariablesForSending();
+      this.filesToDicomize = this.copyFiles.filter((file) => (file.type.includes('image/jpeg') || file.type.includes('application/pdf')
+          || file.type.includes('video/mp4') || file.type.includes('video/mpeg')));
 
-			this.filesFiltered = this.copyFiles.filter(file => {
-				return (!file.type.includes('image/jpeg') && !file.type.includes('application/pdf') &&
-					!file.type.includes('video/mp4') && !file.type.includes('video/mpeg'))
-			})
+      this.filesFiltered = this.copyFiles.filter((file) => (!file.type.includes('image/jpeg') && !file.type.includes('application/pdf')
+          && !file.type.includes('video/mp4') && !file.type.includes('video/mpeg')));
 
-			if (this.filesToDicomize.length > 0 && this.filesFiltered.length === 0) {
-				if (this.studyUIDToSend !== '') {
-					this.UI.getInfo = true
-					this.UI.hide = false
-				} else {
-					this.sendFormData(this.filesToDicomize)
-				}
-			}
+      if (this.filesToDicomize.length > 0 && this.filesFiltered.length === 0) {
+        if (this.studyUIDToSend !== '') {
+          this.UI.getInfo = true;
+          this.UI.hide = false;
+        } else {
+          this.sendFormData(this.filesToDicomize);
+        }
+      }
 
-			if (this.filesFiltered.length > 0 && this.filesToDicomize.length === 0) {
-				this.sendFormData(this.filesFiltered)
-			}
+      if (this.filesFiltered.length > 0 && this.filesToDicomize.length === 0) {
+        this.sendFormData(this.filesFiltered);
+      }
 
-			if (this.filesFiltered.length > 0 && this.filesToDicomize.length > 0) {
-				this.sendFormData(this.copyFiles)
-			}
-		},
-		validDicomValue (dicomValue) {
-			this.UI.getInfo = false
-			this.sendDicomizeFiles(this.filesToDicomize, dicomValue)
-			if (this.filesFiltered.length > 0) {
-				this.sendFormData(this.filesFiltered)
-			}
-		},
-		sendDicomizeFiles (files, dicomValue) {
-			files.forEach(file => {
-				this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then(res => {
-					if (res !== -1) {
-						let data = res
-						this.sendDicomizeDataPromise(file.id, data).then(res => {
-							this.$store.dispatch('removeFileId', { id: file.id })
-							this.countSentFiles++
-						}).catch(err => {
-							this.generateErrorNonDicom([file], err.status)
-							this.$store.dispatch('removeFileId', { id: file.id })
-							this.countSentFiles++
-						})
-					} else {
-						this.$store.dispatch('removeFileId', { id: file.id })
-						this.countSentFiles++
-					}
-				})
-			})
-		},
-		sendDicomizeDataPromise (idFile, data) {
-			return new Promise((resolve, reject) => {
-				let formData = new FormData()
-				formData.append(idFile, data)
+      if (this.filesFiltered.length > 0 && this.filesToDicomize.length > 0) {
+        this.sendFormData(this.copyFiles);
+      }
+    },
+    validDicomValue(dicomValue) {
+      this.UI.getInfo = false;
+      this.sendDicomizeFiles(this.filesToDicomize, dicomValue);
+      if (this.filesFiltered.length > 0) {
+        this.sendFormData(this.filesFiltered);
+      }
+    },
+    sendDicomizeFiles(files, dicomValue) {
+      files.forEach((file) => {
+        this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then((res) => {
+          if (res !== -1) {
+            const data = res;
+            this.sendDicomizeDataPromise(file.id, data).then(() => {
+              this.$store.dispatch('removeFileId', { id: file.id });
+              this.countSentFiles += 1;
+            }).catch((err) => {
+              this.generateErrorNonDicom([file], err.status);
+              this.$store.dispatch('removeFileId', { id: file.id });
+              this.countSentFiles += 1;
+            });
+          } else {
+            this.$store.dispatch('removeFileId', { id: file.id });
+            this.countSentFiles += 1;
+          }
+        });
+      });
+    },
+    sendDicomizeDataPromise(idFile, data) {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append(idFile, data);
 
-				const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
+        const request = `/studies${this.source !== 'inbox' ? `?album=${this.source}` : ''}`;
 
-				HTTP.post(request, data, this.config['dicomizeData']).then(res => {
-					resolve(res)
-				}).catch(err => {
-					reject(err)
-				})
-			})
-		},
-		sendFormData (files) {
-			if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
-				this.sendFormDataPromise(files)
-			} else if (files.length > 0) {
-				this.sendBySize(files)
-			}
-		},
-		initVariablesForSending () {
-			this.UI.show = true
-			this.UI.cancel = false
-			this.countSentFiles = 0
-			this.copyFiles = _.cloneDeep(this.files)
-			this.progress = 0
-			this.listErrorUnknownFiles = {}
-			this.totalUnknownFilesError = 0
+        HTTP.post(request, data, this.config.dicomizeData).then((res) => {
+          resolve(res);
+        }).catch((err) => {
+          reject(err);
+        });
+      });
+    },
+    sendFormData(files) {
+      if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
+        this.sendFormDataPromise(files);
+      } else if (files.length > 0) {
+        this.sendBySize(files);
+      }
+    },
+    initVariablesForSending() {
+      this.UI.show = true;
+      this.UI.cancel = false;
+      this.countSentFiles = 0;
+      this.copyFiles = _.cloneDeep(this.files);
+      this.progress = 0;
+      this.listErrorUnknownFiles = {};
+      this.totalUnknownFilesError = 0;
 
-			this.$store.dispatch('setSending', { sending: true })
-			this.$store.dispatch('initErrorFiles')
-		},
-		sendBySize (files) {
-			let state = {
-				size: 0,
-				tmpIndex: 0
-			}
-			// https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
-			let promiseChain = Promise.resolve()
-			files.forEach(async (file, index) => {
-				state.size += file.content.size
-				if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
-					const nextPromise = this.createNextPromise(files, state.tmpIndex, index + 1)
-					promiseChain = promiseChain.then(nextPromise())
-					state.tmpIndex = index + 1
-					state.size = 0
-				} else if (index === files.length - 1) {
-					const nextPromise = this.createNextPromise(files, state.tmpIndex, files.length)
-					promiseChain = promiseChain.then(nextPromise())
-				}
-			})
-		},
-		createNextPromise (files, firstIndex, secondIndex) {
-			let currentFiles = this.getArrayFilesToSend(files, firstIndex, secondIndex)
-			const nextPromise = () => () => {
-				return this.sendFormDataPromise(currentFiles)
-			}
-			return nextPromise
-		},
-		getArrayFilesToSend (files, firstIndex, secondIndex) {
-			if (firstIndex === secondIndex) {
-				return [files[secondIndex]]
-			} else {
-				return files.slice(firstIndex, secondIndex)
-			}
-		},
-		sendFormDataPromise (files) {
-			return new Promise((resolve) => {
-				if (!this.UI.cancel && this.files.length > 0) {
-					let formData = this.createFormData(files)
-					this.currentFilesLength = files.length
-					const request = `/studies${this.source !== 'inbox' ? '?album=' + this.source : ''}`
-					HTTP.post(request, formData, this.config['formData']).then(res => {
-						this.manageResult(files, res.data, res.status)
-						resolve(res)
-					}).catch(error => {
-						this.manageResult(files, error !== undefined && error.response !== undefined && error.response.data !== undefined ? error.response.data : {}, error !== undefined && error.response !== undefined && error.response.status !== undefined ? error.response.status : 0)
-						resolve(error)
-					})
-				} else if (this.files.length > 0) {
-					this.$store.dispatch('initFiles')
-					resolve('removeFiles')
-				} else {
-					resolve('noFiles')
-				}
-			})
-		},
-		manageResult (files, data, status) {
-			if (status !== 200) {
-				let result = this.getErrorsDicomFromResponse(data)
-				if (result < 0) {
-					this.generateErrorNonDicom(files, status)
-				}
-			}
-			this.$store.dispatch('removeFilesId', { files: files })
-			this.countSentFiles += files.length
-		},
-		createFormData (files) {
-			let formData = new FormData()
-			files.forEach((file) => {
-				formData.append(file.id, file.content)
-			})
-			return formData
-		},
-		getErrorsDicomFromResponse (data) {
-			let error = -1
-			for (var key in this.errorDicom) {
-				if (data.hasOwnProperty(key)) {
-					const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key])
-					this.generateListError(data[key].Value, this.errorDicom[key])
-					this.createListError(errorInResponse)
-					error = 0
-				}
-			}
-			return error
-		},
-		generateErrorNonDicom (files, status = 0) {
-			let map = new Map()
-			files.forEach(file => {
-				map.set(file.id, status)
-			})
-			this.createListError(map)
-		},
-		createListError (error) {
-			error.forEach((errorCode, id) => {
-				const fileError = this.copyFiles.find(file => { return file.id === id })
-				if (fileError) {
-					let textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`
-					this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, textError) })
-				}
-			})
-		},
-		generateListError (dicom, dicomTagFile) {
-			dicom.forEach(x => {
-				if (!x.hasOwnProperty(dicomTagFile)) {
-					let errorCode = x[this.dicomTagError].Value[0]
-					if (this.listErrorUnknownFiles.hasOwnProperty(errorCode)) {
-						this.listErrorUnknownFiles[errorCode] += 1
-					} else {
-						this.listErrorUnknownFiles[errorCode] = 1
-					}
-					this.totalUnknownFilesError += 1
-				}
-			})
-		},
-		dicom2map (dicom, dicomTagFile) {
-			let map = new Map()
-			dicom.forEach(x => {
-				if (x.hasOwnProperty(dicomTagFile)) {
-					let errorCode = x[this.dicomTagError].Value[0]
-					let idFile = x[dicomTagFile].Value[0]
-					map.set(idFile, errorCode)
-				}
-			})
-			return map
-		},
-		createObjErrors (id, value) {
-			return {
-				'id': id,
-				'value': value
-			}
-		},
-		setShowErrors (value) {
-			this.UI.showErrors = value
-		}
-	}
-}
+      this.$store.dispatch('setSending', { sending: true });
+      this.$store.dispatch('initErrorFiles');
+    },
+    sendBySize(files) {
+      const state = {
+        size: 0,
+        tmpIndex: 0,
+      };
+      // https://stackoverflow.com/questions/48014050/wait-promise-inside-for-loop
+      let promiseChain = Promise.resolve();
+      files.forEach(async (file, index) => {
+        state.size += file.content.size;
+        if (this.maxsize < state.size || ((index - state.tmpIndex) >= this.maxsend)) {
+          const nextPromise = this.createNextPromise(files, state.tmpIndex, index + 1);
+          promiseChain = promiseChain.then(nextPromise());
+          state.tmpIndex = index + 1;
+          state.size = 0;
+        } else if (index === files.length - 1) {
+          const nextPromise = this.createNextPromise(files, state.tmpIndex, files.length);
+          promiseChain = promiseChain.then(nextPromise());
+        }
+      });
+    },
+    createNextPromise(files, firstIndex, secondIndex) {
+      const currentFiles = this.getArrayFilesToSend(files, firstIndex, secondIndex);
+      const nextPromise = () => () => this.sendFormDataPromise(currentFiles);
+      return nextPromise;
+    },
+    getArrayFilesToSend(files, firstIndex, secondIndex) {
+      if (firstIndex === secondIndex) {
+        return [files[secondIndex]];
+      }
+      return files.slice(firstIndex, secondIndex);
+    },
+    sendFormDataPromise(files) {
+      return new Promise((resolve) => {
+        if (!this.UI.cancel && this.files.length > 0) {
+          const formData = this.createFormData(files);
+          this.currentFilesLength = files.length;
+          const request = `/studies${this.source !== 'inbox' ? `?album=${this.source}` : ''}`;
+          HTTP.post(request, formData, this.config.formData).then((res) => {
+            this.manageResult(files, res.data, res.status);
+            resolve(res);
+          }).catch((error) => {
+            this.manageResult(files, error !== undefined && error.response !== undefined && error.response.data !== undefined ? error.response.data : {}, error !== undefined && error.response !== undefined && error.response.status !== undefined ? error.response.status : 0);
+            resolve(error);
+          });
+        } else if (this.files.length > 0) {
+          this.$store.dispatch('initFiles');
+          resolve('removeFiles');
+        } else {
+          resolve('noFiles');
+        }
+      });
+    },
+    manageResult(files, data, status) {
+      if (status !== 200) {
+        const result = this.getErrorsDicomFromResponse(data);
+        if (result < 0) {
+          this.generateErrorNonDicom(files, status);
+        }
+      }
+      this.$store.dispatch('removeFilesId', { files });
+      this.countSentFiles += files.length;
+    },
+    createFormData(files) {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append(file.id, file.content);
+      });
+      return formData;
+    },
+    getErrorsDicomFromResponse(data) {
+      let error = -1;
+      Object.keys(this.errorDicom).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+          const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key]);
+          this.generateListError(data[key].Value, this.errorDicom[key]);
+          this.createListError(errorInResponse);
+          error = 0;
+        }
+      });
+      return error;
+    },
+    generateErrorNonDicom(files, status = 0) {
+      const map = new Map();
+      files.forEach((file) => {
+        map.set(file.id, status);
+      });
+      this.createListError(map);
+    },
+    createListError(error) {
+      error.forEach((errorCode, id) => {
+        const fileError = this.copyFiles.find((file) => file.id === id);
+        if (fileError) {
+          const textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`;
+          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, textError) });
+        }
+      });
+    },
+    generateListError(dicom, dicomTagFile) {
+      dicom.forEach((x) => {
+        if (!Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
+          const errorCode = x[this.dicomTagError].Value[0];
+          if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
+            this.listErrorUnknownFiles[errorCode] += 1;
+          } else {
+            this.listErrorUnknownFiles[errorCode] = 1;
+          }
+          this.totalUnknownFilesError += 1;
+        }
+      });
+    },
+    dicom2map(dicom, dicomTagFile) {
+      const map = new Map();
+      dicom.forEach((x) => {
+        if (Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
+          const errorCode = x[this.dicomTagError].Value[0];
+          const idFile = x[dicomTagFile].Value[0];
+          map.set(idFile, errorCode);
+        }
+      });
+      return map;
+    },
+    createObjErrors(id, value) {
+      return {
+        id,
+        value,
+      };
+    },
+    setShowErrors(value) {
+      this.UI.showErrors = value;
+    },
+  },
+};
 </script>
 
 <style scoped>
-	.chat-popup {
-		position: fixed;
-		background: #303030;
-		bottom: 0;
-		right: 15px;
-		border: 3px solid #f1f1f1;
-		z-index: 9;
-		max-width: 300px;
-		opacity: 1;
-		display: block;
-	}
-	.closeBtn {
-		position: relative;
-		border-bottom: 1px solid #f1f1f1;
-	}
+  .chat-popup {
+    position: fixed;
+    background: #303030;
+    bottom: 0;
+    right: 15px;
+    border: 3px solid #f1f1f1;
+    z-index: 9;
+    max-width: 300px;
+    opacity: 1;
+    display: block;
+  }
+  .closeBtn {
+    position: relative;
+    border-bottom: 1px solid #f1f1f1;
+  }
 </style>

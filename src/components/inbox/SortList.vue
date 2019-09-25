@@ -16,31 +16,31 @@
 </template>
 <script>
 export default {
-	name: 'SortList',
-	components: { },
-	mixins: [ ],
-	props: {
-		sortBy: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		currentHeader: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		sortDesc: {
-			type: Boolean,
-			required: true,
-			default: false
-		}
-	},
-	data () {
-		return {
-			height: 24,
-			width: 26
-		}
-	}
-}
+  name: 'SortList',
+  components: { },
+  mixins: [],
+  props: {
+    sortBy: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    currentHeader: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    sortDesc: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      height: 24,
+      width: 26,
+    };
+  },
+};
 </script>

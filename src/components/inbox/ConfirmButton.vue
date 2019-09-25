@@ -31,33 +31,33 @@
 <script>
 
 export default {
-	name: 'ConfirmButton',
-	props: {
-		text: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		btnPrimaryText: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		btnDangerText: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		methodConfirm: {
-			type: Function,
-			required: true,
-			default: () => -1
-		},
-		methodCancel: {
-			type: Function,
-			required: true,
-			default: () => -1
-		}
-	}
-}
+  name: 'ConfirmButton',
+  props: {
+    text: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    btnPrimaryText: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    btnDangerText: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    methodConfirm: {
+      type: Function,
+      required: true,
+      default: () => -1,
+    },
+    methodCancel: {
+      type: Function,
+      required: true,
+      default: () => -1,
+    },
+  },
+};
 </script>

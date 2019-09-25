@@ -19,27 +19,27 @@
 <script>
 
 export default {
-	name: 'AddIcon',
-	props: {
-		width: {
-			type: String,
-			required: true,
-			default: '0px'
-		},
-		height: {
-			type: String,
-			required: true,
-			default: '0px'
-		}
-	}
-}
+  name: 'AddIcon',
+  props: {
+    width: {
+      type: String,
+      required: true,
+      default: '0px',
+    },
+    height: {
+      type: String,
+      required: true,
+      default: '0px',
+    },
+  },
+};
 </script>
 <style scoped>
   .icon{
-		fill: white;
-	}
+    fill: white;
+  }
 
-	.icon:hover{
-		fill: grey;
-	}
+  .icon:hover{
+    fill: grey;
+  }
 </style>

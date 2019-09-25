@@ -1,17 +1,17 @@
 <i18n>
 {
-	"en": {
+  "en": {
     "albums": "Kheops - Albums",
     "album": "Kheops - Album",
-		"newalbum": "Kheops - New album",
+    "newalbum": "Kheops - New album",
     "user": "Kheops - User"
-	},
-	"fr": {
+  },
+  "fr": {
     "albums": "Kheops - Albums",
     "album": "Kheops - Album",
-		"newalbum": "Kheops - Nouvel album",
+    "newalbum": "Kheops - Nouvel album",
     "user": "Kheops - Utilisateur"
-	}
+  }
 }
 </i18n>
 <template>
@@ -45,50 +45,50 @@
 
 <script>
 
-import navHeader from '@/components/navheader'
-import navBar from '@/components/navbar'
-import SendStudies from '@/components/study/SendStudies'
+import navHeader from '@/components/navheader';
+import navBar from '@/components/navbar';
+import SendStudies from '@/components/study/SendStudies';
 
 export default {
-	name: 'App',
-	components: { navHeader, navBar, SendStudies },
-	data () {
-		return {
-			appTitle: 'Kheops'
-		}
-	},
-	computed: {
-		year () {
-			return new Date().getFullYear()
-		}
-	},
-	watch: {
-		'$route' (to, from) {
-			document.title = this.$t(to.meta.title) || this.appTitle
-		}
-	},
-	created () {
-		document.title = 'Kheops'
-	}
-}
+  name: 'App',
+  components: { navHeader, navBar, SendStudies },
+  data() {
+    return {
+      appTitle: 'Kheops',
+    };
+  },
+  computed: {
+    year() {
+      return new Date().getFullYear();
+    },
+  },
+  watch: {
+    $route(to) {
+      document.title = this.$t(to.meta.title) || this.appTitle;
+    },
+  },
+  created() {
+    document.title = 'Kheops';
+  },
+};
 </script>
 
 <style>
 
 .pointer{
-	cursor:pointer;
+  cursor:pointer;
 }
 .ban{
-	cursor:not-allowed;
+  cursor:not-allowed;
 }
 
 .uppercase{
-	text-transform:uppercase;
+  text-transform:uppercase;
 }
 
 a.navbar-brand {
-	color: #CCC;
-	font-size: 11pt;
+  color: #CCC;
+  font-size: 11pt;
 }
 body {
   overflow-y: scroll;

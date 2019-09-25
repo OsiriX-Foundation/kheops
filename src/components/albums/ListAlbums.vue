@@ -1,43 +1,43 @@
 <i18n>
 {
-	"en": {
-		"newalbum": "New album",
-		"Study #": "Study #",
-		"Modalities": "Modalities",
-		"User #": "User #",
-		"Message #": "Message #",
-		"Date": "Created date",
-		"LastEvent": "Last event",
-		"selectednbalbums": "{count} album is selected | {count} albums are selected",
-		"permissionsfailed": "You can't send this albums : ",
+  "en": {
+    "newalbum": "New album",
+    "Study #": "Study #",
+    "Modalities": "Modalities",
+    "User #": "User #",
+    "Message #": "Message #",
+    "Date": "Created date",
+    "LastEvent": "Last event",
+    "selectednbalbums": "{count} album is selected | {count} albums are selected",
+    "permissionsfailed": "You can't send this albums : ",
     "send": "The album {albumName} has been shared.",
     "nomodality": "No modality",
-		"name": "Name",
-		"nomorealbums": "No more albums",
-		"noresults": "No album found",
-		"albumshared": "Album shared",
-		"error": "An error occur please reload the albums.",
-		"reload": "Reload"
-	},
-	"fr": {
-		"newalbum": "Nouvel album",
-		"Study #": "# Etudes",
-		"Modalities": "Modalités",
-		"User #": "# Utilisateurs",
-		"Message #": "# Messages",
-		"Date": "Date de création",
-		"LastEvent": "Dernier événement",
-		"selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-		"permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
-		"send": "L'album {albumName} a été partagé.",
+    "name": "Name",
+    "nomorealbums": "No more albums",
+    "noresults": "No album found",
+    "albumshared": "Album shared",
+    "error": "An error occur please reload the albums.",
+    "reload": "Reload"
+  },
+  "fr": {
+    "newalbum": "Nouvel album",
+    "Study #": "# Etudes",
+    "Modalities": "Modalités",
+    "User #": "# Utilisateurs",
+    "Message #": "# Messages",
+    "Date": "Date de création",
+    "LastEvent": "Dernier événement",
+    "selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
+    "permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
+    "send": "L'album {albumName} a été partagé.",
     "nomodality": "Aucune modalité",
-		"name": "Nom",
-		"nomorealbums": "Pas d'albums en plus",
-		"noresults": "Aucun album trouvé",
-		"albumshared": "Album partagé",
-		"error": "Une erreur s'est produite, veuillez recharger les albums.",
-		"reload": "Recharger"
-	}
+    "name": "Nom",
+    "nomorealbums": "Pas d'albums en plus",
+    "noresults": "Aucun album trouvé",
+    "albumshared": "Album partagé",
+    "error": "Une erreur s'est produite, veuillez recharger les albums.",
+    "reload": "Recharger"
+  }
 }
 </i18n>
 <template>
@@ -283,335 +283,336 @@
 </template>
 <script>
 
-import { mapGetters } from 'vuex'
-import Datepicker from 'vuejs-datepicker'
-import formGetUser from '@/components/user/getUser'
-import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders'
-import InfiniteLoading from 'vue-infinite-loading'
-import SortList from '@/components/inbox/SortList.vue'
-import moment from 'moment'
-import mobiledetect from '@/mixins/mobiledetect.js'
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import { mapGetters } from 'vuex';
+import Datepicker from 'vuejs-datepicker';
+import InfiniteLoading from 'vue-infinite-loading';
+import moment from 'moment';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import formGetUser from '@/components/user/getUser';
+import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
+import SortList from '@/components/inbox/SortList.vue';
+import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
-	name: 'Albums',
-	components: { InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, PulseLoader },
-	data () {
-		return {
-			form_send_album: false,
-			showFilters: false,
-			infiniteId: 0,
-			albumsParams: {
-				offset: 0,
-				limit: 50,
-				sortDesc: true,
-				sortBy: 'last_event_time'
-			},
-			fields: [
-				{
-					key: 'is_selected',
-					label: '',
-					sortable: false,
-					class: 'td_checkbox breakword',
-					thStyle: {
-						'width': '100px'
-					}
-				},
-				{
-					key: 'name',
-					label: this.$t('name'),
-					tdClass: 'name',
-					sortable: true,
-					class: 'breakword',
-					thStyle: {
-						'width': '250px'
-					}
-				},
-				{
-					key: 'number_of_studies',
-					label: this.$t('Study #'),
-					sortable: true,
-					class: 'd-none d-sm-table-cell breakword',
-					thStyle: {
-						'width': '200px'
-					}
-				},
-				{
-					key: 'number_of_users',
-					label: this.$t('User #'),
-					sortable: true,
-					class: 'd-none d-md-table-cell breakword',
-					thStyle: {
-						'width': '200px'
-					}
-				},
-				{
-					key: 'number_of_comments',
-					label: this.$t('Message #'),
-					sortable: true,
-					class: 'd-none d-lg-table-cell breakword',
-					thStyle: {
-						'width': '200px'
-					}
-				},
-				{
-					key: 'created_time',
-					label: this.$t('Date'),
-					sortable: true,
-					class: 'd-none d-sm-table-cell breakword',
-					thStyle: {
-						'width': '200px'
-					}
-				},
-				{
-					key: 'last_event_time',
-					label: this.$t('LastEvent'),
-					sortable: true,
-					class: 'd-none d-lg-table-cell breakword',
-					thStyle: {
-						'width': '200px'
-					}
-				},
-				{
-					key: 'modalities',
-					label: this.$t('Modalities'),
-					sortable: false,
-					formatter: (value, key, item) => {
-						if (value.length > 0) {
-							return value.join(', ')
-						} else {
-							return this.$t('nomodality')
-						}
-					},
-					class: 'breakword',
-					thStyle: {
-						'width': '200px'
-					}
-				}
-			],
-			filters: {
-				name: '',
-				number_of_studies: '',
-				modalities: '',
-				number_of_users: '',
-				number_of_comments: '',
-				CreateDateFrom: '',
-				CreateDateTo: '',
-				EventDateFrom: '',
-				EventDateTo: ''
-			}
-		}
-	},
-	computed: {
-		...mapGetters({
-			albums: 'albums'
-		}),
-		albumsSelected () {
-			return this.albums.filter(album => { return album.is_selected === true })
-		},
-		disabledToCreateDates: function () {
-			let vm = this
-			return {
-				to: vm.filters.CreateDateFrom,
-				from: new Date()
-			}
-		},
-		disabledFromCreateDates: function () {
-			return {
-				from: new Date()
-			}
-		},
-		disabledToEventDates: function () {
-			let vm = this
-			return {
-				to: vm.filters.EventDateFrom,
-				from: new Date()
-			}
-		},
-		disabledFromEventDates: function () {
-			return {
-				from: new Date()
-			}
-		},
-		mobiledetect () {
-			return mobiledetect.mobileAndTabletcheck()
-		}
-	},
-	watch: {
-		filters: {
-			handler: function (filters) {
-				this.searchAlbums()
-			},
-			deep: true
-		},
-		showFilters: {
-			handler: function (showFilters) {
-				if (!showFilters) {
-					this.filters = {
-						name: '',
-						number_of_studies: '',
-						modalities: '',
-						number_of_users: '',
-						number_of_comments: '',
-						CreateDateFrom: '',
-						CreateDateTo: '',
-						EventDateFrom: '',
-						EventDateTo: ''
-					}
-				}
-			}
-		}
-	},
-	created () {
-		this.$store.dispatch('initAlbums', {})
-	},
-	destroyed () {
-		this.$store.dispatch('initAlbums', {})
-	},
-	methods: {
-		clickAlbum (item) {
-			if (item.album_id) {
-				this.$router.push('/albums/' + item.album_id)
-			}
-		},
-		infiniteHandler ($state) {
-			this.getAlbums(this.albumsParams.offset, this.albumsParams.limit).then(res => {
-				if (this.albums.length === parseInt(res.headers['x-total-count'])) {
-					$state.complete()
-				}
-				if (res.status === 200 && res.data.length > 0) {
-					this.albumsParams.offset += this.albumsParams.limit
-					$state.loaded()
-				} else {
-					$state.complete()
-				}
-			}).catch(err => {
-				$state.error()
-				return err
-			})
-		},
-		getAlbums (offset = 0, limit = 0) {
-			let params = {
-				limit: limit,
-				offset: offset,
-				sort: (this.albumsParams.sortDesc ? '-' : '') + this.albumsParams.sortBy
-			}
-			const queries = Object.assign(params, this.prepareFilters())
-			return this.$store.dispatch('getAlbums', { queries: queries })
-		},
-		prepareFilters () {
-			let filtersToSend = {}
-			for (let id in this.filters) {
-				if (this.filters[id] !== '') {
-					if (id === 'name') {
-						filtersToSend[id] = `*${this.filters[id]}*`
-					} else if (id === 'CreateDateFrom') {
-						if (this.filters['CreateDateTo'] === '') {
-							filtersToSend['created_time'] = `${this.transformDate(this.filters[id])}-`
-						} else {
-							filtersToSend['created_time'] = `${this.transformDate(this.filters[id])}-${this.transformDate(this.filters['CreateDateTo'])}`
-						}
-					} else if (id === 'CreateDateTo') {
-						if (this.filters['CreateDateFrom'] === '') {
-							filtersToSend['created_time'] = `-${this.transformDate(this.filters[id])}`
-						}
-					} else if (id === 'EventDateFrom') {
-						if (this.filters['EventDateTo'] === '') {
-							filtersToSend['last_event_time'] = `${this.transformDate(this.filters[id])}-`
-						} else {
-							filtersToSend['last_event_time'] = `${this.transformDate(this.filters[id])}-${this.transformDate(this.filters['EventDateTo'])}`
-						}
-					} else if (id === 'EventDateTo') {
-						if (this.filters['EventDateFrom'] === '') {
-							filtersToSend['last_event_time'] = `-${this.transformDate(this.filters[id])}`
-						}
-					} else {
-						filtersToSend[id] = this.filters[id]
-					}
-				}
-			}
-			return filtersToSend
-		},
-		transformDate (date) {
-			return moment(date).format('YYYYMMDD')
-		},
-		sendToUser (userId) {
-			this.albumsSelected.forEach(album => {
-				this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(res => {
-					this.$snotify.success(this.$t('albumshared'))
-				})
-			})
-		},
-		sortingChanged (ctx) {
-			this.albumsParams.sortDesc = ctx.sortDesc
-			this.albumsParams.sortBy = ctx.sortBy
-			this.searchAlbums()
-		},
-		searchAlbums () {
-			this.albumsParams.offset = 0
-			this.$store.dispatch('initAlbums', { })
-			this.infiniteId += 1
-		},
-		toggleFavorite (albumID, isFavorite) {
-			let value = !isFavorite
-			this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value: value }).then(res => {
-				this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value: value })
-			})
-		},
-		setItemHover (item, index, event) {
-			this.albums[index].flag.is_hover = true
-		},
-		setItemUnhover (item, index, event) {
-			this.albums[index].flag.is_hover = false
-		}
-	}
-}
+  name: 'Albums',
+  components: {
+    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, PulseLoader,
+  },
+  data() {
+    return {
+      form_send_album: false,
+      showFilters: false,
+      infiniteId: 0,
+      albumsParams: {
+        offset: 0,
+        limit: 50,
+        sortDesc: true,
+        sortBy: 'last_event_time',
+      },
+      fields: [
+        {
+          key: 'is_selected',
+          label: '',
+          sortable: false,
+          class: 'td_checkbox breakword',
+          thStyle: {
+            width: '100px',
+          },
+        },
+        {
+          key: 'name',
+          label: this.$t('name'),
+          tdClass: 'name',
+          sortable: true,
+          class: 'breakword',
+          thStyle: {
+            width: '250px',
+          },
+        },
+        {
+          key: 'number_of_studies',
+          label: this.$t('Study #'),
+          sortable: true,
+          class: 'd-none d-sm-table-cell breakword',
+          thStyle: {
+            width: '200px',
+          },
+        },
+        {
+          key: 'number_of_users',
+          label: this.$t('User #'),
+          sortable: true,
+          class: 'd-none d-md-table-cell breakword',
+          thStyle: {
+            width: '200px',
+          },
+        },
+        {
+          key: 'number_of_comments',
+          label: this.$t('Message #'),
+          sortable: true,
+          class: 'd-none d-lg-table-cell breakword',
+          thStyle: {
+            width: '200px',
+          },
+        },
+        {
+          key: 'created_time',
+          label: this.$t('Date'),
+          sortable: true,
+          class: 'd-none d-sm-table-cell breakword',
+          thStyle: {
+            width: '200px',
+          },
+        },
+        {
+          key: 'last_event_time',
+          label: this.$t('LastEvent'),
+          sortable: true,
+          class: 'd-none d-lg-table-cell breakword',
+          thStyle: {
+            width: '200px',
+          },
+        },
+        {
+          key: 'modalities',
+          label: this.$t('Modalities'),
+          sortable: false,
+          formatter: (value) => {
+            if (value.length > 0) {
+              return value.join(', ');
+            }
+            return this.$t('nomodality');
+          },
+          class: 'breakword',
+          thStyle: {
+            width: '200px',
+          },
+        },
+      ],
+      filters: {
+        name: '',
+        number_of_studies: '',
+        modalities: '',
+        number_of_users: '',
+        number_of_comments: '',
+        CreateDateFrom: '',
+        CreateDateTo: '',
+        EventDateFrom: '',
+        EventDateTo: '',
+      },
+    };
+  },
+  computed: {
+    ...mapGetters({
+      albums: 'albums',
+    }),
+    albumsSelected() {
+      return this.albums.filter((album) => album.is_selected === true);
+    },
+    disabledToCreateDates() {
+      const vm = this;
+      return {
+        to: vm.filters.CreateDateFrom,
+        from: new Date(),
+      };
+    },
+    disabledFromCreateDates() {
+      return {
+        from: new Date(),
+      };
+    },
+    disabledToEventDates() {
+      const vm = this;
+      return {
+        to: vm.filters.EventDateFrom,
+        from: new Date(),
+      };
+    },
+    disabledFromEventDates() {
+      return {
+        from: new Date(),
+      };
+    },
+    mobiledetect() {
+      return mobiledetect.mobileAndTabletcheck();
+    },
+  },
+  watch: {
+    filters: {
+      handler() {
+        this.searchAlbums();
+      },
+      deep: true,
+    },
+    showFilters: {
+      handler(showFilters) {
+        if (!showFilters) {
+          this.filters = {
+            name: '',
+            number_of_studies: '',
+            modalities: '',
+            number_of_users: '',
+            number_of_comments: '',
+            CreateDateFrom: '',
+            CreateDateTo: '',
+            EventDateFrom: '',
+            EventDateTo: '',
+          };
+        }
+      },
+    },
+  },
+  created() {
+    this.$store.dispatch('initAlbums', {});
+  },
+  destroyed() {
+    this.$store.dispatch('initAlbums', {});
+  },
+  methods: {
+    clickAlbum(item) {
+      if (item.album_id) {
+        this.$router.push(`/albums/${item.album_id}`);
+      }
+    },
+    infiniteHandler($state) {
+      this.getAlbums(this.albumsParams.offset, this.albumsParams.limit).then((res) => {
+        if (this.albums.length === parseInt(res.headers['x-total-count'], 10)) {
+          $state.complete();
+        }
+        if (res.status === 200 && res.data.length > 0) {
+          this.albumsParams.offset += this.albumsParams.limit;
+          $state.loaded();
+        } else {
+          $state.complete();
+        }
+      }).catch((err) => {
+        $state.error();
+        return err;
+      });
+    },
+    getAlbums(offset = 0, limit = 0) {
+      const params = {
+        limit,
+        offset,
+        sort: (this.albumsParams.sortDesc ? '-' : '') + this.albumsParams.sortBy,
+      };
+      const queries = Object.assign(params, this.prepareFilters());
+      return this.$store.dispatch('getAlbums', { queries });
+    },
+    prepareFilters() {
+      const filtersToSend = {};
+      Object.keys(this.filters).forEach((id) => {
+        if (this.filters[id] !== '') {
+          if (id === 'name') {
+            filtersToSend[id] = `*${this.filters[id]}*`;
+          } else if (id === 'CreateDateFrom') {
+            if (this.filters.CreateDateTo === '') {
+              filtersToSend.created_time = `${this.transformDate(this.filters[id])}-`;
+            } else {
+              filtersToSend.created_time = `${this.transformDate(this.filters[id])}-${this.transformDate(this.filters.CreateDateTo)}`;
+            }
+          } else if (id === 'CreateDateTo') {
+            if (this.filters.CreateDateFrom === '') {
+              filtersToSend.created_time = `-${this.transformDate(this.filters[id])}`;
+            }
+          } else if (id === 'EventDateFrom') {
+            if (this.filters.EventDateTo === '') {
+              filtersToSend.last_event_time = `${this.transformDate(this.filters[id])}-`;
+            } else {
+              filtersToSend.last_event_time = `${this.transformDate(this.filters[id])}-${this.transformDate(this.filters.EventDateTo)}`;
+            }
+          } else if (id === 'EventDateTo') {
+            if (this.filters.EventDateFrom === '') {
+              filtersToSend.last_event_time = `-${this.transformDate(this.filters[id])}`;
+            }
+          } else {
+            filtersToSend[id] = this.filters[id];
+          }
+        }
+      });
+      return filtersToSend;
+    },
+    transformDate(date) {
+      return moment(date).format('YYYYMMDD');
+    },
+    sendToUser(userId) {
+      this.albumsSelected.forEach((album) => {
+        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
+          this.$snotify.success(this.$t('albumshared'));
+        });
+      });
+    },
+    sortingChanged(ctx) {
+      this.albumsParams.sortDesc = ctx.sortDesc;
+      this.albumsParams.sortBy = ctx.sortBy;
+      this.searchAlbums();
+    },
+    searchAlbums() {
+      this.albumsParams.offset = 0;
+      this.$store.dispatch('initAlbums', { });
+      this.infiniteId += 1;
+    },
+    toggleFavorite(albumID, isFavorite) {
+      const value = !isFavorite;
+      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
+        this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value });
+      });
+    },
+    setItemHover(item, index) {
+      this.albums[index].flag.is_hover = true;
+    },
+    setItemUnhover(item, index) {
+      this.albums[index].flag.is_hover = false;
+    },
+  },
+};
 </script>
 
 <style scoped>
 select{
-	display: inline !important;
+  display: inline !important;
 }
 .btn-link {
-	font-weight: 400;
-	color: white;
-	background-color: transparent;
+  font-weight: 400;
+  color: white;
+  background-color: transparent;
 }
 
 .btn-link:hover {
-	color: #c7d1db;
-	text-decoration: underline;
-	background-color: transparent;
-	border-color: transparent;
+  color: #c7d1db;
+  text-decoration: underline;
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .selection-button-container{
-	height: 60px;
+  height: 60px;
 }
 
 .td_checkbox {
-	width: 150px;
+  width: 150px;
 }
 
 input.search-calendar{
-	width: 100px !important;
+  width: 100px !important;
 }
 
 div.calendar-wrapper{
-	color: #333;
+  color: #333;
 }
 
 .breakword {
-	word-break: break-word;
+  word-break: break-word;
 }
 .iconsHover{
-	visibility: visible;
-	display: inline;
-	cursor: pointer;
+  visibility: visible;
+  display: inline;
+  cursor: pointer;
 }
 .iconsUnhover{
-	visibility: hidden;
-	display: inline;
-	cursor: pointer;
+  visibility: hidden;
+  display: inline;
+  cursor: pointer;
 }
 </style>

@@ -1,35 +1,35 @@
 <i18n>
 {
-	"en": {
-		"patientname": "Patient name",
-		"patientbirthdate": "Birth date",
-		"patientid": "Patient ID",
-		"patientsex": "Patient sex",
-		"modalitiesinstudy": "Modalities in study",
-		"studydate": "Study date",
-		"studyid": "Study ID",
-		"StudyInstanceUID": "Study Instance UID",
-		"studytime": "Study time",
-		"patientinfo": "Patient details",
-		"studyinfo": "Study details",
-		"NumberOfStudyRelatedInstances": "Number of instances",
-		"NumberOfStudyRelatedSeries": "Number of series"
-	},
-	"fr": {
-		"patientname": "Nom de patient",
-		"patientbirthdate": "Année de naissance",
-		"patientid": "ID patient",
-		"patientsex": "Sexe du patient",
-		"modalitiesinstudy": "Modalité d'étude",
-		"studydate": "Date de l'étude",
-		"studyid": "ID étude",
-		"StudyInstanceUID": "Study Instance UID",
-		"studytime": "Temps d'étude",
-		"patientinfo": "Informations du patient",
-		"studyinfo": "Information de l'étude",
-		"NumberOfStudyRelatedInstances": "Nombre d'instances",
-		"NumberOfStudyRelatedSeries": "Nombre de séries"
-	}
+  "en": {
+    "patientname": "Patient name",
+    "patientbirthdate": "Birth date",
+    "patientid": "Patient ID",
+    "patientsex": "Patient sex",
+    "modalitiesinstudy": "Modalities in study",
+    "studydate": "Study date",
+    "studyid": "Study ID",
+    "StudyInstanceUID": "Study Instance UID",
+    "studytime": "Study time",
+    "patientinfo": "Patient details",
+    "studyinfo": "Study details",
+    "NumberOfStudyRelatedInstances": "Number of instances",
+    "NumberOfStudyRelatedSeries": "Number of series"
+  },
+  "fr": {
+    "patientname": "Nom de patient",
+    "patientbirthdate": "Année de naissance",
+    "patientid": "ID patient",
+    "patientsex": "Sexe du patient",
+    "modalitiesinstudy": "Modalité d'étude",
+    "studydate": "Date de l'étude",
+    "studyid": "ID étude",
+    "StudyInstanceUID": "Study Instance UID",
+    "studytime": "Temps d'étude",
+    "patientinfo": "Informations du patient",
+    "studyinfo": "Information de l'étude",
+    "NumberOfStudyRelatedInstances": "Nombre d'instances",
+    "NumberOfStudyRelatedSeries": "Nombre de séries"
+  }
 }
 </i18n>
 
@@ -104,46 +104,46 @@
 
 <script>
 export default {
-	name: 'StudyMetadata',
-	props: {
-		id: {
-			type: String,
-			required: true
-		}
-	},
-	data () {
-		return {}
-	},
-	computed: {
-		metadata () {
-			return this.$store.getters.getStudyByUID(this.id)
-		}
-	},
-	methods: {
-		getDate (date) {
-			var year = date.substr(0, 4)
-			var month = date.substr(4, 2)
-			var day = date.substr(6, 2)
-			return day + '/' + month + '/' + year
-		},
-		matchSex (sex) {
-			return /m|M|o|O|f|F/.test(sex)
-		},
-		matchNumbers (number) {
-			return /^[0-9]*([,.][0-9]*)?$/.test(number)
-		}
-	}
-}
+  name: 'StudyMetadata',
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    metadata() {
+      return this.$store.getters.getStudyByUID(this.id);
+    },
+  },
+  methods: {
+    getDate(date) {
+      const year = date.substr(0, 4);
+      const month = date.substr(4, 2);
+      const day = date.substr(6, 2);
+      return `${day}/${month}/${year}`;
+    },
+    matchSex(sex) {
+      return /m|M|o|O|f|F/.test(sex);
+    },
+    matchNumbers(number) {
+      return /^[0-9]*([,.][0-9]*)?$/.test(number);
+    },
+  },
+};
 
 </script>
 
 <style scoped>
 div.description {
-	width: 290px;
-	padding: 0 20px;
-	float: left;
+  width: 290px;
+  padding: 0 20px;
+  float: left;
 }
 label {
-	font-size: 130%;
+  font-size: 130%;
 }
 </style>

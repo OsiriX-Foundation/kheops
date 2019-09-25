@@ -2,22 +2,22 @@
 
 <i18n>
 {
-	"en": {
-		"commentpostsuccess": "comment posted successfully",
-		"imported": "imported",
-		"removed": "removed",
-		"thestudy": "the study",
-		"theseries": "the series",
-		"hasadd": "has add",
-		"hasgranted": "has granted",
-		"hasremoved": "has removed",
-		"adminrights": "admin rights",
-		"hasleft": "has left",
-		"hascreated": "has created",
-		"hasedited": "has edited",
-		"includenotifications": "include notifications",
-		"addalbum": "add as favorite",
-		"removealbum": "remove as favorite",
+  "en": {
+    "commentpostsuccess": "comment posted successfully",
+    "imported": "imported",
+    "removed": "removed",
+    "thestudy": "the study",
+    "theseries": "the series",
+    "hasadd": "has add",
+    "hasgranted": "has granted",
+    "hasremoved": "has removed",
+    "adminrights": "admin rights",
+    "hasleft": "has left",
+    "hascreated": "has created",
+    "hasedited": "has edited",
+    "includenotifications": "include notifications",
+    "addalbum": "add as favorite",
+    "removealbum": "remove as favorite",
     "to": "to",
     "writecomment": "Write your comment here",
     "checkprivateuser": "Send private message to",
@@ -26,23 +26,23 @@
     "editreportprovider": "{user} edit the report provider {reportname}",
     "deletereportprovider": "{user} delete the report provider {reportname}",
     "newreport": "{user} add a new report in the study {study} with the report provider {reportname}"
-	},
-	"fr" : {
-		"commentpostsuccess": "le commentaire a été posté avec succès",
-		"imported": "a importé",
-		"removed": "a supprimé",
-		"thestudy": "l'étude",
-		"theseries": "la série",
-		"hasadd": "a ajouté",
-		"hasgranted": "a attribué",
-		"hasremoved": "a retiré",
-		"adminrights": "des droits admin",
-		"hasleft": "a quitté",
-		"hascreated": "a créé",
-		"hasedited": "a édité",
-		"includenotifications": "inclure les notifications",
-		"addalbum": "a mis en favori",
-		"removealbum": "a enlevé des favories",
+  },
+  "fr" : {
+    "commentpostsuccess": "le commentaire a été posté avec succès",
+    "imported": "a importé",
+    "removed": "a supprimé",
+    "thestudy": "l'étude",
+    "theseries": "la série",
+    "hasadd": "a ajouté",
+    "hasgranted": "a attribué",
+    "hasremoved": "a retiré",
+    "adminrights": "des droits admin",
+    "hasleft": "a quitté",
+    "hascreated": "a créé",
+    "hasedited": "a édité",
+    "includenotifications": "inclure les notifications",
+    "addalbum": "a mis en favori",
+    "removealbum": "a enlevé des favories",
     "to": "à",
     "writecomment": "Ecrivez votre commentaire ici",
     "checkprivateuser": "Envoyer un message privé à",
@@ -51,7 +51,7 @@
     "editreportprovider": "{user} a édité le report provider {reportname}",
     "deletereportprovider": "{user} a supprimé le report provider {reportname}",
     "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}"
-	}
+  }
 }
 </i18n>
 
@@ -315,150 +315,150 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AddUser from '@/components/user/AddUser'
+import { mapGetters } from 'vuex';
+import AddUser from '@/components/user/AddUser';
 
 export default {
-	name: 'CommentsAndNotifications',
-	components: { AddUser },
-	props: {
-		scope: {
-			type: String,
-			required: true
-		},
-		id: {
-			type: String,
-			required: true
-		}
-	},
-	data () {
-		return {
-			newComment: {
-				comment: '',
-				to_user: ''
-			},
-			includeNotifications: false,
-			privateUser: '',
-			messageSend: false,
-			enablePrivate: false,
-			disabledText: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album'
-		}),
-		comments () {
-			return this.$store.getters.getCommentsByUID(this.id)
-		},
-		container_id () {
-			return (this.scope === 'album') ? 'album_comment_container' : 'study_' + this.id.replace(/\./g, '_') + '_comment_container'
-		}
-	},
-	watch: {
-		disabledText: {
-			handler: function (disabledText) {
-				if (!this.disabledText) {
-					let textcomment = this.$refs.textcomment
-					setTimeout(function () { textcomment.focus() }, 0)
-				}
-			}
-		}
-	},
-	created () {
-		this.getComments()
-	},
-	methods: {
-		checkUserFromTextarea () {
-			if (this.disabledText) {
-				this.$refs.privateuser.checkUser()
-			}
-		},
-		SetEnabledVariables () {
-			this.enablePrivate = !this.enablePrivate
-			this.disabledText = !this.disabledText
-		},
-		setPrivateUser (user) {
-			if (user !== '') {
-				this.disabledText = false
-				this.privateUser = user
-			} else {
-				this.disabledText = this.enablePrivate
-			}
-		},
-		addComment () {
-			if (this.newComment.comment.length >= 1) {
-				let queries = {
-					comment: this.newComment.comment
-				}
-				if (this.enablePrivate) {
-					queries.to_user = this.privateUser
-				}
+  name: 'CommentsAndNotifications',
+  components: { AddUser },
+  props: {
+    scope: {
+      type: String,
+      required: true,
+    },
+    id: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      newComment: {
+        comment: '',
+        to_user: '',
+      },
+      includeNotifications: false,
+      privateUser: '',
+      messageSend: false,
+      enablePrivate: false,
+      disabledText: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      album: 'album',
+    }),
+    comments() {
+      return this.$store.getters.getCommentsByUID(this.id);
+    },
+    container_id() {
+      return (this.scope === 'album') ? 'album_comment_container' : `study_${this.id.replace(/\./g, '_')}_comment_container`;
+    },
+  },
+  watch: {
+    disabledText: {
+      handler() {
+        if (!this.disabledText) {
+          const { textcomment } = this.$refs;
+          setTimeout(() => { textcomment.focus(); }, 0);
+        }
+      },
+    },
+  },
+  created() {
+    this.getComments();
+  },
+  methods: {
+    checkUserFromTextarea() {
+      if (this.disabledText) {
+        this.$refs.privateuser.checkUser();
+      }
+    },
+    SetEnabledVariables() {
+      this.enablePrivate = !this.enablePrivate;
+      this.disabledText = !this.disabledText;
+    },
+    setPrivateUser(user) {
+      if (user !== '') {
+        this.disabledText = false;
+        this.privateUser = user;
+      } else {
+        this.disabledText = this.enablePrivate;
+      }
+    },
+    addComment() {
+      if (this.newComment.comment.length >= 1) {
+        const queries = {
+          comment: this.newComment.comment,
+        };
+        if (this.enablePrivate) {
+          queries.to_user = this.privateUser;
+        }
 
-				if (this.scope === 'studies') {
-					this.addStudyComment(queries)
-				} else if (this.scope === 'album') {
-					this.addAlbumComment(queries)
-				}
-			}
-		},
-		addStudyComment (queries) {
-			let params = {
-				'StudyInstanceUID': this.id,
-				'queries': queries
-			}
+        if (this.scope === 'studies') {
+          this.addStudyComment(queries);
+        } else if (this.scope === 'album') {
+          this.addAlbumComment(queries);
+        }
+      }
+    },
+    addStudyComment(queries) {
+      const params = {
+        StudyInstanceUID: this.id,
+        queries,
+      };
 
-			this.$store.dispatch('postStudyComment', params).then(res => {
-				if (res.status === 204) {
-					this.$snotify.success(this.$t('commentpostsuccess'))
-					this.newComment.comment = ''
-					this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(res => {
-						this.scrollBottom()
-					})
-				}
-			}).catch(res => {
-				this.$snotify.error(this.$t('sorryerror') + ': ' + res)
-				this.newComment.comment = ''
-			})
-		},
-		addAlbumComment (queries) {
-			let params = {
-				'album_id': this.id,
-				'queries': queries
-			}
+      this.$store.dispatch('postStudyComment', params).then((res) => {
+        if (res.status === 204) {
+          this.$snotify.success(this.$t('commentpostsuccess'));
+          this.newComment.comment = '';
+          this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
+            this.scrollBottom();
+          });
+        }
+      }).catch((res) => {
+        this.$snotify.error(`${this.$t('sorryerror')}: ${res}`);
+        this.newComment.comment = '';
+      });
+    },
+    addAlbumComment(queries) {
+      const params = {
+        album_id: this.id,
+        queries,
+      };
 
-			this.$store.dispatch('postAlbumComment', params).then(res => {
-				if (res.status === 204) {
-					this.$snotify.success(this.$t('commentpostsuccess'))
-					this.newComment.comment = ''
-					this.getComments()
-				}
-			}).catch(res => {
-				this.$snotify.error(this.$t('sorryerror') + ': ' + res)
-				this.newComment.comment = ''
-			})
-		},
-		getComments () {
-			let types = (this.includeNotifications) ? undefined : { types: 'comments' }
-			if (this.scope === 'album') {
-				this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
-					this.scrollBottom()
-				})
-			} else if (this.scope === 'studies') {
-				this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
-					this.scrollBottom()
-				})
-			}
-		},
-		splitComment (comment) {
-			return comment.split('\n')
-		},
-		scrollBottom () {
-			let container = this.$el.querySelector(`#${this.container_id}`)
-			container.scrollTop = container.scrollHeight
-		}
-	}
-}
+      this.$store.dispatch('postAlbumComment', params).then((res) => {
+        if (res.status === 204) {
+          this.$snotify.success(this.$t('commentpostsuccess'));
+          this.newComment.comment = '';
+          this.getComments();
+        }
+      }).catch((res) => {
+        this.$snotify.error(`${this.$t('sorryerror')}: ${res}`);
+        this.newComment.comment = '';
+      });
+    },
+    getComments() {
+      const types = (this.includeNotifications) ? undefined : { types: 'comments' };
+      if (this.scope === 'album') {
+        this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
+          this.scrollBottom();
+        });
+      } else if (this.scope === 'studies') {
+        this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
+          this.scrollBottom();
+        });
+      }
+    },
+    splitComment(comment) {
+      return comment.split('\n');
+    },
+    scrollBottom() {
+      const container = this.$el.querySelector(`#${this.container_id}`);
+      container.scrollTop = container.scrollHeight;
+    },
+  },
+};
 
 </script>
 

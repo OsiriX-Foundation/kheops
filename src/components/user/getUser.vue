@@ -1,17 +1,17 @@
 <i18n>
 {
-	"en": {
-		"username": "User name",
-		"user": "user",
+  "en": {
+    "username": "User name",
+    "user": "user",
     "send": "Send",
     "cancel": "Cancel"
-	},
-	"fr": {
-		"username": "Utilisateur",
+  },
+  "fr": {
+    "username": "Utilisateur",
     "user": "Utilisateur",
     "send": "Envoyer",
     "cancel": "Annuler"
-	}
+  }
 }
 </i18n>
 
@@ -55,31 +55,31 @@
 
 <script>
 export default {
-	name: 'FormGetUser',
-	data () {
-		return {
-			new_user_name: ''
-		}
-	},
-	methods: {
-		validEmail (email) {
-			var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-			return re.test(email)
-		},
-		getUser () {
-			this.$store.dispatch('checkUser', this.new_user_name).then(sub => {
-				if (!sub) this.$snotify.error('Sorry, unknown user')
-				else {
-					this.$emit('get-user', sub)
-					this.new_user_name = ''
-				}
-			})
-		},
-		cancel () {
-			this.new_user_name = ''
-			this.$emit('cancel-user')
-		}
-	}
+  name: 'FormGetUser',
+  data() {
+    return {
+      new_user_name: '',
+    };
+  },
+  methods: {
+    validEmail(email) {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
+    getUser() {
+      this.$store.dispatch('checkUser', this.new_user_name).then((sub) => {
+        if (!sub) this.$snotify.error('Sorry, unknown user');
+        else {
+          this.$emit('get-user', sub);
+          this.new_user_name = '';
+        }
+      });
+    },
+    cancel() {
+      this.new_user_name = '';
+      this.$emit('cancel-user');
+    },
+  },
 
-}
+};
 </script>

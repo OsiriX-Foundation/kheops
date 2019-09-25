@@ -1,11 +1,11 @@
 <i18n>
 {
-	"en": {
-		"view": "View"
-	},
-	"fr": {
-		"view": "Vue"
-	}
+  "en": {
+    "view": "View"
+  },
+  "fr": {
+    "view": "Vue"
+  }
 }
 </i18n>
 
@@ -19,18 +19,19 @@
 </template>
 
 <script>
-import tokens from '@/components/tokens/tokens'
+import tokens from '@/components/tokens/tokens';
+
 export default {
-	name: 'AlbumSettingsToken',
-	components: { tokens },
-	props: {
-		album: {
-			type: Object,
-			required: true,
-			default: () => {}
-		}
-	}
-}
+  name: 'AlbumSettingsToken',
+  components: { tokens },
+  props: {
+    album: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
+  },
+};
 
 </script>
 

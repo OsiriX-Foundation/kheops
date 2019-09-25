@@ -21,14 +21,14 @@
 <script>
 
 export default {
-	name: 'SortIcon',
-	props: {
-		sorter: {
-			type: Object,
-			required: true
-		}
-	}
-}
+  name: 'SortIcon',
+  props: {
+    sorter: {
+      type: Object,
+      required: true,
+    },
+  },
+};
 
 </script>
 

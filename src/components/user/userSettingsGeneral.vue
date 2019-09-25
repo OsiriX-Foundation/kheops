@@ -1,15 +1,15 @@
 <i18n>
 {
-	"en": {
-		"language": "Language",
+  "en": {
+    "language": "Language",
     "accountmanagement": "Account management",
     "manage": "Manage"
-	},
-	"fr": {
-		"language": "Langue",
+  },
+  "fr": {
+    "language": "Langue",
     "accountmanagement": "Gérer son profil utilisateur",
     "manage": "Gérer"
-	}
+  }
 }
 </i18n>
 
@@ -52,31 +52,31 @@
 
 <script>
 export default {
-	name: 'UserSettingsGeneral',
-	data () {
-		return {
-		}
-	},
-	computed: {
-		lang: {
-			get () {
-				return this.$i18n.locale
-			},
-			set (value) {
-				this.$root.$i18n.locale = value
-			}
-		}
-	},
-	methods: {
-		gomanagement () {
-			window.open(`${process.env.VUE_APP_URL_KEYCLOAK}/auth/realms/${process.env.VUE_APP_REALM_KEYCLOAK}/account`)
-		}
-	}
-}
+  name: 'UserSettingsGeneral',
+  data() {
+    return {
+    };
+  },
+  computed: {
+    lang: {
+      get() {
+        return this.$i18n.locale;
+      },
+      set(value) {
+        this.$root.$i18n.locale = value;
+      },
+    },
+  },
+  methods: {
+    gomanagement() {
+      window.open(`${process.env.VUE_APP_URL_KEYCLOAK}/auth/realms/${process.env.VUE_APP_REALM_KEYCLOAK}/account`);
+    },
+  },
+};
 </script>
 
 <style scoped>
 dt {
-	text-transform: capitalize;
+  text-transform: capitalize;
 }
 </style>

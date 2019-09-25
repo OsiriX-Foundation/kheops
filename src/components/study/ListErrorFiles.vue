@@ -1,20 +1,20 @@
 <!--
-		errorFiles: Array of the error to show
-			- type: Array
-			- required: true
-			- default: []
+    errorFiles: Array of the error to show
+      - type: Array
+      - required: true
+      - default: []
 
-		this component show the file path present in the array errorFiles
+    this component show the file path present in the array errorFiles
     send emit "remove-file-ui" to the parent when :
-			- when the user delete an error file
+      - when the user delete an error file
 -->
 <i18n>
 {
-	"en": {
-		"hideError": "Hide errors"
-	},
-	"fr": {
-		"hideError": "Cacher les erreurs"
+  "en": {
+    "hideError": "Hide errors"
+  },
+  "fr": {
+    "hideError": "Cacher les erreurs"
   }
 }
 </i18n>
@@ -64,37 +64,37 @@
 <script>
 
 export default {
-	name: 'ListErrorFiles',
-	props: {
-		errorFiles: {
-			type: Array,
-			required: true,
-			default: () => []
-		}
-	},
-	data () {
-		return {
-			height: '22',
-			width: '22'
-		}
-	},
-	computed: {
-	},
-	watch: {
-	},
-	created () {
-	},
-	mounted () {
-	},
-	destroyed () {
-		this.$emit('show-errors', false)
-	},
-	methods: {
-		hideErrors () {
-			this.$emit('show-errors', false)
-		}
-	}
-}
+  name: 'ListErrorFiles',
+  props: {
+    errorFiles: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      height: '22',
+      width: '22',
+    };
+  },
+  computed: {
+  },
+  watch: {
+  },
+  created() {
+  },
+  mounted() {
+  },
+  destroyed() {
+    this.$emit('show-errors', false);
+  },
+  methods: {
+    hideErrors() {
+      this.$emit('show-errors', false);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -103,7 +103,7 @@ export default {
     padding: 10px;
     border-bottom: 1px solid #ddd;
     overflow-wrap: break-word;
-	}
+  }
   .files-listing{
     width: 260px;
     margin: auto;

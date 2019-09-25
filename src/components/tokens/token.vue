@@ -1,49 +1,49 @@
 <i18n>
 {
-	"en": {
-		"token": "token",
-		"description": "description",
-		"scope": "scope",
-		"album": "album",
-		"permission": "permission",
-		"write": "write",
-		"read": "read",
-		"download": "show download button",
-		"appropriate": "send to user / album",
-		"expirationdate": "expiration date",
-		"startdate": "start date",
-		"creationdate": "creation date",
-		"revokeddate": "revoke date",
-		"revoke": "revoke",
-		"thistokenrevoked": "this token is revoked",
-		"lastuse": "last use date",
+  "en": {
+    "token": "token",
+    "description": "description",
+    "scope": "scope",
+    "album": "album",
+    "permission": "permission",
+    "write": "write",
+    "read": "read",
+    "download": "show download button",
+    "appropriate": "send to user / album",
+    "expirationdate": "expiration date",
+    "startdate": "start date",
+    "creationdate": "creation date",
+    "revokeddate": "revoke date",
+    "revoke": "revoke",
+    "thistokenrevoked": "this token is revoked",
+    "lastuse": "last use date",
     "back": "back",
     "warningrevoke": "Are you sure you want to revoke this token ?",
     "cancel": "Cancel",
     "confirm": "Confirm"
-	},
-	"fr": {
-		"token": "token",
-		"description": "description",
-		"scope": "applicable à",
-		"album": "album",
-		"permission": "permission",
-		"write": "écriture",
-		"read": "lecture",
-		"download": "bouton téléchargement",
-		"appropriate": "envoyer à un utlisateur ou album",
-		"expirationdate": "date d'expiration",
-		"startdate": "date de début",
-		"creationdate": "date de création",
-		"revokeddate": "date de révoquation",
-		"revoke": "révoquer",
-		"thistokenrevoked": "ce token a été revoqué",
-		"lastuse": "dernière utilisation",
+  },
+  "fr": {
+    "token": "token",
+    "description": "description",
+    "scope": "applicable à",
+    "album": "album",
+    "permission": "permission",
+    "write": "écriture",
+    "read": "lecture",
+    "download": "bouton téléchargement",
+    "appropriate": "envoyer à un utlisateur ou album",
+    "expirationdate": "date d'expiration",
+    "startdate": "date de début",
+    "creationdate": "date de création",
+    "revokeddate": "date de révoquation",
+    "revoke": "révoquer",
+    "thistokenrevoked": "ce token a été revoqué",
+    "lastuse": "dernière utilisation",
     "back": "retour",
     "warningrevoke": "Etes-vous sûr de vouloir revoquer ce token ?",
     "cancel": "Cancel",
     "confirm": "Confirm"
-	}
+  }
 }
 </i18n>
 
@@ -95,7 +95,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            <router-link :to="`/albums/${token.album.album_id}?view=studies`">
+            <router-link :to="`/albums/${token.album.album_id}`">
               {{ token.album.name }}
             </router-link>
           </dd>
@@ -238,86 +238,87 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
-	name: 'Token',
-	props: {
-		tokenId: {
-			type: String,
-			required: false,
-			default: ''
-		}
-	},
-	data () {
-		return {
-			confirmRevoke: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			token: 'token'
-		}),
-		permissions () {
-			let perms = []
-			_.forEach(this.token, (value, key) => {
-				if (key.indexOf('permission') > -1 && value) {
-					perms.push(key.replace('_permission', ''))
-				}
-			})
-			return perms.length ? perms.join(', ') : '-'
-		}
-	},
-	created: function () {
-		this.$store.dispatch('initToken')
-		let capabilityId = this.defineCapabilityId()
-		this.$store.dispatch('getToken', { capabilityId: capabilityId }).then(res => {
-			if (res.status !== 200) {
-				this.redirect()
-				this.$snotify.error('Sorry, an error occur')
-			}
-		}).catch(err => {
-			console.log(err)
-			this.redirect()
-			this.$snotify.error('Sorry, an error occur')
-		})
-	},
-	methods: {
-		redirect () {
-			this.$router.push({ query: { view: 'settings', cat: 'token' } })
-		},
-		defineCapabilityId () {
-			let tokenId = this.tokenId === '0' ? this.$route.query.object : this.tokenId
-			return tokenId
-		},
-		revoke () {
-			if (this.confirmRevoke === false) {
-				this.confirmRevoke = true
-			} else {
-				this.$emit('revoke', this.token.id)
-				this.cancel()
-			}
-		},
-		cancel () {
-			this.$emit('done')
-		}
-	}
-}
+  name: 'Token',
+  props: {
+  },
+  data() {
+    return {
+      confirmRevoke: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      token: 'token',
+    }),
+    permissions() {
+      const perms = [];
+      _.forEach(this.token, (value, key) => {
+        if (key.indexOf('permission') > -1 && value) {
+          perms.push(key.replace('_permission', ''));
+        }
+      });
+      return perms.length ? perms.join(', ') : '-';
+    },
+    tokenId() {
+      return this.$route.params.id;
+    },
+  },
+  created() {
+    this.$store.dispatch('initToken');
+    const capabilityId = this.defineCapabilityId();
+    this.$store.dispatch('getToken', { capabilityId }).then((res) => {
+      if (res.status !== 200) {
+        this.redirect('listtokens');
+        this.$snotify.error('Sorry, an error occur');
+      }
+    }).catch(() => {
+      this.redirect('listtokens');
+      this.$snotify.error('Sorry, an error occur');
+    });
+  },
+  methods: {
+    redirect(action) {
+      this.$router.push({ name: 'albumsettingsaction', params: { action } });
+    },
+    defineCapabilityId() {
+      const tokenId = this.tokenId === '0' ? this.$route.query.object : this.tokenId;
+      return tokenId;
+    },
+    revoke() {
+      if (this.confirmRevoke === false) {
+        this.confirmRevoke = true;
+      } else {
+        this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then((res) => {
+          this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
+          this.cancel();
+        }).catch(() => {
+          this.$snotify.error(this.$t('sorryerror'));
+        });
+      }
+    },
+    cancel() {
+      this.$emit('done');
+    },
+  },
+};
 </script>
 
 <style scoped>
 dt{
-	text-align: left;
-	text-transform: capitalize;
+  text-align: left;
+  text-transform: capitalize;
 }
 label{
-	text-transform: capitalize;
-	margin-left: 1em;
+  text-transform: capitalize;
+  margin-left: 1em;
 }
 div.calendar-wrapper{
-	color: #333;
+  color: #333;
 }
 button{
-	text-transform: capitalize;
+  text-transform: capitalize;
 }
 </style>

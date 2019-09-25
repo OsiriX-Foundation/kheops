@@ -10,17 +10,17 @@
 </template>
 
 <script>
-import Providers from '@/components/providers/Providers'
+import Providers from '@/components/providers/Providers';
 
 export default {
-	name: 'AlbumSettingsReportProvider',
-	components: { Providers },
-	props: {
-		album: {
-			type: Object,
-			required: true,
-			default: () => {}
-		}
-	}
-}
+  name: 'AlbumSettingsReportProvider',
+  components: { Providers },
+  props: {
+    album: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
+  },
+};
 </script>

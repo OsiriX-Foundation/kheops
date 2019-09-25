@@ -1,30 +1,28 @@
-/* eslint-disable */
-
 <i18n scoped>
 {
-	"en": {
-		"albumName": "Album Name",
-		"albumDescription": "Album Description",
-		"users": "Users",
-		"addUser": "Add user",
-		"addSeries": "Add studies / series",
-		"downloadSeries": "Show download button",
-		"sendSeries": "Get studies / series",
-		"deleteSeries": "Remove studies / series",
-		"writeComments": "Write comments"
+  "en": {
+    "albumName": "Album Name",
+    "albumDescription": "Album Description",
+    "users": "Users",
+    "addUser": "Add user",
+    "addSeries": "Add studies / series",
+    "downloadSeries": "Show download button",
+    "sendSeries": "Get studies / series",
+    "deleteSeries": "Remove studies / series",
+    "writeComments": "Write comments"
 
-	},
-	"fr": {
-		"albumName": "Nom de l'album",
-		"albumDescription": "Description de l'album",
-		"users": "Utilisateurs",
-		"addUser": "Ajouter un utilisateur",
-		"addSeries": "Ajouter une étude / série",
-		"downloadSeries": "Télécharger une étude / série",
-		"sendSeries": "Ajouter à un album / inbox",
-		"deleteSeries": "Supprimer une étude / série",
-		"writeComments": "Commenter"
-	}
+  },
+  "fr": {
+    "albumName": "Nom de l'album",
+    "albumDescription": "Description de l'album",
+    "users": "Utilisateurs",
+    "addUser": "Ajouter un utilisateur",
+    "addSeries": "Ajouter une étude / série",
+    "downloadSeries": "Télécharger une étude / série",
+    "sendSeries": "Ajouter à un album / inbox",
+    "deleteSeries": "Supprimer une étude / série",
+    "writeComments": "Commenter"
+  }
 }
 </i18n>
 
@@ -60,22 +58,22 @@
           <nav class="nav nav-pills nav-fill flex-column flex-lg-row text-center justify-content-lg-end">
             <a
               class="nav-link"
-              :class="(view === 'studies' || view === '')?'active':''"
-              @click.stop="view='studies'"
+              :class="(currentView === 'studies' || currentView === undefined)?'active':''"
+              @click.stop="loadView('studies')"
             >
               Studies
             </a>
             <a
               class="nav-link"
-              :class="(view === 'comments')?'active':''"
-              @click.stop="view='comments'"
+              :class="(currentView === 'comments')?'active':''"
+              @click.stop="loadView('comments')"
             >
               Comments
             </a>
             <a
               class="nav-link"
-              :class="(view === 'settings')?'active':''"
-              @click.stop="view='settings'"
+              :class="(currentView === 'settings')?'active':''"
+              @click.stop="loadView('settings')"
             >
               Settings
             </a>
@@ -85,9 +83,9 @@
       </div>
     </div>
     <!--
-			https://fr.vuejs.org/v2/guide/components-dynamic-async.html
+      https://fr.vuejs.org/v2/guide/components-dynamic-async.html
     -->
-    <span v-if="view === 'studies' || view === '' && loading === false">
+    <span v-if="currentView === 'studies' || currentView === undefined && loading === false">
       <div class="container">
         <div
           v-if="album.description !== undefined && album.description.length > 0"
@@ -112,106 +110,102 @@
       />
     </span>
     <album-comments
-      v-if="view=='comments' && loading === false"
+      v-if="currentView=='comments' && loading === false"
       :id="album.album_id"
     />
     <album-settings
-      v-if="view=='settings' && loading === false"
+      v-if="currentView=='settings' && loading === false"
       :album="album"
     />
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AlbumComments from '@/components/albums/AlbumComments'
-import AlbumSettings from '@/components/albums/AlbumSettings'
-import ComponentImportStudy from '@/components/study/ComponentImportStudy'
+import { mapGetters } from 'vuex';
+import AlbumComments from '@/components/albums/AlbumComments';
+import AlbumSettings from '@/components/albums/AlbumSettings';
+import ComponentImportStudy from '@/components/study/ComponentImportStudy';
 
 export default {
-	name: 'Album',
-	components: { ComponentImportStudy, AlbumSettings, AlbumComments },
-	data () {
-		return {
-			view: '',
-			newUserName: '',
-			loading: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			album: 'album'
-		})
-	},
-	watch: {
-		view () {
-			if (this.view !== '' && this.view !== undefined) {
-				let queryParams = { view: this.view }
-				if (this.$route.query.cat !== undefined) queryParams.cat = this.$route.query.cat
-				this.$router.push({ query: queryParams })
-				this.loadAlbum()
-			}
-		},
-		'$route.query' () {
-			if (this.$route.query.view !== undefined) {
-				this.view = this.$route.query.view
-			} else {
-				this.view = ''
-			}
-		}
-	},
-	created () {
-		this.view = this.$route.query.view === undefined ? '' : this.$route.query.view
-		this.loading = true
-		this.loadAlbum().then(res => {
-			this.loading = false
-		})
-	},
-	beforeDestroy () {
-		this.$store.commit('INIT_ALBUM')
-		this.$store.commit('INIT_ALBUM_USERS')
-	},
-	methods: {
-		loadAlbum () {
-			return this.$store.dispatch('getAlbum', { album_id: this.$route.params.album_id }).then((res) => {
-				return res
-				// this.view = this.$route.query.view !== undefined ? this.$route.query.view : ''
-			}).catch(err => {
-				this.$router.push('/albums')
-				Promise.reject(err)
-			})
-		},
-		toggleFavorite (albumID, isFavorite) {
-			let value = !isFavorite
-			this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value: value }).then(res => {
-				this.$store.dispatch('setKeyValueAlbum', { key: 'is_favorite', value: value })
-			})
-		}
-	}
-}
+  name: 'Album',
+  components: { ComponentImportStudy, AlbumSettings, AlbumComments },
+  data() {
+    return {
+      newUserName: '',
+      loading: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      album: 'album',
+    }),
+    currentView() {
+      return this.$route.params.view;
+    },
+    albumID() {
+      return this.$route.params.album_id;
+    },
+  },
+  watch: {
+    albumID() {
+      this.loading = true;
+      this.loadAlbum().then(() => {
+        this.loading = false;
+      });
+    },
+  },
+  created() {
+    this.loading = true;
+    this.loadAlbum().then(() => {
+      this.loading = false;
+    });
+  },
+  beforeDestroy() {
+    this.$store.commit('INIT_ALBUM');
+    this.$store.commit('INIT_ALBUM_USERS');
+  },
+  methods: {
+    loadAlbum() {
+      return this.$store.dispatch('getAlbum', { album_id: this.albumID }).then((res) => res)
+        .catch((err) => {
+          this.$router.push('/albums');
+          Promise.reject(err);
+        });
+    },
+    toggleFavorite(albumID, isFavorite) {
+      const value = !isFavorite;
+      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
+        this.$store.dispatch('setKeyValueAlbum', { key: 'is_favorite', value });
+      });
+    },
+    loadView(view) {
+      this.$router.push({ name: 'albumview', params: { view } });
+    },
+  },
+};
 </script>
 
 <style scoped>
 h3 {
-	margin-bottom: 40px;
-	float: left;
+  margin-bottom: 40px;
+  float: left;
 }
 
 h5.user{
-	float: left;
-	margin-right: 10px;
+  float: left;
+  margin-right: 10px;
 }
 
 .icon{
-	margin-left: 10px;
+  margin-left: 10px;
 }
 .pointer{
-	cursor: pointer;
+  cursor: pointer;
 }
 label{
-	margin-left: 10px;
+  margin-left: 10px;
 }
 a.nav-link{
-	cursor: pointer;
+  cursor: pointer;
 }
 </style>

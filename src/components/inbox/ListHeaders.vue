@@ -1,39 +1,39 @@
 <i18n>
 {
-	"en": {
-		"selectednbstudies": "{count} study is selected | {count} studies are selected",
-		"addalbum": "Add to an album",
-		"infoFavorites": "Favorites",
-		"send": "Send",
-		"delete": "Delete",
-		"cancel": "Cancel",
-		"addfavorites": "Add too favorites",
-		"addfavorites": "Remove too favorites",
+  "en": {
+    "selectednbstudies": "{count} study is selected | {count} studies are selected",
+    "addalbum": "Add to an album",
+    "infoFavorites": "Favorites",
+    "send": "Send",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "addfavorites": "Add too favorites",
+    "addfavorites": "Remove too favorites",
     "confirmDelete": "Are you sure you want to delete {countStudies} study containing {countSeries} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countStudies} studies containing {countSeries} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
     "importdir": "Import directory",
     "importfiles": "Import files",
     "draganddrop": "Or drag and drop",
-		"studiessharedsuccess": "studies sent successfully",
-		"studiessharederror": "studies could not be sent",
-		"addInbox": "Add to inbox"
-	},
-	"fr": {
-		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
-		"addalbum": "Ajouter à un album",
-		"infoFavorites": "Favoris",
-		"send": "Send",
-		"delete": "Delete",
-		"cancel": "Annuler",
-		"addfavorites": "Ajouter aux favoris",
-		"addfavorites": "Supprimer des favoris",
-		"confirmDelete": "Etes vous de sûr de vouloir supprimer {countStudies} étude contenant {countSeries} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série.| Etes vous de sûr de vouloir supprimer {countStudies} études contenant {countSeries} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
+    "studiessharedsuccess": "studies sent successfully",
+    "studiessharederror": "studies could not be sent",
+    "addInbox": "Add to inbox"
+  },
+  "fr": {
+    "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
+    "addalbum": "Ajouter à un album",
+    "infoFavorites": "Favoris",
+    "send": "Send",
+    "delete": "Delete",
+    "cancel": "Annuler",
+    "addfavorites": "Ajouter aux favoris",
+    "addfavorites": "Supprimer des favoris",
+    "confirmDelete": "Etes vous de sûr de vouloir supprimer {countStudies} étude contenant {countSeries} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série.| Etes vous de sûr de vouloir supprimer {countStudies} études contenant {countSeries} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
     "importdir": "Importer un dossier",
     "importfiles": "Importer des fichiers",
     "draganddrop": "Ou Drag and Drop",
-		"studiessharedsuccess": "études ont été envoyées avec succès",
-		"addInbox": "Ajouter à la boite de réception",
-		"studiessharederror": "études n'ont pas pu être envoyée"
-	}
+    "studiessharedsuccess": "études ont été envoyées avec succès",
+    "addInbox": "Ajouter à la boite de réception",
+    "studiessharederror": "études n'ont pas pu être envoyée"
+  }
 }
 </i18n>
 
@@ -69,8 +69,8 @@
           </button>
         </div>
         <!--
-					v-if="!albumId || (album.send_series || album.is_admin)"
-				-->
+          v-if="!albumId || (album.send_series || album.is_admin)"
+        -->
         <b-dropdown
           v-if="showAlbumButton === true"
           :disabled="selectedStudiesNb === 0"
@@ -253,415 +253,413 @@
 </template>
 
 <script>
-import ToggleButton from 'vue-js-toggle-button'
-import Vue from 'vue'
-import { mapGetters } from 'vuex'
-import formGetUser from '@/components/user/getUser'
-import ConfirmButton from '@/components/inbox/ConfirmButton.vue'
-import AddIcon from '@/components/kheopsSVG/AddIcon'
+import ToggleButton from 'vue-js-toggle-button';
+import Vue from 'vue';
+import { mapGetters } from 'vuex';
+import formGetUser from '@/components/user/getUser';
+import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
+import AddIcon from '@/components/kheopsSVG/AddIcon';
 
-Vue.use(ToggleButton)
+Vue.use(ToggleButton);
 
 export default {
-	name: 'ListHeaders',
-	components: { formGetUser, ConfirmButton, AddIcon },
-	props: {
-		studies: {
-			type: Array,
-			required: true,
-			default: () => ([])
-		},
-		albums: {
-			type: Array,
-			required: true,
-			default: () => ([])
-		},
-		albumId: {
-			type: String,
-			required: true,
-			default: ''
-		},
-		showSendButton: {
-			type: Boolean,
-			required: false,
-			default: true
-		},
-		showAlbumButton: {
-			type: Boolean,
-			required: false,
-			default: true
-		},
-		showInboxButton: {
-			type: Boolean,
-			required: false,
-			default: true
-		},
-		showFavoriteButton: {
-			type: Boolean,
-			required: false,
-			default: true
-		},
-		showDeleteButton: {
-			type: Boolean,
-			required: false,
-			default: true
-		},
-		showImportButton: {
-			type: Boolean,
-			required: false,
-			default: true
-		}
-	},
-	data () {
-		return {
-			formSendStudy: false,
-			confirmDelete: false,
-			showFilters: false
-		}
-	},
-	computed: {
-		...mapGetters({
-			sendingFiles: 'sending',
-			series: 'series'
-		}),
-		selectedStudiesNb () {
-			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) }).length
-		},
-		selectedSeriesNb () {
-			let selectedStudiesSeriesNb = 0
-			this.selectedStudies.forEach(study => {
-				selectedStudiesSeriesNb += study.NumberOfStudyRelatedSeries.Value[0]
-			})
+  name: 'ListHeaders',
+  components: { formGetUser, ConfirmButton, AddIcon },
+  props: {
+    studies: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
+    albums: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
+    albumId: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    showSendButton: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showAlbumButton: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showInboxButton: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showFavoriteButton: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showDeleteButton: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showImportButton: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      formSendStudy: false,
+      confirmDelete: false,
+      showFilters: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      sendingFiles: 'sending',
+      series: 'series',
+    }),
+    selectedStudiesNb() {
+      return _.filter(this.studies, (s) => (s.flag.is_selected === true || s.flag.is_indeterminate === true)).length;
+    },
+    selectedSeriesNb() {
+      let selectedStudiesSeriesNb = 0;
+      this.selectedStudies.forEach((study) => {
+        selectedStudiesSeriesNb += study.NumberOfStudyRelatedSeries.Value[0];
+      });
 
-			let selectedSerieNb = 0
-			for (let studyUID in this.selectedSeries) {
-				selectedSerieNb += Object.keys(this.selectedSeries[studyUID]).length
-			}
-			return selectedSerieNb + selectedStudiesSeriesNb
-		},
-		selectedStudies () {
-			return _.filter(this.studies, s => { return (s.flag.is_selected === true) })
-		},
-		selectedSeries () {
-			let selectedSeries = {}
-			let studiesIndeterminate = this.studies.filter(study => { return (study.flag.is_indeterminate === true) })
-			studiesIndeterminate.forEach(study => {
-				let seriesSelected = []
-				let studyUID = study.StudyInstanceUID.Value[0]
-				for (let serieUID in this.series[studyUID]) {
-					if (this.series[studyUID][serieUID].flag.is_selected === true) {
-						seriesSelected.push(this.series[studyUID][serieUID])
-					}
-					if (seriesSelected.length > 0) {
-						selectedSeries[studyUID] = seriesSelected
-					}
-				}
-			})
-			return selectedSeries
-		},
-		allSelectedStudies () {
-			return _.filter(this.studies, s => { return (s.flag.is_selected === true || s.flag.is_indeterminate === true) })
-		},
-		allowedAlbums () {
-			if (this.albumId === '') {
-				return this.albums
-			} else {
-				return this.albums.filter(album => { return album.album_id !== this.albumId })
-			}
-		}
-	},
+      let selectedSerieNb = 0;
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
+        selectedSerieNb += Object.keys(this.selectedSeries[studyUID]).length;
+      });
+      return selectedSerieNb + selectedStudiesSeriesNb;
+    },
+    selectedStudies() {
+      return _.filter(this.studies, (s) => (s.flag.is_selected === true));
+    },
+    selectedSeries() {
+      const selectedSeries = {};
+      const studiesIndeterminate = this.studies.filter((study) => (study.flag.is_indeterminate === true));
+      studiesIndeterminate.forEach((study) => {
+        const seriesSelected = [];
+        const studyUID = study.StudyInstanceUID.Value[0];
+        Object.keys(this.series[studyUID]).forEach((serieUID) => {
+          if (this.series[studyUID][serieUID].flag.is_selected === true) {
+            seriesSelected.push(this.series[studyUID][serieUID]);
+          }
+          if (seriesSelected.length > 0) {
+            selectedSeries[studyUID] = seriesSelected;
+          }
+        });
+      });
+      return selectedSeries;
+    },
+    allSelectedStudies() {
+      return _.filter(this.studies, (s) => (s.flag.is_selected === true || s.flag.is_indeterminate === true));
+    },
+    allowedAlbums() {
+      if (this.albumId === '') {
+        return this.albums;
+      }
+      return this.albums.filter((album) => album.album_id !== this.albumId);
+    },
+  },
 
-	watch: {
-		selectedStudiesNb: {
-			handler: function (selectedStudiesNb) {
-				if (selectedStudiesNb === 0) {
-					this.confirmDelete = false
-					this.formSendStudy = false
-				}
-			}
-		}
-	},
-	created () {
-	},
-	mounted () {
-	},
-	methods: {
-		sendToUser (userSub) {
-			if (this.selectedStudiesNb > 0) {
-				let promises = []
-				this.selectedStudies.forEach(study => {
-					let params = {
-						StudyInstanceUID: study.StudyInstanceUID.Value[0],
-						userSub: userSub,
-						queries: this.getSource()
-					}
-					promises.push(this.$store.dispatch('sendStudy', params))
-				})
-				for (let studyUID in this.selectedSeries) {
-					this.selectedSeries[studyUID].forEach(serie => {
-						let params = {
-							StudyInstanceUID: studyUID,
-							SeriesInstanceUID: serie.SeriesInstanceUID.Value[0],
-							userSub: userSub,
-							queries: this.getSource()
-						}
-						promises.push(this.$store.dispatch('sendSerie', params))
-					})
-				}
+  watch: {
+    selectedStudiesNb: {
+      handler(selectedStudiesNb) {
+        if (selectedStudiesNb === 0) {
+          this.confirmDelete = false;
+          this.formSendStudy = false;
+        }
+      },
+    },
+  },
+  created() {
+  },
+  mounted() {
+  },
+  methods: {
+    sendToUser(userSub) {
+      if (this.selectedStudiesNb > 0) {
+        const promises = [];
+        this.selectedStudies.forEach((study) => {
+          const params = {
+            StudyInstanceUID: study.StudyInstanceUID.Value[0],
+            userSub,
+            queries: this.getSource(),
+          };
+          promises.push(this.$store.dispatch('sendStudy', params));
+        });
+        Object.keys(this.selectedSeries).forEach((studyUID) => {
+          this.selectedSeries[studyUID].forEach((serie) => {
+            const params = {
+              StudyInstanceUID: studyUID,
+              SeriesInstanceUID: serie.SeriesInstanceUID.Value[0],
+              userSub,
+              queries: this.getSource(),
+            };
+            promises.push(this.$store.dispatch('sendSerie', params));
+          });
+        });
 
-				Promise.all(promises).then(res => {
-					this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('studiessharedsuccess')}`)
-					this.formSendStudy = false
-					this.deselectStudySeries()
-				}).catch(err => {
-					console.log(err)
-				})
-			}
-		},
-		setObjectFlagStudy (StudyInstanceUID, flag, value) {
-			let paramsIsSelected = {
-				StudyInstanceUID: StudyInstanceUID,
-				flag: flag,
-				value: value
-			}
-			return paramsIsSelected
-		},
-		setObjectFlagSerie (StudyInstanceUID, SeriesInstanceUID, flag, value) {
-			let paramsIsIndeterminate = {
-				StudyInstanceUID: StudyInstanceUID,
-				SeriesInstanceUID: SeriesInstanceUID,
-				flag: flag,
-				value: value
-			}
-			return paramsIsIndeterminate
-		},
-		deselectStudySeries () {
-			this.allSelectedStudies.forEach(study => {
-				let StudyInstanceUID = study.StudyInstanceUID.Value[0]
-				if (study.flag.is_selected === true) {
-					this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_selected', false))
-				}
-				if (this.series[StudyInstanceUID] !== undefined) {
-					for (let serieUID in this.series[StudyInstanceUID]) {
-						let serie = this.series[StudyInstanceUID][serieUID]
-						if (serie.flag.is_selected) {
-							let SeriesInstanceUID = serie.SeriesInstanceUID.Value[0]
-							this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_indeterminate', false))
-							this.$store.dispatch('setFlagByStudyUIDSerieUID', this.setObjectFlagSerie(StudyInstanceUID, SeriesInstanceUID, 'is_selected', false))
-						}
-					}
-				}
-			})
-		},
-		favoriteSelectedStudies () {
-			let favorites = this.allSelectedStudies.every(s => { return s.flag.is_favorite === true })
-			let params = {
-				StudyInstanceUID: '',
-				queries: this.getSource(),
-				value: !favorites
-			}
-			this.allSelectedStudies.forEach(study => {
-				params.StudyInstanceUID = study.StudyInstanceUID.Value[0]
-				this.$store.dispatch('favoriteStudy', params)
-			})
-		},
-		getSource () {
-			if (this.albumId === '') {
-				return {
-					inbox: true
-				}
-			} else {
-				return {
-					album: this.albumId
-				}
-			}
-		},
-		deleteStudies () {
-			this.deleteSelectedStudies()
-			this.deleteSelectedSeries()
-			this.confirmDelete = false
-			this.deselectStudySeries()
-		},
-		deleteSelectedStudies () {
-			this.selectedStudies.forEach(study => {
-				let params = {
-					StudyInstanceUID: study.StudyInstanceUID.Value[0]
-				}
-				if (this.albumId === '') {
-					this.$store.dispatch('deleteStudy', params)
-				} else {
-					params.album_id = this.albumId
-					this.$store.dispatch('removeStudyInAlbum', params)
-				}
-			})
-		},
-		deleteSelectedSeries () {
-			for (let studyUID in this.selectedSeries) {
-				this.selectedSeries[studyUID].forEach(serie => {
-					let serieUID = serie.SeriesInstanceUID.Value[0]
-					let params = {
-						StudyInstanceUID: studyUID,
-						SeriesInstanceUID: serieUID
-					}
-					if (this.albumId === '') {
-						this.$store.dispatch('deleteSerie', params)
-					} else {
-						params.album_id = this.albumId
-						this.$store.dispatch('removeSerieInAlbum', params)
-					}
-				})
-			}
-		},
-		checkErrorStatus (status, message) {
-			if (status === 403) {
-				this.$snotify.error(message[403])
-			} else if (status === 404) {
-				this.$snotify.error(message[404])
-			} else {
-				this.$snotify.error(message['unknown'])
-			}
-		},
-		addToAlbum (albumId) {
-			let queries = this.getSource()
-			let sendSerie = 0
-			let sendStudy = 0
-			let data = this.generateStudySerieData(albumId)
-			let message = {
-				403: '',
-				404: '',
-				'unknown': ''
-			}
-			this.$store.dispatch('putStudiesInAlbum', { 'queries': queries, 'data': data }).then(res => {
-				res.forEach(data => {
-					if (data.res !== undefined && data.res.status === 201) {
-						if (data.serieId !== undefined) {
-							sendSerie += 1
-						} else {
-							sendStudy += 1
-						}
-					} else {
-						message[403] = `Forbidden to send in album ${data.albumId}`
-						message[404] = `Not found`
-						message['unknown'] = `Error unknown for the study ${data.studyId}`
-						this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message)
-					}
-				})
-				if (sendStudy > 0 || sendSerie > 0) {
-					this.$snotify.success(`${sendStudy} studies send ${sendSerie > 0 ? 'and ' + sendSerie + ' series send ' : ''} to the album`)
-				}
-				this.deselectStudySeries()
-			})
-		},
-		generateStudySerieData (albumId) {
-			let data = []
-			this.selectedStudies.forEach(study => {
-				data.push({
-					album_id: albumId,
-					study_id: study.StudyInstanceUID.Value[0]
-				})
-			})
-			for (let studyUID in this.selectedSeries) {
-				this.selectedSeries[studyUID].forEach(serie => {
-					data.push({
-						album_id: albumId,
-						study_id: studyUID,
-						serie_id: serie.SeriesInstanceUID.Value[0]
-					})
-				})
-			}
-			return data
-		},
-		addToInbox () {
-			let queries = this.getSource()
-			let data = this.generateStudySerieData(this.albumId)
-			let sendStudy = 0
-			let sendSerie = 0
-			let message = {
-				403: '',
-				404: '',
-				'unknown': ''
-			}
-			this.$store.dispatch('selfAppropriateStudy', { data: data, queries: queries }).then(res => {
-				res.forEach(data => {
-					if (data.res !== undefined && data.res.status === 201) {
-						if (data.serieId !== undefined) {
-							sendSerie += 1
-						} else {
-							sendStudy += 1
-						}
-					} else {
-						message[403] = `Forbidden to send in your inbox`
-						message[404] = `Not found`
-						message['unknown'] = `Error unknown for the study ${data.studyId}`
-						this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message)
-					}
-				})
-				if (sendStudy > 0 || sendSerie > 0) {
-					this.$snotify.success(`${sendStudy} studies send ${sendSerie > 0 ? 'and ' + sendSerie + ' series send ' : ''} to the inbox`)
-				}
-				this.deselectStudySeries()
-			})
-		},
-		determineWebkitDirectory () {
-			// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
-			var tmpInput = document.createElement('input')
-			if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true
-			return false
-		},
-		setFilters () {
-			this.showFilters = !this.showFilters
-			this.$emit('setFilters', this.showFilters)
-		},
-		showDragAndDrop () {
-			this.$store.dispatch('setDemoDragAndDrop', true)
-		},
-		reloadStudies () {
-			this.$emit('reloadStudies')
-		},
-		goToCreateAlbum () {
-			this.$router.push({ path: '/albums/new' })
+        Promise.all(promises).then(() => {
+          this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('studiessharedsuccess')}`);
+          this.formSendStudy = false;
+          this.deselectStudySeries();
+        }).catch((err) => {
+          console.log(err);
+        });
+      }
+    },
+    setObjectFlagStudy(StudyInstanceUID, flag, value) {
+      const paramsIsSelected = {
+        StudyInstanceUID,
+        flag,
+        value,
+      };
+      return paramsIsSelected;
+    },
+    setObjectFlagSerie(StudyInstanceUID, SeriesInstanceUID, flag, value) {
+      const paramsIsIndeterminate = {
+        StudyInstanceUID,
+        SeriesInstanceUID,
+        flag,
+        value,
+      };
+      return paramsIsIndeterminate;
+    },
+    deselectStudySeries() {
+      this.allSelectedStudies.forEach((study) => {
+        const StudyInstanceUID = study.StudyInstanceUID.Value[0];
+        if (study.flag.is_selected === true) {
+          this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_selected', false));
+        }
+        if (this.series[StudyInstanceUID] !== undefined) {
+          Object.keys(this.series[StudyInstanceUID]).forEach((serieUID) => {
+            const serie = this.series[StudyInstanceUID][serieUID];
+            if (serie.flag.is_selected) {
+              const SeriesInstanceUID = serie.SeriesInstanceUID.Value[0];
+              this.$store.dispatch('setFlagByStudyUID', this.setObjectFlagStudy(StudyInstanceUID, 'is_indeterminate', false));
+              this.$store.dispatch('setFlagByStudyUIDSerieUID', this.setObjectFlagSerie(StudyInstanceUID, SeriesInstanceUID, 'is_selected', false));
+            }
+          });
+        }
+      });
+    },
+    favoriteSelectedStudies() {
+      const favorites = this.allSelectedStudies.every((s) => s.flag.is_favorite === true);
+      const params = {
+        StudyInstanceUID: '',
+        queries: this.getSource(),
+        value: !favorites,
+      };
+      this.allSelectedStudies.forEach((study) => {
+        [params.StudyInstanceUID] = study.StudyInstanceUID.Value;
+        this.$store.dispatch('favoriteStudy', params);
+      });
+    },
+    getSource() {
+      if (this.albumId === '') {
+        return {
+          inbox: true,
+        };
+      }
+      return {
+        album: this.albumId,
+      };
+    },
+    deleteStudies() {
+      this.deleteSelectedStudies();
+      this.deleteSelectedSeries();
+      this.confirmDelete = false;
+      this.deselectStudySeries();
+    },
+    deleteSelectedStudies() {
+      this.selectedStudies.forEach((study) => {
+        const params = {
+          StudyInstanceUID: study.StudyInstanceUID.Value[0],
+        };
+        if (this.albumId === '') {
+          this.$store.dispatch('deleteStudy', params);
+        } else {
+          params.album_id = this.albumId;
+          this.$store.dispatch('removeStudyInAlbum', params);
+        }
+      });
+    },
+    deleteSelectedSeries() {
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
+        this.selectedSeries[studyUID].forEach((serie) => {
+          const serieUID = serie.SeriesInstanceUID.Value[0];
+          const params = {
+            StudyInstanceUID: studyUID,
+            SeriesInstanceUID: serieUID,
+          };
+          if (this.albumId === '') {
+            this.$store.dispatch('deleteSerie', params);
+          } else {
+            params.album_id = this.albumId;
+            this.$store.dispatch('removeSerieInAlbum', params);
+          }
+        });
+      });
+    },
+    checkErrorStatus(status, message) {
+      if (status === 403) {
+        this.$snotify.error(message[403]);
+      } else if (status === 404) {
+        this.$snotify.error(message[404]);
+      } else {
+        this.$snotify.error(message.unknown);
+      }
+    },
+    addToAlbum(albumId) {
+      const queries = this.getSource();
+      let sendSerie = 0;
+      let sendStudy = 0;
+      const studySerieData = this.generateStudySerieData(albumId);
+      const message = {
+        403: '',
+        404: '',
+        unknown: '',
+      };
+      this.$store.dispatch('putStudiesInAlbum', { queries, data: studySerieData }).then((res) => {
+        res.forEach((data) => {
+          if (data.res !== undefined && data.res.status === 201) {
+            if (data.serieId !== undefined) {
+              sendSerie += 1;
+            } else {
+              sendStudy += 1;
+            }
+          } else {
+            message[403] = `Forbidden to send in album ${data.albumId}`;
+            message[404] = 'Not found';
+            message.unknown = `Error unknown for the study ${data.studyId}`;
+            this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message);
+          }
+        });
+        if (sendStudy > 0 || sendSerie > 0) {
+          this.$snotify.success(`${sendStudy} studies send ${sendSerie > 0 ? `and ${sendSerie} series send ` : ''} to the album`);
+        }
+        this.deselectStudySeries();
+      });
+    },
+    generateStudySerieData(albumId) {
+      const data = [];
+      this.selectedStudies.forEach((study) => {
+        data.push({
+          album_id: albumId,
+          study_id: study.StudyInstanceUID.Value[0],
+        });
+      });
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
+        this.selectedSeries[studyUID].forEach((serie) => {
+          data.push({
+            album_id: albumId,
+            study_id: studyUID,
+            serie_id: serie.SeriesInstanceUID.Value[0],
+          });
+        });
+      });
+      return data;
+    },
+    addToInbox() {
+      const queries = this.getSource();
+      const studySerieData = this.generateStudySerieData(this.albumId);
+      let sendStudy = 0;
+      let sendSerie = 0;
+      const message = {
+        403: '',
+        404: '',
+        unknown: '',
+      };
+      this.$store.dispatch('selfAppropriateStudy', { data: studySerieData, queries }).then((res) => {
+        res.forEach((data) => {
+          if (data.res !== undefined && data.res.status === 201) {
+            if (data.serieId !== undefined) {
+              sendSerie += 1;
+            } else {
+              sendStudy += 1;
+            }
+          } else {
+            message[403] = 'Forbidden to send in your inbox';
+            message[404] = 'Not found';
+            message.unknown = `Error unknown for the study ${data.studyId}`;
+            this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message);
+          }
+        });
+        if (sendStudy > 0 || sendSerie > 0) {
+          this.$snotify.success(`${sendStudy} studies send ${sendSerie > 0 ? `and ${sendSerie} series send ` : ''} to the inbox`);
+        }
+        this.deselectStudySeries();
+      });
+    },
+    determineWebkitDirectory() {
+      // https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+      const tmpInput = document.createElement('input');
+      if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true;
+      return false;
+    },
+    setFilters() {
+      this.showFilters = !this.showFilters;
+      this.$emit('setFilters', this.showFilters);
+    },
+    showDragAndDrop() {
+      this.$store.dispatch('setDemoDragAndDrop', true);
+    },
+    reloadStudies() {
+      this.$emit('reloadStudies');
+    },
+    goToCreateAlbum() {
+      this.$router.push({ path: '/albums/new' });
 
-			let StudiesUID = []
-			this.selectedStudies.forEach(study => {
-				StudiesUID.push(study.StudyInstanceUID.Value[0])
-			})
+      const StudiesUID = [];
+      this.selectedStudies.forEach((study) => {
+        StudiesUID.push(study.StudyInstanceUID.Value[0]);
+      });
 
-			let SeriesUID = []
-			for (let studyUID in this.selectedSeries) {
-				this.selectedSeries[studyUID].forEach(serie => {
-					SeriesUID.push(`${studyUID},${serie.SeriesInstanceUID.Value[0]}`)
-				})
-			}
+      const SeriesUID = [];
+      Object.keys(this.selectedSeries).forEach((studyUID) => {
+        this.selectedSeries[studyUID].forEach((serie) => {
+          SeriesUID.push(`${studyUID},${serie.SeriesInstanceUID.Value[0]}`);
+        });
+      });
 
-			let query = {}
-			if (StudiesUID.length > 0) query['StudyInstanceUID'] = StudiesUID
-			if (SeriesUID.length > 0) query['SeriesInstanceUID'] = SeriesUID
-			if (Object.keys(query).length > 0) {
-				query['source'] = this.albumId === '' ? 'inbox' : this.albumId
-				this.$router.push({ path: '/albums/new', query: query })
-			} else {
-				this.$router.push({ path: '/albums/new' })
-			}
-		}
-	}
-}
+      const query = {};
+      if (StudiesUID.length > 0) query.StudyInstanceUID = StudiesUID;
+      if (SeriesUID.length > 0) query.SeriesInstanceUID = SeriesUID;
+      if (Object.keys(query).length > 0) {
+        query.source = this.albumId === '' ? 'inbox' : this.albumId;
+        this.$router.push({ path: '/albums/new', query });
+      } else {
+        this.$router.push({ path: '/albums/new' });
+      }
+    },
+  },
+};
 
 </script>
 <style scoped>
-	.btn-link {
-		font-weight: 400;
-		color: white;
-		background-color: transparent;
-	}
+  .btn-link {
+    font-weight: 400;
+    color: white;
+    background-color: transparent;
+  }
 
-	.btn-link:hover {
-		color: #c7d1db;
-		text-decoration: underline;
-		background-color: transparent;
-		border-color: transparent;
-	}
+  .btn-link:hover {
+    color: #c7d1db;
+    text-decoration: underline;
+    background-color: transparent;
+    border-color: transparent;
+  }
 
-	.inputfile {
+  .inputfile {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;

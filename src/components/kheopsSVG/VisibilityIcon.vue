@@ -19,27 +19,27 @@
 <script>
 
 export default {
-	name: 'VisibiliyIcon',
-	props: {
-		width: {
-			type: String,
-			required: true,
-			default: '0px'
-		},
-		height: {
-			type: String,
-			required: true,
-			default: '0px'
-		}
-	}
-}
+  name: 'VisibiliyIcon',
+  props: {
+    width: {
+      type: String,
+      required: true,
+      default: '0px',
+    },
+    height: {
+      type: String,
+      required: true,
+      default: '0px',
+    },
+  },
+};
 </script>
 <style>
   .icon{
-		fill: #fff;
-	}
+    fill: #fff;
+  }
 
-	.icon:hover{
-		fill: grey;
-	}
+  .icon:hover{
+    fill: grey;
+  }
 </style>
