@@ -1,6 +1,9 @@
 <template>
   <div id="userSettingsToken">
-    <tokens scope="user" />
+    <tokens
+      scope="user"
+      :write-permission="true"
+    />
   </div>
 </template>
 
