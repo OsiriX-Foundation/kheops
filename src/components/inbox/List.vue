@@ -294,7 +294,7 @@
             <br>
             <br>
           </div>
-          {{ $t(data.label) }}
+          {{ data.label }}
         </template>
         <!--
           CONTENT TABLE

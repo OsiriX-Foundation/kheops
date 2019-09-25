@@ -89,7 +89,7 @@
           :current-header="data.field.key"
           :sort-by="albumsParams.sortBy"
         />
-        {{ $t(data.label) }}
+        {{ data.label }}
       </template>
       <template
         slot="HEAD_number_of_studies"
@@ -122,7 +122,7 @@
           :current-header="data.field.key"
           :sort-by="albumsParams.sortBy"
         />
-        {{ $t(data.label) }}
+        {{ data.label }}
       </template>
       <template
         slot="HEAD_created_time"
@@ -162,7 +162,7 @@
           :current-header="data.field.key"
           :sort-by="albumsParams.sortBy"
         />
-        {{ $t(data.label) }}
+        {{ data.label }}
       </template>
       <template
         slot="HEAD_last_event_time"
@@ -203,7 +203,7 @@
           :current-header="data.field.key"
           :sort-by="albumsParams.sortBy"
         />
-        {{ $t(data.label) }}
+        {{ data.label }}
       </template>
       <template
         slot="is_selected"
