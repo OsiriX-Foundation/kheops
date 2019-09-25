@@ -71,6 +71,41 @@ const actions = {
       return res;
     }).catch((err) => Promise.reject(err));
   },
+  updateStudies({ commit }, params) {
+    const request = 'studies';
+    let queries = '';
+    if (params.queries !== undefined) {
+      queries = httpoperations.getQueriesParameters(params.queries);
+    }
+    return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/dicom+json' } }).then((res) => {
+      if (res.data !== '') {
+        const studies = dicomoperations.translateDICOM(res.data);
+        studies.forEach((study, index) => {
+          const currentUID = study.StudyInstanceUID.Value[0];
+          const stateUID = state.studies[index] !== undefined ? state.studies[index].StudyInstanceUID.Value[0] : undefined;
+
+          study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
+          study.flag.is_favorite = study.SumFavorites.Value[0] > 0;
+          study.flag.is_commented = study.SumComments.Value[0] > 0;
+          study._showDetails = false;
+          if (state.studies.length > 0 && currentUID !== stateUID) {
+            const paramsUpdate = {
+              index,
+              study,
+            };
+            commit('UPDATE_STUDIES', paramsUpdate);
+            if (state.studies.length > params.queries.limit) {
+              commit('REMOVE_LASTSTUDY');
+            }
+          }
+        });
+        if (state.studies.length === 0) {
+          commit('SET_STUDIES', studies);
+        }
+      }
+      return res;
+    }).catch((err) => Promise.reject(err));
+  },
   setShowDetails({ commit }, params) {
     const index = state.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
     commit('SET_STUDY_SHOW_DETAILS', { index, value: params.value });
@@ -193,13 +228,18 @@ const mutations = {
       state.studies.push(study);
     });
   },
+  UPDATE_STUDIES(state, params) {
+    state.studies.splice(params.index, 0, params.study);
+  },
+  REMOVE_LASTSTUDY(state) {
+    if (state.studies.length > 0) {
+      state.studies.splice(state.studies.length - 1, 1);
+    }
+  },
   SET_STUDY_FLAG(state, params) {
     const study = state.studies[params.index];
     study.flag[params.flag] = params.value;
     Vue.set(state.studies, params.index, study);
-  },
-  UPDATE_STUDIES(state, params) {
-    state.studies = params.studies;
   },
   DELETE_STUDY(state, params) {
     const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);

@@ -384,6 +384,7 @@
     <infinite-loading
       :identifier="infiniteId"
       @infinite="infiniteHandler"
+      ref="infiniteLoading"
     >
       <div slot="spinner">
         <pulse-loader
@@ -583,10 +584,8 @@ export default {
   watch: {
     sendingFiles() {
       if (!this.sendingFiles) {
-        /*
-        this.$store.dispatch('initStudies', { })
-        this.getStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit)
-        */
+        this.updateStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit);
+        this.$refs.infiniteLoading.stateChanger.reset();
       }
     },
     filters: {
@@ -751,7 +750,7 @@ export default {
       this.$store.dispatch('initSeries');
       this.infiniteId += 1;
     },
-    getStudies(offset = 0, limit = 0) {
+    setStudiesQueries (offset = 0, limit = 0) {
       const params = {
         limit,
         offset,
@@ -764,7 +763,15 @@ export default {
         params.album = this.albumID;
       }
       const queries = Object.assign(params, this.prepareFilters());
+      return queries
+    },
+    getStudies(offset = 0, limit = 0) {
+      const queries = this.setStudiesQueries(offset, limit);
       return this.$store.dispatch('getStudies', { queries });
+    },
+    updateStudies(offset = 0, limit = 0) {
+      const queries = this.setStudiesQueries(offset, limit);
+      return this.$store.dispatch('updateStudies', { queries });
     },
     prepareFilters() {
       const filtersToSend = {};
