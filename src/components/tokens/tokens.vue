@@ -37,7 +37,10 @@
 </i18n>
 
 <template>
-  <div class="tokens">
+  <div
+    class="tokens"
+    v-if="writePermission"
+  >
     <div
       v-if="currentView === 'listtokens'"
     >
@@ -86,6 +89,11 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    writePermission: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   data() {

@@ -144,6 +144,9 @@ export default {
     ...mapGetters({
       album: 'album',
     }),
+    currentSettings() {
+      return this.$route.params.category;
+    },
     currentView() {
       return this.$route.params.view;
     },
@@ -158,6 +161,16 @@ export default {
         this.loading = false;
       });
     },
+    currentView() {
+      if (this.currentView !== undefined) {
+        this.loadAlbum()
+      }
+    },
+    currentSettings() {
+      if (this.currentSettings !== undefined) {
+        this.loadAlbum()
+      }
+    }
   },
   created() {
     this.loading = true;

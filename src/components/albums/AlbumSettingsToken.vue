@@ -14,6 +14,7 @@
     <tokens
       scope="album"
       :albumid="album.album_id"
+      :write-permission="album.is_admin"
     />
   </div>
 </template>
