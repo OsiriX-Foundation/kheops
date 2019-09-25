@@ -27,6 +27,8 @@
     "expired": "expiré",
     "revokedsuccess": "révoqué avec succès",
     "expiration date": "date d'expiration",
+    "status": "statut",
+    "description": "description",
     "scope": "application",
     "create date": "créé le",
     "last used": "dern. utilisation",

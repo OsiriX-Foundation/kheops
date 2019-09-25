@@ -100,7 +100,7 @@
           :current-header="data.field.key"
           :sort-by="albumsParams.sortBy"
         />
-        {{ $t(data.label) }}
+        {{ data.label }}
       </template>
       <template
         slot="HEAD_number_of_users"
@@ -111,7 +111,7 @@
           :current-header="data.field.key"
           :sort-by="albumsParams.sortBy"
         />
-        {{ $t(data.label) }}
+        {{ data.label }}
       </template>
       <template
         slot="HEAD_number_of_comments"
