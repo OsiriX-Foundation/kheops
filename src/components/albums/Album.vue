@@ -9,8 +9,10 @@
     "downloadSeries": "Show download button",
     "sendSeries": "Get studies / series",
     "deleteSeries": "Remove studies / series",
-    "writeComments": "Write comments"
-
+    "writeComments": "Write comments",
+    "studies": "Studies",
+    "comments": "Comments",
+    "settings": "Settings"
   },
   "fr": {
     "albumName": "Nom de l'album",
@@ -21,7 +23,10 @@
     "downloadSeries": "Télécharger une étude / série",
     "sendSeries": "Ajouter à un album / inbox",
     "deleteSeries": "Supprimer une étude / série",
-    "writeComments": "Commenter"
+    "writeComments": "Commenter",
+    "studies": "Etudes",
+    "comments": "Commentaires",
+    "settings": "Réglages"
   }
 }
 </i18n>
@@ -61,21 +66,21 @@
               :class="(currentView === 'studies' || currentView === undefined)?'active':''"
               @click.stop="loadView('studies')"
             >
-              Studies
+              {{ $t('studies') }}
             </a>
             <a
               class="nav-link"
               :class="(currentView === 'comments')?'active':''"
               @click.stop="loadView('comments')"
             >
-              Comments
+              {{ $t('comments') }}
             </a>
             <a
               class="nav-link"
               :class="(currentView === 'settings')?'active':''"
               @click.stop="loadView('settings')"
             >
-              Settings
+              {{ $t('settings') }}
             </a>
           </nav>
         </div>
