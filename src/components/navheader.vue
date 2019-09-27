@@ -53,6 +53,14 @@
           <b-nav-item v-access="'active'">
             <a
               class="pointer"
+              @click="redirect('https://docs.kheops.online')"
+            >
+              <v-icon name="help" />
+            </a>
+          </b-nav-item>
+          <b-nav-item v-access="'active'">
+            <a
+              class="pointer"
               @click="logout()"
             >
               <v-icon name="sign-out-alt" />
@@ -122,6 +130,9 @@ export default {
         localStorage.setItem('language', value);
         this.$root.$i18n.locale = value;
       }
+    },
+    redirect(href) {
+      window.location.href = href;
     },
   },
 };
