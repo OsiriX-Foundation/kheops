@@ -31,7 +31,7 @@
       <span
         v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
         class="ml-1"
-        @click.stop="openViewer('Ohif')"
+        @click.stop="openViewer('Weasis')"
       >
         <visibility-icon
           width="24px"
@@ -229,7 +229,8 @@ export default {
       window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
     },
     openWeasis(StudyInstanceUID, token) {
-      const url = `$dicom:get --zip ${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`;
+      // --query-ext="&includedefaults=false"
+      const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {

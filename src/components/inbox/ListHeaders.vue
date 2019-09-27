@@ -163,6 +163,24 @@
             <span style="color: white">{{ $t("delete") }}</span>
           </button>
         </div>
+        <div
+          class="align-self-center"
+        >
+          <button
+            type="button"
+            class="btn btn-link btn-sm text-center"
+            :disabled="selectedStudiesNb === 0"
+            @click="openWeasis"
+          >
+            <span>
+              <visibility-icon
+                width="24px"
+                height="24px"
+              />
+            </span><br>
+            <span style="color: white">Weasis</span>
+          </button>
+        </div>
         <div class="ml-auto" />
         <div
           v-if="showImportButton === true"
@@ -259,12 +277,13 @@ import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
+import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 
 Vue.use(ToggleButton);
 
 export default {
   name: 'ListHeaders',
-  components: { formGetUser, ConfirmButton, AddIcon },
+  components: { formGetUser, ConfirmButton, AddIcon, VisibilityIcon },
   props: {
     studies: {
       type: Array,
@@ -385,6 +404,10 @@ export default {
   mounted() {
   },
   methods: {
+    openWeasis() {
+      console.log(this.selectedStudies)
+      console.log(this.selectedSeries)
+    },
     sendToUser(userSub) {
       if (this.selectedStudiesNb > 0) {
         const promises = [];
