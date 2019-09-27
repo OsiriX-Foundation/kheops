@@ -1,9 +1,8 @@
 
 <template>
   <span>
-
     <span
-      :class="classIconPN(study.flag.is_hover)"
+      :class="classIconPN(study.flag.is_hover || study._showDetails)"
       class="ml-1"
     >
       <a
@@ -58,7 +57,7 @@
     </span>
     <span
       v-if="showCommentIcon"
-      :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
+      :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover || study._showDetails)"
       class="ml-1"
       @click.stop="showComments(study, 'comments')"
     >
@@ -71,7 +70,7 @@
     </span>
     <span
       v-if="showFavoriteIcon"
-      :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
+      :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover || study._showDetails)"
       class="ml-1"
       @click.stop="toggleFavorite()"
     >
@@ -261,11 +260,14 @@ export default {
     visibility: visible;
     display: inline;
     cursor: pointer;
+    opacity: 1;
   }
   .iconsUnhover{
     visibility: hidden;
     display: inline;
     cursor: pointer;
+    opacity: 0;
+    /* transition: visibility 0.15s, opacity 0.15s linear; */
   }
   a.download{
     color: #FFF;

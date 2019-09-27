@@ -444,6 +444,7 @@ export default {
       infiniteId: 0,
       showFilters: false,
       isActive: false,
+      showIcons: false,
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -821,6 +822,9 @@ export default {
     },
     changeFilterValue(value) {
       this.showFilters = value;
+    },
+    setShowIcons(value) {
+      this.showIcons = value
     },
   },
 };
