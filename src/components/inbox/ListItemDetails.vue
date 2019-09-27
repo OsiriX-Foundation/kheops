@@ -214,4 +214,7 @@ export default {
 </script>
 
 <style scoped>
+.nav a:hover:not(.active) {
+  opacity: 0.5;
+}
 </style>

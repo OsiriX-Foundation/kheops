@@ -77,4 +77,7 @@ export default {
 svg.fa-icon{
   margin-right: 10px;
 }
+.nav li a:hover:not(.active) {
+  opacity: 0.5;
+}
 </style>
