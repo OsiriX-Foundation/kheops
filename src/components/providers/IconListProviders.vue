@@ -90,7 +90,7 @@ export default {
   },
   watch: {
     show () {
-      this.$emit('dropdownState', this.show);
+      this.$emit('dropdownState', this.show, this.study.StudyInstanceUID.Value[0]);
     }
   },
   created() {

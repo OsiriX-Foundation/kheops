@@ -355,6 +355,7 @@
                   <icon-list-providers
                     :study="row.item"
                     :providers="providersEnable"
+                    @dropdownState="setShowIcons"
                   />
                 </template>
               </list-icons>
@@ -823,8 +824,12 @@ export default {
     changeFilterValue(value) {
       this.showFilters = value;
     },
-    setShowIcons(value) {
-      this.showIcons = value
+    setShowIcons(value, studyUID, index = -1) {
+      let studyIndex = index;
+      if (studyIndex === -1) {
+        studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === studyUID);
+      }
+      this.studies[studyIndex].showIcons = value;
     },
   },
 };
