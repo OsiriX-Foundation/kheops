@@ -17,11 +17,17 @@
 <template>
   <div id="app">
     <vue-snotify />
-    <nav-header />
-    <nav-bar />
+    <nav-header
+      :logged="logged"
+    />
+    <nav-bar
+      v-if="logged"
+    />
 
     <!-- content -->
-    <router-view style="margin: 25px auto" />
+    <router-view 
+      :style="logged ? 'margin: 25px auto' : 'margin: 75px auto'"
+    />
 
     <send-studies />
     <!-- footer -->
@@ -60,6 +66,9 @@ export default {
   computed: {
     year() {
       return new Date().getFullYear();
+    },
+    logged() {
+      return this.$keycloak.authenticated;
     },
   },
   watch: {

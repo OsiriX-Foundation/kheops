@@ -59,10 +59,10 @@ const i18n = new VueI18n({
   locale: 'en',
   messages,
 });
-
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
   config: keycloakconfig,
+  init: { onLoad: 'check-sso' },
   onReady: () => {
     tokenInterceptor();
     /* eslint-disable no-new */
