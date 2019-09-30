@@ -6,7 +6,12 @@ export const HTTP = axios.create({ baseURL: serverURL });
 
 HTTP.interceptors.request.use((config) => {
   const tmpconfig = config;
-  tmpconfig.headers.Authorization = `Bearer ${Vue.prototype.$keycloak.token}`;
+  if (window.location.pathname.includes('/view/')) {
+    const [, , token] = window.location.pathname.split('/');
+    tmpconfig.headers.Authorization = `Bearer ${token}`;
+  } else {
+    tmpconfig.headers.Authorization = `Bearer ${Vue.prototype.$keycloak.token}`;
+  }
   return tmpconfig;
 }, (error) => Promise.reject(error));
 
