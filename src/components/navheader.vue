@@ -2,11 +2,15 @@
 {
   "en": {
     "welcome": "Welcome",
-    "lang": "lang"
+    "lang": "lang",
+    "tooltipHelp": "Help",
+    "tooltipLogout": "Logout"
   },
   "fr": {
     "welcome": "Bienvenue",
-    "lang": "lang"
+    "lang": "lang",
+    "tooltipHelp": "Aide",
+    "tooltipLogout": "Déconnexion"
   }
 }
 </i18n>
@@ -52,7 +56,9 @@
           </b-nav-item>
           <b-nav-item v-access="'active'">
             <a
+              :title="$t('tooltipHelp')"
               class="pointer"
+              target="_blank"
               @click="redirect('https://docs.kheops.online')"
             >
               <v-icon name="help" />
@@ -60,6 +66,7 @@
           </b-nav-item>
           <b-nav-item v-access="'active'">
             <a
+              :title="$t('tooltipLogout')"
               class="pointer"
               @click="logout()"
             >
@@ -132,7 +139,7 @@ export default {
       }
     },
     redirect(href) {
-      window.location.href = href;
+      window.open(href, '_blank');
     },
   },
 };
