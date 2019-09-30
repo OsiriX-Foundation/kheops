@@ -270,7 +270,6 @@ export default {
     display: inline;
     cursor: pointer;
     opacity: 0;
-    /* transition: visibility 0.15s, opacity 0.15s linear; */
   }
   a.download{
     color: #FFF;
