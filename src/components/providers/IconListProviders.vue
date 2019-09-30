@@ -6,6 +6,8 @@
       variant="link"
       no-caret
       right
+      @shown="setShow(true)"
+      @hidden="setShow(false)"
     >
       <template slot="button-content">
         <v-icon
@@ -78,6 +80,7 @@ export default {
   data() {
     return {
       serverURL,
+      show: false,
     };
   },
   computed: {
@@ -85,15 +88,19 @@ export default {
       return Vue.prototype.$keycloak.token;
     },
   },
-
   watch: {
+    show () {
+      this.$emit('dropdownState', this.show, this.study.StudyInstanceUID.Value[0]);
+    }
   },
-
   created() {
   },
   mounted() {
   },
   methods: {
+    setShow(value) {
+      this.show = value
+    },
     checkProviderModalities(study, provider) {
       if (provider.data.supported_modalities === undefined) {
         return true;

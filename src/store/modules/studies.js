@@ -59,6 +59,7 @@ const actions = {
           // https://bootstrap-vue.js.org/docs/components/table/
           // chapter - Row details support
           study._showDetails = false;
+          study.showIcons = false;
         });
         if (params.queries.offset === 0) {
           commit('INIT_STUDIES');
@@ -88,6 +89,7 @@ const actions = {
           study.flag.is_favorite = study.SumFavorites.Value[0] > 0;
           study.flag.is_commented = study.SumComments.Value[0] > 0;
           study._showDetails = false;
+          study.showIcons = false;
           if (state.studies.length > 0 && currentUID !== stateUID) {
             const paramsUpdate = {
               index,
