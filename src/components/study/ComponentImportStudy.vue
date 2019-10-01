@@ -125,7 +125,7 @@ export default {
       demoDragAndDrop: 'demoDragAndDrop',
     }),
     albumNoPermission() {
-      return !(this.album.is_admin || this.album.add_series) && this.scope === 'album';
+      return !(this.album.is_admin || this.album.add_series) && Object.keys(this.album).length > 0;
     },
     classDragIn() {
       if (!mobiledetect.mobileAndTabletcheck()) {
