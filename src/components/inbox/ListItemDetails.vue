@@ -143,6 +143,11 @@ export default {
       required: true,
       default: '',
     },
+    source: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -177,7 +182,9 @@ export default {
         studySelected: this.study.flag.is_selected,
         queries: {},
       };
-      params.queries = this.getSource();
+      if (Object.keys(this.source).length > 0) {
+        params.queries[this.source.key] = this.source.value;
+      }
       params.queries.includefield = this.includefield;
       this.loadingSerie = true;
       this.$store.dispatch('getSeries', params).then((res) => {
@@ -189,16 +196,6 @@ export default {
         this.loadingSerie = false;
         this.errorSeries = true;
       });
-    },
-    getSource() {
-      if (this.albumId === '') {
-        return {
-          inbox: true,
-        };
-      }
-      return {
-        album: this.albumId,
-      };
     },
     setViewDetails(StudyInstanceUID, flagView) {
       const viewSelected = flagView === '' ? 'series' : flagView;
