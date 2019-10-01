@@ -377,6 +377,7 @@
             <list-item-details
               :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
               :album-id="albumID"
+              :source="source"
             />
           </b-card>
         </template>

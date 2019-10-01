@@ -95,6 +95,7 @@
       <component-import-study
         :album="album"
         :source="source"
+        :permissions="permissions"
       />
     </span>
     <album-comments
@@ -141,6 +142,16 @@ export default {
         key: 'album',
         value: this.albumID,
       }
+    },
+    permissions() {
+      return {
+        add_series: this.album.add_series || this.album.is_admin,
+        delete_series: this.album.delete_series || this.album.is_admin,
+        download_series: this.album.download_series || this.album.is_admin,
+        send_series: this.album.send_series || this.album.is_admin,
+        write_comments: this.album.write_comments || this.album.is_admin,
+        add_inbox: this.album.send_series || this.album.is_admin,
+      };
     },
   },
   watch: {

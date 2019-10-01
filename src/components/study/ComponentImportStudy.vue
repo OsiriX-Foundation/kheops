@@ -99,9 +99,14 @@ export default {
     },
     source: {
       type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    permissions: {
+      type: Object,
       required: true,
       default: () => ({}),
-    }
+    },
   },
   data() {
     return {
@@ -130,16 +135,6 @@ export default {
         return 'dragNotEnterFormClass';
       }
       return '';
-    },
-    permissions() {
-      return {
-        add_series: this.album.album_id !== undefined ? this.album.add_series || this.album.is_admin : true,
-        delete_series: this.album.album_id !== undefined ? this.album.delete_series || this.album.is_admin : true,
-        download_series: this.album.album_id !== undefined ? this.album.download_series || this.album.is_admin : true,
-        send_series: this.album.album_id !== undefined ? this.album.send_series || this.album.is_admin : true,
-        write_comments: this.album.album_id !== undefined ? this.album.write_comments || this.album.is_admin : true,
-        add_inbox: this.album.album_id !== undefined ? this.album.send_series || this.album.is_admin : false,
-      };
     },
   },
   watch: {

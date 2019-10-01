@@ -2,6 +2,7 @@
   <div>
     <component-import-study
       :source="source"
+      :permissions="permissions"
     />
   </div>
 </template>
@@ -19,6 +20,14 @@ export default {
       source: {
         key: 'inbox',
         value: true,
+      },
+      permissions: {
+        add_series: true,
+        delete_series: true,
+        download_series: true,
+        send_series: true,
+        write_comments: true,
+        add_inbox: false,
       },
     };
   },

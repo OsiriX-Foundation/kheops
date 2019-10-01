@@ -1,6 +1,8 @@
 <template>
   <div>
-    <list />
+    <component-import-study
+      :permissions="permissions"
+    />
   </div>
 </template>
 
@@ -15,6 +17,14 @@ export default {
   },
   data() {
     return {
+      permissions: {
+        add_series: true,
+        delete_series: true,
+        download_series: true,
+        send_series: true,
+        write_comments: true,
+        add_inbox: false,
+      },
     };
   },
   computed: {
