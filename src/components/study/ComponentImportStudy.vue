@@ -3,7 +3,7 @@
   "en": {
     "cantUpload": "You can't upload when files are sending",
     "upload": "Drop your files / directories !",
-    "cantUploadPermission": "You do not have the required permissions to study.",
+    "cantUploadPermission": "You do not have the required permissions to upload studies.",
     "cancel": "Cancel"
   },
   "fr": {
