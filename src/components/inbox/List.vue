@@ -106,7 +106,7 @@
       :show-delete-button="permissions.delete_series"
       :show-import-button="permissions.add_series"
       :show-inbox-button="permissions.add_inbox"
-      :album-id="album.album_id !== undefined ? album.album_id : ''"
+      :album-id="source.key === 'album' ? source.value : ''"
       @setFilters="changeFilterValue"
       @reloadStudies="reloadStudies"
     />
@@ -125,7 +125,7 @@
         :show-delete-button="permissions.delete_series"
         :show-import-button="permissions.add_series"
         :show-inbox-button="permissions.add_inbox"
-        :album-id="album.album_id !== undefined ? album.album_id : ''"
+        :album-id="source.key === 'album' ? source.value : ''"
         @setFilters="changeFilterValue"
         @reloadStudies="reloadStudies"
       />
@@ -346,8 +346,8 @@
                 :show-comment-icon="true"
                 :show-download-icon="permissions.download_series"
                 :show-import-icon="permissions.add_series"
-                :show-report-provider-icon="album.album_id !== undefined ? true : false"
-                :album-id="album.album_id !== undefined ? album.album_id : ''"
+                :show-report-provider-icon="source.key === 'album' ? true : false"
+                :album-id="source.key === 'album' ? source.value : ''"
               >
                 <template
                   slot="reportprovider"
@@ -434,11 +434,6 @@ export default {
   },
   mixins: [],
   props: {
-    album: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
     permissions: {
       type: Object,
       required: true,
@@ -575,8 +570,8 @@ export default {
       return mobiledetect.mobileAndTabletcheck();
     },
     albumID() {
-      if (this.album.album_id !== undefined || this.album.album_id !== '') {
-        return this.album.album_id;
+      if (this.source.key === 'album') {
+        return this.source.value
       }
       return undefined;
     },
@@ -684,7 +679,7 @@ export default {
       }
     },
     getAlbum() {
-      return this.$store.dispatch('getAlbum', { album_id: this.album.album_id }).catch((err) => {
+      return this.$store.dispatch('getAlbum', { album_id: this.albumID }).catch((err) => {
         this.$router.push('/albums');
         return err;
       });
@@ -692,7 +687,7 @@ export default {
     setAlbumInbox() {
       if (this.albumID !== undefined) {
         this.$store.dispatch('getProviders', { albumID: this.albumID });
-        this.$store.commit('SET_MODALITIES', this.album.modalities);
+        this.$store.dispatch('setModalitiesAlbum')
       } else {
         this.$store.dispatch('getInboxInfo');
       }

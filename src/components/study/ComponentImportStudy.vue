@@ -70,7 +70,6 @@
         >
           <list
             ref="list"
-            :album="album"
             :permissions="permissions"
             :source="source"
             @loadfiles="inputLoadFiles"
@@ -92,11 +91,6 @@ export default {
   name: 'ComponentDragAndDrop',
   components: { ClipLoader, List },
   props: {
-    album: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
     source: {
       type: Object,
       required: false,
@@ -192,7 +186,7 @@ export default {
     storeFiles(files) {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files });
-      this.$store.dispatch('setSource', { source: this.album.album_id !== undefined ? this.album.album_id : 'inbox' });
+      this.$store.dispatch('setSource', { source: this.source.key === 'inbox' ? this.source.key : this.source.value });
     },
     createObjFiles(file, path, name) {
       if (!this.excludeFileName(name)) {
