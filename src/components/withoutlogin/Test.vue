@@ -8,13 +8,12 @@
 
 <script>
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
-import List from '@/components/inbox/List';
 import { HTTP } from '@/router/http';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'Inbox',
-  components: { ComponentImportStudy, List },
+  components: { ComponentImportStudy },
   props: {
   },
   data() {
