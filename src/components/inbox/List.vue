@@ -447,7 +447,7 @@ export default {
       type: Object,
       required: true,
       default: () => ({}),
-    }
+    },
   },
   data() {
     return {
@@ -752,21 +752,18 @@ export default {
       this.$store.dispatch('initSeries');
       this.infiniteId += 1;
     },
-    setStudiesQueries (offset = 0, limit = 0) {
+    setStudiesQueries(offset = 0, limit = 0) {
       const params = {
         limit,
         offset,
         includefield: ['favorite', 'comments', '00081030'],
         sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy,
       };
-      console.log(this.source)
-      if (this.albumID === undefined) {
-        params.inbox = true;
-      } else {
-        params.album = this.albumID;
+      if (Object.keys(this.source).length > 0) {
+        params[this.source.key] = this.source.value;
       }
       const queries = Object.assign(params, this.prepareFilters());
-      return queries
+      return queries;
     },
     getStudies(offset = 0, limit = 0) {
       const queries = this.setStudiesQueries(offset, limit);

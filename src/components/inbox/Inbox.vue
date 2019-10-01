@@ -17,7 +17,8 @@ export default {
   data() {
     return {
       source: {
-        inbox: true,
+        key: 'inbox',
+        value: true,
       },
     };
   },

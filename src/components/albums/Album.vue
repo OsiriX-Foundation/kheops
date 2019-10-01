@@ -138,7 +138,8 @@ export default {
     },
     source() {
       return {
-        album: this.albumID,
+        key: 'album',
+        value: this.albumID,
       }
     },
   },
