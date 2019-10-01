@@ -614,11 +614,16 @@ export default {
   },
   created() {
     this.initData();
-    const queriesAlbums = {
-      canAddSeries: true,
-    };
-    this.$store.dispatch('getAlbums', { queries: queriesAlbums });
-    this.setAlbumInbox();
+    if (Object.keys(this.source).length > 0) {
+      const queriesAlbums = {
+        canAddSeries: true,
+      };
+      this.$store.dispatch('getAlbums', { queries: queriesAlbums });
+      this.setAlbumInbox();
+    } else {
+      let modalities = ['CT', 'SM', 'CR', 'RG', 'DX', 'NM', 'XC', 'AU', 'SR', 'OP']
+      this.$store.commit('SET_MODALITIES', modalities);
+    }
   },
   destroyed() {
     this.$store.dispatch('initStudies', {});
@@ -668,12 +673,14 @@ export default {
     },
     reloadStudies() {
       this.searchStudies();
-      if (this.albumID !== undefined) {
-        this.getAlbum().then(() => {
+      if (Object.keys(this.source).length > 0) {
+        if (this.albumID !== undefined) {
+          this.getAlbum().then(() => {
+            this.setAlbumInbox();
+          });
+        } else {
           this.setAlbumInbox();
-        });
-      } else {
-        this.setAlbumInbox();
+        }
       }
     },
     getAlbum() {

@@ -89,11 +89,12 @@ import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
 import { ViewerToken } from '@/mixins/tokens.js';
+import { CurrentUser } from '../../mixins/currentuser.js';
 
 export default {
   name: 'ListIcons',
   components: { OsirixIcon, VisibilityIcon, AddIcon },
-  mixins: [ViewerToken],
+  mixins: [ViewerToken, CurrentUser],
   props: {
     study: {
       type: Object,
@@ -150,7 +151,13 @@ export default {
       return navigator.platform;
     },
     access_token() {
-      return Vue.prototype.$keycloak.token;
+      if (this.$keycloak.authenticated) {
+        return Vue.prototype.$keycloak.token;
+      } else if (window.location.pathname.includes('view')) {
+        const [, , token] = window.location.pathname.split('/');
+        return token
+      }
+      return ''
     },
     showIcons() {
       return (this.study.flag.is_hover || this.study._showDetails || this.study.showIcons)
@@ -199,7 +206,7 @@ export default {
     getURLDownload() {
       const source = this.albumId === '' ? 'inbox' : this.albumId;
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      this.getViewerToken(this.access_token, StudyInstanceUID, source).then((res) => {
+      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, source).then((res) => {
         const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : `album=${source}`}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
         location.href = URL;
@@ -214,7 +221,7 @@ export default {
       if (viewer === 'Ohif') {
         ohifWindow = window.open('', 'OHIFViewer');
       }
-      this.getViewerToken(this.access_token, StudyInstanceUID, source).then((res) => {
+      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, source).then((res) => {
         if (viewer === 'Osirix') {
           this.openOsiriX(StudyInstanceUID, res.data.access_token);
         } else if (viewer === 'Ohif') {

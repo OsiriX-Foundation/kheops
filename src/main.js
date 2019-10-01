@@ -62,7 +62,10 @@ const i18n = new VueI18n({
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
   config: keycloakconfig,
-  init: { onLoad: 'check-sso' },
+  init: {
+    onLoad: 'check-sso',
+    checkLoginIframe: true,
+  },
   onReady: () => {
     tokenInterceptor();
     /* eslint-disable no-new */
