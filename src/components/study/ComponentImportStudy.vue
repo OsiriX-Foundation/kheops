@@ -3,13 +3,13 @@
   "en": {
     "cantUpload": "You can't upload when files are sending",
     "upload": "Drop your files / directories !",
-    "cantUploadAlbum": "You can't load files in this album.",
+    "cantUploadPermission": "You do not have the required permissions to study.",
     "cancel": "Cancel"
   },
   "fr": {
     "cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
     "upload": "Lâcher vos fichiers / dossiers !",
-    "cantUploadAlbum": "Vous ne pouvez pas charger des fichiers dans cet album.",
+    "cantUploadPermission": "Vous n'avez pas les permissions requises pour charger des études.",
     "cancel": "Annuler"
   }
 }
@@ -38,9 +38,9 @@
           class="outPopUp"
         >
           <p
-            v-if="albumNoPermission"
+            v-if="!canUpload"
           >
-            {{ $t("cantUploadAlbum") }}
+            {{ $t("cantUploadPermission") }}
           </p>
           <p
             v-else-if="sending && files.length > 0"
@@ -124,8 +124,8 @@ export default {
       files: 'files',
       demoDragAndDrop: 'demoDragAndDrop',
     }),
-    albumNoPermission() {
-      return !(this.album.is_admin || this.album.add_series) && Object.keys(this.album).length > 0;
+    canUpload() {
+      return this.permissions.add_series;
     },
     classDragIn() {
       if (!mobiledetect.mobileAndTabletcheck()) {
@@ -164,7 +164,7 @@ export default {
       // Capture the files from the drop event and add them to local files array
       this.$refs.fileform.addEventListener('drop', async (e) => {
         if (this.hover) this.hover = false;
-        if (!this.sending && !this.loading && !this.albumNoPermission) {
+        if (!this.sending && !this.loading && this.canUpload) {
           this.loading = true;
           this.manageDataTransfer(e.dataTransfer.items);
         }
