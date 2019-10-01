@@ -1,9 +1,8 @@
 
 <template>
   <span>
-
     <span
-      :class="classIconPN(study.flag.is_hover)"
+      :class="classIconPN(showIcons)"
       class="ml-1"
     >
       <a
@@ -58,7 +57,7 @@
     </span>
     <span
       v-if="showCommentIcon"
-      :class="study.flag.is_commented ? '' : classIconPN(study.flag.is_hover)"
+      :class="study.flag.is_commented ? '' : classIconPN(showIcons)"
       class="ml-1"
       @click.stop="showComments(study, 'comments')"
     >
@@ -71,7 +70,7 @@
     </span>
     <span
       v-if="showFavoriteIcon"
-      :class="study.flag.is_favorite ? '' : classIconPN(study.flag.is_hover)"
+      :class="study.flag.is_favorite ? '' : classIconPN(showIcons)"
       class="ml-1"
       @click.stop="toggleFavorite()"
     >
@@ -153,6 +152,9 @@ export default {
     access_token() {
       return Vue.prototype.$keycloak.token;
     },
+    showIcons() {
+      return (this.study.flag.is_hover || this.study._showDetails || this.study.showIcons)
+    }
   },
 
   watch: {
@@ -262,11 +264,13 @@ export default {
     visibility: visible;
     display: inline;
     cursor: pointer;
+    opacity: 1;
   }
   .iconsUnhover{
     visibility: hidden;
     display: inline;
     cursor: pointer;
+    opacity: 0;
   }
   a.download{
     color: #FFF;

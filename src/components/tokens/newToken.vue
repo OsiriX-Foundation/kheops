@@ -22,8 +22,8 @@
     "permission": "Permission",
     "write": "écriture",
     "read": "lecture",
-    "download": "téléchargement",
-    "appropriate": "approprier",
+    "download": "montrer le bouton de téléchargement",
+    "appropriate": "ajouter à un album / inbox",
     "expirationdate": "Date d'expiration",
     "tokencopysuccess": "Token copié avec succès"
   }

@@ -355,6 +355,7 @@
                   <icon-list-providers
                     :study="row.item"
                     :providers="providersEnable"
+                    @dropdownState="setShowIcons"
                   />
                 </template>
               </list-icons>
@@ -444,6 +445,7 @@ export default {
       infiniteId: 0,
       showFilters: false,
       isActive: false,
+      showIcons: false,
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -574,7 +576,7 @@ export default {
         download_series: this.album.album_id !== undefined ? this.album.download_series || this.album.is_admin : true,
         send_series: this.album.album_id !== undefined ? this.album.send_series || this.album.is_admin : true,
         write_comments: this.album.album_id !== undefined ? this.album.write_comments || this.album.is_admin : true,
-        add_inbox: this.album.album_id !== undefined ? this.album.add_series || this.album.is_admin : false,
+        add_inbox: this.album.album_id !== undefined ? this.album.send_series || this.album.is_admin : false,
       };
     },
     providersEnable() {
@@ -821,6 +823,13 @@ export default {
     },
     changeFilterValue(value) {
       this.showFilters = value;
+    },
+    setShowIcons(value, studyUID, index = -1) {
+      let studyIndex = index;
+      if (studyIndex === -1) {
+        studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === studyUID);
+      }
+      this.studies[studyIndex].showIcons = value;
     },
   },
 };
