@@ -72,6 +72,7 @@
             ref="list"
             :album="album"
             :permissions="permissions"
+            :source="source"
             @loadfiles="inputLoadFiles"
             @loaddirectories="inputLoadFiles"
           />
@@ -94,6 +95,11 @@ export default {
     album: {
       type: Object,
       required: false,
+      default: () => ({}),
+    },
+    source: {
+      type: Object,
+      required: true,
       default: () => ({}),
     }
   },

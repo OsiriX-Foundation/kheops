@@ -443,6 +443,11 @@ export default {
       required: true,
       default: () => ({}),
     },
+    source: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    }
   },
   data() {
     return {
@@ -754,6 +759,7 @@ export default {
         includefield: ['favorite', 'comments', '00081030'],
         sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy,
       };
+      console.log(this.source)
       if (this.albumID === undefined) {
         params.inbox = true;
       } else {

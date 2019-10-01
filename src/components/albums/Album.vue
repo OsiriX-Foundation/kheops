@@ -94,6 +94,7 @@
       </div>
       <component-import-study
         :album="album"
+        :source="source"
       />
     </span>
     <album-comments
@@ -134,6 +135,11 @@ export default {
     },
     albumID() {
       return this.$route.params.album_id;
+    },
+    source() {
+      return {
+        album: this.albumID,
+      }
     },
   },
   watch: {

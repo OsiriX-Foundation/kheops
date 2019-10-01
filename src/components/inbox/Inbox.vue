@@ -1,6 +1,8 @@
 <template>
   <div>
-    <component-import-study />
+    <component-import-study
+      :source="source"
+    />
   </div>
 </template>
 
@@ -14,6 +16,9 @@ export default {
   },
   data() {
     return {
+      source: {
+        inbox: true,
+      },
     };
   },
   computed: {
