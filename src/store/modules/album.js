@@ -130,7 +130,7 @@ const actions = {
     }).catch((err) => Promise.reject(err));
   },
   setModalitiesAlbum({ commit }) {
-    commit('SET_MODALITIES', state.album.modalities)
+    commit('SET_MODALITIES', state.album.modalities);
   },
 };
 

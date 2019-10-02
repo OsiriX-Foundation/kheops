@@ -257,7 +257,7 @@
       </div>
     </div>
     <div
-      v-if="scope === 'studies' || album.is_admin || album.write_comments"
+      v-if="writeComments"
     >
       <div class="row mt-4 justify-content-center">
         <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
@@ -330,6 +330,11 @@ export default {
       type: String,
       required: true,
     },
+    writeComments: {
+      type: Boolean,
+      required: true,
+      default: false,
+    }
   },
   data() {
     return {

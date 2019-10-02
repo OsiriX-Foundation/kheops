@@ -105,10 +105,10 @@
           </div>
         </div>
       </div>
-
       <comments-and-notifications
         v-if="study.flag.view === 'comments'"
         :id="study.StudyInstanceUID.Value[0]"
+        :write-comments="this.$route.name !== 'test'"
         scope="studies"
       />
       <study-metadata
