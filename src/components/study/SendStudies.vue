@@ -381,7 +381,7 @@ export default {
     },
     sourceIsAlbum() {
       return (this.source !== 'inbox' && this.source !== undefined);
-    }
+    },
   },
   watch: {
     sending() {

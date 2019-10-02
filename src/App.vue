@@ -25,7 +25,7 @@
     />
 
     <!-- content -->
-    <router-view 
+    <router-view
       :style="logged ? 'margin: 25px auto' : 'margin: 75px auto'"
     />
 
