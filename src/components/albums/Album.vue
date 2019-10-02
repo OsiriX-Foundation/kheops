@@ -39,6 +39,15 @@
                 :color="(!album.is_favorite) ? 'grey' : ''"
               />
             </span>
+            <span
+              @click.stop="toggleTwitter(album.album_id)"
+            >
+              <v-icon
+                name="twitter"
+                :color="(twitterToken.length > 0) ? '#1da1f2' : 'grey'"
+                scale="3"
+              />
+            </span>
           </h3>
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
@@ -111,6 +120,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import moment from 'moment';
 import AlbumComments from '@/components/albums/AlbumComments';
 import AlbumSettings from '@/components/albums/AlbumSettings';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
@@ -122,11 +132,22 @@ export default {
     return {
       newUserName: '',
       loading: false,
+      twitterTokenParams: {
+        title: 'twitter_link',
+        scope_type: 'album',
+        album: '',
+        read_permission: true,
+        write_permission: false,
+        download_permission: true,
+        appropriate_permission: false,
+        expiration_time: '',
+      },
     };
   },
   computed: {
     ...mapGetters({
       album: 'album',
+      albumTokens: 'albumTokens',
     }),
     currentSettings() {
       return this.$route.params.category;
@@ -153,6 +174,9 @@ export default {
         add_inbox: this.album.send_series || this.album.is_admin,
       };
     },
+    twitterToken() {
+      return this.albumTokens.filter(token => token.title.includes('twitter_link') && moment(token.expiration_time) > moment() && !token.revoked);
+    },
   },
   watch: {
     albumID() {
@@ -174,6 +198,7 @@ export default {
   },
   created() {
     this.loading = true;
+    this.getTokens();
     this.loadAlbum().then(() => {
       this.loading = false;
     });
@@ -183,6 +208,13 @@ export default {
     this.$store.commit('INIT_ALBUM_USERS');
   },
   methods: {
+    getTokens() {
+      const queries = {
+        valid: true,
+        album: this.albumID,
+      };
+      return this.$store.dispatch('getAlbumTokens', { queries });
+    },
     loadAlbum() {
       return this.$store.dispatch('getAlbum', { album_id: this.albumID }).then((res) => res)
         .catch((err) => {
@@ -195,6 +227,36 @@ export default {
       this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
         this.$store.dispatch('setKeyValueAlbum', { key: 'is_favorite', value });
       });
+    },
+    toggleTwitter(albumID) {
+      if (this.twitterToken.length === 0) {
+        this.createTwitterToken(albumID);
+      } else {
+        this.revokeTwitterToken();
+      }
+    },
+    createTwitterToken(albumID) {
+      this.twitterTokenParams.album = albumID;
+      this.twitterTokenParams.expiration_time = moment().add(100, 'Y').format();
+      this.$store.dispatch('createToken', { token: this.twitterTokenParams }).then((res) => {
+        const urlTwitter = `https://twitter.com/intent/tweet`
+        const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`
+        const queries = `?text=${encodeURIComponent(urlSharing)}`
+        window.open(urlTwitter+queries, '_blank');
+      }).catch((err) => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    revokeTwitterToken() {
+      this.twitterToken.forEach(token => {
+        this.$store.dispatch('revokeToken', { token_id: token.id }).then((res) => {
+          if (res.status === 200) {
+            this.getTokens();
+          }
+        }).catch(() => {
+          this.$snotify.error(this.$t('sorryerror'));
+        });
+      })
     },
     loadView(view) {
       this.$router.push({ name: 'albumview', params: { view } });
