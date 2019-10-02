@@ -121,7 +121,7 @@ export default {
     categories() {
       const categories = [...this.basicCategories];
       if (this.album.is_admin) {
-        categories.push('socialmedia');
+        // categories.push('socialmedia');
         categories.push('tokens');
       }
       return categories;

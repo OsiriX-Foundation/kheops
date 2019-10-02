@@ -54,6 +54,17 @@
                 scale="3"
               />
             </span>
+            <span
+              :title="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
+              style="cursor: pointer;"
+              @click.stop="toggleSharing(album.album_id)"
+            >
+              <v-icon
+                name="link"
+                :color="(sharingToken.length > 0) ? '' : 'grey'"
+                scale="2"
+              />
+            </span>
           </h3>
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
@@ -106,6 +117,41 @@
             </p>
           </div>
         </div>
+
+        <div
+          v-if="sharingTokenParams.show === true"
+          class="chat-popup container-fluid p-0"
+        >
+          <div
+            class="closeBtn d-flex"
+          >
+            <div
+              class="p-2"
+            >
+              <b>URL to share</b>
+            </div>
+            <div
+              class="ml-auto p-1"
+            >
+              <button
+                type="button"
+                class="btn btn-link btn-sm"
+                @click="cancelSharingToken()"
+              >
+                <close-icon
+                  width="20"
+                  height="20"
+                />
+              </button>
+            </div>
+          </div>
+          <sharing-link
+            :album-id="albumID"
+            :url="urlSharing"
+            @cancel="cancelSharingToken"
+            @create="createSharingToken"
+          />
+        </div>
       </div>
       <component-import-study
         :album="album"
@@ -130,10 +176,12 @@ import moment from 'moment';
 import AlbumComments from '@/components/albums/AlbumComments';
 import AlbumSettings from '@/components/albums/AlbumSettings';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
+import SharingLink from '@/components/socialmedia/SharingLink';
+import CloseIcon from '@/components/kheopsSVG/CloseIcon';
 
 export default {
   name: 'Album',
-  components: { ComponentImportStudy, AlbumSettings, AlbumComments },
+  components: { ComponentImportStudy, AlbumSettings, AlbumComments, SharingLink, CloseIcon },
   data() {
     return {
       newUserName: '',
@@ -148,6 +196,10 @@ export default {
         appropriate_permission: false,
         expiration_time: '',
       },
+      sharingTokenParams: {
+        show: false,
+      },
+      urlSharing: '',
     };
   },
   computed: {
@@ -182,6 +234,9 @@ export default {
     },
     twitterToken() {
       return this.albumTokens.filter((token) => token.title.includes('twitter_link') && moment(token.expiration_time) > moment() && !token.revoked);
+    },
+    sharingToken() {
+      return this.albumTokens.filter((token) => token.title.includes('sharing_link') && moment(token.expiration_time) > moment() && !token.revoked);
     },
   },
   watch: {
@@ -238,13 +293,13 @@ export default {
       if (this.twitterToken.length === 0) {
         this.createTwitterToken(albumID);
       } else {
-        this.revokeTwitterToken();
+        this.revokeTokens(this.twitterToken);
       }
     },
     createTwitterToken(albumID) {
       this.twitterTokenParams.album = albumID;
       this.twitterTokenParams.expiration_time = moment().add(100, 'Y').format();
-      this.$store.dispatch('createToken', { token: this.twitterTokenParams }).then((res) => {
+      this.createToken(this.twitterTokenParams).then((res) => {
         const urlTwitter = 'https://twitter.com/intent/tweet';
         const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
         const queries = `?text=${encodeURIComponent(urlSharing)}`;
@@ -253,8 +308,31 @@ export default {
         this.$snotify.error(this.$t('sorryerror'));
       });
     },
-    revokeTwitterToken() {
-      this.twitterToken.forEach((token) => {
+    toggleSharing() {
+      if (this.sharingToken.length === 0) {
+        this.sharingTokenParams.show = !this.sharingTokenParams.show
+      } else {
+        this.urlSharing = ''
+        this.revokeTokens(this.sharingToken);
+      }
+    },
+    cancelSharingToken() {
+      this.sharingTokenParams.show = false
+      this.urlSharing = ''
+    },
+    createSharingToken (token) {
+      this.createToken(token).then((res) => {
+        const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
+        this.urlSharing = urlSharing
+      }).catch(() => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    createToken(token) {
+      return this.$store.dispatch('createToken', { token })
+    },
+    revokeTokens(tokens) {
+      tokens.forEach((token) => {
         this.$store.dispatch('revokeToken', { token_id: token.id }).then((res) => {
           if (res.status === 200) {
             this.getTokens();
@@ -296,5 +374,17 @@ a.nav-link{
 }
 .nav a:hover:not(.active) {
   opacity: 0.5;
+}
+.chat-popup {
+  background: #303030;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+  max-width: 550px;
+  opacity: 1;
+  display: block;
+}
+.closeBtn {
+  position: relative;
+  border-bottom: 1px solid #f1f1f1;
 }
 </style>
