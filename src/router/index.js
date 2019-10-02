@@ -188,7 +188,7 @@ const router = new Router({
   },
   {
     path: '/view/:token',
-    name: 'test',
+    name: 'viewnologin',
     component: Test,
   },
   {
