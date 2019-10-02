@@ -3,12 +3,16 @@
   "en": {
     "studies": "Studies",
     "comments": "Comments",
-    "settings": "Settings"
+    "settings": "Settings",
+    "twitterEnable": "Twitter link enable",
+    "twitterDisable": "No twitter link"
   },
   "fr": {
     "studies": "Etudes",
     "comments": "Commentaires",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "twitterEnable": "Lien twitter déjà actif",
+    "twitterDisable": "Pas de lien twitter"
   }
 }
 </i18n>
@@ -41,6 +45,7 @@
             </span>
             <span
               @click.stop="toggleTwitter(album.album_id)"
+              :title="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
             >
               <v-icon
                 name="twitter"
