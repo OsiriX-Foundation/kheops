@@ -27,7 +27,7 @@ export default {
     },
     permissions() {
       return {
-        add_series: this.logged && this.scope.includes('write'),
+        add_series: this.scope.includes('write'),
         delete_series: this.scope.includes('write'),
         download_series: this.scope.includes('downloadbutton'),
         send_series: false,
@@ -51,8 +51,6 @@ export default {
       queries = httpoperations.getFormData(params.queries);
     }
     HTTP.post('token/introspect', queries).then((res) => {
-      console.log(res.data)
-      console.log(res.data.scope.split(' '))
       this.scope = res.data.scope.split(' ')
     }).catch((err) => {
       console.log(err)
