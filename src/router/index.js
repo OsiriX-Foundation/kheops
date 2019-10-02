@@ -7,7 +7,7 @@ import Album from '@/components/albums/Album';
 import User from '@/components/user/user';
 import store from '@/store';
 import Inbox from '@/components/inbox/Inbox';
-import Test from '@/components/withoutlogin/Test';
+import ViewWithoutLogin from '@/components/withoutlogin/ViewWithoutLogin';
 // import PermissionDenied from '@/components/user/permissionDenied'
 
 // import {ServerTable, ClientTable, Event} from 'vue-tables-2';
@@ -189,7 +189,7 @@ const router = new Router({
   {
     path: '/view/:token',
     name: 'viewnologin',
-    component: Test,
+    component: ViewWithoutLogin,
   },
   {
     path: '*',

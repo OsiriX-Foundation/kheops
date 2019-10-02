@@ -12,7 +12,7 @@ import { HTTP } from '@/router/http';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {
-  name: 'Inbox',
+  name: 'ViewWithoutLogin',
   components: { ComponentImportStudy },
   props: {
   },
@@ -39,11 +39,9 @@ export default {
   watch: {
   },
   created() {
-    const [, , token] = window.location.pathname.split('/');
     const params = {
       queries: {
-        token,
-        // token: '87EM86qCVvG7gICDTUoJVA',
+        token: this.$route.params.token,
       }
     }
     let queries = '';
