@@ -76,6 +76,7 @@
               target="_blank"
               @click="redirect('https://docs.kheops.online')"
             >
+              {{ $t('tooltipHelp') }}
               <v-icon name="help" />
             </a>
           </b-nav-item>
