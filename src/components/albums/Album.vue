@@ -44,12 +44,13 @@
               />
             </span>
             <span
-              @click.stop="toggleTwitter(album.album_id)"
               :title="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
+              style="cursor: pointer;"
+              @click.stop="toggleTwitter(album.album_id)"
             >
               <v-icon
                 name="twitter"
-                :color="(twitterToken.length > 0) ? '#1da1f2' : 'grey'"
+                :color="(twitterToken.length > 0) ? '#1da1f2' : '#657786'"
                 scale="3"
               />
             </span>
@@ -167,7 +168,7 @@ export default {
       return {
         key: 'album',
         value: this.albumID,
-      }
+      };
     },
     permissions() {
       return {
@@ -180,7 +181,7 @@ export default {
       };
     },
     twitterToken() {
-      return this.albumTokens.filter(token => token.title.includes('twitter_link') && moment(token.expiration_time) > moment() && !token.revoked);
+      return this.albumTokens.filter((token) => token.title.includes('twitter_link') && moment(token.expiration_time) > moment() && !token.revoked);
     },
   },
   watch: {
@@ -244,16 +245,16 @@ export default {
       this.twitterTokenParams.album = albumID;
       this.twitterTokenParams.expiration_time = moment().add(100, 'Y').format();
       this.$store.dispatch('createToken', { token: this.twitterTokenParams }).then((res) => {
-        const urlTwitter = `https://twitter.com/intent/tweet`
-        const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`
-        const queries = `?text=${encodeURIComponent(urlSharing)}`
-        window.open(urlTwitter+queries, '_blank');
-      }).catch((err) => {
+        const urlTwitter = 'https://twitter.com/intent/tweet';
+        const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
+        const queries = `?text=${encodeURIComponent(urlSharing)}`;
+        window.open(urlTwitter + queries, '_blank');
+      }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
       });
     },
     revokeTwitterToken() {
-      this.twitterToken.forEach(token => {
+      this.twitterToken.forEach((token) => {
         this.$store.dispatch('revokeToken', { token_id: token.id }).then((res) => {
           if (res.status === 200) {
             this.getTokens();
@@ -261,7 +262,7 @@ export default {
         }).catch(() => {
           this.$snotify.error(this.$t('sorryerror'));
         });
-      })
+      });
     },
     loadView(view) {
       this.$router.push({ name: 'albumview', params: { view } });
