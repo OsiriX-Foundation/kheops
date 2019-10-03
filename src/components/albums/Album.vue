@@ -60,14 +60,15 @@
               />
             </span>
             <span
+              id="sharing-link"
               v-if="album.is_admin === true"
-              :title="sharingToken.length > 0 ? $t('sharingEnable') : $t('sharingDisable')"
-              style="cursor: pointer;"
+              :text="sharingToken.length > 0 ? $t('sharingEnable') : $t('sharingDisable')"
+              class="btn btn-link"
               @click.stop="toggleSharing(album.album_id)"
             >
               <v-icon
                 name="link"
-                :color="(sharingToken.length > 0) ? '' : 'grey'"
+                :color="(sharingToken.length > 0) ? 'white' : 'grey'"
                 scale="2"
               />
             </span>
@@ -105,40 +106,6 @@
       https://fr.vuejs.org/v2/guide/components-dynamic-async.html
     -->
 
-    <div
-      v-if="sharingTokenParams.show === true"
-      class="chat-popup container-fluid p-0 mb-2"
-    >
-      <div
-        class="closeBtn d-flex"
-      >
-        <div
-          class="p-2"
-        >
-          <b>URL to share</b>
-        </div>
-        <div
-          class="ml-auto p-1"
-        >
-          <button
-            type="button"
-            class="btn btn-link btn-sm"
-            @click="cancelSharingToken()"
-          >
-            <close-icon
-              width="20"
-              height="20"
-            />
-          </button>
-        </div>
-      </div>
-      <sharing-link
-        :album-id="albumID"
-        :url="urlSharing"
-        @cancel="cancelSharingToken"
-        @create="createSharingToken"
-      />
-    </div>
     <span v-if="currentView === 'studies' || currentView === undefined && loading === false">
       <div class="container">
         <div
@@ -173,6 +140,49 @@
       v-if="currentView=='settings' && loading === false"
       :album="album"
     />
+
+    <b-popover
+      target="sharing-link"
+      :show.sync="sharingTokenParams.show"
+      :placement="'bottom'"
+      triggers="click"
+    >
+      <div
+        class="chat-popup container-fluid p-0 mb-2"
+      >
+        <div
+          class="closeBtn d-flex"
+          v-if="sharingTokenParams.show"
+        >
+          <div
+            class="p-2"
+          >
+            <b>URL to share</b>
+          </div>
+          <div
+            class="ml-auto p-1"
+          >
+            <button
+              type="button"
+              class="btn btn-link btn-sm"
+              @click="cancelSharingToken()"
+            >
+              <close-icon
+                width="20"
+                height="20"
+              />
+            </button>
+          </div>
+        </div>
+        <sharing-link
+          v-if="sharingTokenParams.show"
+          :album-id="albumID"
+          :url="urlSharing"
+          @cancel="cancelSharingToken"
+          @create="createSharingToken"
+        />
+      </div>
+    </b-popover>
   </div>
 </template>
 
@@ -191,7 +201,7 @@ export default {
   data() {
     return {
       newUserName: '',
-      loading: false,
+      loading: true,
       twitterTokenParams: {
         title: 'twitter_link',
         scope_type: 'album',
@@ -265,11 +275,13 @@ export default {
   },
   created() {
     this.loading = true;
-    this.loadAlbum().then(() => {
-      if (this.album.is_admin === true) {
-        this.getTokens();
+    this.loadAlbum().then((res) => {
+      if (res !== undefined && res.status === 200) {
+        if (this.album.is_admin === true) {
+          this.getTokens();
+        }
+        this.loading = false;
       }
-      this.loading = false;
     });
   },
   beforeDestroy() {

@@ -22,12 +22,12 @@
     v-if="url === ''"
   >
     <div class="row mt-2 mb-2">
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div class="col-xs-12 col-sm-12 col-md-8">
         <label>
           {{ $t('write') }}
         </label>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div class="col-xs-12 col-sm-12 col-md-4">
         <toggle-button
           v-model="token.write_permission"
           :labels="{checked: 'Yes', unchecked: 'No'}"
@@ -36,12 +36,12 @@
     </div>
 
     <div class="row mb-2">
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div class="col-xs-12 col-sm-12 col-md-8">
         <label>
           {{ $t('download') }}
         </label>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div class="col-xs-12 col-sm-12 col-md-4">
         <toggle-button
           v-if="token.read_permission"
           v-model="token.download_permission"
@@ -51,7 +51,7 @@
     </div>
     <div class="row mb-2">
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <b>{{ $t('expirationdate') }}</b>
+        {{ $t('expirationdate') }}
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
         <datepicker
@@ -68,19 +68,21 @@
       </div>
     </div>
     <div class="row mb-2">
-      <div class="col-xs-12 col-sm-12 col-md-6">
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          @click="create"
+        >
+          {{ $t('create') }}
+        </button>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6">
-          <button
-            type="submit"
-            class="btn btn-primary"
-            @click="create"
-          >
-            {{ $t('create') }}
-          </button>
+    </div>
+      <div class="row mb-2">
+        <div class="col-xs-12 col-sm-12 col-md-12">
           <button
             type="reset"
-            class="btn btn-secondary ml-3"
+            class="btn btn-secondary btn-block"
             @click="cancel"
           >
             {{ $t('cancel') }}
@@ -100,19 +102,17 @@
     </div>
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 mb-2">
-        <b-card>
-          <b class="mr-2">{{ url }}</b>
-          <button
-            v-clipboard:copy="url"
-            type="button"
-            class="btn btn-secondary btn-sm"
-          >
-            <v-icon
-              name="paste"
-              scale="1"
-            />
-          </button>
-        </b-card>
+        <b class="mr-2">{{ url }}</b>
+        <button
+          v-clipboard:copy="url"
+          type="button"
+          class="btn btn-secondary btn-sm"
+        >
+          <v-icon
+            name="paste"
+            scale="1"
+          />
+        </button>
       </div>
     </div>
   </div>
