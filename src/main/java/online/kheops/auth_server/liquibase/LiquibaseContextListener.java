@@ -25,11 +25,14 @@ public class LiquibaseContextListener implements ServletContextListener {
     private static ServletContext servletContext;
     private final String changeLogFile = "kheopsChangeLog-master.xml";
     private static final java.util.logging.Logger LOG = Logger.getLogger(LiquibaseContextListener.class.getName());
+    private static final String dbVersion = "v1";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 
         servletContext = sce.getServletContext();
+
+        LOG.log(Level.INFO, "Start initializing the DB with Liquibase. Database version : " + dbVersion);
 
         final Properties properties = new Properties();
         properties.setProperty(Environment.USER, getJDBCUser());
@@ -55,7 +58,7 @@ public class LiquibaseContextListener implements ServletContextListener {
                 // Initialize Liquibase and run the update
                 Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
                 Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
-                final String version = getJDBCVersion();
+                final String version = dbVersion;
 
                 if (liquibase.tagExists(version)) {
                     liquibase.rollback(version, "");
@@ -69,7 +72,7 @@ public class LiquibaseContextListener implements ServletContextListener {
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Unable to use liquibase", e);
             }
-        LOG.log(Level.INFO, "Liquibase : database version : " + getJDBCVersion());
+        LOG.log(Level.INFO, "Liquibase : database version : " + dbVersion + "SUCCESSFUL");
     }
 
     @Override
@@ -94,10 +97,6 @@ public class LiquibaseContextListener implements ServletContextListener {
     private static String getJDBCUser() {
         verifyState();
         return servletContext.getInitParameter("online.kheops.jdbc.user");
-    }
-    private static String getJDBCVersion() {
-        verifyState();
-        return servletContext.getInitParameter("online.kheops.jdbc.version");
     }
 
 }
