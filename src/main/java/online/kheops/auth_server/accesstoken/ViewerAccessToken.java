@@ -54,7 +54,11 @@ public final class ViewerAccessToken implements AccessToken {
     }
 
     public String getSourceId() {
-        return jwe.getString(Consts.JWE.SOURCE_ID);
+        if (jwe.containsKey(Consts.JWE.SOURCE_ID)) {
+            return jwe.getString(Consts.JWE.SOURCE_ID);
+        } else {
+            return null;
+        }
     }
 
     public String getStudyInstanceUID() {

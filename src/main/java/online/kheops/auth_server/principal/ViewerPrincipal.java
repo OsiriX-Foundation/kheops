@@ -70,7 +70,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        if (viewerAccessToken.getSourceId() == null) {
+        if (!viewerAccessToken.isInbox() && viewerAccessToken.getSourceId() == null) {
             return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
         } else {
             this.em = EntityManagerListener.createEntityManager();
