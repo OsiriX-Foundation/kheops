@@ -141,6 +141,11 @@ export default {
       required: false,
       default: true,
     },
+    source: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -179,15 +184,11 @@ export default {
   mounted() {
   },
   methods: {
-    getSource() {
-      if (this.albumId === '') {
-        return {
-          inbox: true,
-        };
+    getSourceQueries() {
+      if (Object.keys(this.source).length > 0) {
+        return `${encodeURIComponent(this.source.key)}=${encodeURIComponent(this.source.value)}`
       }
-      return {
-        album: this.albumId,
-      };
+      return ''
     },
     classIconPN(visibility) {
       if (visibility || this.mobiledetect) {
@@ -198,16 +199,20 @@ export default {
     toggleFavorite() {
       const params = {
         StudyInstanceUID: this.study.StudyInstanceUID.Value[0],
-        queries: this.getSource(),
         value: !this.study.flag.is_favorite,
       };
+      if (Object.keys(this.source).length > 0) {
+        params.queries = {}
+        params.queries[this.source.key] = this.source.value
+      }
       this.$store.dispatch('favoriteStudy', params);
     },
     getURLDownload() {
       const source = this.albumId === '' ? 'inbox' : this.albumId;
+      const sourceQuery = this.getSourceQueries()
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, source).then((res) => {
-        const queryparams = `accept=application%2Fzip&${source === 'inbox' ? 'inbox=true' : `album=${source}`}`;
+        const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
         location.href = URL;
       }).catch((err) => {
@@ -217,6 +222,7 @@ export default {
     openViewer(viewer) {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       const source = this.albumId === '' ? 'inbox' : this.albumId;
+      const sourceQuery = this.getSourceQueries()
       let ohifWindow;
       if (viewer === 'Ohif') {
         ohifWindow = window.open('', 'OHIFViewer');
@@ -225,7 +231,7 @@ export default {
         if (viewer === 'Osirix') {
           this.openOsiriX(StudyInstanceUID, res.data.access_token);
         } else if (viewer === 'Ohif') {
-          ohifWindow.location.href = this.openOhif(StudyInstanceUID, res.data.access_token, source === 'inbox' ? 'inbox=true' : `album=${source}`);
+          ohifWindow.location.href = this.openOhif(StudyInstanceUID, res.data.access_token, sourceQuery);
         } else if (viewer === 'Weasis') {
           this.openWeasis(StudyInstanceUID, res.data.access_token);
         }
@@ -242,7 +248,7 @@ export default {
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata?${queryparams}`;
+      const url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
       return `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`;
     },
     showComments(study, flagView) {

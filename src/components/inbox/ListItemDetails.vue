@@ -76,6 +76,7 @@
             <series-summary
               :serie="serie"
               :study="study"
+              :source="source"
             />
           </div>
         </div>

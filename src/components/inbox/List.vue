@@ -348,6 +348,7 @@
                 :show-import-icon="permissions.add_series"
                 :show-report-provider-icon="source.key === 'album' ? true : false"
                 :album-id="source.key === 'album' ? source.value : ''"
+                :source="source"
               >
                 <template
                   slot="reportprovider"

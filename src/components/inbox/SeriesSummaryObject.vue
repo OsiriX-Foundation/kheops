@@ -118,6 +118,11 @@ export default {
       required: true,
       default: () => {},
     },
+    source: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    },
   },
   data() {
     return {};
@@ -135,9 +140,6 @@ export default {
     },
     selected() {
       return this.serie.flag.is_selected;
-    },
-    source() {
-      return this.$route.params.album_id ? this.$route.params.album_id : 'inbox';
     },
     isSelected: {
       // getter
