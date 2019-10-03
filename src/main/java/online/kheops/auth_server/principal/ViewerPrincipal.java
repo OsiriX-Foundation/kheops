@@ -150,9 +150,10 @@ public class ViewerPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasAlbumAccess(String albumId){
+    public boolean hasAlbumAccess(String albumId) {
         try {
-            return kheopsPrincipal.hasAlbumAccess(albumId) && !viewerAccessToken.isInbox() && viewerAccessToken.getSourceId().equals(albumId);
+            return kheopsPrincipal.hasAlbumAccess(albumId) && !viewerAccessToken.isInbox() &&
+                    (viewerAccessToken.getSourceId() == null || viewerAccessToken.getSourceId().equals(albumId));
         } catch (AlbumNotFoundException e) {
             return false;
         }
@@ -179,7 +180,9 @@ public class ViewerPrincipal implements KheopsPrincipal {
     @Override
     public String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException {
         final String albumID;
-        if(!viewerAccessToken.isInbox()) {
+        if (!viewerAccessToken.isInbox() && viewerAccessToken.getSourceId() == null) {
+           albumID = kheopsPrincipal.getAlbumID();
+        } else if (!viewerAccessToken.isInbox()) {
             albumID = viewerAccessToken.getSourceId();
         } else {
             throw new NotAlbumScopeTypeException("");
