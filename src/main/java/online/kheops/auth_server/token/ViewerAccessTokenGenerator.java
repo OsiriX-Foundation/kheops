@@ -50,7 +50,7 @@ class ViewerAccessTokenGenerator {
     }
 
     ViewerAccessTokenGenerator withSourceType(final String sourceType) {
-        this.sourceType = Objects.requireNonNull(sourceType);
+        this.sourceType = sourceType;
         return this;
     }
 
@@ -67,13 +67,12 @@ class ViewerAccessTokenGenerator {
     String generate(@SuppressWarnings("SameParameterValue") final long expiresIn) {
         Objects.requireNonNull(token);
         Objects.requireNonNull(studyInstanceUID);
-        Objects.requireNonNull(sourceType);
 
-        if (!sourceType.equals(ALBUM) && !sourceType.equals(INBOX)) {
+        if (sourceType != null && !sourceType.equals(ALBUM) && !sourceType.equals(INBOX)) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_REQUEST,
                     "'source_type' can be only '" + ALBUM + "' or '" + INBOX + "'");
         }
-        if (sourceType.equals(ALBUM) && (sourceId == null || sourceId.isEmpty())) {
+        if (sourceType != null && sourceType.equals(ALBUM) && (sourceId == null || sourceId.isEmpty())) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_REQUEST,
                     "'source_id' must be set when 'source_type'=" + ALBUM);
         }
@@ -101,8 +100,10 @@ class ViewerAccessTokenGenerator {
         try {
             final JSONObject data = new JSONObject();
             data.put(Consts.JWE.TOKEN, token);
-            data.put(Consts.JWE.SOURCE_ID, sourceId);
-            data.put(Consts.JWE.IS_INBOX, sourceType.equals(INBOX));
+            if (sourceId != null) {
+                data.put(Consts.JWE.SOURCE_ID, sourceId);
+            }
+            data.put(Consts.JWE.IS_INBOX, (sourceType != null && sourceType.equals(INBOX)));
             data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
             data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
 
