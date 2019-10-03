@@ -15,6 +15,7 @@ import java.util.List;
 
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.token.TokenRequestException.Error.*;
+import static online.kheops.auth_server.util.Consts.INBOX;
 import static online.kheops.auth_server.util.Tools.checkValidUID;
 
 public enum TokenGrantType {
@@ -129,11 +130,14 @@ public enum TokenGrantType {
 
                 return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject, "pep", studyInstanceUID, seriesInstanceUID);
             } else if (scope.equals("viewer")) {
-                verifySingleHeader(form, "source_type");
+                verifyNotDuplicateHeader(form, "source_type");
                 final String sourceType = form.getFirst("source_type");
 
                 final String sourceId;
-                if (sourceType.equals(ALBUM)) {
+                if (sourceType != null && !(sourceType.equals(INBOX) || sourceType.equals(ALBUM))) {
+                    throw new TokenRequestException(INVALID_REQUEST, "sourceType must be either album or inbox");
+                }
+                if (sourceType != null && sourceType.equals(ALBUM)) {
                     verifySingleHeader(form, "source_id");
                     sourceId = form.getFirst("source_id");
                 } else {
@@ -188,8 +192,16 @@ public enum TokenGrantType {
 
     private static void verifySingleHeader(final MultivaluedMap<String, String> form, final String param) {
         final List<String> params = form.get(param);
-        if (params == null || form.get(param).size() != 1) {
+        if (params == null || params.size() != 1) {
             throw new TokenRequestException(INVALID_REQUEST, "Must have a single " + param);
+        }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static void verifyNotDuplicateHeader(final MultivaluedMap<String, String> form, final String param) {
+        final List<String> params = form.get(param);
+        if (params != null && params.size() > 1) {
+            throw new TokenRequestException(INVALID_REQUEST, "Must not have multiple " + param);
         }
     }
 
