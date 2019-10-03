@@ -10,7 +10,6 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -71,31 +70,31 @@ public class ViewerPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
-        try {
-            tx.begin();
+        if (viewerAccessToken.getSourceId() == null) {
+            return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
+        } else {
+            this.em = EntityManagerListener.createEntityManager();
+            this.tx = em.getTransaction();
+            try {
+                tx.begin();
 
-            final List<Series> seriesList;
-            if(viewerAccessToken.isInbox()) {
-                seriesList = findSeriesListByStudyUIDFromInbox(getUser(), studyInstanceUID, em);
-            } else {
-                final Album album = getAlbum(viewerAccessToken.getSourceId(), em);
-                seriesList = findSeriesListByStudyUIDFromAlbum(getUser(), album, studyInstanceUID, em);
-            }
+                final List<Series> seriesList;
+                if (viewerAccessToken.isInbox()) {
+                    seriesList = findSeriesListByStudyUIDFromInbox(getUser(), studyInstanceUID, em);
+                } else {
+                    final Album album = getAlbum(viewerAccessToken.getSourceId(), em);
+                    seriesList = findSeriesListByStudyUIDFromAlbum(getUser(), album, studyInstanceUID, em);
+                }
 
-            if (seriesList.contains(getSeries(studyInstanceUID, seriesInstanceUID, em))) {
-                return true;
-            } else {
+                return seriesList.contains(getSeries(studyInstanceUID, seriesInstanceUID, em));
+            } catch (AlbumNotFoundException e) {
                 return false;
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
             }
-        } catch (AlbumNotFoundException e) {
-            return false;
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
         }
     }
 
@@ -105,11 +104,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        if (studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID())) {
-            return true;
-        } else {
-            return false;
-        }
+        return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
     }
 
     @Override
