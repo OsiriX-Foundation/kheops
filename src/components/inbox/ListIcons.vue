@@ -208,10 +208,9 @@ export default {
       this.$store.dispatch('favoriteStudy', params);
     },
     getURLDownload() {
-      const source = this.albumId === '' ? 'inbox' : this.albumId;
       const sourceQuery = this.getSourceQueries()
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, source).then((res) => {
+      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
         const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
         location.href = URL;
@@ -221,13 +220,12 @@ export default {
     },
     openViewer(viewer) {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      const source = this.albumId === '' ? 'inbox' : this.albumId;
       const sourceQuery = this.getSourceQueries()
       let ohifWindow;
       if (viewer === 'Ohif') {
         ohifWindow = window.open('', 'OHIFViewer');
       }
-      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, source).then((res) => {
+      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
         if (viewer === 'Osirix') {
           this.openOsiriX(StudyInstanceUID, res.data.access_token);
         } else if (viewer === 'Ohif') {
