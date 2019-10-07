@@ -49,7 +49,9 @@ export default {
       queries = httpoperations.getFormData(params.queries);
     }
     HTTP.post('token/introspect', queries).then((res) => {
-      this.scope = res.data.scope.split(' ')
+      if (res.data.active === true) {
+        this.scope = res.data.scope.split(' ')
+      }
     }).catch((err) => {
       console.log(err)
     })
