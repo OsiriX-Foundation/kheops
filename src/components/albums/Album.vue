@@ -49,7 +49,8 @@
             </span>
             <span
               v-if="album.is_admin === true"
-              :title="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
+              id="twitter-link"
+              :text="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
               style="cursor: pointer;"
               @click.stop="toggleTwitter(album.album_id)"
             >
@@ -60,11 +61,11 @@
               />
             </span>
             <span
-              id="sharing-link"
               v-if="album.is_admin === true"
+              id="sharing-link"
               :text="sharingToken.length > 0 ? $t('sharingEnable') : $t('sharingDisable')"
-              class="btn btn-link"
-              @click.stop="toggleSharing(album.album_id)"
+              class="btn btn-link p-0"
+              @click.stop="sharingTokenParams.show = !sharingTokenParams.show"
             >
               <v-icon
                 name="link"
@@ -105,7 +106,6 @@
     <!--
       https://fr.vuejs.org/v2/guide/components-dynamic-async.html
     -->
-
     <span v-if="currentView === 'studies' || currentView === undefined && loading === false">
       <div class="container">
         <div
@@ -140,48 +140,32 @@
       v-if="currentView=='settings' && loading === false"
       :album="album"
     />
-
     <b-popover
+      v-if="showRevokeTwitter"
+      target="twitter-link"
+      :show="showRevokeTwitter"
+      placement="auto"
+    >
+      <twitter-link
+        :tokens="twitterToken"
+        @cancel="showRevokeTwitter = false"
+        @revoke="revokeTwitterTokens"
+      />
+    </b-popover>
+    <b-popover
+      v-if="sharingTokenParams.show"
       target="sharing-link"
       :show.sync="sharingTokenParams.show"
-      :placement="'bottom'"
-      triggers="click"
+      placement="auto"
     >
-      <div
-        class="chat-popup container-fluid p-0 mb-2"
-      >
-        <div
-          class="closeBtn d-flex"
-          v-if="sharingTokenParams.show"
-        >
-          <div
-            class="p-2"
-          >
-            <b>URL to share</b>
-          </div>
-          <div
-            class="ml-auto p-1"
-          >
-            <button
-              type="button"
-              class="btn btn-link btn-sm"
-              @click="cancelSharingToken()"
-            >
-              <close-icon
-                width="20"
-                height="20"
-              />
-            </button>
-          </div>
-        </div>
-        <sharing-link
-          v-if="sharingTokenParams.show"
-          :album-id="albumID"
-          :url="urlSharing"
-          @cancel="cancelSharingToken"
-          @create="createSharingToken"
-        />
-      </div>
+      <sharing-link
+        :album-id="albumID"
+        :url="urlSharing"
+        :tokens="sharingToken"
+        @cancel="cancelSharingToken"
+        @revoke="revokeSharingTokens"
+        @create="createSharingToken"
+      />
     </b-popover>
   </div>
 </template>
@@ -193,11 +177,13 @@ import AlbumComments from '@/components/albums/AlbumComments';
 import AlbumSettings from '@/components/albums/AlbumSettings';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
 import SharingLink from '@/components/socialmedia/SharingLink';
-import CloseIcon from '@/components/kheopsSVG/CloseIcon';
+import TwitterLink from '@/components/socialmedia/TwitterLink';
 
 export default {
   name: 'Album',
-  components: { ComponentImportStudy, AlbumSettings, AlbumComments, SharingLink, CloseIcon },
+  components: {
+    ComponentImportStudy, AlbumSettings, AlbumComments, SharingLink, TwitterLink,
+  },
   data() {
     return {
       newUserName: '',
@@ -212,6 +198,7 @@ export default {
         appropriate_permission: false,
         expiration_time: '',
       },
+      showRevokeTwitter: false,
       sharingTokenParams: {
         show: false,
       },
@@ -313,7 +300,7 @@ export default {
       if (this.twitterToken.length === 0) {
         this.createTwitterToken(albumID);
       } else {
-        this.revokeTokens(this.twitterToken);
+        this.showRevokeTwitter = this.twitterToken.length > 0 && !this.showRevokeTwitter;
       }
     },
     createTwitterToken(albumID) {
@@ -328,28 +315,28 @@ export default {
         this.$snotify.error(this.$t('sorryerror'));
       });
     },
-    toggleSharing() {
-      if (this.sharingToken.length === 0) {
-        this.sharingTokenParams.show = !this.sharingTokenParams.show
-      } else {
-        this.urlSharing = ''
-        this.revokeTokens(this.sharingToken);
-      }
+    revokeTwitterTokens(tokens) {
+      this.showRevokeTwitter = false;
+      this.revokeTokens(tokens);
+    },
+    revokeSharingTokens(tokens) {
+      this.cancelSharingToken();
+      this.urlSharing = '';
+      this.revokeTokens(tokens);
     },
     cancelSharingToken() {
-      this.sharingTokenParams.show = false
-      this.urlSharing = ''
+      this.sharingTokenParams.show = false;
     },
-    createSharingToken (token) {
+    createSharingToken(token) {
       this.createToken(token).then((res) => {
         const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
-        this.urlSharing = urlSharing
+        this.urlSharing = urlSharing;
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
       });
     },
     createToken(token) {
-      return this.$store.dispatch('createToken', { token })
+      return this.$store.dispatch('createToken', { token });
     },
     revokeTokens(tokens) {
       tokens.forEach((token) => {
@@ -394,17 +381,5 @@ a.nav-link{
 }
 .nav a:hover:not(.active) {
   opacity: 0.5;
-}
-.chat-popup {
-  background: #303030;
-  border: 3px solid #f1f1f1;
-  z-index: 9;
-  max-width: 550px;
-  opacity: 1;
-  display: block;
-}
-.closeBtn {
-  position: relative;
-  border-bottom: 1px solid #f1f1f1;
 }
 </style>
