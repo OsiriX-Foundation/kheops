@@ -161,7 +161,7 @@
         <div class="col-xs-12 col-sm-12 col-md-12">
           <button
             type="submit"
-            class="btn btn-primary btn-block"
+            class="btn btn-danger btn-block"
             @click="revoke"
           >
             {{ $t('disable') }}
