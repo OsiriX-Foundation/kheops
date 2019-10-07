@@ -36,7 +36,8 @@
     "nomorestudies": "No more studies",
     "noresults": "No study found",
     "error": "An error occur please reload the studies.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "nopermissions": "You don't have the permissions to show the studies list."
   },
   "fr": {
     "selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -70,7 +71,8 @@
     "nomorestudies": "Plus d'études",
     "noresults": "Aucune étude trouvée.",
     "error": "Une erreur s'est produite, veuillez recharger les études.",
-    "reload": "Recharger"
+    "reload": "Recharger",
+    "nopermissions": "Vous n'avez pas les autorisations pour afficher la liste des études."
   }
 }
 </i18n>
@@ -401,14 +403,23 @@
         {{ $t('noresults') }}
       </div>
       <div slot="error">
-        {{ $t('error') }} <br> <br>
-        <button
-          type="button"
-          class=" btn btn-md"
-          @click="searchStudies()"
+        <span
+          v-if="statusList === 401 || statusList === 403"
         >
-          {{ $t('reload') }}
-        </button>
+          {{ $t('nopermissions') }}
+        </span>
+        <span
+          v-else
+        >
+          {{ $t('error') }} <br> <br>
+          <button
+            type="button"
+            class=" btn btn-md"
+            @click="searchStudies()"
+          >
+            {{ $t('reload') }}
+          </button>
+        </span>
       </div>
     </infinite-loading>
   </div>
@@ -453,6 +464,7 @@ export default {
       showFilters: false,
       isActive: false,
       showIcons: false,
+      statusList: 200,
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -647,6 +659,9 @@ export default {
     // https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
     infiniteHandler($state) {
       this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then((res) => {
+        if (res.status !== undefined) {
+          this.statusList = res.status
+        }
         if (this.studies.length === parseInt(res.headers['x-total-count'], 10)) {
           $state.complete();
         }
@@ -657,6 +672,9 @@ export default {
           $state.complete();
         }
       }).catch((err) => {
+        if (err.response !== undefined && err.response.status !== undefined) {
+          this.statusList = err.response.status
+        }
         $state.error();
         return err;
       });
