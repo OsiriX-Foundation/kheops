@@ -158,7 +158,8 @@ export default {
     access_token() {
       if (this.$keycloak.authenticated) {
         return Vue.prototype.$keycloak.token;
-      } if (window.location.pathname.includes('view')) {
+      }
+      if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
         return token;
       }
