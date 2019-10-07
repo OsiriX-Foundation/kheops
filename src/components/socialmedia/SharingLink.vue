@@ -232,15 +232,15 @@ export default {
   },
   methods: {
     cancel() {
-      this.$emit('cancel')
+      this.$emit('cancel');
     },
     create() {
       this.token.expiration_time = moment(this.token.expiration_time).format();
-      this.$emit('create', this.token)
+      this.$emit('create', this.token);
     },
     revoke() {
-      this.$emit('revoke', this.tokens)
-    }
+      this.$emit('revoke', this.tokens);
+    },
   },
 };
 </script>

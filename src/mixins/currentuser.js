@@ -5,11 +5,11 @@ export const CurrentUser = {
     currentuserAccessToken() {
       if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
-        return token
-      } else if (Vue.prototype.$keycloak.authenticated) {
+        return token;
+      } if (Vue.prototype.$keycloak.authenticated) {
         return Vue.prototype.$keycloak.token;
-      } 
-      return ''
+      }
+      return '';
     },
     currentuserSub() {
       return Vue.prototype.$keycloak.idTokenParsed.sub;

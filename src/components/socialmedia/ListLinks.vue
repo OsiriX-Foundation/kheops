@@ -157,7 +157,8 @@ export default {
     return {
       loadingData: false,
       showInvalid: false,
-      sortBy: 'expiration_date',fields: [
+      sortBy: 'expiration_date',
+      fields: [
         {
           key: 'status',
           label: this.$t('status'),

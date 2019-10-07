@@ -102,11 +102,11 @@ export default {
   },
   methods: {
     cancel() {
-      this.$emit('cancel')
+      this.$emit('cancel');
     },
     revoke() {
-      this.$emit('revoke', this.tokens)
-    }
+      this.$emit('revoke', this.tokens);
+    },
   },
 };
 </script>

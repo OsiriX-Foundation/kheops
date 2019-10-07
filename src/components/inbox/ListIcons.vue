@@ -158,15 +158,15 @@ export default {
     access_token() {
       if (this.$keycloak.authenticated) {
         return Vue.prototype.$keycloak.token;
-      } else if (window.location.pathname.includes('view')) {
+      } if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
-        return token
+        return token;
       }
-      return ''
+      return '';
     },
     showIcons() {
-      return (this.study.flag.is_hover || this.study._showDetails || this.study.showIcons)
-    }
+      return (this.study.flag.is_hover || this.study._showDetails || this.study.showIcons);
+    },
   },
 
   watch: {
@@ -186,9 +186,9 @@ export default {
   methods: {
     getSourceQueries() {
       if (Object.keys(this.source).length > 0) {
-        return `${encodeURIComponent(this.source.key)}=${encodeURIComponent(this.source.value)}`
+        return `${encodeURIComponent(this.source.key)}=${encodeURIComponent(this.source.value)}`;
       }
-      return ''
+      return '';
     },
     classIconPN(visibility) {
       if (visibility || this.mobiledetect) {
@@ -202,13 +202,13 @@ export default {
         value: !this.study.flag.is_favorite,
       };
       if (Object.keys(this.source).length > 0) {
-        params.queries = {}
-        params.queries[this.source.key] = this.source.value
+        params.queries = {};
+        params.queries[this.source.key] = this.source.value;
       }
       this.$store.dispatch('favoriteStudy', params);
     },
     getURLDownload() {
-      const sourceQuery = this.getSourceQueries()
+      const sourceQuery = this.getSourceQueries();
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
         const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
@@ -220,7 +220,7 @@ export default {
     },
     openViewer(viewer) {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      const sourceQuery = this.getSourceQueries()
+      const sourceQuery = this.getSourceQueries();
       let ohifWindow;
       if (viewer === 'Ohif') {
         ohifWindow = window.open('', 'OHIFViewer');

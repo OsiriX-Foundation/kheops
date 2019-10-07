@@ -387,9 +387,9 @@
       </b-table>
     </div>
     <infinite-loading
+      ref="infiniteLoading"
       :identifier="infiniteId"
       @infinite="infiniteHandler"
-      ref="infiniteLoading"
     >
       <div slot="spinner">
         <pulse-loader
@@ -584,7 +584,7 @@ export default {
     },
     albumID() {
       if (this.source.key === 'album') {
-        return this.source.value
+        return this.source.value;
       }
       return undefined;
     },
@@ -629,7 +629,7 @@ export default {
       this.$store.dispatch('getAlbums', { queries: queriesAlbums });
       this.setAlbumInbox();
     } else {
-      let modalities = ['CT', 'SM', 'CR', 'RG', 'DX', 'NM', 'XC', 'AU', 'SR', 'OP']
+      const modalities = ['CT', 'SM', 'CR', 'RG', 'DX', 'NM', 'XC', 'AU', 'SR', 'OP'];
       this.$store.commit('SET_MODALITIES', modalities);
     }
   },
@@ -660,7 +660,7 @@ export default {
     infiniteHandler($state) {
       this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then((res) => {
         if (res.status !== undefined) {
-          this.statusList = res.status
+          this.statusList = res.status;
         }
         if (this.studies.length === parseInt(res.headers['x-total-count'], 10)) {
           $state.complete();
@@ -673,7 +673,7 @@ export default {
         }
       }).catch((err) => {
         if (err.response !== undefined && err.response.status !== undefined) {
-          this.statusList = err.response.status
+          this.statusList = err.response.status;
         }
         $state.error();
         return err;
@@ -706,7 +706,7 @@ export default {
     setAlbumInbox() {
       if (this.albumID !== undefined) {
         this.$store.dispatch('getProviders', { albumID: this.albumID });
-        this.$store.dispatch('setModalitiesAlbum')
+        this.$store.dispatch('setModalitiesAlbum');
       } else {
         this.$store.dispatch('getInboxInfo');
       }

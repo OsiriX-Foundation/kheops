@@ -18,7 +18,7 @@ export default {
   },
   data() {
     return {
-      scope : []
+      scope: [],
     };
   },
   computed: {
@@ -33,7 +33,7 @@ export default {
         send_series: false,
         write_comments: false,
         add_inbox: false,
-      }
+      };
     },
   },
   watch: {
@@ -42,19 +42,19 @@ export default {
     const params = {
       queries: {
         token: this.$route.params.token,
-      }
-    }
+      },
+    };
     let queries = '';
     if (params.queries !== undefined) {
       queries = httpoperations.getFormData(params.queries);
     }
     HTTP.post('token/introspect', queries).then((res) => {
       if (res.data.active === true) {
-        this.scope = res.data.scope.split(' ')
+        this.scope = res.data.scope.split(' ');
       }
     }).catch((err) => {
-      console.log(err)
-    })
+      console.log(err);
+    });
   },
   mounted() {
   },

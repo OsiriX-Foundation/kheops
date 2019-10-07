@@ -89,9 +89,9 @@ export default {
     },
   },
   watch: {
-    show () {
+    show() {
       this.$emit('dropdownState', this.show, this.study.StudyInstanceUID.Value[0]);
-    }
+    },
   },
   created() {
   },
@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     setShow(value) {
-      this.show = value
+      this.show = value;
     },
     checkProviderModalities(study, provider) {
       if (provider.data.supported_modalities === undefined) {
