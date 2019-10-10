@@ -47,7 +47,7 @@
           <label>
             {{ $t('revoke') }}
           </label>
-        </div>>
+        </div>
       </div>
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-12 col-md-12">
