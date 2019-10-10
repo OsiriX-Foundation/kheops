@@ -2,7 +2,7 @@
 {
   "en": {
     "write": "Add and delete series in the album",
-    "download": "Can download the studies",
+    "download": "Show download button",
     "expirationdate": "Expiration date",
     "create": "Create",
     "cancel": "Cancel",
@@ -14,7 +14,7 @@
   },
   "fr": {
     "write": "Ajouter et supprimer des séries dans l'album",
-    "download": "Peux télécharger les études présentes",
+    "download": "Montrer le bouton de téléchargement",
     "expirationdate": "Date d'expiration",
     "create": "Créer",
     "cancel": "Annuler",
