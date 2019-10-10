@@ -62,6 +62,8 @@ sed -i "s|\%{kheops_ui_keycloak_clientid}|$KHEOPS_UI_KEYCLOAK_CLIENTID|g" $FILEN
 api="${KHEOPS_ROOT_SCHEME}://${KHEOPS_ROOT_HOST}:${KHEOPS_ROOT_PORT}${KHEOPS_API_PATH}"
 sed -i "s|\%{kheops_api_url}|$api|g" $FILENAME
 sed -i "s|\%{kheops_viewer_url}|$KHEOPS_VIEWER_URL|g" $FILENAME
+root="${KHEOPS_ROOT_SCHEME}://${KHEOPS_ROOT_HOST}"
+sed -i "s|\%{kheops_root_url}|$root|g" $FILENAME
 
 chmod a+w /etc/nginx/conf.d/ui.conf
 #######################################################################################

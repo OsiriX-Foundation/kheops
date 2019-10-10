@@ -7,14 +7,13 @@ import Album from '@/components/albums/Album';
 import User from '@/components/user/user';
 import store from '@/store';
 import Inbox from '@/components/inbox/Inbox';
-
+import ViewWithoutLogin from '@/components/withoutlogin/ViewWithoutLogin';
 // import PermissionDenied from '@/components/user/permissionDenied'
 
 // import {ServerTable, ClientTable, Event} from 'vue-tables-2';
 
 Vue.use(Router);
 // Vue.use(ClientTable);
-
 function requireAuth(to, from, next) {
   store.dispatch('getCredentials').then((test) => {
     if (!test) {
@@ -52,6 +51,7 @@ const router = new Router({
     meta: {
       permissions: 'active',
       condition: 'any',
+      requiresAuth: true,
     },
   },
   {
@@ -63,6 +63,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'albums',
+      requiresAuth: true,
     },
   },
   {
@@ -74,6 +75,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'newalbum',
+      requiresAuth: true,
     },
   },
   {
@@ -85,6 +87,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'album',
+      requiresAuth: true,
     },
   },
   {
@@ -96,6 +99,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'album',
+      requiresAuth: true,
     },
   },
   {
@@ -107,6 +111,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'album',
+      requiresAuth: true,
     },
   },
   {
@@ -118,6 +123,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'album',
+      requiresAuth: true,
     },
   },
   {
@@ -129,6 +135,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'album',
+      requiresAuth: true,
     },
   },
   {
@@ -140,6 +147,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'user',
+      requiresAuth: true,
     },
   },
   {
@@ -151,6 +159,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'user',
+      requiresAuth: true,
     },
   },
   {
@@ -162,6 +171,7 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'user',
+      requiresAuth: true,
     },
   },
   {
@@ -173,7 +183,13 @@ const router = new Router({
       permissions: 'active',
       condition: 'any',
       title: 'user',
+      requiresAuth: true,
     },
+  },
+  {
+    path: '/view/:token',
+    name: 'viewnologin',
+    component: ViewWithoutLogin,
   },
   {
     path: '*',
@@ -192,7 +208,16 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  next();
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (router.app.$keycloak.authenticated) {
+      next();
+    } else {
+      const loginUrl = router.app.$keycloak.createLoginUrl();
+      window.location.replace(loginUrl);
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

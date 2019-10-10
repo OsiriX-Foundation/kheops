@@ -129,6 +129,9 @@ const actions = {
       return res;
     }).catch((err) => Promise.reject(err));
   },
+  setModalitiesAlbum({ commit }) {
+    commit('SET_MODALITIES', state.album.modalities);
+  },
 };
 
 // mutations

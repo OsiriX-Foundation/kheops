@@ -6,13 +6,15 @@
     "general": "General",
     "user": "User",
     "tokens": "Tokens",
-    "providerSR": "Report providers"
+    "providerSR": "Report providers",
+    "socialmedia": "Social Media"
   },
   "fr": {
     "general": "Général",
     "user": "Utilisateur",
     "tokens": "Tokens",
-    "providerSR": "Report providers"
+    "providerSR": "Report providers",
+    "socialmedia": "Réseaux sociaux"
   }
 }
 </i18n>
@@ -78,6 +80,10 @@
           v-if="currentCategory === 'providerSR'"
           :album="album"
         />
+        <album-settings-social-media
+          v-if="currentCategory === 'socialmedia'"
+          :album="album"
+        />
       </div>
     </div>
   </div>
@@ -88,11 +94,16 @@ import AlbumSettingsGeneral from '@/components/albums/AlbumSettingsGeneral';
 import AlbumSettingsUser from '@/components/albums/AlbumSettingsUser';
 import AlbumSettingsToken from '@/components/albums/AlbumSettingsToken';
 import AlbumSettingsReportProvider from '@/components/albums/AlbumSettingsReportProvider';
+import AlbumSettingsSocialMedia from '@/components/albums/AlbumSettingsSocialMedia';
 
 export default {
   name: 'AlbumSettings',
   components: {
-    AlbumSettingsGeneral, AlbumSettingsUser, AlbumSettingsToken, AlbumSettingsReportProvider,
+    AlbumSettingsGeneral,
+    AlbumSettingsUser,
+    AlbumSettingsToken,
+    AlbumSettingsReportProvider,
+    AlbumSettingsSocialMedia,
   },
   props: {
     album: {
@@ -108,7 +119,12 @@ export default {
   },
   computed: {
     categories() {
-      return (this.album.is_admin) ? this.basicCategories.concat('tokens') : this.basicCategories;
+      const categories = [...this.basicCategories];
+      if (this.album.is_admin) {
+        // categories.push('socialmedia');
+        categories.push('tokens');
+      }
+      return categories;
     },
     currentCategory() {
       return this.$route.params.category !== undefined ? this.$route.params.category : this.basicCategories[0];
