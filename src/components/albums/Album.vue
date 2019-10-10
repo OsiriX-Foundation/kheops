@@ -209,6 +209,7 @@ export default {
     ...mapGetters({
       album: 'album',
       albumTokens: 'albumTokens',
+      validParamsToken: 'validParamsToken',
     }),
     currentSettings() {
       return this.$route.params.category;
@@ -278,7 +279,7 @@ export default {
   methods: {
     getTokens() {
       const queries = {
-        valid: true,
+        valid: this.validParamsToken,
         album: this.albumID,
       };
       return this.$store.dispatch('getAlbumTokens', { queries });

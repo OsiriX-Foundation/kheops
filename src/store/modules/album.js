@@ -5,6 +5,7 @@ const state = {
   album: {},
   users: [],
   tokens: [],
+  validParamsToken: true,
 };
 
 // getters
@@ -12,6 +13,7 @@ const getters = {
   album: (state) => state.album,
   albumUsers: (state) => state.users,
   albumTokens: (state) => state.tokens,
+  validParamsToken: (state) => state.validParamsToken,
 };
 
 // actions
@@ -132,6 +134,12 @@ const actions = {
   setModalitiesAlbum({ commit }) {
     commit('SET_MODALITIES', state.album.modalities);
   },
+  initValidParamToken({ commit }) {
+    commit('INIT_VALID_PARAM_TOKEN');
+  },
+  setValidParamToken({ commit }, value) {
+    commit('SET_VALID_PARAM_TOKEN', value);
+  },
 };
 
 // mutations
@@ -156,6 +164,12 @@ const mutations = {
   },
   SET_ALBUM_TOKEN(state, token) {
     state.tokens.push(token);
+  },
+  INIT_VALID_PARAM_TOKEN(state) {
+    state.validParamsToken = true;
+  },
+  SET_VALID_PARAM_TOKEN(state, value) {
+    state.validParamsToken = value;
   },
 };
 
