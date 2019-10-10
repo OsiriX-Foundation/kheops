@@ -61,7 +61,7 @@
         <toggle-button
           v-model="showInvalid"
           :labels="{checked: 'Yes', unchecked: 'No'}"
-          @change="getTokens"
+          @change="toggleValid"
         />
         <span class="ml-2 toggle-label">
           {{ $t('showinvalidtoken') }}
@@ -293,10 +293,17 @@ export default {
       this.loadingData = false;
     });
   },
+  beforeDestroy() {
+    this.$store.dispatch('initValidParamToken');
+  },
   methods: {
     initRouterName() {
       this.routername.actionid = this.scope === 'album' ? 'albumsettingsactionid' : 'useractionid';
       this.routername.action = this.scope === 'album' ? 'albumsettingsaction' : 'useraction';
+    },
+    toggleValid() {
+      this.getTokens();
+      this.$store.commit('setValidParamToken', !this.showInvalid);
     },
     getTokens() {
       if (this.scope === 'album' && this.albumid) {
