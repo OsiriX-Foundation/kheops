@@ -49,10 +49,25 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav right>
-          <b-nav-item v-access="'active'">
+          <b-nav-item
+            v-if="logged"
+            v-access="'active'"
+          >
             {{ $t('welcome') }} <router-link to="/user">
               {{ currentuserFullname }}
             </router-link>
+          </b-nav-item>
+          <b-nav-item
+            v-else-if="logged === false"
+            v-access="'active'"
+          >
+            <a
+              :title="$t('tooltipLogout')"
+              class="pointer"
+              @click="login()"
+            >
+              Login
+            </a>
           </b-nav-item>
           <b-nav-item v-access="'active'">
             <a
@@ -61,10 +76,14 @@
               target="_blank"
               @click="redirect('https://docs.kheops.online')"
             >
+              {{ $t('tooltipHelp') }}
               <v-icon name="help" />
             </a>
           </b-nav-item>
-          <b-nav-item v-access="'active'">
+          <b-nav-item
+            v-if="logged"
+            v-access="'active'"
+          >
             <a
               :title="$t('tooltipLogout')"
               class="pointer"
@@ -104,6 +123,13 @@ import { CurrentUser } from '@/mixins/currentuser.js';
 export default {
   name: 'NavHeader',
   mixins: [CurrentUser],
+  props: {
+    logged: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
   data() {
     return {
       availableLanguage: [
@@ -131,6 +157,9 @@ export default {
       store.dispatch('logout').then(() => {
         Vue.prototype.$keycloak.logoutFn();
       });
+    },
+    login() {
+      Vue.prototype.$keycloak.loginFn();
     },
     changeLang(value) {
       if (this.availableLanguage.includes(value)) {

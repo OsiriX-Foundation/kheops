@@ -20,7 +20,7 @@
     "userlist": "Liste d'utilisateurs",
     "add_user": "Inviter un utilisateur",
     "add_series": "Ajouter une étude / série",
-    "download_series": "Télécharger une étude / série",
+    "download_series": "Montrer le bouton de téléchargement",
     "send_series": "Ajouter à un album / inbox",
     "delete_series": "Supprimer une étude / série",
     "write_comments": "Commenter",

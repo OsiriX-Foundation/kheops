@@ -2,7 +2,7 @@
 {
   "en": {
     "filesSend": "{count} files have been sent | {count} file has been sent | {count} files have been sent",
-    "locationSend": "in your inbox. | in an",
+    "locationSend": ". | in an",
     "album": "album.",
     "filesErrors": "{count} files produced an error. | {count} file produced an error. | {count} files produced an error.",
     "showError": "Show errors",
@@ -19,7 +19,7 @@
   },
   "fr": {
     "filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
-    "locationSend": "dans votre boîte de réception. | dans un",
+    "locationSend": ". | dans un",
     "album": "album.",
     "filesErrors": "{count} fichier a rencontré une erreur. | {count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
     "showError": "Montrer les erreurs",
@@ -212,9 +212,9 @@
             class="col-12 mt-2 mb-2"
           >
             {{ $tc("filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
-            {{ $tc("locationSend", source !== 'inbox' ? 0 : 1) }}
+            {{ $tc("locationSend", sourceIsAlbum ? 0 : 1) }}
             <span
-              v-if="source !== 'inbox'"
+              v-if="sourceIsAlbum"
             >
               <a
                 href="#"
@@ -379,6 +379,9 @@ export default {
     totalSizeFiles() {
       return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
     },
+    sourceIsAlbum() {
+      return (this.source !== 'inbox' && this.source !== undefined);
+    },
   },
   watch: {
     sending() {
@@ -477,7 +480,7 @@ export default {
         const formData = new FormData();
         formData.append(idFile, data);
 
-        const request = `/studies${this.source !== 'inbox' ? `?album=${this.source}` : ''}`;
+        const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
 
         HTTP.post(request, data, this.config.dicomizeData).then((res) => {
           resolve(res);
@@ -541,7 +544,7 @@ export default {
         if (!this.UI.cancel && this.files.length > 0) {
           const formData = this.createFormData(files);
           this.currentFilesLength = files.length;
-          const request = `/studies${this.source !== 'inbox' ? `?album=${this.source}` : ''}`;
+          const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
           HTTP.post(request, formData, this.config.formData).then((res) => {
             this.manageResult(files, res.data, res.status);
             resolve(res);

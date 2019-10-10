@@ -3,13 +3,13 @@
   "en": {
     "cantUpload": "You can't upload when files are sending",
     "upload": "Drop your files / directories !",
-    "cantUploadAlbum": "You can't load files in this album.",
+    "cantUploadPermission": "You do not have the required permissions to upload studies.",
     "cancel": "Cancel"
   },
   "fr": {
     "cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
     "upload": "Lâcher vos fichiers / dossiers !",
-    "cantUploadAlbum": "Vous ne pouvez pas charger des fichiers dans cet album.",
+    "cantUploadPermission": "Vous n'avez pas les permissions requises pour charger des études.",
     "cancel": "Annuler"
   }
 }
@@ -38,9 +38,9 @@
           class="outPopUp"
         >
           <p
-            v-if="albumNoPermission"
+            v-if="!canUpload"
           >
-            {{ $t("cantUploadAlbum") }}
+            {{ $t("cantUploadPermission") }}
           </p>
           <p
             v-else-if="sending && files.length > 0"
@@ -70,7 +70,8 @@
         >
           <list
             ref="list"
-            :album="album"
+            :permissions="permissions"
+            :source="source"
             @loadfiles="inputLoadFiles"
             @loaddirectories="inputLoadFiles"
           />
@@ -90,9 +91,14 @@ export default {
   name: 'ComponentDragAndDrop',
   components: { ClipLoader, List },
   props: {
-    album: {
+    source: {
       type: Object,
       required: false,
+      default: () => ({}),
+    },
+    permissions: {
+      type: Object,
+      required: true,
       default: () => ({}),
     },
   },
@@ -112,8 +118,8 @@ export default {
       files: 'files',
       demoDragAndDrop: 'demoDragAndDrop',
     }),
-    albumNoPermission() {
-      return !(this.album.is_admin || this.album.add_series) && this.scope === 'album';
+    canUpload() {
+      return this.permissions.add_series;
     },
     classDragIn() {
       if (!mobiledetect.mobileAndTabletcheck()) {
@@ -152,7 +158,7 @@ export default {
       // Capture the files from the drop event and add them to local files array
       this.$refs.fileform.addEventListener('drop', async (e) => {
         if (this.hover) this.hover = false;
-        if (!this.sending && !this.loading && !this.albumNoPermission) {
+        if (!this.sending && !this.loading && this.canUpload) {
           this.loading = true;
           this.manageDataTransfer(e.dataTransfer.items);
         }
@@ -180,7 +186,7 @@ export default {
     storeFiles(files) {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files });
-      this.$store.dispatch('setSource', { source: this.album.album_id !== undefined ? this.album.album_id : 'inbox' });
+      this.$store.dispatch('setSource', { source: this.source.key === 'inbox' ? this.source.key : this.source.value });
     },
     createObjFiles(file, path, name) {
       if (!this.excludeFileName(name)) {

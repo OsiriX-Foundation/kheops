@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { HTTP } from '@/router/http';
 
 export const ViewerToken = {
@@ -16,9 +17,13 @@ export const ViewerToken = {
         subject_token_type: this.subject_token_type,
         scope: this.scope,
         studyUID: studyInstanceUID,
-        source_type: source === 'inbox' ? source : 'album',
-        source_id: source === 'inbox' ? '' : source,
       };
+      if (Object.keys(source).length > 0) {
+        body.source_type = source.key
+        if (source.key === 'album') {
+          body.source_id = source.value
+        }
+      }
       const bodyParams = [];
       Object.entries(body).forEach((param) => {
         if (param[1] !== '') bodyParams.push(param.join('='));

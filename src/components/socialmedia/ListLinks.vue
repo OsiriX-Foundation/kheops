@@ -1,38 +1,8 @@
 <i18n>
 {
   "en": {
-    "newtoken": "New token",
-    "showrevokedtoken": "Show revoked tokens",
-    "showinvalidtoken": "Show invalid tokens",
-    "revoke": "revoke",
-    "revoked": "revoked",
-    "active": "active",
-    "expired": "expired",
-    "revokedsuccess": "revoked successfully",
-    "expiration date": "expiration date",
-    "status": "status",
-    "description": "description",
-    "scope": "scope",
-    "create date": "create date",
-    "last used": "last used",
-    "permission": "permission"
   },
   "fr": {
-    "newtoken": "Nouveau token",
-    "showrevokedtoken": "Afficher les tokens révoqués",
-    "showinvalidtoken": "Afficher les tokens invalides",
-    "revoke": "révoquer",
-    "revoked": "révoqué",
-    "active": "actif",
-    "expired": "expiré",
-    "revokedsuccess": "révoqué avec succès",
-    "expiration date": "date d'expiration",
-    "status": "statut",
-    "description": "description",
-    "scope": "application",
-    "create date": "créé le",
-    "last used": "dern. utilisation",
-    "permission": "permission"
   }
 }
 </i18n>
@@ -48,38 +18,26 @@
           scale="1"
           class="mr-3"
         />
-        {{ $t('newtoken') }}
+        {{ $t('newlink') }}
       </span>
     </h4>
     <div class="d-flex flex-row">
       <div class="mt-2">
         <h4>
-          Tokens
+          {{ $t('links') }}
         </h4>
       </div>
-      <div class="mt-2 ml-auto">
-        <toggle-button
-          v-model="showInvalid"
-          :labels="{checked: 'Yes', unchecked: 'No'}"
-          @change="toggleValid"
-        />
-        <span class="ml-2 toggle-label">
-          {{ $t('showinvalidtoken') }}
-        </span>
-      </div>
     </div>
-
     <b-table
       v-if="loadingData === false"
       stacked="sm"
       striped
       hover
-      :items="tokens"
+      :items="links"
       :fields="fields"
       :sort-desc="true"
       :sort-by.sync="sortBy"
       tbody-tr-class="link"
-      @row-clicked="loadToken"
     >
       <template
         slot="scope_type"
@@ -106,11 +64,17 @@
         </div>
       </template>
       <template
+        slot="link"
+        slot-scope="data"
+      >
+        {{ data }}
+      </template>
+      <template
         slot="status"
         slot-scope="data"
       >
         <div
-          v-if="tokenStatus(data.item)=='active'"
+          v-if="linkStatus(data.item)=='active'"
           class="text-success"
         >
           <span class="nowrap">
@@ -121,7 +85,7 @@
           </span>
         </div>
         <div
-          v-if="tokenStatus(data.item)=='revoked'"
+          v-if="linkStatus(data.item)=='revoked'"
           class="text-danger"
         >
           <v-icon
@@ -130,7 +94,7 @@
           />{{ $t("revoked") }}<br>{{ data.item.revoke_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.revoke_time|formatTime }}</small>
         </div>
         <div
-          v-if="tokenStatus(data.item)=='expired'"
+          v-if="linkStatus(data.item)=='expired'"
           class="text-danger"
         >
           <v-icon
@@ -138,7 +102,7 @@
             class="mr-2"
           />{{ $t("expired") }}<br>{{ data.item.expiration_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.expiration_time|formatTime }}</small>
         </div>
-        <div v-if="tokenStatus(data.item)=='wait'">
+        <div v-if="linkStatus(data.item)=='wait'">
           <v-icon
             name="clock"
             class="mr-2"
@@ -171,25 +135,6 @@
       >
         {{ data.item|formatPermissions }}
       </template>
-      <template
-        slot="actions"
-        slot-scope="data"
-      >
-        <button
-          v-if="!data.item.revoked"
-          type="button"
-          class="btn btn-danger btn-xs"
-          @click.stop="revoke(data.item.id)"
-        >
-          {{ $t('revoke') }}
-        </button>
-        <span
-          v-if="data.item.revoked"
-          class="text-danger"
-        >
-          {{ $t('revoked') }}
-        </span>
-      </template>
     </b-table>
   </div>
 </template>
@@ -202,21 +147,16 @@ export default {
   name: 'ListTokens',
   components: { },
   props: {
-    scope: {
-      type: String,
-      required: true,
-      default: '',
-    },
     albumid: {
       type: String,
-      required: false,
+      required: true,
       default: null,
     },
   },
   data() {
     return {
-      showInvalid: false,
       loadingData: false,
+      showInvalid: false,
       sortBy: 'expiration_date',
       fields: [
         {
@@ -230,10 +170,9 @@ export default {
           sortable: true,
         },
         {
-          key: 'scope_type',
-          label: this.$t('scope'),
+          key: 'link',
+          label: this.$t('description'),
           sortable: true,
-          class: this.scope === 'album' ? 'd-none' : 'd-none d-sm-table-cell',
         },
         {
           key: 'expiration_time',
@@ -242,89 +181,46 @@ export default {
           class: 'd-none d-sm-table-cell',
         },
         {
-          key: 'issued_at_time',
-          label: this.$t('create date'),
-          sortable: true,
-          class: 'd-none d-md-table-cell',
-        },
-        {
-          key: 'last_used',
-          label: this.$t('last used'),
-          sortable: true,
-          class: 'd-none d-md-table-cell',
-        },
-        {
           key: 'permission',
           label: this.$t('permission'),
           sortable: true,
           class: 'd-none d-sm-table-cell',
         },
-        {
-          key: 'actions',
-          label: '',
-          sortable: false,
-        },
       ],
-      routername: {
-        actionid: '',
-        action: '',
-      },
     };
   },
   computed: {
     ...mapGetters({
-      user: 'currentUser',
       albumTokens: 'albumTokens',
     }),
-    tokens() {
-      let tokens = [];
-      if (this.scope === 'user') {
-        tokens = this.user.tokens;
-      } else if (this.scope === 'album') {
-        tokens = this.albumTokens;
-      }
-      return tokens;
+    links() {
+      return this.albumTokens;
     },
   },
   created() {
     this.loadingData = true;
-    this.initRouterName();
     this.getTokens().then(() => {
       this.loadingData = false;
     });
   },
-  beforeDestroy() {
-    this.$store.dispatch('initValidParamToken');
-  },
   methods: {
-    initRouterName() {
-      this.routername.actionid = this.scope === 'album' ? 'albumsettingsactionid' : 'useractionid';
-      this.routername.action = this.scope === 'album' ? 'albumsettingsaction' : 'useraction';
-    },
-    toggleValid() {
-      this.getTokens();
-      this.$store.commit('setValidParamToken', !this.showInvalid);
-    },
     getTokens() {
-      if (this.scope === 'album' && this.albumid) {
-        const queries = {
-          valid: !this.showInvalid,
-          album: this.albumid,
-        };
-        return this.$store.dispatch('getAlbumTokens', { queries });
-      }
-      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid });
+      const queries = {
+        valid: !this.showInvalid,
+        album: this.albumid,
+      };
+      return this.$store.dispatch('getAlbumTokens', { queries });
     },
     loadToken(item) {
       const action = 'token';
       const { id } = item;
-      this.$router.push({ name: this.routername.actionid, params: { action, id } });
+      this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
     },
     clickNew() {
       const action = 'newtoken';
-      this.$router.push({ name: this.routername.action, params: { action } });
+      this.$router.push({ name: 'albumsettingsaction', params: { action } });
     },
-    tokenStatus(itemToken) {
+    linkStatus(itemToken) {
       if (itemToken.revoked) {
         return 'revoked';
       } if (moment(itemToken.not_before_time) > moment()) {
