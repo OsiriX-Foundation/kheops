@@ -405,8 +405,19 @@ export default {
   },
   methods: {
     openWeasis() {
-      console.log(this.selectedStudies)
-      console.log(this.selectedSeries)
+      let queryParams = ''
+      this.selectedStudies.forEach(study => {
+        queryParams += `studyUID=${encodeURIComponent(study.StudyInstanceUID.Value[0])}`
+      })
+      Object.keys(this.selectedSeries).forEach(studyUID => {
+        this.selectedSeries[studyUID].forEach(serie => {
+          queryParams += `seriesUID=${encodeURIComponent(serie.SeriesInstanceUID.Value[0])}`
+        })
+      })
+      console.log(queryParams)
+
+      // const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="${queryParams}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
+      // window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     sendToUser(userSub) {
       if (this.selectedStudiesNb > 0) {
