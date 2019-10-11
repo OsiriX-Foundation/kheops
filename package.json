@@ -15,6 +15,7 @@
     "eslint-plugin-import": "^2.18.2",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "v-calendar": "^0.9.7",
     "vee-validate": "^2.2.11",
     "vue": "^2.6.10",
     "vue-awesome": "^3.5.4",
@@ -27,7 +28,8 @@
     "vue-spinner": "^1.0.3",
     "vue-uuid": "^1.1.1",
     "vuejs-datepicker": "^1.5.4",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "webpack-merge": "^4.2.2"
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.3.0",
