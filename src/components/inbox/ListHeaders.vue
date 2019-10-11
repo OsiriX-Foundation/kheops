@@ -278,12 +278,15 @@ import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
+import { ViewerToken } from '@/mixins/tokens.js';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 Vue.use(ToggleButton);
 
 export default {
   name: 'ListHeaders',
   components: { formGetUser, ConfirmButton, AddIcon, VisibilityIcon },
+  mixins: [ViewerToken, CurrentUser],
   props: {
     studies: {
       type: Array,
@@ -387,6 +390,10 @@ export default {
       }
       return this.albums.filter((album) => album.album_id !== this.albumId);
     },
+    source() {
+      let source = this.getSource()
+      return source.inbox !== undefined ? 'inbox' : 'album'
+    }
   },
 
   watch: {
@@ -415,7 +422,6 @@ export default {
         })
       })
       console.log(queryParams)
-
       // const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="${queryParams}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
       // window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
