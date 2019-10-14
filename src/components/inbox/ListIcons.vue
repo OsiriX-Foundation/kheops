@@ -245,6 +245,7 @@ export default {
     openWeasis(StudyInstanceUID, token) {
       // --query-ext="&includedefaults=false"
       const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
+      console.log(url)
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
