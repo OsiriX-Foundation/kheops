@@ -98,6 +98,15 @@ public final class WadoRsResource {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
     
+    @GET
+    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{instancesInstanceUID:([0-9]+[.])*[0-9]+}/thumbnail")
+    public Response wadoInstancesThumbnail(@HeaderParam(AUTHORIZATION) String authorizationHeader,
+                                 @PathParam("studyInstanceUID") String studyInstanceUID,
+                                 @PathParam("instancesInstanceUID") String instancesInstanceUID,
+                                 @PathParam("seriesInstanceUID") String seriesInstanceUID) {
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+    }
+    
     
     //@GET
     //@Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
