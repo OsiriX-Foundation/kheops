@@ -93,6 +93,12 @@ const actions = {
     if (params.data[0][tagSOPClassUID] !== undefined) {
       serie.SOPClassUID = params.data[0][tagSOPClassUID];
     }
+    dispatch('getImage', {
+      StudyInstanceUID: params.StudyInstanceUID,
+      SeriesInstanceUID: params.serieUID,
+      serie: params.serie,
+    });
+    /*
     if (params.data[0][tagModality].Value[0].includes('SR')) {
       serie.imgSrc = SRImage;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID });
@@ -109,15 +115,18 @@ const actions = {
         serie: params.serie,
       });
     }
+    */
     return true;
   },
   getImage({ commit }, params) {
-    const request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`;
+    const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/thumbnail`;
+    const queries = `viewport=${encodeURIComponent('500,500')}`;
+    // const request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`;
     const { serie } = params;
-    return HTTP.get(request, {
+    return HTTP.get(`${request}?${queries}`, {
       responseType: 'arraybuffer',
       headers: {
-        Accept: 'image/jpeg',
+        Accept: 'image/png',
       },
     }).then((resp) => {
       let img = DicomLogo;
