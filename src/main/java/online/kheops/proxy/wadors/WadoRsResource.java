@@ -92,7 +92,7 @@ public final class WadoRsResource {
     
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/thumbnail")
-    public Response wadoInstanceFrame(@HeaderParam(AUTHORIZATION) String authorizationHeader,
+    public Response wadoSeriesThumbnail(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                                  @PathParam("studyInstanceUID") String studyInstanceUID,
                                  @PathParam("seriesInstanceUID") String seriesInstanceUID) {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
