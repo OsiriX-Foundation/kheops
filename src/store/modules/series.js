@@ -120,7 +120,7 @@ const actions = {
   },
   getImage({ commit }, params) {
     const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/thumbnail`;
-    const queries = `viewport=${encodeURIComponent('500,500')}`;
+    const queries = `viewport=${encodeURIComponent('256,256')}`;
     // const request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`;
     const { serie } = params;
     return HTTP.get(`${request}?${queries}`, {
@@ -139,7 +139,8 @@ const actions = {
       }
       serie.imgSrc = img;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
-    }).catch(() => {
+    }).catch((err) => {
+      console.log(err);
       serie.imgSrc = DicomLogo;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
     });
