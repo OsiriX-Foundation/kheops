@@ -1,26 +1,31 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.accesstoken.AccessToken;
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
+import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
+import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 
 @Path("/")
@@ -34,6 +39,9 @@ public class SendingResource
 
     @Context
     private SecurityContext securityContext;
+
+    @Context
+    private HttpHeaders httpHeaders;
 
     @PUT
     @Secured
@@ -265,12 +273,42 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+        final String token = httpHeaders.getHeaderString("X-Token-Source");
+
+        if (token != null) {
+            final AccessToken accessToken;
+            try {
+                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+            } catch (AccessTokenVerificationException e) {
+                return Response.status(FORBIDDEN).entity(e.getMessage()).build(); //todo modifier la reponse
             }
-        } catch (SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+
+            final User user;
+            try {
+                user = getOrCreateUser(accessToken.getSubject());
+            } catch (UserNotFoundException e) {
+                return Response.status(FORBIDDEN).build(); //todo modifier la reponse
+            }
+
+            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
+
+            try {
+                if (!tokenPrincipal.hasStudyWriteAccess(studyInstanceUID) || !tokenPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                    return Response.status(FORBIDDEN).build();
+                }
+            } catch (SeriesNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            }
+
+
+        } else {
+            try {
+                if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                    return Response.status(FORBIDDEN).build();
+                }
+            } catch (SeriesNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            }
         }
 
         try {
@@ -294,8 +332,11 @@ public class SendingResource
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox) {
 
-        if ((fromAlbumId == null && fromInbox == null) ||
-                (fromAlbumId != null && fromInbox != null && fromInbox)) {
+
+        final String token = httpHeaders.getHeaderString("X-Token-Source");
+
+        if (((fromAlbumId == null && fromInbox == null) ||
+                (fromAlbumId != null && fromInbox != null && fromInbox)) && token == null) {
             return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
@@ -305,16 +346,56 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumId)) {
+        if (token != null) {
+            final AccessToken accessToken;
+            try {
+                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+            } catch (AccessTokenVerificationException e) {
+                return Response.status(FORBIDDEN).entity(e.getMessage()).build(); //todo modifier la reponse
+            }
+
+            final User user;
+            try {
+                user = getOrCreateUser(accessToken.getSubject());
+            } catch (UserNotFoundException e) {
+                return Response.status(FORBIDDEN).build(); //todo modifier la reponse
+            }
+
+            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
+
+
+
+            if (tokenPrincipal.getScope() == ScopeType.ALBUM)
+            {
+                try {
+                    fromAlbumId = tokenPrincipal.getAlbumID();
+                } catch (NotAlbumScopeTypeException e) {
+                    e.printStackTrace();
+                } catch (AlbumNotFoundException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+
+            if (!tokenPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
             }
 
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
-                return Response.status(FORBIDDEN).build();
+
+
+
+        } else {
+
+            try {
+                if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumId)) {
+                    return Response.status(FORBIDDEN).build();
+                }
+
+                if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
+                    return Response.status(FORBIDDEN).build();
+                }
+            } catch (AlbumNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
             }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         try {
