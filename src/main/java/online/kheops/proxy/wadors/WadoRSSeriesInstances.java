@@ -49,7 +49,7 @@ public class WadoRSSeriesInstances {
 
     @GET
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
-    @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
+    @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8", "application/dicom+json;qs=1,multipart/related;type=application/dicom+xml;qs=0.9,application/json;qs=0.8"})
     public Response wadoInstances(@PathParam("StudyInstanceUID") String studyInstanceUID,
                                   @PathParam("SeriesInstanceUID") String seriesInstanceUID,
                                   @HeaderParam(AUTHORIZATION) String authorizationHeader,
