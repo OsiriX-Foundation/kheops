@@ -292,7 +292,7 @@ public class SendingResource
             final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
             try {
-                if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID) || !tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+                if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                     return Response.status(FORBIDDEN).build();
                 }
             } catch (SeriesNotFoundException e) {
@@ -301,7 +301,7 @@ public class SendingResource
 
         } else {
             try {
-                if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID) || !kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                     return Response.status(FORBIDDEN).build();
                 }
             } catch (SeriesNotFoundException e) {
