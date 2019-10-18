@@ -13,14 +13,13 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.user.UsersPermission;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
@@ -45,7 +44,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @UserAccessSecured
+    //@UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(AlbumUserPermissions.SEND_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
@@ -84,7 +83,7 @@ public class SendingResource
 
     @PUT
     @Secured
-    @UserAccessSecured
+    //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -280,26 +279,25 @@ public class SendingResource
             try {
                 accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
             } catch (AccessTokenVerificationException e) {
-                return Response.status(FORBIDDEN).entity(e.getMessage()).build(); //todo modifier la reponse
+                return Response.status(FORBIDDEN).entity(e.getMessage()).build();
             }
 
             final User user;
             try {
                 user = getOrCreateUser(accessToken.getSubject());
             } catch (UserNotFoundException e) {
-                return Response.status(FORBIDDEN).build(); //todo modifier la reponse
+                return Response.status(FORBIDDEN).build();
             }
 
             final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
             try {
-                if (!tokenPrincipal.hasStudyWriteAccess(studyInstanceUID) || !tokenPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID) || !tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                     return Response.status(FORBIDDEN).build();
                 }
             } catch (SeriesNotFoundException e) {
                 return Response.status(NOT_FOUND).entity(e.getMessage()).build();
             }
-
 
         } else {
             try {
@@ -351,27 +349,30 @@ public class SendingResource
             try {
                 accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
             } catch (AccessTokenVerificationException e) {
-                return Response.status(FORBIDDEN).entity(e.getMessage()).build(); //todo modifier la reponse
+                return Response.status(FORBIDDEN).entity(e.getMessage()).build();
             }
 
             final User user;
             try {
                 user = getOrCreateUser(accessToken.getSubject());
             } catch (UserNotFoundException e) {
-                return Response.status(FORBIDDEN).build(); //todo modifier la reponse
+                return Response.status(FORBIDDEN).build();
             }
 
             final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
-
-
 
             if (tokenPrincipal.getScope() == ScopeType.ALBUM)
             {
                 try {
                     fromAlbumId = tokenPrincipal.getAlbumID();
-                } catch (NotAlbumScopeTypeException e) {
-                    e.printStackTrace();
-                } catch (AlbumNotFoundException e) {
+                    if (!tokenPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
+                        return Response.status(FORBIDDEN).build();
+                    }
+                    if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                        return Response.status(FORBIDDEN).build();
+                    }
+
+                } catch (AlbumNotFoundException | NotAlbumScopeTypeException e) {
                     throw new IllegalStateException(e);
                 }
             }
@@ -379,9 +380,6 @@ public class SendingResource
             if (!tokenPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
             }
-
-
-
 
         } else {
 
