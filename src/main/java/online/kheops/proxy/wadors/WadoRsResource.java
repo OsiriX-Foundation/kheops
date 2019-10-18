@@ -97,13 +97,23 @@ public final class WadoRsResource {
                                  @PathParam("seriesInstanceUID") String seriesInstanceUID) {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
-    
+
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{instancesInstanceUID:([0-9]+[.])*[0-9]+}/thumbnail")
     public Response wadoInstancesThumbnail(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-                                 @PathParam("studyInstanceUID") String studyInstanceUID,
-                                 @PathParam("instancesInstanceUID") String instancesInstanceUID,
-                                 @PathParam("seriesInstanceUID") String seriesInstanceUID) {
+                                           @PathParam("studyInstanceUID") String studyInstanceUID,
+                                           @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                                           @PathParam("instancesInstanceUID") String instancesInstanceUID) {
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+    }
+
+    @GET
+    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{instancesInstanceUID:([0-9]+[.])*[0-9]+}/frames/{framesInstanceUID:([0-9]+[.])*[0-9]+}/thumbnail")
+    public Response wadoFramesThumbnail(@HeaderParam(AUTHORIZATION) String authorizationHeader,
+                                        @PathParam("studyInstanceUID") String studyInstanceUID,
+                                        @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                                        @PathParam("instancesInstanceUID") String instancesInstanceUID,
+                                        @PathParam("framesInstanceUID") String framesInstanceUID) {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
     
