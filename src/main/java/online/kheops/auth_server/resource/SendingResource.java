@@ -483,9 +483,7 @@ public class SendingResource
                 } catch (AlbumNotFoundException | NotAlbumScopeTypeException e) {
                     throw new IllegalStateException(e);
                 }
-            }
-
-            if (!tokenPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            } else {
                 return Response.status(FORBIDDEN).build();
             }
 
