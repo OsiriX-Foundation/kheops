@@ -301,7 +301,7 @@ public class SendingResource
 
         } else {
             try {
-                if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID) || !kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+                if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                     return Response.status(FORBIDDEN).build();
                 }
             } catch (SeriesNotFoundException e) {
