@@ -138,7 +138,10 @@ public class SendingResource
 
         final String token = httpHeaders.getHeaderString("X-Token-Source");
 
+        boolean fromToken;
+
         if (token != null) {
+            fromToken = true;
             final AccessToken accessToken;
             try {
                 accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
@@ -173,6 +176,7 @@ public class SendingResource
 
         } else {
 
+            fromToken = false;
             try {
                 if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                     LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
@@ -194,7 +198,7 @@ public class SendingResource
                     return Response.status(FORBIDDEN).entity("No write access with this credential").build();
                 }
             } else {
-                Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromToken, kheopsPrincipal.getKheopsLogBuilder());
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException | ClientIdNotFoundException e) {
             LOG.log(WARNING, "Unable to add series", e);
