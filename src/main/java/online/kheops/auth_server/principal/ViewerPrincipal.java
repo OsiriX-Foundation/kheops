@@ -83,7 +83,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
                     seriesList = findSeriesListByStudyUIDFromInbox(getUser(), studyInstanceUID, em);
                 } else {
                     final Album album = getAlbum(viewerAccessToken.getSourceId(), em);
-                    seriesList = findSeriesListByStudyUIDFromAlbum(getUser(), album, studyInstanceUID, em);
+                    seriesList = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
                 }
 
                 return seriesList.contains(getSeries(studyInstanceUID, seriesInstanceUID, em));

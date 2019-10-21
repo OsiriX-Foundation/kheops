@@ -107,7 +107,7 @@ public class Sending {
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album callingAlbum = getAlbum(albumId, em);
 
-            final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
+            final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em);
 
             if (availableSeries.isEmpty()) {
                 throw new SeriesNotFoundException("No study with the given StudyInstanceUID in the album");
@@ -499,7 +499,7 @@ public class Sending {
             final Album album = getAlbum(albumId, em);
             final Album inbox = callingUser.getInbox();
 
-            final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(callingUser, album, studyInstanceUID, em);
+            final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
 
             for (Series series : seriesLst) {
                 if(!inbox.containsSeries(series, em)) {
@@ -563,7 +563,7 @@ public class Sending {
         if (fromAlbumId != null) {
             final Album callingAlbum = getAlbum(fromAlbumId, em);
 
-            availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
+            availableSeries = findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em);
         } else if (fromInbox) {
             availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
         } else {

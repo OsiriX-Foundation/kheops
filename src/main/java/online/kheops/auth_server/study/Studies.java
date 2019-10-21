@@ -510,7 +510,7 @@ public class Studies {
 
             } else {
                 album = getAlbum(fromAlbumId, em);
-                seriesList = findSeriesListByStudyUIDFromAlbum(callingUser,album, studyInstanceUID, em);
+                seriesList = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
                 kheopsLogBuilder.album(fromAlbumId);
             }
             if(seriesList.isEmpty()) {
