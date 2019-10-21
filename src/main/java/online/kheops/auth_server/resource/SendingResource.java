@@ -7,8 +7,11 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
+import online.kheops.auth_server.capability.CapabilityToken;
 import online.kheops.auth_server.capability.ScopeType;
+import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
@@ -133,18 +136,56 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
+        final String token = httpHeaders.getHeaderString("X-Token-Source");
+
+        if (token != null) {
+            final AccessToken accessToken;
+            try {
+                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+            } catch (AccessTokenVerificationException e) {
+                return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+            }
+
+            final User user;
+            try {
+                user = getOrCreateUser(accessToken.getSubject());
+            } catch (UserNotFoundException e) {
                 return Response.status(FORBIDDEN).build();
             }
-        } catch (SeriesNotFoundException e) {
-            LOG.log(WARNING, "StudyUID:" + studyInstanceUID + " SeriesUID:" + seriesInstanceUID + " was not found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+
+            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
+
+            try {
+                if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+                    return Response.status(FORBIDDEN).build();
+                }
+            } catch (SeriesNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            }
+
+            if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
+                return Response.status(FORBIDDEN).build();
+            }
+            Capability capability = tokenPrincipal.getCapability().get();
+            if (!capability.hasAppropriatePermission()) {
+                return Response.status(FORBIDDEN).build();
+            }
+
+        } else {
+
+            try {
+                if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                    LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
+                    return Response.status(FORBIDDEN).build();
+                }
+            } catch (SeriesNotFoundException e) {
+                LOG.log(WARNING, "StudyUID:" + studyInstanceUID + " SeriesUID:" + seriesInstanceUID + " was not found", e);
+                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            }
         }
 
         try {
-            if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumID)) {
                     Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
@@ -160,6 +201,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         return Response.status(CREATED).build();
+
     }
 
     @PUT
@@ -172,8 +214,41 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+        final String token = httpHeaders.getHeaderString("X-Token-Source");
+
+        if (token != null) {
+            final AccessToken accessToken;
+            try {
+                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+            } catch (AccessTokenVerificationException e) {
+                return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+            }
+
+            final User user;
+            try {
+                user = getOrCreateUser(accessToken.getSubject());
+            } catch (UserNotFoundException e) {
+                return Response.status(FORBIDDEN).build();
+            }
+
+            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
+
+            if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                return Response.status(FORBIDDEN).build();
+            }
+
+            if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
+                return Response.status(FORBIDDEN).build();
+            }
+            Capability capability = tokenPrincipal.getCapability().get();
+            if (!capability.hasAppropriatePermission()) {
+                return Response.status(FORBIDDEN).build();
+            }
+
+        } else {
+            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+                return Response.status(FORBIDDEN).build();
+            }
         }
 
         try {
@@ -313,6 +388,14 @@ public class SendingResource
                 }
             } catch (SeriesNotFoundException e) {
                 return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            }
+
+            if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
+                return Response.status(FORBIDDEN).build();
+            }
+            Capability capability = tokenPrincipal.getCapability().get();
+            if (!capability.hasAppropriatePermission()) {
+                return Response.status(FORBIDDEN).build();
             }
 
         } else {
