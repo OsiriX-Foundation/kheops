@@ -245,6 +245,11 @@ public class SendingResource
                 return Response.status(FORBIDDEN).build();
             }
 
+            if (albumId != null) {
+                return Response.status(BAD_REQUEST).build();
+            }
+            albumId = capability.getAlbum().getId();
+
         } else {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
