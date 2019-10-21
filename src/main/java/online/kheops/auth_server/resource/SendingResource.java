@@ -53,6 +53,24 @@ public class SendingResource
                                        @QueryParam(ALBUM) String fromAlbumId,
                                        @QueryParam(INBOX) Boolean fromInbox) {
 
+
+        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
+
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+
+            if (fromInbox != null || fromAlbumId != null) {
+                return Response.status(BAD_REQUEST).build();
+            }
+
+            try {
+                fromAlbumId = kheopsPrincipal.getAlbumID();
+            } catch (NotAlbumScopeTypeException e) {
+                throw new IllegalStateException(e);
+            } catch (AlbumNotFoundException e) {
+                return Response.status(BAD_REQUEST).build();
+            }
+        }
+
         if ((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) {
             return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
@@ -61,8 +79,6 @@ public class SendingResource
         if(fromAlbumId != null) {
             fromInbox = false;
         }
-
-        final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if(fromInbox && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
             return Response.status(UNAUTHORIZED).entity("You can't send study:"+studyInstanceUID+" from inbox").build();
