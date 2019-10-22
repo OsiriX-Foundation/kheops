@@ -3,6 +3,7 @@ package online.kheops.auth_server.album;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
+import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
@@ -438,6 +440,15 @@ public class Albums {
             return false;
         } finally {
             em.close();
+        }
+    }
+
+    public static boolean albumContainStudy(String studyUID, Album album, EntityManager em) {
+        try {
+            findStudyByStudyandAlbum(studyUID, album, em);
+            return true;
+        } catch (StudyNotFoundException e) {
+            return false;
         }
     }
 }

@@ -7,7 +7,6 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.*;
-import online.kheops.auth_server.capability.CapabilityToken;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
@@ -18,7 +17,6 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
-import online.kheops.auth_server.user.UsersPermission;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
@@ -144,7 +142,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final String token = httpHeaders.getHeaderString("X-Token-Source");
+        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
 
         boolean fromToken;
 
@@ -177,7 +175,7 @@ public class SendingResource
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 return Response.status(FORBIDDEN).build();
             }
-            
+
             final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
             if (optionalCapability.isPresent()) {
                 final Capability capability = optionalCapability.get();
@@ -230,7 +228,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final String token = httpHeaders.getHeaderString("X-Token-Source");
+        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
 
         if (token != null) {
             final AccessToken accessToken;
@@ -387,7 +385,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final String token = httpHeaders.getHeaderString("X-Token-Source");
+        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
 
         if (token != null) {
             final AccessToken accessToken;
@@ -459,7 +457,7 @@ public class SendingResource
                                     @QueryParam(INBOX) Boolean fromInbox) {
 
 
-        final String token = httpHeaders.getHeaderString("X-Token-Source");
+        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
 
         if (((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) && token == null) {

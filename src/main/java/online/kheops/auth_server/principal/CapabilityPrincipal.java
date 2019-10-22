@@ -9,7 +9,6 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -23,7 +22,6 @@ import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
-import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 
 
 public class CapabilityPrincipal implements KheopsPrincipal {
@@ -167,27 +165,15 @@ public class CapabilityPrincipal implements KheopsPrincipal {
                 try {
                     series = getSeries(studyInstanceUID, seriesInstanceUID, em);
                 } catch (SeriesNotFoundException e) {
-                    //if the series not exist
-                    if (capability.hasWritePermission()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    //here the series not exist
+                    return capability.hasWritePermission();
                 }
                 if (isOrphan(series, em)) {
-                    if (capability.hasWritePermission()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return capability.hasWritePermission();
                 }
 
                 if(mergeCapability.getAlbum().containsSeries(series, em)) {
-                    if (capability.hasAppropriatePermission()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return capability.hasAppropriatePermission();
                 }
             } catch (UserNotMemberException e) {
                 return false;
@@ -208,10 +194,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            final Study study;
-            try {
-                study = findStudyByStudyandAlbum(studyInstanceUID, capability.getAlbum(), em);
-            } catch (StudyNotFoundException e) {
+            if (!albumContainStudy(studyInstanceUID, capability.getAlbum(), em)) {
                 return capability.hasWritePermission();
             }
             return capability.hasAppropriatePermission();
