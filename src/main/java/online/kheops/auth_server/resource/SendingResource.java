@@ -112,7 +112,7 @@ public class SendingResource
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(NOT_FOUND).build();
+                return Response.status(FORBIDDEN).build();
             }
         } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
