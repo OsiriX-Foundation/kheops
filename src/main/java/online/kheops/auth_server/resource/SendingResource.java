@@ -23,6 +23,7 @@ import online.kheops.auth_server.user.UsersPermission;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
@@ -176,9 +177,13 @@ public class SendingResource
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 return Response.status(FORBIDDEN).build();
             }
-            Capability capability = tokenPrincipal.getCapability().get();
-            if (!capability.hasAppropriatePermission()) {
-                return Response.status(FORBIDDEN).build();
+            
+            final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
+            if (optionalCapability.isPresent()) {
+                final Capability capability = optionalCapability.get();
+                if (!capability.hasAppropriatePermission()) {
+                    return Response.status(FORBIDDEN).build();
+                }
             }
 
         } else {
@@ -251,15 +256,18 @@ public class SendingResource
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 return Response.status(FORBIDDEN).build();
             }
-            Capability capability = tokenPrincipal.getCapability().get();
-            if (!capability.hasAppropriatePermission()) {
-                return Response.status(FORBIDDEN).build();
-            }
 
-            if (albumId != null) {
-                return Response.status(BAD_REQUEST).build();
+            final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
+            if (optionalCapability.isPresent()) {
+                final Capability capability = optionalCapability.get();
+                if (!capability.hasAppropriatePermission()) {
+                    return Response.status(FORBIDDEN).build();
+                }
+                if (albumId != null) {
+                    return Response.status(BAD_REQUEST).build();
+                }
+                albumId = capability.getAlbum().getId();
             }
-            albumId = capability.getAlbum().getId();
 
         } else {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
@@ -409,10 +417,15 @@ public class SendingResource
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 return Response.status(FORBIDDEN).build();
             }
-            Capability capability = tokenPrincipal.getCapability().get();
-            if (!capability.hasAppropriatePermission()) {
-                return Response.status(FORBIDDEN).build();
+            final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
+            if (optionalCapability.isPresent()) {
+                final Capability capability = optionalCapability.get();
+                if (!capability.hasAppropriatePermission()) {
+                    return Response.status(FORBIDDEN).build();
+                }
             }
+
+
 
         } else {
             try {
