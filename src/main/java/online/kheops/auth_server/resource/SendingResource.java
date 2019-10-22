@@ -72,6 +72,13 @@ public class SendingResource
             } catch (AlbumNotFoundException e) {
                 return Response.status(BAD_REQUEST).build();
             }
+            try {
+                if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
+                    return Response.status(FORBIDDEN ).build();
+                }
+            } catch (AlbumNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
         }
 
         if ((fromAlbumId == null && fromInbox == null) ||
@@ -112,7 +119,7 @@ public class SendingResource
 
         try {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+                return Response.status(FORBIDDEN ).build();
             }
         } catch (SeriesNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
