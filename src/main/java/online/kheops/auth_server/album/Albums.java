@@ -442,13 +442,4 @@ public class Albums {
             em.close();
         }
     }
-
-    public static boolean albumContainStudy(String studyUID, Album album, EntityManager em) {
-        try {
-            findStudyByStudyandAlbum(studyUID, album, em);
-            return true;
-        } catch (StudyNotFoundException e) {
-            return false;
-        }
-    }
 }

@@ -475,16 +475,21 @@ public class Studies {
 
         try {
             tx.begin();
-            StudyQueries.findStudyByStudyandAlbum(studyUID, album, em);
-            return true;
-
-        } catch (StudyNotFoundException e) {
-            return false;
+            return canAccessStudy(album, studyUID, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
+        }
+    }
+
+    public static boolean canAccessStudy(Album album, String studyUID, EntityManager em) {
+        try {
+            StudyQueries.findStudyByStudyandAlbum(studyUID, album, em);
+            return true;
+        } catch (StudyNotFoundException e) {
+            return false;
         }
     }
 
