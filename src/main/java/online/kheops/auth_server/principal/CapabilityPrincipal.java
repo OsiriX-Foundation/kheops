@@ -153,9 +153,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
             return false;
 
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!capability.hasWritePermission()) {
-                return false;
-            }
             try {
                 tx.begin();
 
@@ -163,21 +160,33 @@ public class CapabilityPrincipal implements KheopsPrincipal {
 
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), mergeUser, em);
                 if (!albumUser.isAdmin()) {
-                    return false;
+                    return false;//if the creator of the token is no longer the admin of the album
                 }
                 final Series series;
                 try {
                     series = getSeries(studyInstanceUID, seriesInstanceUID, em);
                 } catch (SeriesNotFoundException e) {
                     //if the series not exist
-                    return true;
+                    if (capability.hasWritePermission()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
                 if (isOrphan(series, em)) {
-                    return true;
+                    if (capability.hasWritePermission()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
 
                 if(mergeCapability.getAlbum().containsSeries(series, em)) {
-                    return true;
+                    if (capability.hasAppropriatePermission()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             } catch (UserNotMemberException e) {
                 return false;
