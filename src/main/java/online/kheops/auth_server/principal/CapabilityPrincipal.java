@@ -194,7 +194,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!canAccessStudy(capability.getAlbum(), studyInstanceUID, em)) {
+            if (!canAccessStudy(capability.getAlbum(), studyInstanceUID)) {
                 return capability.hasWritePermission();
             }
             return capability.hasAppropriatePermission();
