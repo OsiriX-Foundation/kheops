@@ -72,6 +72,13 @@ public class CapabilitiesResource {
         if (readPermission) {
             capabilityParametersBuilder.appropriatePermission(appropriatePermission)
                     .downloadPermission(downloadPermission);
+        } else {
+            if (appropriatePermission) {
+                return Response.status(BAD_REQUEST).entity("'appropriatePermission' is availble only if 'readPermission' is True").build();
+            }
+            if (downloadPermission) {
+                return Response.status(BAD_REQUEST).entity("'downloadPermission' is availble only if 'readPermission' is True").build();
+            }
         }
         if(notBeforeTime != null) {
             try {
