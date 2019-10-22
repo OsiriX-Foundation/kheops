@@ -23,6 +23,7 @@ import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
+import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyandAlbum;
 
 
 public class CapabilityPrincipal implements KheopsPrincipal {
@@ -207,7 +208,13 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            return capability.hasWritePermission();
+            final Study study;
+            try {
+                study = findStudyByStudyandAlbum(studyInstanceUID, capability.getAlbum(), em);
+            } catch (StudyNotFoundException e) {
+                return capability.hasWritePermission();
+            }
+            return capability.hasAppropriatePermission();
         } else {
             return false;
         }
