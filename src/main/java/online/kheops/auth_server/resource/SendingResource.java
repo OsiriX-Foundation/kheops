@@ -19,10 +19,12 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -38,7 +40,7 @@ public class SendingResource
     private static final Logger LOG = Logger.getLogger(SendingResource.class.getName());
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
     private SecurityContext securityContext;
@@ -48,37 +50,29 @@ public class SendingResource
 
     @PUT
     @Secured
-    //@UserAccessSecured
     @AlbumAccessSecured
     @AlbumPermissionSecured(AlbumUserPermissions.SEND_SERIES)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
                                        @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) String fromAlbumId,
-                                       @QueryParam(INBOX) Boolean fromInbox) {
+                                       @QueryParam(INBOX) Boolean fromInbox,
+                                       @Context HttpServletRequest request,
+                                       @Context HttpServletResponse response) {
 
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-
-            if (fromInbox != null || fromAlbumId != null) {
-                return Response.status(BAD_REQUEST).build();
-            }
-
             try {
-                fromAlbumId = kheopsPrincipal.getAlbumID();
-            } catch (NotAlbumScopeTypeException e) {
-                throw new IllegalStateException(e);
-            } catch (AlbumNotFoundException e) {
-                return Response.status(BAD_REQUEST).build();
-            }
-            try {
-                if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
-                    return Response.status(FORBIDDEN ).build();
+                if (fromInbox != null || (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID()))) {
+                    return Response.status(BAD_REQUEST).build();
+                } else if (fromAlbumId == null) {
+                    request.getRequestDispatcher(request.getRequestURI() + "?&album=" + kheopsPrincipal.getAlbumID()).forward(request, response);
+                    return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
                 }
-            } catch (AlbumNotFoundException e) {
-                throw new IllegalStateException(e);
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
+                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
             }
         }
 
@@ -98,10 +92,8 @@ public class SendingResource
         try {
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox, kheopsPrincipal.getKheopsLogBuilder());
         } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
-            LOG.log(WARNING, "not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         } catch (BadRequestException e) {
-            LOG.log(WARNING, "bad request", e);
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
@@ -110,7 +102,6 @@ public class SendingResource
 
     @PUT
     @Secured
-    //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -294,12 +285,22 @@ public class SendingResource
 
     @DELETE
     @Secured
-    //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
-    public Response deleteStudyFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
+    public Response deleteStudyFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                         @Context HttpServletRequest request,
+                                         @Context HttpServletResponse response) {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
+
+        if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            try {
+                request.getRequestDispatcher(request.getRequestURI()+"/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
+                return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
+                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            }
+        }
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
             return Response.status(FORBIDDEN).build();
@@ -332,24 +333,21 @@ public class SendingResource
 
     @DELETE
     @Secured
-    //@UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteSeriesFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
+                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
+                                          @Context HttpServletRequest request,
+                                          @Context HttpServletResponse response) {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
-                URI uri = new URI("authorization/studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/albums/"+kheopsPrincipal.getAlbumID());
-                return Response.temporaryRedirect(uri).build();
-            } catch (NotAlbumScopeTypeException e) {
-                e.printStackTrace();
-            } catch (AlbumNotFoundException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
+                request.getRequestDispatcher(request.getRequestURI()+"/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
+                return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
+                return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
             }
         }
 
@@ -572,7 +570,6 @@ public class SendingResource
     public Response deleteSeriesFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                           @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
-
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
