@@ -2,10 +2,10 @@ import Vue from 'vue';
 import { HTTP } from '@/router/http';
 import dicomoperations from '@/mixins/dicomoperations';
 import httpoperations from '@/mixins/httpoperations';
-import SRImage from '@/assets/SR_2.png';
-import PDFImage from '@/assets/pdf-240x240.png';
-import VideoImage from '@/assets/video.png';
-import DicomLogo from '@/assets/dicom_logo.png';
+import SRImage from '@/assets/img/SR_2.png';
+import PDFImage from '@/assets/img/pdf-240x240.png';
+import VideoImage from '@/assets/img/video.png';
+import DicomLogo from '@/assets/img/dicom_logo.png';
 
 // initial state
 const state = {
