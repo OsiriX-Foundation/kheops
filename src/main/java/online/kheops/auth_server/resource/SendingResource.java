@@ -68,7 +68,7 @@ public class SendingResource
                 if (fromInbox != null || (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID()))) {
                     return Response.status(BAD_REQUEST).build();
                 } else if (fromAlbumId == null) {
-                    request.getRequestDispatcher(request.getRequestURI() + "?&album=" + kheopsPrincipal.getAlbumID()).forward(request, response);
+                    request.getRequestDispatcher(request.getRequestURI().replace("/authorization", "") + "?&album=" + kheopsPrincipal.getAlbumID()).forward(request, response);
                     return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
                 }
             } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
@@ -295,7 +295,7 @@ public class SendingResource
 
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
-                request.getRequestDispatcher(request.getRequestURI()+"/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
+                request.getRequestDispatcher(request.getRequestURI().replace("/authorization", "")+"/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
             } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
                 return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
@@ -344,7 +344,7 @@ public class SendingResource
 
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
-                request.getRequestDispatcher(request.getRequestURI()+"/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
+                request.getRequestDispatcher(request.getRequestURI().replace("/authorization", "")+"/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
             } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
                 return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
