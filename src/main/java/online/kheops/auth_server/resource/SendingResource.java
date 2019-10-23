@@ -342,7 +342,7 @@ public class SendingResource
 
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
-                URI uri = new URI("studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/albums/"+kheopsPrincipal.getAlbumID());
+                URI uri = new URI("authorization/studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/albums/"+kheopsPrincipal.getAlbumID());
                 return Response.temporaryRedirect(uri).build();
             } catch (NotAlbumScopeTypeException e) {
                 e.printStackTrace();
