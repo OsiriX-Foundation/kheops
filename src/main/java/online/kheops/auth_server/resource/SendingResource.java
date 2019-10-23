@@ -21,6 +21,8 @@ import online.kheops.auth_server.user.AlbumUserPermissions;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -337,6 +339,19 @@ public class SendingResource
                                           @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
+
+        if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            try {
+                URI uri = new URI("studies/"+studyInstanceUID+"/series/"+seriesInstanceUID+"/albums/"+kheopsPrincipal.getAlbumID());
+                return Response.temporaryRedirect(uri).build();
+            } catch (NotAlbumScopeTypeException e) {
+                e.printStackTrace();
+            } catch (AlbumNotFoundException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
 
         try{
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
