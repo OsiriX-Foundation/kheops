@@ -8,10 +8,11 @@
       right
       @shown="setShow(true)"
       @hidden="setShow(false)"
+      toggle-class="kheopsicon"
     >
       <template slot="button-content">
         <v-icon
-          class="align-middle"
+          class="align-middle kheopsicon"
           style="margin-right:1; color: white"
           name="build"
         />

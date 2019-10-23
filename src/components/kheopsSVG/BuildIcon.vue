@@ -3,7 +3,7 @@
     xmlns="http://www.w3.org/2000/svg"
     :width="width"
     :height="height"
-    class="icon"
+    class="kheopsicon"
     viewBox="0 0 24 24"
   >
     <path
@@ -35,8 +35,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-  .icon{
-    fill: #fff;
-  }
-</style>

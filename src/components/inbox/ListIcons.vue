@@ -8,7 +8,7 @@
       <a
         v-if="showDownloadIcon"
         href="#"
-        class="download"
+        class="kheopsicon"
         @click.stop="getURLDownload()"
       >
         <v-icon
@@ -288,6 +288,6 @@ export default {
   }
 
   a.download:hover{
-    color: #fd7e14;
+    color: #fca638;
   }
 </style>
