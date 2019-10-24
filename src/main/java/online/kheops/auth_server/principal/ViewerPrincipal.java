@@ -64,7 +64,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
     public String getName() { return kheopsPrincipal.getName(); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
+    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
 
         if(!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
             return false;
@@ -86,7 +86,13 @@ public class ViewerPrincipal implements KheopsPrincipal {
                     seriesList = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
                 }
 
-                return seriesList.contains(getSeries(studyInstanceUID, seriesInstanceUID, em));
+                final Series series;
+                try {
+                    series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+                } catch (SeriesNotFoundException e) {
+                    return false;
+                }
+                return seriesList.contains(series);
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {

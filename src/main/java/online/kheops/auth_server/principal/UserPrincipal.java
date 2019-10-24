@@ -52,16 +52,12 @@ public class UserPrincipal implements KheopsPrincipal {
     public String getName() { return Long.toString(dbid); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
+    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
             tx.begin();
-            if (canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em)) {
-                return true;
-            } else {
-                throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + " not found");
-            }
+            return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -92,7 +88,7 @@ public class UserPrincipal implements KheopsPrincipal {
     public boolean hasUserAccess() { return true; }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
@@ -125,7 +121,7 @@ public class UserPrincipal implements KheopsPrincipal {
             }
             em.close();
         }
-        throw new SeriesNotFoundException("SeriesUID : " + seriesInstanceUID + "from studyUID : " + studyInstanceUID + "not found");
+        return false;
     }
 
     @Override

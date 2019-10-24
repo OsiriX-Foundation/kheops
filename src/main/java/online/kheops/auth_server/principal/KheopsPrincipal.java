@@ -20,12 +20,12 @@ public interface KheopsPrincipal extends Principal, TokenProvenance {
     long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
-    boolean hasSeriesReadAccess(String study, String series) throws SeriesNotFoundException;
+    boolean hasSeriesReadAccess(String study, String series);
     boolean hasStudyReadAccess(String study);
     boolean hasUserAccess();
     boolean hasInboxAccess();
 
-    boolean hasSeriesWriteAccess(String study, String series) throws SeriesNotFoundException;
+    boolean hasSeriesWriteAccess(String study, String series);
 
     boolean hasStudyWriteAccess(String study);
 

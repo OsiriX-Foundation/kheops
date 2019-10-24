@@ -109,12 +109,8 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN ).build();
-            }
-        } catch (SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            return Response.status(FORBIDDEN ).build();
         }
 
         try {
@@ -157,12 +153,8 @@ public class SendingResource
 
             final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
-            try {
-                if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-                    return Response.status(FORBIDDEN).build();
-                }
-            } catch (SeriesNotFoundException e) {
-                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(FORBIDDEN).build();
             }
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
@@ -178,16 +170,10 @@ public class SendingResource
             }
 
         } else {
-
             fromToken = false;
-            try {
-                if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                    LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
-                    return Response.status(FORBIDDEN).build();
-                }
-            } catch (SeriesNotFoundException e) {
-                LOG.log(WARNING, "StudyUID:" + studyInstanceUID + " SeriesUID:" + seriesInstanceUID + " was not found", e);
-                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
+                return Response.status(FORBIDDEN).build();
             }
         }
 
@@ -351,12 +337,8 @@ public class SendingResource
             }
         }
 
-        try{
-            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            return Response.status(FORBIDDEN).build();
         }
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
@@ -417,12 +399,8 @@ public class SendingResource
 
             final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
-            try {
-                if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-                    return Response.status(FORBIDDEN).build();
-                }
-            } catch (SeriesNotFoundException e) {
-                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(FORBIDDEN).build();
             }
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
@@ -437,12 +415,8 @@ public class SendingResource
             }
 
         } else {
-            try {
-                if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                    return Response.status(FORBIDDEN).build();
-                }
-            } catch (SeriesNotFoundException e) {
-                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+                return Response.status(FORBIDDEN).build();
             }
         }
 

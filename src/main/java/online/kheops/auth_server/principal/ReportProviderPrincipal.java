@@ -102,8 +102,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     public boolean hasUserAccess() { return false; }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID)
-            throws SeriesNotFoundException {
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
 
         if (!hasWriteAccess) {
             return false;
@@ -139,7 +138,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             }
             em.close();
         }
-        throw new SeriesNotFoundException("SeriesUID : " + seriesInstanceUID + "from studyUID : " + studyInstanceUID + "not found");
+        return false;
     }
 
     @Override

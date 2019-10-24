@@ -55,17 +55,13 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException {
+    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
             tx.begin();
             if(getScope() == ScopeType.USER) {
-                if (canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em)) {
-                    return true;
-                } else {
-                    throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + "not found");
-                }
+                return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
             } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) { //the user who created the token is not longer an admin => normally the token should be removed
