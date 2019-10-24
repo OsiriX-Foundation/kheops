@@ -436,8 +436,6 @@ public class SendingResource
                 }
             }
 
-
-
         } else {
             try {
                 if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
