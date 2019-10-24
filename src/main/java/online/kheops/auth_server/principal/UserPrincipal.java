@@ -132,7 +132,7 @@ public class UserPrincipal implements KheopsPrincipal {
     public boolean hasStudyWriteAccess(String study) { return true; }
 
     @Override
-    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
         this.tx = em.getTransaction();
         try {
@@ -143,7 +143,7 @@ public class UserPrincipal implements KheopsPrincipal {
             final AlbumUser albumUser = getAlbumUser(album, userMerge, em);
 
             if(userMerge.getInbox() == album) {
-                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                return false;
             }
             if (albumUser.isAdmin()) {
                 return true;
@@ -152,7 +152,7 @@ public class UserPrincipal implements KheopsPrincipal {
             return usersPermission.hasUserPermission(album);
 
         } catch (AlbumNotFoundException | UserNotMemberException e) {
-            throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+            return false;
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

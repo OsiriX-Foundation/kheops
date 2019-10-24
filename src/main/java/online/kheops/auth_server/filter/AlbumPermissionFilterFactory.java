@@ -61,13 +61,11 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
         }
 
         private void tryPermission(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
-            try {
-                if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                    requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : " + albumID + " Forbidden").build());
-                }
-            } catch (AlbumNotFoundException e) {
-                requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
+
+            if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
+                requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : " + albumID + " Forbidden").build());
             }
+
         }
     }
 }

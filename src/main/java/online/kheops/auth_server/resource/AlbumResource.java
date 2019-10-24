@@ -131,16 +131,12 @@ public class AlbumResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal) securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
         final AlbumResponse albumResponse;
 
-        try {
-            if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
-                return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
+            return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
         }
+
         try {
             albumResponse = Albums.getAlbum(callingUserPk, albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
         } catch (JOOQException e) {

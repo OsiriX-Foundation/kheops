@@ -29,9 +29,9 @@ public interface KheopsPrincipal extends Principal, TokenProvenance {
 
     boolean hasStudyWriteAccess(String study);
 
-    boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) throws AlbumNotFoundException;
+    boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId);
 
-    boolean hasAlbumAccess(String albumId) throws AlbumNotFoundException;
+    boolean hasAlbumAccess(String albumId);
 
     KheopsLogBuilder getKheopsLogBuilder();
 

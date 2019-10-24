@@ -17,12 +17,14 @@ import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.UnsupportedEncodingException;
@@ -71,16 +73,10 @@ public class ReportProviderResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newReportProvider(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                            @FormParam("url") final String url,
-                            @FormParam("name") final String name) {
+                            @FormParam("url") @NotNull @NotEmpty final String url,
+                            @FormParam("name") @NotNull @NotEmpty final String name) {
 
-        if (name == null || name.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("'name' formparam must be set").build();
-        }
-
-        if (url == null || url.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("'url' formparam must be set").build();
-        } else if ( !isValidConfigUrl(url)) {
+        if ( !isValidConfigUrl(url)) {
             return Response.status(BAD_REQUEST).entity("'url' formparam is not valid").build();
         }
 
@@ -100,17 +96,9 @@ public class ReportProviderResource {
     @Path("report")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Response newReport(@FormParam("access_token") final String tokenParam,
+    public Response newReport(@FormParam("access_token") @NotNull @NotEmpty final String tokenParam,
                               @FormParam("client_id") final String clientId,
-                              @FormParam("studyUID") List<String> studyInstanceUIDs) {//Edit UidValidator for work with @FormParam
-
-        if (tokenParam == null) {
-            return Response.status(BAD_REQUEST).entity("Missing 'access_token'").build();
-        }
-
-        if (studyInstanceUIDs == null || studyInstanceUIDs.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity(StudyInstanceUID + " param must be set").build();
-        }
+                              @FormParam("studyUID") @NotNull @NotEmpty List<String> studyInstanceUIDs) {//Edit UidValidator for work with @FormParam
 
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
@@ -274,8 +262,6 @@ public class ReportProviderResource {
                     "</html>";
 
             return Response.status(OK).entity(html).build();
-        } catch (AlbumNotFoundException e) {
-            throw new IllegalStateException("Album just found, how could we not have it now", e);
         } catch (ReportProviderUriNotValidException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (UnsupportedEncodingException e) {

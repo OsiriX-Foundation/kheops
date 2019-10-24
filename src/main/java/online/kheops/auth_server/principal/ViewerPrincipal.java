@@ -117,8 +117,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
     public boolean hasStudyWriteAccess(String study) { return false; }
 
     @Override
-    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId)
-            throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
 
         if (!kheopsPrincipal.hasAlbumPermission(usersPermission, albumId)) {
             return false;
@@ -129,14 +128,19 @@ public class ViewerPrincipal implements KheopsPrincipal {
                 tx.begin();
 
                 final User userMerge = em.merge(getUser());
-                final Album album = getAlbum(albumId, em);
+                final Album album;
+                try {
+                    album = getAlbum(albumId, em);
+                } catch (AlbumNotFoundException e) {
+                    return false;
+                }
 
                 if(!isMemberOfAlbum(userMerge, album, em)) {
-                    throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                    return false;
                 }
 
                 if(userMerge.getInbox() == album) {
-                    throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                    return false;
                 }
 
                 return usersPermission.hasViewerPermission(album);
@@ -151,12 +155,9 @@ public class ViewerPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasAlbumAccess(String albumId) {
-        try {
-            return kheopsPrincipal.hasAlbumAccess(albumId) && !viewerAccessToken.isInbox() &&
-                    (viewerAccessToken.getSourceId() == null || viewerAccessToken.getSourceId().equals(albumId));
-        } catch (AlbumNotFoundException e) {
-            return false;
-        }
+
+        return kheopsPrincipal.hasAlbumAccess(albumId) && !viewerAccessToken.isInbox() &&
+                (viewerAccessToken.getSourceId() == null || viewerAccessToken.getSourceId().equals(albumId));
     }
 
     @Override

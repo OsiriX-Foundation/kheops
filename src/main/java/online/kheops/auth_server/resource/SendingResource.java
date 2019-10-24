@@ -517,17 +517,12 @@ public class SendingResource
             }
 
         } else {
+            if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumId)) {
+                return Response.status(FORBIDDEN).build();
+            }
 
-            try {
-                if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumId)) {
-                    return Response.status(FORBIDDEN).build();
-                }
-
-                if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
-                    return Response.status(FORBIDDEN).build();
-                }
-            } catch (AlbumNotFoundException e) {
-                return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
+                return Response.status(FORBIDDEN).build();
             }
         }
 

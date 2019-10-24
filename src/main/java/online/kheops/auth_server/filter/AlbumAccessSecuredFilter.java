@@ -39,11 +39,8 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
     }
 
     private void tryAccess(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
-        try {
-            if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
-                requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
-            }
-        } catch (AlbumNotFoundException e) {
+
+        if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
             requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
         }
     }
