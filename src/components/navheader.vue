@@ -27,21 +27,17 @@
     fixed="top"
   >
     <b-navbar-toggle target="nav_collapse" />
-    <b-navbar-brand href="#">
-      <!--
-      <img
-        src="../assets/sib_logo_small.gif"
-        style="margin-right:5px"
+    <b-navbar-nav>
+      <kheops
+        :width="24"
+        :height="24"
+      />
+      <span
+        style="font-size: 1.1rem; text-align: center; padding-left: 5px"
       >
-      -->
-      <router-link
-        to="/"
-        style="font-size: 1.3rem;"
-        class="kheopsfont"
-      >
-        Kheops
-      </router-link>
-    </b-navbar-brand>
+        KHEOPS
+      </span>
+    </b-navbar-nav>
 
     <b-collapse
       id="nav_collapse"
@@ -125,9 +121,11 @@
 import Vue from 'vue';
 import store from '@/store';
 import { CurrentUser } from '@/mixins/currentuser.js';
+import Kheops from '@/components/kheopsSVG/Kheops.vue';
 
 export default {
   name: 'NavHeader',
+  components: { Kheops },
   mixins: [CurrentUser],
   props: {
     logged: {
