@@ -4,8 +4,8 @@
 
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
-// import 'bootstrap/dist/css/bootstrap.css'
 import '@/css/bootstrap_dark.css';
+import '@/css/bootstrap_kheops.css';
 import '@/css/main.css';
 import Snotify, { SnotifyPosition } from 'vue-snotify';
 import 'vue-snotify/styles/material.css';
