@@ -133,7 +133,7 @@
               v-model="token.read_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
             />
-            
+
             <label
               class="token-props"
             >

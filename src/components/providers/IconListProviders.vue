@@ -6,9 +6,9 @@
       variant="link"
       no-caret
       right
+      toggle-class="kheopsicon"
       @shown="setShow(true)"
       @hidden="setShow(false)"
-      toggle-class="kheopsicon"
     >
       <template slot="button-content">
         <v-icon
