@@ -98,18 +98,18 @@ export default {
         name: {
           label: this.$t('name_provider'),
           sortable: true,
-          tdClass: 'breakwork',
+          tdClass: 'word-break',
         },
         url: {
           label: this.$t('url'),
           sortable: true,
-          tdClass: 'breakwork',
+          tdClass: 'word-break',
           class: 'd-none d-sm-table-cell',
         },
         created_time: {
           label: this.$t('created_time'),
           sortable: true,
-          tdClass: 'breakwork',
+          tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
         },
         btn_edit: {
@@ -156,10 +156,3 @@ export default {
   },
 };
 </script>
-
-<style>
-  .breakwork {
-    word-break: break-word;
-  }
-</style>
-

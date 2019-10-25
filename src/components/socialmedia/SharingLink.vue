@@ -244,20 +244,3 @@ export default {
   },
 };
 </script>
-<style>
-div.calendar-wrapper{
-  color: #333;
-}
-.chat-popup {
-  background: #303030;
-  border: 3px solid #f1f1f1;
-  z-index: 9;
-  max-width: 550px;
-  opacity: 1;
-  display: block;
-}
-.closeBtn {
-  position: relative;
-  border-bottom: 1px solid #f1f1f1;
-}
-</style>

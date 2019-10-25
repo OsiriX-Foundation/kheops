@@ -314,7 +314,7 @@ export default {
           key: 'is_selected',
           label: '',
           sortable: false,
-          class: 'td_checkbox breakword',
+          class: 'td_checkbox_albums word-break-all',
           thStyle: {
             width: '100px',
           },
@@ -324,7 +324,7 @@ export default {
           label: this.$t('name'),
           tdClass: 'name',
           sortable: true,
-          class: 'breakword',
+          class: 'word-break-all',
           thStyle: {
             width: '250px',
           },
@@ -333,7 +333,7 @@ export default {
           key: 'number_of_studies',
           label: this.$t('Study #'),
           sortable: true,
-          class: 'd-none d-sm-table-cell breakword',
+          class: 'd-none d-sm-table-cell word-break-all',
           thStyle: {
             width: '200px',
           },
@@ -342,7 +342,7 @@ export default {
           key: 'number_of_users',
           label: this.$t('User #'),
           sortable: true,
-          class: 'd-none d-md-table-cell breakword',
+          class: 'd-none d-md-table-cell word-break-all',
           thStyle: {
             width: '200px',
           },
@@ -351,7 +351,7 @@ export default {
           key: 'number_of_comments',
           label: this.$t('Message #'),
           sortable: true,
-          class: 'd-none d-lg-table-cell breakword',
+          class: 'd-none d-lg-table-cell word-break-all',
           thStyle: {
             width: '200px',
           },
@@ -360,7 +360,7 @@ export default {
           key: 'created_time',
           label: this.$t('Date'),
           sortable: true,
-          class: 'd-none d-sm-table-cell breakword',
+          class: 'd-none d-sm-table-cell word-break-all',
           thStyle: {
             width: '200px',
           },
@@ -369,7 +369,7 @@ export default {
           key: 'last_event_time',
           label: this.$t('LastEvent'),
           sortable: true,
-          class: 'd-none d-lg-table-cell breakword',
+          class: 'd-none d-lg-table-cell word-break-all',
           thStyle: {
             width: '200px',
           },
@@ -384,7 +384,7 @@ export default {
             }
             return this.$t('nomodality');
           },
-          class: 'breakword',
+          class: 'word-break-all',
           thStyle: {
             width: '200px',
           },
@@ -568,51 +568,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-select{
-  display: inline !important;
-}
-.btn-link {
-  font-weight: 400;
-  color: white;
-  background-color: transparent;
-}
-
-.btn-link:hover {
-  color: #c7d1db;
-  text-decoration: underline;
-  background-color: transparent;
-  border-color: transparent;
-}
-
-.selection-button-container{
-  height: 60px;
-}
-
-.td_checkbox {
-  width: 150px;
-}
-
-input.search-calendar{
-  width: 100px !important;
-}
-
-div.calendar-wrapper{
-  color: #333;
-}
-
-.breakword {
-  word-break: break-word;
-}
-.iconsHover{
-  visibility: visible;
-  display: inline;
-  cursor: pointer;
-}
-.iconsUnhover{
-  visibility: hidden;
-  display: inline;
-  cursor: pointer;
-}
-</style>

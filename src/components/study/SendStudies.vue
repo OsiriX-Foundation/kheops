@@ -167,7 +167,7 @@
               :max="totalSize"
               show-progress
               animated
-              style="text-align:center"
+              class="text-center"
             >
               {{ countSentFiles }} / {{ totalSize }}
             </b-progress-bar>
@@ -176,8 +176,7 @@
             >
               <button
                 type="button"
-                class="btn btn-link btn-sm text-center"
-                style="color: red"
+                class="btn btn-link btn-sm text-center text-warning"
                 @click="setCancel()"
               >
                 <span>
@@ -239,7 +238,9 @@
                 :key="item.key"
               >
                 {{ $tc("unknownError", item, {count: item }) }} <br>
-                <span style="color: red">
+                <span
+                  class="text-warning"
+                >
                   {{ errorValues[key] }}
                 </span>
               </div>
@@ -251,8 +252,7 @@
               {{ $tc("filesErrors", error.length, {count: error.length}) }}
               <button
                 type="button"
-                class="btn btn-link btn-sm text-center"
-                style="color: red"
+                class="btn btn-link btn-sm text-center text-warning"
                 @click="UI.showErrors=!UI.showErrors"
               >
                 <span v-if="!UI.showErrors">
@@ -641,21 +641,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-  .chat-popup {
-    position: fixed;
-    background: #303030;
-    bottom: 0;
-    right: 15px;
-    border: 3px solid #f1f1f1;
-    z-index: 9;
-    max-width: 300px;
-    opacity: 1;
-    display: block;
-  }
-  .closeBtn {
-    position: relative;
-    border-bottom: 1px solid #f1f1f1;
-  }
-</style>

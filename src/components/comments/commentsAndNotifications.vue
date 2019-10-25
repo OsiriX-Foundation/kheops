@@ -74,8 +74,7 @@
 
       <div
         :id="container_id"
-        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3"
-        style="max-height: 600px; overflow-y: scroll;"
+        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3 comment-section"
       >
         <div
           v-for="comment in comments"
@@ -466,7 +465,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-
-</style>

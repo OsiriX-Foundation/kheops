@@ -14,8 +14,7 @@
   <div>
     <div
       v-if="(currentView === 'listproviders') && writePermission"
-      class="my-3 selection-button-container"
-      style=" position: relative;"
+      class="my-3 selection-button-container provider-position"
     >
       <h4>
         <span
@@ -125,9 +124,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.selection-button-container{
-  height: 60px;
-}
-</style>

@@ -21,7 +21,7 @@
         <router-link
           to="albums/new"
           active-class="active"
-          style="display: inline; color: white"
+          class="inline-white"
         >
           <v-icon
             name="plus"
@@ -35,8 +35,7 @@
     >
       <button
         type="button"
-        class="btn btn-link btn-sm text-center"
-        style="display: inline; color: white"
+        class="btn btn-link btn-sm text-center inline-white"
         :disabled="disabledBtnShare"
         @click="inviteClick"
       >
@@ -67,8 +66,7 @@
     <div>
       <button
         type="button"
-        class="btn btn-link btn-lg"
-        style="display: inline; color: white"
+        class="btn btn-link btn-lg inline-white"
         @click="searchClick"
       >
         <v-icon
@@ -109,17 +107,3 @@ export default {
 };
 
 </script>
-<style scoped>
-.btn-link {
-  font-weight: 400;
-  color: white;
-  background-color: transparent;
-}
-
-.btn-link:hover {
-  color: #c7d1db;
-  text-decoration: underline;
-  background-color: transparent;
-  border-color: transparent;
-}
-</style>

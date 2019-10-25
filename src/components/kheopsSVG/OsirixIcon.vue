@@ -11,7 +11,7 @@
     viewBox="0 0 289 224"
     enable-background="new 0 0 289 224"
     xml:space="preserve"
-    class="icon"
+    class="kheopsicon"
   >
     <path
       id="icon_interior"
@@ -63,12 +63,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-  .icon{
-    fill: #fff;
-  }
-
-  .icon:hover{
-    fill: grey;
-  }
-</style>

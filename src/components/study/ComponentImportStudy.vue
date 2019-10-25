@@ -283,23 +283,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-  .dragenterClass {
-    opacity: 0.5;
-  }
-  .dragenterFormClass {
-    border: 5px dotted green !important;
-  }
-  .dragNotEnterFormClass {
-    border: 5px dotted transparent !important;
-  }
-  .outPopUp {
-    position: fixed;
-    z-index: 15;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size:45px;
-  }
-</style>

@@ -57,7 +57,7 @@
       :key="file.id"
       class="mb-2"
     >
-      <b style="word-break: break-word">
+      <b class="word-break">
         {{ file.name }}
       </b>
       <br>
@@ -180,6 +180,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-</style>

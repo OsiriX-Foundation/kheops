@@ -33,8 +33,7 @@
 <template>
   <div id="newToken">
     <div
-      class="my-3 selection-button-container"
-      style=" position: relative;"
+      class="my-3 selection-button-container token-position"
     >
       <h4>
         <button
@@ -124,11 +123,22 @@
             <toggle-button
               v-model="token.write_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
-            /> <label>{{ $t('write') }}</label><br>
+            />
+            <label
+              class="token-props"
+            >
+              {{ $t('write') }}
+            </label><br>
             <toggle-button
               v-model="token.read_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
-            /> <label>{{ $t('read') }}</label><br>
+            />
+            
+            <label
+              class="token-props"
+            >
+              {{ $t('read') }}
+            </label><br>
             <toggle-button
               v-if="token.read_permission"
               v-model="token.download_permission"
@@ -206,7 +216,7 @@
       @hidden="cancel"
     >
       <dl class="my-2 row">
-        <dt class="col-xs-12 col-sm-3">
+        <dt class="col-xs-12 col-sm-3 token-title">
           {{ token.title }}
         </dt>
         <dd class="col-xs-10 col-sm-8">
@@ -322,18 +332,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-dt{
-  text-align: right;
-  text-transform: capitalize;
-}
-label{
-  text-transform: capitalize;
-  margin-left: 1em;
-}
-div.calendar-wrapper{
-  color: #333;
-}
-
-</style>

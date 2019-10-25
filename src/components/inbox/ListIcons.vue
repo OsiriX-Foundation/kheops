@@ -12,8 +12,7 @@
         @click.stop="getURLDownload()"
       >
         <v-icon
-          class="align-middle"
-          style="margin-right:1"
+          class="align-middle icon-margin"
           name="download"
         />
       </a>
@@ -40,8 +39,7 @@
       <label
         v-if="showImportIcon"
         for="file"
-        style="cursor:pointer; display: inline;"
-        class="ml-1"
+        class="ml-1 pointer display-inline"
         @click="setStudyUID()"
       >
         <add-icon
@@ -62,8 +60,7 @@
       @click.stop="showComments(study, 'comments')"
     >
       <v-icon
-        class="align-middle"
-        style="margin-right:1"
+        class="align-middle icon-margin"
         name="comment-dots"
         :color="study.flag.is_commented ? '' : 'grey'"
       />
@@ -75,8 +72,7 @@
       @click.stop="toggleFavorite()"
     >
       <v-icon
-        class="align-middle"
-        style="margin-right:1"
+        class="align-middle icon-margin"
         name="star"
         :color="(!study.flag.is_favorite) ? 'grey' : ''"
       />
@@ -269,25 +265,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-  .iconsHover{
-    visibility: visible;
-    display: inline;
-    cursor: pointer;
-    opacity: 1;
-  }
-  .iconsUnhover{
-    visibility: hidden;
-    display: inline;
-    cursor: pointer;
-    opacity: 0;
-  }
-  a.download{
-    color: #FFF;
-  }
-
-  a.download:hover{
-    color: #fca638;
-  }
-</style>

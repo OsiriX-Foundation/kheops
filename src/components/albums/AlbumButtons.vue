@@ -75,7 +75,7 @@ Props :
         class="col-12"
       >
         <p
-          style="color:red;"
+          class="text-warning"
         >
           {{ $t('lastadmin') }}
         </p>
@@ -235,10 +235,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.btnalbum{
-  padding: 10px;
-}
-
-</style>

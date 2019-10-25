@@ -30,7 +30,9 @@
     >
       <div class="row">
         <div class="col-12 col-sm-12 col-md-12 col-lg-6">
-          <h3>
+          <h3
+            class="album-title word-break-all"
+          >
             <v-icon
               name="book"
               scale="2"
@@ -51,7 +53,7 @@
               v-if="album.is_admin === true"
               id="twitter-link"
               :text="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
-              style="cursor: pointer;"
+              class="pointer"
               @click.stop="toggleTwitter(album.album_id)"
             >
               <v-icon
@@ -113,8 +115,7 @@
           class="card"
         >
           <div
-            class="card-body"
-            style="max-height: 135px; overflow-y: auto"
+            class="card-body album-description"
           >
             <p
               v-for="line in album.description.split('\n')"
@@ -357,31 +358,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-h3 {
-  margin-bottom: 40px;
-  float: left;
-}
-
-h5.user{
-  float: left;
-  margin-right: 10px;
-}
-
-.icon{
-  margin-left: 10px;
-}
-.pointer{
-  cursor: pointer;
-}
-label{
-  margin-left: 10px;
-}
-a.nav-link{
-  cursor: pointer;
-}
-.nav a:hover:not(.active) {
-  opacity: 0.5;
-}
-</style>

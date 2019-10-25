@@ -28,7 +28,10 @@
             class="nav-link"
             active-class="active"
           >
-            <v-icon name="bars" />{{ $t("inbox") }}
+            <v-icon
+              name="bars"
+              class="navbar-icon-margin"
+            />{{ $t("inbox") }}
           </router-link>
         </li>
         <li class="nav-item">
@@ -37,7 +40,10 @@
             class="nav-link"
             active-class="active"
           >
-            <v-icon name="book" />{{ $t("albums") }}
+            <v-icon
+              name="book"
+              class="navbar-icon-margin"
+            />{{ $t("albums") }}
           </router-link>
         </li>
         <!--
@@ -69,15 +75,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-#navbar_container{
-  margin-top: 100px;
-}
-svg.fa-icon{
-  margin-right: 10px;
-}
-.nav li a:hover:not(.active) {
-  opacity: 0.5;
-}
-</style>

@@ -35,14 +35,16 @@
 
 <template>
   <div class="container">
-    <h3>
+    <h3
+      class="newalbum-title"
+    >
       {{ displayName }}
     </h3>
     <form @submit.prevent="createAlbum">
       <fieldset>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt class="d-none d-sm-block">
+            <dt class="d-none d-sm-block edit-title">
               {{ $t('albumName') }}
             </dt>
             <b class="d-block d-sm-none">{{ $t('albumName') }}</b>
@@ -61,7 +63,7 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt class="d-none d-sm-block">
+            <dt class="d-none d-sm-block edit-title">
               {{ $t('albumDescription') }}
             </dt>
             <b class="d-block d-sm-none">{{ $t('albumDescription') }}</b>
@@ -80,7 +82,7 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt class="d-none d-sm-block">
+            <dt class="d-none d-sm-block edit-title">
               {{ $t('users') }}
             </dt>
             <b class="d-block d-sm-none">{{ $t('users') }}</b>
@@ -89,7 +91,7 @@
             <dd>
               <h5
                 v-if="album.users.length > 0"
-                class="user"
+                class="newalbum-user"
               >
                 <span
                   v-for="user in album.users"
@@ -98,14 +100,16 @@
                 >
                   {{ user.email }}
                   <span
-                    class="icon pointer"
+                    class="pointer"
                     @click="deleteUser(user)"
                   >
                     <v-icon name="times" />
                   </span>
                 </span>
               </h5>
-              <h5 class="user">
+              <h5
+                class="newalbum-user"
+              >
                 <div class="input-group mb-3">
                   <input
                     v-model="newUserName"
@@ -133,12 +137,12 @@
         </div>
       </fieldset>
 
-      <fieldset class="user_settings">
+      <fieldset class="user-settings">
         <legend>{{ $t('usersettings') }}</legend>
         <div
           v-for="(value,label) in album.userSettings"
           :key="label"
-          class="row form-group"
+          class="row form-group toggle-padding"
           :class="(label==='sendSeries')?'offset-1':''"
         >
           <div>
@@ -149,7 +153,11 @@
               :sync="true"
             />
           </div>
-          <label>{{ $t(label) }}</label>
+          <label
+            class="user-settings"
+          >
+            {{ $t(label) }}
+          </label>
         </div>
       </fieldset>
       <fieldset>
@@ -329,37 +337,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-h3 {
-  margin-bottom: 40px;
-}
-
-h5.user{
-  float: left;
-  margin-right: 10px;
-}
-
-.icon{
-  margin-left: 10px;
-}
-.pointer{
-  cursor: pointer;
-}
-label{
-  margin-left: 10px;
-}
-fieldset.user_settings {
-  border: 1px solid #333;
-  padding: 20px;
-  background-color: #303030 ;
-}
-
-fieldset.user_settings legend{
-  padding: 0 20px;
-  width: auto;
-}
-dt{
-  text-align: right;
-}
-</style>

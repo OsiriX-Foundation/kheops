@@ -40,8 +40,7 @@
       <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
         <h5>{{ $t('patientinfo') }}</h5>
         <table
-          class="table table-striped"
-          style="word-break: break-word;"
+          class="table table-striped-color-reverse word-break"
         >
           <tbody>
             <tr v-if="metadata.PatientName">
@@ -67,8 +66,7 @@
       <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
         <h5>{{ $t('studyinfo') }}</h5>
         <table
-          class="table table-striped"
-          style="word-break: break-word;"
+          class="table table-striped-color-reverse word-break"
         >
           <tbody>
             <tr v-if="metadata.ModalitiesInStudy.Value !== undefined">
@@ -136,14 +134,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-div.description {
-  width: 290px;
-  padding: 0 20px;
-  float: left;
-}
-label {
-  font-size: 130%;
-}
-</style>

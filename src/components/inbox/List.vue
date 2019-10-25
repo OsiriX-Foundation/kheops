@@ -954,7 +954,7 @@ export default {
     position: fixed;
     top: 70px;
     width: 100%;
-    background: #555;
+    background: #06162c;
     z-index: 5;
     opacity: 0.95;
   }

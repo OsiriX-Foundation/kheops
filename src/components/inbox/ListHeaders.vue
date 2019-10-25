@@ -82,10 +82,9 @@
               <v-icon
                 class="align-middle"
                 name="book"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("addalbum") }}</span>
+            <span>{{ $t("addalbum") }}</span>
           </template>
           <b-dropdown-item
             v-for="allowedAlbum in allowedAlbums"
@@ -116,10 +115,9 @@
               <v-icon
                 class="align-middle"
                 name="bars"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("addInbox") }}</span>
+            <span>{{ $t("addInbox") }}</span>
           </button>
         </div>
         <div
@@ -136,10 +134,9 @@
               <v-icon
                 class="align-middle"
                 name="star"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("infoFavorites") }}</span>
+            <span>{{ $t("infoFavorites") }}</span>
           </button>
         </div>
         <div
@@ -156,10 +153,9 @@
               <v-icon
                 class="align-middle"
                 name="trash"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("delete") }}</span>
+            <span>{{ $t("delete") }}</span>
           </button>
         </div>
         <div class="ml-auto" />
@@ -647,26 +643,3 @@ export default {
 };
 
 </script>
-<style scoped>
-  .btn-link {
-    font-weight: 400;
-    color: white;
-    background-color: transparent;
-  }
-
-  .btn-link:hover {
-    color: #c7d1db;
-    text-decoration: underline;
-    background-color: transparent;
-    border-color: transparent;
-  }
-
-  .inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
-</style>

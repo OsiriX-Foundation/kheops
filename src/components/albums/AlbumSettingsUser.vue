@@ -39,8 +39,7 @@
   <div class="container">
     <h3
       v-if="!form_add_user"
-      class="pointer d-sm-inline-flex"
-      style="width: 100%"
+      class="d-sm-inline-flex full-width"
     >
       <div
         class="mr-auto"
@@ -105,12 +104,12 @@
       :show-change-role="true"
     />
 
-    <fieldset class="user_settings">
+    <fieldset class="user-settings">
       <legend>{{ $t('usersettings') }}</legend>
       <div
         v-for="(label,idx) in userSettings"
         :key="idx"
-        class="row form-group"
+        class="row form-group toggle-padding"
         :class="(label=='send_series')?'offset-1':''"
       >
         <div>
@@ -230,20 +229,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-input::placeholder {
-  text-transform: lowercase;
-}
-fieldset.user_settings {
-  border: 1px solid #333;
-  padding: 20px;
-  background-color: #303030 ;
-}
-
-fieldset.user_settings legend{
-  padding: 0 20px;
-  width: auto;
-
-}
-</style>

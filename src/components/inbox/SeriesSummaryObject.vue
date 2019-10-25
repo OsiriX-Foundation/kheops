@@ -44,13 +44,12 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <div
-          class="d-flex flex-row justify-content-center align-items-center"
-          style="height: 100%;"
+          class="d-flex flex-row justify-content-center align-items-center full-height"
         >
           <div class="p-2">
             <img
               v-if="!loadingImage"
-              :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
+              :class="!serie.Modality.Value[0].includes('SR') ? 'pointer' : ''"
               :src="serie.imgSrc"
               width="250"
               height="250"
@@ -64,7 +63,7 @@
         </div>
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
-        <table class="table table-striped">
+        <table class="table table-striped-color-reverse">
           <tbody>
             <tr v-if="serie.Modality && serie.Modality.Value !== undefined">
               <th>{{ $t('modality') }}</th>
@@ -258,22 +257,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-div.preview{
-  width: 290px;
-  padding: 0 20px;
-  float: left;
-}
-div.seriesSummaryContainer{
-  font-size: 90%;
-  line-height: 1.5em;
-}
-label{
-  font-size: 130%;
-}
-.cursor-img{
-  cursor: pointer;
-}
-
-</style>

@@ -20,7 +20,9 @@
 
 <template>
   <div class="container">
-    <dl>
+    <dl
+      class="font-large word-break-all"
+    >
       <dt>{{ $t('albumname') }}</dt>
       <dd>
         <div v-if="edit.name === '-1'">
@@ -80,8 +82,7 @@
           <p
             v-for="(p,pidx) in formattedAlbumDescription"
             :key="pidx"
-            class="my-0"
-            style="word-break: break-all;"
+            class="my-0 word-break-all"
           >
             {{ p }}
           </p>
@@ -93,8 +94,7 @@
                 <textarea
                   v-model="edit.description"
                   rows="5"
-                  class="form-control"
-                  style="resize: none;"
+                  class="form-control no-resize"
                   maxlength="2048"
                 />
               </div>
@@ -189,27 +189,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-dd span.icon-edit, dt span.icon-edit {
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-dl {
-  font-size: 125%;
-}
-dl label {
-  font-size: 100%;
-  margin-left: 20px;
-}
-
-dd.album_description{
-  border: 1px solid #333;
-  height: 10em;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-</style>
-

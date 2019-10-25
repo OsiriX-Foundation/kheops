@@ -33,7 +33,7 @@
         :height="24"
       />
       <span
-        style="font-size: 1.1rem; text-align: center; padding-left: 5px"
+        class="kheops-title"
       >
         KHEOPS
       </span>
@@ -105,7 +105,7 @@
               @click="changeLang(language)"
             >
               <span
-                style="text-transform: uppercase;"
+                class="text-uppercase"
               >
                 {{ language }}
               </span>
