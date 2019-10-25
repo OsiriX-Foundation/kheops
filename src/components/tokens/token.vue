@@ -96,9 +96,11 @@
             {{ $t('album') }}
           </dt>
         </div>
-        <div class="col-xs-12 col-sm-9">
+        <div class="col-xs-12 col-sm-9 word-break">
           <dd>
-            <router-link :to="`/albums/${token.album.album_id}`">
+            <router-link
+              :to="`/albums/${token.album.album_id}`"
+            >
               {{ token.album.name }}
             </router-link>
           </dd>
