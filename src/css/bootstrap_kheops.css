@@ -124,3 +124,7 @@ a.text-warning:hover, a.text-warning:focus {
 	text-decoration: none;
 	background-color: #003866;
 }
+
+.popover {
+	background-color: #1d2434;
+}
