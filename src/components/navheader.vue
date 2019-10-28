@@ -28,17 +28,13 @@
   >
     <b-navbar-toggle target="nav_collapse" />
     <b-navbar-nav>
-      <kheops
-        :width="24"
-        :height="24"
-      />
+      <kheops />
       <span
         class="kheops-title"
       >
         KHEOPS
       </span>
     </b-navbar-nav>
-
     <b-collapse
       id="nav_collapse"
       is-nav

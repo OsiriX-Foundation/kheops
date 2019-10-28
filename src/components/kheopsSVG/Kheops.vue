@@ -99,17 +99,5 @@
 
 export default {
   name: 'KheopsIcon',
-  props: {
-    width: {
-      type: String,
-      required: true,
-      default: '0px',
-    },
-    height: {
-      type: String,
-      required: true,
-      default: '0px',
-    },
-  },
 };
 </script>
