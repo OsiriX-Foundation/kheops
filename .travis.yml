@@ -4,6 +4,9 @@ sudo: required
 services:
   - docker
 
+jdk:
+  - openjdk8
+
 notifications:
   email: false
 
