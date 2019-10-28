@@ -51,7 +51,7 @@
         {{ $t('newtoken') }}
       </span>
     </h4>
-    <div class="d-flex flex-row">
+    <div class="d-flex align-content-around flex-wrap">
       <div class="mt-2">
         <h4>
           Tokens
@@ -253,7 +253,7 @@ export default {
           key: 'last_used',
           label: this.$t('last used'),
           sortable: true,
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'permission',
