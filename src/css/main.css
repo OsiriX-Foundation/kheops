@@ -270,6 +270,10 @@ dd.album_description{
 	overflow-y: scroll;
 }
 
+.icon-margin-right {
+	margin-right: 5px;
+}
+
 /********************************/
 
 /*

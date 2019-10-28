@@ -25,7 +25,10 @@
     "createreportprovider": "{user} create the report provider {reportname}",
     "editreportprovider": "{user} edit the report provider {reportname}",
     "deletereportprovider": "{user} delete the report provider {reportname}",
-    "newreport": "{user} add a new report in the study {study} with the report provider {reportname}"
+    "newreport": "{user} add a new report in the study {study} with the report provider {reportname}",
+    "privatemessagereceive": "Private message",
+    "privatemessagesend": "Private message for: {user}",
+    "you": "You"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -50,7 +53,10 @@
     "createreportprovider": "{user} a créé le report provider {reportname}",
     "editreportprovider": "{user} a édité le report provider {reportname}",
     "deletereportprovider": "{user} a supprimé le report provider {reportname}",
-    "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}"
+    "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}",
+    "privatemessagereceive": "Message privé",
+    "privatemessagesend": "Message privé pour: {user}",
+    "you": "Vous"
   }
 }
 </i18n>
@@ -88,15 +94,29 @@
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
             <div class="card-header">
-              <v-icon name="user" /> {{ comment.origin_name }}
-              <span
-                v-if="comment.target_name"
-              >
-                {{ $t('to') }} {{ comment.target_name }}
+              <v-icon name="user" class="icon-margin-right" />
+              <span>
+                {{ currentuserEmail !== comment.origin_name ? comment.origin_name : $t('you') }}
               </span>
               <span class="float-right">
                 {{ comment.post_date | formatDate }}
               </span>
+              <div
+                v-if="comment.is_private"
+              >
+                <b
+                  class="text-warning"
+                  v-if="comment.is_private && currentuserEmail !== comment.origin_name"
+                >
+                  {{ $t('privatemessagereceive', { user: comment.origin_name }) }}
+                </b>
+                <b
+                  class="text-warning"
+                  v-if="comment.is_private && currentuserEmail !== comment.target_name"
+                >
+                  {{ $t('privatemessagesend', { user: comment.target_name }) }}
+                </b>
+              </div>
             </div>
             <div
               class="card-body"
@@ -315,11 +335,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
 
 export default {
   name: 'CommentsAndNotifications',
   components: { AddUser },
+  mixins: [CurrentUser],
   props: {
     scope: {
       type: String,
