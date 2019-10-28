@@ -35,11 +35,11 @@ export default {
 };
 </script>
 <style scoped>
-  .icon{
-    fill: red;
-  }
+.icon{
+  fill: red;
+}
 
-  .icon:hover{
-    fill: #fd7e14;
-  }
+.icon:hover{
+  fill: #fd7e14;
+}
 </style>

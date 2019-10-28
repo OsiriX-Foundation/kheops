@@ -37,6 +37,7 @@
       <router-link
         to="/"
         style="font-size: 1.3rem;"
+        class="kheopsfont"
       >
         Kheops
       </router-link>
@@ -52,8 +53,13 @@
           <b-nav-item
             v-if="logged"
             v-access="'active'"
+            class="kheopsfont"
           >
-            {{ $t('welcome') }} <router-link to="/user">
+            {{ $t('welcome') }}
+            <router-link
+              to="/user"
+              class="kheopsfont"
+            >
               {{ currentuserFullname }}
             </router-link>
           </b-nav-item>
