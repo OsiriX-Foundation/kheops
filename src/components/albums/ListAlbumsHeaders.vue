@@ -63,7 +63,9 @@
         />
       </button>
     </div>
-    <div>
+    <div
+      class="d-none d-sm-block align-self-center"
+    >
       <button
         type="button"
         class="btn btn-link btn-lg inline-white kheopsicon"
