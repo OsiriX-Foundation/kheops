@@ -100,6 +100,10 @@ a.text-warning:hover, a.text-warning:focus {
 	background-color: #1d2434;
 }
 
+.table-hover tbody tr:hover {
+	background-color: #051327;
+}
+
 .card{
 	background-color: #1d2434;
 }
