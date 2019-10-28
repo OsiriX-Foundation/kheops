@@ -91,7 +91,7 @@
             :key="allowedAlbum.id"
             @click.stop="addToAlbum(allowedAlbum.album_id)"
           >
-            {{ allowedAlbum.name }}
+            {{ allowedAlbum.name|maxTextLength(albumNameMaxLength) }}
           </b-dropdown-item>
           <b-dropdown-divider />
           <b-dropdown-item
@@ -315,6 +315,7 @@ export default {
       formSendStudy: false,
       confirmDelete: false,
       showFilters: false,
+      albumNameMaxLength: 25,
     };
   },
   computed: {
