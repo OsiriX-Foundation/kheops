@@ -15,7 +15,8 @@
     "scope": "scope",
     "create date": "create date",
     "last used": "last used",
-    "permission": "permission"
+    "permission": "permission",
+    "notokens": "There are no tokens to show"
   },
   "fr": {
     "newtoken": "Nouveau token",
@@ -32,7 +33,8 @@
     "scope": "application",
     "create date": "créé le",
     "last used": "dern. utilisation",
-    "permission": "permission"
+    "permission": "permission",
+    "notokens": "Aucun token créé"
   }
 }
 </i18n>
@@ -68,12 +70,12 @@
         </span>
       </div>
     </div>
-
     <b-table
       v-if="loadingData === false"
       stacked="sm"
       striped
       hover
+      show-empty
       :items="tokens"
       :fields="fields"
       :sort-desc="true"
@@ -189,6 +191,20 @@
         >
           {{ $t('revoked') }}
         </span>
+      </template>
+      <template v-slot:empty="scope">
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('notokens') }}
+        </div>
+      </template>
+      <template v-slot:emptyfiltered="scope">
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('notokens') }}
+        </div>
       </template>
     </b-table>
   </div>

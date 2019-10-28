@@ -7,7 +7,8 @@
     "refresh": "Refresh",
     "created_time": "Created time",
     "name_provider": "Name of provider",
-    "url": "Configuration URL"
+    "url": "Configuration URL",
+    "noreports": "There are no report providers to show"
   },
   "fr": {
     "edit": "Editer",
@@ -16,7 +17,8 @@
     "refresh": "Rafraîchir",
     "created_time": "Date de création",
     "name_provider": "Nom du provider",
-    "url": "URL de configuration"
+    "url": "URL de configuration",
+    "noreports": "Aucun report provider créé"
   }
 }
 </i18n>
@@ -41,6 +43,7 @@
       stacked="sm"
       striped
       hover
+      show-empty
       :items="providers"
       :fields="fields"
       :sort-desc="true"
@@ -68,6 +71,20 @@
         >
           {{ $t('edit') }}
         </button>
+      </template>
+      <template v-slot:empty="scope">
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('noreports') }}
+        </div>
+      </template>
+      <template v-slot:emptyfiltered="scope">
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('noreports') }}
+        </div>
       </template>
     </b-table>
   </div>
