@@ -36,10 +36,12 @@ a.text-warning:hover, a.text-warning:focus {
 
 .bg-primary{
 	border-color: #003866;
+	background-color: #003866 !important;
 }
 
 .bg-secondary{
 	border-color: #242c3f;
+	background-color: #242c3f !important;
 }
 
 .btn-primary {
@@ -92,15 +94,11 @@ a.text-warning:hover, a.text-warning:focus {
 }
 
 .card{
-	background-color: #242c3f;
-}
-
-.card-body{
 	background-color: #1d2434;
 }
 
 .card-header{
-	background-color: #1d2434;
+	background-color: #242c3f;
 	border-bottom-color: #fff;
 }
 
