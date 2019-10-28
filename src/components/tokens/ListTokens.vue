@@ -305,7 +305,7 @@ export default {
     },
     toggleValid() {
       this.getTokens();
-      this.$store.commit('setValidParamToken', !this.showInvalid);
+      this.$store.dispatch('setValidParamToken', !this.showInvalid);
     },
     getTokens() {
       if (this.scope === 'album' && this.albumid) {
