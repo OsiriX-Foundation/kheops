@@ -45,7 +45,7 @@ Props :
     >
       <div class="col-lg-4 d-none d-sm-none d-md-block" />
       <div
-        class="col-lg-8 d-none d-sm-none d-md-block"
+        class="btnalbum col-lg-8 d-none d-sm-none d-md-block"
         align="right"
       >
         <p v-if="confirmQuit && !lastAdmin && !lastUser">
@@ -56,7 +56,7 @@ Props :
         </p>
       </div>
       <div
-        class="d-md-none"
+        class="btnalbum d-md-none"
       >
         <p v-if="confirmQuit && !lastAdmin && !lastUser">
           {{ $t("quitalbum") }}
