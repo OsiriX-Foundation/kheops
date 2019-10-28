@@ -240,7 +240,7 @@ export default {
       const ohifWindow = window.open('', 'OHIFViewer');
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
         const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`
-        ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}`;
+        ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
       }).catch((err) => {
         console.log(err);
       });
