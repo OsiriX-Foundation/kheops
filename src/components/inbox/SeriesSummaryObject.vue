@@ -29,11 +29,13 @@
         >
           <span
             v-if="serie.SeriesDescription && serie.SeriesDescription.Value"
+            class="pointer"
           >
             {{ serie.SeriesDescription.Value[0] }}
           </span>
           <span
             v-else
+            class="pointer"
           >
             No description
           </span>

@@ -64,6 +64,14 @@ a.text-warning:hover, a.text-warning:focus {
 	border-color: #d62c1a;
 }
 
+.custom-control-input:checked ~ .custom-control-label::before {
+	background-color: #003866 !important;
+}
+
+.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::before {
+	background-color: #003866;
+}
+
 .table th,
 .table td {
 	border-top: 1px solid #47526d;
@@ -76,7 +84,6 @@ a.text-warning:hover, a.text-warning:focus {
 .table tbody + tbody {
 	border-top: 2px solid #47526d;
 }
-
 .table-striped tbody tr:nth-of-type(odd) {
 	background-color: #1d2434;
 }

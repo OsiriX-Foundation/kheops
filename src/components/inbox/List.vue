@@ -376,7 +376,9 @@
           slot="row-details"
           slot-scope="row"
         >
-          <b-card>
+          <b-card
+            class="pointer-default"
+          >
             <list-item-details
               :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
               :album-id="albumID"

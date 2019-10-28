@@ -7,6 +7,7 @@ body{
 	background-color: #06162c;
 	overflow-y: scroll;
 }
+
 footer {
   position: absolute;
   bottom: 0;
@@ -15,6 +16,14 @@ footer {
 .link, .pointer{
 	cursor: pointer;
 }
+.pointer-default{
+	cursor: default !important;
+}
+
+.button-cursor:active:hover:not([disabled]) {
+	cursor: pointer;
+}
+
 .nowrap{
 	white-space: nowrap;
 }

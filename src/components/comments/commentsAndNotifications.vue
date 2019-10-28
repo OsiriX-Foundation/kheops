@@ -285,7 +285,11 @@
             inline
             @change="SetEnabledVariables()"
           >
-            {{ $t("checkprivateuser") }}
+            <span
+              class="pointer"
+            >
+              {{ $t("checkprivateuser") }}
+            </span>
           </b-form-checkbox>
         </div>
         <div class="col-sm-6 col-md-4">
@@ -319,7 +323,7 @@
                 <button
                   title="send comment"
                   type="submit"
-                  class="btn btn-primary"
+                  class="btn btn-primary button-cursor"
                   :disabled="newComment.comment.length < 1 || disabledText"
                 >
                   <v-icon name="paper-plane" />
