@@ -44,26 +44,26 @@ public class OHIFMetadataResource {
     @GET
     @Produces(APPLICATION_JSON)
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata")
-    public MetadataDTO ohifmetatdata(@HeaderParam(AUTHORIZATION) String authorizationHeader,
+    public MetadataDTO wado(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                             @PathParam("studyInstanceUID") String studyInstanceUID,
                             @QueryParam("firstseries") String firstSeriesInstanceUID,
                             @QueryParam("inbox") Boolean inbox,
                             @QueryParam("album") String album) {
-        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), OHIFVersion.V1, inbox, album);
+        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), inbox, album);
     }
 
     @GET
     @Produces(APPLICATION_JSON)
-    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata2")
-    public MetadataDTO ohifmetatdata2(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-                            @PathParam("studyInstanceUID") String studyInstanceUID,
-                            @QueryParam("firstseries") String firstSeriesInstanceUID,
-                            @QueryParam("inbox") Boolean inbox,
-                            @QueryParam("album") String album) {
-        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), OHIFVersion.V2, inbox, album);
+    @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/ohifmetadata")
+    public MetadataDTO wadoWithCapability(@PathParam("capability") String capabilityToken,
+                                          @PathParam("studyInstanceUID") String studyInstanceUID,
+                                          @QueryParam("firstseries") String firstSeriesInstanceUID,
+                                          @QueryParam("inbox") Boolean inbox,
+                                          @QueryParam("album") String album) {
+        return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.from(capabilityToken), inbox, album);
     }
 
-    private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken, OHIFVersion ohifVersion, Boolean inbox, String album) {
+    private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken, Boolean inbox, String album) {
         final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
 
@@ -88,7 +88,7 @@ public class OHIFMetadataResource {
         final URI metadataServiceURI = metadataServiceUriBuilder.build(studyInstanceUID);
 
         try {
-            return MetadataDTO.from(wadoUri, ohifVersion, firstSeriesInstanceUID,
+            return MetadataDTO.from(wadoUri, firstSeriesInstanceUID,
                     CLIENT.target(metadataServiceURI)
                             .request(APPLICATION_DICOM_JSON)
                             .header(AUTHORIZATION, "Bearer " + authorizationToken)

@@ -23,11 +23,8 @@ class StudyDTO {
         return seriesMap.values();
     }
 
-    @XmlElement(name = "studyInstanceUID")
-    private final String studyInstanceUidV1;
-
-    @XmlElement(name = "studyInstanceUid")
-    private final String studyInstanceUidV2;
+    @XmlElement
+    private final String studyInstanceUID;
 
     @XmlElement
     private final String patientName;
@@ -36,7 +33,7 @@ class StudyDTO {
         throw new UnsupportedOperationException();
     }
 
-    StudyDTO(final URI wadoURI, final OHIFVersion ohifVersion, final String firstSeriesInstanceUID, final Attributes attributes) {
+    StudyDTO(final URI wadoURI, final String firstSeriesInstanceUID, final Attributes attributes) {
         this.wadoURI = Objects.requireNonNull(wadoURI);
         Objects.requireNonNull(attributes);
 
@@ -46,18 +43,7 @@ class StudyDTO {
             seriesMap = new TreeMap<>(UIDKey.getFirstUIDComparator(firstSeriesInstanceUID));
         }
 
-        switch (ohifVersion) {
-            case V1:
-                studyInstanceUidV1 = attributes.getString(Tag.StudyInstanceUID);
-                studyInstanceUidV2 = null;
-                break;
-            case V2:
-                studyInstanceUidV2 = attributes.getString(Tag.StudyInstanceUID);
-                studyInstanceUidV1 = null;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown OHIF Version");
-        }
+        studyInstanceUID = attributes.getString(Tag.StudyInstanceUID);
         patientName = attributes.getString(Tag.PatientName);
 
         addInstance(attributes);
