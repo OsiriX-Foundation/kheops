@@ -15,6 +15,9 @@ class MetadataDTO {
     private final URI wadoURI;
 
     @XmlTransient
+    private final OHIFVersion ohifVersion;
+
+    @XmlTransient
     private final String firstSeriesInstanceUID;
 
     @XmlTransient
@@ -25,23 +28,24 @@ class MetadataDTO {
         return studyMap.values();
     }
 
-    public static MetadataDTO from(final URI rootURI, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
-        return new MetadataDTO(rootURI, firstSeriesInstanceUID, attributesList);
+    public static MetadataDTO from(final URI rootURI, final OHIFVersion ohifVersion, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
+        return new MetadataDTO(rootURI, ohifVersion, firstSeriesInstanceUID, attributesList);
     }
 
     private MetadataDTO() {
         throw new UnsupportedOperationException();
     }
 
-    private MetadataDTO(final URI wadoURI, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
+    private MetadataDTO(final URI wadoURI, final OHIFVersion ohifVersion, final String firstSeriesInstanceUID, final List<Attributes> attributesList) {
         studyMap = new TreeMap<>();
         this.wadoURI = wadoURI;
+        this.ohifVersion = ohifVersion;
         this.firstSeriesInstanceUID = firstSeriesInstanceUID;
         attributesList.forEach(this::addInstance);
     }
 
     private void addInstance(final Attributes attributes) {
-        studyMap.computeIfAbsent(UIDKey.fromStudy(attributes), studyUID -> new StudyDTO(wadoURI, firstSeriesInstanceUID, attributes))
+        studyMap.computeIfAbsent(UIDKey.fromStudy(attributes), studyUID -> new StudyDTO(wadoURI, ohifVersion, firstSeriesInstanceUID, attributes))
                 .addInstance(attributes);
     }
 }
