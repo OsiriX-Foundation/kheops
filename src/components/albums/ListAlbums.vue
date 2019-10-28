@@ -322,6 +322,7 @@ export default {
         {
           key: 'name',
           label: this.$t('name'),
+          thClass: 'pointer',
           tdClass: 'name',
           sortable: true,
           class: 'word-break-all',
@@ -333,6 +334,7 @@ export default {
           key: 'number_of_studies',
           label: this.$t('Study #'),
           sortable: true,
+          thClass: 'pointer',
           class: 'd-none d-sm-table-cell word-break-all',
           thStyle: {
             width: '200px',
@@ -342,6 +344,7 @@ export default {
           key: 'number_of_users',
           label: this.$t('User #'),
           sortable: true,
+          thClass: 'pointer',
           class: 'd-none d-md-table-cell word-break-all',
           thStyle: {
             width: '200px',
@@ -351,6 +354,7 @@ export default {
           key: 'number_of_comments',
           label: this.$t('Message #'),
           sortable: true,
+          thClass: 'pointer',
           class: 'd-none d-lg-table-cell word-break-all',
           thStyle: {
             width: '200px',
@@ -360,6 +364,7 @@ export default {
           key: 'created_time',
           label: this.$t('Date'),
           sortable: true,
+          thClass: 'pointer',
           class: 'd-none d-sm-table-cell word-break-all',
           thStyle: {
             width: '200px',
@@ -369,6 +374,7 @@ export default {
           key: 'last_event_time',
           label: this.$t('LastEvent'),
           sortable: true,
+          thClass: 'pointer',
           class: 'd-none d-lg-table-cell word-break-all',
           thStyle: {
             width: '200px',

@@ -54,7 +54,7 @@
     >
       <button
         type="button"
-        class=" btn btn-link btn-lg"
+        class=" btn btn-link btn-lg kheopsicon"
         @click="reloadAlbums()"
       >
         <v-icon
@@ -66,7 +66,7 @@
     <div>
       <button
         type="button"
-        class="btn btn-link btn-lg inline-white"
+        class="btn btn-link btn-lg inline-white kheopsicon"
         @click="searchClick"
       >
         <v-icon

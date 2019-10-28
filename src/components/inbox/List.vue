@@ -486,6 +486,7 @@ export default {
         PatientName: {
           label: this.$t('PatientName'),
           sortable: true,
+          thClass: 'pointer',
           tdClass: 'word-break',
           formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
@@ -500,6 +501,7 @@ export default {
         PatientID: {
           label: this.$t('PatientID'),
           sortable: true,
+          thClass: 'pointer',
           tdClass: 'word-break',
           class: 'word-break d-none d-md-table-cell d-lg-table-cell',
           formatter: (value) => value.Value[0],
@@ -525,6 +527,7 @@ export default {
         StudyDate: {
           label: this.$t('StudyDate'),
           sortable: true,
+          thClass: 'pointer',
           tdClass: 'word-break',
           class: 'word-break d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
           formatter: (value) => {
