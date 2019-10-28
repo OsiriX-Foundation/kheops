@@ -157,6 +157,18 @@ div.calendar-wrapper{
 /*
 	INBOX
 */
+.td_checkbox_inbox {
+    width: auto;
+}
+
+div.wrapper-class{
+    color: #333;
+}
+
+div.calendar-class{
+	color: #333;
+}
+
 div.preview{
 	width: 290px;
 	padding: 0 20px;
@@ -165,6 +177,18 @@ div.preview{
 div.seriesSummaryContainer{
 	font-size: 90%;
 	line-height: 1.5em;
+}
+
+.sticky {
+    position: fixed;
+    top: 70px;
+    width: 100%;
+    background: #06162c;
+    z-index: 5;
+    opacity: 0.95;
+}
+.sticky + .content {
+	padding-top: 70px;
 }
 
 .display-inline{
@@ -348,7 +372,6 @@ dd.album_description{
     position: absolute;
     z-index: -1;
 }
-
 /*
 	DRAG AND DROP POP UP
 */
