@@ -24,7 +24,10 @@ class StudyDTO {
     }
 
     @XmlElement
-    private final String studyInstanceUID;
+    private final String studyInstanceUID; // used by OHIF v1
+
+    @XmlElement
+    private final String studyInstanceUid; // used by OHIF v2
 
     @XmlElement
     private final String patientName;
@@ -44,6 +47,7 @@ class StudyDTO {
         }
 
         studyInstanceUID = attributes.getString(Tag.StudyInstanceUID);
+        studyInstanceUid = attributes.getString(Tag.StudyInstanceUID);
         patientName = attributes.getString(Tag.PatientName);
 
         addInstance(attributes);
