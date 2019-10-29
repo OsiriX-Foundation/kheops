@@ -62,10 +62,9 @@
               <v-icon
                 class="align-middle"
                 name="paper-plane"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("send") }}</span>
+            <span>{{ $t("send") }}</span>
           </button>
         </div>
         <!--
@@ -190,6 +189,7 @@
             <b-dropdown
               id="dropdown-divider"
               class="m-1"
+              toggle-class="kheopsicon"
               variant="link"
               right
             >
@@ -235,6 +235,7 @@
             <v-icon
               name="refresh"
               scale="2"
+              class="kheopsicon"
             />
           </button>
         </div>
@@ -249,6 +250,7 @@
             <v-icon
               name="search"
               scale="2"
+              class="kheopsicon"
             />
           </button>
         </div>

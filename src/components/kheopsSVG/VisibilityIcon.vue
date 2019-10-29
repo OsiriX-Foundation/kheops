@@ -4,7 +4,7 @@
     :width="width"
     :height="height"
     viewBox="0 0 24 24"
-    class="icon"
+    class="kheopsicon"
   >
     <path
       d="M0 0h24v24H0z"
@@ -34,12 +34,3 @@ export default {
   },
 };
 </script>
-<style>
-  .icon{
-    fill: #fff;
-  }
-
-  .icon:hover{
-    fill: grey;
-  }
-</style>

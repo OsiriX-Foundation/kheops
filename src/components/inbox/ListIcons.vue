@@ -8,7 +8,7 @@
       <a
         v-if="showDownloadIcon"
         href="#"
-        class="download"
+        class="kheopsicon"
         @click.stop="getURLDownload()"
       >
         <v-icon
@@ -249,8 +249,8 @@ export default {
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
-      return `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${token}`;
+      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`
+      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
     },
     showComments(study, flagView) {
       const params = {
@@ -290,6 +290,6 @@ export default {
   }
 
   a.download:hover{
-    color: #fd7e14;
+    color: #fca638;
   }
 </style>
