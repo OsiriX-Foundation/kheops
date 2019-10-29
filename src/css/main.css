@@ -17,3 +17,30 @@ footer {
 .nowrap{
 	white-space: nowrap;
 }
+
+.kheopsicon{
+	color: #FFFFFF;
+	fill: #FFFFFF;
+}
+
+.kheopsicon:hover{
+	color: #fca638;
+	fill: #fca638;
+}
+.kheopsicon{
+	color: #FFFFFF;
+	fill: #FFFFFF;
+}
+
+.kheopsicon:hover{
+	color: #fca638;
+	fill: #fca638;
+}
+
+.kheopsfont{
+	color: #fca638;
+}
+
+.kheopsfont:hover{
+	color: #fca638;
+}

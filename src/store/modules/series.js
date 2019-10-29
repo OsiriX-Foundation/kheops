@@ -2,10 +2,10 @@ import Vue from 'vue';
 import { HTTP } from '@/router/http';
 import dicomoperations from '@/mixins/dicomoperations';
 import httpoperations from '@/mixins/httpoperations';
-import SRImage from '@/assets/SR_2.png';
-import PDFImage from '@/assets/pdf-240x240.png';
-import VideoImage from '@/assets/video.png';
-import DicomLogo from '@/assets/dicom_logo.png';
+import SRImage from '@/assets/img/SR_2.png';
+import PDFImage from '@/assets/img/pdf-240x240.png';
+import VideoImage from '@/assets/img/video.png';
+import DicomLogo from '@/assets/img/dicom_logo.png';
 
 // initial state
 const state = {
@@ -56,7 +56,7 @@ const actions = {
   },
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
-    if (serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
+    if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
       return dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
           return dispatch('setImageSrc', {

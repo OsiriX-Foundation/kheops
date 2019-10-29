@@ -226,6 +226,12 @@ export default {
       });
       return allSelected;
     },
+    getSourceQueries() {
+      if (Object.keys(this.source).length > 0) {
+        return `${encodeURIComponent(this.source.key)}=${encodeURIComponent(this.source.value)}`;
+      }
+      return '';
+    },
     openTab(series) {
       const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1';
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
@@ -239,8 +245,10 @@ export default {
     openViewer() {
       const ohifWindow = window.open('', 'OHIFViewer');
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
-        const url = `${process.env.VUE_APP_URL_API}/studies/${this.studyInstanceUID}/ohifmetadata?firstseries=${this.seriesInstanceUID}`;
-        ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/?url=${encodeURIComponent(url)}#token=${res.data.access_token}`;
+        let sourceQueries = this.getSourceQueries()
+        let queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? '&'+sourceQueries : ''}`
+        const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata${queryparams}`
+        ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
       }).catch((err) => {
         console.log(err);
       });
