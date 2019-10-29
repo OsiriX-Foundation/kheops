@@ -248,7 +248,7 @@ export default {
     },
     openOhif(StudyInstanceUID, token, queryparams) {
       const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`
-      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}#token=${token}`;
+      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
     },
     showComments(study, flagView) {
       const params = {
