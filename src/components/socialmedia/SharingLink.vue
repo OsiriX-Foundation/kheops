@@ -8,7 +8,6 @@
     "cancel": "Cancel",
     "revoke": "Do you want disable the latest sharing link created ?",
     "valid": "Valid",
-    "title": "URL to share",
     "disable": "Revoke",
     "urlsharing": "Your sharing url :"
   },
@@ -20,7 +19,6 @@
     "cancel": "Annuler",
     "revoke": "Voulez-vous désactiver le dernier lien de partage créé ?",
     "valid": "Valider",
-    "title": "URL à partager",
     "disable": "Désactiver",
     "urlsharing": "Votre url de partage :"
   }

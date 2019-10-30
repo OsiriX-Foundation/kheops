@@ -7,7 +7,8 @@
     "twitterEnable": "Twitter link enable",
     "twitterDisable": "No twitter link",
     "sharingEnable": "Sharing link enable",
-    "sharingDisable": "No sharing link"
+    "sharingDisable": "No sharing link",
+    "sharingTitle": "URL to share"
   },
   "fr": {
     "studies": "Etudes",
@@ -16,7 +17,8 @@
     "twitterEnable": "Lien twitter déjà actif",
     "twitterDisable": "Pas de lien twitter",
     "sharingEnable": "Lien de partage déjà actif",
-    "sharingDisable": "Pas de lien de partage"
+    "sharingDisable": "Pas de lien de partage",
+    "sharingTitle": "URL à partager"
   }
 }
 </i18n>
@@ -167,7 +169,7 @@
     >
       <template v-slot:title>
         <pop-over-title
-          title="URL to share"
+          :title="$t('sharingTitle')"
           @cancel="cancelSharingToken"
         />
       </template>
