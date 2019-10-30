@@ -331,8 +331,8 @@ export default {
         SpinnerCancelSize: '30px',
         getInfo: false,
       },
-      maxsize: 10e6,
-      maxsend: 99,
+      maxsize: 10e5,
+      maxsend: 5,
       config: {
         formData: {
           headers: {
