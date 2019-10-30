@@ -416,8 +416,8 @@ dd.album_description{
 .chat-popup {
     position: fixed;
     background: #242c3f;
-    bottom: 30px;
-    right: 30px;
+    bottom: 15px;
+    right: 15px;
     border: 1px solid #47526d;
     z-index: 9;
     max-width: 300px;
