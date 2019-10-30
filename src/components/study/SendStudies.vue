@@ -208,7 +208,7 @@
           class="row"
         >
           <div
-            class="col-12 mt-2 mb-2"
+            class="col-11 mt-2 mb-2 ml-3"
           >
             {{ $tc("filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
             {{ $tc("locationSend", sourceIsAlbum ? 0 : 1) }}
@@ -249,10 +249,9 @@
             <div
               v-if="error.length > 0"
             >
-              {{ $tc("filesErrors", error.length, {count: error.length}) }}
-              <button
-                type="button"
-                class="btn btn-link btn-sm text-center text-warning"
+              {{ $tc("filesErrors", error.length, {count: error.length}) }} <br />
+              <a
+                class="text-center text-warning"
                 @click="UI.showErrors=!UI.showErrors"
               >
                 <span v-if="!UI.showErrors">
@@ -266,7 +265,7 @@
                   :width="UI.SVGwidth"
                   color="red"
                 />
-              </button>
+              </a>
             </div>
           </div>
         </div>
