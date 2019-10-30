@@ -1,3 +1,24 @@
+<i18n>
+{
+  "en": {
+    "download": "Download",
+    "osirix": "Open OsiriX",
+    "ohif": "Open OHIF",
+    "import": "Import data",
+    "comments": "Open comments",
+    "favorite": "Favorite"
+  },
+  "fr": {
+    "download": "Télécharger",
+    "osirix": "Ouvrir OsiriX",
+    "ohif": "Ouvrir OHIF",
+    "import": "Importer des données",
+    "comments": "Ouvrir les commentaires",
+    "favorite": "Favori"
+  }
+}
+
+</i18n>
 
 <template>
   <span>
@@ -14,12 +35,14 @@
         <v-icon
           class="align-middle icon-margin"
           name="download"
+          :title="$t('download')"
         />
       </a>
       <span
         v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i) && showViewerIcon"
         class="ml-1"
         @click.stop="openViewer('Osirix')"
+        :title="$t('osirix')"
       >
         <osirix-icon
           width="22px"
@@ -30,6 +53,7 @@
         v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
         class="ml-1"
         @click.stop="openViewer('Ohif')"
+        :title="$t('ohif')"
       >
         <visibility-icon
           width="24px"
@@ -41,6 +65,7 @@
         for="file"
         class="ml-1 pointer display-inline"
         @click="setStudyUID()"
+        :title="$t('import')"
       >
         <add-icon
           width="24px"
@@ -63,6 +88,7 @@
         class="align-middle icon-margin"
         name="comment-dots"
         :class="study.flag.is_commented ? 'bg-neutral' : 'icon-disabled'"
+        :title="$t('comments')"
       />
     </span>
     <span
@@ -75,6 +101,7 @@
         class="align-middle icon-margin"
         name="star"
         :class="study.flag.is_favorite ? 'bg-neutral' : 'icon-disabled'"
+        :title="$t('favorite')"
       />
     </span>
   </span>
