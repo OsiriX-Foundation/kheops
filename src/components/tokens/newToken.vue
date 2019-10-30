@@ -123,6 +123,7 @@
             <toggle-button
               v-model="token.write_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
+              :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
             />
             <label
               class="token-props"
@@ -132,6 +133,7 @@
             <toggle-button
               v-model="token.read_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
+              :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
             />
 
             <label
@@ -143,6 +145,7 @@
               v-if="token.read_permission"
               v-model="token.download_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
+              :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
               class="ml-3"
             /> <label v-if="token.read_permission">
               {{ $t('download') }}
@@ -151,6 +154,7 @@
               v-if="token.read_permission"
               v-model="token.appropriate_permission"
               :labels="{checked: 'Yes', unchecked: 'No'}"
+              :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
               class="ml-3"
             /> <label v-if="token.read_permission">
               {{ $t('appropriate') }}

@@ -50,8 +50,8 @@ a.text-warning:hover, a.text-warning:focus {
 }
 
 .btn-secondary {
-	background-color: #242c3f !important;
-	border-color: #242c3f;
+	background-color: #444444 !important;
+	border-color: #444444;
 }
 
 .btn-danger {
@@ -74,11 +74,12 @@ a.text-warning:hover, a.text-warning:focus {
 
 .table th,
 .table td {
-	border-top: 1px solid #47526d;
+	border-bottom: 1px solid #47526d;
 }
 
 .table thead th {
 	border-bottom: 2px solid #47526d;
+	border-top: 2px solid #47526d;
 }
 
 .table tbody + tbody {
@@ -101,7 +102,7 @@ a.text-warning:hover, a.text-warning:focus {
 }
 
 .table-hover tbody tr:hover {
-	background-color: #051327;
+	background-color: #003866;
 }
 
 .card{

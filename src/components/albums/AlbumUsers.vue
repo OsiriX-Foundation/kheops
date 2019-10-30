@@ -54,7 +54,7 @@ Props :
             {{ user.user_name }}
             <span
               v-if="user.is_admin"
-              class="font-success"
+              class="font-neutral"
             >
               {{ $t("Admin") }}
             </span>

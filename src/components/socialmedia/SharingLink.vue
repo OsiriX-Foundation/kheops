@@ -64,6 +64,7 @@
           <toggle-button
             v-model="token.write_permission"
             :labels="{checked: 'Yes', unchecked: 'No'}"
+            :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
           />
         </div>
       </div>
@@ -79,6 +80,7 @@
             v-if="token.read_permission"
             v-model="token.download_permission"
             :labels="{checked: 'Yes', unchecked: 'No'}"
+            :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
           />
         </div>
       </div>

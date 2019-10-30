@@ -150,6 +150,7 @@
               v-model="album.userSettings[label]"
               :labels="{checked: 'Yes', unchecked: 'No'}"
               :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')"
+              :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
               :sync="true"
             />
           </div>

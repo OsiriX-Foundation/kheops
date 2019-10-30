@@ -61,12 +61,16 @@ footer {
 .kheopsicon-danger:hover{
 	fill: #dd3d3d;
 }
-.kheopsfont{
+.font-kheops{
+	color: #fca638 !important;
+}
+
+.font-kheops:hover{
 	color: #fca638;
 }
 
-.kheopsfont:hover{
-	color: #fca638;
+.bg-kheops{
+	background-color: #fca638;
 }
 
 a{
@@ -98,6 +102,19 @@ a.navbar-brand {
 .font-success {
 	color:#5fc04c;
 }
+
+.bg-success {
+	color:#5fc04c;
+}
+
+.font-neutral{
+	color: #60b3c4
+}
+
+.bg-neutral{
+	color: #60b3c4
+}
+
 .no-resize {
 	resize: none;
 }
@@ -307,6 +324,9 @@ dd.album_description{
 	margin-right: 5px;
 }
 
+.card-main{
+	border: 1px solid #47526d;
+}
 /********************************/
 
 /*
@@ -314,7 +334,7 @@ dd.album_description{
 */
 .closeBtn {
 	position: relative;
-	border-bottom: 1px solid #f1f1f1;
+	background-color: #003866;
 }
 /********************************/
 
@@ -387,9 +407,9 @@ dd.album_description{
 .chat-popup {
     position: fixed;
     background: #242c3f;
-    bottom: 0;
-    right: 15px;
-    border: 3px solid #f1f1f1;
+    bottom: 30px;
+    right: 30px;
+    border: 1px solid #47526d;
     z-index: 9;
     max-width: 300px;
     opacity: 1;

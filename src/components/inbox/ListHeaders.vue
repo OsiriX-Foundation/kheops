@@ -166,16 +166,16 @@
           <div>
             <b-dropdown
               id="dropdown-divider"
-              class="m-1"
               toggle-class="kheopsicon"
               variant="link"
               right
             >
               <template slot="button-content">
                 <add-icon
-                  width="30px"
-                  height="30px"
-                />
+                  width="34px"
+                  height="34px"
+                /><br>
+                <span>{{ $t("import") }}</span>
               </template>
               <b-dropdown-item-button
                 :disabled="sendingFiles"
@@ -207,14 +207,15 @@
         >
           <button
             type="button"
-            class=" btn btn-link btn-lg"
+            class=" btn btn-link "
             @click="reloadStudies()"
           >
             <v-icon
               name="refresh"
               scale="2"
               class="kheopsicon"
-            />
+            /><br>
+            <span>{{ $t("refresh") }}</span>
           </button>
         </div>
         <div
@@ -222,14 +223,15 @@
         >
           <button
             type="button"
-            class=" btn btn-link btn-lg"
+            class=" btn btn-link"
             @click="setFilters()"
           >
             <v-icon
               name="search"
-              scale="2"
               class="kheopsicon"
-            />
+              scale="1.8"
+            /><br>
+            <span>{{ $t("search") }}</span>
           </button>
         </div>
       </div>

@@ -63,6 +63,7 @@
         <toggle-button
           v-model="showInvalid"
           :labels="{checked: 'Yes', unchecked: 'No'}"
+          :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
           @change="toggleValid"
         />
         <span class="ml-2 toggle-label">

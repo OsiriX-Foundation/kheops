@@ -70,17 +70,19 @@
       >
         <label class="mr-2">
           {{ $t('includenotifications') }}
-        </label> <toggle-button
+        </label>
+        <toggle-button
           v-model="includeNotifications"
           :labels="{checked: 'Yes', unchecked: 'No'}"
           :sync="true"
+          :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
           @change="getComments"
         />
       </p>
 
       <div
         :id="container_id"
-        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3 comment-section"
+        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3 comment-section card-main"
       >
         <div
           v-for="comment in comments"

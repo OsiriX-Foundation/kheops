@@ -119,6 +119,7 @@
             :labels="{checked: 'Yes', unchecked: 'No'}"
             :disabled="(!album.download_series && label=='send_series')"
             :sync="true"
+            :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
             @change="patchAlbum(label)"
           />
           <v-icon

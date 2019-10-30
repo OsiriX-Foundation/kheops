@@ -45,19 +45,19 @@
           <b-nav-item
             v-if="logged"
             v-access="'active'"
-            class="kheopsfont"
+            class="font-kheops active"
           >
             {{ $t('welcome') }}
             <router-link
               to="/user"
-              class="kheopsfont"
+              class="font-kheops"
             >
               {{ currentuserFullname }}
             </router-link>
           </b-nav-item>
           <b-nav-item
             v-else-if="logged === false"
-            v-access="'active'"
+            class="active"
           >
             <a
               :title="$t('tooltipLogout')"
@@ -67,7 +67,9 @@
               Login
             </a>
           </b-nav-item>
-          <b-nav-item v-access="'active'">
+          <b-nav-item
+            class="active"
+          >
             <a
               :title="$t('tooltipHelp')"
               class="pointer"
@@ -80,7 +82,7 @@
           </b-nav-item>
           <b-nav-item
             v-if="logged"
-            v-access="'active'"
+            class="active"
           >
             <a
               :title="$t('tooltipLogout')"
@@ -93,6 +95,7 @@
           <b-nav-item-dropdown
             :text="`${$t('lang')}: ${lang}`"
             right
+            class="active"
           >
             <b-dropdown-item
               v-for="language in availableLanguage"
