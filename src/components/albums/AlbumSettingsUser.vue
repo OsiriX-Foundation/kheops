@@ -107,35 +107,47 @@
     <fieldset class="user-settings">
       <legend>{{ $t('usersettings') }}</legend>
       <div
-        v-for="(label,idx) in userSettings"
-        :key="idx"
         class="row form-group toggle-padding"
-        :class="(label=='send_series')?'offset-1':''"
       >
-        <div>
-          <toggle-button
-            v-if="album.is_admin"
-            :value="album[label]"
-            :labels="{checked: 'Yes', unchecked: 'No'}"
-            :disabled="(!album.download_series && label=='send_series')"
-            :sync="true"
-            :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
-            @change="patchAlbum(label)"
-          />
-          <v-icon
-            v-if="!album.is_admin && !album[label]"
-            name="ban"
-            class="text-danger"
-          />
-          <v-icon
-            v-if="!album.is_admin && album[label]"
-            name="check-circle"
-            class="text-success"
-          />
+        <div class="col-xl-1" />
+        <div
+          v-for="(value, idx) in numberCol"
+          :key="idx"
+          class="col-md-12 col-lg-6 col-xl-5"
+        >
+          <span
+            v-for="(label,idy) in userSettings.slice((userSettings.length/2)*(idx), (userSettings.length/2)*value)"
+            :key="idy"
+          >
+            <div
+              class="mt-2"
+              :class="(label=='send_series')?'offset-1':''"
+            >
+              <toggle-button
+                v-if="album.is_admin"
+                :value="album[label]"
+                :labels="{checked: 'Yes', unchecked: 'No'}"
+                :disabled="(!album.download_series && label=='send_series')"
+                :sync="true"
+                :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+                @change="patchAlbum(label)"
+              />
+              <v-icon
+                v-if="!album.is_admin && !album[label]"
+                name="ban"
+                class="text-danger"
+              />
+              <v-icon
+                v-if="!album.is_admin && album[label]"
+                name="check-circle"
+                class="text-success"
+              />
+              <label class="ml-2 mt-2">
+                {{ $t(label) }}
+              </label>
+            </div>
+          </span>
         </div>
-        <label class="ml-2">
-          {{ $t(label) }}
-        </label>
       </div>
     </fieldset>
   </div>
@@ -175,6 +187,7 @@ export default {
         send_series: 'sendSeries',
         write_comments: 'writeComments',
       },
+      numberCol: 2,
     };
   },
   computed: {
