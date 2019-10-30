@@ -161,4 +161,25 @@ a.text-warning:hover, a.text-warning:focus {
 
 .popover {
 	background-color: #1d2434;
+	font-size: 14px;
+}
+
+.popover-header {
+	background-color: #003866;
+}
+
+.bs-popover-bottom .arrow::after, .bs-popover-auto[x-placement^="bottom"] .arrow::after {
+	border-bottom-color: #003866;
+}
+
+.bs-popover-left .arrow::after, .bs-popover-auto[x-placement^="left"] .arrow::after {
+	border-left-color: #1d2434;
+}
+
+.bs-popover-right .arrow::after, .bs-popover-auto[x-placement^="right"] .arrow::after {
+	border-right-color: #1d2434;
+}
+
+.bs-popover-top .arrow::after, .bs-popover-auto[x-placement^="top"] .arrow::after {
+	border-top-color: #1d2434;
 }

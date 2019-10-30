@@ -18,29 +18,6 @@
 </i18n>
 <template>
   <span>
-    <div
-      class="closeBtn d-flex"
-    >
-      <div
-        class="p-2"
-      >
-        <b>{{ $t('title') }}</b>
-      </div>
-      <div
-        class="ml-auto p-1"
-      >
-        <button
-          type="button"
-          class="btn btn-link btn-sm"
-          @click="cancel()"
-        >
-          <close-icon
-            width="20"
-            height="20"
-          />
-        </button>
-      </div>
-    </div>
     <div>
       <div class="row mt-2">
         <div class="col-xs-12 col-sm-12 col-md-12">
@@ -75,11 +52,8 @@
   </span>
 </template>
 <script>
-import CloseIcon from '@/components/kheopsSVG/CloseIcon';
-
 export default {
   name: 'TwitterLink',
-  components: { CloseIcon },
   props: {
     tokens: {
       type: Array,
@@ -92,20 +66,12 @@ export default {
       toggle_revoke: false,
     };
   },
-  computed: {
-  },
-  watch: {
-  },
-  created() {
-  },
-  beforeDestroy() {
-  },
   methods: {
-    cancel() {
-      this.$emit('cancel');
-    },
     revoke() {
       this.$emit('revoke', this.tokens);
+    },
+    cancel() {
+      this.$emit('cancel');
     },
   },
 };

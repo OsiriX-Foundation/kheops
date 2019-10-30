@@ -29,29 +29,6 @@
 <template>
   <span>
     <div
-      class="closeBtn d-flex"
-    >
-      <div
-        class="p-2"
-      >
-        <b>{{ $t('title') }}</b>
-      </div>
-      <div
-        class="ml-auto p-1"
-      >
-        <button
-          type="button"
-          class="btn btn-link btn-sm"
-          @click="cancel()"
-        >
-          <close-icon
-            width="20"
-            height="20"
-          />
-        </button>
-      </div>
-    </div>
-    <div
       v-if="url === '' && tokens.length === 0"
     >
       <div class="row mt-2 mb-2">
@@ -223,14 +200,6 @@ export default {
       },
       toggle_revoke: false,
     };
-  },
-  computed: {
-  },
-  watch: {
-  },
-  created() {
-  },
-  beforeDestroy() {
   },
   methods: {
     cancel() {

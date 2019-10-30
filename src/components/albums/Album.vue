@@ -147,10 +147,16 @@
       :show="showRevokeTwitter"
       placement="auto"
     >
+      <template v-slot:title>
+        <pop-over-title
+          title="Twitter"
+          @cancel="showRevokeTwitter = false"
+        />
+      </template>
       <twitter-link
         :tokens="twitterToken"
-        @cancel="showRevokeTwitter = false"
         @revoke="revokeTwitterTokens"
+        @cancel="showRevokeTwitter = false"
       />
     </b-popover>
     <b-popover
@@ -159,6 +165,12 @@
       :show.sync="sharingTokenParams.show"
       placement="auto"
     >
+      <template v-slot:title>
+        <pop-over-title
+          title="URL to share"
+          @cancel="cancelSharingToken"
+        />
+      </template>
       <sharing-link
         :album-id="albumID"
         :url="urlSharing"
@@ -177,13 +189,14 @@ import moment from 'moment';
 import AlbumComments from '@/components/albums/AlbumComments';
 import AlbumSettings from '@/components/albums/AlbumSettings';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
+import PopOverTitle from '@/components/socialmedia/PopOverTitle';
 import SharingLink from '@/components/socialmedia/SharingLink';
 import TwitterLink from '@/components/socialmedia/TwitterLink';
 
 export default {
   name: 'Album',
   components: {
-    ComponentImportStudy, AlbumSettings, AlbumComments, SharingLink, TwitterLink,
+    ComponentImportStudy, AlbumSettings, AlbumComments, PopOverTitle, SharingLink, TwitterLink,
   },
   data() {
     return {
