@@ -104,52 +104,65 @@
       :show-change-role="true"
     />
 
-    <fieldset class="user-settings">
-      <legend>{{ $t('usersettings') }}</legend>
-      <div
-        class="row form-group toggle-padding"
-      >
-        <div class="col-xl-1" />
+    <div class="card user-settings">
+      <div class="container mb-3">
         <div
-          v-for="(value, idx) in numberCol"
-          :key="idx"
-          class="col-md-12 col-lg-6 col-xl-5"
+          class="bg-primary row"
         >
-          <span
-            v-for="(label,idy) in userSettings.slice((userSettings.length/2)*(idx), (userSettings.length/2)*value)"
-            :key="idy"
-          >
-            <div
-              class="mt-2"
-              :class="(label=='send_series')?'offset-1':''"
+          <div class="col-xl-1"/>
+          <div class="col-xl-11">
+            <h4
+              class="mt-3 mb-3 ml-2"
             >
-              <toggle-button
-                v-if="album.is_admin"
-                :value="album[label]"
-                :labels="{checked: 'Yes', unchecked: 'No'}"
-                :disabled="(!album.download_series && label=='send_series')"
-                :sync="true"
-                :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
-                @change="patchAlbum(label)"
-              />
-              <v-icon
-                v-if="!album.is_admin && !album[label]"
-                name="ban"
-                class="text-danger"
-              />
-              <v-icon
-                v-if="!album.is_admin && album[label]"
-                name="check-circle"
-                class="text-success"
-              />
-              <label class="ml-2 mt-2">
-                {{ $t(label) }}
-              </label>
-            </div>
-          </span>
+              {{ $t('usersettings') }}
+            </h4>
+          </div>
+        </div>
+        <div
+          class="row toggle-padding mt-3"
+        >
+          <div class="col-xl-1" />
+          <div
+            v-for="(value, idx) in numberCol"
+            :key="idx"
+            class="col-md-12 col-lg-6 col-xl-5"
+          >
+            <span
+              v-for="(label,idy) in userSettings.slice((userSettings.length/2)*(idx), (userSettings.length/2)*value)"
+              :key="idy"
+            >
+              <div
+                class="mt-2"
+                :class="(label=='send_series')?'offset-1':''"
+              >
+                <toggle-button
+                  v-if="album.is_admin"
+                  :value="album[label]"
+                  :labels="{checked: 'Yes', unchecked: 'No'}"
+                  :disabled="(!album.download_series && label=='send_series')"
+                  :sync="true"
+                  :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+                  @change="patchAlbum(label)"
+                />
+                <v-icon
+                  v-if="!album.is_admin && !album[label]"
+                  name="ban"
+                  class="text-danger"
+                />
+                <v-icon
+                  v-if="!album.is_admin && album[label]"
+                  name="check-circle"
+                  class="text-success"
+                />
+                <label class="ml-2 mt-2 word-break">
+                  {{ $t(label) }}
+                </label>
+              </div>
+            </span>
+          </div>
         </div>
       </div>
-    </fieldset>
+    </div>
   </div>
 </template>
 
