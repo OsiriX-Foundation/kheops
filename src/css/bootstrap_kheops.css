@@ -105,6 +105,30 @@ a.text-warning:hover, a.text-warning:focus {
 	background-color: #003866;
 }
 
+.table-hover tbody tr.b-table-details {
+	background-color: #06162c;
+}
+
+.table-hover tbody tr.b-table-details:hover {
+	background-color: #06162c;
+}
+
+.table-striped-color.table-nohover tbody tr:nth-of-type(odd):hover {
+	background-color: #06162c;
+}
+
+.table-striped-color.table-nohover tbody tr:nth-of-type(even):hover {
+	background-color: #1d2434;
+}
+
+.table-striped-color-reverse.table-nohover tbody tr:nth-of-type(odd):hover {
+	background-color: #06162c;
+}
+
+.table-striped-color-reverse.table-nohover tbody tr:nth-of-type(even):hover {
+	background-color: #1d2434;
+}
+
 .card{
 	background-color: #1d2434;
 }

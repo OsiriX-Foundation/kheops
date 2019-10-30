@@ -40,7 +40,7 @@
       <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
         <h5>{{ $t('patientinfo') }}</h5>
         <table
-          class="table table-striped-color-reverse word-break"
+          class="table table-striped-color-reverse word-break table-nohover"
         >
           <tbody>
             <tr v-if="metadata.PatientName">
@@ -66,7 +66,7 @@
       <div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 mb-3">
         <h5>{{ $t('studyinfo') }}</h5>
         <table
-          class="table table-striped-color-reverse word-break"
+          class="table table-striped-color-reverse word-break table-nohover"
         >
           <tbody>
             <tr v-if="metadata.ModalitiesInStudy.Value !== undefined">

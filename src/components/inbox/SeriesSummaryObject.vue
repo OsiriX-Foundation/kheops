@@ -65,7 +65,7 @@
         </div>
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
-        <table class="table table-striped-color-reverse">
+        <table class="table table-striped-color-reverse table-nohover">
           <tbody>
             <tr v-if="serie.Modality && serie.Modality.Value !== undefined">
               <th>{{ $t('modality') }}</th>
