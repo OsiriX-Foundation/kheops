@@ -174,8 +174,7 @@
                 <add-icon
                   width="34px"
                   height="34px"
-                /><br>
-                <span>{{ $t("import") }}</span>
+                />
               </template>
               <b-dropdown-item-button
                 :disabled="sendingFiles"
@@ -214,8 +213,7 @@
               name="refresh"
               scale="2"
               class="kheopsicon"
-            /><br>
-            <span>{{ $t("refresh") }}</span>
+            />
           </button>
         </div>
         <div
@@ -230,8 +228,7 @@
               name="search"
               class="kheopsicon"
               scale="1.8"
-            /><br>
-            <span>{{ $t("search") }}</span>
+            />
           </button>
         </div>
       </div>
