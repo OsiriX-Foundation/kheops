@@ -62,7 +62,7 @@
       <v-icon
         class="align-middle icon-margin"
         name="comment-dots"
-        :color="study.flag.is_commented ? '' : 'grey'"
+        :class="study.flag.is_commented ? 'bg-neutral' : 'icon-disabled'"
       />
     </span>
     <span
@@ -74,7 +74,7 @@
       <v-icon
         class="align-middle icon-margin"
         name="star"
-        :color="(!study.flag.is_favorite) ? 'grey' : ''"
+        :class="study.flag.is_favorite ? 'bg-neutral' : 'icon-disabled'"
       />
     </span>
   </span>

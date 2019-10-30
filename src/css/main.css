@@ -115,6 +115,15 @@ a.navbar-brand {
 	color: #60b3c4
 }
 
+.bg-kheops-grey {
+	color: #444444;
+}
+
+.icon-disabled{
+	color: grey;
+}
+
+
 .no-resize {
 	resize: none;
 }
