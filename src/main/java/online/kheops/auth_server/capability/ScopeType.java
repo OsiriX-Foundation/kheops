@@ -31,6 +31,7 @@ public enum ScopeType {
         @Override
         public void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability) {
             capabilityResponse.setScopeType(this.name().toLowerCase());
+            capabilityResponse.setOriginNull();
         }
 
         @Override

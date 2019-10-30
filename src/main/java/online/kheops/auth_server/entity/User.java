@@ -76,6 +76,26 @@ public class User {
             return "UNKNOWN";//TODO
         }
     }
+    public String getLastName() {
+        try {
+            final Keycloak keycloak = Keycloak.getInstance();
+            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
+            return userResponseBuilder.getLastName();
+        } catch (UserNotFoundException | KeycloakException e) {
+            LOG.log(Level.SEVERE, "Error getting lastName", e);
+            return "UNKNOWN";//TODO
+        }
+    }
+    public String getFirstName() {
+        try {
+            final Keycloak keycloak = Keycloak.getInstance();
+            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
+            return userResponseBuilder.getFirstName();
+        } catch (UserNotFoundException | KeycloakException e) {
+            LOG.log(Level.SEVERE, "Error getting firstName", e);
+            return "UNKNOWN";//TODO
+        }
+    }
 
     public Set<Capability> getCapabilities() {
         return capabilities;

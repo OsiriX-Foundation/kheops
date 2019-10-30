@@ -19,6 +19,8 @@ public class KeycloakUsers {
     public String getEmail(int index) {
         return users.getJsonObject(index).getString("email");
     }
+    public String getLastName(int index) { return users.getJsonObject(index).getString("lastName"); }
+    public String getFirstName(int index) { return users.getJsonObject(index).getString("firstName"); }
 
     public String getId(int index) {
         return users.getJsonObject(index).getString("id");

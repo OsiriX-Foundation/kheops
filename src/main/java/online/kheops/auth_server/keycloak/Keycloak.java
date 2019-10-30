@@ -1,6 +1,7 @@
 package online.kheops.auth_server.keycloak;
 
 import online.kheops.auth_server.user.CacheUserName;
+import online.kheops.auth_server.user.UserCachedData;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
@@ -112,7 +113,10 @@ public class Keycloak {
                     final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
                     if (keycloakUsers.size() > 0) {
                         final int index = keycloakUsers.verifyEmail(userLowerCase);
-                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0));
+                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index))
+                                .setSub(keycloakUsers.getId(0))
+                                .setFirstName(keycloakUsers.getFirstName(index))
+                                .setLastName(keycloakUsers.getLastName(index));
                     } else {
                         throw new UserNotFoundException();
                     }
@@ -122,9 +126,14 @@ public class Keycloak {
             }
         } else {
 
-            String userEmail = cacheUserName.getCachedValue(user);
-            if (userEmail != null) {
-                return new UserResponseBuilder().setEmail(userEmail).setSub(user);
+            UserCachedData cachedData = cacheUserName.getCachedValue(user);
+
+            if (cachedData != null) {
+                return new UserResponseBuilder()
+                        .setEmail(cachedData.getEmail())
+                        .setFirstName(cachedData.getFirstName())
+                        .setLastName(cachedData.getLastName())
+                        .setSub(user);
             }
 
             final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
@@ -144,8 +153,11 @@ public class Keycloak {
                     JsonArray reply = jsonReader.readArray();
                     final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                     if (keycloakUser.size() == 1) {
-                        cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
-                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0));
+                        cacheUserName.cacheValue(keycloakUser.getEmail(0), keycloakUser.getLastName(0), keycloakUser.getFirstName(0), keycloakUser.getId(0));
+                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0))
+                                .setSub(keycloakUser.getId(0))
+                                .setLastName(keycloakUser.getLastName(0))
+                                .setFirstName(keycloakUser.getFirstName(0));
                     } else {
                         throw new UserNotFoundException();
                     }
@@ -189,13 +201,16 @@ public class Keycloak {
                 final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                 for(int i = 0;i < keycloakUser.size(); i++) {
                     if(!keycloakUser.getEmail(i).startsWith("service-account-") && !keycloakUser.getEmail(i).endsWith("@placeholder.org")) {
-                        userResponseBuilders.add(new UserResponseBuilder().setEmail(keycloakUser.getEmail(i)).setSub(keycloakUser.getId(i)));
+                        userResponseBuilders.add(new UserResponseBuilder()
+                                .setEmail(keycloakUser.getEmail(i))
+                                .setSub(keycloakUser.getId(i))
+                                .setFirstName(keycloakUser.getFirstName(i))
+                                .setLastName(keycloakUser.getLastName(i)));
                     }
                 }
                 return userResponseBuilders;
             }
         }
-
 
         throw new KeycloakException("ERROR:");
     }
