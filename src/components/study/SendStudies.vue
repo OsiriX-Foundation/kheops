@@ -92,12 +92,11 @@
             {{ $t("titleBoxDicomize") }}
           </span>
         </div>
+        <!--
         <div
           class="ml-auto p-1"
         >
-          <!--
             Reduce / Show icon
-          -->
           <button
             type="button"
             class="btn btn-link btn-sm"
@@ -121,11 +120,12 @@
             </span>
           </button>
         </div>
+        -->
         <!--
             Close icon
           -->
         <div
-          class="p-1"
+          class="ml-auto p-1"
         >
           <button
             type="button"
