@@ -85,9 +85,9 @@
       @click.stop="showComments(study, 'comments')"
     >
       <v-icon
-        class="align-middle icon-margin"
+        class="align-middle icon-margin kheopsicon"
         name="comment-dots"
-        :class="study.flag.is_commented ? '' : 'icon-disabled'"
+        :class="study.flag.is_commented ? 'bg-neutral' : ''"
         :title="$t('comments')"
       />
     </span>
@@ -98,9 +98,9 @@
       @click.stop="toggleFavorite()"
     >
       <v-icon
-        class="align-middle icon-margin"
+        class="align-middle icon-margin kheopsicon"
         name="star"
-        :class="study.flag.is_favorite ? '' : 'icon-disabled'"
+        :class="study.flag.is_favorite ? 'bg-neutral' : ''"
         :title="$t('favorite')"
       />
     </span>
