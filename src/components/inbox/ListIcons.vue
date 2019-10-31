@@ -4,6 +4,7 @@
     "download": "Download",
     "osirix": "Open OsiriX",
     "ohif": "Open OHIF",
+    "weasis": "Open Weasis",
     "import": "Import data",
     "comments": "Open comments",
     "favorite": "Favorite"
@@ -12,6 +13,7 @@
     "download": "Télécharger",
     "osirix": "Ouvrir OsiriX",
     "ohif": "Ouvrir OHIF",
+    "weasis": "Ouvrir Weasis",
     "import": "Importer des données",
     "comments": "Ouvrir les commentaires",
     "favorite": "Favori"
@@ -47,6 +49,17 @@
         <osirix-icon
           width="22px"
           height="22px"
+        />
+      </span>
+      <span
+        v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
+        class="ml-1"
+        @click.stop="openViewer('Weasis')"
+        :title="$t('weasis')"
+      >
+        <visibility-icon
+          width="24px"
+          height="24px"
         />
       </span>
       <span
@@ -266,7 +279,7 @@ export default {
       window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
     },
     openWeasis(StudyInstanceUID, token) {
-      const url = `$dicom:get --zip ${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`;
+      const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
