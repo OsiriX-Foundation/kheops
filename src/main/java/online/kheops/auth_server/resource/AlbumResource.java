@@ -46,7 +46,7 @@ public class AlbumResource {
     @Path("albums")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newAlbum(@DefaultValue("Album_name") @FormParam("name") String name,
+    public Response newAlbum(@FormParam("name") String name,
                              @DefaultValue("") @FormParam("description") String description,
                              @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
