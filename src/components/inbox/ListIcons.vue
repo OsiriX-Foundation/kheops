@@ -247,7 +247,7 @@ export default {
       const sourceQuery = this.getSourceQueries();
       let ohifWindow;
       if (viewer === 'Ohif') {
-        ohifWindow = window.open('', 'OHIFViewer');
+        ohifWindow = window.open('', `OHIFViewer-${StudyInstanceUID}`);
       }
       this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
         if (viewer === 'Osirix') {

@@ -192,7 +192,8 @@ export default {
           this.loadingSerie = false;
           this.errorSeries = false;
         }
-      }).catch(() => {
+      }).catch((err) => {
+        console.log(err)
         this.loadingSerie = false;
         this.errorSeries = true;
       });
