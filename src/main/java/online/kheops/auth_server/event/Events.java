@@ -32,7 +32,7 @@ public class Events {
         CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT}
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
-            throws UserNotFoundException, AlbumNotFoundException, BadQueryParametersException{
+            throws UserNotFoundException, AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

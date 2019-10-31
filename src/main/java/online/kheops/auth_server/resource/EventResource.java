@@ -113,11 +113,8 @@ public class EventResource {
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.WARNING, "Not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        } catch (BadQueryParametersException e) {
-            LOG.log(Level.WARNING, "Bad request", e);
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
-
+        
         kheopsPrincipal.getKheopsLogBuilder().album(albumId)
                 .action(KheopsLogBuilder.ActionType.POST_COMMENT)
                 .log();
