@@ -243,7 +243,7 @@ export default {
       }
     },
     openViewer() {
-      const ohifWindow = window.open('', 'OHIFViewer');
+      const ohifWindow = window.open('', `OHIFViewer-${this.studyInstanceUID}`);
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
         let sourceQueries = this.getSourceQueries()
         let queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? '&'+sourceQueries : ''}`
@@ -254,7 +254,7 @@ export default {
       });
     },
     openWADO(series, contentType) {
-      const wadoWindow = window.open('', 'WADO');
+      const wadoWindow = window.open('', `WADO-${this.seriesInstanceUID}`);
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
         const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
         wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`;
