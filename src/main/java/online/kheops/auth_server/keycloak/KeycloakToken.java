@@ -78,6 +78,11 @@ public class KeycloakToken {
         return accessToken;
     }
 
+    public void removeToken() {
+        accessToken = null;
+        renewTime = null;
+    }
+
     private URI getTokenUri() throws KeycloakException {
         final ConfigurationResponse response;
         try {

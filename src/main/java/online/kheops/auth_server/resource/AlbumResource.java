@@ -35,7 +35,6 @@ public class AlbumResource {
 
     private static final Logger LOG = Logger.getLogger(AlbumResource.class.getName());
 
-
     @Context
     private UriInfo uriInfo;
 
@@ -54,7 +53,7 @@ public class AlbumResource {
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                              MultivaluedMap<String, String> form) {
-        
+
         if(name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
             return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
         }

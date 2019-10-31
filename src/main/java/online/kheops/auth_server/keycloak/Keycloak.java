@@ -51,19 +51,15 @@ public class Keycloak {
         public String getEmail() {
             return email;
         }
-
         public String getFirstName() {
             return firstName;
         }
-
         public String getLastName() {
             return lastName;
         }
-
         public String getUsername() {
             return username;
         }
-
         public String getId() {
             return id;
         }
@@ -90,6 +86,7 @@ public class Keycloak {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken())
                     .get(UserRepresentation.class);
         } catch (ProcessingException | WebApplicationException e) {
+            token.removeToken();
             throw new UserNotFoundException("unable to find the userinfo", e);
         }
     }
@@ -103,6 +100,7 @@ public class Keycloak {
             try {
                 response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
             } catch (ProcessingException e) {
+                token.removeToken();
                 throw new KeycloakException("Error during introspect token", e);
             }
 
@@ -122,6 +120,7 @@ public class Keycloak {
                     }
                 }
             } else {
+                token.removeToken();
                 throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
             }
         } else {
@@ -144,6 +143,7 @@ public class Keycloak {
                 Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
                 response = builder.get();
             } catch (ProcessingException e) {
+                token.removeToken();
                 throw new KeycloakException("Error during introspect token", e);
             }
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -162,11 +162,13 @@ public class Keycloak {
                         throw new UserNotFoundException();
                     }
                 } catch (Exception e) {
+                    token.removeToken();
                     throw new KeycloakException("error during parsing response : " + output, e);
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
             } else {
+                token.removeToken();
                 try {
                     String responseString = response.readEntity(String.class);
                     throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString + "\n" + responseString);
@@ -190,6 +192,7 @@ public class Keycloak {
                     .queryParam("briefRepresentation", "true")
                     .request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
         } catch (ProcessingException e) {
+            token.removeToken();
             throw new KeycloakException("Error during introspect token", e);
         }
 
@@ -211,7 +214,7 @@ public class Keycloak {
                 return userResponseBuilders;
             }
         }
-
+        token.removeToken();
         throw new KeycloakException("ERROR:");
     }
 }
