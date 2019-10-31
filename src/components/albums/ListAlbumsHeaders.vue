@@ -15,20 +15,18 @@
     class="d-flex"
   >
     <div
-      class="p-2"
+      class="p-3"
     >
-      <h3>
-        <router-link
-          to="albums/new"
-          active-class="active"
-          class="inline-white"
-        >
+      <button
+        class="btn btn-secondary ml-2"
+        @click="goNewAlbum"  
+      >
           <v-icon
             name="plus"
             class="mr-2"
-          />{{ $t('newalbum') }}
-        </router-link>
-      </h3>
+          />
+          {{ $t('newalbum') }}
+      </button>
     </div>
     <div
       class="p-2"
@@ -105,6 +103,9 @@ export default {
     reloadAlbums() {
       this.$emit('reloadAlbums');
     },
+    goNewAlbum() {
+      this.$router.push('/albums/new');
+    }
   },
 };
 

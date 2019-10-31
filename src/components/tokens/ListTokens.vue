@@ -40,19 +40,16 @@
 </i18n>
 <template>
   <div>
-    <h4>
-      <span
-        class="link"
-        @click="clickNew()"
-      >
-        <v-icon
-          name="plus"
-          scale="1"
-          class="mr-3"
-        />
-        {{ $t('newtoken') }}
-      </span>
-    </h4>
+    <button
+      class="btn btn-secondary my-3"
+      @click="clickNew()"
+    >
+      <v-icon
+        name="plus"
+        class="mr-2"
+      />
+      {{ $t('newtoken') }}
+    </button>
     <div class="d-flex align-content-around flex-wrap">
       <div class="mt-2">
         <h4>
