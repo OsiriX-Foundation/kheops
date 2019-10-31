@@ -87,7 +87,7 @@
       <v-icon
         class="align-middle icon-margin"
         name="comment-dots"
-        :class="study.flag.is_commented ? 'bg-neutral' : 'icon-disabled'"
+        :class="study.flag.is_commented ? '' : 'icon-disabled'"
         :title="$t('comments')"
       />
     </span>
@@ -100,7 +100,7 @@
       <v-icon
         class="align-middle icon-margin"
         name="star"
-        :class="study.flag.is_favorite ? 'bg-neutral' : 'icon-disabled'"
+        :class="study.flag.is_favorite ? '' : 'icon-disabled'"
         :title="$t('favorite')"
       />
     </span>
