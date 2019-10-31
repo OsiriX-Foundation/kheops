@@ -54,8 +54,8 @@ public class EventResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutation")) {
-            types.remove("mutation");
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutations")) {
+            types.remove("mutations");
             types.add("comments");
         }
 
@@ -114,7 +114,7 @@ public class EventResource {
             LOG.log(Level.WARNING, "Not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
-        
+
         kheopsPrincipal.getKheopsLogBuilder().album(albumId)
                 .action(KheopsLogBuilder.ActionType.POST_COMMENT)
                 .log();
