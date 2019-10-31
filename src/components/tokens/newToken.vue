@@ -221,6 +221,8 @@
     <b-modal
       id="tokenModal"
       ref="tokenModal"
+      header-class="bg-primary"
+      body-class="bg-secondary"
       centered
       no-fade
       hide-footer
