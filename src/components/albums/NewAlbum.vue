@@ -148,9 +148,8 @@
           <div>
             <toggle-button
               v-model="album.userSettings[label]"
-              :labels="{checked: 'Yes', unchecked: 'No'}"
               :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')"
-              :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+              :color="{checked: '#5fc04c', unchecked: 'grey'}"
               :sync="true"
             />
           </div>

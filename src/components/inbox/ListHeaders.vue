@@ -250,14 +250,11 @@
 </template>
 
 <script>
-import ToggleButton from 'vue-js-toggle-button';
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
-
-Vue.use(ToggleButton);
 
 export default {
   name: 'ListHeaders',

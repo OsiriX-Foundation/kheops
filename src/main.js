@@ -12,6 +12,7 @@ import 'vue-snotify/styles/material.css';
 import 'vue-awesome/icons';
 import lodash from 'lodash';
 import Icon from 'vue-awesome/components/Icon';
+import ToggleButton from 'vue-js-toggle-button';
 import VeeValidate from 'vee-validate';
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js';
 import '@/filters/filters.js';
@@ -37,6 +38,7 @@ Vue.use(BootstrapVue);
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
 Vue.use(VueI18n);
 Vue.use(lodash);
+Vue.use(ToggleButton);
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon);
 Vue.directive('access', Access);

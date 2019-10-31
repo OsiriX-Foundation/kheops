@@ -73,9 +73,8 @@
         </label>
         <toggle-button
           v-model="includeNotifications"
-          :labels="{checked: 'Yes', unchecked: 'No'}"
           :sync="true"
-          :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+          :color="{checked: '#5fc04c', unchecked: 'grey'}"
           @change="getComments"
         />
       </p>

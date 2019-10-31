@@ -62,8 +62,7 @@
       <div class="mt-2 ml-auto">
         <toggle-button
           v-model="showInvalid"
-          :labels="{checked: 'Yes', unchecked: 'No'}"
-          :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+          :color="{checked: '#5fc04c', unchecked: 'grey'}"
           @change="toggleValid"
         />
         <span class="ml-2 toggle-label">

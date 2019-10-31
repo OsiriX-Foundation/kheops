@@ -38,8 +38,7 @@
         <div class="col-xs-12 col-sm-12 col-md-4">
           <toggle-button
             v-model="token.write_permission"
-            :labels="{checked: 'Yes', unchecked: 'No'}"
-            :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+            :color="{checked: '#5fc04c', unchecked: 'grey'}"
           />
         </div>
       </div>
@@ -54,8 +53,7 @@
           <toggle-button
             v-if="token.read_permission"
             v-model="token.download_permission"
-            :labels="{checked: 'Yes', unchecked: 'No'}"
-            :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+            :color="{checked: '#5fc04c', unchecked: 'grey'}"
           />
         </div>
       </div>

@@ -5,7 +5,7 @@
     "add_user": "Invite a user",
     "add_series": "Add Studies / Series",
     "download_series": "Show Download Button",
-    "send_series": "Add to album / inbox",
+    "send_series": "Sharing",
     "delete_series": "Remove Studies / Series",
     "write_comments": "Write Comments",
     "albumuseraddsuccess": "User successfully added to the album",
@@ -21,7 +21,7 @@
     "add_user": "Inviter un utilisateur",
     "add_series": "Ajouter une étude / série",
     "download_series": "Montrer le bouton de téléchargement",
-    "send_series": "Ajouter à un album / inbox",
+    "send_series": "Partager",
     "delete_series": "Supprimer une étude / série",
     "write_comments": "Commenter",
     "albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
@@ -138,10 +138,9 @@
                 <toggle-button
                   v-if="album.is_admin"
                   :value="album[label]"
-                  :labels="{checked: 'Yes', unchecked: 'No'}"
                   :disabled="(!album.download_series && label=='send_series')"
                   :sync="true"
-                  :color="{checked: '#5fc04c', unchecked: '#60b3c4'}"
+                  :color="{checked: '#5fc04c', unchecked: 'grey'}"
                   @change="patchAlbum(label)"
                 />
                 <v-icon
