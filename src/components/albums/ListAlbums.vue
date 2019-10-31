@@ -230,12 +230,13 @@
           </div>
           <span
             class="ml-auto"
+            :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
             @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
           >
             <v-icon
               name="star"
-              :color="(!row.item.is_favorite) ? 'grey' : ''"
-              :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
+              class="kheopsicon"
+              :class="(!row.item.is_favorite) ? '' : 'bg-neutral'"
             />
           </span>
         </div>
