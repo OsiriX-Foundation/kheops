@@ -9,6 +9,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
@@ -252,7 +253,7 @@ public class AlbumResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final PairListXTotalCount<UserAlbumResponse> pair;
+        final PairListXTotalCount<UserResponse> pair;
 
         try {
             pair = Albums.getUsers(albumId, limit, offset);
@@ -261,7 +262,7 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(pair.getAttributesList()) {};
+        final GenericEntity<List<UserResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.LIST_USERS)

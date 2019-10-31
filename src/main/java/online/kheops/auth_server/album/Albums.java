@@ -4,6 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
@@ -180,11 +181,11 @@ public class Albums {
         }
     }
 
-    public static PairListXTotalCount<UserAlbumResponse> getUsers(String albumId, Integer limit , Integer offset)
+    public static PairListXTotalCount<UserResponse> getUsers(String albumId, Integer limit , Integer offset)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final List<UserAlbumResponse> listUserAlbumResponse = new ArrayList<>();
+        final List<UserResponse> listUserAlbumResponse = new ArrayList<>();
         final long totalCount;
         try {
             final Album album = getAlbum(albumId, em);
@@ -196,7 +197,7 @@ public class Albums {
                     if (i > offset + limit) {
                         break;
                     } else {
-                        listUserAlbumResponse.add(new UserAlbumResponse(albumUser));
+                        listUserAlbumResponse.add(new UserResponse(albumUser));
                     }
                 }
             }

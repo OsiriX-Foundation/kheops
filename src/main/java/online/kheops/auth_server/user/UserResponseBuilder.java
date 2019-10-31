@@ -36,7 +36,6 @@ public class UserResponseBuilder {
         firstName = user.getFirstName();
         email = user.getEmail();
 
-
         return this;
     }
 
@@ -61,7 +60,7 @@ public class UserResponseBuilder {
 
     public String getSub() { return sub; }
 
-    protected Boolean getAlbumAccess() { return albumAccess; }
+    public Boolean getAlbumAccess() { return albumAccess; }
 
-    protected Boolean getStudyAccess() { return studyAccess; }
+    public Boolean getStudyAccess() { return studyAccess; }
 }
