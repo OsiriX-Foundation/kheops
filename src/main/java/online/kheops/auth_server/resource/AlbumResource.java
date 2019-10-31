@@ -15,8 +15,10 @@ import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
@@ -46,16 +48,13 @@ public class AlbumResource {
     @Path("albums")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newAlbum(@FormParam("name") String name,
+    public Response newAlbum(@FormParam("name") @NotEmpty @NotNull String name,
                              @DefaultValue("") @FormParam("description") String description,
                              @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                              MultivaluedMap<String, String> form) {
-
-        if (name.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
-        }
+        
         if(name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
             return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
         }
