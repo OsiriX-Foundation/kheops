@@ -50,11 +50,7 @@ public class Events {
             if(isPrivateComment) {
                 final User targetUser = em.merge(getOrCreateUser(user));
 
-                if (targetUser == callingUser) {
-                    throw new BadQueryParametersException("Self comment forbidden");
-                }
-
-                if (!isMemberOfAlbum(targetUser, album, em)) {
+                if (targetUser != callingUser && !isMemberOfAlbum(targetUser, album, em)) {
                     throw new UserNotFoundException("Target user is not a member of the album : " + albumId);
                 }
 
@@ -265,11 +261,7 @@ public class Events {
             if(isPrivateComment) {
                 User targetUser = em.merge(getOrCreateUser(targetUserPk));
 
-                if (targetUser == callingUser) {
-                    throw new BadQueryParametersException("Self comment forbidden");
-                }
-
-                if (!Studies.canAccessStudy(targetUser, study, em)) {
+                if (targetUser != callingUser && !Studies.canAccessStudy(targetUser, study, em)) {
                     throw new UserNotFoundException("Target user can't access to this study : " + studyInstanceUID);
                 }
 
