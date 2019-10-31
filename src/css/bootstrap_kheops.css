@@ -113,6 +113,10 @@ a.text-warning:hover, a.text-warning:focus {
 	background-color: #06162c;
 }
 
+.table-hover tbody tr.b-table-has-details {
+	background-color: #003866;
+}
+
 .table-striped-color.table-nohover tbody tr:nth-of-type(odd):hover {
 	background-color: #06162c;
 }
