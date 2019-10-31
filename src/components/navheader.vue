@@ -30,7 +30,7 @@
     <b-navbar-nav>
       <kheops />
       <span
-        class="kheops-title"
+        class="kheops-title font-kheops"
       >
         KHEOPS
       </span>
