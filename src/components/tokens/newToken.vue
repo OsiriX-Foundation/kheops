@@ -11,8 +11,10 @@
     "download": "show download button",
     "appropriate": "add to album / inbox",
     "expirationdate": "Expiration date",
-    "tokencopysuccess": "Token successfully copied"
-
+    "copysuccess": "Successfully copied",
+    "tokenvalue": "Token value",
+    "urlvalue": "Access data url",
+    "warning": "WARNING: You only see once the token value !"
   },
   "fr": {
     "newtoken": "Nouveau token",
@@ -25,7 +27,10 @@
     "download": "montrer le bouton de téléchargement",
     "appropriate": "ajouter à un album / inbox",
     "expirationdate": "Date d'expiration",
-    "tokencopysuccess": "Token copié avec succès"
+    "copysuccess": "Copié avec succès",
+    "tokenvalue": "Valeur du token",
+    "urlvalue": "Url d'accès aux données",
+    "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !"
   }
 }
 </i18n>
@@ -144,7 +149,11 @@
               v-model="token.download_permission"
               :color="{checked: '#5fc04c', unchecked: 'grey'}"
               class="ml-3"
-            /> <label v-if="token.read_permission">
+            />
+            <label
+              v-if="token.read_permission"
+              class="token-props"
+            >
               {{ $t('download') }}
             </label><br>
             <toggle-button
@@ -152,7 +161,11 @@
               v-model="token.appropriate_permission"
               :color="{checked: '#5fc04c', unchecked: 'grey'}"
               class="ml-3"
-            /> <label v-if="token.read_permission">
+            />
+            <label
+              v-if="token.read_permission"
+              class="token-props"
+            >
               {{ $t('appropriate') }}
             </label>
           </div>
@@ -215,9 +228,44 @@
       size="lg"
       @hidden="cancel"
     >
+      <template v-slot:modal-title>
+          {{ token.title }}
+      </template>
+      <dl class="my-2 row">
+        <dt class="col-12 text-warning font-large">
+          {{ $t('warning') }}
+        </dt>
+      </dl>
       <dl class="my-2 row">
         <dt class="col-xs-12 col-sm-3 token-title">
-          {{ token.title }}
+          {{ $t('urlvalue') }}
+        </dt>
+        <dd class="col-xs-10 col-sm-8">
+          <input
+            v-model="token.url"
+            type="text"
+            readonly
+            class="form-control form-control-sm"
+          >
+        </dd>
+        <div class="col-xs-2 col-sm-1 pointer">
+          <button
+            v-clipboard:copy="token.url"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onCopyError"
+            type="button"
+            class="btn btn-secondary btn-sm"
+          >
+            <v-icon
+              name="paste"
+              scale="1"
+            />
+          </button>
+        </div>
+      </dl>
+      <dl class="my-2 row">
+        <dt class="col-xs-12 col-sm-3 token-title">
+          {{ $t('tokenvalue') }}
         </dt>
         <dd class="col-xs-10 col-sm-8">
           <input
@@ -272,6 +320,7 @@ export default {
         scope_type: this.scope,
         album: this.albumid,
         access_token: '',
+        url: '',
         read_permission: false,
         write_permission: false,
         appropriate_permission: false,
@@ -313,6 +362,7 @@ export default {
       token.not_before_time = moment(this.token.not_before_time).format();
       this.$store.dispatch('createToken', { token }).then((res) => {
         this.token.access_token = res.data.access_token;
+        this.token.url = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
         this.$snotify.success('token created successfully');
         this.$refs.tokenModal.show();
       }).catch(() => {
@@ -320,7 +370,7 @@ export default {
       });
     },
     onCopy() {
-      this.$snotify.success(this.$t('tokencopysuccess'));
+      this.$snotify.success(this.$t('copysuccess'));
     },
     onCopyError() {
       this.$snotify.error(this.$t('sorryerror'));
