@@ -5,7 +5,6 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
