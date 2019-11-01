@@ -54,6 +54,4 @@ public class KeycloakUsers {
     public int size () {
         return users.size();
     }
-
-
 }

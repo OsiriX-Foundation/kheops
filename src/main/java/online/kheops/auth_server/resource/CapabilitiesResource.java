@@ -51,10 +51,10 @@ public class CapabilitiesResource {
                                         @FormParam("not_before_time") String notBeforeTime,
                                         @NotNull @FormParam("scope_type") String scopeType,
                                         @FormParam("album") String albumId,
-                                        @NotNull @FormParam("read_permission") boolean readPermission,
-                                        @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
-                                        @NotNull @FormParam("download_permission") boolean downloadPermission,
-                                        @NotNull @FormParam("write_permission") boolean writePermission) {
+                                        @DefaultValue("false") @FormParam("read_permission") boolean readPermission,
+                                        @DefaultValue("false") @FormParam("appropriate_permission") boolean appropriatePermission,
+                                        @DefaultValue("false") @FormParam("download_permission") boolean downloadPermission,
+                                        @DefaultValue("false") @FormParam("write_permission") boolean writePermission) {
 
         if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
             return Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
