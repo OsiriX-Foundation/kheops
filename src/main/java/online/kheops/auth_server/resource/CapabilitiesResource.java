@@ -89,7 +89,6 @@ public class CapabilitiesResource {
         if(expirationTime != null) {
             try {
                 capabilityParametersBuilder.expirationTime(expirationTime);
-
             } catch (DateTimeParseException e) {
                 return Response.status(BAD_REQUEST).entity("Bad query parameter 'expiration_time'").build();
             }

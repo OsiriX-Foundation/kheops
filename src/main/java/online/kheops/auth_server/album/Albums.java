@@ -287,7 +287,7 @@ public class Albums {
                 }
             }
 
-            //Delete the album if it was the last User
+            //Delete the album if it is the last User
             if (album.getAlbumUser().size() == 1) {
                 deleteAlbum(callingUser, albumId);
             } else {
