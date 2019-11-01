@@ -16,11 +16,27 @@ public class KeycloakUsers {
         return users;
     }
 
-    public String getEmail(int index) {
-        return users.getJsonObject(index).getString("email");
+    public String getEmail(int index)  {
+        if (users.getJsonObject(index).containsKey("email")) {
+            return users.getJsonObject(index).getString("email");
+        } else {
+            return null;
+        }
     }
-    public String getLastName(int index) { return users.getJsonObject(index).getString("lastName"); }
-    public String getFirstName(int index) { return users.getJsonObject(index).getString("firstName"); }
+    public String getLastName(int index) {
+        if (users.getJsonObject(index).containsKey("lastName")) {
+            return users.getJsonObject(index).getString("lastName");
+        } else {
+            return null;
+        }
+    }
+    public String getFirstName(int index) {
+        if (users.getJsonObject(index).containsKey("firstName")) {
+            return users.getJsonObject(index).getString("firstName");
+        } else {
+            return null;
+        }
+    }
 
     public String getId(int index) {
         return users.getJsonObject(index).getString("id");
