@@ -230,7 +230,7 @@ public class Albums {
                 try {
                     final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
                     if (! targetAlbumUser.isAdmin() && isAdmin) {
-                        //Here, the targetUser is an normal member and he will be promot admin
+                        //Here, the targetUser is an normal member and he will be promot as admin
                         targetAlbumUser.setAdmin(isAdmin);
                         final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
                         em.persist(mutationPromoteAdmin);

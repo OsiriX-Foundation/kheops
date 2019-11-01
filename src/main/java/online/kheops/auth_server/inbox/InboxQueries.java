@@ -28,7 +28,6 @@ public class InboxQueries {
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
 
-
             query.addSelect(countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
                     countDistinct(SERIES.PK).as("number_of_series"),
                     sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("number_of_instances"),
@@ -46,9 +45,7 @@ public class InboxQueries {
 
             final Record result = query.fetchOne();
 
-            final InboxInfoResponse inboxInfoResponse = new InboxInfoResponse(result);
-
-            return inboxInfoResponse;
+            return new InboxInfoResponse(result);
         } catch (SQLException e) {
             throw new JOOQException("Error during request", e);
         }

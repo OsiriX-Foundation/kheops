@@ -69,10 +69,7 @@ public class CapabilitiesResource {
                 .readPermission(readPermission)
                 .writePermission(writePermission);
 
-        if (readPermission) {
-            capabilityParametersBuilder.appropriatePermission(appropriatePermission)
-                    .downloadPermission(downloadPermission);
-        } else {
+        if (!readPermission) {
             if (appropriatePermission) {
                 return Response.status(BAD_REQUEST).entity("'appropriatePermission' is availble only if 'readPermission' is True").build();
             }
@@ -80,11 +77,13 @@ public class CapabilitiesResource {
                 return Response.status(BAD_REQUEST).entity("'downloadPermission' is availble only if 'readPermission' is True").build();
             }
         }
+        capabilityParametersBuilder.appropriatePermission(appropriatePermission)
+                .downloadPermission(downloadPermission);
         if(notBeforeTime != null) {
             try {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
             } catch (DateTimeParseException e) {
-                return Response.status(BAD_REQUEST).entity("Bad query parameter {not_before_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter 'not_before_time'").build();
             }
         }
         if(expirationTime != null) {
@@ -92,7 +91,7 @@ public class CapabilitiesResource {
                 capabilityParametersBuilder.expirationTime(expirationTime);
 
             } catch (DateTimeParseException e) {
-                return Response.status(BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter 'expiration_time'").build();
             }
         }
 
@@ -101,7 +100,7 @@ public class CapabilitiesResource {
         } catch (CapabilityBadRequestException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
+            return Response.status(BAD_REQUEST).entity("'scope_type' must be 'user' or 'album'. Not : "+scopeType).build();
         }
 
         final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
@@ -185,7 +184,6 @@ public class CapabilitiesResource {
 
         final CapabilitiesResponse capabilityResponses;
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
-
 
         try {
             capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getDBID());

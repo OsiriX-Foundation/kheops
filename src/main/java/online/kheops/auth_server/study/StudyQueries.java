@@ -84,5 +84,4 @@ public class StudyQueries {
             throw new StudyNotFoundException("StudyInstanceUID : " + studyUID + " is not in the album :" + album.getId(), e);
         }
     }
-
 }
