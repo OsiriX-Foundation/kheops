@@ -530,11 +530,8 @@ public class Sending {
         Set<String> availableSeriesUIDs;
 
         EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
-
             callingUser = em.merge(callingUser);
 
             if (fromAlbumId != null) {
@@ -545,12 +542,7 @@ public class Sending {
             } else {
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromAlbumandInbox(callingUser, studyInstanceUID, em);
             }
-
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 

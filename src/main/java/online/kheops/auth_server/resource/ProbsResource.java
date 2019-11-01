@@ -3,7 +3,6 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.EntityManagerListener;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -24,19 +23,13 @@ public class ProbsResource {
     public Response readiness() {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
             //try to querying the db
             em.createQuery("SELECT COUNT(u) FROM User u", Long.class).getSingleResult();
-            tx.commit();
         } catch (Exception e) {
             return Response.status(INTERNAL_SERVER_ERROR).entity("").build();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 

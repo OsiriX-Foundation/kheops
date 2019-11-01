@@ -78,17 +78,11 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             album = em.merge(album);
-
             return canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em);
 
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -113,9 +107,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
 
             if (!canAccessStudy(album, studyInstanceUID)) {
                 return false;
@@ -133,9 +125,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
                 return true;
             }
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
         return false;
@@ -149,10 +138,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
-
              album = em.merge(album);
 
              if(!album.getId().equals(albumId))  {
@@ -162,9 +148,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             return usersPermission.hasProviderPermission(album);
 
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -239,18 +222,10 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             album = em.merge(album);
-            tx.commit();
-
             return canAccessStudy(album, studyInstanceUID);
-
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
