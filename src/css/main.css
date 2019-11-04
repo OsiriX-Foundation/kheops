@@ -115,6 +115,14 @@ a.navbar-brand {
 	color: #60b3c4
 }
 
+.font-white {
+	color: white !important;
+}
+
+.font-white:hover {
+	color: #adadad !important;
+}
+
 .bg-kheops-grey {
 	color: #444444;
 }

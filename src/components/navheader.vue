@@ -68,32 +68,34 @@
             </a>
           </b-nav-item>
           <b-nav-item
-            class="active"
+            class="active pointer"
+            :title="$t('tooltipHelp')"
+            target="_blank"
+            @click="redirect('https://docs.kheops.online')"
           >
-            <a
-              :title="$t('tooltipHelp')"
-              class="pointer"
-              target="_blank"
-              @click="redirect('https://docs.kheops.online')"
+            <span
+              class="font-white"
             >
               {{ $t('tooltipHelp') }}
               <v-icon name="help" />
-            </a>
+            </span>
           </b-nav-item>
           <b-nav-item
             v-if="logged"
-            class="active"
+            :title="$t('tooltipLogout')"
+            class="active pointer"
+            @click="logout()"
           >
-            <a
-              :title="$t('tooltipLogout')"
-              class="pointer"
-              @click="logout()"
+            <span
+              class="font-white"
             >
+              {{ $t('tooltipLogout') }}
               <v-icon name="sign-out-alt" />
-            </a>
+            </span>
           </b-nav-item>
           <b-nav-item-dropdown
             :text="`${$t('lang')}: ${lang}`"
+            toggle-class="font-white"
             right
             class="active"
           >
