@@ -137,29 +137,55 @@
         </div>
       </fieldset>
 
-      <fieldset class="user-settings">
-        <legend>{{ $t('usersettings') }}</legend>
-        <div
-          v-for="(value,label) in album.userSettings"
-          :key="label"
-          class="row form-group toggle-padding"
-          :class="(label==='sendSeries')?'offset-1':''"
-        >
-          <div>
-            <toggle-button
-              v-model="album.userSettings[label]"
-              :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')"
-              :color="{checked: '#5fc04c', unchecked: 'grey'}"
-              :sync="true"
-            />
-          </div>
-          <label
-            class="user-settings"
+      <div class="card user-settings">
+        <div class="container mb-3">
+          <div
+            class="bg-primary row"
           >
-            {{ $t(label) }}
-          </label>
+            <div class="col-xl-1"/>
+            <div class="col-xl-11">
+              <h4
+                class="mt-3 mb-3 ml-2"
+              >
+                {{ $t('usersettings') }}
+              </h4>
+            </div>
+          </div>
+          <div
+            class="row toggle-padding mt-3"
+          >
+            <div class="col-xl-1" />
+            <div
+              v-for="(value, idx) in numberCol"
+              :key="idx"
+              class="col-md-12 col-lg-6 col-xl-5"
+            >
+              <span
+                v-for="(value,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*value)"
+                :key="idy"
+              >
+                <div
+                  class="mt-2"
+                  :class="(value[0]=='sendSeries')?'offset-1':''"
+                >
+                  <toggle-button
+                    v-model="album.userSettings[value[0]]"
+                    :disabled="(!album.userSettings.downloadSeries && value[0]=='sendSeries')"
+                    :color="{checked: '#5fc04c', unchecked: 'grey'}"
+                    :sync="true"
+                  />
+                  <label
+                    class="user-settings ml-2 mt-2 word-break"
+                  >
+                    {{ $t(value[0]) }}
+                  </label>
+                </div>
+              </span>
+            </div>
+          </div>
         </div>
-      </fieldset>
+      </div>
+
       <fieldset>
         <div class="row">
           <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
@@ -226,11 +252,15 @@ export default {
         },
       },
       newUserName: '',
+      numberCol: 2,
     };
   },
   computed: {
     displayName() {
       return (!this.album.album_id) ? this.$t('newalbum') : this.album.name;
+    },
+    userSettingsLength() {
+      return Object.keys(this.album.userSettings).length;
     },
   },
   watch: {
