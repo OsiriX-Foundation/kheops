@@ -217,7 +217,7 @@
           </button>
         </div>
         <div
-          class="d-none d-sm-block align-self-center"
+          class="align-self-center"
         >
           <button
             type="button"

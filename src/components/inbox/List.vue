@@ -168,12 +168,33 @@
             v-if="showFilters"
             @click.stop=""
           >
-            <input
-              v-model="filters.PatientName"
-              type="search"
-              class="form-control form-control-sm"
-              :placeholder="$t('filter')"
-            > <br>
+            <div class="d-flex">
+              <div class="flex-fill">
+                <input
+                  v-model="filters.PatientName"
+                  type="search"
+                  class="form-control form-control-sm"
+                  :placeholder="$t('filter')"
+                >
+              </div>
+              <span>
+                <select
+                  v-model="filters.ModalitiesInStudy"
+                  class="form-control form-control-sm d-block d-sm-none"
+                  :placeholder="$t('filter')"
+                >
+                  <option value="" />
+                  <option
+                    v-for="modality in modalities"
+                    :key="modality.id"
+                    :value="modality"
+                  >
+                    {{ modality }}
+                  </option>
+                </select>
+              </span>
+            </div>
+            <br>
           </div>
           <sort-list
             :sort-desc="studiesParams.sortDesc"
@@ -336,11 +357,13 @@
           >
             <div class="">
               {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
+              <span
+                class="d-block d-sm-none"
+              >
+                {{row.item.ModalitiesInStudy !== undefined ? row.item.ModalitiesInStudy.Value.join(', ') : '' }}
+              </span>
             </div>
             <div :class="mobiledetect===true ? '' : 'ml-auto'">
-              <!--
-        :show-favorite-icon="permissions.add_series"
-      -->
               <list-icons
                 :study="row.item"
                 :mobiledetect="mobiledetect"
