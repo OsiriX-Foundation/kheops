@@ -19,13 +19,13 @@
     >
       <button
         class="btn btn-secondary ml-2"
-        @click="goNewAlbum"  
+        @click="goNewAlbum"
       >
-          <v-icon
-            name="plus"
-            class="mr-2"
-          />
-          {{ $t('newalbum') }}
+        <v-icon
+          name="plus"
+          class="mr-2"
+        />
+        {{ $t('newalbum') }}
       </button>
     </div>
     <div
@@ -105,7 +105,7 @@ export default {
     },
     goNewAlbum() {
       this.$router.push('/albums/new');
-    }
+    },
   },
 };
 

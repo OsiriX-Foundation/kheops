@@ -38,7 +38,7 @@ Vue.filter('formatPermissions', (item) => {
 
 Vue.filter('maxTextLength', (value, maxlength) => {
   if (value.length > maxlength) {
-    return value.slice(0, maxlength) + " ..."
+    return `${value.slice(0, maxlength)} ...`;
   }
-  return value
-})
+  return value;
+});

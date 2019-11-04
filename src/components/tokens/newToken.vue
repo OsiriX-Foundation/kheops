@@ -231,7 +231,7 @@
       @hidden="cancel"
     >
       <template v-slot:modal-title>
-          {{ token.title }}
+        {{ token.title }}
       </template>
       <dl class="my-2 row">
         <dt class="col-12 text-warning font-large">

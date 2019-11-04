@@ -95,7 +95,10 @@
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
             <div class="card-header">
-              <v-icon name="user" class="icon-margin-right" />
+              <v-icon
+                name="user"
+                class="icon-margin-right"
+              />
               <span>
                 {{ currentuserEmail !== comment.origin_name ? comment.origin_name : $t('you') }}
               </span>
@@ -106,14 +109,14 @@
                 v-if="comment.is_private"
               >
                 <b
-                  class="text-warning"
                   v-if="comment.is_private && currentuserEmail !== comment.origin_name"
+                  class="text-warning"
                 >
                   {{ $t('privatemessagereceive', { user: comment.origin_name }) }}
                 </b>
                 <b
-                  class="text-warning"
                   v-if="comment.is_private && currentuserEmail !== comment.target_name"
+                  class="text-warning"
                 >
                   {{ $t('privatemessagesend', { user: comment.target_name }) }}
                 </b>

@@ -249,7 +249,7 @@
             <div
               v-if="error.length > 0"
             >
-              {{ $tc("filesErrors", error.length, {count: error.length}) }} <br />
+              {{ $tc("filesErrors", error.length, {count: error.length}) }} <br>
               <a
                 class="text-center text-warning"
                 @click="UI.showErrors=!UI.showErrors"

@@ -246,9 +246,9 @@ export default {
     openViewer() {
       const ohifWindow = window.open('', `OHIFViewer-${this.studyInstanceUID}`);
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
-        let sourceQueries = this.getSourceQueries()
-        let queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? '&'+sourceQueries : ''}`
-        const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata${queryparams}`
+        const sourceQueries = this.getSourceQueries();
+        const queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? `&${sourceQueries}` : ''}`;
+        const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata${queryparams}`;
         ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
       }).catch((err) => {
         console.log(err);

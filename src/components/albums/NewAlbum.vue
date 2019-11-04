@@ -142,7 +142,7 @@
           <div
             class="bg-primary row"
           >
-            <div class="col-xl-1"/>
+            <div class="col-xl-1" />
             <div class="col-xl-11">
               <h4
                 class="mt-3 mb-3 ml-2"

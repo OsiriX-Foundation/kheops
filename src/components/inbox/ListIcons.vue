@@ -43,8 +43,8 @@
       <span
         v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i) && showViewerIcon"
         class="ml-1"
-        @click.stop="openViewer('Osirix')"
         :title="$t('osirix')"
+        @click.stop="openViewer('Osirix')"
       >
         <osirix-icon
           width="22px"
@@ -54,9 +54,10 @@
       <span
         v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
         class="ml-1"
-        @click.stop="openViewer('Weasis')"
         :title="$t('weasis')"
+        @click.stop="openViewer('Weasis')"
       >
+        <weasis-icon />
         <visibility-icon
           width="24px"
           height="24px"
@@ -65,8 +66,8 @@
       <span
         v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
         class="ml-1"
-        @click.stop="openViewer('Ohif')"
         :title="$t('ohif')"
+        @click.stop="openViewer('Ohif')"
       >
         <visibility-icon
           width="24px"
@@ -77,8 +78,8 @@
         v-if="showImportIcon"
         for="file"
         class="ml-1 pointer display-inline"
-        @click="setStudyUID()"
         :title="$t('import')"
+        @click="setStudyUID()"
       >
         <add-icon
           width="24px"
@@ -122,6 +123,7 @@
 <script>
 import Vue from 'vue';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
+import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
 import { ViewerToken } from '@/mixins/tokens.js';
@@ -129,7 +131,9 @@ import { CurrentUser } from '../../mixins/currentuser.js';
 
 export default {
   name: 'ListIcons',
-  components: { OsirixIcon, VisibilityIcon, AddIcon },
+  components: {
+    OsirixIcon, VisibilityIcon, AddIcon, WeasisIcon,
+  },
   mixins: [ViewerToken, CurrentUser],
   props: {
     study: {
@@ -283,7 +287,7 @@ export default {
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`
+      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
       return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
     },
     showComments(study, flagView) {
