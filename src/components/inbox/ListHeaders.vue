@@ -82,17 +82,16 @@
               <v-icon
                 class="align-middle"
                 name="book"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("addalbum") }}</span>
+            <span>{{ $t("addalbum") }}</span>
           </template>
           <b-dropdown-item
             v-for="allowedAlbum in allowedAlbums"
             :key="allowedAlbum.id"
             @click.stop="addToAlbum(allowedAlbum.album_id)"
           >
-            {{ allowedAlbum.name }}
+            {{ allowedAlbum.name|maxTextLength(albumNameMaxLength) }}
           </b-dropdown-item>
           <b-dropdown-divider />
           <b-dropdown-item
@@ -116,10 +115,9 @@
               <v-icon
                 class="align-middle"
                 name="bars"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("addInbox") }}</span>
+            <span>{{ $t("addInbox") }}</span>
           </button>
         </div>
         <div
@@ -136,10 +134,9 @@
               <v-icon
                 class="align-middle"
                 name="star"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("infoFavorites") }}</span>
+            <span>{{ $t("infoFavorites") }}</span>
           </button>
         </div>
         <div
@@ -156,10 +153,9 @@
               <v-icon
                 class="align-middle"
                 name="trash"
-                color="white"
               />
             </span><br>
-            <span style="color: white">{{ $t("delete") }}</span>
+            <span>{{ $t("delete") }}</span>
           </button>
         </div>
         <div class="ml-auto" />
@@ -170,15 +166,14 @@
           <div>
             <b-dropdown
               id="dropdown-divider"
-              class="m-1"
               toggle-class="kheopsicon"
               variant="link"
               right
             >
               <template slot="button-content">
                 <add-icon
-                  width="30px"
-                  height="30px"
+                  width="34px"
+                  height="34px"
                 />
               </template>
               <b-dropdown-item-button
@@ -211,7 +206,7 @@
         >
           <button
             type="button"
-            class=" btn btn-link btn-lg"
+            class=" btn btn-link "
             @click="reloadStudies()"
           >
             <v-icon
@@ -222,17 +217,17 @@
           </button>
         </div>
         <div
-          class="d-none d-sm-block align-self-center"
+          class="align-self-center"
         >
           <button
             type="button"
-            class=" btn btn-link btn-lg"
+            class=" btn btn-link"
             @click="setFilters()"
           >
             <v-icon
               name="search"
-              scale="2"
               class="kheopsicon"
+              scale="1.8"
             />
           </button>
         </div>
@@ -255,14 +250,11 @@
 </template>
 
 <script>
-import ToggleButton from 'vue-js-toggle-button';
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
-
-Vue.use(ToggleButton);
 
 export default {
   name: 'ListHeaders',
@@ -319,6 +311,7 @@ export default {
       formSendStudy: false,
       confirmDelete: false,
       showFilters: false,
+      albumNameMaxLength: 25,
     };
   },
   computed: {
@@ -647,26 +640,3 @@ export default {
 };
 
 </script>
-<style scoped>
-  .btn-link {
-    font-weight: 400;
-    color: white;
-    background-color: transparent;
-  }
-
-  .btn-link:hover {
-    color: #c7d1db;
-    text-decoration: underline;
-    background-color: transparent;
-    border-color: transparent;
-  }
-
-  .inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
-</style>

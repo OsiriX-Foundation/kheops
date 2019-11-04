@@ -56,8 +56,8 @@ const actions = {
   },
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
-    if (serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
-      return dispatch('getSerieMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
+    if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
+      return dispatch('getSeriesMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
           return dispatch('setImageSrc', {
             StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data,
@@ -74,7 +74,15 @@ const actions = {
       serie,
     });
   },
-  getSerieMetadata(context, params) {
+  getSeriesInstances(context, params) {
+    const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/instances`;
+    let queries = '';
+    if (params.queries !== undefined) {
+      queries = httpoperations.getQueriesParameters(params.queries);
+    }
+    return HTTP.get(request + queries).then((res) => res).catch((err) => Promise.reject(err));
+  },
+  getSeriesMetadata(context, params) {
     const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/metadata`;
     let queries = '';
     if (params.queries !== undefined) {

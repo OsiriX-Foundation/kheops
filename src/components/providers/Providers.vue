@@ -14,21 +14,18 @@
   <div>
     <div
       v-if="(currentView === 'listproviders') && writePermission"
-      class="my-3 selection-button-container"
-      style=" position: relative;"
+      class="my-3 selection-button-container provider-position"
     >
-      <h4>
-        <span
-          class="link"
-          @click="loadAction('newprovider')"
-        >
-          <v-icon
-            name="plus"
-            scale="1"
-            class="mr-3"
-          />{{ $t('newprovider') }}
-        </span>
-      </h4>
+      <button
+        class="btn btn-secondary"
+        @click="loadAction('newprovider')"
+      >
+        <v-icon
+          name="plus"
+          class="mr-2"
+        />
+        {{ $t('newprovider') }}
+      </button>
     </div>
 
     <new-provider
@@ -125,9 +122,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.selection-button-container{
-  height: 60px;
-}
-</style>

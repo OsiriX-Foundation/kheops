@@ -15,6 +15,3 @@ export default {
   components: { tokens },
 };
 </script>
-
-<style scoped>
-</style>

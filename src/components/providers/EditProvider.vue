@@ -26,8 +26,7 @@
 <template>
   <div>
     <div
-      class="my-3 selection-button-container"
-      style=" position: relative;"
+      class="my-3 selection-button-container provider-position"
     >
       <h4>
         <button

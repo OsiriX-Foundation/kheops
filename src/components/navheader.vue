@@ -27,22 +27,14 @@
     fixed="top"
   >
     <b-navbar-toggle target="nav_collapse" />
-    <b-navbar-brand href="#">
-      <!--
-      <img
-        src="../assets/sib_logo_small.gif"
-        style="margin-right:5px"
+    <b-navbar-nav>
+      <kheops />
+      <span
+        class="kheops-title font-kheops"
       >
-      -->
-      <router-link
-        to="/"
-        style="font-size: 1.3rem;"
-        class="kheopsfont"
-      >
-        Kheops
-      </router-link>
-    </b-navbar-brand>
-
+        KHEOPS
+      </span>
+    </b-navbar-nav>
     <b-collapse
       id="nav_collapse"
       is-nav
@@ -53,19 +45,19 @@
           <b-nav-item
             v-if="logged"
             v-access="'active'"
-            class="kheopsfont"
+            class="font-kheops active"
           >
             {{ $t('welcome') }}
             <router-link
               to="/user"
-              class="kheopsfont"
+              class="font-kheops"
             >
               {{ currentuserFullname }}
             </router-link>
           </b-nav-item>
           <b-nav-item
             v-else-if="logged === false"
-            v-access="'active'"
+            class="active"
           >
             <a
               :title="$t('tooltipLogout')"
@@ -75,32 +67,37 @@
               Login
             </a>
           </b-nav-item>
-          <b-nav-item v-access="'active'">
-            <a
-              :title="$t('tooltipHelp')"
-              class="pointer"
-              target="_blank"
-              @click="redirect('https://docs.kheops.online')"
+          <b-nav-item
+            class="active pointer"
+            :title="$t('tooltipHelp')"
+            target="_blank"
+            @click="redirect('https://docs.kheops.online')"
+          >
+            <span
+              class="font-white"
             >
               {{ $t('tooltipHelp') }}
               <v-icon name="help" />
-            </a>
+            </span>
           </b-nav-item>
           <b-nav-item
             v-if="logged"
-            v-access="'active'"
+            :title="$t('tooltipLogout')"
+            class="active pointer"
+            @click="logout()"
           >
-            <a
-              :title="$t('tooltipLogout')"
-              class="pointer"
-              @click="logout()"
+            <span
+              class="font-white"
             >
+              {{ $t('tooltipLogout') }}
               <v-icon name="sign-out-alt" />
-            </a>
+            </span>
           </b-nav-item>
           <b-nav-item-dropdown
             :text="`${$t('lang')}: ${lang}`"
+            toggle-class="font-white"
             right
+            class="active"
           >
             <b-dropdown-item
               v-for="language in availableLanguage"
@@ -109,7 +106,7 @@
               @click="changeLang(language)"
             >
               <span
-                style="text-transform: uppercase;"
+                class="text-uppercase"
               >
                 {{ language }}
               </span>
@@ -125,9 +122,11 @@
 import Vue from 'vue';
 import store from '@/store';
 import { CurrentUser } from '@/mixins/currentuser.js';
+import Kheops from '@/components/kheopsSVG/Kheops.vue';
 
 export default {
   name: 'NavHeader',
+  components: { Kheops },
   mixins: [CurrentUser],
   props: {
     logged: {

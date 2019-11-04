@@ -35,3 +35,10 @@ Vue.filter('formatPermissions', (item) => {
   });
   return (perms.length) ? perms.join(', ') : '-';
 });
+
+Vue.filter('maxTextLength', (value, maxlength) => {
+  if (value.length > maxlength) {
+    return `${value.slice(0, maxlength)} ...`;
+  }
+  return value;
+});

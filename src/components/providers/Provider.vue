@@ -47,8 +47,7 @@
 <template>
   <div v-if="Object.keys(provider).length > 0">
     <div
-      class="my-3 selection-button-container"
-      style=" position: relative;"
+      class="my-3 provider-position"
     >
       <h4>
         <button
@@ -369,8 +368,3 @@ export default {
   },
 };
 </script>
-<style>
-  .breakwork {
-    word-break: break-word;
-  }
-</style>

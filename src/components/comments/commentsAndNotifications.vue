@@ -25,7 +25,10 @@
     "createreportprovider": "{user} create the report provider {reportname}",
     "editreportprovider": "{user} edit the report provider {reportname}",
     "deletereportprovider": "{user} delete the report provider {reportname}",
-    "newreport": "{user} add a new report in the study {study} with the report provider {reportname}"
+    "newreport": "{user} add a new report in the study {study} with the report provider {reportname}",
+    "privatemessagereceive": "Private message",
+    "privatemessagesend": "Private message for: {user}",
+    "you": "You"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -50,7 +53,10 @@
     "createreportprovider": "{user} a créé le report provider {reportname}",
     "editreportprovider": "{user} a édité le report provider {reportname}",
     "deletereportprovider": "{user} a supprimé le report provider {reportname}",
-    "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}"
+    "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}",
+    "privatemessagereceive": "Message privé",
+    "privatemessagesend": "Message privé pour: {user}",
+    "you": "Vous"
   }
 }
 </i18n>
@@ -64,18 +70,18 @@
       >
         <label class="mr-2">
           {{ $t('includenotifications') }}
-        </label> <toggle-button
+        </label>
+        <toggle-button
           v-model="includeNotifications"
-          :labels="{checked: 'Yes', unchecked: 'No'}"
           :sync="true"
+          :color="{checked: '#5fc04c', unchecked: 'grey'}"
           @change="getComments"
         />
       </p>
 
       <div
         :id="container_id"
-        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3"
-        style="max-height: 600px; overflow-y: scroll;"
+        class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3 comment-section card-main"
       >
         <div
           v-for="comment in comments"
@@ -89,15 +95,32 @@
             :class="(comment.is_private)?'bg-primary':'bg-secondary'"
           >
             <div class="card-header">
-              <v-icon name="user" /> {{ comment.origin_name }}
-              <span
-                v-if="comment.target_name"
-              >
-                {{ $t('to') }} {{ comment.target_name }}
+              <v-icon
+                name="user"
+                class="icon-margin-right"
+              />
+              <span>
+                {{ currentuserEmail !== comment.origin_name ? comment.origin_name : $t('you') }}
               </span>
               <span class="float-right">
                 {{ comment.post_date | formatDate }}
               </span>
+              <div
+                v-if="comment.is_private"
+              >
+                <b
+                  v-if="comment.is_private && currentuserEmail !== comment.origin_name"
+                  class="text-warning"
+                >
+                  {{ $t('privatemessagereceive', { user: comment.origin_name }) }}
+                </b>
+                <b
+                  v-if="comment.is_private && currentuserEmail !== comment.target_name"
+                  class="text-warning"
+                >
+                  {{ $t('privatemessagesend', { user: comment.target_name }) }}
+                </b>
+              </div>
             </div>
             <div
               class="card-body"
@@ -266,7 +289,11 @@
             inline
             @change="SetEnabledVariables()"
           >
-            {{ $t("checkprivateuser") }}
+            <span
+              class="pointer"
+            >
+              {{ $t("checkprivateuser") }}
+            </span>
           </b-form-checkbox>
         </div>
         <div class="col-sm-6 col-md-4">
@@ -300,7 +327,7 @@
                 <button
                   title="send comment"
                   type="submit"
-                  class="btn btn-primary"
+                  class="btn btn-primary button-cursor"
                   :disabled="newComment.comment.length < 1 || disabledText"
                 >
                   <v-icon name="paper-plane" />
@@ -316,11 +343,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
 
 export default {
   name: 'CommentsAndNotifications',
   components: { AddUser },
+  mixins: [CurrentUser],
   props: {
     scope: {
       type: String,
@@ -466,7 +495,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-
-</style>

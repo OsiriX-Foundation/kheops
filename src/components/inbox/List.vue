@@ -144,7 +144,7 @@
         :sort-desc="true"
         :no-local-sorting="true"
         :no-sort-reset="true"
-        :tbody-class="'table-wrapper-scroll-y link'"
+        :tbody-class="'link'"
         @sort-changed="sortingChanged"
         @row-hovered="setItemHover"
         @row-unhovered="setItemUnhover"
@@ -168,12 +168,33 @@
             v-if="showFilters"
             @click.stop=""
           >
-            <input
-              v-model="filters.PatientName"
-              type="search"
-              class="form-control form-control-sm"
-              :placeholder="$t('filter')"
-            > <br>
+            <div class="d-flex">
+              <div class="flex-fill">
+                <input
+                  v-model="filters.PatientName"
+                  type="search"
+                  class="form-control form-control-sm"
+                  :placeholder="$t('filter')"
+                >
+              </div>
+              <span>
+                <select
+                  v-model="filters.ModalitiesInStudy"
+                  class="form-control form-control-sm d-block d-sm-none"
+                  :placeholder="$t('filter')"
+                >
+                  <option value="" />
+                  <option
+                    v-for="modality in modalities"
+                    :key="modality.id"
+                    :value="modality"
+                  >
+                    {{ modality }}
+                  </option>
+                </select>
+              </span>
+            </div>
+            <br>
           </div>
           <sort-list
             :sort-desc="studiesParams.sortDesc"
@@ -282,7 +303,7 @@
           >
             <select
               v-model="filters.ModalitiesInStudy"
-              class="form-control form-control-sm"
+              class="form-control form-control-sm display-inline"
             >
               <option value="" />
               <option
@@ -336,11 +357,13 @@
           >
             <div class="">
               {{ row.value["Alphabetic"] }} {{ row.value["Ideographic"] }}
+              <span
+                class="d-block d-sm-none"
+              >
+                {{ row.item.ModalitiesInStudy !== undefined ? row.item.ModalitiesInStudy.Value.join(', ') : '' }}
+              </span>
             </div>
             <div :class="mobiledetect===true ? '' : 'ml-auto'">
-              <!--
-        :show-favorite-icon="permissions.add_series"
-      -->
               <list-icons
                 :study="row.item"
                 :mobiledetect="mobiledetect"
@@ -349,6 +372,7 @@
                 :show-download-icon="permissions.download_series"
                 :show-import-icon="permissions.add_series"
                 :show-report-provider-icon="source.key === 'album' ? true : false"
+                :show-weasis-icon="!mobiledetect"
                 :album-id="source.key === 'album' ? source.value : ''"
                 :source="source"
               >
@@ -376,7 +400,9 @@
           slot="row-details"
           slot-scope="row"
         >
-          <b-card>
+          <b-card
+            class="pointer-default"
+          >
             <list-item-details
               :study-u-i-d="row.item.StudyInstanceUID.Value[0]"
               :album-id="albumID"
@@ -476,7 +502,7 @@ export default {
           key: 'is_selected',
           label: '',
           sortable: false,
-          class: ['td_checkbox', 'breakword'],
+          class: ['td_checkbox_inbox', 'word-break'],
           thStyle: {
             width: '100px',
           },
@@ -484,7 +510,8 @@ export default {
         PatientName: {
           label: this.$t('PatientName'),
           sortable: true,
-          tdClass: 'breakwork',
+          thClass: 'pointer',
+          tdClass: 'word-break',
           formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
               return value.Value[0];
@@ -498,8 +525,9 @@ export default {
         PatientID: {
           label: this.$t('PatientID'),
           sortable: true,
-          tdClass: 'breakwork',
-          class: 'breakword d-none d-md-table-cell d-lg-table-cell',
+          thClass: 'pointer',
+          tdClass: 'word-break',
+          class: 'word-break d-none d-md-table-cell d-lg-table-cell',
           formatter: (value) => value.Value[0],
           thStyle: {
             width: '250px',
@@ -508,8 +536,8 @@ export default {
         StudyDescription: {
           label: this.$t('StudyDescription'),
           sortable: false,
-          tdClass: 'breakwork',
-          class: 'breakword d-none d-lg-table-cell',
+          tdClass: 'word-break',
+          class: 'word-break d-none d-lg-table-cell',
           formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
               return value.Value[0];
@@ -523,8 +551,9 @@ export default {
         StudyDate: {
           label: this.$t('StudyDate'),
           sortable: true,
-          tdClass: 'breakwork',
-          class: 'breakword d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
+          thClass: 'pointer',
+          tdClass: 'word-break',
+          class: 'word-break d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
           formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
               return value.Value[0];
@@ -538,8 +567,8 @@ export default {
         ModalitiesInStudy: {
           label: this.$t('Modality'),
           sortable: false,
-          tdClass: 'breakwork',
-          class: 'breakword d-none d-sm-table-cell',
+          tdClass: 'word-break',
+          class: 'word-break d-none d-sm-table-cell',
           formatter: (value) => value.Value.join(', '),
           thStyle: {
             width: '150px',
@@ -854,119 +883,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-  select{
-    display: inline !important;
-  }
-  .iconsHover{
-    visibility: visible;
-    display: inline;
-    cursor: pointer;
-  }
-  .iconsUnhover{
-    visibility: hidden;
-    display: inline;
-    cursor: pointer;
-  }
-  .btn-link {
-    font-weight: 400;
-    color: white;
-    background-color: transparent;
-  }
-
-  .btn-link:hover {
-    color: #c7d1db;
-    text-decoration: underline;
-    background-color: transparent;
-    border-color: transparent;
-  }
-
-  .patientNameContainer{
-    position: relative;
-    white-space: nowrap;
-  }
-
-  .patientNameIcons{
-    visibility:hidden;
-    display: inline;
-    cursor: pointer;
-  }
-  @media (max-width:1024px) {
-    .patientNameIcons {
-      visibility: visible;
-      display: inline-block;
-    }
-  }
-  .patientName:hover .patientNameIcons {
-    visibility:visible;
-  }
-
-  .patientNameIcons > span.selected{
-    visibility:visible !important;
-  }
-
-  .patientNameIcons span{
-    margin: 0 3px;
-  }
-
-  .selection-button-container{
-    height: 60px;
-  }
-
-  .td_checkbox {
-    width: auto;
-  }
-
-  input.search-calendar{
-    width: 100px !important;
-  }
-
-  div.wrapper-class{
-    color: #333;
-  }
-
-  div.calendar-class{
-    color: #333;
-  }
-
-  a{
-    cursor: pointer;
-  }
-
-  a.download{
-    color: #FFF;
-  }
-
-  a.download:hover{
-    color: #fd7e14;
-  }
-  .inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
-  .sticky {
-    position: fixed;
-    top: 70px;
-    width: 100%;
-    background: #555;
-    z-index: 5;
-    opacity: 0.95;
-  }
-  .sticky + .content {
-    padding-top: 70px;
-  }
-  .table-wrapper-scroll-y {
-    width: 5px;
-    height: 5px;
-    overflow: scroll;
-    display: block;
-  }
-  .breakword {
-    word-break: break-word;
-  }
-</style>

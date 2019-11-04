@@ -7,7 +7,7 @@
     "addUser": "Invite a user",
     "addSeries": "Add studies / series",
     "downloadSeries": "Show download button",
-    "sendSeries": "Send to user / album",
+    "sendSeries": "Sharing",
     "deleteSeries": "Remove studies / series",
     "writeComments": "Write comments",
     "create": "Create",
@@ -21,8 +21,8 @@
     "users": "Utilisateurs",
     "addUser": "Inviter un utilisateur",
     "addSeries": "Ajouter une étude / série",
-    "downloadSeries": "Télécharger une étude / série",
-    "sendSeries": "Ajouter à un album / inbox",
+    "downloadSeries": "Montrer le bouton de téléchargement",
+    "sendSeries": "Partager",
     "deleteSeries": "Supprimer une étude / série",
     "writeComments": "Commenter",
     "create": "Créer",
@@ -35,14 +35,16 @@
 
 <template>
   <div class="container">
-    <h3>
+    <h3
+      class="newalbum-title"
+    >
       {{ displayName }}
     </h3>
     <form @submit.prevent="createAlbum">
       <fieldset>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt class="d-none d-sm-block">
+            <dt class="d-none d-sm-block edit-title">
               {{ $t('albumName') }}
             </dt>
             <b class="d-block d-sm-none">{{ $t('albumName') }}</b>
@@ -61,7 +63,7 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt class="d-none d-sm-block">
+            <dt class="d-none d-sm-block edit-title">
               {{ $t('albumDescription') }}
             </dt>
             <b class="d-block d-sm-none">{{ $t('albumDescription') }}</b>
@@ -80,7 +82,7 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
-            <dt class="d-none d-sm-block">
+            <dt class="d-none d-sm-block edit-title">
               {{ $t('users') }}
             </dt>
             <b class="d-block d-sm-none">{{ $t('users') }}</b>
@@ -89,7 +91,7 @@
             <dd>
               <h5
                 v-if="album.users.length > 0"
-                class="user"
+                class="newalbum-user"
               >
                 <span
                   v-for="user in album.users"
@@ -98,14 +100,16 @@
                 >
                   {{ user.email }}
                   <span
-                    class="icon pointer"
+                    class="pointer"
                     @click="deleteUser(user)"
                   >
                     <v-icon name="times" />
                   </span>
                 </span>
               </h5>
-              <h5 class="user">
+              <h5
+                class="newalbum-user"
+              >
                 <div class="input-group mb-3">
                   <input
                     v-model="newUserName"
@@ -133,25 +137,55 @@
         </div>
       </fieldset>
 
-      <fieldset class="user_settings">
-        <legend>{{ $t('usersettings') }}</legend>
-        <div
-          v-for="(value,label) in album.userSettings"
-          :key="label"
-          class="row form-group"
-          :class="(label==='sendSeries')?'offset-1':''"
-        >
-          <div>
-            <toggle-button
-              v-model="album.userSettings[label]"
-              :labels="{checked: 'Yes', unchecked: 'No'}"
-              :disabled="(!album.userSettings.downloadSeries && label=='sendSeries')"
-              :sync="true"
-            />
+      <div class="card user-settings">
+        <div class="container mb-3">
+          <div
+            class="bg-primary row"
+          >
+            <div class="col-xl-1" />
+            <div class="col-xl-11">
+              <h4
+                class="mt-3 mb-3 ml-2"
+              >
+                {{ $t('usersettings') }}
+              </h4>
+            </div>
           </div>
-          <label>{{ $t(label) }}</label>
+          <div
+            class="row toggle-padding mt-3"
+          >
+            <div class="col-xl-1" />
+            <div
+              v-for="(value, idx) in numberCol"
+              :key="idx"
+              class="col-md-12 col-lg-6 col-xl-5"
+            >
+              <span
+                v-for="(value,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*value)"
+                :key="idy"
+              >
+                <div
+                  class="mt-2"
+                  :class="(value[0]=='sendSeries')?'offset-1':''"
+                >
+                  <toggle-button
+                    v-model="album.userSettings[value[0]]"
+                    :disabled="(!album.userSettings.downloadSeries && value[0]=='sendSeries')"
+                    :color="{checked: '#5fc04c', unchecked: 'grey'}"
+                    :sync="true"
+                  />
+                  <label
+                    class="user-settings ml-2 mt-2 word-break"
+                  >
+                    {{ $t(value[0]) }}
+                  </label>
+                </div>
+              </span>
+            </div>
+          </div>
         </div>
-      </fieldset>
+      </div>
+
       <fieldset>
         <div class="row">
           <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
@@ -218,11 +252,15 @@ export default {
         },
       },
       newUserName: '',
+      numberCol: 2,
     };
   },
   computed: {
     displayName() {
       return (!this.album.album_id) ? this.$t('newalbum') : this.album.name;
+    },
+    userSettingsLength() {
+      return Object.keys(this.album.userSettings).length;
     },
   },
   watch: {
@@ -329,37 +367,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-h3 {
-  margin-bottom: 40px;
-}
-
-h5.user{
-  float: left;
-  margin-right: 10px;
-}
-
-.icon{
-  margin-left: 10px;
-}
-.pointer{
-  cursor: pointer;
-}
-label{
-  margin-left: 10px;
-}
-fieldset.user_settings {
-  border: 1px solid #333;
-  padding: 20px;
-  background-color: #303030 ;
-}
-
-fieldset.user_settings legend{
-  padding: 0 20px;
-  width: auto;
-}
-dt{
-  text-align: right;
-}
-</style>

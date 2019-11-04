@@ -5,7 +5,7 @@
     "add_user": "Invite a user",
     "add_series": "Add Studies / Series",
     "download_series": "Show Download Button",
-    "send_series": "Add to album / inbox",
+    "send_series": "Sharing",
     "delete_series": "Remove Studies / Series",
     "write_comments": "Write Comments",
     "albumuseraddsuccess": "User successfully added to the album",
@@ -21,7 +21,7 @@
     "add_user": "Inviter un utilisateur",
     "add_series": "Ajouter une étude / série",
     "download_series": "Montrer le bouton de téléchargement",
-    "send_series": "Ajouter à un album / inbox",
+    "send_series": "Partager",
     "delete_series": "Supprimer une étude / série",
     "write_comments": "Commenter",
     "albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
@@ -39,8 +39,7 @@
   <div class="container">
     <h3
       v-if="!form_add_user"
-      class="pointer d-sm-inline-flex"
-      style="width: 100%"
+      class="d-sm-inline-flex full-width"
     >
       <div
         class="mr-auto"
@@ -105,39 +104,64 @@
       :show-change-role="true"
     />
 
-    <fieldset class="user_settings">
-      <legend>{{ $t('usersettings') }}</legend>
-      <div
-        v-for="(label,idx) in userSettings"
-        :key="idx"
-        class="row form-group"
-        :class="(label=='send_series')?'offset-1':''"
-      >
-        <div>
-          <toggle-button
-            v-if="album.is_admin"
-            :value="album[label]"
-            :labels="{checked: 'Yes', unchecked: 'No'}"
-            :disabled="(!album.download_series && label=='send_series')"
-            :sync="true"
-            @change="patchAlbum(label)"
-          />
-          <v-icon
-            v-if="!album.is_admin && !album[label]"
-            name="ban"
-            class="text-danger"
-          />
-          <v-icon
-            v-if="!album.is_admin && album[label]"
-            name="check-circle"
-            class="text-success"
-          />
+    <div class="card user-settings">
+      <div class="container mb-3">
+        <div
+          class="bg-primary row"
+        >
+          <div class="col-xl-1" />
+          <div class="col-xl-11">
+            <h4
+              class="mt-3 mb-3 ml-2"
+            >
+              {{ $t('usersettings') }}
+            </h4>
+          </div>
         </div>
-        <label class="ml-2">
-          {{ $t(label) }}
-        </label>
+        <div
+          class="row toggle-padding mt-3"
+        >
+          <div class="col-xl-1" />
+          <div
+            v-for="(value, idx) in numberCol"
+            :key="idx"
+            class="col-md-12 col-lg-6 col-xl-5"
+          >
+            <span
+              v-for="(label,idy) in userSettings.slice((userSettings.length/2)*(idx), (userSettings.length/2)*value)"
+              :key="idy"
+            >
+              <div
+                class="mt-2"
+                :class="(label=='send_series')?'offset-1':''"
+              >
+                <toggle-button
+                  v-if="album.is_admin"
+                  :value="album[label]"
+                  :disabled="(!album.download_series && label=='send_series')"
+                  :sync="true"
+                  :color="{checked: '#5fc04c', unchecked: 'grey'}"
+                  @change="patchAlbum(label)"
+                />
+                <v-icon
+                  v-if="!album.is_admin && !album[label]"
+                  name="ban"
+                  class="text-danger"
+                />
+                <v-icon
+                  v-if="!album.is_admin && album[label]"
+                  name="check-circle"
+                  class="text-success"
+                />
+                <label class="ml-2 mt-2 word-break">
+                  {{ $t(label) }}
+                </label>
+              </div>
+            </span>
+          </div>
+        </div>
       </div>
-    </fieldset>
+    </div>
   </div>
 </template>
 
@@ -175,6 +199,7 @@ export default {
         send_series: 'sendSeries',
         write_comments: 'writeComments',
       },
+      numberCol: 2,
     };
   },
   computed: {
@@ -230,20 +255,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-input::placeholder {
-  text-transform: lowercase;
-}
-fieldset.user_settings {
-  border: 1px solid #333;
-  padding: 20px;
-  background-color: #303030 ;
-}
-
-fieldset.user_settings legend{
-  padding: 0 20px;
-  width: auto;
-
-}
-</style>

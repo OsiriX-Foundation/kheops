@@ -81,26 +81,3 @@ export default {
   },
 };
 </script>
-
-<style>
-
-.pointer{
-  cursor:pointer;
-}
-.ban{
-  cursor:not-allowed;
-}
-
-.uppercase{
-  text-transform:uppercase;
-}
-
-a.navbar-brand {
-  color: #CCC;
-  font-size: 11pt;
-}
-body {
-  overflow-y: scroll;
-}
-</style>
-

@@ -6,15 +6,15 @@
       variant="link"
       no-caret
       right
+      toggle-class="kheopsicon"
       @shown="setShow(true)"
       @hidden="setShow(false)"
-      toggle-class="kheopsicon"
     >
       <template slot="button-content">
         <v-icon
-          class="align-middle kheopsicon"
-          style="margin-right:1; color: white"
+          class="align-middle kheopsicon icon-margin"
           name="build"
+          color="white"
         />
       </template>
       <b-dropdown-form
@@ -47,9 +47,8 @@
         />
         <button
           v-if="checkProviderModalities(study, provider)"
-          style="cursor: pointer"
           type="submit"
-          class="dropdown-item"
+          class="dropdown-item pointer"
         >
           {{ provider.name }}
         </button>

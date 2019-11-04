@@ -81,20 +81,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.selection-button-container{
-height: 60px;
-}
-.toggle-label{
-vertical-align: top;
-}
-dt{
-text-align: right;
-}
-
-tr:hover {
-visibility: visible;
-}
-
-</style>

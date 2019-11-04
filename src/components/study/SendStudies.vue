@@ -92,12 +92,11 @@
             {{ $t("titleBoxDicomize") }}
           </span>
         </div>
+        <!--
         <div
           class="ml-auto p-1"
         >
-          <!--
             Reduce / Show icon
-          -->
           <button
             type="button"
             class="btn btn-link btn-sm"
@@ -121,11 +120,12 @@
             </span>
           </button>
         </div>
+        -->
         <!--
             Close icon
           -->
         <div
-          class="p-1"
+          class="ml-auto p-1"
         >
           <button
             type="button"
@@ -167,7 +167,7 @@
               :max="totalSize"
               show-progress
               animated
-              style="text-align:center"
+              class="text-center"
             >
               {{ countSentFiles }} / {{ totalSize }}
             </b-progress-bar>
@@ -176,8 +176,7 @@
             >
               <button
                 type="button"
-                class="btn btn-link btn-sm text-center"
-                style="color: red"
+                class="btn btn-link btn-sm text-center text-warning"
                 @click="setCancel()"
               >
                 <span>
@@ -209,7 +208,7 @@
           class="row"
         >
           <div
-            class="col-12 mt-2 mb-2"
+            class="col-11 mt-2 mb-2 ml-3"
           >
             {{ $tc("filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
             {{ $tc("locationSend", sourceIsAlbum ? 0 : 1) }}
@@ -239,7 +238,9 @@
                 :key="item.key"
               >
                 {{ $tc("unknownError", item, {count: item }) }} <br>
-                <span style="color: red">
+                <span
+                  class="text-warning"
+                >
                   {{ errorValues[key] }}
                 </span>
               </div>
@@ -248,11 +249,9 @@
             <div
               v-if="error.length > 0"
             >
-              {{ $tc("filesErrors", error.length, {count: error.length}) }}
-              <button
-                type="button"
-                class="btn btn-link btn-sm text-center"
-                style="color: red"
+              {{ $tc("filesErrors", error.length, {count: error.length}) }} <br>
+              <a
+                class="text-center text-warning"
                 @click="UI.showErrors=!UI.showErrors"
               >
                 <span v-if="!UI.showErrors">
@@ -266,7 +265,7 @@
                   :width="UI.SVGwidth"
                   color="red"
                 />
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -641,21 +640,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-  .chat-popup {
-    position: fixed;
-    background: #303030;
-    bottom: 0;
-    right: 15px;
-    border: 3px solid #f1f1f1;
-    z-index: 9;
-    max-width: 300px;
-    opacity: 1;
-    display: block;
-  }
-  .closeBtn {
-    position: relative;
-    border-bottom: 1px solid #f1f1f1;
-  }
-</style>

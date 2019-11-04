@@ -15,7 +15,8 @@
     "scope": "scope",
     "create date": "create date",
     "last used": "last used",
-    "permission": "permission"
+    "permission": "permission",
+    "notokens": "There are no tokens to show"
   },
   "fr": {
     "newtoken": "Nouveau token",
@@ -32,26 +33,24 @@
     "scope": "application",
     "create date": "créé le",
     "last used": "dern. utilisation",
-    "permission": "permission"
+    "permission": "permission",
+    "notokens": "Aucun token créé"
   }
 }
 </i18n>
 <template>
   <div>
-    <h4>
-      <span
-        class="link"
-        @click="clickNew()"
-      >
-        <v-icon
-          name="plus"
-          scale="1"
-          class="mr-3"
-        />
-        {{ $t('newtoken') }}
-      </span>
-    </h4>
-    <div class="d-flex flex-row">
+    <button
+      class="btn btn-secondary my-3"
+      @click="clickNew()"
+    >
+      <v-icon
+        name="plus"
+        class="mr-2"
+      />
+      {{ $t('newtoken') }}
+    </button>
+    <div class="d-flex align-content-around flex-wrap">
       <div class="mt-2">
         <h4>
           Tokens
@@ -60,7 +59,7 @@
       <div class="mt-2 ml-auto">
         <toggle-button
           v-model="showInvalid"
-          :labels="{checked: 'Yes', unchecked: 'No'}"
+          :color="{checked: '#5fc04c', unchecked: 'grey'}"
           @change="toggleValid"
         />
         <span class="ml-2 toggle-label">
@@ -68,12 +67,12 @@
         </span>
       </div>
     </div>
-
     <b-table
       v-if="loadingData === false"
       stacked="sm"
       striped
       hover
+      show-empty
       :items="tokens"
       :fields="fields"
       :sort-desc="true"
@@ -190,6 +189,20 @@
           {{ $t('revoked') }}
         </span>
       </template>
+      <template v-slot:empty="scope">
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('notokens') }}
+        </div>
+      </template>
+      <template v-slot:emptyfiltered="scope">
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('notokens') }}
+        </div>
+      </template>
     </b-table>
   </div>
 </template>
@@ -228,12 +241,14 @@ export default {
           key: 'title',
           label: this.$t('description'),
           sortable: true,
+          tdClass: 'word-break',
         },
         {
           key: 'scope_type',
           label: this.$t('scope'),
           sortable: true,
           class: this.scope === 'album' ? 'd-none' : 'd-none d-sm-table-cell',
+          tdClass: 'word-break',
         },
         {
           key: 'expiration_time',
@@ -251,7 +266,7 @@ export default {
           key: 'last_used',
           label: this.$t('last used'),
           sortable: true,
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'permission',
@@ -303,7 +318,7 @@ export default {
     },
     toggleValid() {
       this.getTokens();
-      this.$store.commit('setValidParamToken', !this.showInvalid);
+      this.$store.dispatch('setValidParamToken', !this.showInvalid);
     },
     getTokens() {
       if (this.scope === 'album' && this.albumid) {
