@@ -11,8 +11,8 @@
     version="1.1"
     inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
     xml:space="preserve"
-    width="32"
-    height="32"
+    :width="width"
+    :height="height"
     viewBox="0 0 32 32"
     sodipodi:docname="logo-button.svg"
     inkscape:export-filename="/home/nicolas/Data/Data/Projects/Weasis/Design and Graphics/Logo/logo-button-512.png"
@@ -59,9 +59,9 @@
       </clipPath>
     </defs>
     <sodipodi:namedview
-      pagecolor="#ffffff"
-      bordercolor="#666666"
       id="namedview4"
+      pagecolor="#003866"
+      bordercolor="#666666"
       borderopacity="1"
       objecttolerance="10"
       gridtolerance="10"
@@ -86,75 +86,78 @@
       inkscape:groupmode="layer"
       inkscape:label="logo-button"
       transform="matrix(1.25,0,0,-1.25,-144.82125,170.56875)"
+      @mouseover="hover = true;"
+      @mouseout="hover = false;"
     >
       <g
         id="g12"
-        style="fill:#000000"
+        style="fill:#ffffff"
         transform="matrix(0.43056445,0,0,0.43056445,65.627046,62.915596)"
       >
         <g
           id="g14"
           clip-path="url(#clipPath16)"
-          style="fill:#000000"
+          style="fill:#ffffff"
         >
           <g
             id="g20"
             transform="translate(120.6064,141.0825)"
-            style="fill:#000000"
+            style="fill:#ffffff"
           >
             <path
               id="path22"
               d="M 0,0 C 0,13.939 11.296,25.238 25.227,25.238 39.158,25.238 50.454,13.939 50.454,0 50.454,-13.938 39.158,-25.237 25.227,-25.237 11.296,-25.237 0,-13.938 0,0"
-              style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+              inkscape:connector-curvature="0"
+              style="fill-opacity:1;fill-rule:nonzero;stroke:none"
+              :style="hover ? 'fill: #fca638' : 'fill: #ffffff'"
+            />
+          </g>
+        </g>
+      </g>
+      <g
+        id="g24"
+        transform="matrix(0.43056445,0,0,0.43056445,128.74719,117.76654)"
+      >
+        <path
+          id="path26"
+          d="m 0,0 8.326,16.613 -16.648,0 L 0,0 Z"
+          style="fill:#003866;fill-opacity:1;fill-rule:nonzero;stroke:none"
+          inkscape:connector-curvature="0"
+        />
+      </g>
+      <g
+        id="g28"
+        transform="matrix(0.43056445,0,0,0.43056445,65.627046,62.915596)"
+      >
+        <g
+          id="g30"
+          clip-path="url(#clipPath32)"
+        >
+          <g
+            id="g36"
+            transform="translate(146.4863,137.6294)"
+          >
+            <path
+              id="path38"
+              d="M 0,0 C 1.285,0 2.336,1.074 2.336,2.389 2.336,3.695 1.312,4.725 0,4.725 -1.313,4.725 -2.395,3.674 -2.395,2.389 -2.395,1.074 -1.313,0 0,0"
+              style="fill:#003866;fill-opacity:1;fill-rule:nonzero;stroke:none"
+              inkscape:connector-curvature="0"
+            />
+          </g>
+          <g
+            id="g40"
+            transform="translate(130.7539,151.9614)"
+          >
+            <path
+              id="path42"
+              d="m 0,0 14.255,-28.514 c 0.283,-0.557 0.852,-0.908 1.476,-0.908 0.623,0 1.194,0.351 1.482,0.908 L 31.468,0 c 0.25,0.51 0.219,1.113 -0.08,1.602 -0.299,0.482 -0.825,0.783 -1.403,0.783 l -0.509,0 c -0.623,0 -1.202,-0.354 -1.477,-0.91 L 15.731,-23.014 3.464,1.475 c -0.276,0.556 -0.843,0.91 -1.47,0.91 l -0.515,0 C 0.905,2.385 0.376,2.084 0.079,1.602 -0.222,1.113 -0.247,0.51 0,0"
+              style="fill:#003866;fill-opacity:1;fill-rule:nonzero;stroke:none"
               inkscape:connector-curvature="0"
             />
           </g>
         </g>
       </g>
-    <g
-      id="g24"
-      transform="matrix(0.43056445,0,0,0.43056445,128.74719,117.76654)"
-    >
-      <path
-        id="path26"
-        d="m 0,0 8.326,16.613 -16.648,0 L 0,0 Z"
-        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-        inkscape:connector-curvature="0"
-      />
     </g>
-    <g
-      id="g28"
-      transform="matrix(0.43056445,0,0,0.43056445,65.627046,62.915596)"
-    >
-      <g
-        id="g30"
-        clip-path="url(#clipPath32)"
-      >
-        <g
-          id="g36"
-          transform="translate(146.4863,137.6294)"
-        >
-          <path
-            id="path38"
-            d="M 0,0 C 1.285,0 2.336,1.074 2.336,2.389 2.336,3.695 1.312,4.725 0,4.725 -1.313,4.725 -2.395,3.674 -2.395,2.389 -2.395,1.074 -1.313,0 0,0"
-            style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-            inkscape:connector-curvature="0"
-          />
-        </g>
-        <g
-          id="g40"
-          transform="translate(130.7539,151.9614)"
-        >
-          <path
-            id="path42"
-            d="m 0,0 14.255,-28.514 c 0.283,-0.557 0.852,-0.908 1.476,-0.908 0.623,0 1.194,0.351 1.482,0.908 L 31.468,0 c 0.25,0.51 0.219,1.113 -0.08,1.602 -0.299,0.482 -0.825,0.783 -1.403,0.783 l -0.509,0 c -0.623,0 -1.202,-0.354 -1.477,-0.91 L 15.731,-23.014 3.464,1.475 c -0.276,0.556 -0.843,0.91 -1.47,0.91 l -0.515,0 C 0.905,2.385 0.376,2.084 0.079,1.602 -0.222,1.113 -0.247,0.51 0,0"
-            style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-            inkscape:connector-curvature="0"
-          />
-      </g>
-    </g>
-  </g>
-  </g>
   </svg>
 </template>
 
@@ -166,13 +169,18 @@ export default {
     width: {
       type: String,
       required: false,
-      default: '0px',
+      default: '32',
     },
     height: {
       type: String,
       required: false,
-      default: '0px',
+      default: '32',
     },
+  },
+  data() {
+    return {
+      hover: false,
+    };
   },
 };
 </script>

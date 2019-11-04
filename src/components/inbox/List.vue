@@ -360,7 +360,7 @@
               <span
                 class="d-block d-sm-none"
               >
-                {{row.item.ModalitiesInStudy !== undefined ? row.item.ModalitiesInStudy.Value.join(', ') : '' }}
+                {{ row.item.ModalitiesInStudy !== undefined ? row.item.ModalitiesInStudy.Value.join(', ') : '' }}
               </span>
             </div>
             <div :class="mobiledetect===true ? '' : 'ml-auto'">
@@ -372,6 +372,7 @@
                 :show-download-icon="permissions.download_series"
                 :show-import-icon="permissions.add_series"
                 :show-report-provider-icon="source.key === 'album' ? true : false"
+                :show-weasis-icon="!mobiledetect"
                 :album-id="source.key === 'album' ? source.value : ''"
                 :source="source"
               >

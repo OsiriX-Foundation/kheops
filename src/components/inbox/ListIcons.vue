@@ -57,7 +57,10 @@
         :title="$t('weasis')"
         @click.stop="openViewer('Weasis')"
       >
-        <weasis-icon />
+        <weasis-icon
+          width="24"
+          height="24"
+        />
       </span>
       <span
         v-if="showViewerIcon"
