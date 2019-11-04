@@ -151,8 +151,8 @@
             style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
             inkscape:connector-curvature="0"
           />
-        </g>
       </g>
+    </g>
   </g>
   </g>
   </svg>
