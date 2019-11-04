@@ -143,13 +143,11 @@ a.navbar-brand {
 	height: 100%;
 }
 .iconsHover{
-	visibility: visible;
 	display: inline;
 	cursor: pointer;
 	opacity: 1;
 }
 .iconsUnhover{
-	visibility: hidden;
 	display: inline;
 	cursor: pointer;
 	opacity: 0;

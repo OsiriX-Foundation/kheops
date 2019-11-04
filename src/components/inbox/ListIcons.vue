@@ -52,19 +52,15 @@
         />
       </span>
       <span
-        v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
+        v-if="showWeasisIcon"
         class="ml-1"
         :title="$t('weasis')"
         @click.stop="openViewer('Weasis')"
       >
         <weasis-icon />
-        <visibility-icon
-          width="24px"
-          height="24px"
-        />
       </span>
       <span
-        v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
+        v-if="showViewerIcon"
         class="ml-1"
         :title="$t('ohif')"
         @click.stop="openViewer('Ohif')"
@@ -177,6 +173,11 @@ export default {
       default: true,
     },
     showReportProviderIcon: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showWeasisIcon: {
       type: Boolean,
       required: false,
       default: true,
