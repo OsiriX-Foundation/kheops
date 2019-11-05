@@ -158,24 +158,6 @@
             <span>{{ $t("delete") }}</span>
           </button>
         </div>
-        <div
-          class="align-self-center"
-        >
-          <button
-            type="button"
-            class="btn btn-link btn-sm text-center"
-            :disabled="selectedStudiesNb === 0"
-            @click="openWeasis"
-          >
-            <span>
-              <visibility-icon
-                width="24px"
-                height="24px"
-              />
-            </span><br>
-            <span style="color: white">Weasis</span>
-          </button>
-        </div>
         <div class="ml-auto" />
         <div
           v-if="showImportButton === true"
@@ -406,20 +388,6 @@ export default {
   mounted() {
   },
   methods: {
-    openWeasis() {
-      let queryParams = ''
-      this.selectedStudies.forEach(study => {
-        queryParams += `studyUID=${encodeURIComponent(study.StudyInstanceUID.Value[0])}`
-      })
-      Object.keys(this.selectedSeries).forEach(studyUID => {
-        this.selectedSeries[studyUID].forEach(serie => {
-          queryParams += `seriesUID=${encodeURIComponent(serie.SeriesInstanceUID.Value[0])}`
-        })
-      })
-      console.log(queryParams)
-      // const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="${queryParams}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
-      // window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
-    },
     sendToUser(userSub) {
       if (this.selectedStudiesNb > 0) {
         const promises = [];
