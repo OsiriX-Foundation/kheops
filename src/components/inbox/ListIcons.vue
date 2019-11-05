@@ -287,13 +287,7 @@ export default {
       window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
     },
     openWeasis(StudyInstanceUID, token) {
-<<<<<<< HEAD
-      // --query-ext="&includedefaults=false"
-      const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
-      console.log(url)
-=======
       const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
->>>>>>> demo
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
