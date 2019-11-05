@@ -4,13 +4,15 @@
     "welcome": "Welcome",
     "lang": "lang",
     "tooltipHelp": "Help",
-    "tooltipLogout": "Logout"
+    "tooltipLogout": "Logout",
+    "tooltipLogin": "Login"
   },
   "fr": {
     "welcome": "Bienvenue",
     "lang": "lang",
     "tooltipHelp": "Aide",
-    "tooltipLogout": "Déconnexion"
+    "tooltipLogout": "Déconnexion",
+    "tooltipLogin": "Se connecter"
   }
 }
 </i18n>
@@ -57,15 +59,16 @@
           </b-nav-item>
           <b-nav-item
             v-else-if="logged === false"
-            class="active"
+            class="active pointer"
+            :title="$t('tooltipLogin')"
+            @click="login()"
           >
-            <a
-              :title="$t('tooltipLogout')"
-              class="pointer"
-              @click="login()"
+
+            <span
+              class="font-white"
             >
-              Login
-            </a>
+              {{ $t('tooltipLogin') }}
+            </span>
           </b-nav-item>
           <b-nav-item
             class="active pointer"
