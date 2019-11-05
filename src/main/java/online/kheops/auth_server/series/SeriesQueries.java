@@ -108,7 +108,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from Series s join s.study st where s.seriesInstanceUID = :SeriesInstanceUID and st.studyInstanceUID = :StudyInstanceUID", Series.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
