@@ -60,8 +60,25 @@
           class="p-2"
         >
           <done-icon
+            v-if="error.length === 0"
             :height="'20'"
             :width="'20'"
+          />
+          <span
+            v-if="error.length > 0 && error.length < totalSize"
+          >
+            <v-icon
+              name="warning"
+              :height="'20'"
+              :width="'20'"
+              color="red"
+            />
+          </span>
+          <error-icon
+            v-if="error.length === totalSize"
+            :height="'20'"
+            :width="'20'"
+            color="red"
           />
         </div>
         <div
