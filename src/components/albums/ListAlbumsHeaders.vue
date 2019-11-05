@@ -15,28 +15,25 @@
     class="d-flex"
   >
     <div
-      class="p-2"
+      class="p-3"
     >
-      <h3>
-        <router-link
-          to="albums/new"
-          active-class="active"
-          style="display: inline; color: white"
-        >
-          <v-icon
-            name="plus"
-            class="mr-2"
-          />{{ $t('newalbum') }}
-        </router-link>
-      </h3>
+      <button
+        class="btn btn-secondary ml-2"
+        @click="goNewAlbum"
+      >
+        <v-icon
+          name="plus"
+          class="mr-2"
+        />
+        {{ $t('newalbum') }}
+      </button>
     </div>
     <div
       class="p-2"
     >
       <button
         type="button"
-        class="btn btn-link btn-sm text-center"
-        style="display: inline; color: white"
+        class="btn btn-link btn-sm text-center inline-white"
         :disabled="disabledBtnShare"
         @click="inviteClick"
       >
@@ -55,7 +52,7 @@
     >
       <button
         type="button"
-        class=" btn btn-link btn-lg"
+        class=" btn btn-link btn-lg kheopsicon"
         @click="reloadAlbums()"
       >
         <v-icon
@@ -64,11 +61,12 @@
         />
       </button>
     </div>
-    <div>
+    <div
+      class="d-none d-sm-block align-self-center"
+    >
       <button
         type="button"
-        class="btn btn-link btn-lg"
-        style="display: inline; color: white"
+        class="btn btn-link btn-lg inline-white kheopsicon"
         @click="searchClick"
       >
         <v-icon
@@ -105,21 +103,10 @@ export default {
     reloadAlbums() {
       this.$emit('reloadAlbums');
     },
+    goNewAlbum() {
+      this.$router.push('/albums/new');
+    },
   },
 };
 
 </script>
-<style scoped>
-.btn-link {
-  font-weight: 400;
-  color: white;
-  background-color: transparent;
-}
-
-.btn-link:hover {
-  color: #c7d1db;
-  text-decoration: underline;
-  background-color: transparent;
-  border-color: transparent;
-}
-</style>

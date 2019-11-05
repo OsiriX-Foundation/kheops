@@ -88,8 +88,7 @@
           v-if="loadingSerie === false && errorSeries === true"
         >
           <div
-            class="d-flex flex-column justify-content-center align-items-center"
-            style="height: 100%;"
+            class="d-flex flex-column justify-content-center align-items-center full-height"
           >
             <div class="mb-3">
               {{ $t('errorSeries') }}
@@ -194,7 +193,7 @@ export default {
           this.errorSeries = false;
         }
       }).catch((err) => {
-        console.log(err)
+        console.log(err);
         this.loadingSerie = false;
         this.errorSeries = true;
       });
@@ -211,9 +210,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.nav a:hover:not(.active) {
-  opacity: 0.5;
-}
-</style>

@@ -54,7 +54,7 @@ Props :
             {{ user.user_name }}
             <span
               v-if="user.is_admin"
-              style="color:#13B98B"
+              class="font-neutral"
             >
               {{ $t("Admin") }}
             </span>
@@ -306,13 +306,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-div.user-table-container{
-  min-height: 200px;
-  padding: 25px 0;
-}
-a {
-  cursor: pointer;
-}
-</style>

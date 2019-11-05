@@ -18,6 +18,3 @@ export default {
   name: 'UserSettingsProvider',
 };
 </script>
-
-<style scoped>
-</style>

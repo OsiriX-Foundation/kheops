@@ -7,7 +7,8 @@
     "twitterEnable": "Twitter link enable",
     "twitterDisable": "No twitter link",
     "sharingEnable": "Sharing link enable",
-    "sharingDisable": "No sharing link"
+    "sharingDisable": "No sharing link",
+    "sharingTitle": "URL to share"
   },
   "fr": {
     "studies": "Etudes",
@@ -16,7 +17,8 @@
     "twitterEnable": "Lien twitter déjà actif",
     "twitterDisable": "Pas de lien twitter",
     "sharingEnable": "Lien de partage déjà actif",
-    "sharingDisable": "Pas de lien de partage"
+    "sharingDisable": "Pas de lien de partage",
+    "sharingTitle": "URL à partager"
   }
 }
 </i18n>
@@ -30,7 +32,9 @@
     >
       <div class="row">
         <div class="col-12 col-sm-12 col-md-12 col-lg-6">
-          <h3>
+          <h3
+            class="album-title word-break-all"
+          >
             <v-icon
               name="book"
               scale="2"
@@ -51,7 +55,7 @@
               v-if="album.is_admin === true"
               id="twitter-link"
               :text="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
-              style="cursor: pointer;"
+              class="pointer"
               @click.stop="toggleTwitter(album.album_id)"
             >
               <v-icon
@@ -113,8 +117,7 @@
           class="card"
         >
           <div
-            class="card-body"
-            style="max-height: 135px; overflow-y: auto"
+            class="card-body album-description"
           >
             <p
               v-for="line in album.description.split('\n')"
@@ -146,10 +149,16 @@
       :show="showRevokeTwitter"
       placement="auto"
     >
+      <template v-slot:title>
+        <pop-over-title
+          title="Twitter"
+          @cancel="showRevokeTwitter = false"
+        />
+      </template>
       <twitter-link
         :tokens="twitterToken"
-        @cancel="showRevokeTwitter = false"
         @revoke="revokeTwitterTokens"
+        @cancel="showRevokeTwitter = false"
       />
     </b-popover>
     <b-popover
@@ -158,6 +167,12 @@
       :show.sync="sharingTokenParams.show"
       placement="auto"
     >
+      <template v-slot:title>
+        <pop-over-title
+          :title="$t('sharingTitle')"
+          @cancel="cancelSharingToken"
+        />
+      </template>
       <sharing-link
         :album-id="albumID"
         :url="urlSharing"
@@ -176,13 +191,14 @@ import moment from 'moment';
 import AlbumComments from '@/components/albums/AlbumComments';
 import AlbumSettings from '@/components/albums/AlbumSettings';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
+import PopOverTitle from '@/components/socialmedia/PopOverTitle';
 import SharingLink from '@/components/socialmedia/SharingLink';
 import TwitterLink from '@/components/socialmedia/TwitterLink';
 
 export default {
   name: 'Album',
   components: {
-    ComponentImportStudy, AlbumSettings, AlbumComments, SharingLink, TwitterLink,
+    ComponentImportStudy, AlbumSettings, AlbumComments, PopOverTitle, SharingLink, TwitterLink,
   },
   data() {
     return {
@@ -357,31 +373,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-h3 {
-  margin-bottom: 40px;
-  float: left;
-}
-
-h5.user{
-  float: left;
-  margin-right: 10px;
-}
-
-.icon{
-  margin-left: 10px;
-}
-.pointer{
-  cursor: pointer;
-}
-label{
-  margin-left: 10px;
-}
-a.nav-link{
-  cursor: pointer;
-}
-.nav a:hover:not(.active) {
-  opacity: 0.5;
-}
-</style>

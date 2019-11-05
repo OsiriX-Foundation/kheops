@@ -146,12 +146,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-a.nav-link{
-  cursor: pointer;
-}
-.nav a:hover:not(.active) {
-  opacity: 0.5;
-}
-</style>

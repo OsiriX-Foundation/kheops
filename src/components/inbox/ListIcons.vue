@@ -1,3 +1,26 @@
+<i18n>
+{
+  "en": {
+    "download": "Download",
+    "osirix": "Open OsiriX",
+    "ohif": "Open OHIF",
+    "weasis": "Open Weasis",
+    "import": "Import data",
+    "comments": "Open comments",
+    "favorite": "Favorite"
+  },
+  "fr": {
+    "download": "Télécharger",
+    "osirix": "Ouvrir OsiriX",
+    "ohif": "Ouvrir OHIF",
+    "weasis": "Ouvrir Weasis",
+    "import": "Importer des données",
+    "comments": "Ouvrir les commentaires",
+    "favorite": "Favori"
+  }
+}
+
+</i18n>
 
 <template>
   <span>
@@ -12,14 +35,15 @@
         @click.stop="getURLDownload()"
       >
         <v-icon
-          class="align-middle"
-          style="margin-right:1"
+          class="align-middle icon-margin"
           name="download"
+          :title="$t('download')"
         />
       </a>
       <span
         v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i) && showViewerIcon"
         class="ml-1"
+        :title="$t('osirix')"
         @click.stop="openViewer('Osirix')"
       >
         <osirix-icon
@@ -28,9 +52,21 @@
         />
       </span>
       <span
-        v-if="study.ModalitiesInStudy[0] !== 'SR' && showViewerIcon"
+        v-if="showWeasisIcon"
         class="ml-1"
+        :title="$t('weasis')"
         @click.stop="openViewer('Weasis')"
+      >
+        <weasis-icon
+          width="24"
+          height="24"
+        />
+      </span>
+      <span
+        v-if="showViewerIcon"
+        class="ml-1"
+        :title="$t('ohif')"
+        @click.stop="openViewer('Ohif')"
       >
         <visibility-icon
           width="24px"
@@ -40,8 +76,8 @@
       <label
         v-if="showImportIcon"
         for="file"
-        style="cursor:pointer; display: inline;"
-        class="ml-1"
+        class="ml-1 pointer display-inline"
+        :title="$t('import')"
         @click="setStudyUID()"
       >
         <add-icon
@@ -62,10 +98,10 @@
       @click.stop="showComments(study, 'comments')"
     >
       <v-icon
-        class="align-middle"
-        style="margin-right:1"
+        class="align-middle icon-margin kheopsicon"
         name="comment-dots"
-        :color="study.flag.is_commented ? '' : 'grey'"
+        :class="study.flag.is_commented ? 'bg-neutral' : ''"
+        :title="$t('comments')"
       />
     </span>
     <span
@@ -75,10 +111,10 @@
       @click.stop="toggleFavorite()"
     >
       <v-icon
-        class="align-middle"
-        style="margin-right:1"
+        class="align-middle icon-margin kheopsicon"
         name="star"
-        :color="(!study.flag.is_favorite) ? 'grey' : ''"
+        :class="study.flag.is_favorite ? 'bg-neutral' : ''"
+        :title="$t('favorite')"
       />
     </span>
   </span>
@@ -86,6 +122,7 @@
 <script>
 import Vue from 'vue';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
+import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
 import { ViewerToken } from '@/mixins/tokens.js';
@@ -93,7 +130,9 @@ import { CurrentUser } from '../../mixins/currentuser.js';
 
 export default {
   name: 'ListIcons',
-  components: { OsirixIcon, VisibilityIcon, AddIcon },
+  components: {
+    OsirixIcon, VisibilityIcon, AddIcon, WeasisIcon,
+  },
   mixins: [ViewerToken, CurrentUser],
   props: {
     study: {
@@ -137,6 +176,11 @@ export default {
       default: true,
     },
     showReportProviderIcon: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showWeasisIcon: {
       type: Boolean,
       required: false,
       default: true,
@@ -224,7 +268,7 @@ export default {
       const sourceQuery = this.getSourceQueries();
       let ohifWindow;
       if (viewer === 'Ohif') {
-        ohifWindow = window.open('', 'OHIFViewer');
+        ohifWindow = window.open('', `OHIFViewer-${StudyInstanceUID}`);
       }
       this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
         if (viewer === 'Osirix') {
@@ -243,13 +287,17 @@ export default {
       window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
     },
     openWeasis(StudyInstanceUID, token) {
+<<<<<<< HEAD
       // --query-ext="&includedefaults=false"
       const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}" --accept-ext=""`;
       console.log(url)
+=======
+      const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
+>>>>>>> demo
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`
+      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
       return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
     },
     showComments(study, flagView) {
@@ -271,25 +319,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-  .iconsHover{
-    visibility: visible;
-    display: inline;
-    cursor: pointer;
-    opacity: 1;
-  }
-  .iconsUnhover{
-    visibility: hidden;
-    display: inline;
-    cursor: pointer;
-    opacity: 0;
-  }
-  a.download{
-    color: #FFF;
-  }
-
-  a.download:hover{
-    color: #fca638;
-  }
-</style>

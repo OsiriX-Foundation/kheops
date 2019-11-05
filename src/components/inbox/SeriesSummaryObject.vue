@@ -29,11 +29,13 @@
         >
           <span
             v-if="serie.SeriesDescription && serie.SeriesDescription.Value"
+            class="pointer"
           >
             {{ serie.SeriesDescription.Value[0] }}
           </span>
           <span
             v-else
+            class="pointer"
           >
             No description
           </span>
@@ -44,13 +46,12 @@
     <div class="row justify-content-center">
       <div class="mb-2 preview">
         <div
-          class="d-flex flex-row justify-content-center align-items-center"
-          style="height: 100%;"
+          class="d-flex flex-row justify-content-center align-items-center full-height"
         >
           <div class="p-2">
             <img
               v-if="!loadingImage"
-              :class="!serie.Modality.Value[0].includes('SR') ? 'cursor-img' : ''"
+              :class="!serie.Modality.Value[0].includes('SR') ? 'pointer' : ''"
               :src="serie.imgSrc"
               width="250"
               height="250"
@@ -64,7 +65,7 @@
         </div>
       </div>
       <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
-        <table class="table table-striped">
+        <table class="table table-striped-color-reverse table-nohover">
           <tbody>
             <tr v-if="serie.Modality && serie.Modality.Value !== undefined">
               <th>{{ $t('modality') }}</th>
@@ -243,18 +244,18 @@ export default {
       }
     },
     openViewer() {
-      const ohifWindow = window.open('', 'OHIFViewer');
+      const ohifWindow = window.open('', `OHIFViewer-${this.studyInstanceUID}`);
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
-        let sourceQueries = this.getSourceQueries()
-        let queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? '&'+sourceQueries : ''}`
-        const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata${queryparams}`
+        const sourceQueries = this.getSourceQueries();
+        const queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? `&${sourceQueries}` : ''}`;
+        const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata${queryparams}`;
         ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
       }).catch((err) => {
         console.log(err);
       });
     },
     openWADO(series, contentType) {
-      const wadoWindow = window.open('', 'WADO');
+      const wadoWindow = window.open('', `WADO-${this.seriesInstanceUID}`);
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
         const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
         wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`;
@@ -266,22 +267,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-div.preview{
-  width: 290px;
-  padding: 0 20px;
-  float: left;
-}
-div.seriesSummaryContainer{
-  font-size: 90%;
-  line-height: 1.5em;
-}
-label{
-  font-size: 130%;
-}
-.cursor-img{
-  cursor: pointer;
-}
-
-</style>
