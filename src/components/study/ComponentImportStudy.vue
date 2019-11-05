@@ -106,7 +106,7 @@ export default {
     return {
       dragAndDropCapable: false,
       hover: false,
-      excludeFiles: ['DICOMDIR'],
+      excludeFiles: ['DICOMDIR', '.DS_Store'],
       count: 0,
       counterDraging: 0,
       loading: false,
