@@ -85,11 +85,11 @@
             </tr>
             <tr v-if="serie.SeriesDate && serie.SeriesDate.Value !== undefined">
               <th>{{ $t('seriesdate') }}</th>
-              <td>{{ serie.SeriesDate.Value[0]|formatDate }}</td>
+              <td>{{ serie.SeriesDate.Value[0] | formatDate }}</td>
             </tr>
             <tr v-if="serie.SeriesTime && serie.SeriesTime.Value !== undefined">
               <th>{{ $t('seriestime') }}</th>
-              <td>{{ serie.SeriesTime.Value[0] }}</td>
+              <td>{{ serie.SeriesTime.Value[0] | setSeriesTime }}</td>
             </tr>
           </tbody>
         </table>

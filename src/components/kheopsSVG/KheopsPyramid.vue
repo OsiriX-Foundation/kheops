@@ -9,8 +9,8 @@
     xmlns="http://www.w3.org/2000/svg"
     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-    width="10.0245697mm"
-    height="6.1332766mm"
+    :width="width"
+    :height="height"
     viewBox="0 0 50.245697 31.332766"
     version="1.1"
     sodipodi:docname="dessin.svg"
@@ -98,6 +98,18 @@
 <script>
 
 export default {
-  name: 'KheopsIcon',
+  name: 'KheopsPyramid',
+  props: {
+    width: {
+      type: String,
+      required: false,
+      default: '12.2696mm',
+    },
+    height: {
+      type: String,
+      required: false,
+      default: '7.41195mm',
+    },
+  },
 };
 </script>

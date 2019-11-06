@@ -87,7 +87,7 @@
             </tr>
             <tr v-if="metadata.StudyTime.Value !== undefined && matchNumbers(metadata.StudyTime.Value[0])">
               <th>{{ $t('studytime') }}</th>
-              <td>{{ metadata.StudyTime.Value[0] }}</td>
+              <td>{{ metadata.StudyTime.Value[0] | setSeriesTime }}</td>
             </tr>
             <tr v-if="metadata.NumberOfStudyRelatedSeries.Value !== undefined && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
               <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>

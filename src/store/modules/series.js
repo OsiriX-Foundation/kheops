@@ -57,10 +57,11 @@ const actions = {
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
     if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
-      return dispatch('getSeriesMetadata', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
+      return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
+          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : ''
           return dispatch('setImageSrc', {
-            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data,
+            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality
           });
         }
         return res;
@@ -98,10 +99,11 @@ const actions = {
       videoPhotographicImageStorage: '1.2.840.10008.5.1.4.1.1.77.1.4.1',
       encapsulatedPDFStorage: '1.2.840.10008.5.1.4.1.1.104.1',
     };
+    const modality = params.modality.length > 0 ? params.modality : params.data[0][tagModality].Value[0];
     if (params.data[0][tagSOPClassUID] !== undefined) {
       serie.SOPClassUID = params.data[0][tagSOPClassUID];
     }
-    if (params.data[0][tagModality].Value[0].includes('SR')) {
+    if (modality.includes('SR')) {
       serie.imgSrc = SRImage;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID });
     } else if (params.data[0][tagSOPClassUID].Value[0] === SOPClassUID.videoPhotographicImageStorage) {
