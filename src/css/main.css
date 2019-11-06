@@ -128,6 +128,10 @@ a.navbar-brand {
 	color: #60b3c4 !important;
 }
 
+.fill-neutral{
+	fill: #60b3c4;
+}
+
 .font-white {
 	color: white !important;
 }
