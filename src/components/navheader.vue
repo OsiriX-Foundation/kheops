@@ -4,13 +4,15 @@
     "welcome": "Welcome",
     "lang": "lang",
     "tooltipHelp": "Help",
-    "tooltipLogout": "Logout"
+    "tooltipLogout": "Logout",
+    "tooltipLogin": "Login"
   },
   "fr": {
     "welcome": "Bienvenue",
     "lang": "lang",
     "tooltipHelp": "Aide",
-    "tooltipLogout": "Déconnexion"
+    "tooltipLogout": "Déconnexion",
+    "tooltipLogin": "Se connecter"
   }
 }
 </i18n>
@@ -28,12 +30,21 @@
   >
     <b-navbar-toggle target="nav_collapse" />
     <b-navbar-nav>
-      <kheops />
-      <span
-        class="kheops-title font-kheops"
-      >
-        KHEOPS
-      </span>
+      <div class="d-flex">
+        <div style="padding-right: 5px">
+          <kheops-pyramid
+              width="12.2696mm"
+              height="7.41195mm"
+          />
+        </div>
+        <div class="align-self-end">
+          <kheops-font
+            width="16.5968mm"
+            height="3.70944mm"
+          />
+        </div>
+      </div>
+      
     </b-navbar-nav>
     <b-collapse
       id="nav_collapse"
@@ -57,15 +68,16 @@
           </b-nav-item>
           <b-nav-item
             v-else-if="logged === false"
-            class="active"
+            class="active pointer"
+            :title="$t('tooltipLogin')"
+            @click="login()"
           >
-            <a
-              :title="$t('tooltipLogout')"
-              class="pointer"
-              @click="login()"
+
+            <span
+              class="font-white"
             >
-              Login
-            </a>
+              {{ $t('tooltipLogin') }}
+            </span>
           </b-nav-item>
           <b-nav-item
             class="active pointer"
@@ -122,11 +134,12 @@
 import Vue from 'vue';
 import store from '@/store';
 import { CurrentUser } from '@/mixins/currentuser.js';
-import Kheops from '@/components/kheopsSVG/Kheops.vue';
+import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
+import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
 
 export default {
   name: 'NavHeader',
-  components: { Kheops },
+  components: { KheopsPyramid, KheopsFont },
   mixins: [CurrentUser],
   props: {
     logged: {
