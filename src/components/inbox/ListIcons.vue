@@ -31,11 +31,10 @@
       <a
         v-if="showDownloadIcon"
         href="#"
-        class="kheopsicon"
         @click.stop="getURLDownload()"
       >
         <v-icon
-          class="align-middle icon-margin"
+          class="align-middle icon-margin kheopsicon"
           name="download"
           :title="$t('download')"
         />
