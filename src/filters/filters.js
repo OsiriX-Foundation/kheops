@@ -45,6 +45,14 @@ Vue.filter('maxTextLength', (value, maxlength) => {
 
 // http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#TM
 // The ACR-NEMA Standard 300 (predecessor to DICOM) supported a string of characters of the format HH:MM:SS.frac for this VR.
+
+function formatFract(fract) {
+  if (/^0+$/.test(fract) === true) {
+    return undefined;
+  }
+  return fract;
+}
+
 Vue.filter('setSeriesTime', (seriesTime) => {
   if (seriesTime !== undefined) {
     const [time, fract] = seriesTime.split('.');
@@ -55,7 +63,8 @@ Vue.filter('setSeriesTime', (seriesTime) => {
       && (time.length % 2) === 0
       && time.length <= 6
       && (fract === undefined || (fract.length === 6 && fractIsNum))) {
-      const addFract = fract !== undefined ? `.${fract}` : '';
+      const fmtFract = formatFract(fract)
+      const addFract = fmtFract !== undefined ? `.${fract}` : '';
       return `${time.match(/.{1,2}/g).join(':')}${addFract}`;
     }
   }
