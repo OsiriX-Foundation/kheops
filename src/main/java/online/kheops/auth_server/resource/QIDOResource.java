@@ -291,7 +291,7 @@ public class QIDOResource {
                             retrieveURL.append("/link/").append(kheopsPrincipal.getOriginalToken());
                         }
                         retrieveURL.append("/studies/");
-                        retrieveURL.append(series.getString(Tag.StudyInstanceUID));
+                        retrieveURL.append(studyInstanceUID);
                         retrieveURL.append("/series/");
                         retrieveURL.append(series.getString(Tag.SeriesInstanceUID));
                         series.setString(Tag.RetrieveURL, VR.UR, retrieveURL.toString());
