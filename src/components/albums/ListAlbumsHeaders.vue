@@ -71,7 +71,7 @@
       >
         <v-icon
           name="search"
-          scale="2"
+          scale="1.8"
         />
       </button>
     </div>
