@@ -287,7 +287,7 @@ export default {
       window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
     },
     openWeasis(StudyInstanceUID, token) {
-      const url = `$weasis:config pro="dicom.qido.query.multi.params true" $dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
+      const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
       window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
     },
     openOhif(StudyInstanceUID, token, queryparams) {
