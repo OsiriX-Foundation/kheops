@@ -99,9 +99,18 @@
                 name="user"
                 class="icon-margin-right"
               />
-              <span>
-                {{ currentuserEmail !== comment.origin.email ? `${comment.origin.first_name} ${comment.origin.last_name}` : $t('you') }}
+              <span
+                v-if="currentuserEmail === comment.origin.email"
+              >
+                {{ $t('you') }}
               </span>
+              <a
+                v-else
+                :title="comment.origin.email"
+                @click="clickPrivateUser(comment.origin.email)"
+              >
+                {{ `${comment.origin.first_name} ${comment.origin.last_name}` }}
+              </a>
               <span class="float-right">
                 {{ comment.post_date | formatDate }}
               </span>
@@ -285,6 +294,7 @@
       <div class="row mt-4 justify-content-center">
         <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
           <b-form-checkbox
+            v-model="statusMsgPrivate"
             class="pt-1"
             inline
             @change="SetEnabledVariables()"
@@ -376,6 +386,7 @@ export default {
       messageSend: false,
       enablePrivate: false,
       disabledText: false,
+      statusMsgPrivate: false,
     };
   },
   computed: {
@@ -408,9 +419,13 @@ export default {
         this.$refs.privateuser.checkUser();
       }
     },
+    clickPrivateUser(user) {
+      this.statusMsgPrivate = true
+      this.SetEnabledVariables()
+    },
     SetEnabledVariables() {
-      this.enablePrivate = !this.enablePrivate;
-      this.disabledText = !this.disabledText;
+      this.enablePrivate = !this.statusMsgPrivate;
+      this.disabledText = !this.statusMsgPrivate;
     },
     setPrivateUser(user) {
       if (user !== '') {
