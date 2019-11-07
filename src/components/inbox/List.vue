@@ -530,8 +530,9 @@ export default {
           class: 'word-break d-none d-md-table-cell d-lg-table-cell',
           formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
-              return value.Value[0]
+              return value.Value[0];
             }
+            return '';
           },
           thStyle: {
             width: '250px',
