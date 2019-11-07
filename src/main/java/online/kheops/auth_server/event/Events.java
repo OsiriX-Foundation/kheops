@@ -12,10 +12,12 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
@@ -119,11 +121,22 @@ public class Events {
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
+            final HashMap<String, Boolean> userMember = new HashMap<>();
+
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
+                if (!userMember.containsKey(e.getUser().getKeycloakId())) {
+                    userMember.put(e.getUser().getKeycloakId(), isMemberOfAlbum(e.getUser(), album, em));
+                }
                 if (e instanceof Comment) {
-                    eventResponses.add(new EventResponse((Comment)e));
+                    if (e.getPrivateTargetUser() != null && !userMember.containsKey(e.getPrivateTargetUser().getKeycloakId())) {
+                        userMember.put(e.getPrivateTargetUser().getKeycloakId(), isMemberOfAlbum(e.getPrivateTargetUser(), album, em));
+                    }
+                    eventResponses.add(new EventResponse((Comment)e, userMember));
                 } else if (e instanceof Mutation) {
-                    eventResponses.add(new EventResponse((Mutation) e));
+                    if (((Mutation) e).getToUser() != null && !userMember.containsKey(((Mutation) e).getToUser().getKeycloakId())) {
+                        userMember.put(((Mutation) e).getToUser().getKeycloakId(), isMemberOfAlbum(((Mutation) e).getToUser(), album, em));
+                    }
+                    eventResponses.add(new EventResponse((Mutation) e, userMember));
                 }
             }
 
@@ -144,9 +157,16 @@ public class Events {
 
         try {
             final Album album = getAlbum(albumId, em);
+            final HashMap<String, Boolean> userMember = new HashMap<>();
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                    eventResponses.add(new EventResponse(m));
+                if (!userMember.containsKey(m.getUser().getKeycloakId())) {
+                    userMember.put(m.getUser().getKeycloakId(), isMemberOfAlbum(m.getUser(), album, em));
+                }
+                if (m.getToUser() != null && !userMember.containsKey(m.getToUser().getKeycloakId())) {
+                    userMember.put(m.getToUser().getKeycloakId(), isMemberOfAlbum(m.getToUser(), album, em));
+                }
+                    eventResponses.add(new EventResponse(m, userMember));
             }
 
             XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
@@ -163,13 +183,20 @@ public class Events {
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
+        final HashMap<String, Boolean> userMember = new HashMap<>();
 
         try {
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(c));
+                if (!userMember.containsKey(c.getUser().getKeycloakId())) {
+                    userMember.put(c.getUser().getKeycloakId(), isMemberOfAlbum(c.getUser(), album, em));
+                }
+                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
+                    userMember.put(c.getPrivateTargetUser().getKeycloakId(), isMemberOfAlbum(c.getPrivateTargetUser(), album, em));
+                }
+                eventResponses.add(new EventResponse(c, userMember));
             }
             XTotalCount = EventQueries.getTotalCommentsByAlbum(callingUser, album, em);
         } finally {
@@ -178,18 +205,25 @@ public class Events {
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
 
-    public static PairListXTotalCount<EventResponse>  getCommentsByStudyUID(User callingUser, String studyInstanceUID, Integer offset, Integer limit) {
+    public static PairListXTotalCount<EventResponse> getCommentsByStudyUID(User callingUser, String studyInstanceUID, Integer offset, Integer limit) {
 
         final List<EventResponse> eventResponses = new ArrayList<>();
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
+        final HashMap<String, Boolean> userMember = new HashMap<>();
 
         try {
             callingUser = em.merge(callingUser);
 
             for (Comment c : EventQueries.getCommentsByStudy(callingUser, studyInstanceUID, offset, limit, em)) {
-                eventResponses.add(new EventResponse(c));
+                if (!userMember.containsKey(c.getUser().getKeycloakId())) {
+                    userMember.put(c.getUser().getKeycloakId(), canAccessStudy(c.getUser(), c.getStudy(), em));
+                }
+                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
+                    userMember.put(c.getPrivateTargetUser().getKeycloakId(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
+                }
+                eventResponses.add(new EventResponse(c, userMember));
             }
             XTotalCount = EventQueries.getTotalCommentsByStudy(callingUser, studyInstanceUID, em);
         } finally {

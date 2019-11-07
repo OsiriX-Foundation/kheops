@@ -7,6 +7,7 @@ import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 public class EventResponse {
 
@@ -71,25 +72,34 @@ public class EventResponse {
 
     private EventResponse() { /*empty*/ }
 
-    public EventResponse(Comment comment) {
+    public EventResponse(Comment comment, HashMap<String, Boolean> userMember) {
 
         eventType = "Comment";
-        origin = new UserResponseBuilder().setUser(comment.getUser()).build();
+        origin = new UserResponseBuilder()
+                .setUser(comment.getUser())
+                .setCanAccess(userMember.get(comment.getUser().getKeycloakId()))
+                .build();
         this.comment = comment.getComment();
         postDate = comment.getEventTime();
         if (comment.getPrivateTargetUser() != null) {
             privateComment = true;
-            target = new UserResponseBuilder().setUser(comment.getPrivateTargetUser()).build();
+            target = new UserResponseBuilder()
+                    .setUser(comment.getPrivateTargetUser())
+                    .setCanAccess(userMember.get(comment.getPrivateTargetUser().getKeycloakId()))
+                    .build();
         } else {
             privateComment = false;
         }
     }
 
-    public EventResponse(Mutation mutation) {
+    public EventResponse(Mutation mutation, HashMap<String, Boolean> userMember) {
 
         eventType = "Mutation";
 
-        origin = new UserResponseBuilder().setUser(mutation.getUser()).build();
+        origin = new UserResponseBuilder()
+                .setUser(mutation.getUser())
+                .setCanAccess(userMember.get(mutation.getUser().getKeycloakId()))
+                .build();
         postDate = mutation.getEventTime();
         mutationType = mutation.getMutationType();
 
@@ -98,7 +108,10 @@ public class EventResponse {
                 mutationType.equals(Events.MutationType.ADD_USER.toString()) ||
                 mutationType.equals(Events.MutationType.ADD_ADMIN.toString()) ||
                 mutationType.equals(Events.MutationType.REMOVE_USER.toString())) {
-            target = new UserResponseBuilder().setUser(mutation.getToUser()).build();
+            target = new UserResponseBuilder()
+                    .setUser(mutation.getToUser())
+                    .setCanAccess(userMember.get(mutation.getToUser().getKeycloakId()))
+                    .build();
         }
         if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
                 mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString()) ||

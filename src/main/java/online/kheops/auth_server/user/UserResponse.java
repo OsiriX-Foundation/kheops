@@ -16,6 +16,10 @@ public class UserResponse  implements Comparable<UserResponse> {
     @XmlElement(name = "sub")
     private String sub;
 
+    //For event
+    @XmlElement(name = "can_access")
+    private Boolean canAccess;
+
     //For users in album
     @XmlElement(name = "is_admin")
     private Boolean isAdmin;
@@ -44,6 +48,7 @@ public class UserResponse  implements Comparable<UserResponse> {
 
         albumAccess = userResponseBuilder.getAlbumAccess();
         studyAccess = userResponseBuilder.getStudyAccess();
+        userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
     }
 
     @Override

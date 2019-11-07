@@ -2,6 +2,8 @@ package online.kheops.auth_server.user;
 
 import online.kheops.auth_server.entity.User;
 
+import java.util.Optional;
+
 public class UserResponseBuilder {
     private String email;
     private String firstName;
@@ -9,6 +11,7 @@ public class UserResponseBuilder {
     private String sub;
     private Boolean albumAccess;
     private Boolean studyAccess;
+    private Optional<Boolean> canAccess = Optional.empty();
 
     public UserResponseBuilder() {/*empty*/}
 
@@ -45,6 +48,11 @@ public class UserResponseBuilder {
         return this;
     }
 
+    public UserResponseBuilder setCanAccess(Boolean canAccess) {
+        this.canAccess = Optional.ofNullable(canAccess);
+        return this;
+    }
+
     public UserResponseBuilder setStudyAccess(Boolean studyAccess) {
         this.studyAccess = studyAccess;
         return this;
@@ -63,4 +71,6 @@ public class UserResponseBuilder {
     public Boolean getAlbumAccess() { return albumAccess; }
 
     public Boolean getStudyAccess() { return studyAccess; }
+
+    public Optional<Boolean> getCanAccess() { return canAccess; }
 }
