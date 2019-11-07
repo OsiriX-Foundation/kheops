@@ -31,11 +31,10 @@
       <a
         v-if="showDownloadIcon"
         href="#"
-        class="kheopsicon"
         @click.stop="getURLDownload()"
       >
         <v-icon
-          class="align-middle icon-margin"
+          class="align-middle icon-margin kheopsicon"
           name="download"
           :title="$t('download')"
         />
@@ -100,7 +99,7 @@
       <v-icon
         class="align-middle icon-margin kheopsicon"
         name="comment-dots"
-        :class="study.flag.is_commented ? 'bg-neutral' : ''"
+        :class="study.flag.is_commented ? 'bg-neutral fill-neutral' : ''"
         :title="$t('comments')"
       />
     </span>
@@ -113,7 +112,7 @@
       <v-icon
         class="align-middle icon-margin kheopsicon"
         name="star"
-        :class="study.flag.is_favorite ? 'bg-neutral' : ''"
+        :class="study.flag.is_favorite ? 'bg-neutral fill-neutral' : ''"
         :title="$t('favorite')"
       />
     </span>

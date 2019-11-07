@@ -41,32 +41,41 @@ footer {
 	fill: #FFFFFF;
 }
 
-.kheopsicon:hover{
-	color: #fca638;
-	fill: #fca638;
+@media (min-width: 992px) {
+	.kheopsicon:hover{
+		color: #fca638;
+		fill: #fca638;
+	}
 }
 
 .kheopsicon-success{
 	fill: #5fc04c;
 }
 
-.kheopsicon-success:hover{
-	fill: #54a844;
+@media (min-width: 992px) {
+	.kheopsicon-success:hover{
+		fill: #54a844;
+	}
 }
 
 .kheopsicon-danger{
 	fill: #fc4848;
 }
 
-.kheopsicon-danger:hover{
-	fill: #dd3d3d;
+@media (min-width: 992px) {
+	.kheopsicon-danger:hover{
+		fill: #dd3d3d;
+	}
 }
+
 .font-kheops{
 	color: #fca638 !important;
 }
 
-.font-kheops:hover{
-	color: #fca638;
+@media (min-width: 992px) {
+	.font-kheops:hover{
+		color: #fca638;
+	}
 }
 
 .bg-kheops{
@@ -87,12 +96,16 @@ a.navbar-brand {
 	font-size: 11pt;
 }
 
-.nav li a:hover:not(.active) {
-    color: #fca638;
+@media (min-width: 992px) {
+	.nav li a:hover:not(.active) {
+		color: #fca638;
+	}
 }
 
-.nav a:hover:not(.active) {
-    color: #fca638;
+@media (min-width: 992px) {
+	.nav a:hover:not(.active) {
+		color: #fca638;
+	}
 }
 
 .font-large {
@@ -108,21 +121,26 @@ a.navbar-brand {
 }
 
 .font-neutral{
-	color: #60b3c4
+	color: #60b3c4;
 }
 
 .bg-neutral{
-	color: #60b3c4
+	color: #60b3c4 !important;
+}
+
+.fill-neutral{
+	fill: #60b3c4;
 }
 
 .font-white {
 	color: white !important;
 }
 
-.font-white:hover {
-	color: #adadad !important;
+@media (min-width: 992px) {
+	.font-white:hover {
+		color: #adadad !important;
+	}
 }
-
 .bg-kheops-grey {
 	color: #444444;
 }

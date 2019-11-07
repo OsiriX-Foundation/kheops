@@ -32,19 +32,6 @@
     <send-studies />
     <!-- footer -->
     <footer>
-      <b-navbar
-        toggleable="md"
-        type="info"
-        navbar-dark
-        bg-primary
-      >
-        <b-navbar-brand
-          href="#"
-          tag="h4"
-        >
-          © KHEOPS, inc {{ year }}
-        </b-navbar-brand>
-      </b-navbar>
     </footer>
   </div>
 </template>

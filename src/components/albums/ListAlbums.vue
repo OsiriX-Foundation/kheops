@@ -236,7 +236,7 @@
             <v-icon
               name="star"
               class="kheopsicon"
-              :class="(!row.item.is_favorite) ? '' : 'bg-neutral'"
+              :class="(!row.item.is_favorite) ? '' : 'bg-neutral fill-neutral'"
             />
           </span>
         </div>
