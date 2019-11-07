@@ -528,7 +528,11 @@ export default {
           thClass: 'pointer',
           tdClass: 'word-break',
           class: 'word-break d-none d-md-table-cell d-lg-table-cell',
-          formatter: (value) => value.Value[0],
+          formatter: (value) => {
+            if (value !== null && value.Value !== undefined) {
+              return value.Value[0]
+            }
+          },
           thStyle: {
             width: '250px',
           },
