@@ -96,7 +96,7 @@
             v-if="logged"
             :title="$t('tooltipLogout')"
             class="active pointer"
-            :href="googleLogout"
+            @click="logout()"
           >
             <span
               class="font-white"
@@ -159,11 +159,6 @@ export default {
   computed: {
     lang() {
       return this.$i18n.locale;
-    },
-    googleLogout() {
-      const logoutUrl = `${process.env.VUE_APP_URL_KEYCLOAK}/auth/realms/${process.env.VUE_APP_REALM_KEYCLOAK}/protocol/openid-connect/logout`
-      const queryParam = `redirect_uri=${encodeURIComponent(process.env.VUE_APP_URL_ROOT)}`
-      return `${logoutUrl}?${queryParam}`
     },
   },
   created() {
