@@ -88,8 +88,8 @@ public class UserResource {
         final KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder();
 
         if(reference == null && search != null) {
-            if (search.length() < 3) {
-                return Response.status(BAD_REQUEST).entity("'search' query param must have minimum 3 characters").build();
+            if (search.length() < 1) {
+                return Response.status(BAD_REQUEST).entity("'search' query param must have minimum 1 characters").build();
             }
 
             kheopsLogBuilder.action(ActionType.USERS_LIST);
