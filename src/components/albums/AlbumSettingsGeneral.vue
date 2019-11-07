@@ -42,6 +42,7 @@
                   v-model="edit.name"
                   type="text"
                   class="form-control"
+                  maxlength="255"
                 >
               </div>
               <div class="input-group-append">
