@@ -304,7 +304,7 @@
             v-model="statusMsgPrivate"
             class="pt-1"
             inline
-            @change="SetEnabledVariables()"
+            @change="setEnabledVariables()"
           >
             <span
               class="pointer"
@@ -438,10 +438,12 @@ export default {
         } else if (res.status === 200 && res.data[this.accessVar]) {
           this.statusMsgPrivate = true
           this.$refs.privateuser.setUser(user);
+          const { textcomment } = this.$refs;
+          setTimeout(() => { textcomment.focus(); }, 0);
         }
       });
     },
-    SetEnabledVariables() {
+    setEnabledVariables() {
       this.disabledText = !this.statusMsgPrivate;
     },
     setPrivateUser(user) {
