@@ -28,7 +28,10 @@
     "newreport": "{user} add a new report in the study {study} with the report provider {reportname}",
     "privatemessagereceive": "Private message for you.",
     "privatemessagesend": "Private message for: {user}",
-    "you": "You"
+    "you": "You",
+    "userunknown": "User {user} unknown",
+    "noaccessalbum": "{user} has no access to this album",
+    "noaccessstudy": "{user} has no access to this study"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -56,7 +59,10 @@
     "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}",
     "privatemessagereceive": "Message privé pour vous.",
     "privatemessagesend": "Message privé pour: {user}",
-    "you": "Vous"
+    "you": "Vous",
+    "userunknown": "Utilisateur {user} inconnu",
+    "noaccessalbum": "{user} n'a pas d'accès à cet album",
+    "noaccessstudy": "{user} n'a pas d'accès à cette étude"
   }
 }
 </i18n>
@@ -106,6 +112,7 @@
               </span>
               <a
                 v-else
+                class="font-white"
                 :title="comment.origin.email"
                 @click="clickPrivateUser(comment.origin.email)"
               >
@@ -311,7 +318,7 @@
             :id="id ? id : album.album_id"
             ref="privateuser"
             :scope="scope"
-            :enable-add="enablePrivate"
+            :enable-add="statusMsgPrivate"
             @private-user="setPrivateUser"
           />
         </div>
@@ -399,6 +406,9 @@ export default {
     container_id() {
       return (this.scope === 'album') ? 'album_comment_container' : `study_${this.id.replace(/\./g, '_')}_comment_container`;
     },
+    accessVar() {
+      return this.scope === 'album' ? 'album_access' : 'study_access';
+    },
   },
   watch: {
     disabledText: {
@@ -420,11 +430,18 @@ export default {
       }
     },
     clickPrivateUser(user) {
-      this.statusMsgPrivate = true
-      this.SetEnabledVariables()
+      this.$refs.privateuser.checkSpecificUser(user).then((res) => {
+        if (res.status === 204) {
+          this.$snotify.error(this.$t('userunknown', { user }));
+        } else if (!res.data[this.accessVar]) {
+          this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user }) : this.$t('noaccessstudy', { user }));
+        } else if (res.status === 200 && res.data[this.accessVar]) {
+          this.statusMsgPrivate = true
+          this.$refs.privateuser.setUser(user);
+        }
+      });
     },
     SetEnabledVariables() {
-      this.enablePrivate = !this.statusMsgPrivate;
       this.disabledText = !this.statusMsgPrivate;
     },
     setPrivateUser(user) {
@@ -432,7 +449,7 @@ export default {
         this.disabledText = false;
         this.privateUser = user;
       } else {
-        this.disabledText = this.enablePrivate;
+        this.disabledText = this.statusMsgPrivate;
       }
     },
     addComment() {
@@ -440,7 +457,7 @@ export default {
         const queries = {
           comment: this.newComment.comment,
         };
-        if (this.enablePrivate) {
+        if (this.statusMsgPrivate) {
           queries.to_user = this.privateUser;
         }
 

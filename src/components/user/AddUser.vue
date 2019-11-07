@@ -133,12 +133,15 @@ export default {
       this.user = '';
       this.$emit('private-user', this.user);
     },
+    checkSpecificUser(username) {
+      const request = `users?reference=${username}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`;
+      return HTTP.get(request, { headers: { Accept: 'application/json' } });
+    },
     checkUser() {
       if (this.newUserName.length > 0) {
         const username = this.newUserName;
         const request = `users?reference=${username}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`;
-
-        HTTP.get(request, { headers: { Accept: 'application/json' } }).then((res) => {
+        this.checkSpecificUser(username).then((res) => {
           if (res.status === 204) {
             this.$snotify.error(this.$t('userunknown', { user: username }));
           } else if (!res.data[this.accessVar]) {
