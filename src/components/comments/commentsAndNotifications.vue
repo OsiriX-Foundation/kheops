@@ -26,7 +26,7 @@
     "editreportprovider": "{user} edit the report provider {reportname}",
     "deletereportprovider": "{user} delete the report provider {reportname}",
     "newreport": "{user} add a new report in the study {study} with the report provider {reportname}",
-    "privatemessagereceive": "Private message",
+    "privatemessagereceive": "Private message for you.",
     "privatemessagesend": "Private message for: {user}",
     "you": "You"
   },
@@ -54,7 +54,7 @@
     "editreportprovider": "{user} a édité le report provider {reportname}",
     "deletereportprovider": "{user} a supprimé le report provider {reportname}",
     "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}",
-    "privatemessagereceive": "Message privé",
+    "privatemessagereceive": "Message privé pour vous.",
     "privatemessagesend": "Message privé pour: {user}",
     "you": "Vous"
   }
@@ -100,7 +100,7 @@
                 class="icon-margin-right"
               />
               <span>
-                {{ currentuserEmail !== comment.origin_name ? comment.origin_name : $t('you') }}
+                {{ currentuserEmail !== comment.origin.email ? `${comment.origin.first_name} ${comment.origin.last_name}` : $t('you') }}
               </span>
               <span class="float-right">
                 {{ comment.post_date | formatDate }}
@@ -109,16 +109,16 @@
                 v-if="comment.is_private"
               >
                 <b
-                  v-if="comment.is_private && currentuserEmail !== comment.origin_name"
+                  v-if="comment.is_private && currentuserEmail !== comment.origin.email"
                   class="text-warning"
                 >
-                  {{ $t('privatemessagereceive', { user: comment.origin_name }) }}
+                  {{ $t('privatemessagereceive', { user: `${comment.origin.first_name} ${comment.origin.last_name}` }) }}
                 </b>
                 <b
-                  v-if="comment.is_private && currentuserEmail !== comment.target_name"
+                  v-if="comment.is_private && currentuserEmail !== comment.target.email"
                   class="text-warning"
                 >
-                  {{ $t('privatemessagesend', { user: comment.target_name }) }}
+                  {{ $t('privatemessagesend', { user: `${comment.target.first_name} ${comment.target.last_name}` }) }}
                 </b>
               </div>
             </div>
@@ -152,13 +152,13 @@
                 v-if="comment.mutation_type === 'IMPORT_STUDY'"
                 class="flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('imported') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_STUDY'"
                 class="flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('removed') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- IMPORT_SERIES, REMOVE_SERIES -->
@@ -166,13 +166,13 @@
                 v-if="comment.mutation_type === 'IMPORT_SERIES'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('imported') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_SERIES'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('removed') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
@@ -180,31 +180,31 @@
                 v-if="comment.mutation_type === 'ADD_USER'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} <i>{{ comment.target_name }}</i>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} <i>{{ `${comment.target.first_name} ${comment.target.last_name}` }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'ADD_ADMIN'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} <i>{{ comment.target_name }}</i>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} <i>{{ `${comment.target.first_name} ${comment.target.last_name}` }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_USER'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theuser') }} <i>{{ comment.target_name }}</i>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('removed') }} {{ $t('theuser') }} <i>{{ `${comment.target.first_name} ${comment.target.last_name}` }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'PROMOTE_ADMIN'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ comment.target_name }}</i>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ `${comment.target.first_name} ${comment.target.last_name}` }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'DEMOTE_ADMIN'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ comment.target_name }}</i>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ `${comment.target.first_name} ${comment.target.last_name}` }}</i>
               </div>
 
               <!-- LEAVE_ALBUM -->
@@ -212,7 +212,7 @@
                 v-if="comment.mutation_type === 'LEAVE_ALBUM'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasleft') }}
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hasleft') }}
               </div>
 
               <!-- CREATE_ALBUM -->
@@ -220,7 +220,7 @@
                 v-if="comment.mutation_type === 'CREATE_ALBUM'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
               </div>
 
               <!-- EDIT_ALBUM -->
@@ -228,7 +228,7 @@
                 v-if="comment.mutation_type === 'EDIT_ALBUM'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
               </div>
 
               <!-- ADD STUDY IN FAVORITES -->
@@ -236,7 +236,7 @@
                 v-if="comment.mutation_type === 'ADD_FAV' && comment.study"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('addalbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('addalbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- ADD STUDY IN FAVORITES -->
@@ -244,35 +244,35 @@
                 v-if="comment.mutation_type === 'REMOVE_FAV' && comment.study"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ `${comment.origin.first_name} ${comment.origin.last_name}` }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <div
                 v-if="comment.mutation_type === 'CREATE_REPORT_PROVIDER' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('createreportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
+                {{ $t('createreportprovider', {user: `${comment.origin.first_name} ${comment.origin.last_name}`, reportname: comment.report_provider.name}) }}
               </div>
 
               <div
                 v-if="comment.mutation_type === 'EDIT_REPORT_PROVIDER' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('editreportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
+                {{ $t('editreportprovider', {user: `${comment.origin.first_name} ${comment.origin.last_name}`, reportname: comment.report_provider.name}) }}
               </div>
 
               <div
                 v-if="comment.mutation_type === 'DELETE_REPORT_PROVIDER' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('deletereportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
+                {{ $t('deletereportprovider', {user: `${comment.origin.first_name} ${comment.origin.last_name}`, reportname: comment.report_provider.name}) }}
               </div>
 
               <div
                 v-if="comment.mutation_type === 'NEW_REPORT' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('newreport', {user: comment.origin_name, reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+                {{ $t('newreport', {user: `${comment.origin.first_name} ${comment.origin.last_name}`, reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
               </div>
             </div>
           </div>
