@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.album.AlbumResponse;
 import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
@@ -11,6 +10,7 @@ import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -96,14 +96,14 @@ public class UserResource {
 
             try {
                 final Keycloak keycloak = Keycloak.getInstance();
-                final List<UserResponseBuilder> result = keycloak.getUsers(search, limit, offset);
+                final List<UserResponse> result = keycloak.getUsers(search, limit, offset);
                 kheopsLogBuilder.log();
 
                 if(result.isEmpty()) {
                     return Response.status(NO_CONTENT).build();
                 }
 
-                final GenericEntity<List<UserResponseBuilder>> genericUsersResponsesList = new GenericEntity<List<UserResponseBuilder>>(result) {};
+                final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<List<UserResponse>>(result) {};
                 return Response.status(OK).entity(genericUsersResponsesList).build();
             } catch (KeycloakException e) {
                 LOG.log(Level.WARNING, "Keycloak error", e);

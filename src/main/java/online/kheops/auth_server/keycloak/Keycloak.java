@@ -1,9 +1,6 @@
 package online.kheops.auth_server.keycloak;
 
-import online.kheops.auth_server.user.CacheUserName;
-import online.kheops.auth_server.user.UserCachedData;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponseBuilder;
+import online.kheops.auth_server.user.*;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -179,9 +176,8 @@ public class Keycloak {
         }
     }
 
-    public List<UserResponseBuilder> getUsers(String find, Integer limit, Integer offset)
+    public List<UserResponse> getUsers(String find, Integer limit, Integer offset)
             throws KeycloakException {
-
 
         final Response response;
         final String findLowerCase = find.toLowerCase();
@@ -200,18 +196,19 @@ public class Keycloak {
             String output = response.readEntity(String.class);
             try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
                 JsonArray reply = jsonReader.readArray();
-                List<UserResponseBuilder> userResponseBuilders = new ArrayList<>();
+                List<UserResponse> userResponse = new ArrayList<>();
                 final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                 for(int i = 0;i < keycloakUser.size(); i++) {
                     if(!keycloakUser.getEmail(i).startsWith("service-account-") && !keycloakUser.getEmail(i).endsWith("@placeholder.org")) {
-                        userResponseBuilders.add(new UserResponseBuilder()
+                        userResponse.add(new UserResponseBuilder()
                                 .setEmail(keycloakUser.getEmail(i))
                                 .setSub(keycloakUser.getId(i))
                                 .setFirstName(keycloakUser.getFirstName(i))
-                                .setLastName(keycloakUser.getLastName(i)));
+                                .setLastName(keycloakUser.getLastName(i))
+                                .build());
                     }
                 }
-                return userResponseBuilders;
+                return userResponse;
             }
         }
         token.removeToken();
