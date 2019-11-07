@@ -159,8 +159,8 @@ public class QIDOResource {
         }
 
         final boolean includeFieldFavorite;
-        includeFieldFavorite = uriInfo.getQueryParameters().containsKey("includefield") && (uriInfo.getQueryParameters().get("includefield").contains(String.format("%08X", CUSTOM_DICOM_TAG_FAVORITE)) ||
-                uriInfo.getQueryParameters().get("includefield").contains(FAVORITE));
+        includeFieldFavorite = uriInfo.getQueryParameters().containsKey(INCLUDE_FIELD) && (uriInfo.getQueryParameters().get(INCLUDE_FIELD).contains(String.format("%08X", CUSTOM_DICOM_TAG_FAVORITE)) ||
+                uriInfo.getQueryParameters().get(INCLUDE_FIELD).contains(FAVORITE));
 
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {

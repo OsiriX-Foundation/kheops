@@ -28,6 +28,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.util.Consts.INCLUDE_FIELD;
+
 public abstract class Fetcher {
     private static final Logger LOG = Logger.getLogger(Fetcher.class.getName());
 
@@ -46,7 +48,7 @@ public abstract class Fetcher {
     }
 
     static void setDicomWebURI(URI dicomWebURI) {
-        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}").queryParam("includefield", String.format("%08X", Tag.StudyDescription));
+        studyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies").queryParam("StudyInstanceUID", "{StudyInstanceUID}").queryParam(INCLUDE_FIELD, String.format("%08X", Tag.StudyDescription));
         seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
