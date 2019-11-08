@@ -50,8 +50,7 @@ public class AlbumResource {
                              @DefaultValue("") @FormParam("description") String description,
                              @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
-                             @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
-                             MultivaluedMap<String, String> form) {
+                             @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments) {
 
         name = name.trim();
         description = description.trim();
