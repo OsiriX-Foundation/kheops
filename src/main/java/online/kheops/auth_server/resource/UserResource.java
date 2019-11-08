@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.album.Albums;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
@@ -21,6 +20,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,8 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT_PROVIDER_TOKEN;
+import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
 import static online.kheops.auth_server.util.Consts.*;
 
@@ -85,7 +88,8 @@ public class UserResource {
                                 @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                 @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
-        final KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder();
+        final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
+        final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
         if(reference == null && search != null) {
             if (search.length() < 1) {
@@ -96,7 +100,47 @@ public class UserResource {
 
             try {
                 final Keycloak keycloak = Keycloak.getInstance();
-                final List<UserResponse> result = keycloak.getUsers(search, limit, offset);
+                final List<UserResponse> result;
+
+                if (albumId != null) {
+                    final List<UserResponse> users = keycloak.getUsers(search, 1000, 0);
+                    result = new ArrayList<>();
+                    for (UserResponse user : users) {
+                        if (isMemberOfAlbum(user.getSub(), albumId)) {
+                            if (offset > 0) {
+                                offset--;
+                            } else {
+                                result.add(user);
+                                limit--;
+                                if (limit == 0) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else if (studyInstanceUID != null) {
+                    if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                        return Response.status(NOT_FOUND).entity("StudyInstanceUID : " + studyInstanceUID + "not found").build();
+                    }
+                    final List<UserResponse> users = keycloak.getUsers(search, 1000, 0);
+                    result = new ArrayList<>();
+                    for (UserResponse user : users) {
+                        if (canAccessStudy(user.getSub(), studyInstanceUID)) {
+                            if (offset > 0) {
+                                offset--;
+                            } else {
+                                result.add(user);
+                                limit--;
+                                if (limit == 0) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    result = keycloak.getUsers(search, limit, offset);
+                }
+
                 kheopsLogBuilder.log();
 
                 if(result.isEmpty()) {
@@ -119,11 +163,11 @@ public class UserResource {
 
                 if(albumId != null) {
                     kheopsLogBuilder.album(albumId);
-                    userResponseBuilder.setAlbumAccess(Albums.isMemberOfAlbum(userResponseBuilder.getSub(), albumId));
+                    userResponseBuilder.setAlbumAccess(isMemberOfAlbum(userResponseBuilder.getSub(), albumId));
                 }
 
                 if(studyInstanceUID != null) {
-                    userResponseBuilder.setStudyAccess(Studies.canAccessStudy(userResponseBuilder.getSub(), studyInstanceUID));
+                    userResponseBuilder.setStudyAccess(canAccessStudy(userResponseBuilder.getSub(), studyInstanceUID));
                     kheopsLogBuilder.study(studyInstanceUID);
                 }
 
@@ -137,7 +181,7 @@ public class UserResource {
                 return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
             }
         } else {
-            return Response.status(BAD_REQUEST).build();
+            return Response.status(BAD_REQUEST).entity("Use query param 'search' xor 'reference'").build();
         }
     }
 

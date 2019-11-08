@@ -51,6 +51,8 @@ public class UserResponse  implements Comparable<UserResponse> {
         userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
     }
 
+    public String getSub() { return sub; }
+
     @Override
     public int compareTo(UserResponse userResponse) {
         return email.compareTo(userResponse.email);
