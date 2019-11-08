@@ -137,21 +137,14 @@ public class SendingResource
 
         if (token != null) {
             fromToken = true;
-            final AccessToken accessToken;
+            final KheopsPrincipal tokenPrincipal;
             try {
-                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
-            }
-
-            final User user;
-            try {
-                user = getOrCreateUser(accessToken.getSubject());
             } catch (UserNotFoundException e) {
                 return Response.status(FORBIDDEN).build();
             }
-
-            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
             if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
@@ -210,21 +203,14 @@ public class SendingResource
         final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
 
         if (token != null) {
-            final AccessToken accessToken;
+            final KheopsPrincipal tokenPrincipal;
             try {
-                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
-            }
-
-            final User user;
-            try {
-                user = getOrCreateUser(accessToken.getSubject());
             } catch (UserNotFoundException e) {
                 return Response.status(FORBIDDEN).build();
             }
-
-            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
             if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
@@ -383,21 +369,14 @@ public class SendingResource
         final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
 
         if (token != null) {
-            final AccessToken accessToken;
+            final KheopsPrincipal tokenPrincipal;
             try {
-                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
-            }
-
-            final User user;
-            try {
-                user = getOrCreateUser(accessToken.getSubject());
             } catch (UserNotFoundException e) {
                 return Response.status(FORBIDDEN).build();
             }
-
-            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
             if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 return Response.status(FORBIDDEN).build();
@@ -456,21 +435,14 @@ public class SendingResource
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (token != null) {
-            final AccessToken accessToken;
+            final KheopsPrincipal tokenPrincipal;
             try {
-                accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
-            }
-
-            final User user;
-            try {
-                user = getOrCreateUser(accessToken.getSubject());
             } catch (UserNotFoundException e) {
                 return Response.status(FORBIDDEN).build();
             }
-
-            final KheopsPrincipal tokenPrincipal =  accessToken.newPrincipal(context, user);
 
             if (tokenPrincipal.getScope() == ScopeType.ALBUM)
             {
@@ -547,5 +519,14 @@ public class SendingResource
         }
 
         return Response.status(NO_CONTENT).build();
+    }
+
+    private KheopsPrincipal getPrincipalFromHeadersXTokenSource(String token)
+            throws AccessTokenVerificationException, UserNotFoundException {
+
+        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+        final User user = getOrCreateUser(accessToken.getSubject());
+
+        return accessToken.newPrincipal(context, user);
     }
 }
