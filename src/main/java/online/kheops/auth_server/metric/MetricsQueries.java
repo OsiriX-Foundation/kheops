@@ -6,6 +6,8 @@ import java.time.ZoneOffset;
 
 class MetricsQueries {
 
+    private MetricsQueries() { /*empty*/ }
+
     static Long getNumberOfAlbumsIncludeInbox(EntityManager em) {
         return em.createQuery("SELECT COUNT(a) FROM Album a", Long.class)
                 .getSingleResult();

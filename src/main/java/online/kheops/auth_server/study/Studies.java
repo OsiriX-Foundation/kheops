@@ -361,7 +361,7 @@ public class Studies {
         }
     }
 
-    private static Condition createCondition(String filter, TableField<? extends Record, String> column, Boolean isFuzzyMatching) {
+    private static Condition createCondition(String filter, TableField<? extends Record, String> column, boolean isFuzzyMatching) {
         String parameterNoStar = filter.replace("*", "");
 
         if (parameterNoStar.length() == 0) {
