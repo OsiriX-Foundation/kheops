@@ -33,7 +33,7 @@
     "noaccessalbum": "{user} has no access to this album",
     "noaccessstudy": "{user} has no access to this study",
     "noaccess": "no more access",
-    "nocommentaccessalbum": "no access to this album.",
+    "nocommentaccessalbum": "is no longer a member of this album.",
     "nocommentaccessstudy": "no access to this study."
   },
   "fr" : {
@@ -66,7 +66,7 @@
     "userunknown": "Utilisateur {user} inconnu",
     "noaccessalbum": "{user} n'a pas d'accès à cet album",
     "noaccessstudy": "{user} n'a pas d'accès à cette étude",
-    "nocommentaccessalbum": "n'a plus accès à cet album.",
+    "nocommentaccessalbum": "n'est plus membre de cet album.",
     "nocommentaccessstudy": "n'a plus accès à cette étude."
   }
 }
