@@ -1,8 +1,5 @@
 language: minimal
 
-services:
-  - docker
-
 notifications:
   email: false
 
