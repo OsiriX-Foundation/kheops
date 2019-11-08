@@ -31,7 +31,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     private final String originalToken;
 
     private EntityManager em;
-    private EntityTransaction tx;
 
     //old version
     private final Long dbid;

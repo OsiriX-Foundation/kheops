@@ -4,7 +4,6 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.ScopeType;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 

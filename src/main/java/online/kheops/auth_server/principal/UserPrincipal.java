@@ -9,7 +9,6 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -27,7 +26,6 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 public class UserPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
-    private EntityTransaction tx;
     private final User user;
     private final String actingParty;
     private final boolean linkAuthorization;

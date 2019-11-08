@@ -24,7 +24,6 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 public class ReportProviderPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
-    private EntityTransaction tx;
     private final User user;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;

@@ -7,7 +7,6 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
 import online.kheops.auth_server.principal.KheopsPrincipal;
-import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
@@ -20,8 +19,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +29,7 @@ import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
+import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.*;
 
 @Path("/")
@@ -99,46 +97,17 @@ public class UserResource {
             kheopsLogBuilder.action(ActionType.USERS_LIST);
 
             try {
-                final Keycloak keycloak = Keycloak.getInstance();
                 final List<UserResponse> result;
 
                 if (albumId != null) {
-                    final List<UserResponse> users = keycloak.getUsers(search, 1000, 0);
-                    result = new ArrayList<>();
-                    for (UserResponse user : users) {
-                        if (isMemberOfAlbum(user.getSub(), albumId)) {
-                            if (offset > 0) {
-                                offset--;
-                            } else {
-                                result.add(user);
-                                limit--;
-                                if (limit == 0) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    result = searchUsersInAlbum(search, albumId, limit, offset);
                 } else if (studyInstanceUID != null) {
                     if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                        return Response.status(NOT_FOUND).entity("StudyInstanceUID : " + studyInstanceUID + "not found").build();
+                        return Response.status(NOT_FOUND).entity("StudyInstanceUID : " + studyInstanceUID + " not found").build();
                     }
-                    final List<UserResponse> users = keycloak.getUsers(search, 1000, 0);
-                    result = new ArrayList<>();
-                    for (UserResponse user : users) {
-                        if (canAccessStudy(user.getSub(), studyInstanceUID)) {
-                            if (offset > 0) {
-                                offset--;
-                            } else {
-                                result.add(user);
-                                limit--;
-                                if (limit == 0) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    result = searchUsersInStudy(search, studyInstanceUID, limit, offset);
                 } else {
-                    result = keycloak.getUsers(search, limit, offset);
+                    result = searchUsers(search, limit, offset);
                 }
 
                 kheopsLogBuilder.log();

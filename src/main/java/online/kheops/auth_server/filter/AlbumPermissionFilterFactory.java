@@ -1,6 +1,5 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.AlbumUserPermissions;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
 
