@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.generateCapability;
 import static online.kheops.auth_server.capability.CapabilityId.ID_PATTERN;
-import static online.kheops.auth_server.capability.CapabilityToken.TOKEN_PATTERN;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 

@@ -13,7 +13,6 @@ import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import java.util.Optional;
 

@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
-import static online.kheops.auth_server.generated.tables.Series.SERIES;
-
 public class AlbumResponseBuilder {
 
     private String id;

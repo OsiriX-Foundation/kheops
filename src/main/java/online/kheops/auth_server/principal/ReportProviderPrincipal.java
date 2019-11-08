@@ -6,12 +6,10 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.ws.rs.ForbiddenException;
 
 import java.util.List;
