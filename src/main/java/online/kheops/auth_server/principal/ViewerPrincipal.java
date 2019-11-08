@@ -15,7 +15,6 @@ import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,6 @@ import static online.kheops.auth_server.user.Users.getOrCreateUser;
 public class ViewerPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
-    private EntityTransaction tx;
     private final ViewerAccessToken viewerAccessToken;
     private final KheopsPrincipal kheopsPrincipal;
     private final boolean linkAuthorization;
