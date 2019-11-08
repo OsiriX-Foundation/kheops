@@ -24,6 +24,7 @@ script:
 #  - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/assets
 #  - cp -r $TRAVIS_BUILD_DIR/src/assets $TRAVIS_BUILD_DIR/docker/tls/assets
    - docker build -t osirixfoundation/kheops-ui:$TRAVIS_BRANCH .
+   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
    - docker push osirixfoundation/kheops-ui:$TRAVIS_BRANCH
 
 #after_success:
