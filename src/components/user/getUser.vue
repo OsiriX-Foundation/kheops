@@ -21,6 +21,7 @@
       <form @submit.prevent="getUser">
         <div class="input-group mb-2">
           <div>
+            <!--
             <input
               v-model="new_user_name"
               type="email"
@@ -28,6 +29,10 @@
               autofocus
               :placeholder="'email '+$t('user')"
             >
+            -->
+            <input-auto-complet
+              @input-value="setUsername"
+            />
           </div>
           <div class="input-group-append">
             <button
@@ -54,8 +59,11 @@
 </template>
 
 <script>
+import InputAutoComplet from '@/components/globals/InputAutoComplet';
+
 export default {
   name: 'FormGetUser',
+  components: { InputAutoComplet },
   data() {
     return {
       new_user_name: '',
@@ -79,6 +87,9 @@ export default {
       this.new_user_name = '';
       this.$emit('cancel-user');
     },
+    setUsername(username){
+      this.new_user_name = username
+    }
   },
 
 };
