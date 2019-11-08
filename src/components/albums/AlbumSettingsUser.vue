@@ -212,7 +212,7 @@ export default {
   },
   methods: {
     addUser() {
-      const sameUserName = this.users.filter((user) => user.user_name === this.new_user_name);
+      const sameUserName = this.users.filter((user) => user.email === this.new_user_name);
       if (sameUserName.length > 0) {
         this.$snotify.error(this.$t('allreadypresent'));
       } else if (this.validEmail(this.new_user_name)) {

@@ -95,7 +95,7 @@
               >
                 <span
                   v-for="user in album.users"
-                  :key="user.user_name"
+                  :key="user.email"
                   class="badge badge-secondary"
                 >
                   {{ user.email }}
