@@ -9,11 +9,13 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
@@ -32,7 +34,6 @@ public class AlbumResource {
 
     private static final Logger LOG = Logger.getLogger(AlbumResource.class.getName());
 
-
     @Context
     private UriInfo uriInfo;
 
@@ -45,16 +46,15 @@ public class AlbumResource {
     @Path("albums")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newAlbum(@DefaultValue("Album_name") @FormParam("name") String name,
+    public Response newAlbum(@FormParam("name") @NotBlank String name,
                              @DefaultValue("") @FormParam("description") String description,
                              @FormParam("addUser") Boolean addUser, @FormParam("downloadSeries") Boolean downloadSeries,
                              @FormParam("sendSeries") Boolean sendSeries, @FormParam("deleteSeries") Boolean deleteSeries,
                              @FormParam("addSeries") Boolean addSeries, @FormParam("writeComments") Boolean writeComments,
                              MultivaluedMap<String, String> form) {
 
-        if (name.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
-        }
+        name = name.trim();
+        description = description.trim();
         if(name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
             return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
         }
@@ -131,16 +131,12 @@ public class AlbumResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal) securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
-
         final AlbumResponse albumResponse;
 
-        try {
-            if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
-                return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
+            return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
         }
+
         try {
             albumResponse = Albums.getAlbum(callingUserPk, albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
         } catch (JOOQException e) {
@@ -175,11 +171,24 @@ public class AlbumResource {
                               @FormParam("notificationNewSeries") Boolean notificationNewSeries,
                               @FormParam("notificationNewComment") Boolean notificationNewComment) {
 
-        if(name != null && name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
-            return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
+
+        if(name != null) {
+            name = name .trim();
+            if (name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+                return Response.status(BAD_REQUEST).entity("Param 'name' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length()).build();
+            }
+            if (name.isEmpty()) {
+                return Response.status(BAD_REQUEST).entity("Param 'name' is empty").build();
+            }
         }
-        if(description != null && description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
-            return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
+        if(description != null) {
+            description = description.trim();
+            if (description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+                return Response.status(BAD_REQUEST).entity("Param 'description' is too long. max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length()).build();
+            }
+            if (description.isEmpty()) {
+                return Response.status(BAD_REQUEST).entity("Param 'description' is empty").build();
+            }
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -256,7 +265,7 @@ public class AlbumResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final long callingUserPk = kheopsPrincipal.getDBID();
 
-        final PairListXTotalCount<UserAlbumResponse> pair;
+        final PairListXTotalCount<UserResponse> pair;
 
         try {
             pair = Albums.getUsers(albumId, limit, offset);
@@ -265,7 +274,7 @@ public class AlbumResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
-        final GenericEntity<List<UserAlbumResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserAlbumResponse>>(pair.getAttributesList()) {};
+        final GenericEntity<List<UserResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.LIST_USERS)

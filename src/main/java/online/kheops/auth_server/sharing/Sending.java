@@ -107,7 +107,7 @@ public class Sending {
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album callingAlbum = getAlbum(albumId, em);
 
-            final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
+            final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em);
 
             if (availableSeries.isEmpty()) {
                 throw new SeriesNotFoundException("No study with the given StudyInstanceUID in the album");
@@ -384,7 +384,7 @@ public class Sending {
                     .series(seriesInstanceUID);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, kheopsLogBuilder);
+                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, false, kheopsLogBuilder);
             }
 
             final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
@@ -411,7 +411,7 @@ public class Sending {
         }
     }
 
-    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, boolean fromToken, KheopsLogBuilder kheopsLogBuilder)
             throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -429,8 +429,9 @@ public class Sending {
             try {
                 final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-                if(isOrphan(storedSeries, em)) {
-                    //here the series exists but she is orphan
+
+                if(isOrphan(storedSeries, em) || fromToken) {
+                    //here the series exists but she is orphan or it's an appropriate from an album capability token
                     final Album inbox = callingUser.getInbox();
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
                     storedSeries.addAlbumSeries(inboxSeries);
@@ -499,7 +500,7 @@ public class Sending {
             final Album album = getAlbum(albumId, em);
             final Album inbox = callingUser.getInbox();
 
-            final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(callingUser, album, studyInstanceUID, em);
+            final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
 
             for (Series series : seriesLst) {
                 if(!inbox.containsSeries(series, em)) {
@@ -529,11 +530,8 @@ public class Sending {
         Set<String> availableSeriesUIDs;
 
         EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
-
             callingUser = em.merge(callingUser);
 
             if (fromAlbumId != null) {
@@ -544,12 +542,7 @@ public class Sending {
             } else {
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromAlbumandInbox(callingUser, studyInstanceUID, em);
             }
-
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 
@@ -563,7 +556,7 @@ public class Sending {
         if (fromAlbumId != null) {
             final Album callingAlbum = getAlbum(fromAlbumId, em);
 
-            availableSeries = findSeriesListByStudyUIDFromAlbum(callingUser, callingAlbum, studyInstanceUID, em);
+            availableSeries = findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em);
         } else if (fromInbox) {
             availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
         } else {

@@ -13,12 +13,9 @@ public class Inbox {
 
 
     public static InboxInfoResponse getInboxInfo(User user, KheopsLogBuilder kheopsLogBuilder)
-    throws JOOQException{
-        final InboxInfoResponse inboxInfoResponse;
+            throws JOOQException {
 
-
-        inboxInfoResponse = InboxQueries.getInboxInfo(user.getPk());
-
+        final InboxInfoResponse inboxInfoResponse = InboxQueries.getInboxInfo(user.getPk());
 
         kheopsLogBuilder.action(KheopsLogBuilder.ActionType.INBOX_INFO)
                 .log();

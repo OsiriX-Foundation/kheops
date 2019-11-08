@@ -9,12 +9,10 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import java.util.Optional;
 
@@ -27,7 +25,6 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 public class UserPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
-    private EntityTransaction tx;
     private final User user;
     private final String actingParty;
     private final boolean linkAuthorization;
@@ -52,20 +49,11 @@ public class UserPrincipal implements KheopsPrincipal {
     public String getName() { return Long.toString(dbid); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
+    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
-            if (canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em)) {
-                return true;
-            } else {
-                throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + " not found");
-            }
+            return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -73,17 +61,12 @@ public class UserPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasStudyReadAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
         } catch (StudyNotFoundException e) {
             return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -92,12 +75,9 @@ public class UserPrincipal implements KheopsPrincipal {
     public boolean hasUserAccess() { return true; }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException{
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
-
             //find if the series exist
             final Series series;
             try {
@@ -120,30 +100,24 @@ public class UserPrincipal implements KheopsPrincipal {
                 }
             }
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
-        throw new SeriesNotFoundException("SeriesUID : " + seriesInstanceUID + "from studyUID : " + studyInstanceUID + "not found");
+        return false;
     }
 
     @Override
     public boolean hasStudyWriteAccess(String study) { return true; }
 
     @Override
-    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) throws AlbumNotFoundException {
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
-
             final User userMerge = em.merge(user);
             final Album album = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(album, userMerge, em);
 
             if(userMerge.getInbox() == album) {
-                throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+                return false;
             }
             if (albumUser.isAdmin()) {
                 return true;
@@ -152,11 +126,8 @@ public class UserPrincipal implements KheopsPrincipal {
             return usersPermission.hasUserPermission(album);
 
         } catch (AlbumNotFoundException | UserNotMemberException e) {
-            throw new AlbumNotFoundException("Album id : " + albumId + " not found");
+            return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -164,9 +135,7 @@ public class UserPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasAlbumAccess(String albumId){
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             final User userMerge = em.merge(user);
             final Album album = getAlbum(albumId, em);
 
@@ -174,9 +143,6 @@ public class UserPrincipal implements KheopsPrincipal {
         } catch (AlbumNotFoundException e) {
             return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }

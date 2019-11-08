@@ -48,7 +48,7 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study and a = u.inbox", Study.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("study", study);
             query.setParameter("user", user);
             return query.getSingleResult();
@@ -62,7 +62,7 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createQuery("select st from Album a join a.albumSeries alS join alS.series s join s.study st where a=:album and st = :study", Study.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("study", study);
             query.setParameter("album", album);
             return query.getSingleResult();
@@ -76,7 +76,7 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createQuery("select st from Album a join a.albumSeries alS join alS.series s join s.study st where a=:album and st.studyInstanceUID = :studyUID", Study.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("studyUID", studyUID);
             query.setParameter("album", album);
             return query.getSingleResult();
@@ -84,5 +84,4 @@ public class StudyQueries {
             throw new StudyNotFoundException("StudyInstanceUID : " + studyUID + " is not in the album :" + album.getId(), e);
         }
     }
-
 }

@@ -29,12 +29,11 @@ public class SeriesQueries {
         return query.getResultList();
     }
 
-    public static List<Series> findSeriesListByStudyUIDFromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a <> u.inbox and :album = a and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+    public static List<Series> findSeriesListByStudyUIDFromAlbum(Album album, String studyInstanceUID, EntityManager em) {
+        TypedQuery<Series> query = em.createQuery("select s from Album a join a.albumSeries alS join alS.series s where :album = a and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(StudyInstanceUID,studyInstanceUID);
-        query.setParameter("callingUser",callingUser);
         query.setParameter("album",album);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         return query.getResultList();
     }
 
@@ -42,7 +41,7 @@ public class SeriesQueries {
         TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(StudyInstanceUID,studyInstanceUID);
         query.setParameter("callingUser",callingUser);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         return query.getResultList();
     }
 
@@ -68,7 +67,7 @@ public class SeriesQueries {
             query.setParameter("album", album);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             return query.getSingleResult();
         } catch (NoResultException e) {
             throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found in the album :" + album.getId(), e);
@@ -82,7 +81,7 @@ public class SeriesQueries {
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter("callingUser", callingUser);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             return query.getSingleResult();
         } catch (NoResultException e) {
             throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found all albums and inbox for the user :" + callingUser.getKeycloakId(), e);
@@ -97,7 +96,7 @@ public class SeriesQueries {
             seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
             seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             seriesQuery.setParameter("callingUser", callingUser);
-            seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             return seriesQuery.getSingleResult();
         } catch (NoResultException e) {
             throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found with share permission for the user : " + callingUser.getKeycloakId(), e);
@@ -109,7 +108,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from Series s join s.study st where s.seriesInstanceUID = :SeriesInstanceUID and st.studyInstanceUID = :StudyInstanceUID", Series.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
@@ -123,7 +122,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and (au.admin = true or a.sendSeries = true)", Series.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
@@ -137,7 +136,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and a = u.inbox", Series.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
@@ -149,7 +148,7 @@ public class SeriesQueries {
     public static boolean isOrphan(Series series, EntityManager em) {
         try {
             TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s = :series", Series.class);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.getSingleResult();
             return false;

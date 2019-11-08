@@ -6,12 +6,10 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.ws.rs.ForbiddenException;
 
 import java.util.List;
@@ -24,7 +22,6 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 public class ReportProviderPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
-    private EntityTransaction tx;
     private final User user;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;
@@ -78,17 +75,11 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             album = em.merge(album);
-
             return canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em);
 
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -102,8 +93,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     public boolean hasUserAccess() { return false; }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID)
-            throws SeriesNotFoundException {
+    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
 
         if (!hasWriteAccess) {
             return false;
@@ -114,9 +104,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
 
             if (!canAccessStudy(album, studyInstanceUID)) {
                 return false;
@@ -134,12 +122,9 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
                 return true;
             }
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
-        throw new SeriesNotFoundException("SeriesUID : " + seriesInstanceUID + "from studyUID : " + studyInstanceUID + "not found");
+        return false;
     }
 
     @Override
@@ -150,10 +135,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
-
              album = em.merge(album);
 
              if(!album.getId().equals(albumId))  {
@@ -163,9 +145,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             return usersPermission.hasProviderPermission(album);
 
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -240,18 +219,10 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             album = em.merge(album);
-            tx.commit();
-
             return canAccessStudy(album, studyInstanceUID);
-
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }

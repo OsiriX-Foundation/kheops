@@ -1,6 +1,5 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.AlbumUserPermissions;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
 
@@ -61,13 +59,11 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
         }
 
         private void tryPermission(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
-            try {
-                if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                    requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : " + albumID + " Forbidden").build());
-                }
-            } catch (AlbumNotFoundException e) {
-                requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
+
+            if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
+                requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : " + albumID + " Forbidden").build());
             }
+
         }
     }
 }

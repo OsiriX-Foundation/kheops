@@ -17,12 +17,16 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
+import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
+import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 
@@ -134,5 +138,53 @@ public class Users {
         LOG.log(INFO, "Finished sharing with the welcomebot");
 
         return newUser;
+    }
+
+    public static List<UserResponse> searchUsersInAlbum(String search, String albumId, Integer limit, Integer offset)
+            throws KeycloakException {
+        final Keycloak keycloak = Keycloak.getInstance();
+        final List<UserResponse> users = keycloak.getUsers(search, 1000, 0);
+        List<UserResponse> result = new ArrayList<>();
+        for (UserResponse user : users) {
+            if (isMemberOfAlbum(user.getSub(), albumId)) {
+                if (offset > 0) {
+                    offset--;
+                } else {
+                    result.add(user);
+                    limit--;
+                    if (limit == 0) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<UserResponse> searchUsersInStudy(String search, String studyInstanceUID, Integer limit, Integer offset)
+        throws KeycloakException {
+        final Keycloak keycloak = Keycloak.getInstance();
+        final List<UserResponse> users = keycloak.getUsers(search, 1000, 0);
+        List<UserResponse> result = new ArrayList<>();
+        for (UserResponse user : users) {
+            if (canAccessStudy(user.getSub(), studyInstanceUID)) {
+                if (offset > 0) {
+                    offset--;
+                } else {
+                    result.add(user);
+                    limit--;
+                    if (limit == 0) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<UserResponse> searchUsers(String search, Integer limit, Integer offset)
+        throws KeycloakException {
+        final Keycloak keycloak = Keycloak.getInstance();
+        return keycloak.getUsers(search, limit, offset);
     }
 }

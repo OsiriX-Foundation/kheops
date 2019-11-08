@@ -9,12 +9,10 @@ import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.token.TokenProvenance;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import java.util.Optional;
 
@@ -32,7 +30,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     private final String originalToken;
 
     private EntityManager em;
-    private EntityTransaction tx;
 
     //old version
     private final Long dbid;
@@ -56,17 +53,11 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) throws SeriesNotFoundException {
+    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             if(getScope() == ScopeType.USER) {
-                if (canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em)) {
-                    return true;
-                } else {
-                    throw new SeriesNotFoundException("seriesInstanceUID : " + seriesInstanceUID + "not found");
-                }
+                return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
             } else if (getScope() == ScopeType.ALBUM && capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
                 if (!albumUser.isAdmin()) { //the user who created the token is not longer an admin => normally the token should be removed
@@ -77,9 +68,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         } catch (UserNotMemberException e) {
             return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
         return false;
@@ -88,9 +76,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasStudyReadAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             final Study study = getStudy(studyInstanceUID, em);
             if(getScope() == ScopeType.USER) {
                 return canAccessStudy(user, study, em);
@@ -104,9 +90,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         } catch (StudyNotFoundException | UserNotMemberException e) {
             return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
         return false;
@@ -118,11 +101,9 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         final User mergeUser = em.merge(user);
         if (getScope() == ScopeType.USER) {
             try {
-                tx.begin();
                 final Series series;
                 try {
                     series = getSeries(studyInstanceUID, seriesInstanceUID, em);
@@ -145,46 +126,35 @@ public class CapabilityPrincipal implements KheopsPrincipal {
                     }
                 }
             } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
                 em.close();
             }
             return false;
 
         } else if (getScope() == ScopeType.ALBUM) {
-            if (!capability.hasWritePermission()) {
-                return false;
-            }
             try {
-                tx.begin();
-
                 Capability mergeCapability = em.merge(capability);
 
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), mergeUser, em);
                 if (!albumUser.isAdmin()) {
-                    return false;
+                    return false;//if the creator of the token is no longer the admin of the album
                 }
                 final Series series;
                 try {
                     series = getSeries(studyInstanceUID, seriesInstanceUID, em);
                 } catch (SeriesNotFoundException e) {
-                    //if the series not exist
-                    return true;
+                    //here the series not exist
+                    return capability.hasWritePermission();
                 }
                 if (isOrphan(series, em)) {
-                    return true;
+                    return capability.hasWritePermission();
                 }
 
                 if(mergeCapability.getAlbum().containsSeries(series, em)) {
-                    return true;
+                    return capability.hasAppropriatePermission();
                 }
             } catch (UserNotMemberException e) {
                 return false;
             } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
                 em.close();
             }
         }
@@ -194,11 +164,13 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasStudyWriteAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         if (getScope() == ScopeType.USER) {
            return true;
         } else if (getScope() == ScopeType.ALBUM) {
-            return capability.hasWritePermission();
+            if (!canAccessStudy(capability.getAlbum(), studyInstanceUID)) {
+                return capability.hasWritePermission();
+            }
+            return capability.hasAppropriatePermission();
         } else {
             return false;
         }
@@ -212,9 +184,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         }
 
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         try {
-            tx.begin();
             if(getScope() == ScopeType.ALBUM) {
 
                 final Album album = em.merge(capability.getAlbum());
@@ -241,9 +211,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         } catch (UserNotMemberException | AlbumNotFoundException e) {
             return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
         return false;
@@ -252,7 +219,6 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     @Override
     public boolean hasAlbumAccess(String albumId) {
         this.em = EntityManagerListener.createEntityManager();
-        this.tx = em.getTransaction();
         if (getScope() == ScopeType.ALBUM) {
             return albumId.equals(capability.getAlbum().getId());
         } else if (getScope() == ScopeType.USER) {
@@ -260,15 +226,11 @@ public class CapabilityPrincipal implements KheopsPrincipal {
                 return false;
             }
             try {
-                tx.begin();
                 final Album album = getAlbum(albumId, em);
                 return isMemberOfAlbum(user, album, em);
             } catch (AlbumNotFoundException e) {
                 return false;
             } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
                 em.close();
             }
         } else {

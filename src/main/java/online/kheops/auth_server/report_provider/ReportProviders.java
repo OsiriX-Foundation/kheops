@@ -156,21 +156,15 @@ public class ReportProviders {
     public static PairListXTotalCount<ReportProviderResponse> getReportProviders(String albumId, Integer limit, Integer offset, KheopsLogBuilder kheopsLogBuilder) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
 
         final List<ReportProviderResponse> reportProviders = new ArrayList<>();
         final long totalCount;
         final List<ReportProvider> reportProvidersEntity;
 
         try {
-            tx.begin();
             reportProvidersEntity = getReportProvidersWithAlbumId(albumId, limit, offset, em);
             totalCount = countReportProviderWithAlbumId(albumId, em);
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 
@@ -187,25 +181,18 @@ public class ReportProviders {
     public static ReportProviderResponse getReportProvider(String albumId, String clientId, KheopsLogBuilder kheopsLogBuilder)
             throws ClientIdNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
         final ReportProvider reportProvider;
 
         try {
-            tx.begin();
-
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
                 throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
             }
 
-            tx.commit();
         } catch (NoResultException e) {
             throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 
@@ -303,21 +290,13 @@ public class ReportProviders {
             throws ClientIdNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
         final ReportProvider reportProvider;
 
         try {
-            tx.begin();
-
             reportProvider = getReportProviderWithClientId(clientId, em);
-
-            tx.commit();
         } catch (NoResultException e) {
             throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 

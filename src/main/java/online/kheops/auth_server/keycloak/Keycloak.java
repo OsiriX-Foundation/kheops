@@ -1,8 +1,6 @@
 package online.kheops.auth_server.keycloak;
 
-import online.kheops.auth_server.user.CacheUserName;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponseBuilder;
+import online.kheops.auth_server.user.*;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -50,19 +48,15 @@ public class Keycloak {
         public String getEmail() {
             return email;
         }
-
         public String getFirstName() {
             return firstName;
         }
-
         public String getLastName() {
             return lastName;
         }
-
         public String getUsername() {
             return username;
         }
-
         public String getId() {
             return id;
         }
@@ -89,6 +83,7 @@ public class Keycloak {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken())
                     .get(UserRepresentation.class);
         } catch (ProcessingException | WebApplicationException e) {
+            token.removeToken();
             throw new UserNotFoundException("unable to find the userinfo", e);
         }
     }
@@ -102,6 +97,7 @@ public class Keycloak {
             try {
                 response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
             } catch (ProcessingException e) {
+                token.removeToken();
                 throw new KeycloakException("Error during introspect token", e);
             }
 
@@ -112,19 +108,28 @@ public class Keycloak {
                     final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
                     if (keycloakUsers.size() > 0) {
                         final int index = keycloakUsers.verifyEmail(userLowerCase);
-                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index)).setSub(keycloakUsers.getId(0));
+                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index))
+                                .setSub(keycloakUsers.getId(0))
+                                .setFirstName(keycloakUsers.getFirstName(index))
+                                .setLastName(keycloakUsers.getLastName(index));
                     } else {
                         throw new UserNotFoundException();
                     }
                 }
             } else {
+                token.removeToken();
                 throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
             }
         } else {
 
-            String userEmail = cacheUserName.getCachedValue(user);
-            if (userEmail != null) {
-                return new UserResponseBuilder().setEmail(userEmail).setSub(user);
+            UserCachedData cachedData = cacheUserName.getCachedValue(user);
+
+            if (cachedData != null) {
+                return new UserResponseBuilder()
+                        .setEmail(cachedData.getEmail())
+                        .setFirstName(cachedData.getFirstName())
+                        .setLastName(cachedData.getLastName())
+                        .setSub(user);
             }
 
             final URI userUri = UriBuilder.fromUri(usersUri).path("/" + user).build();
@@ -135,6 +140,7 @@ public class Keycloak {
                 Invocation.Builder builder = ClientBuilder.newClient().target(userUri).request().header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString);
                 response = builder.get();
             } catch (ProcessingException e) {
+                token.removeToken();
                 throw new KeycloakException("Error during introspect token", e);
             }
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -144,17 +150,22 @@ public class Keycloak {
                     JsonArray reply = jsonReader.readArray();
                     final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                     if (keycloakUser.size() == 1) {
-                        cacheUserName.cacheValue(keycloakUser.getId(0), keycloakUser.getEmail(0));
-                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0)).setSub(keycloakUser.getId(0));
+                        cacheUserName.cacheValue(keycloakUser.getEmail(0), keycloakUser.getLastName(0), keycloakUser.getFirstName(0), keycloakUser.getId(0));
+                        return new UserResponseBuilder().setEmail(keycloakUser.getEmail(0))
+                                .setSub(keycloakUser.getId(0))
+                                .setLastName(keycloakUser.getLastName(0))
+                                .setFirstName(keycloakUser.getFirstName(0));
                     } else {
                         throw new UserNotFoundException();
                     }
                 } catch (Exception e) {
+                    token.removeToken();
                     throw new KeycloakException("error during parsing response : " + output, e);
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
             } else {
+                token.removeToken();
                 try {
                     String responseString = response.readEntity(String.class);
                     throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString + "\n" + responseString);
@@ -165,9 +176,8 @@ public class Keycloak {
         }
     }
 
-    public List<UserResponseBuilder> getUsers(String find, Integer limit, Integer offset)
+    public List<UserResponse> getUsers(String find, Integer limit, Integer offset)
             throws KeycloakException {
-
 
         final Response response;
         final String findLowerCase = find.toLowerCase();
@@ -178,6 +188,7 @@ public class Keycloak {
                     .queryParam("briefRepresentation", "true")
                     .request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
         } catch (ProcessingException e) {
+            token.removeToken();
             throw new KeycloakException("Error during introspect token", e);
         }
 
@@ -185,18 +196,22 @@ public class Keycloak {
             String output = response.readEntity(String.class);
             try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
                 JsonArray reply = jsonReader.readArray();
-                List<UserResponseBuilder> userResponseBuilders = new ArrayList<>();
+                List<UserResponse> userResponse = new ArrayList<>();
                 final KeycloakUsers keycloakUser = new KeycloakUsers(reply);
                 for(int i = 0;i < keycloakUser.size(); i++) {
                     if(!keycloakUser.getEmail(i).startsWith("service-account-") && !keycloakUser.getEmail(i).endsWith("@placeholder.org")) {
-                        userResponseBuilders.add(new UserResponseBuilder().setEmail(keycloakUser.getEmail(i)).setSub(keycloakUser.getId(i)));
+                        userResponse.add(new UserResponseBuilder()
+                                .setEmail(keycloakUser.getEmail(i))
+                                .setSub(keycloakUser.getId(i))
+                                .setFirstName(keycloakUser.getFirstName(i))
+                                .setLastName(keycloakUser.getLastName(i))
+                                .build());
                     }
                 }
-                return userResponseBuilders;
+                return userResponse;
             }
         }
-
-
+        token.removeToken();
         throw new KeycloakException("ERROR:");
     }
 }

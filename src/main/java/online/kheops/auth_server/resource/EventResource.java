@@ -17,6 +17,7 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.servlet.ServletContext;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -48,24 +49,17 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                               @QueryParam("types") final List<String> types,
-                              @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                              @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
+                              @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                              @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutation")) {
-            types.remove("mutation");
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM && types.contains("mutations")) {
+            types.remove("mutations");
             types.add("comments");
         }
 
         final PairListXTotalCount<EventResponse> pair;
-
-        if( offset < 0 ) {
-            return Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
-        }
-        if( limit < 0 ) {
-            return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
-        }
 
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
@@ -119,9 +113,6 @@ public class EventResource {
         } catch (UserNotFoundException | AlbumNotFoundException e) {
             LOG.log(Level.WARNING, "Not found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        } catch (BadQueryParametersException e) {
-            LOG.log(Level.WARNING, "Bad request", e);
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         }
 
         kheopsPrincipal.getKheopsLogBuilder().album(albumId)
@@ -136,8 +127,8 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     public Response getComments(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                @QueryParam(QUERY_PARAMETER_LIMIT) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                @QueryParam(QUERY_PARAMETER_OFFSET) @DefaultValue("0") Integer offset) {
+                                @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
+                                @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -146,16 +137,7 @@ public class EventResource {
         }
 
         final PairListXTotalCount<EventResponse> pair;
-
-        if( offset < 0 ) {
-            return Response.status(BAD_REQUEST).entity("offset must be >= 0").build();
-        }
-        if( limit < 0 ) {
-            return Response.status(BAD_REQUEST).entity("limit must be >= 0").build();
-        }
-
         pair = Events.getCommentsByStudyUID(kheopsPrincipal.getUser(), studyInstanceUID, offset, limit);
-
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)

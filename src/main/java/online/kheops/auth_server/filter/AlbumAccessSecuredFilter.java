@@ -1,6 +1,5 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 
@@ -39,11 +38,8 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
     }
 
     private void tryAccess(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
-        try {
-            if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
-                requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
-            }
-        } catch (AlbumNotFoundException e) {
+
+        if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
             requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
         }
     }

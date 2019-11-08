@@ -2,6 +2,8 @@ package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.album.AlbumResponse;
 import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.user.UserResponse;
+import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.ZoneOffset;
@@ -53,7 +55,7 @@ public class CapabilitiesResponse {
     @XmlElement(name = "scope_study")
     private String study;
     @XmlElement(name = "created_by")
-    private String createdBy;
+    private UserResponse createdBy;
 
     private CapabilitiesResponse() { /*empty*/ }
 
@@ -69,7 +71,7 @@ public class CapabilitiesResponse {
             if (capability.getLastUsed() != null) {
                 lastUsed = ZonedDateTime.of(capability.getLastUsed(), ZoneOffset.UTC).toString();
             }
-            createdBy = capability.getUser().getEmail();
+            createdBy = new UserResponseBuilder().setUser(capability.getUser()).build();
         }
 
         expirationTime = ZonedDateTime.of(capability.getExpirationTime(), ZoneOffset.UTC).toString();
@@ -86,9 +88,7 @@ public class CapabilitiesResponse {
         ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(this, capability);
     }
 
-    public void setScopeType(String scopeType) {
-        this.scopeType = scopeType;
-    }
+    public void setScopeType(String scopeType) { this.scopeType = scopeType; }
     public void setReadPermission(Boolean readPermission) { this.readPermission = readPermission; }
     public void setWritePermission(Boolean writePermission) { this.writePermission = writePermission; }
     public void setDownloadPermission(Boolean downloadPermission) { this.downloadPermission = downloadPermission; }
@@ -96,4 +96,5 @@ public class CapabilitiesResponse {
     public void setAlbumResponse(AlbumResponse albumResponse) { this.albumResponse = albumResponse; }
     public void setSeries(String series) { this.series = series; }
     public void setStudy(String study) { this.study = study; }
+    public void setOriginNull() { this.createdBy = null; }
 }

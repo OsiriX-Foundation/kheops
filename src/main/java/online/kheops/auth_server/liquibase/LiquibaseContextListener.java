@@ -23,16 +23,16 @@ import java.util.logging.Logger;
 public class LiquibaseContextListener implements ServletContextListener {
 
     private static ServletContext servletContext;
-    private final String changeLogFile = "kheopsChangeLog-master.xml";
+    private static final String CHANGE_LOG_FILE = "kheopsChangeLog-master.xml";
     private static final java.util.logging.Logger LOG = Logger.getLogger(LiquibaseContextListener.class.getName());
-    private static final String dbVersion = "v1";
+    private static final String DB_VERSION = "v1";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 
         servletContext = sce.getServletContext();
 
-        LOG.log(Level.INFO, "Start initializing the DB with Liquibase. Database version : " + dbVersion);
+        LOG.log(Level.INFO, "Start initializing the DB with Liquibase. Database version : " + DB_VERSION);
 
         final Properties properties = new Properties();
         properties.setProperty(Environment.USER, getJDBCUser());
@@ -57,8 +57,8 @@ public class LiquibaseContextListener implements ServletContextListener {
 
                 // Initialize Liquibase and run the update
                 Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
-                Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
-                final String version = dbVersion;
+                Liquibase liquibase = new Liquibase(CHANGE_LOG_FILE, new ClassLoaderResourceAccessor(), database);
+                final String version = DB_VERSION;
 
                 if (liquibase.tagExists(version)) {
                     liquibase.rollback(version, "");
@@ -72,7 +72,7 @@ public class LiquibaseContextListener implements ServletContextListener {
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Unable to use liquibase", e);
             }
-        LOG.log(Level.INFO, "Liquibase : database version : " + dbVersion + "SUCCESSFUL");
+        LOG.log(Level.INFO, "Liquibase : database version : " + DB_VERSION + "SUCCESSFUL");
     }
 
     @Override

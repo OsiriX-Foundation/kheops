@@ -160,15 +160,11 @@ public class Capabilities {
         final long totalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
-
         try {
-            tx.begin();
-
             callingUser = em.merge(callingUser);
 
             final List<Capability> capabilities;
-            if(valid) {
+            if (valid) {
                 capabilities = findCapabilitiesByUserValidOnly(callingUser, limit, offset, em);
                 totalCount = countCapabilitiesByUserValidOnly(callingUser, em);
             } else {
@@ -176,17 +172,13 @@ public class Capabilities {
                 totalCount = countAllCapabilitiesByUser(callingUser, em);
             }
 
-            for (Capability capability: capabilities) {
+            for (Capability capability : capabilities) {
                 capabilityResponses.add(new CapabilitiesResponse(capability, false, false));
             }
-
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
+
         return new PairListXTotalCount<>(totalCount, capabilityResponses);
     }
 
@@ -196,12 +188,9 @@ public class Capabilities {
         final long totalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
 
+        final List<Capability> capabilities;
         try {
-            tx.begin();
-
-            final List<Capability> capabilities;
             if(valid) {
                 capabilities = findCapabilitiesByAlbumValidOnly(albumId, limit, offset, em);
                 totalCount = countCapabilitiesByAlbumValidOnly(albumId, em);
@@ -213,12 +202,7 @@ public class Capabilities {
             for (Capability capability: capabilities) {
                 capabilityResponses.add(new CapabilitiesResponse(capability, false, false));
             }
-
-            tx.commit();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
         return new PairListXTotalCount<>(totalCount, capabilityResponses);

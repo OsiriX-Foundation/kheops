@@ -4,7 +4,6 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.ScopeType;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
@@ -71,10 +70,8 @@ public class MetricResponse {
 
     public MetricResponse() {
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
             numberOfUsers = getNumberOfUsers(em);
             numberOfAlbums = getNumberOfAlbumsIncludeInbox(em) - numberOfUsers; // - numberOfUsers exclude inbox
             numberOfReportProviders = getNumberOfReportProviders(em);
@@ -104,8 +101,6 @@ public class MetricResponse {
             seriesInStudyHistogram = getStudySeriesHistogram(em);
             seriesInAlbumHistogram = getAlbumSeriesHistogram(em);
 
-            tx.commit();
-
             for (AlbumUserHistogram albumUserHistogram : usersInAlbumHistogram) {
                 if (albumUserHistogram.nbUsers == 1) {
                     albumUserHistogram.nbAlbums = albumUserHistogram.nbAlbums - numberOfUsers; //remove all inbox
@@ -114,9 +109,6 @@ public class MetricResponse {
             }
 
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }

@@ -1,6 +1,7 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.Capability;
+import online.kheops.auth_server.user.UserResponse;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class AlbumResponse {
     @XmlElement(name = "number_of_users")
     private Integer numberOfUsers;
     @XmlElement(name = "users")
-    private List<UserAlbumResponse> users;
+    private List<UserResponse> users;
     @XmlElement(name = "number_of_comments")
     private Integer numberOfComments;
     @XmlElement(name = "number_of_studies")
@@ -99,5 +100,5 @@ public class AlbumResponse {
 
     public String getId() { return id; }
 
-    public void setUsers(List<UserAlbumResponse> users) { this.users = users; }
+    public void setUsers(List<UserResponse> users) { this.users = users; }
 }

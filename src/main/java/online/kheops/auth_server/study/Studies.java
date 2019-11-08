@@ -471,19 +471,14 @@ public class Studies {
     public static boolean canAccessStudy(Album album, String studyUID) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
             StudyQueries.findStudyByStudyandAlbum(studyUID, album, em);
             return true;
 
         } catch (StudyNotFoundException e) {
             return false;
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
     }
@@ -510,7 +505,7 @@ public class Studies {
 
             } else {
                 album = getAlbum(fromAlbumId, em);
-                seriesList = findSeriesListByStudyUIDFromAlbum(callingUser,album, studyInstanceUID, em);
+                seriesList = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
                 kheopsLogBuilder.album(fromAlbumId);
             }
             if(seriesList.isEmpty()) {

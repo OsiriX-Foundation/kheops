@@ -13,16 +13,16 @@ public class CacheUserName {
     private static CacheUserName instance = null;
     private static final String CACHE_ALIAS = "userCache";
 
-    private Cache<String, String> userCache;
+    private Cache<String, UserCachedData> userCache;
 
     private CacheUserName() {
         CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(CACHE_USER.SIZE))
+                .withCache(CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, UserCachedData.class, ResourcePoolsBuilder.heap(CACHE_USER.SIZE))
                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(CACHE_USER.DURATION)))
                 .build();
         cacheManager.init();
 
-        userCache = cacheManager.getCache(CACHE_ALIAS, String.class, String.class);
+        userCache = cacheManager.getCache(CACHE_ALIAS, String.class, UserCachedData.class);
     }
 
     public static synchronized CacheUserName getInstance() {
@@ -32,11 +32,12 @@ public class CacheUserName {
         return instance = new CacheUserName();
     }
 
-    public void cacheValue(String userName, String userId) {
-        userCache.putIfAbsent(userName, userId);
+    public void cacheValue(String email, String lastName, String firstName, String userId) {
+        final UserCachedData userCachedData = new UserCachedData(email, firstName, lastName);
+        userCache.putIfAbsent(userId, userCachedData);
     }
 
-    public String getCachedValue(String userId) {
+    public UserCachedData getCachedValue(String userId) {
         return userCache.get(userId);
     }
 

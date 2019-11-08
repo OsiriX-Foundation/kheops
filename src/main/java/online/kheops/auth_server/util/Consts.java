@@ -20,6 +20,10 @@ public class Consts {
     public static final String ALBUM = "album";
     public static final String INBOX = "inbox";
 
+    public static final String INCLUDE_FIELD = "includefield";
+
+    public static final String HEADER_X_TOKEN_SOURCE = "X-Token-Source";
+
     public abstract static class USER_IN_ROLE {
         private USER_IN_ROLE() {}
         public static final String CAPABILITY = "capability";

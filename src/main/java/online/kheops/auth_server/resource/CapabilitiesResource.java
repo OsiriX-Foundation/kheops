@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.generateCapability;
 import static online.kheops.auth_server.capability.CapabilityId.ID_PATTERN;
-import static online.kheops.auth_server.capability.CapabilityToken.TOKEN_PATTERN;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -51,10 +50,10 @@ public class CapabilitiesResource {
                                         @FormParam("not_before_time") String notBeforeTime,
                                         @NotNull @FormParam("scope_type") String scopeType,
                                         @FormParam("album") String albumId,
-                                        @NotNull @FormParam("read_permission") boolean readPermission,
-                                        @NotNull @FormParam("appropriate_permission") boolean appropriatePermission,
-                                        @NotNull @FormParam("download_permission") boolean downloadPermission,
-                                        @NotNull @FormParam("write_permission") boolean writePermission) {
+                                        @DefaultValue("false") @FormParam("read_permission") boolean readPermission,
+                                        @DefaultValue("false") @FormParam("appropriate_permission") boolean appropriatePermission,
+                                        @DefaultValue("false") @FormParam("download_permission") boolean downloadPermission,
+                                        @DefaultValue("false") @FormParam("write_permission") boolean writePermission) {
 
         if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
             return Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
@@ -69,23 +68,28 @@ public class CapabilitiesResource {
                 .readPermission(readPermission)
                 .writePermission(writePermission);
 
-        if (readPermission) {
-            capabilityParametersBuilder.appropriatePermission(appropriatePermission)
-                    .downloadPermission(downloadPermission);
+        if (!readPermission) {
+            if (appropriatePermission) {
+                return Response.status(BAD_REQUEST).entity("'appropriatePermission' is availble only if 'readPermission' is True").build();
+            }
+            if (downloadPermission) {
+                return Response.status(BAD_REQUEST).entity("'downloadPermission' is availble only if 'readPermission' is True").build();
+            }
         }
+        capabilityParametersBuilder.appropriatePermission(appropriatePermission)
+                .downloadPermission(downloadPermission);
         if(notBeforeTime != null) {
             try {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
             } catch (DateTimeParseException e) {
-                return Response.status(BAD_REQUEST).entity("Bad query parameter {not_before_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter 'not_before_time'").build();
             }
         }
         if(expirationTime != null) {
             try {
                 capabilityParametersBuilder.expirationTime(expirationTime);
-
             } catch (DateTimeParseException e) {
-                return Response.status(BAD_REQUEST).entity("Bad query parameter {expiration_time}").build();
+                return Response.status(BAD_REQUEST).entity("Bad query parameter 'expiration_time'").build();
             }
         }
 
@@ -94,7 +98,7 @@ public class CapabilitiesResource {
         } catch (CapabilityBadRequestException e) {
             return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(BAD_REQUEST).entity("{scope_type} = user or album. Not : "+scopeType).build();
+            return Response.status(BAD_REQUEST).entity("'scope_type' must be 'user' or 'album'. Not : "+scopeType).build();
         }
 
         final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
@@ -178,7 +182,6 @@ public class CapabilitiesResource {
 
         final CapabilitiesResponse capabilityResponses;
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
-
 
         try {
             capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getDBID());

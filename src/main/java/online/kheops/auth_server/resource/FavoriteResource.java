@@ -115,12 +115,8 @@ public class FavoriteResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
-            }
-        } catch (SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).build();
+        if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+            return Response.status(FORBIDDEN).build();
         }
 
         try {

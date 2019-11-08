@@ -1,6 +1,7 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.user.UserResponse;
 import org.jooq.Record;
 
 import java.math.BigDecimal;
@@ -11,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
-import static online.kheops.auth_server.generated.tables.Series.SERIES;
-
 public class AlbumResponseBuilder {
 
     private String id;
@@ -22,7 +21,7 @@ public class AlbumResponseBuilder {
     private LocalDateTime createdTime;
     private LocalDateTime lastEventTime;
     private Integer numberOfUsers;
-    private List<UserAlbumResponse> users;
+    private List<UserResponse> users;
     private Integer numberOfComments;
     private Integer numberOfStudies;
     private Integer numberOfSeries;
@@ -91,8 +90,8 @@ public class AlbumResponseBuilder {
     }
 
     public AlbumResponseBuilder addUser(AlbumUser albumUser) {
-        UserAlbumResponse userAlbumResponse = new UserAlbumResponse(albumUser);
-        users.add(userAlbumResponse);
+        UserResponse userResponse = new UserResponse(albumUser);
+        users.add(userResponse);
         return this;
     }
 
@@ -126,7 +125,7 @@ public class AlbumResponseBuilder {
         return numberOfUsers;
     }
 
-    public List<UserAlbumResponse> getUsers() {
+    public List<UserResponse> getUsers() {
         return users;
     }
 
