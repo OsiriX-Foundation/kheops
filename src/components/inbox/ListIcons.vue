@@ -65,7 +65,7 @@
         v-if="showViewerIcon"
         class="ml-1"
         :title="$t('ohif')"
-        @click.stop="openViewer('Ohif')"
+        @click.stop="openViewer('default')"
       >
         <visibility-icon
           width="24px"
@@ -126,13 +126,14 @@ import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 import AddIcon from '@/components/kheopsSVG/AddIcon';
 import { ViewerToken } from '@/mixins/tokens.js';
 import { CurrentUser } from '../../mixins/currentuser.js';
+import { Viewer } from '@/mixins/viewer.js';
 
 export default {
   name: 'ListIcons',
   components: {
     OsirixIcon, VisibilityIcon, AddIcon, WeasisIcon,
   },
-  mixins: [ViewerToken, CurrentUser],
+  mixins: [ViewerToken, CurrentUser, Viewer],
   props: {
     study: {
       type: Object,
@@ -265,33 +266,33 @@ export default {
     openViewer(viewer) {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       const sourceQuery = this.getSourceQueries();
-      let ohifWindow;
-      if (viewer === 'Ohif') {
-        ohifWindow = window.open('', `OHIFViewer-${StudyInstanceUID}`);
+      let openWindow = {};
+      let openWSI = this.study.ModalitiesInStudy !== undefined
+        && this.study.ModalitiesInStudy.Value.length === 1
+        && this.study.ModalitiesInStudy.Value[0] === 'SM';
+      if (viewer === 'default' && openWSI === false) {
+        openWindow['ohif'] = window.open('', `OHIFViewer-${StudyInstanceUID}`);
+      } else if (viewer ==='default' && openWSI === true) {
+        openWindow['wsi'] = window.open('', `WSIViewer-${StudyInstanceUID}`);
       }
       this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
+        const viewerToken = res.data.access_token;
+        let url = '';
         if (viewer === 'Osirix') {
-          this.openOsiriX(StudyInstanceUID, res.data.access_token);
-        } else if (viewer === 'Ohif') {
-          ohifWindow.location.href = this.openOhif(StudyInstanceUID, res.data.access_token, sourceQuery);
+          url = this.openOsiriX(StudyInstanceUID, viewerToken);
+          window.open(url, '_self');
+        } else if (viewer === 'default' && openWindow['ohif'] !== undefined) {
+          url = this.openOhif(StudyInstanceUID, viewerToken, sourceQuery);
+          openWindow['ohif'].location.href = url;
+        } else if (viewer === 'default' && openWindow['wsi'] !== undefined) {
+          openWindow['wsi'].location.href = this.openWSI(StudyInstanceUID, viewerToken, sourceQuery);
         } else if (viewer === 'Weasis') {
-          this.openWeasis(StudyInstanceUID, res.data.access_token);
+          url = this.openWeasis(StudyInstanceUID, res.data.access_token);
+          window.open(url, '_self');
         }
       }).catch((err) => {
         console.log(err);
       });
-    },
-    openOsiriX(StudyInstanceUID, token) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`;
-      window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
-    },
-    openWeasis(StudyInstanceUID, token) {
-      const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
-      window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
-    },
-    openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
-      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
     },
     showComments(study, flagView) {
       const params = {
