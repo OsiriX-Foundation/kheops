@@ -294,21 +294,6 @@ export default {
         console.log(err);
       });
     },
-<<<<<<< HEAD
-    openOsiriX(StudyInstanceUID, token) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}?accept=application/zip`;
-      window.open(`osirix://?methodName=downloadURL&URL='${encodeURIComponent(url)}'`, '_self');
-    },
-    openWeasis(StudyInstanceUID, token) {
-      const url = `$weasis:config pro="dicom.qido.query.multi.params true" $dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
-      window.open(`weasis://?${encodeURIComponent(url)}`, '_self');
-    },
-    openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
-      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
-    },
-=======
->>>>>>> demo
     showComments(study, flagView) {
       const params = {
         StudyInstanceUID: study.StudyInstanceUID.Value[0],
