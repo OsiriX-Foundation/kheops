@@ -24,7 +24,6 @@ export const Viewer = {
       return `${process.env.VUE_APP_URL_VIEWER_SM}#access_token=${encodeURIComponent(token)}&target_uri=${encodeURIComponent(url)}&studyUID=${encodeURIComponent(StudyInstanceUID)}&${defaultFragParameters}`;
     },
     openWADO(StudyInstanceUID, token, queryparams) {
-      console.log('here')
       return `${process.env.VUE_APP_URL_API}/link/${token}/wado${queryparams}`
     }
   },

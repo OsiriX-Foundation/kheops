@@ -240,26 +240,34 @@ export default {
       let openWSI = this.study.ModalitiesInStudy !== undefined
         && this.study.ModalitiesInStudy.Value.length === 1
         && this.study.ModalitiesInStudy.Value[0] === 'SM';
-
+      let windowProps = {}
+      if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
+        windowProps['name'] = `WADO-${this.seriesInstanceUID}`;
+        windowProps['id'] = 'WADO'
+      } else if (openWSI) {
+        windowProps['name'] = `WSI-${this.studyInstanceUID}`;
+        windowProps['id'] = 'WSI'
+      } else if (series.Modality.Value[0] !== 'SR') {
+        windowProps['name'] = `OHIF-${this.studyInstanceUID}`;
+        windowProps['id'] = 'OHIF'
+      }
+      let openWindow = window.open('', windowProps.name)
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;
         const sourceQuery = this.getSourceQueries();
         let url = '';
-        if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
-          const wadoWindow = window.open('', `WADO-${this.seriesInstanceUID}`);
+        if (windowProps.id === 'WADO') {
           const contentType = series.SOPClassUID.Value[0] === SOPPdf ? 'application/pdf' : 'video/mp4';
           const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
           url = this.openWADO(this.studyInstanceUID, viewerToken, queryparams);
-          wadoWindow.location.href = url;
-        } else if (openWSI) {
-          const wsiWindow = window.open('', `WSI-${this.studyInstanceUID}`);
+          openWindow.location.href = url;
+        } else if (windowProps.id === 'WSI') {
           url = this.openWSI(this.studyInstanceUID, viewerToken);
-          wsiWindow.location.href = url;
-        } else if (series.Modality.Value[0] !== 'SR') {
-          const ohifWindow = window.open('', `OHIF-${this.studyInstanceUID}`);
+          openWindow.location.href = url;
+        } else if (windowProps.id === 'OHIF') {
           const sourceQuery = this.getSourceQueries();
           url = this.openOhif(this.studyInstanceUID, viewerToken, sourceQuery);
-          ohifWindow.location.href = url;
+          openWindow.location.href = url;
         }
       }).catch((err) => {
         console.log(err);
