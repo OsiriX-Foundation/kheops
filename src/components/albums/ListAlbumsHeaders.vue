@@ -11,71 +11,75 @@
 }
 </i18n>
 <template>
+<div>
   <div
-    class="d-flex"
+    class="pt-2"
   >
     <div
-      class="p-3"
+      class="d-flex flex-wrap"
     >
-      <button
-        class="btn btn-secondary ml-2"
-        @click="goNewAlbum"
-      >
-        <v-icon
-          name="plus"
-          class="mr-2"
-        />
-        {{ $t('newalbum') }}
-      </button>
-    </div>
-    <div
-      class="p-2"
-    >
-      <button
-        type="button"
-        class="btn btn-link btn-sm text-center inline-white"
-        :disabled="disabledBtnShare"
-        @click="inviteClick"
-      >
-        <span>
-          <v-icon
-            name="user-plus"
-            scale="1.5"
-          />
-        </span><br>
-        {{ $t("share") }}
-      </button>
-    </div>
-    <div class="ml-auto" />
-    <div
-      class="d-none d-sm-block align-self-center"
-    >
-      <button
-        type="button"
-        class=" btn btn-link btn-lg kheopsicon"
-        @click="reloadAlbums()"
-      >
-        <v-icon
-          name="refresh"
-          scale="2"
-        />
-      </button>
-    </div>
-    <div
-      class="d-none d-sm-block align-self-center"
-    >
-      <button
-        type="button"
-        class="btn btn-link btn-lg inline-white kheopsicon"
-        @click="searchClick"
-      >
-        <v-icon
-          name="search"
-          scale="1.8"
-        />
-      </button>
+        <div class="p-2 align-self-center d-none d-sm-block">
+          <button
+            class="btn btn-secondary ml-2"
+            @click="goNewAlbum"
+          >
+            <v-icon
+              name="plus"
+              class="mr-2"
+            />
+            {{ $t('newalbum') }}
+          </button>
+        </div>
+        <div
+          class="align-self-center"
+        >
+          <button
+            type="button"
+            class="btn btn-link btn-sm text-center inline-white"
+            :disabled="disabledBtnShare"
+            @click="inviteClick"
+          >
+            <span>
+              <v-icon
+                name="user-plus"
+                scale="1.5"
+              />
+            </span><br>
+            {{ $t("share") }}
+          </button>
+        </div>
+        <div class="ml-auto" />
+        <div
+          class="align-self-center"
+        >
+          <button
+            type="button"
+            class="btn btn-link kheopsicon"
+            @click="reloadAlbums()"
+          >
+            <v-icon
+              name="refresh"
+              scale="2"
+            />
+          </button>
+        </div>
+        <div
+          class="align-self-center"
+        >
+          <button
+            type="button"
+            class="btn btn-link kheopsicon"
+            @click="searchClick"
+          >
+            <v-icon
+              name="search"
+              scale="1.8"
+            />
+          </button>
+        </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
