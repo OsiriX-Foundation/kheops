@@ -26,9 +26,15 @@
     "editreportprovider": "{user} edit the report provider {reportname}",
     "deletereportprovider": "{user} delete the report provider {reportname}",
     "newreport": "{user} add a new report in the study {study} with the report provider {reportname}",
-    "privatemessagereceive": "Private message",
+    "privatemessagereceive": "Private message for you.",
     "privatemessagesend": "Private message for: {user}",
-    "you": "You"
+    "you": "You",
+    "userunknown": "User {user} unknown",
+    "noaccessalbum": "{user} has no access to this album",
+    "noaccessstudy": "{user} has no access to this study",
+    "noaccess": "no more access",
+    "nocommentaccessalbum": "is no longer a member of this album.",
+    "nocommentaccessstudy": "no access to this study."
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -54,9 +60,14 @@
     "editreportprovider": "{user} a édité le report provider {reportname}",
     "deletereportprovider": "{user} a supprimé le report provider {reportname}",
     "newreport": "{user} a ajouté un nouveau rapport dans l'étude {study} avec le report provider {reportname}",
-    "privatemessagereceive": "Message privé",
+    "privatemessagereceive": "Message privé pour vous.",
     "privatemessagesend": "Message privé pour: {user}",
-    "you": "Vous"
+    "you": "Vous",
+    "userunknown": "Utilisateur {user} inconnu",
+    "noaccessalbum": "{user} n'a pas d'accès à cet album",
+    "noaccessstudy": "{user} n'a pas d'accès à cette étude",
+    "nocommentaccessalbum": "n'est plus membre de cet album.",
+    "nocommentaccessstudy": "n'a plus accès à cette étude."
   }
 }
 </i18n>
@@ -98,9 +109,27 @@
               <v-icon
                 name="user"
                 class="icon-margin-right"
+                :class="comment.origin.can_access === false ? 'font-neutral' : ''"
               />
-              <span>
-                {{ currentuserEmail !== comment.origin_name ? comment.origin_name : $t('you') }}
+              <span
+                v-if="currentuserEmail === comment.origin.email"
+              >
+                {{ $t('you') }}
+              </span>
+              <a
+                v-else-if="comment.origin.can_access === true "
+                class="font-white"
+                :title="comment.origin.email"
+                @click="clickPrivateUser(comment.origin.email)"
+              >
+                {{ getUsername(comment.origin) }}
+              </a>
+              <span
+                v-else
+                class="font-neutral"
+                :title="comment.origin.email"
+              >
+                {{ getUsername(comment.origin) }} - <i>{{ scope === 'album' ? $t('nocommentaccessalbum') : $t('nocommentaccessstudy') }}</i>
               </span>
               <span class="float-right">
                 {{ comment.post_date | formatDate }}
@@ -109,16 +138,16 @@
                 v-if="comment.is_private"
               >
                 <b
-                  v-if="comment.is_private && currentuserEmail !== comment.origin_name"
+                  v-if="comment.is_private && currentuserEmail !== comment.origin.email"
                   class="text-warning"
                 >
-                  {{ $t('privatemessagereceive', { user: comment.origin_name }) }}
+                  {{ $t('privatemessagereceive', { user: getUsername(comment.origin) }) }}
                 </b>
                 <b
-                  v-if="comment.is_private && currentuserEmail !== comment.target_name"
+                  v-if="comment.is_private && currentuserEmail !== comment.target.email"
                   class="text-warning"
                 >
-                  {{ $t('privatemessagesend', { user: comment.target_name }) }}
+                  {{ $t('privatemessagesend', { user: getUsername(comment.target) }) }}
                 </b>
               </div>
             </div>
@@ -152,13 +181,13 @@
                 v-if="comment.mutation_type === 'IMPORT_STUDY'"
                 class="flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('imported') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_STUDY'"
                 class="flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('removed') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- IMPORT_SERIES, REMOVE_SERIES -->
@@ -166,13 +195,13 @@
                 v-if="comment.mutation_type === 'IMPORT_SERIES'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('imported') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('imported') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_SERIES'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('removed') }} {{ $t('theseries') }} <b>{{ comment.series.description ? comment.series.description : comment.series.UID }}</b> {{ $t('in') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN -->
@@ -180,31 +209,31 @@
                 v-if="comment.mutation_type === 'ADD_USER'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} <i>{{ comment.target_name }}</i>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hasadd') }} {{ $t('theuser') }} <i>{{ getUsername(comment.target) }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'ADD_ADMIN'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} <i>{{ comment.target_name }}</i>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hasadd') }} {{ $t('theadmin') }} <i>{{ getUsername(comment.target) }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'REMOVE_USER'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removed') }} {{ $t('theuser') }} <i>{{ comment.target_name }}</i>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('removed') }} {{ $t('theuser') }} <i>{{ getUsername(comment.target) }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'PROMOTE_ADMIN'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ comment.target_name }}</i>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hasgranted') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ getUsername(comment.target) }}</i>
               </div>
               <div
                 v-if="comment.mutation_type === 'DEMOTE_ADMIN'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ comment.target_name }}</i>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hasremoved') }} {{ $t('adminrights') }} {{ $t('to') }} <i>{{ getUsername(comment.target) }}</i>
               </div>
 
               <!-- LEAVE_ALBUM -->
@@ -212,7 +241,7 @@
                 v-if="comment.mutation_type === 'LEAVE_ALBUM'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasleft') }}
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hasleft') }}
               </div>
 
               <!-- CREATE_ALBUM -->
@@ -220,7 +249,7 @@
                 v-if="comment.mutation_type === 'CREATE_ALBUM'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hascreated') }} {{ $t('thealbum') }}
               </div>
 
               <!-- EDIT_ALBUM -->
@@ -228,7 +257,7 @@
                 v-if="comment.mutation_type === 'EDIT_ALBUM'"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('hasedited') }} {{ $t('thealbum') }}
               </div>
 
               <!-- ADD STUDY IN FAVORITES -->
@@ -236,7 +265,7 @@
                 v-if="comment.mutation_type === 'ADD_FAV' && comment.study"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('addalbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('addalbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <!-- ADD STUDY IN FAVORITES -->
@@ -244,35 +273,35 @@
                 v-if="comment.mutation_type === 'REMOVE_FAV' && comment.study"
                 class=" flex-grow-1 bd-highlight"
               >
-                <i>{{ comment.origin_name }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+                <i>{{ getUsername(comment.origin) }}</i> {{ $t('removealbum') }} {{ $t('thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
               </div>
 
               <div
                 v-if="comment.mutation_type === 'CREATE_REPORT_PROVIDER' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('createreportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
+                {{ $t('createreportprovider', {user: getUsername(comment.origin), reportname: comment.report_provider.name}) }}
               </div>
 
               <div
                 v-if="comment.mutation_type === 'EDIT_REPORT_PROVIDER' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('editreportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
+                {{ $t('editreportprovider', {user: getUsername(comment.origin), reportname: comment.report_provider.name}) }}
               </div>
 
               <div
                 v-if="comment.mutation_type === 'DELETE_REPORT_PROVIDER' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('deletereportprovider', {user: comment.origin_name, reportname: comment.report_provider.name}) }}
+                {{ $t('deletereportprovider', {user: getUsername(comment.origin), reportname: comment.report_provider.name}) }}
               </div>
 
               <div
                 v-if="comment.mutation_type === 'NEW_REPORT' && comment.report_provider"
                 class=" flex-grow-1 bd-highlight"
               >
-                {{ $t('newreport', {user: comment.origin_name, reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+                {{ $t('newreport', {user: getUsername(comment.origin), reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
               </div>
             </div>
           </div>
@@ -285,9 +314,10 @@
       <div class="row mt-4 justify-content-center">
         <div class="col-sm-6 col-md-4 text-sm-left text-md-right">
           <b-form-checkbox
+            v-model="statusMsgPrivate"
             class="pt-1"
             inline
-            @change="SetEnabledVariables()"
+            @change="setEnabledVariables()"
           >
             <span
               class="pointer"
@@ -301,7 +331,7 @@
             :id="id ? id : album.album_id"
             ref="privateuser"
             :scope="scope"
-            :enable-add="enablePrivate"
+            :enable-add="statusMsgPrivate"
             @private-user="setPrivateUser"
           />
         </div>
@@ -376,6 +406,7 @@ export default {
       messageSend: false,
       enablePrivate: false,
       disabledText: false,
+      statusMsgPrivate: false,
     };
   },
   computed: {
@@ -387,6 +418,9 @@ export default {
     },
     container_id() {
       return (this.scope === 'album') ? 'album_comment_container' : `study_${this.id.replace(/\./g, '_')}_comment_container`;
+    },
+    accessVar() {
+      return this.scope === 'album' ? 'album_access' : 'study_access';
     },
   },
   watch: {
@@ -403,21 +437,40 @@ export default {
     this.getComments();
   },
   methods: {
+    getUsername(objectUser) {
+      if (objectUser.last_name === "" || objectUser.first_name === "") {
+        return objectUser.email;
+      }
+      return `${objectUser.first_name} ${objectUser.last_name}`
+    },
     checkUserFromTextarea() {
       if (this.disabledText) {
         this.$refs.privateuser.checkUser();
       }
     },
-    SetEnabledVariables() {
-      this.enablePrivate = !this.enablePrivate;
-      this.disabledText = !this.disabledText;
+    clickPrivateUser(user) {
+      this.$refs.privateuser.checkSpecificUser(user).then((res) => {
+        if (res.status === 204) {
+          this.$snotify.error(this.$t('userunknown', { user }));
+        } else if (!res.data[this.accessVar]) {
+          this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user }) : this.$t('noaccessstudy', { user }));
+        } else if (res.status === 200 && res.data[this.accessVar]) {
+          this.statusMsgPrivate = true
+          this.$refs.privateuser.setUser(user);
+          const { textcomment } = this.$refs;
+          setTimeout(() => { textcomment.focus(); }, 0);
+        }
+      });
+    },
+    setEnabledVariables() {
+      this.disabledText = !this.statusMsgPrivate;
     },
     setPrivateUser(user) {
       if (user !== '') {
         this.disabledText = false;
         this.privateUser = user;
       } else {
-        this.disabledText = this.enablePrivate;
+        this.disabledText = this.statusMsgPrivate;
       }
     },
     addComment() {
@@ -425,7 +478,7 @@ export default {
         const queries = {
           comment: this.newComment.comment,
         };
-        if (this.enablePrivate) {
+        if (this.statusMsgPrivate) {
           queries.to_user = this.privateUser;
         }
 

@@ -103,11 +103,12 @@ import { mapGetters } from 'vuex';
 import BounceLoader from 'vue-spinner/src/BounceLoader.vue';
 import { ViewerToken } from '../../mixins/tokens.js';
 import { CurrentUser } from '../../mixins/currentuser.js';
+import { Viewer } from '@/mixins/viewer.js';
 
 export default {
   name: 'SeriesSummary',
   components: { BounceLoader },
-  mixins: [ViewerToken, CurrentUser],
+  mixins: [ViewerToken, CurrentUser, Viewer],
   props: {
     serie: {
       type: Object,
@@ -236,29 +237,38 @@ export default {
     openTab(series) {
       const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1';
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
+      let openWSI = this.study.ModalitiesInStudy !== undefined
+        && this.study.ModalitiesInStudy.Value.length === 1
+        && this.study.ModalitiesInStudy.Value[0] === 'SM';
+      let windowProps = {}
       if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
-        const contentType = series.SOPClassUID.Value[0] === SOPPdf ? 'application/pdf' : 'video/mp4';
-        this.openWADO(series, contentType);
+        windowProps['name'] = `WADO-${this.seriesInstanceUID}`;
+        windowProps['id'] = 'WADO'
+      } else if (openWSI) {
+        windowProps['name'] = `WSI-${this.studyInstanceUID}`;
+        windowProps['id'] = 'WSI'
       } else if (series.Modality.Value[0] !== 'SR') {
-        this.openViewer();
+        windowProps['name'] = `OHIF-${this.studyInstanceUID}`;
+        windowProps['id'] = 'OHIF'
       }
-    },
-    openViewer() {
-      const ohifWindow = window.open('', `OHIFViewer-${this.studyInstanceUID}`);
+      let openWindow = window.open('', windowProps.name)
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
-        const sourceQueries = this.getSourceQueries();
-        const queryparams = `?firstseries=${this.seriesInstanceUID}${sourceQueries.length > 0 ? `&${sourceQueries}` : ''}`;
-        const url = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${this.studyInstanceUID}/ohifmetadata${queryparams}`;
-        ohifWindow.location.href = `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
-      }).catch((err) => {
-        console.log(err);
-      });
-    },
-    openWADO(series, contentType) {
-      const wadoWindow = window.open('', `WADO-${this.seriesInstanceUID}`);
-      this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
-        const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
-        wadoWindow.location.href = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/wado${queryparams}`;
+        const viewerToken = res.data.access_token;
+        const sourceQuery = this.getSourceQueries();
+        let url = '';
+        if (windowProps.id === 'WADO') {
+          const contentType = series.SOPClassUID.Value[0] === SOPPdf ? 'application/pdf' : 'video/mp4';
+          const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
+          url = this.openWADO(this.studyInstanceUID, viewerToken, queryparams);
+          openWindow.location.href = url;
+        } else if (windowProps.id === 'WSI') {
+          url = this.openWSI(this.studyInstanceUID, viewerToken);
+          openWindow.location.href = url;
+        } else if (windowProps.id === 'OHIF') {
+          const sourceQuery = this.getSourceQueries();
+          url = this.openOhif(this.studyInstanceUID, viewerToken, sourceQuery);
+          openWindow.location.href = url;
+        }
       }).catch((err) => {
         console.log(err);
       });
