@@ -15,7 +15,8 @@
     "errorcode": "Error code",
     "authorizationerror": "Authorization Error",
     "nondicomfile": "Non DICOM file",
-    "unknownerror": "Unknown Error"
+    "unknownerror": "Unknown Error",
+    "reload": "Reload files"
   },
   "fr": {
     "filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -32,7 +33,8 @@
     "errorcode": "Code d'erreur",
     "authorizationerror": "Erreur d'authorisation",
     "nondicomfile": "Fichier non DICOM",
-    "unknownerror": "Erreur inconnue"
+    "unknownerror": "Erreur inconnue",
+    "reload": "Recharger les fichiers"
   }
 }
 </i18n>
@@ -258,7 +260,7 @@
                 <span
                   class="text-warning"
                 >
-                  {{ errorValues[key] }}
+                  {{ $t(errorValues[key]) }}
                 </span>
               </div>
             </div>
@@ -266,7 +268,23 @@
             <div
               v-if="error.length > 0"
             >
-              {{ $tc("filesErrors", error.length, {count: error.length}) }} <br>
+              <div
+                class="mb-1"
+              >
+                <span>
+                  {{ $tc("filesErrors", error.length, {count: error.length}) }}
+                </span>
+              </div>
+              <div
+                class="mb-1"
+              >
+                <a
+                  class="text-center text-success"
+                  @click="retry"
+                >
+                  {{ $t('reload') }}
+                </a>
+              </div>
               <a
                 class="text-center text-warning"
                 @click="UI.showErrors=!UI.showErrors"
@@ -419,6 +437,10 @@ export default {
   destroyed() {
   },
   methods: {
+    retry() {
+      this.$store.dispatch('setSending', { sending: true });
+      this.$store.dispatch('setFiles', {files: this.error});
+    },
     goToAlbum() {
       this.$router.push(`/albums/${this.source}`);
     },
@@ -617,7 +639,7 @@ export default {
         const fileError = this.copyFiles.find((file) => file.id === id);
         if (fileError) {
           const textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`;
-          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, textError) });
+          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError) });
         }
       });
     },
@@ -645,11 +667,10 @@ export default {
       });
       return map;
     },
-    createObjErrors(id, value) {
-      return {
-        id,
-        value,
-      };
+    createObjErrors(file, value) {
+      let objError = file;
+      objError.value = value;
+      return objError;
     },
     setShowErrors(value) {
       this.UI.showErrors = value;
