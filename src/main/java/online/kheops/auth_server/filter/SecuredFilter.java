@@ -78,11 +78,10 @@ public class SecuredFilter implements ContainerRequestFilter {
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final User finalUser = user;
         final boolean isLinkAuthorization = linkAuthorization;
+        final KheopsPrincipal principal = accessToken.newPrincipal(servletContext, finalUser);
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
-            public KheopsPrincipal getUserPrincipal() {
-                return accessToken.newPrincipal(servletContext, finalUser);
-            }
+            public KheopsPrincipal getUserPrincipal() { return principal; }
 
             @Override
             public boolean isUserInRole(String role) {
