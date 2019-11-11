@@ -16,7 +16,7 @@
     "authorizationerror": "Authorization Error",
     "nondicomfile": "Non DICOM file",
     "unknownerror": "Unknown Error",
-    "reload": "Reload files"
+    "reload": "Reload erroneous files"
   },
   "fr": {
     "filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
@@ -34,7 +34,7 @@
     "authorizationerror": "Erreur d'authorisation",
     "nondicomfile": "Fichier non DICOM",
     "unknownerror": "Erreur inconnue",
-    "reload": "Recharger les fichiers"
+    "reload": "Recharger les fichiers erronés"
   }
 }
 </i18n>
