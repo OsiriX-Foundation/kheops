@@ -73,8 +73,7 @@ public class Users {
 
         //the user is in keycloak but not in kheops => add the user in kheops
         new KheopsLogBuilder().user(userReference)
-                .action(KheopsLogBuilder.ActionType.NEW_USER)
-                .log();
+                .action(KheopsLogBuilder.ActionType.NEW_USER);
 
         final User newUser;
         final EntityManager em = EntityManagerListener.createEntityManager();

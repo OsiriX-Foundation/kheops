@@ -29,8 +29,7 @@ public class FetchResource {
         Fetcher.fetchStudy(studyInstanceUID);
         ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .study(studyInstanceUID)
-                .action(ActionType.FETCH)
-                .log();
+                .action(ActionType.FETCH);
         return Response.ok().build();
     }
 }
