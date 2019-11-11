@@ -120,6 +120,14 @@ a.navbar-brand {
 	color:#5fc04c;
 }
 
+.text-neutral {
+	color: #60b3c4 !important;
+}
+
+a.text-neutral:hover, a.text-neutral:focus {
+	color: #70d6eb !important;
+}
+
 .font-neutral{
 	color: #60b3c4;
 }

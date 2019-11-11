@@ -30,6 +30,18 @@ a.text-warning:hover, a.text-warning:focus {
 	color: #dd3d3d !important;
 }
 
+.text-success {
+	color: #5fc04c !important;
+}
+
+a.text-success:hover, a.text-success:focus {
+	color: #54a844 !important;
+}
+
+a.text-success:hover, a.text-success:focus {
+	color: #54a844 !important;
+}
+
 .bg-light {
 	background-color: #1d2434 !important;
 }

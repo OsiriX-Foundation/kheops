@@ -279,7 +279,7 @@
                 class="mb-1"
               >
                 <a
-                  class="text-center text-success"
+                  class="text-center text-neutral"
                   @click="retry"
                 >
                   {{ $t('reload') }}
