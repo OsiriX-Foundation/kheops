@@ -210,6 +210,13 @@ public final class Resource {
              final InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
             if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
                 LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
+                try {
+                    String responseString = gatewayResponse.readEntity(String.class);
+                    LOG.log(Level.SEVERE, () -> "Response Content: " + responseString);
+                } catch (ProcessingException pe) {
+                    LOG.log(Level.SEVERE, "Unable to get a response content", pe);
+                }
+
                 throw new WebApplicationException(BAD_GATEWAY);
             }
 
