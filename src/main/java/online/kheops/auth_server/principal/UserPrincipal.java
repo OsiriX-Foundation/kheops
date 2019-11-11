@@ -29,6 +29,7 @@ public class UserPrincipal implements KheopsPrincipal {
     private final String actingParty;
     private final boolean linkAuthorization;
     private final String originalToken;
+    private final KheopsLogBuilder kheopsLogBuilder;
 
     //old version
     private final Long dbid;
@@ -38,6 +39,11 @@ public class UserPrincipal implements KheopsPrincipal {
         this.actingParty = actingParty;
         this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
+
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .tokenType(TokenType.KEYCLOAK_TOKEN);
     }
     @Override
     public long getDBID() {
@@ -161,10 +167,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(getUser().getKeycloakId())
-                .tokenType(TokenType.KEYCLOAK_TOKEN);
+        return kheopsLogBuilder;
     }
 
     @Override

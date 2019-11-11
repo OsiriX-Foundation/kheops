@@ -28,6 +28,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
     private final User user;
     private final boolean linkAuthorization;
     private final String originalToken;
+    private final KheopsLogBuilder kheopsLogBuilder;
 
     private EntityManager em;
 
@@ -40,6 +41,12 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         this.em = EntityManagerListener.createEntityManager();
         this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
+
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(user.getKeycloakId())
+                .scope(capability.getScopeType())
+                .tokenType(getTokenType());
     }
     @Override
     public long getDBID() {
@@ -269,11 +276,7 @@ public class CapabilityPrincipal implements KheopsPrincipal {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(user.getKeycloakId())
-                .scope(capability.getScopeType())
-                .tokenType(getTokenType());
+        return kheopsLogBuilder;
     }
 
     @Override

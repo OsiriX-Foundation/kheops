@@ -27,6 +27,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private final boolean hasWriteAccess;
     private final String actingParty;
     private final String capabilityTokenId;
+    private final KheopsLogBuilder kheopsLogBuilder;
 
     private List<String> studyUids;
     private String clientId;
@@ -53,6 +54,12 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         this.hasWriteAccess = hasWriteAccess;
         this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
+
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .clientID(clientId)
+                .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
     }
     @Override
     public long getDBID() {
@@ -167,13 +174,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     public String getAlbumID() { return album.getId(); }
 
     @Override
-    public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(getUser().getKeycloakId())
-                .clientID(clientId)
-                .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
-    }
+    public KheopsLogBuilder getKheopsLogBuilder() { return kheopsLogBuilder; }
 
     @Override
     public String toString() {

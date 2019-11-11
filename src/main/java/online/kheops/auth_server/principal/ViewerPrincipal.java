@@ -33,7 +33,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
     private final KheopsPrincipal kheopsPrincipal;
     private final boolean linkAuthorization;
     private final String originalToken;
-
+    private final KheopsLogBuilder kheopsLogBuilder;
 
     public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, boolean linkAuthorization, String originalToken) {
 
@@ -50,6 +50,11 @@ public class ViewerPrincipal implements KheopsPrincipal {
         this.viewerAccessToken = viewerAccessToken;
         this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
+
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .tokenType(AccessToken.TokenType.VIEWER_TOKEN);
     }
 
     @Override
@@ -200,10 +205,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(getUser().getKeycloakId())
-                .tokenType(AccessToken.TokenType.VIEWER_TOKEN);
+        return kheopsLogBuilder;
     }
 
     @Override
