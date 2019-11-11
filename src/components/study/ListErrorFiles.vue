@@ -37,7 +37,7 @@
             <!--
               https://css-tricks.com/almanac/properties/o/overflow-wrap/
             -->
-            {{ error.id }}
+            {{ error.path }}
           </div>
           <div
             class="col-sm-auto text-warning"
