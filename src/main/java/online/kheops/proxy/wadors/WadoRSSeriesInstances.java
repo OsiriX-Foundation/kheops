@@ -34,6 +34,7 @@ public class WadoRSSeriesInstances {
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
     private static final String LINK_AUTHORIZATION = "X-Link-Authorization";
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 
     @Context
     UriInfo uriInfo;
@@ -46,6 +47,9 @@ public class WadoRSSeriesInstances {
 
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @GET
     @Path("password/dicomweb/studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
@@ -68,6 +72,7 @@ public class WadoRSSeriesInstances {
                     .withClientSecret(context.getInitParameter("online.kheops.client.dicomwebproxysecret"))
                     .withCapability(AuthorizationToken.fromAuthorizationHeader(authorizationHeader).getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
+                    .xForwardedFor(headerXForwardedFor)
                     .build();
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);

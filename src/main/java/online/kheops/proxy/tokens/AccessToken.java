@@ -24,6 +24,8 @@ public class AccessToken {
     private static final Logger LOG = Logger.getLogger(AccessToken.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient().register(HttpAuthenticationFeature.basicBuilder().build());
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private String token;
 
     @SuppressWarnings("unused")
@@ -41,6 +43,7 @@ public class AccessToken {
         private String clientSecret;
         private String capability;
         private SeriesID seriesID;
+        private String headerXForwardedFor = null;
         URI authorizationServerRoot;
 
         private AccessTokenBuilder(URI authorizationServerRoot) {
@@ -59,6 +62,11 @@ public class AccessToken {
 
         public AccessTokenBuilder withClientSecret(String clientSecret) {
             this.clientSecret = Objects.requireNonNull(clientSecret);
+            return this;
+        }
+
+        public AccessTokenBuilder xForwardedFor(String headerXForwardedFor) {
+            this.headerXForwardedFor = headerXForwardedFor;
             return this;
         }
 
@@ -97,6 +105,7 @@ public class AccessToken {
                         .request(APPLICATION_JSON_TYPE)
                         .property(HTTP_AUTHENTICATION_USERNAME, clientId)
                         .property(HTTP_AUTHENTICATION_PASSWORD, clientSecret)
+                        .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
                         .post(Entity.form(form), TokenResponse.class);
             } catch (ProcessingException | WebApplicationException e) {
                 throw new AccessTokenException("Unable to get a request token for the capability URL", e);

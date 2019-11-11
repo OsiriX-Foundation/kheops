@@ -34,11 +34,16 @@ public final class WadoRSStudyInstance {
     private static final Logger LOG = Logger.getLogger(WadoRSStudyInstance.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     @Context
     ServletContext context;
 
     @HeaderParam(AUTHORIZATION)
     String authorizationHeader;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @Context
     UriInfo uriInfo;
@@ -80,6 +85,7 @@ public final class WadoRSStudyInstance {
         try {
             seriesList = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
                     .header(AUTHORIZATION, authorizationHeader)
+                    .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
                     .get(new GenericType<List<Attributes>>() {});
 
         } catch (ProcessingException e) {
@@ -126,7 +132,7 @@ public final class WadoRSStudyInstance {
 
             final AccessToken accessToken;
             try {
-                accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
+                accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).xForwardedFor(headerXForwardedFor).build();
             } catch (AccessTokenException e) {
                 LOG.log(SEVERE, "Unable to get an access token", e);
                 throw new NotAuthorizedException("Bearer", "Basic");

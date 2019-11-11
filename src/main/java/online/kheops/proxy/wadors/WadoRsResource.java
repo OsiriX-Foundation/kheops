@@ -34,20 +34,22 @@ public final class WadoRsResource {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     @Context
     UriInfo uriInfo;
 
     @Context
     ServletContext context;
 
-    @Context
-    HttpHeaders httpHeaders;
-
     @HeaderParam(ACCEPT)
     String acceptParam;
 
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}")
@@ -116,15 +118,8 @@ public final class WadoRsResource {
                                         @PathParam("framesInstanceUID") String framesInstanceUID) {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
-    
-    //@GET
-    //@Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances")
-    //public Response wadoInstances(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-    //                             @PathParam("studyInstanceUID") String studyInstanceUID,
-    //                             @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-    //    return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
-    //}    
-    
+
+
     private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");
@@ -137,6 +132,7 @@ public final class WadoRsResource {
                     .withClientSecret(context.getInitParameter("online.kheops.client.dicomwebproxysecret"))
                     .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
+                    .xForwardedFor(headerXForwardedFor)
                     .build();
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);

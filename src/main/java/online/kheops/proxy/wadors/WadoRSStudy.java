@@ -43,6 +43,8 @@ public final class WadoRSStudy {
     private static final Logger LOG = Logger.getLogger(WadoRSStudy.class.getName());
     private static final Client CLIENT = newClient();
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private static Client newClient() {
         final Client client = ClientBuilder.newClient();
         client.register(MultipartStreamingWriter.class);
@@ -62,6 +64,9 @@ public final class WadoRSStudy {
 
     @HeaderParam(AUTHORIZATION)
     String authorizationHeader;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
 
     @GET
@@ -111,6 +116,7 @@ public final class WadoRSStudy {
         final List<Attributes> seriesList;
         try (final Response listResponse = CLIENT.target(qidoServiceURI).request(MediaTypes.APPLICATION_DICOM_JSON_TYPE)
                     .header(AUTHORIZATION, authorizationHeader)
+                    .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
                     .get()) {
             if (listResponse.getStatus() == UNAUTHORIZED.getStatusCode() || listResponse.getStatus() == FORBIDDEN.getStatusCode()) {
                 LOG.log(WARNING, () -> "Authentication error while getting the series list, status: " + listResponse.getStatus());
@@ -139,7 +145,7 @@ public final class WadoRSStudy {
                 final String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
                 final AccessToken accessToken;
                 try {
-                    accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).build();
+                    accessToken = accessTokenBuilder.withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID)).xForwardedFor(headerXForwardedFor).build();
                 } catch (AccessTokenException e) {
                     LOG.log(WARNING, "Unable to get an access token", e);
                     throw new WebApplicationException(UNAUTHORIZED);

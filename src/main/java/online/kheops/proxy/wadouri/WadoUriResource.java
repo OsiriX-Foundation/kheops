@@ -29,6 +29,8 @@ public class WadoUriResource {
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     @Context
     UriInfo uriInfo;
 
@@ -40,6 +42,9 @@ public class WadoUriResource {
 
     @HeaderParam(ACCEPT_CHARSET)
     String acceptCharsetParam;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @GET
     @Path("/password/dicomweb/wado")
@@ -80,6 +85,7 @@ public class WadoUriResource {
                     .withClientSecret(context.getInitParameter("online.kheops.client.dicomwebproxysecret"))
                     .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
+                    .xForwardedFor(headerXForwardedFor)
                     .build();
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);

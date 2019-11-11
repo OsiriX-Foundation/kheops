@@ -22,6 +22,8 @@ import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeatu
 public class Introspect {
     private static final Client CLIENT = ClientBuilder.newClient().register(HttpAuthenticationFeature.basicBuilder().build());
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private Introspect() {}
 
     private static class ActingPartyResponse {
@@ -85,10 +87,12 @@ public class Introspect {
     public static class Introspector {
         private final ServletContext servletContext;
         private final WebTarget webTarget;
+        private final String headerXForwardedFor;
 
-        private Introspector(ServletContext servletContext, URI endpoint) {
+        private Introspector(ServletContext servletContext, URI endpoint, String headerXForwardedFor) {
             this.servletContext = servletContext;
             webTarget = CLIENT.target(Objects.requireNonNull(endpoint));
+            this.headerXForwardedFor = headerXForwardedFor;
         }
 
         public Response token(String token) throws AccessTokenException {
@@ -99,6 +103,7 @@ public class Introspect {
                 return webTarget.request(APPLICATION_JSON_TYPE)
                         .property(HTTP_AUTHENTICATION_USERNAME, servletContext.getInitParameter("online.kheops.client.dicomwebproxyclientid"))
                         .property(HTTP_AUTHENTICATION_PASSWORD, servletContext.getInitParameter("online.kheops.client.dicomwebproxysecret"))
+                        .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
                         .post(Entity.form(form), Response.class);
             } catch (ProcessingException | WebApplicationException e) {
                 throw new AccessTokenException("Error introspecting", e);
@@ -106,7 +111,7 @@ public class Introspect {
         }
     }
 
-    public static Introspector endpoint(ServletContext servletContext, URI endpoint) {
-        return new Introspector(servletContext, endpoint);
+    public static Introspector endpoint(ServletContext servletContext, URI endpoint, String headerXForwardedFor) {
+        return new Introspector(servletContext, endpoint, headerXForwardedFor);
     }
 }

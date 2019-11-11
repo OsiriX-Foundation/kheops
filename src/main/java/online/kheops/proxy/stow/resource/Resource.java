@@ -55,6 +55,8 @@ public final class Resource {
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
     private static final Client CLIENT = newClient();
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private static final String BOUNDARY = "Boundary-ffc9be9e668952f2e1815be2709b87827169798a";
 
     private static Client newClient() {
@@ -72,6 +74,9 @@ public final class Resource {
 
     @HeaderParam(CONTENT_TYPE)
     MediaType contentType;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @Context
     HttpServletRequest request;
@@ -114,7 +119,7 @@ public final class Resource {
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
         final Introspect.Response introspectResponse;
         try {
-            introspectResponse = Introspect.endpoint(context, introspectionURI).token(authorizationToken.getToken());
+            introspectResponse = Introspect.endpoint(context, introspectionURI, headerXForwardedFor).token(authorizationToken.getToken());
             if (!introspectResponse.isActive()) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
                 throw new NotAuthorizedException("Bearer", "Basic");

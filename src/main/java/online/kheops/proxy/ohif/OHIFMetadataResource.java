@@ -30,6 +30,7 @@ public class OHIFMetadataResource {
     private static final Logger LOG = Logger.getLogger(OHIFMetadataResource.class.getName());
 
     private static final String LINK_AUTHORIZATION = "X-Link-Authorization";
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 
     private static final Client CLIENT = ClientBuilder.newClient()
             .register(JSONAttributesListMarshaller.class)
@@ -40,6 +41,9 @@ public class OHIFMetadataResource {
 
     @HeaderParam(LINK_AUTHORIZATION)
     String linkAuthorizationHeader;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @GET
     @Produces(APPLICATION_JSON)
@@ -92,6 +96,7 @@ public class OHIFMetadataResource {
                     CLIENT.target(metadataServiceURI)
                             .request(APPLICATION_DICOM_JSON)
                             .header(AUTHORIZATION, "Bearer " + authorizationToken)
+                            .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
                             .get(new GenericType<List<Attributes>>() {}));
         } catch (ResponseProcessingException | WebApplicationException e) {
             final int status;
