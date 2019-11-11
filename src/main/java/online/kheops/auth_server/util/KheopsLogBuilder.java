@@ -104,7 +104,12 @@ public class KheopsLogBuilder {
         return this;
     }
 
+
     public void log() {
+
+    }
+
+    public void log2() {
         StringBuilder logString = new StringBuilder();
         for (LogEntry pair: logEntry) {
             logString.append(pair.getKey()).append("=").append(pair.getValue()).append(" ");

@@ -104,7 +104,8 @@ public class Series {
                 kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_SERIES);
             }
             kheopsLogBuilder.series(seriesInstanceUID)
-                    .study(studyInstanceUID);
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

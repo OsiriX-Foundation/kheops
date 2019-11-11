@@ -62,7 +62,8 @@ public class Capabilities {
             tx.commit();
             kheopsLogBuilder.action(ActionType.NEW_CAPABILITY)
                     .capabilityID(capability.getId())
-                    .scope("user");
+                    .scope("user")
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -110,7 +111,8 @@ public class Capabilities {
             kheopsLogBuilder.action(ActionType.NEW_CAPABILITY)
                     .capabilityID(capability.getId())
                     .scope("album")
-                    .album(album.getId());
+                    .album(album.getId())
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -141,7 +143,8 @@ public class Capabilities {
 
             tx.commit();
             kheopsLogBuilder.action(ActionType.REVOKE_CAPABILITY)
-                    .capabilityID(capabilityId);
+                    .capabilityID(capabilityId)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

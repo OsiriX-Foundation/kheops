@@ -23,7 +23,7 @@ public class XForwardedForFilter implements ContainerResponseFilter {
         }
         if (requestContext.getHeaders().containsKey("X-Forwarded-For")) {
             final String ip = requestContext.getHeaders().get("X-Forwarded-For").get(0);
-            log.ip(ip).log();
+            log.ip(ip).log2();
         }
     }
 }

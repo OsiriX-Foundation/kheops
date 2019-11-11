@@ -137,6 +137,7 @@ public class QIDOResource {
         } else {
             kheopsLogBuilder.album("inbox/all_albums");
         }
+        kheopsLogBuilder.log();
         return response.build();
     }
 
@@ -321,6 +322,7 @@ public class QIDOResource {
         } else if (fromInbox) {
             kheopsLogBuilder.album("inbox");
         }
+        kheopsLogBuilder.log();
         return responseBuilder.build();
     }
 
@@ -427,6 +429,7 @@ public class QIDOResource {
         } else if (fromInbox) {
             kheopsLogBuilder.album("inbox");
         }
+        kheopsLogBuilder.log();
         return Response.ok(stream).build();
     }
 

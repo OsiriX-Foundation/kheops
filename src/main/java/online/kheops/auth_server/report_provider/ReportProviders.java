@@ -66,7 +66,8 @@ public class ReportProviders {
 
         kheopsLogBuilder.album(albumId)
                 .action(ActionType.NEW_REPORT_PROVIDER)
-                .clientID(reportProvider.getClientId());
+                .clientID(reportProvider.getClientId())
+                .log();
         return new ReportProviderResponse(reportProvider);
     }
 
@@ -172,7 +173,8 @@ public class ReportProviders {
         }
 
         kheopsLogBuilder.album(albumId)
-                .action(ActionType.LIST_REPORT_PROVIDERS);
+                .action(ActionType.LIST_REPORT_PROVIDERS)
+                .log();
         return new PairListXTotalCount<>(totalCount, reportProviders);
     }
 
@@ -196,7 +198,8 @@ public class ReportProviders {
 
         kheopsLogBuilder.action(ActionType.GET_REPORT_PROVIDER)
                 .clientID(clientId)
-                .album(albumId);
+                .album(albumId)
+                .log();
         return new ReportProviderResponse(reportProvider);
     }
 
@@ -233,7 +236,8 @@ public class ReportProviders {
         }
         kheopsLogBuilder.album(albumId)
                 .clientID(clientId)
-                .action(ActionType.DELETE_REPORT_PROVIDER);
+                .action(ActionType.DELETE_REPORT_PROVIDER)
+                .log();
     }
 
     public static ReportProviderResponse editReportProvider(User callingUser, String albumId, String clientId, String url, String name, KheopsLogBuilder kheopsLogBuilder)
@@ -277,7 +281,8 @@ public class ReportProviders {
         }
         kheopsLogBuilder.album(albumId)
                 .clientID(clientId)
-                .action(ActionType.EDIT_REPORT_PROVIDER);
+                .action(ActionType.EDIT_REPORT_PROVIDER)
+                .log();
         return new ReportProviderResponse(reportProvider);
     }
 

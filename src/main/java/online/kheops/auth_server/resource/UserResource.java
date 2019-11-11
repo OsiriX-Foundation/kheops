@@ -110,6 +110,8 @@ public class UserResource {
                     result = searchUsers(search, limit, offset);
                 }
 
+                kheopsLogBuilder.log();
+
                 if(result.isEmpty()) {
                     return Response.status(NO_CONTENT).build();
                 }
@@ -138,6 +140,7 @@ public class UserResource {
                     kheopsLogBuilder.study(studyInstanceUID);
                 }
 
+                kheopsLogBuilder.log();
                 return Response.status(OK).entity(userResponseBuilder.build()).build();
             } catch (UserNotFoundException e) {
                 LOG.log(Level.WARNING, "User not found", e);
@@ -182,7 +185,8 @@ public class UserResource {
             new KheopsLogBuilder().user(accessToken.getSubject())
                     .provenance(accessToken)
                     .action(ActionType.USER_INFO)
-                    .tokenType(accessToken.getTokenType());
+                    .tokenType(accessToken.getTokenType())
+                    .log();
             return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSubject()));
         } catch (UserNotFoundException | KeycloakException e) {
             LOG.log(Level.INFO, "Unable to get the user info", e);

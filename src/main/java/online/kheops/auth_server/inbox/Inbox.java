@@ -17,7 +17,8 @@ public class Inbox {
 
         final InboxInfoResponse inboxInfoResponse = InboxQueries.getInboxInfo(user.getPk());
 
-        kheopsLogBuilder.action(KheopsLogBuilder.ActionType.INBOX_INFO);
+        kheopsLogBuilder.action(KheopsLogBuilder.ActionType.INBOX_INFO)
+                .log();
 
         return inboxInfoResponse;
     }

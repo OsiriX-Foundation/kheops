@@ -39,9 +39,6 @@ public class TokenResource
     @Context
     SecurityContext securityContext;
 
-    @Context
-    private HttpHeaders httpHeaders;
-
     @POST
     @TokenSecurity
     @Path("/token")
@@ -71,12 +68,7 @@ public class TokenResource
             result.getScope().ifPresent(logBuilder::scope);
             result.getStudyInstanceUID().ifPresent(logBuilder::study);
             result.getSeriesInstanceUID().ifPresent(logBuilder::series);
-            final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-            if (ip != null) {
-                logBuilder.ip(ip);
-            }
             logBuilder.log();
-
 
             return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
@@ -135,14 +127,10 @@ public class TokenResource
                 em.close();
             }
 
-            final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
+            new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(ActionType.INTROSPECT_TOKEN);
-            final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-            if (ip != null) {
-                logBuilder.ip(ip);
-            }
-            logBuilder.log();
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .log();
 
             final IntrospectResponse introspectResponse = IntrospectResponse.from(accessToken);
             introspectResponse.setAlbumId(albumId);
@@ -151,14 +139,10 @@ public class TokenResource
         } else if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString()) ||
                 accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) {
-            final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
+            new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(ActionType.INTROSPECT_TOKEN);
-            final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-            if (ip != null) {
-                logBuilder.ip(ip);
-            }
-            logBuilder.log();
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .log();
 
             return Response.status(OK).entity(IntrospectResponse.from(accessToken).toJson()).build();
         } else {

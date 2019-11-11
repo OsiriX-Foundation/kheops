@@ -64,9 +64,6 @@ public class ReportProviderResource {
     @Context
     ServletContext context;
 
-    @Context
-    private HttpHeaders httpHeaders;
-
     @POST
     @Secured
     @UserAccessSecured
@@ -251,6 +248,7 @@ public class ReportProviderResource {
                     .album(albumId)
                     .clientID(clientId);
             studyInstanceUIDs.forEach(kheopsLogBuilder::study);
+            kheopsLogBuilder.log();
 
             final String html = " <html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
                     "  <head>\n" +
@@ -275,13 +273,7 @@ public class ReportProviderResource {
     @Path(".well-known/report-provider-configuration")
     @Produces(MediaType.APPLICATION_JSON)
     public Response configuration() {
-
-        final KheopsLogBuilder logBuilder = new KheopsLogBuilder().action(ActionType.REPORT_PROVIDER_CONFIGURATION);
-        final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-        if (ip != null) {
-            logBuilder.ip(ip);
-        }
-        logBuilder.log();
+        new KheopsLogBuilder().action(ActionType.REPORT_PROVIDER_CONFIGURATION).log();
         return  Response.status(OK).entity(new ConfigurationResponse(getHostRoot())).build();
     }
 
@@ -399,7 +391,8 @@ public class ReportProviderResource {
         }
 
         ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                .action(ActionType.REPORT_PROVIDER_METADATA);
+                .action(ActionType.REPORT_PROVIDER_METADATA)
+                .log();
         return  Response.status(OK).entity(clientMetadataResponse).build();
     }
 

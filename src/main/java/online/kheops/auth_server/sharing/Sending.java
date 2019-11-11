@@ -58,7 +58,8 @@ public class Sending {
             tx.commit();
             kheopsLogBuilder.action(ActionType.REMOVE_STUDY)
                     .album("inbox")
-                    .study(studyInstanceUID);
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -84,7 +85,8 @@ public class Sending {
             kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
                     .album("inbox")
                     .study(studyInstanceUID)
-                    .series(seriesInstanceUID);
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -130,7 +132,8 @@ public class Sending {
             tx.commit();
             kheopsLogBuilder.action(ActionType.REMOVE_STUDY)
                     .album(albumId)
-                    .study(studyInstanceUID);
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -168,7 +171,8 @@ public class Sending {
             kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
                     .album(albumId)
                     .study(studyInstanceUID)
-                    .series(seriesInstanceUID);
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -209,7 +213,8 @@ public class Sending {
                 kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
                         .album(albumId)
                         .study(studyInstanceUID)
-                        .series(seriesInstanceUID);
+                        .series(seriesInstanceUID)
+                        .log();
                 return;
             }
 
@@ -235,7 +240,8 @@ public class Sending {
             kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
                     .album(albumId)
                     .study(studyInstanceUID)
-                    .series(seriesInstanceUID);
+                    .series(seriesInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -277,7 +283,8 @@ public class Sending {
                 }
                 kheopsLogBuilder.album(albumId)
                         .action(ActionType.SHARE_STUDY_WITH_ALBUM)
-                        .study(studyInstanceUID);
+                        .study(studyInstanceUID)
+                        .log();
                 return;
             }
             final Study study = availableSeries.get(0).getStudy();
@@ -298,7 +305,8 @@ public class Sending {
             }
             kheopsLogBuilder.album(albumId)
                     .action(ActionType.SHARE_STUDY_WITH_ALBUM)
-                    .study(studyInstanceUID);
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -347,7 +355,8 @@ public class Sending {
             }
             kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
                     .action(ActionType.SHARE_STUDY_WITH_USER)
-                    .study(studyInstanceUID);
+                    .study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -382,6 +391,8 @@ public class Sending {
             final Album inbox = targetUser.getInbox();
             if(inbox.containsSeries(series, em)) {
                 //target user has already access to the series
+
+                kheopsLogBuilder.log();
                 return;
             }
 
@@ -391,6 +402,7 @@ public class Sending {
             em.persist(albumSeries);
 
             tx.commit();
+            kheopsLogBuilder.log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -426,8 +438,11 @@ public class Sending {
                     inbox.addSeries(inboxSeries);
                     em.persist(inboxSeries);
                     tx.commit();
+
+                    kheopsLogBuilder.log();
                     return; //appropriate OK
                 } else if(isSeriesInInbox(callingUser, storedSeries, em)) {
+                    kheopsLogBuilder.log();
                     return;
                 } else {
                     try {
@@ -439,6 +454,7 @@ public class Sending {
 
                         em.persist(inboxSeries);
                         tx.commit();
+                        kheopsLogBuilder.log();
                         return;
                     } catch (SeriesNotFoundException e2) {
                         throw new SeriesNotFoundException(e2.getMessage());
@@ -462,6 +478,7 @@ public class Sending {
             em.persist(inboxSeries);
 
             tx.commit();
+            kheopsLogBuilder.log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -498,7 +515,8 @@ public class Sending {
             tx.commit();
             kheopsLogBuilder.action(ActionType.APPROPRIATE_STUDY)
                     .study(studyInstanceUID)
-                    .fromAlbum(albumId);
+                    .fromAlbum(albumId)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

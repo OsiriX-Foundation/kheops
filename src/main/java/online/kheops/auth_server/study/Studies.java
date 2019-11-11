@@ -527,7 +527,8 @@ public class Studies {
             em.persist(favAlbumMutation);
             album.updateLastEventTime();
             tx.commit();
-            kheopsLogBuilder.study(studyInstanceUID);
+            kheopsLogBuilder.study(studyInstanceUID)
+                    .log();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

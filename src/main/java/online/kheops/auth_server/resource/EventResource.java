@@ -83,7 +83,8 @@ public class EventResource {
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         kheopsLogBuilder.album(albumId)
-                .action(KheopsLogBuilder.ActionType.LIST_EVENTS);
+                .action(KheopsLogBuilder.ActionType.LIST_EVENTS)
+                .log();
         return Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
@@ -115,7 +116,8 @@ public class EventResource {
         }
 
         kheopsPrincipal.getKheopsLogBuilder().album(albumId)
-                .action(KheopsLogBuilder.ActionType.POST_COMMENT);
+                .action(KheopsLogBuilder.ActionType.POST_COMMENT)
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -139,7 +141,8 @@ public class EventResource {
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)
-                .action(KheopsLogBuilder.ActionType.LIST_EVENTS);
+                .action(KheopsLogBuilder.ActionType.LIST_EVENTS)
+                .log();
         return Response.ok(genericEventsResponsesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount())
                 .build();
@@ -175,7 +178,8 @@ public class EventResource {
         }
 
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)
-                .action(KheopsLogBuilder.ActionType.POST_COMMENT);
+                .action(KheopsLogBuilder.ActionType.POST_COMMENT)
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 }

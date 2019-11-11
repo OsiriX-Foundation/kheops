@@ -166,7 +166,8 @@ public class CapabilitiesResource {
             kheopsLogBuilder.scope("user");
         }
 
-        kheopsLogBuilder.action(ActionType.GET_CAPABILITIES);
+        kheopsLogBuilder.action(ActionType.GET_CAPABILITIES)
+                .log();
         GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(pair.getAttributesList()) {};
         return Response.status(OK).entity(genericCapabilityResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
@@ -189,7 +190,8 @@ public class CapabilitiesResource {
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
         kheopsPrincipal.getKheopsLogBuilder().action(ActionType.GET_CAPABILITY)
-                .capabilityID(capabilityTokenID);
+                .capabilityID(capabilityTokenID)
+                .log();
         return Response.status(OK).entity(capabilityResponses).build();
     }
 }
