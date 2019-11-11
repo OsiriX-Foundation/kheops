@@ -51,6 +51,11 @@ public class KheopsLogBuilder {
         return this;
     }
 
+    public KheopsLogBuilder ip(String ip) {
+        logEntry.add(new LogEntry("sourceIP", ip));
+        return this;
+    }
+
     public KheopsLogBuilder user(String userId) {
         logEntry.add(new LogEntry("user", userId));
         return this;
@@ -101,6 +106,10 @@ public class KheopsLogBuilder {
 
 
     public void log() {
+
+    }
+
+    public void log2() {
         StringBuilder logString = new StringBuilder();
         for (LogEntry pair: logEntry) {
             logString.append(pair.getKey()).append("=").append(pair.getValue()).append(" ");
