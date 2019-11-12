@@ -54,9 +54,13 @@ Props :
             {{ user|getUsername }}
             <span
               v-if="user.is_admin"
-              class="font-neutral"
             >
-              {{ $t("Admin") }}
+              -
+              <span
+                class="font-neutral"
+              >
+                {{ $t("Admin") }}
+              </span>
             </span>
             <!-- on mobile -->
             <div
@@ -142,6 +146,7 @@ Props :
             >
               <a
                 v-if="showChangeRole"
+                class="font-white"
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
