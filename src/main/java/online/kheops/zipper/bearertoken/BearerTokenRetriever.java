@@ -22,9 +22,13 @@ import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeatu
 public final class BearerTokenRetriever {
     private static final Client CLIENT = ClientBuilder.newClient().register(HttpAuthenticationFeature.basicBuilder().build());
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private final ServletContext servletContext;
     private final URI tokenURI;
     private final AccessToken accessToken;
+    private String xForwaededFor;
+
 
     private static class TokenResponse {
         @XmlElement(name = "access_token")
@@ -35,6 +39,7 @@ public final class BearerTokenRetriever {
         private final ServletContext servletContext;
         private URI authorizationURI;
         private AccessToken accessToken;
+        private String xForwaededFor;
 
         public Builder(ServletContext servletContext) {
             this.servletContext = Objects.requireNonNull(servletContext);
@@ -50,6 +55,11 @@ public final class BearerTokenRetriever {
             return this;
         }
 
+        public Builder xForwaededFor(String xForwaededFor) {
+            this.xForwaededFor = xForwaededFor;
+            return this;
+        }
+
         public BearerTokenRetriever build() {
             return new BearerTokenRetriever(this);
         }
@@ -57,6 +67,7 @@ public final class BearerTokenRetriever {
 
     private BearerTokenRetriever(Builder builder) {
         servletContext = builder.servletContext;
+        xForwaededFor = builder.xForwaededFor;
         accessToken = Objects.requireNonNull(builder.accessToken, "accessToken");
         URI authorizationURI = Objects.requireNonNull(builder.authorizationURI, "authorizationURI");
         tokenURI = UriBuilder.fromUri(authorizationURI).path("/token").build();
@@ -69,6 +80,7 @@ public final class BearerTokenRetriever {
                 .request(APPLICATION_JSON_TYPE)
                 .property(HTTP_AUTHENTICATION_USERNAME, servletContext.getInitParameter("online.kheops.client.zipperclientid"))
                 .property(HTTP_AUTHENTICATION_PASSWORD, servletContext.getInitParameter("online.kheops.client.zippersecret"))
+                .header(HEADER_X_FORWARDED_FOR, xForwaededFor)
                 .async().
                 post(Entity.form(form), new InvocationCallback<TokenResponse>() {
 

@@ -39,11 +39,16 @@ public final class ZipStudyResource {
     private static final String INBOX = "inbox";
     private static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private static final Client CLIENT = newClient().register(HttpAuthenticationFeature.basicBuilder().build());
     private static final String DICOM_ZIP_FILENAME = "DICOM.ZIP";
 
     @Context
     ServletContext context;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @GET
     @Path("/{" + STUDY_INSTANCE_UID +"}")
@@ -59,6 +64,7 @@ public final class ZipStudyResource {
         final BearerTokenRetriever bearerTokenRetriever = new BearerTokenRetriever.Builder(context)
                 .authorizationURI(authorizationURI())
                 .accessToken(accessToken)
+                .xForwaededFor(headerXForwardedFor)
                 .build();
         final InstanceRetrievalService instanceRetrievalService = new InstanceRetrievalService.Builder()
                 .client(CLIENT)
