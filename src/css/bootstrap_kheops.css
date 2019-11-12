@@ -77,11 +77,11 @@ a.text-success:hover, a.text-success:focus {
 }
 
 .custom-control-input:checked ~ .custom-control-label::before {
-	background-color: #003866 !important;
+	background-color: #005194 !important;
 }
 
 .custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::before {
-	background-color: #003866;
+	background-color: #005194;
 }
 
 .table th,
