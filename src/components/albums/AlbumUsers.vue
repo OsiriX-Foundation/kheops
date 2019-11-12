@@ -263,11 +263,9 @@ export default {
       };
       this.$store.dispatch('manageAlbumUserAdmin', params).then((res) => {
         if (res.status === 204) {
-          const message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin');
           if (this.confirmResetAdmin === user.email) {
             this.getAlbum();
           }
-          this.$snotify.success(message);
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }
@@ -285,9 +283,7 @@ export default {
           user: user.email,
         };
         this.$store.dispatch('removeAlbumUser', params).then((res) => {
-          if (res.status === 204) {
-            this.$snotify.success(this.$t('albumuserdeletesuccess'));
-          } else {
+          if (res.status !== 204) {
             this.$snotify.error(this.$t('sorryerror'));
           }
           this.confirmDelete = '';

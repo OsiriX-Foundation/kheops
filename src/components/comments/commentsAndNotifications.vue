@@ -491,7 +491,6 @@ export default {
 
       this.$store.dispatch('postStudyComment', params).then((res) => {
         if (res.status === 204) {
-          this.$snotify.success(this.$t('commentpostsuccess'));
           this.newComment.comment = '';
           this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
             this.scrollBottom();
@@ -510,7 +509,6 @@ export default {
 
       this.$store.dispatch('postAlbumComment', params).then((res) => {
         if (res.status === 204) {
-          this.$snotify.success(this.$t('commentpostsuccess'));
           this.newComment.comment = '';
           this.getComments();
         }

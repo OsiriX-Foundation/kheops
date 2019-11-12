@@ -325,7 +325,6 @@ export default {
         this.confirmRevoke = true;
       } else {
         this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then((res) => {
-          this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
           this.cancel();
         }).catch(() => {
           this.$snotify.error(this.$t('sorryerror'));
