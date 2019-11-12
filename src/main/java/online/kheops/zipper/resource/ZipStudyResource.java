@@ -100,7 +100,11 @@ public final class ZipStudyResource {
 
         List<Attributes> attributesList;
         try {
-            attributesList = CLIENT.target(metadataURI).request().accept("application/dicom+json").header(AUTHORIZATION, "Bearer " + accessToken.toString()).get(new GenericType<List<Attributes>>() {});
+            attributesList = CLIENT.target(metadataURI).request()
+                    .accept("application/dicom+json")
+                    .header(AUTHORIZATION, "Bearer " + accessToken.toString())
+                    .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
+                    .get(new GenericType<List<Attributes>>() {});
         } catch (ResponseProcessingException | WebApplicationException e) {
             final int status;
             if (e instanceof ResponseProcessingException) {
