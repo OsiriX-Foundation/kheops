@@ -32,6 +32,7 @@ import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.HttpHeaders.X_TOKEN_SOURCE;
 
 @Path("/")
 public class SendingResource
@@ -45,8 +46,8 @@ public class SendingResource
     @Context
     private SecurityContext securityContext;
 
-    @Context
-    private HttpHeaders httpHeaders;
+    @HeaderParam(X_TOKEN_SOURCE)
+    String headerXTokenSource;
 
     @PUT
     @Secured
@@ -131,15 +132,13 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
-
         boolean fromToken;
 
-        if (token != null) {
+        if (headerXTokenSource != null) {
             fromToken = true;
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
             } catch (UserNotFoundException e) {
@@ -200,12 +199,10 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
-
-        if (token != null) {
+        if (headerXTokenSource != null) {
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
             } catch (UserNotFoundException e) {
@@ -366,12 +363,10 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
-
-        if (token != null) {
+        if (headerXTokenSource != null) {
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
             } catch (UserNotFoundException e) {
@@ -421,10 +416,8 @@ public class SendingResource
                                     @QueryParam(INBOX) Boolean fromInbox) {
 
 
-        final String token = httpHeaders.getHeaderString(HEADER_X_TOKEN_SOURCE);
-
         if (((fromAlbumId == null && fromInbox == null) ||
-                (fromAlbumId != null && fromInbox != null && fromInbox)) && token == null) {
+                (fromAlbumId != null && fromInbox != null && fromInbox)) && headerXTokenSource == null) {
             return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
@@ -434,10 +427,10 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (token != null) {
+        if (headerXTokenSource != null) {
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(token);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
             } catch (AccessTokenVerificationException e) {
                 return Response.status(FORBIDDEN).entity(e.getMessage()).build();
             } catch (UserNotFoundException e) {

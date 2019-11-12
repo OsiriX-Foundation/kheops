@@ -26,6 +26,7 @@ import static online.kheops.auth_server.report_provider.ReportProviderQueries.ge
 import static online.kheops.auth_server.report_provider.ReportProviders.getRedirectUri;
 import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 
 
 @Path("/")
@@ -39,8 +40,8 @@ public class TokenResource
     @Context
     SecurityContext securityContext;
 
-    @Context
-    private HttpHeaders httpHeaders;
+    @HeaderParam(X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @POST
     @TokenSecurity
@@ -71,9 +72,8 @@ public class TokenResource
             result.getScope().ifPresent(logBuilder::scope);
             result.getStudyInstanceUID().ifPresent(logBuilder::study);
             result.getSeriesInstanceUID().ifPresent(logBuilder::series);
-            final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-            if (ip != null) {
-                logBuilder.ip(ip);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
             }
             logBuilder.log();
 
@@ -137,9 +137,8 @@ public class TokenResource
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN);
-            final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-            if (ip != null) {
-                logBuilder.ip(ip);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
             }
             logBuilder.log();
 
@@ -153,9 +152,8 @@ public class TokenResource
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN);
-            final String ip = httpHeaders.getHeaderString("X-Forwarded-For");
-            if (ip != null) {
-                logBuilder.ip(ip);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
             }
             logBuilder.log();
 
