@@ -315,7 +315,7 @@ export default {
           key: 'is_selected',
           label: '',
           sortable: false,
-          class: 'td_checkbox_albums word-break-all',
+          class: 'td_checkbox_albums word-break',
           thStyle: {
             width: '100px',
           },
@@ -326,7 +326,7 @@ export default {
           thClass: 'pointer',
           tdClass: 'name',
           sortable: true,
-          class: 'word-break-all',
+          class: 'word-break',
           thStyle: {
             width: '250px',
           },
@@ -336,7 +336,7 @@ export default {
           label: this.$t('Study #'),
           sortable: true,
           thClass: 'pointer',
-          class: 'd-none d-sm-table-cell word-break-all',
+          class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
           },
@@ -346,7 +346,7 @@ export default {
           label: this.$t('User #'),
           sortable: true,
           thClass: 'pointer',
-          class: 'd-none d-md-table-cell word-break-all',
+          class: 'd-none d-md-table-cell word-break',
           thStyle: {
             width: '200px',
           },
@@ -356,7 +356,7 @@ export default {
           label: this.$t('Message #'),
           sortable: true,
           thClass: 'pointer',
-          class: 'd-none d-lg-table-cell word-break-all',
+          class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
           },
@@ -366,7 +366,7 @@ export default {
           label: this.$t('Date'),
           sortable: true,
           thClass: 'pointer',
-          class: 'd-none d-sm-table-cell word-break-all',
+          class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
           },
@@ -376,7 +376,7 @@ export default {
           label: this.$t('LastEvent'),
           sortable: true,
           thClass: 'pointer',
-          class: 'd-none d-lg-table-cell word-break-all',
+          class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
           },
@@ -391,7 +391,7 @@ export default {
             }
             return this.$t('nomodality');
           },
-          class: 'word-break-all',
+          class: 'word-break',
           thStyle: {
             width: '200px',
           },
