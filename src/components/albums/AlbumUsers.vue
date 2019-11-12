@@ -51,7 +51,7 @@ Props :
           :key="user.email"
         >
           <td>
-            {{ `${user.first_name} ${user.last_name}` }}
+            {{ user|getUsername }}
             <span
               v-if="user.is_admin"
               class="font-neutral"

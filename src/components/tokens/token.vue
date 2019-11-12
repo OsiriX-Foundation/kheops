@@ -20,7 +20,8 @@
     "back": "back",
     "warningrevoke": "Are you sure you want to revoke this token ?",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "createdby": "Created by"
   },
   "fr": {
     "token": "token",
@@ -42,7 +43,8 @@
     "back": "retour",
     "warningrevoke": "Etes-vous sûr de vouloir revoquer ce token ?",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "createdby": "Créé par"
   }
 }
 </i18n>
@@ -103,6 +105,20 @@
             >
               {{ token.album.name }}
             </router-link>
+          </dd>
+        </div>
+      </div>
+      <div
+        class="row"
+      >
+        <div class="col-xs-12 col-sm-3">
+          <dt class="token-title">
+            {{ $t('createdby') }}
+          </dt>
+        </div>
+        <div class="col-xs-12 col-sm-9 word-break">
+          <dd>
+            {{ token.created_by|getUsername }}
           </dd>
         </div>
       </div>
