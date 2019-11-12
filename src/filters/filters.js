@@ -43,6 +43,19 @@ Vue.filter('maxTextLength', (value, maxlength) => {
   return value;
 });
 
+Vue.filter('getUsername', (value) => {
+  if (value === undefined
+    || value.last_name === undefined
+    || value.first_name === undefined
+    || value.last_name === undefined
+    || value.email === undefined) {
+    return 'bad value';
+  } else if (value.first_name === "" || value.last_name === "") {
+    return value.email;
+  }
+  return `${value.first_name} ${value.last_name}`;
+})
+
 // http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#TM
 // The ACR-NEMA Standard 300 (predecessor to DICOM) supported a string of characters of the format HH:MM:SS.frac for this VR.
 

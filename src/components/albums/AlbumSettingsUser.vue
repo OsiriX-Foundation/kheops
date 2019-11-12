@@ -222,7 +222,6 @@ export default {
         };
         this.$store.dispatch('addAlbumUser', params).then((res) => {
           if (res.status === 201) {
-            this.$snotify.success(this.$t('albumuseraddsuccess'));
             this.new_user_name = '';
             this.form_add_user = false;
             this.confirm_delete = '';

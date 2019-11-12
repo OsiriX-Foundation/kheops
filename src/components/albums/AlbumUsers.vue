@@ -51,12 +51,16 @@ Props :
           :key="user.email"
         >
           <td>
-            {{ `${user.first_name} ${user.last_name}` }}
+            {{ user|getUsername }}
             <span
               v-if="user.is_admin"
-              class="font-neutral"
             >
-              {{ $t("Admin") }}
+              -
+              <span
+                class="font-neutral"
+              >
+                {{ $t("Admin") }}
+              </span>
             </span>
             <!-- on mobile -->
             <div
@@ -142,6 +146,7 @@ Props :
             >
               <a
                 v-if="showChangeRole"
+                class="font-white"
                 @click.stop="toggleAdmin(user)"
               >
                 {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
@@ -263,11 +268,9 @@ export default {
       };
       this.$store.dispatch('manageAlbumUserAdmin', params).then((res) => {
         if (res.status === 204) {
-          const message = (user.is_admin) ? this.$t('usernotsettoadmin') : this.$t('usersettoadmin');
           if (this.confirmResetAdmin === user.email) {
             this.getAlbum();
           }
-          this.$snotify.success(message);
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }
@@ -285,9 +288,7 @@ export default {
           user: user.email,
         };
         this.$store.dispatch('removeAlbumUser', params).then((res) => {
-          if (res.status === 204) {
-            this.$snotify.success(this.$t('albumuserdeletesuccess'));
-          } else {
+          if (res.status !== 204) {
             this.$snotify.error(this.$t('sorryerror'));
           }
           this.confirmDelete = '';

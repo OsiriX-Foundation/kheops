@@ -365,7 +365,6 @@ export default {
       this.$store.dispatch('createToken', { token }).then((res) => {
         this.token.access_token = res.data.access_token;
         this.token.url = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
-        this.$snotify.success('token created successfully');
         this.$refs.tokenModal.show();
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
