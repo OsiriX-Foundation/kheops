@@ -213,7 +213,6 @@ export default {
         this.confirmDeletion = true;
       } else {
         this.$store.dispatch('deleteAlbum', { album_id: this.album.album_id }).then(() => {
-          this.$snotify.success(this.$t('albumdeletesuccess'));
           this.$router.push('/albums');
         }).catch(() => {
           this.$snotify.error(this.$t('sorryerror'));
@@ -225,7 +224,6 @@ export default {
         this.confirmQuit = true;
       } else {
         this.$store.dispatch('removeAlbumUser', { album_id: this.album.album_id, user: this.currentuserSub }).then(() => {
-          this.$snotify.success(this.$t('albumquitsuccess'));
           this.$router.push('/albums');
         }).catch(() => {
           this.$snotify.error(this.$t('sorryerror'));

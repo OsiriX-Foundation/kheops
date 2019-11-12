@@ -204,7 +204,6 @@ export default {
         if (res.status !== 200) {
           this.setStateProvider(false, false, true);
         } else {
-          this.$snotify.success('Provider updated');
           this.$emit('done');
         }
       }).catch((err) => {
@@ -228,7 +227,6 @@ export default {
           if (res.status !== 204) {
             this.$snotify.error('Sorry, an error occured');
           } else {
-            this.$snotify.success('Provider remove');
             this.$emit('done');
           }
         }).catch((err) => {

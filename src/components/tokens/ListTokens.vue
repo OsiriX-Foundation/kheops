@@ -351,7 +351,6 @@ export default {
     },
     revoke(tokenId) {
       this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
-        this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
         this.getTokens();
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
