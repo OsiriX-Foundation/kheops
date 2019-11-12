@@ -52,7 +52,7 @@ public class KheopsLogBuilder {
     }
 
     public KheopsLogBuilder ip(String ip) {
-        logEntry.add(new LogEntry("sourceIP", ip));
+        logEntry.add(new LogEntry("sourceIP", ip.split(", ")[0]));
         return this;
     }
 
