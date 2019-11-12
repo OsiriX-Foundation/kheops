@@ -4,7 +4,6 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.annotation.Priority;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.container.*;
 import javax.ws.rs.ext.Provider;
 
@@ -15,9 +14,6 @@ import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 @Provider
 @Priority(USER)
 public class XForwardedForFilter implements ContainerRequestFilter {
-
-    @HeaderParam(X_FORWARDED_FOR)
-    String headerXForwardedFor;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -30,8 +26,9 @@ public class XForwardedForFilter implements ContainerRequestFilter {
         } catch(Exception e) {
             return;
         }
-        if (headerXForwardedFor != null) {
-            log.ip(headerXForwardedFor);
+        if (requestContext.getHeaders().containsKey(X_FORWARDED_FOR)) {
+            final String ip = requestContext.getHeaders().get(X_FORWARDED_FOR).get(0);
+            log.ip(ip);
         }
     }
 }
