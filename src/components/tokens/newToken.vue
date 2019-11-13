@@ -12,6 +12,7 @@
     "appropriate": "add to album / inbox",
     "expirationdate": "Expiration date",
     "copysuccess": "Successfully copied",
+	  "sorryerror": "Sorry, an error occured",
     "tokenvalue": "Token value",
     "urlvalue": "Access data url",
     "warning": "WARNING: You only see once the token value !"
@@ -28,6 +29,7 @@
     "appropriate": "ajouter à un album / inbox",
     "expirationdate": "Date d'expiration",
     "copysuccess": "Copié avec succès",
+  	"sorryerror": "Désolé, une erreur est survenue",
     "tokenvalue": "Valeur du token",
     "urlvalue": "Url d'accès aux données",
     "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !"

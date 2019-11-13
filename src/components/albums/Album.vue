@@ -33,7 +33,7 @@
       <div class="row">
         <div class="col-12 col-sm-12 col-md-12 col-lg-6">
           <h3
-            class="album-title word-break-all"
+            class="album-title word-break"
           >
             <v-icon
               name="book"

@@ -157,7 +157,7 @@
               <p
                 v-for="(p,pidx) in splitComment(comment.comment)"
                 :key="pidx"
-                class="my-0"
+                class="my-0 word-break"
               >
                 {{ p }}
               </p>
