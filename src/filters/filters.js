@@ -58,15 +58,31 @@ Vue.filter('getUsername', (value) => {
 
 // http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#TM
 // The ACR-NEMA Standard 300 (predecessor to DICOM) supported a string of characters of the format HH:MM:SS.frac for this VR.
+function formatTime(time, maxLength) {
+  const sizeMissValue = maxLength - time.length;
+  if (sizeMissValue !== 0) {
+    let missValue = new Array(sizeMissValue + 1).join('0');
+    return time.concat(missValue);
+  }
+  return time;
+}
 
 function formatFract(fract) {
+  // Check if only 0
   if (/^0+$/.test(fract) === true) {
     return undefined;
+  } else if (fract !== undefined) {
+    let reverseFract = fract.split('').reverse().join('');
+    while(reverseFract.charAt(0) === '0') {
+      reverseFract = reverseFract.substr(1);
+    }
+    return reverseFract.split('').reverse().join('');
   }
   return fract;
 }
 
-Vue.filter('setSeriesTime', (seriesTime) => {
+Vue.filter('formatTM', (seriesTime) => {
+  const maxLength = 6
   if (seriesTime !== undefined) {
     const [time, fract] = seriesTime.split('.');
     const timeIsNum = /^\d+$/.test(time);
@@ -74,12 +90,13 @@ Vue.filter('setSeriesTime', (seriesTime) => {
     if (timeIsNum === true
       && time !== undefined
       && (time.length % 2) === 0
-      && time.length <= 6
-      && (fract === undefined || (fract.length === 6 && fractIsNum))) {
-      const fmtFract = formatFract(fract)
-      const addFract = fmtFract !== undefined ? `.${fract}` : '';
-      return `${time.match(/.{1,2}/g).join(':')}${addFract}`;
+      && time.length <= maxLength
+      && (fract === undefined || fractIsNum)) {
+      const fmtTime = formatTime(time, maxLength);
+      const fmtFract = formatFract(fract);
+      const addFract = fmtFract !== undefined ? `.${fmtFract}` : '';
+      return `${fmtTime.match(/.{1,2}/g).join(':')}${addFract}`;
     }
   }
-  return 'Invalid Value';
+  return `Invalid Value (${seriesTime})`;
 });
