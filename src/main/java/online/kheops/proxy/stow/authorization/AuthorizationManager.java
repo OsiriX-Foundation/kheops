@@ -38,12 +38,15 @@ public final class AuthorizationManager {
     private static final Logger LOG = Logger.getLogger(AuthorizationManager.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient();
 
+    private static final String HEADER_X_LINK_AUTHORIZATION = "X-Link-Authorization";
+
     private final Set<SeriesID> authorizedSeriesIDs = new HashSet<>();
     private final Set<SeriesID> forbiddenSeriesIDs = new HashSet<>();
     private final Set<InstanceID> forbiddenInstanceIDs = new HashSet<>();
     private final Set<ContentLocation> authorizedContentLocations = new HashSet<>();
     private final UriBuilder authorizationUriBuilder;
     private final AuthorizationToken bearerToken;
+    private final String headerXLinkAuthorization;
 
     private final List<ProcessingFailure> processingFailures = new ArrayList<>();
 
@@ -61,8 +64,9 @@ public final class AuthorizationManager {
         }
     }
 
-    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId) {
+    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId, String headerXLinkAuthorization) {
         this.bearerToken = Objects.requireNonNull(authorizationToken);
+        this.headerXLinkAuthorization = headerXLinkAuthorization;
         authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
         if (albumId != null) {
             authorizationUriBuilder.path("/albums/" + albumId);
@@ -176,6 +180,7 @@ public final class AuthorizationManager {
         try (final Response response = CLIENT.target(uri)
                     .request()
                     .header(AUTHORIZATION, bearerToken.getHeaderValue())
+                    .header(HEADER_X_LINK_AUTHORIZATION, headerXLinkAuthorization)
                     .put(Entity.text(""))) {
 
             if (response.getStatusInfo().getFamily() == SUCCESSFUL) {

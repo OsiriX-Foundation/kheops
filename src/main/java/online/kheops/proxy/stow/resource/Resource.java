@@ -56,6 +56,7 @@ public final class Resource {
     private static final Client CLIENT = newClient();
 
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+    private static final String HEADER_X_LINK_AUTHORIZATION = "X-Link-Authorization";
 
     private static final String BOUNDARY = "Boundary-ffc9be9e668952f2e1815be2709b87827169798a";
 
@@ -77,6 +78,9 @@ public final class Resource {
 
     @HeaderParam(HEADER_X_FORWARDED_FOR)
     String headerXForwardedFor;
+
+    @HeaderParam(HEADER_X_LINK_AUTHORIZATION)
+    String headerXLinkAuthorization;
 
     @Context
     HttpServletRequest request;
@@ -134,7 +138,7 @@ public final class Resource {
         }
 
         final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken);
-        final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId);
+        final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId, headerXLinkAuthorization);
 
         try (InputStream inputStream = getConvertedInputStream(request.getInputStream())) {
             final Proxy proxy = new Proxy(providers, getConvertedContentType(), inputStream, authorizationManager, fetchRequester::addStudies);
