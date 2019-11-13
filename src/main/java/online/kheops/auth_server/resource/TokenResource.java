@@ -35,13 +35,13 @@ public class TokenResource
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
-    SecurityContext securityContext;
+    private SecurityContext securityContext;
 
     @HeaderParam(X_FORWARDED_FOR)
-    String headerXForwardedFor;
+    private String headerXForwardedFor;
 
     @POST
     @TokenSecurity

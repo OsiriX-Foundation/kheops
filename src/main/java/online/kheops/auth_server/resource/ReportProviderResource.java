@@ -62,7 +62,7 @@ public class ReportProviderResource {
     private SecurityContext securityContext;
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @POST
     @Secured

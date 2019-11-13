@@ -60,7 +60,7 @@ public class QIDOResource {
     private UriInfo uriInfo;
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
     private SecurityContext securityContext;

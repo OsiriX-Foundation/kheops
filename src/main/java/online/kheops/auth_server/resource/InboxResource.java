@@ -21,8 +21,6 @@ public class InboxResource {
     @Context
     private SecurityContext securityContext;
 
-
-
     @GET
     @Secured
     @UserAccessSecured

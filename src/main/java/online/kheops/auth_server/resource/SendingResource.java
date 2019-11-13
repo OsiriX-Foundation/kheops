@@ -47,7 +47,7 @@ public class SendingResource
     private SecurityContext securityContext;
 
     @HeaderParam(X_TOKEN_SOURCE)
-    String headerXTokenSource;
+    private String headerXTokenSource;
 
     @PUT
     @Secured
@@ -401,7 +401,6 @@ public class SendingResource
         }
 
         return Response.status(CREATED).build();
-
     }
 
     @PUT

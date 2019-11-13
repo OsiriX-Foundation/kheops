@@ -34,7 +34,7 @@ public class SecuredFilter implements ContainerRequestFilter {
     private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
 
     @Context
-    ServletContext servletContext;
+    private ServletContext servletContext;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {

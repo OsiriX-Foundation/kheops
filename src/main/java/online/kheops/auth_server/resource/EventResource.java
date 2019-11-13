@@ -35,7 +35,7 @@ public class EventResource {
     private static final Logger LOG = Logger.getLogger(EventResource.class.getName());
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
     private SecurityContext securityContext;
