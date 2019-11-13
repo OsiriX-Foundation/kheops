@@ -125,7 +125,7 @@ a.text-success:hover, a.text-success:focus {
 	background-color: #06162c;
 }
 
-.table-hover tbody tr.b-table-has-details {
+.table tbody tr.b-table-has-details {
 	background-color: #003866;
 }
 

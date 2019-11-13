@@ -56,7 +56,7 @@
     />
     <b-table
       striped
-      hover
+      :hover="mobiledetect ? false : true"
       :items="albums"
       :fields="fields"
       :sort-desc="true"

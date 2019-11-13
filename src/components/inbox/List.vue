@@ -138,7 +138,7 @@
       <b-table
         class="container-fluid"
         striped
-        hover
+        :hover="mobiledetect ? false : true"
         :items="studies"
         :fields="fields"
         :sort-desc="true"
