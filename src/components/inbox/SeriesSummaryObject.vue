@@ -29,7 +29,7 @@
         >
           <span
             v-if="serie.SeriesDescription && serie.SeriesDescription.Value"
-            class="pointer"
+            class="pointer word-break"
           >
             {{ serie.SeriesDescription.Value[0] }}
           </span>
@@ -81,7 +81,9 @@
             </tr>
             <tr v-if="serie.SeriesDescription && serie.SeriesDescription.Value !== undefined">
               <th>{{ $t('description') }}</th>
-              <td>{{ serie.SeriesDescription.Value[0] }}</td>
+              <td
+                class="word-break"
+              >{{ serie.SeriesDescription.Value[0] }}</td>
             </tr>
             <tr v-if="serie.SeriesDate && serie.SeriesDate.Value !== undefined">
               <th>{{ $t('seriesdate') }}</th>
