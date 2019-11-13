@@ -22,7 +22,6 @@ import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findAllCapabilitiesByAlbum;
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
-import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 
 public class Capabilities {
 

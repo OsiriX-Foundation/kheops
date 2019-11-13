@@ -516,7 +516,7 @@ public class SendingResource
     private KheopsPrincipal getPrincipalFromHeadersXTokenSource(String token)
             throws AccessTokenVerificationException, UserNotFoundException {
 
-        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, token, false);
+        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, token);
         final User user = getOrCreateUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);

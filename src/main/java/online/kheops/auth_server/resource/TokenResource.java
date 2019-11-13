@@ -68,7 +68,8 @@ public class TokenResource
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(grantType.getLogActionType());
+                    .action(grantType.getLogActionType())
+                    .link(false);
             result.getScope().ifPresent(logBuilder::scope);
             result.getStudyInstanceUID().ifPresent(logBuilder::study);
             result.getSeriesInstanceUID().ifPresent(logBuilder::series);
@@ -136,7 +137,8 @@ public class TokenResource
 
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(ActionType.INTROSPECT_TOKEN);
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .link(false);
             if (headerXForwardedFor != null) {
                 logBuilder.ip(headerXForwardedFor);
             }
@@ -151,7 +153,8 @@ public class TokenResource
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) {
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(ActionType.INTROSPECT_TOKEN);
+                    .action(ActionType.INTROSPECT_TOKEN)
+                    .link(false);
             if (headerXForwardedFor != null) {
                 logBuilder.ip(headerXForwardedFor);
             }

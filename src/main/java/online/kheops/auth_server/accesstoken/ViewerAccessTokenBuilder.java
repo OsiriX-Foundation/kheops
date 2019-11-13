@@ -17,7 +17,7 @@ final class ViewerAccessTokenBuilder implements AccessTokenBuilder {
     }
 
     @Override
-    public AccessToken build(String assertionToken, boolean linkAuthorization) throws AccessTokenVerificationException {
+    public AccessToken build(String assertionToken) throws AccessTokenVerificationException {
 
         try {
             final JsonWebEncryption jwe = new JsonWebEncryption();
@@ -29,7 +29,7 @@ final class ViewerAccessTokenBuilder implements AccessTokenBuilder {
 
             jwe.setCompactSerialization(assertionToken);
 
-            return ViewerAccessToken.getBuilder(servletContext).build(jwe.getPayload(), linkAuthorization);
+            return ViewerAccessToken.getBuilder(servletContext).build(jwe.getPayload());
         } catch (JoseException e) {
             throw new AccessTokenVerificationException("Unable to decode JWT", e);
         }

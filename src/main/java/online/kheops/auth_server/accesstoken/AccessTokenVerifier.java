@@ -21,12 +21,7 @@ public abstract class AccessTokenVerifier {
 
     public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
             throws AccessTokenVerificationException {
-        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken, false);
-    }
-
-    public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken, boolean linkAuthorization)
-            throws AccessTokenVerificationException {
-        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken, linkAuthorization);
+        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken);
     }
 
     public static AccessToken authenticateIntrospectableAccessToken(ServletContext servletContext, String accessToken)
@@ -35,10 +30,10 @@ public abstract class AccessTokenVerifier {
         List<Class<?>> introspectableAccessTokenBuilderClasses = new ArrayList<>(accessTokenBuilderClasses);
         introspectableAccessTokenBuilderClasses.add(pepAccessTokenClass);
 
-        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken, false);
+        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken);
     }
 
-    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken, boolean linkAuthorization)
+    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken)
             throws AccessTokenVerificationException {
 
         List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
@@ -63,7 +58,7 @@ public abstract class AccessTokenVerifier {
             }
 
             try {
-                return accessTokenBuilder.build(accessToken, linkAuthorization);
+                return accessTokenBuilder.build(accessToken);
             } catch (AccessTokenVerificationException e) {
                 exceptionList.add(e);
             }

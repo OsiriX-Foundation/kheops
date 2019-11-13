@@ -26,17 +26,15 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 public class CapabilityPrincipal implements KheopsPrincipal {
     private final Capability capability;
     private final User user;
-    private final boolean linkAuthorization;
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
     private EntityManager em;
 
-    public CapabilityPrincipal(Capability capability, User user, boolean linkAuthorization, String originalToken) {
+    public CapabilityPrincipal(Capability capability, User user,  String originalToken) {
         this.capability = capability;
         this.user = user;
         this.em = EntityManagerListener.createEntityManager();
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
 
         kheopsLogBuilder = new KheopsLogBuilder()
@@ -278,6 +276,12 @@ public class CapabilityPrincipal implements KheopsPrincipal {
 
     @Override
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
+    }
 
     @Override
     public boolean isLink() { return linkAuthorization;  }

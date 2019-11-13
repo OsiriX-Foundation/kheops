@@ -7,5 +7,6 @@ public abstract class HttpHeaders {
     public static final String X_TOTAL_COUNT = "X-Total-Count";
     public static final String X_TOKEN_SOURCE = "X-Token-Source";
     public static final String X_FORWARDED_FOR = "X-Forwarded-For";
+    public static final String X_LINK_AUTHORIZATION = "X-Link-Authorization";
 
 }

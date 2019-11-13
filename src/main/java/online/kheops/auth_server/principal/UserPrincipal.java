@@ -27,14 +27,12 @@ public class UserPrincipal implements KheopsPrincipal {
     private EntityManager em;
     private final User user;
     private final String actingParty;
-    private final boolean linkAuthorization;
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    public UserPrincipal(User user, String actingParty, boolean linkAuthorization, String originalToken) {
+    public UserPrincipal(User user, String actingParty, String originalToken) {
         this.user = user;
         this.actingParty = actingParty;
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
 
         kheopsLogBuilder = new KheopsLogBuilder()
@@ -170,6 +168,12 @@ public class UserPrincipal implements KheopsPrincipal {
     @Override
     public String toString() {
         return "[UserPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
     }
 
     @Override

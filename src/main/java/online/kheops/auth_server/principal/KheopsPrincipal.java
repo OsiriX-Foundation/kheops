@@ -39,6 +39,8 @@ public interface KheopsPrincipal extends Principal, TokenProvenance {
 
     default Optional<String> getClientId() {return Optional.empty();}
 
+    void setLink(boolean linkAuthorization);
+
     boolean isLink();
 
     String getOriginalToken();

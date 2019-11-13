@@ -31,11 +31,10 @@ public class ViewerPrincipal implements KheopsPrincipal {
     private EntityManager em;
     private final ViewerAccessToken viewerAccessToken;
     private final KheopsPrincipal kheopsPrincipal;
-    private final boolean linkAuthorization;
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, boolean linkAuthorization, String originalToken) {
+    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, String originalToken) {
 
         final AccessToken accessToken = viewerAccessToken.getAccessToken();
 
@@ -48,7 +47,6 @@ public class ViewerPrincipal implements KheopsPrincipal {
         kheopsPrincipal = accessToken.newPrincipal(servletContext, user);
 
         this.viewerAccessToken = viewerAccessToken;
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
 
         kheopsLogBuilder = new KheopsLogBuilder()
@@ -210,6 +208,12 @@ public class ViewerPrincipal implements KheopsPrincipal {
     @Override
     public Optional<List<String>> getStudyList() {
         return Optional.of(Collections.singletonList(viewerAccessToken.getStudyInstanceUID()));
+    }
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
     }
 
     @Override

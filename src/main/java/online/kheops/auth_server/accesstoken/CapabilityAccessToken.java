@@ -18,13 +18,12 @@ import java.util.Optional;
 final class CapabilityAccessToken implements AccessToken {
     private final String sub;
     private Capability capability;
-    private boolean linkAuthorization;
     private final String token;
 
 
     static final class CapabilityAccessTokenBuilder implements AccessTokenBuilder {
         @Override
-        public AccessToken build(String capabilityToken, boolean linkAuthorization) throws AccessTokenVerificationException {
+        public AccessToken build(String capabilityToken) throws AccessTokenVerificationException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {
                 throw new AccessTokenVerificationException("Bad capability token format");
             }
@@ -44,7 +43,7 @@ final class CapabilityAccessToken implements AccessToken {
 
                 tx.commit();
 
-                return new CapabilityAccessToken(capability, sub, linkAuthorization, capabilityToken);
+                return new CapabilityAccessToken(capability, sub, capabilityToken);
             } catch (CapabilityNotFoundException e) {
                 throw new AccessTokenVerificationException("Unknown capability token");
             } catch (CapabilityNotValidException e) {
@@ -58,10 +57,9 @@ final class CapabilityAccessToken implements AccessToken {
         }
     }
 
-    private CapabilityAccessToken(Capability capability, String sub, boolean linkAuthorization, String token) {
+    private CapabilityAccessToken(Capability capability, String sub, String token) {
         this.capability = Objects.requireNonNull(capability);
         this.sub = Objects.requireNonNull(sub);
-        this.linkAuthorization = linkAuthorization;
         this.token = token;
     }
 
@@ -111,14 +109,11 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new CapabilityPrincipal(capability, user, linkAuthorization, token);
+        return new CapabilityPrincipal(capability, user, token);
     }
 
     @Override
     public Optional<String> getCapabilityTokenId() {
         return Optional.of(capability.getId());
     }
-
-    @Override
-    public boolean isLink() { return linkAuthorization; }
 }

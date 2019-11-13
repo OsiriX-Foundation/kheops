@@ -32,11 +32,10 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private List<String> studyUids;
     private String clientId;
     private Album album;
-    private final boolean linkAuthorization;
     private final String originalToken;
 
     public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids,
-                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, boolean linkAuthorization, String originalToken) {
+                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, String originalToken) {
         try {
             album = getReportProvider(clientId).getAlbum();
         } catch (ClientIdNotFoundException e) {
@@ -49,7 +48,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         this.capabilityTokenId = capabilityTokenId;
         this.hasReadAccess = hasReadAccessAccess;
         this.hasWriteAccess = hasWriteAccess;
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
 
         kheopsLogBuilder = new KheopsLogBuilder()
@@ -196,6 +194,13 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     @Override
     public Optional<String> getCapabilityTokenId() {
         return Optional.ofNullable(capabilityTokenId);
+    }
+
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
     }
 
     @Override
