@@ -24,15 +24,6 @@ after_success:
   - git fetch --unshallow
   - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
 
-#addons:
-#  sonarcloud: $SONAR_ORGANIZATION
-#    organization:
-#    token:
-#      secure: $SONAR_LOGIN
-#script:
-  # other script steps might be done before running the actual analysis
-#  - sonar-scanner
-
 deploy:
   skip_cleanup: true
   provider: script
