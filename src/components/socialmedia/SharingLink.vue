@@ -9,7 +9,9 @@
     "revoke": "Do you want disable the latest sharing link created ?",
     "valid": "Valid",
     "disable": "Revoke",
-    "urlsharing": "Your sharing url :"
+    "urlsharing": "Your sharing url :",
+    "copysuccess": "Successfully copied",
+	  "sorryerror": "Sorry, an error occured"
   },
   "fr": {
     "write": "Ajouter et supprimer des séries dans l'album",
@@ -20,7 +22,9 @@
     "revoke": "Voulez-vous désactiver le dernier lien de partage créé ?",
     "valid": "Valider",
     "disable": "Désactiver",
-    "urlsharing": "Votre url de partage :"
+    "urlsharing": "Votre url de partage :",
+    "copysuccess": "Copié avec succès",
+  	"sorryerror": "Désolé, une erreur est survenue"
   }
 }
 </i18n>
@@ -114,6 +118,8 @@
             <b class="mr-2">{{ url }}</b>
             <button
               v-clipboard:copy="url"
+              v-clipboard:success="onCopy"
+              v-clipboard:error="onCopyError"
               type="button"
               class="btn btn-secondary btn-sm"
             >
@@ -207,6 +213,12 @@ export default {
     },
     revoke() {
       this.$emit('revoke', this.tokens);
+    },
+    onCopy() {
+      this.$snotify.success(this.$t('copysuccess'));
+    },
+    onCopyError() {
+      this.$snotify.error(this.$t('sorryerror'));
     },
   },
 };
