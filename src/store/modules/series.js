@@ -56,7 +56,7 @@ const actions = {
   },
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
-    if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
+    if (['DOC', 'XC', 'SR'].includes(serie.Modality.Value[0]) || (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1)) {
       return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
           const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : ''
@@ -103,12 +103,6 @@ const actions = {
     if (params.data[0][tagSOPClassUID] !== undefined) {
       serie.SOPClassUID = params.data[0][tagSOPClassUID];
     }
-    dispatch('getImage', {
-      StudyInstanceUID: params.StudyInstanceUID,
-      SeriesInstanceUID: params.serieUID,
-      serie: params.serie,
-    });
-    /*
     if (modality.includes('SR')) {
       serie.imgSrc = SRImage;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, serie: params.serie, SeriesInstanceUID: params.serieUID });
@@ -125,7 +119,6 @@ const actions = {
         serie: params.serie,
       });
     }
-    */
     return true;
   },
   getImage({ commit }, params) {
