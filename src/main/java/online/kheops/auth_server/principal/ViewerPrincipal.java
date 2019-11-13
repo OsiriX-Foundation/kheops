@@ -58,12 +58,6 @@ public class ViewerPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public long getDBID() {
-        return kheopsPrincipal.getDBID();
-    }
-    //end old version
-
-    @Override
     public String getName() { return kheopsPrincipal.getName(); }
 
     @Override

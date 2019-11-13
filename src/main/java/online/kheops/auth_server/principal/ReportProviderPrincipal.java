@@ -35,8 +35,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private final boolean linkAuthorization;
     private final String originalToken;
 
-    //old version
-    private final Long dbid;
     public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids,
                                    String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, boolean linkAuthorization, String originalToken) {
         try {
@@ -46,7 +44,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
         this.clientId = clientId;
         this.studyUids = studyUids;
-        this.dbid = user.getPk();
         this.user = user;
         this.actingParty = actingParty;
         this.capabilityTokenId = capabilityTokenId;
@@ -61,14 +58,9 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
                 .clientID(clientId)
                 .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
     }
-    @Override
-    public long getDBID() {
-        return dbid;
-    }
-    //end old version
 
     @Override
-    public String getName() { return Long.toString(dbid); }
+    public String getName() { return user.getKeycloakId(); }
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
@@ -178,7 +170,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
     @Override
     public String toString() {
-        return "[ReportProviderPrincipal user:" + getUser() + " dbid:" + getDBID() + " albumId:" + album.getId() + " clientID:" + clientId + "]";
+        return "[ReportProviderPrincipal user:" + getUser() + " albumId:" + album.getId() + " clientID:" + clientId + "]";
     }
 
     @Override

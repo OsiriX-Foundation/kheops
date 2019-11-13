@@ -203,9 +203,11 @@ public class AlbumQueries {
         }
     }
 
-    public static AlbumResponse findAlbumByUserPkAndAlbumId(String albumId, long userPK)
+    public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user)
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
+
+            final long userPK = user.getPk();
 
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();

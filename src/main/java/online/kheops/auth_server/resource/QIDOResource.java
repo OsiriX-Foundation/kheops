@@ -79,7 +79,7 @@ public class QIDOResource {
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
+        final long callingUserPk = kheopsPrincipal.getUser().getPk();
 
         if(fromInbox != null && fromInbox && !kheopsPrincipal.hasUserAccess()) {
             return Response.status(FORBIDDEN).build();

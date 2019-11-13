@@ -225,15 +225,14 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponse getCapability(String capabilityTokenID, long callingUserPk)
+    public static CapabilitiesResponse getCapability(String capabilityTokenID, User user)
             throws CapabilityNotFoundException {
 
         final CapabilitiesResponse capabilityResponse;
-
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final User user = findUserByPk(callingUserPk, em);
 
         try {
+            user = em.merge(user);
             Capability capability = getCapability(user, capabilityTokenID, em);
             capabilityResponse = new CapabilitiesResponse(capability, false, false);
         } finally {

@@ -31,10 +31,7 @@ public class UserPrincipal implements KheopsPrincipal {
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    //old version
-    private final Long dbid;
     public UserPrincipal(User user, String actingParty, boolean linkAuthorization, String originalToken) {
-        this.dbid = user.getPk();
         this.user = user;
         this.actingParty = actingParty;
         this.linkAuthorization = linkAuthorization;
@@ -45,14 +42,9 @@ public class UserPrincipal implements KheopsPrincipal {
                 .user(getUser().getKeycloakId())
                 .tokenType(TokenType.KEYCLOAK_TOKEN);
     }
-    @Override
-    public long getDBID() {
-        return dbid;
-    }
-    //end old version
 
     @Override
-    public String getName() { return Long.toString(dbid); }
+    public String getName() { return user.getKeycloakId(); }
 
     @Override
     public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
@@ -177,7 +169,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public String toString() {
-        return "[UserPrincipal user:" + getUser() + " dbid:" + getDBID() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+        return "[UserPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
     }
 
     @Override

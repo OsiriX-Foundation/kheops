@@ -16,7 +16,6 @@ import java.util.Optional;
 
 public interface KheopsPrincipal extends Principal, TokenProvenance {
 
-    long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
     boolean hasSeriesReadAccess(String study, String series);

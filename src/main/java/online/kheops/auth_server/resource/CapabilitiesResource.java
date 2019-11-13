@@ -184,7 +184,7 @@ public class CapabilitiesResource {
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
 
         try {
-            capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getDBID());
+            capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getUser());
         } catch (CapabilityNotFoundException e) {
             LOG.log(Level.WARNING, "Not Found", e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();

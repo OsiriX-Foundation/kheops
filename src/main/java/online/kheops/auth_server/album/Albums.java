@@ -46,7 +46,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(newAlbum.getId(), callingUser.getPk());
+            albumResponse = findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -103,7 +103,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(editAlbum.getId(), callingUser.getPk());
+            albumResponse = findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -167,11 +167,11 @@ public class Albums {
         }
     }
 
-    public static AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess, boolean withUsersList)
+    public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
            throws JOOQException, AlbumNotFoundException {
         AlbumResponse albumResponse;
         if (withUserAccess) {
-            albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
+            albumResponse = findAlbumByUserAndAlbumId(albumId, user);
             if(withUsersList) {
                 albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
             }

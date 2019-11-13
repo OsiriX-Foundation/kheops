@@ -32,11 +32,8 @@ public class CapabilityPrincipal implements KheopsPrincipal {
 
     private EntityManager em;
 
-    //old version
-    private final Long dbid;
     public CapabilityPrincipal(Capability capability, User user, boolean linkAuthorization, String originalToken) {
         this.capability = capability;
-        this.dbid=user.getPk();
         this.user = user;
         this.em = EntityManagerListener.createEntityManager();
         this.linkAuthorization = linkAuthorization;
@@ -48,15 +45,10 @@ public class CapabilityPrincipal implements KheopsPrincipal {
                 .scope(capability.getScopeType())
                 .tokenType(getTokenType());
     }
-    @Override
-    public long getDBID() {
-        return dbid;
-    }
-    //end old version
 
     @Override
     public String getName() {
-        return Long.toString(dbid);
+        return user.getKeycloakId();
     }
 
     @Override
