@@ -125,7 +125,7 @@ import { mapGetters } from 'vuex';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications';
 import studyMetadata from '@/components/study/studyMetadata';
-import SeriesSummary from '@/components/inbox/SeriesSummaryObject';
+import SeriesSummary from '@/components/inbox/SeriesSummary';
 
 export default {
   name: 'ListItemDetails',
