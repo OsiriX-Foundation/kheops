@@ -77,7 +77,7 @@
             />
           </span>
           <error-icon
-            v-if="error.length === totalSize"
+            v-if="error.length === totalSize && totalSize !== 0"
             :height="'20'"
             :width="'20'"
             color="red"
