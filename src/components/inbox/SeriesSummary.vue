@@ -22,80 +22,41 @@
 
 <template>
   <div class="seriesSummaryContainer">
-    <div class="row justify-content-center">
-      <div class="mb-2">
-        <b-form-checkbox
-          v-model="isSelected"
-        >
-          <span
-            v-if="serie.SeriesDescription && serie.SeriesDescription.Value"
-            class="pointer word-break"
-          >
-            {{ serie.SeriesDescription.Value[0] }}
-          </span>
-          <span
-            v-else
-            class="pointer"
-          >
-            No description
-          </span>
-        </b-form-checkbox>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
+    <div class="row  justify-content-center">
       <div class="mb-2 preview">
         <div
-          class="d-flex flex-row justify-content-center align-items-center full-height"
+          class="d-flex flex-row justify-content-center"
         >
-          <div class="p-2">
-            <img
-              v-if="!loadingImage"
-              :class="!serie.Modality.Value[0].includes('SR') ? 'pointer' : ''"
-              :src="serie.imgSrc"
-              width="250"
-              height="250"
-              @click="openTab(serie)"
-            >
-            <bounce-loader
-              :loading="loadingImage"
-              color="white"
-            />
-          </div>
+          <img
+            v-if="!loadingImage"
+            :class="!serie.Modality.Value[0].includes('SR') ? 'pointer' : ''"
+            :src="serie.imgSrc"
+            width="150"
+            height="150"
+            @click="openTab(serie)"
+          >
+          <bounce-loader
+            :loading="loadingImage"
+            color="white"
+          />
         </div>
       </div>
-      <div class="col col-mb-2 col-sm-10 col-md-8 col-lg-6 description">
-        <table class="table table-striped-color-reverse table-nohover">
-          <tbody>
-            <tr v-if="serie.Modality && serie.Modality.Value !== undefined">
-              <th>{{ $t('modality') }}</th>
-              <td>{{ serie.Modality.Value[0] }}</td>
-            </tr>
-            <tr v-if="serie.RetrieveAETitle && serie.RetrieveAETitle.Value !== undefined">
-              <th>{{ $t('applicationentity') }}</th>
-              <td>{{ serie.RetrieveAETitle.Value[0] }}</td>
-            </tr>
-            <tr v-if="serie.NumberOfSeriesRelatedInstances && serie.NumberOfSeriesRelatedInstances.Value !== undefined">
-              <th>{{ $t('numberimages') }}</th>
-              <td>{{ serie.NumberOfSeriesRelatedInstances.Value[0] }}</td>
-            </tr>
-            <tr v-if="serie.SeriesDescription && serie.SeriesDescription.Value !== undefined">
-              <th>{{ $t('description') }}</th>
-              <td
-                class="word-break"
-              >{{ serie.SeriesDescription.Value[0] }}</td>
-            </tr>
-            <tr v-if="serie.SeriesDate && serie.SeriesDate.Value !== undefined">
-              <th>{{ $t('seriesdate') }}</th>
-              <td>{{ serie.SeriesDate.Value[0] | formatDate }}</td>
-            </tr>
-            <tr v-if="serie.SeriesTime && serie.SeriesTime.Value !== undefined">
-              <th>{{ $t('seriestime') }}</th>
-              <td>{{ serie.SeriesTime.Value[0] | formatTM }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    </div>
+    <div class="row mb-2 ml-2">
+      <b-form-checkbox
+        v-model="isSelected"
+      >
+        <span
+          class="pointer word-break font-white"
+        >
+          {{ imageTitle }}  <br />
+          <span
+            v-if="serie.SeriesDate && serie.SeriesDate.Value !== undefined"
+          >
+            {{ serie.SeriesDate.Value[0] | formatDate }} {{ serie.SeriesTime.Value[0] | formatTM }}
+          </span>
+        </span>
+      </b-form-checkbox>
     </div>
   </div>
 </template>
@@ -136,6 +97,17 @@ export default {
       studies: 'studies',
       series: 'series',
     }),
+    imageTitle() {
+      let modality = ''
+      let description = ''
+      if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
+        modality = this.serie.Modality.Value[0]
+      }
+      if (this.serie.SeriesDescription !== undefined && this.serie.SeriesDescription.Value !== undefined) {
+        description = this.serie.SeriesDescription.Value[0]
+      }
+      return `${modality} - ${description}`
+    },
     seriesInstanceUID() {
       return this.serie.SeriesInstanceUID.Value[0];
     },

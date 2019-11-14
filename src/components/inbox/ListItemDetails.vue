@@ -33,7 +33,7 @@
 
 <template>
   <div class="row">
-    <div class="col-xl-auto mb-4">
+    <div class="col-lg-2 col-xl-auto mb-4">
       <nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
         <a
           class="nav-link"
@@ -59,7 +59,7 @@
       </nav>
     </div>
     <div
-      class="col-sm-12 col-md-12 col-lg-12 col-xl-10"
+      class="col-sm-12 col-md-12 col-lg-10 col-xl-10"
     >
       <div
         v-if="study.flag.view === 'series'"
@@ -71,7 +71,7 @@
           <div
             v-for="serie in series[studyUID]"
             :key="serie.id"
-            class="col-sm-12 col-md-12 col-lg-12 col-xl-6 mb-5"
+            class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-5"
           >
             <series-summary
               :serie="serie"
