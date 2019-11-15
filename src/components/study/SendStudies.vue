@@ -89,7 +89,9 @@
         >
           <v-icon
             class="align-middle"
-            name="baidu"
+            name="warning"
+            :height="'20'"
+            :width="'20'"
           />
         </div>
         <div
@@ -510,6 +512,8 @@ export default {
             this.$store.dispatch('removeFileId', { id: file.id });
             this.countSentFiles += 1;
           }
+        }).catch((err) => {
+          console.log(err)
         });
       });
     },
