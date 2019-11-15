@@ -50,11 +50,7 @@
           class="pointer word-break font-white"
         >
           {{ imageTitle }}  <br />
-          <span
-            v-if="serie.SeriesDate && serie.SeriesDate.Value !== undefined"
-          >
-            {{ serie.SeriesDate.Value[0] | formatDate }} {{ serie.SeriesTime.Value[0] | formatTM }}
-          </span>
+          {{ serieDate }}
         </span>
       </b-form-checkbox>
     </div>
@@ -62,6 +58,7 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import BounceLoader from 'vue-spinner/src/BounceLoader.vue';
 import { ViewerToken } from '../../mixins/tokens.js';
@@ -107,6 +104,17 @@ export default {
         description = this.serie.SeriesDescription.Value[0]
       }
       return `${modality} - ${description}`
+    },
+    serieDate() {
+      let seriesDate = ''
+      let seriesTime = ''
+      if (this.serie.SeriesDate && this.serie.SeriesDate.Value !== undefined) {
+        seriesDate = Vue.options.filters.formatDate(this.serie.SeriesDate.Value[0])
+      }
+      if (this.serie.SeriesTime && this.serie.SeriesTime.Value !== undefined) {
+        seriesTime = Vue.options.filters.formatTM(this.serie.SeriesTime.Value[0])
+      }
+      return `${seriesDate} ${seriesTime}`
     },
     seriesInstanceUID() {
       return this.serie.SeriesInstanceUID.Value[0];
