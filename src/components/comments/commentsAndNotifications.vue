@@ -449,7 +449,7 @@ export default {
         } else if (!res.data[this.accessVar]) {
           this.$snotify.error(this.scope === 'album' ? this.$t('noaccessalbum', { user }) : this.$t('noaccessstudy', { user }));
         } else if (res.status === 200 && res.data[this.accessVar]) {
-          this.statusMsgPrivate = true
+          this.statusMsgPrivate = true;
           this.$refs.privateuser.setUser(user);
           const { textcomment } = this.$refs;
           setTimeout(() => { textcomment.focus(); }, 0);
