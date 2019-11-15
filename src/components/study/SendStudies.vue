@@ -515,6 +515,7 @@ export default {
     },
     sendDicomizeDataPromise(idFile, data) {
       return new Promise((resolve, reject) => {
+        console.log('send !')
         const formData = new FormData();
         formData.append(idFile, data);
 
