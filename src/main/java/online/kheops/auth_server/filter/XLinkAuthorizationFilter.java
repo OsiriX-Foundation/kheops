@@ -28,7 +28,7 @@ public class XLinkAuthorizationFilter implements ContainerRequestFilter {
             return;
         }
         if (requestContext.getHeaders().containsKey(X_LINK_AUTHORIZATION)) {
-            final boolean link = Boolean.valueOf(requestContext.getHeaders().get(X_LINK_AUTHORIZATION).get(0));
+            final boolean link = Boolean.parseBoolean(requestContext.getHeaders().get(X_LINK_AUTHORIZATION).get(0));
             log.link(link);
         } else {
             log.link(false);
