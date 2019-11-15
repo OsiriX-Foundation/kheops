@@ -43,19 +43,19 @@
           class="table table-striped-color-reverse word-break table-nohover"
         >
           <tbody>
-            <tr v-if="metadata.PatientName">
+            <tr v-if="metadata.PatientName !== undefined && metadata.PatientName.Value !== undefined && metadata.PatientName.Value[0]['Alphabetic'] !== undefined">
               <th>{{ $t('patientname') }}</th>
               <td>{{ metadata.PatientName.Value[0]['Alphabetic'] }}</td>
             </tr>
-            <tr v-if="metadata.PatientBirthDate.Value !== undefined && matchNumbers(metadata.PatientBirthDate.Value[0])">
+            <tr v-if="metadata.PatientBirthDate !== undefined && metadata.PatientBirthDate.Value !== undefined && matchNumbers(metadata.PatientBirthDate.Value[0])">
               <th>{{ $t('patientbirthdate') }}</th>
               <td>{{ getDate(metadata.PatientBirthDate.Value[0]) }}</td>
             </tr>
-            <tr v-if="metadata.PatientID">
+            <tr v-if="metadata.PatientID !== undefined && metadata.PatientID.Value !== undefined">
               <th>{{ $t('patientid') }}</th>
               <td>{{ metadata.PatientID.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.PatientSex.Value !== undefined && matchSex(metadata.PatientSex)">
+            <tr v-if="metadata.PatientSex !== undefined && metadata.PatientSex.Value !== undefined && matchSex(metadata.PatientSex)">
               <th>{{ $t('patientsex') }}</th>
               <td>{{ metadata.PatientSex.Value[0] }}</td>
             </tr>
@@ -69,27 +69,27 @@
           class="table table-striped-color-reverse word-break table-nohover"
         >
           <tbody>
-            <tr v-if="metadata.ModalitiesInStudy.Value !== undefined">
+            <tr v-if="metadata.ModalitiesInStudy !== undefined && metadata.ModalitiesInStudy.Value !== undefined">
               <th>{{ $t('modalitiesinstudy') }}</th>
               <td>{{ metadata.ModalitiesInStudy.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyDate.Value !== undefined && matchNumbers(metadata.StudyDate.Value[0])">
+            <tr v-if="metadata.StudyDate !== undefined && metadata.StudyDate.Value !== undefined && matchNumbers(metadata.StudyDate.Value[0])">
               <th>{{ $t('studydate') }}</th>
               <td>{{ metadata.StudyDate.Value[0]|formatDate }}</td>
             </tr>
-            <tr v-if="metadata.StudyID.Value !== undefined">
+            <tr v-if="metadata.StudyID !== undefined && metadata.StudyID.Value !== undefined">
               <th>{{ $t('studyid') }}</th>
               <td>{{ metadata.StudyID.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyInstanceUID.Value !== undefined">
+            <tr v-if="metadata.StudyInstanceUID !== undefined && metadata.StudyInstanceUID.Value !== undefined">
               <th>{{ $t('StudyInstanceUID') }}</th>
               <td>{{ metadata.StudyInstanceUID.Value[0] }}</td>
             </tr>
-            <tr v-if="metadata.StudyTime.Value !== undefined && matchNumbers(metadata.StudyTime.Value[0])">
+            <tr v-if="metadata.StudyTime !== undefined && metadata.StudyTime.Value !== undefined && matchNumbers(metadata.StudyTime.Value[0])">
               <th>{{ $t('studytime') }}</th>
               <td>{{ metadata.StudyTime.Value[0] | formatTM }}</td>
             </tr>
-            <tr v-if="metadata.NumberOfStudyRelatedSeries.Value !== undefined && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
+            <tr v-if="metadata.NumberOfStudyRelatedSeries !== undefined && metadata.NumberOfStudyRelatedSeries.Value !== undefined && matchNumbers(metadata.NumberOfStudyRelatedSeries.Value[0])">
               <th>{{ $t('NumberOfStudyRelatedSeries') }}</th>
               <td>{{ metadata.NumberOfStudyRelatedSeries.Value[0] }}</td>
             </tr>
