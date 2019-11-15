@@ -58,12 +58,10 @@
             v-access="'active'"
             class="font-kheops active"
           >
-            {{ $t('welcome') }}
             <router-link
               to="/user"
-              class="font-kheops"
             >
-              {{ currentuserFullname }}
+              {{ currentuserFullname !== undefined ? currentuserFullname : currentuserEmail }}
             </router-link>
           </b-nav-item>
           <b-nav-item

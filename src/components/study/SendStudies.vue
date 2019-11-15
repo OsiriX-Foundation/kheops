@@ -77,7 +77,7 @@
             />
           </span>
           <error-icon
-            v-if="error.length === totalSize"
+            v-if="error.length === totalSize && totalSize !== 0"
             :height="'20'"
             :width="'20'"
             color="red"
@@ -89,7 +89,9 @@
         >
           <v-icon
             class="align-middle"
-            name="baidu"
+            name="warning"
+            :height="'20'"
+            :width="'20'"
           />
         </div>
         <div
@@ -510,11 +512,14 @@ export default {
             this.$store.dispatch('removeFileId', { id: file.id });
             this.countSentFiles += 1;
           }
+        }).catch((err) => {
+          console.log(err)
         });
       });
     },
     sendDicomizeDataPromise(idFile, data) {
       return new Promise((resolve, reject) => {
+        console.log('send !')
         const formData = new FormData();
         formData.append(idFile, data);
 
