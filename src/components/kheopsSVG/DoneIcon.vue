@@ -19,7 +19,7 @@
 <script>
 
 export default {
-  name: 'AddIcon',
+  name: 'DoneIcon',
   props: {
     width: {
       type: String,

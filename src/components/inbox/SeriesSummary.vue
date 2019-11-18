@@ -22,7 +22,7 @@
 
 <template>
   <div class="seriesSummaryContainer">
-    <div class="row  justify-content-center">
+    <div class="row justify-content-center">
       <div class="mb-2 preview">
         <div
           class="d-flex flex-row justify-content-center"
@@ -49,7 +49,7 @@
         <span
           class="pointer word-break font-white"
         >
-          {{ imageTitle }}  <br />
+          {{ imageTitle }}  <br>
           {{ serieDate }}
         </span>
       </b-form-checkbox>
@@ -95,26 +95,26 @@ export default {
       series: 'series',
     }),
     imageTitle() {
-      let modality = ''
-      let description = ''
+      let modality = '';
+      let description = '';
       if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
-        modality = this.serie.Modality.Value[0]
+        modality = this.serie.Modality.Value[0];
       }
       if (this.serie.SeriesDescription !== undefined && this.serie.SeriesDescription.Value !== undefined) {
-        description = this.serie.SeriesDescription.Value[0]
+        description = this.serie.SeriesDescription.Value[0];
       }
-      return `${modality} - ${description}`
+      return `${modality} - ${description}`;
     },
     serieDate() {
-      let seriesDate = ''
-      let seriesTime = ''
+      let seriesDate = '';
+      let seriesTime = '';
       if (this.serie.SeriesDate && this.serie.SeriesDate.Value !== undefined) {
-        seriesDate = Vue.options.filters.formatDate(this.serie.SeriesDate.Value[0])
+        seriesDate = Vue.options.filters.formatDate(this.serie.SeriesDate.Value[0]);
       }
       if (this.serie.SeriesTime && this.serie.SeriesTime.Value !== undefined) {
-        seriesTime = Vue.options.filters.formatTM(this.serie.SeriesTime.Value[0])
+        seriesTime = Vue.options.filters.formatTM(this.serie.SeriesTime.Value[0]);
       }
-      return `${seriesDate} ${seriesTime}`
+      return `${seriesDate} ${seriesTime}`;
     },
     seriesInstanceUID() {
       return this.serie.SeriesInstanceUID.Value[0];
@@ -219,21 +219,21 @@ export default {
     openTab(series) {
       const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1';
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
-      let openWSI = this.study.ModalitiesInStudy !== undefined
-        && this.study.ModalitiesInStudy.Value.length === 1
-        && this.study.ModalitiesInStudy.Value[0] === 'SM';
-      let windowProps = {}
+      const openWSI = series.Modality !== undefined
+        && series.Modality.Value !== undefined
+        && series.Modality.Value[0] === 'SM';
+      const windowProps = {};
       if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
-        windowProps['name'] = `WADO-${this.seriesInstanceUID}`;
-        windowProps['id'] = 'WADO'
+        windowProps.name = `WADO-${this.seriesInstanceUID}`;
+        windowProps.id = 'WADO';
       } else if (openWSI) {
-        windowProps['name'] = `WSI-${this.studyInstanceUID}`;
-        windowProps['id'] = 'WSI'
+        windowProps.name = `WSI-${this.studyInstanceUID}`;
+        windowProps.id = 'WSI';
       } else if (series.Modality.Value[0] !== 'SR') {
-        windowProps['name'] = `OHIF-${this.studyInstanceUID}`;
-        windowProps['id'] = 'OHIF'
+        windowProps.name = `OHIF-${this.studyInstanceUID}`;
+        windowProps.id = 'OHIF';
       }
-      let openWindow = window.open('', windowProps.name)
+      const openWindow = window.open('', windowProps.name);
       this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;
         const sourceQuery = this.getSourceQueries();

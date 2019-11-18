@@ -59,9 +59,9 @@ const actions = {
     if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
       return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
-          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : ''
+          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : '';
           return dispatch('setImageSrc', {
-            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality
+            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality,
           });
         }
         return res;

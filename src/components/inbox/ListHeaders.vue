@@ -171,7 +171,8 @@
               right
             >
               <template slot="button-content">
-                <add-icon
+                <v-icon
+                  name="add"
                   width="34px"
                   height="34px"
                 />
@@ -254,11 +255,10 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
-import AddIcon from '@/components/kheopsSVG/AddIcon';
 
 export default {
   name: 'ListHeaders',
-  components: { formGetUser, ConfirmButton, AddIcon },
+  components: { formGetUser, ConfirmButton },
   props: {
     studies: {
       type: Array,

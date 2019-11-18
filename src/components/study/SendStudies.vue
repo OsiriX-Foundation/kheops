@@ -340,7 +340,6 @@ import InputDicomize from '@/components/study/InputDicomize';
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue';
 import BlockIcon from '@/components/kheopsSVG/BlockIcon';
 import CloseIcon from '@/components/kheopsSVG/CloseIcon';
-import AddIcon from '@/components/kheopsSVG/AddIcon';
 import RemoveIcon from '@/components/kheopsSVG/RemoveIcon';
 import DoneIcon from '@/components/kheopsSVG/DoneIcon';
 import { DicomOperations } from '@/mixins/dicomoperations';
@@ -348,7 +347,7 @@ import { DicomOperations } from '@/mixins/dicomoperations';
 export default {
   name: 'SendStudies',
   components: {
-    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize,
+    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, RemoveIcon, DoneIcon, InputDicomize,
   },
   mixins: [DicomOperations],
   props: {
@@ -441,7 +440,7 @@ export default {
   methods: {
     retry() {
       this.$store.dispatch('setSending', { sending: true });
-      this.$store.dispatch('setFiles', {files: this.error});
+      this.$store.dispatch('setFiles', { files: this.error });
     },
     goToAlbum() {
       this.$router.push(`/albums/${this.source}`);
@@ -495,36 +494,48 @@ export default {
         this.sendFormData(this.filesFiltered);
       }
     },
+    errorDicomize(file, err = undefined) {
+      const status = err !== undefined ? err.status : undefined;
+      this.generateErrorNonDicom([file], status);
+      this.$store.dispatch('removeFileId', { id: file.id });
+    },
     sendDicomizeFiles(files, dicomValue) {
-      files.forEach((file) => {
-        this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then((res) => {
-          if (res !== -1) {
-            const data = res;
-            this.sendDicomizeDataPromise(file.id, data).then(() => {
-              this.$store.dispatch('removeFileId', { id: file.id });
-              this.countSentFiles += 1;
+      let promiseSequential = Promise.resolve();
+      this.getStudy(this.studyUIDToSend).then((res) => {
+        const study = res.data[0];
+        files.forEach((file) => {
+          promiseSequential = promiseSequential.then(() => new Promise((resolve, reject) => {
+            this.dicomize(study, file, dicomValue[file.name]).then((res) => {
+              const data = res;
+              this.sendDicomizeDataPromise(file.id, data).then(() => {
+                this.$store.dispatch('removeFileId', { id: file.id });
+                this.countSentFiles += 1;
+                resolve({ id: file.id, data });
+              }).catch((err) => {
+                reject(err);
+              });
             }).catch((err) => {
-              this.generateErrorNonDicom([file], err.status);
-              this.$store.dispatch('removeFileId', { id: file.id });
-              this.countSentFiles += 1;
+              reject(err);
             });
-          } else {
-            this.$store.dispatch('removeFileId', { id: file.id });
+          })).catch((err) => {
+            console.log(err);
+            this.errorDicomize(file, err);
             this.countSentFiles += 1;
-          }
-        }).catch((err) => {
-          console.log(err)
+          });
+        });
+      }).catch((err) => {
+        console.log(err);
+        files.forEach((file) => {
+          this.errorDicomize(file, err);
+          this.countSentFiles += 1;
         });
       });
     },
     sendDicomizeDataPromise(idFile, data) {
       return new Promise((resolve, reject) => {
-        console.log('send !')
         const formData = new FormData();
         formData.append(idFile, data);
-
         const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
-
         HTTP.post(request, data, this.config.dicomizeData).then((res) => {
           resolve(res);
         }).catch((err) => {
@@ -673,7 +684,7 @@ export default {
       return map;
     },
     createObjErrors(file, value) {
-      let objError = file;
+      const objError = file;
       objError.value = value;
       return objError;
     },
