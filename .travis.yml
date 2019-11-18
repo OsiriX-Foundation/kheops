@@ -9,6 +9,12 @@ script:
 
 after_success:
    - docker push osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH
-   - curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $TRAVIS_TOKEN" -d "{"request": {"branch":"ci-test", "message":"from nginx"}}" https://api.travis-ci.org/repo/19160020/requests
+   - "curl -s -X POST 
+       -H 'Content-Type: application/json' 
+       -H 'Accept: application/json' 
+       -H 'Travis-API-Version: 3' 
+       -H 'Authorization: token $TRAVIS_TOKEN' 
+       -d '{"request": {"branch":"ci-test", "message":"from nginx"}}' 
+       https://api.travis-ci.org/repo/19160020/requests"
 
 
