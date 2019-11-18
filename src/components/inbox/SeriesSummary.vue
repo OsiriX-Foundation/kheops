@@ -219,9 +219,9 @@ export default {
     openTab(series) {
       const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1';
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
-      const openWSI = this.study.ModalitiesInStudy !== undefined
-        && this.study.ModalitiesInStudy.Value.length === 1
-        && this.study.ModalitiesInStudy.Value[0] === 'SM';
+      const openWSI = series.Modality !== undefined
+        && series.Modality.Value !== undefined
+        && series.Modality.Value[0] === 'SM';
       const windowProps = {};
       if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
         windowProps.name = `WADO-${this.seriesInstanceUID}`;
