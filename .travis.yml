@@ -4,9 +4,9 @@ notifications:
   email: false
 
 script:
-   - docker build -t osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH .
-   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#   - docker build -t osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH .
+#   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-after_success:
-   - docker push osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH
-   - "curl -s -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Travis-API-Version: 3' -H 'Authorization: token $TRAVIS_TOKEN' -d '{\"request\": {\"branch\":\"ci-test\", \"message\":\"from nginx\"}}' 'https://api.travis-ci.org/repo/19160020/requests'"
+#after_success:
+#   - docker push osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH
+   - "curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Travis-API-Version: 3' -H 'Authorization: token $TRAVIS_TOKEN' -d '{\"request\": {\"branch\":\"ci-test\", \"message\":\"from nginx\"}}' 'https://api.travis-ci.org/repo/19160020/requests'"
