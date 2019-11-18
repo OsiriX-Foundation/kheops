@@ -127,27 +127,25 @@ export const DicomOperations = {
     };
   },
   methods: {
-    dicomize(studyUID, file, dicomValue) {
+    dicomize(study, file, dicomValue) {
       return new Promise((resolve, reject) => {
-        if (studyUID) {
-          this.getStudy(studyUID).then((res) => {
-            const tags = this.getTags(file.type);
-            const boundary = 'myboundary';
-            const contentTypeHeader = `Content-Type: application/dicom+json; transfer-syntax=${tags.transferSyntax}`;
-            if (tags !== -1) {
-              const objDicom = this.generateDicom(tags.necessaryTag, tags.createTag, tags.tagBulkDataURI, res.data[0], dicomValue);
-              this.generateMultiPart(boundary, [objDicom.ordered], contentTypeHeader, file, objDicom.bulkDataUri)
-                .then((res) => {
-                  resolve(res);
-                });
-            }
-          }).catch((err) => {
-            reject(err);
-          });
+        if (study !== undefined) {
+          const tags = this.getTags(file.type);
+          const boundary = 'myboundary';
+          const contentTypeHeader = `Content-Type: application/dicom+json; transfer-syntax=${tags.transferSyntax}`;
+          if (tags !== -1) {
+            const objDicom = this.generateDicom(tags.necessaryTag, tags.createTag, tags.tagBulkDataURI, study, dicomValue);
+            this.generateMultiPart(boundary, [objDicom.ordered], contentTypeHeader, file, objDicom.bulkDataUri)
+              .then((res) => {
+                resolve(res);
+              }).catch(err => {
+                reject(err)
+              });
+          }
         } else {
-          resolve(-1);
+          reject(new Error('Study undefined'))
         }
-      });
+      })
     },
     getStudy(studyUID) {
       return new Promise((resolve, reject) => {
@@ -257,7 +255,7 @@ export const DicomOperations = {
       return dec;
     },
     generateMultiPart(boundary, dicomHeader, contentTypeHeader, dataToPost, bulkDataUri) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         const header = Buffer.from(`\r\n--${boundary}\r\n${contentTypeHeader}\r\n\r\n${JSON.stringify(dicomHeader)}\r\n`, 'utf-8');
         const end = Buffer.from(`\r\n--${boundary}--`, 'utf-8');
         const file = dataToPost.content;
@@ -266,6 +264,8 @@ export const DicomOperations = {
           value = Buffer.concat([value, Buffer.from(res)]);
           const multiPartData = Buffer.concat([header, value, end]);
           resolve(multiPartData);
+        }).catch((err) => {
+          reject(err)
         });
       });
     },
