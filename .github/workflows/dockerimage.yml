@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Publish Docker
-      uses: elgohr/Publish-Docker-Github-Action@2.4
-      with:
-        name: osirixfoundation/kheops-reverse-proxy
-        username: ${{ secrets.DOCKER_USERNAME }} 
-        password: ${{ secrets.DOCKER_PASSWORD }}     
+     - name: webhook
+       uses: zzzze/webhook-trigger@master
+       with:
+         data: "{\"request\":{\"branch\":\"ci-test\",\"config\":null,\"message\":\"from github\"}}"
+         webhook_url: "https://api.travis-ci.com/repo/19160020/requests"
+         options: "-H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"Travis-API-Version: 3\" -H \"Authorization: token ${{ secrets.TRAVIS_TOKEN }}\""
