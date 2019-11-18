@@ -79,9 +79,11 @@
         :title="$t('import')"
         @click="setStudyUID()"
       >
-        <add-icon
+        <v-icon
+          name="add"
           width="24px"
           height="24px"
+          class="kheopsicon"
         />
       </label>
       <span
@@ -123,7 +125,6 @@ import Vue from 'vue';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
 import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
-import AddIcon from '@/components/kheopsSVG/AddIcon';
 import { ViewerToken } from '@/mixins/tokens.js';
 import { CurrentUser } from '../../mixins/currentuser.js';
 import { Viewer } from '@/mixins/viewer.js';
@@ -131,7 +132,7 @@ import { Viewer } from '@/mixins/viewer.js';
 export default {
   name: 'ListIcons',
   components: {
-    OsirixIcon, VisibilityIcon, AddIcon, WeasisIcon,
+    OsirixIcon, VisibilityIcon, WeasisIcon,
   },
   mixins: [ViewerToken, CurrentUser, Viewer],
   props: {

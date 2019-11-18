@@ -340,7 +340,6 @@ import InputDicomize from '@/components/study/InputDicomize';
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue';
 import BlockIcon from '@/components/kheopsSVG/BlockIcon';
 import CloseIcon from '@/components/kheopsSVG/CloseIcon';
-import AddIcon from '@/components/kheopsSVG/AddIcon';
 import RemoveIcon from '@/components/kheopsSVG/RemoveIcon';
 import DoneIcon from '@/components/kheopsSVG/DoneIcon';
 import { DicomOperations } from '@/mixins/dicomoperations';
@@ -348,7 +347,7 @@ import { DicomOperations } from '@/mixins/dicomoperations';
 export default {
   name: 'SendStudies',
   components: {
-    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize,
+    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, RemoveIcon, DoneIcon, InputDicomize,
   },
   mixins: [DicomOperations],
   props: {

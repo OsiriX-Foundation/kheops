@@ -22,7 +22,7 @@
 
 <template>
   <div class="seriesSummaryContainer">
-    <div class="row  justify-content-center">
+    <div class="row justify-content-center">
       <div class="mb-2 preview">
         <div
           class="d-flex flex-row justify-content-center"
