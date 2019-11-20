@@ -65,8 +65,6 @@ public class KeycloakToken {
             final TokenResponse tokenResponse;
             try {
                 Invocation.Builder builder = CLIENT.target(tokenUri).request().header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED);
-                LOG.log(Level.WARNING, "tokenUri: " + tokenUri);
-                LOG.log(Level.WARNING, "form: " + form);
                 tokenResponse = builder.post(Entity.form(form), TokenResponse.class);
                 accessToken = tokenResponse.accessToken;
                 renewTime = Instant.now().plusSeconds(tokenResponse.expiresIn - MINIMUM_VALIDITY);
