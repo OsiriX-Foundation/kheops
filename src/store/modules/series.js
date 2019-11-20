@@ -66,6 +66,7 @@ const actions = {
         }
         return res;
       }).catch((err) => {
+        dispatch('setImageError', serie);
         Promise.reject(err);
       });
     }
@@ -121,7 +122,7 @@ const actions = {
     }
     return true;
   },
-  getImage({ commit }, params) {
+  getImage({ commit, dispatch }, params) {
     const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/thumbnail`;
     const queries = `viewport=${encodeURIComponent('256,256')}`;
     const { serie } = params;
@@ -142,9 +143,13 @@ const actions = {
       serie.imgSrc = img;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
     }).catch(() => {
-      serie.imgSrc = DicomLogo;
-      commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
+      dispatch('setImageError', serie);
     });
+  },
+  setImageError({ commit }, params) {
+    const serie = params;
+    serie.imgSrc = DicomLogo;
+    commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
   },
   setFlagByStudyUIDSerieUID({ commit }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
