@@ -122,9 +122,10 @@ const actions = {
     return true;
   },
   getImage({ commit }, params) {
-    const request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`;
+    const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/thumbnail`;
+    const queries = `viewport=${encodeURIComponent('256,256')}`;
     const { serie } = params;
-    return HTTP.get(request, {
+    return HTTP.get(`${request}?${queries}`, {
       responseType: 'arraybuffer',
       headers: {
         Accept: 'image/jpeg',
