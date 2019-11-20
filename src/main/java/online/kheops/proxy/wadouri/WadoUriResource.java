@@ -111,32 +111,9 @@ public class WadoUriResource {
             invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
-        try (final Response upstreamResponse = invocationBuilder.get()) {
-            if (upstreamResponse.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
-                LOG.log(WARNING, "Sever error from upstream: status" + upstreamResponse.getStatus());
-                throw new WebApplicationException(BAD_GATEWAY);
-            }
-
-            StreamingOutput streamingOutput = output -> {
-                try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class)) {
-                    byte[] buffer = new byte[4096];
-                    int len = inputStream.read(buffer);
-                    while (len != -1) {
-                        output.write(buffer, 0, len);
-                        len = inputStream.read(buffer);
-                    }
-                } catch (Exception e) {
-                    throw new IOException(e);
-                }
-            };
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setNoCache(true);
-
-            return Response.status(upstreamResponse.getStatus()).entity(streamingOutput)
-                    .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
-                    .cacheControl(cacheControl)
-                    .build();
+        final Response upstreamResponse;
+        try {
+            upstreamResponse = invocationBuilder.get();
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
             throw new WebApplicationException(BAD_GATEWAY);
@@ -144,6 +121,34 @@ public class WadoUriResource {
             LOG.log(SEVERE, "unknown error while getting from upstream", e);
             throw new InternalServerErrorException("unknown error while getting from upstream");
         }
+
+        if (upstreamResponse.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
+            LOG.log(WARNING, "Sever error from upstream: status" + upstreamResponse.getStatus());
+            throw new WebApplicationException(BAD_GATEWAY);
+        }
+
+        StreamingOutput streamingOutput = output -> {
+            try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class)) {
+                byte[] buffer = new byte[4096];
+                int len = inputStream.read(buffer);
+                while (len != -1) {
+                    output.write(buffer, 0, len);
+                    len = inputStream.read(buffer);
+                }
+            } catch (Exception e) {
+                throw new IOException(e);
+            } finally {
+                upstreamResponse.close();
+            }
+        };
+
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+
+        return Response.status(upstreamResponse.getStatus()).entity(streamingOutput)
+                .header(CONTENT_TYPE, upstreamResponse.getHeaderString(CONTENT_TYPE))
+                .cacheControl(cacheControl)
+                .build();
     }
 
     private URI getParameterURI(String parameter) {
