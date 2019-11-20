@@ -97,13 +97,17 @@ export default {
     imageTitle() {
       let modality = '';
       let description = '';
+      let numberInstances = '';
       if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
         modality = this.serie.Modality.Value[0];
+      }
+      if (this.serie.NumberOfSeriesRelatedInstances !== undefined && this.serie.NumberOfSeriesRelatedInstances.Value !== undefined) {
+        numberInstances = `[ ${this.serie.NumberOfSeriesRelatedInstances.Value[0]} ]`
       }
       if (this.serie.SeriesDescription !== undefined && this.serie.SeriesDescription.Value !== undefined) {
         description = this.serie.SeriesDescription.Value[0];
       }
-      return `${modality} - ${description}`;
+      return `${modality} - ${description} ${numberInstances}`;
     },
     serieDate() {
       let seriesDate = '';
