@@ -92,33 +92,30 @@ public class Keycloak {
             throws UserNotFoundException, KeycloakException {
 
         if(user.contains("@")) {
-            final Response response;
             final String userLowerCase = user.toLowerCase();
-            try {
-                response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+            try (final Response response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get()){
+                if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                    String output = response.readEntity(String.class);
+                    try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                        JsonArray reply = jsonReader.readArray();
+                        final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
+                        if (keycloakUsers.size() > 0) {
+                            final int index = keycloakUsers.verifyEmail(userLowerCase);
+                            return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index))
+                                    .setSub(keycloakUsers.getId(0))
+                                    .setFirstName(keycloakUsers.getFirstName(index))
+                                    .setLastName(keycloakUsers.getLastName(index));
+                        } else {
+                            throw new UserNotFoundException();
+                        }
+                    }
+                } else {
+                    token.removeToken();
+                    throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
+                }
             } catch (ProcessingException e) {
                 token.removeToken();
                 throw new KeycloakException("Error during introspect token", e);
-            }
-
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                String output = response.readEntity(String.class);
-                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
-                    JsonArray reply = jsonReader.readArray();
-                    final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
-                    if (keycloakUsers.size() > 0) {
-                        final int index = keycloakUsers.verifyEmail(userLowerCase);
-                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index))
-                                .setSub(keycloakUsers.getId(0))
-                                .setFirstName(keycloakUsers.getFirstName(index))
-                                .setLastName(keycloakUsers.getLastName(index));
-                    } else {
-                        throw new UserNotFoundException();
-                    }
-                }
-            } else {
-                token.removeToken();
-                throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
             }
         } else {
 
