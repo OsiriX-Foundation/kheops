@@ -33,8 +33,8 @@
       <div class="d-flex">
         <div style="padding-right: 5px">
           <kheops-pyramid
-              width="12.2696mm"
-              height="7.41195mm"
+            width="12.2696mm"
+            height="7.41195mm"
           />
         </div>
         <div class="align-self-end">
@@ -44,7 +44,6 @@
           />
         </div>
       </div>
-      
     </b-navbar-nav>
     <b-collapse
       id="nav_collapse"
@@ -70,7 +69,6 @@
             :title="$t('tooltipLogin')"
             @click="login()"
           >
-
             <span
               class="font-white"
             >

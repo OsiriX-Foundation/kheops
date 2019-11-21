@@ -12,9 +12,8 @@
     >
       <template slot="button-content">
         <v-icon
-          class="align-middle kheopsicon icon-margin"
+          class="align-middle icon-margin"
           name="build"
-          color="white"
         />
       </template>
       <b-dropdown-form

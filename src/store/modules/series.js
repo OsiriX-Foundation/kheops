@@ -59,9 +59,9 @@ const actions = {
     if (['DOC', 'XC', 'SR'].includes(serie.Modality.Value[0]) || (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1)) {
       return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
-          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : ''
+          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : '';
           return dispatch('setImageSrc', {
-            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality
+            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality,
           });
         }
         return res;
@@ -124,7 +124,6 @@ const actions = {
   getImage({ commit }, params) {
     const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/thumbnail`;
     const queries = `viewport=${encodeURIComponent('256,256')}`;
-    // const request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`;
     const { serie } = params;
     return HTTP.get(`${request}?${queries}`, {
       responseType: 'arraybuffer',

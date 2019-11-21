@@ -11,13 +11,13 @@
 }
 </i18n>
 <template>
-<div>
-  <div
-    class="pt-2"
-  >
+  <div>
     <div
-      class="d-flex flex-wrap"
+      class="pt-2"
     >
+      <div
+        class="d-flex flex-wrap"
+      >
         <div class="p-2 align-self-center d-none d-sm-block">
           <button
             class="btn btn-secondary ml-2"
@@ -77,9 +77,9 @@
             />
           </button>
         </div>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>

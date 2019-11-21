@@ -171,7 +171,8 @@
               right
             >
               <template slot="button-content">
-                <add-icon
+                <v-icon
+                  name="add"
                   width="34px"
                   height="34px"
                 />
@@ -254,15 +255,10 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
-import AddIcon from '@/components/kheopsSVG/AddIcon';
-import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
-import { ViewerToken } from '@/mixins/tokens.js';
-import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'ListHeaders',
-  components: { formGetUser, ConfirmButton, AddIcon, VisibilityIcon },
-  mixins: [ViewerToken, CurrentUser],
+  components: { formGetUser, ConfirmButton },
   props: {
     studies: {
       type: Array,

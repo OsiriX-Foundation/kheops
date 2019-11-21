@@ -31,8 +31,7 @@
 
     <send-studies />
     <!-- footer -->
-    <footer>
-    </footer>
+    <footer />
   </div>
 </template>
 
