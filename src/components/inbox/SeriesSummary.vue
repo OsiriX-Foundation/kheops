@@ -29,11 +29,11 @@
         >
           <img
             v-if="!loadingImage"
-            :class="!serie.Modality.Value[0].includes('SR') ? 'pointer' : ''"
+            :class="checkSR ? 'pointer' : ''"
             :src="serie.imgSrc"
             width="150"
             height="150"
-            @click="openTab(serie)"
+            @click="checkSR ? openTab(serie) : ''"
           >
           <bounce-loader
             :loading="loadingImage"
@@ -94,6 +94,9 @@ export default {
       studies: 'studies',
       series: 'series',
     }),
+    checkSR() {
+      return this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined && !this.serie.Modality.Value[0].includes('SR');
+    },
     imageTitle() {
       let modality = '';
       let description = '';
