@@ -14,6 +14,11 @@ const state = {
     is_selected: false,
     is_favorite: false,
   },
+  modalities: [
+    'DOC',
+    'CT',
+    'SR',
+  ],
 };
 
 // getters
@@ -56,7 +61,8 @@ const actions = {
   },
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
-    if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
+    if ((serie.Modality !== undefined && serie.Modality.Value !== undefined && state.modalities.includes(serie.Modality.Value[0]))
+      || (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1)) {
       return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
           const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : '';
@@ -129,7 +135,7 @@ const actions = {
     return HTTP.get(`${request}?${queries}`, {
       responseType: 'arraybuffer',
       headers: {
-        Accept: 'image/jpeg',
+        Accept: 'image/png',
       },
     }).then((resp) => {
       let img = DicomLogo;
