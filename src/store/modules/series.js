@@ -106,7 +106,7 @@ const actions = {
       videoPhotographicImageStorage: '1.2.840.10008.5.1.4.1.1.77.1.4.1',
       encapsulatedPDFStorage: '1.2.840.10008.5.1.4.1.1.104.1',
     };
-    const modality = params.modality.length > 0 ? params.modality : params.data[0][tagModality].Value[0];
+    const modality = params.modality.length > 0 || params.data[0][tagModality] === undefined ? params.modality : params.data[0][tagModality].Value[0];
     if (params.data[0][tagSOPClassUID] !== undefined) {
       serie.SOPClassUID = params.data[0][tagSOPClassUID];
     }

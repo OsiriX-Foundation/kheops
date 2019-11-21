@@ -95,7 +95,10 @@ export default {
       series: 'series',
     }),
     checkSR() {
-      return this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined && !this.serie.Modality.Value[0].includes('SR');
+      if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
+        return !this.serie.Modality.Value[0].includes('SR');
+      }
+      return true;
     },
     imageTitle() {
       let modality = '';
@@ -236,7 +239,7 @@ export default {
       } else if (openWSI) {
         windowProps.name = `WSI-${this.studyInstanceUID}`;
         windowProps.id = 'WSI';
-      } else if (series.Modality.Value[0] !== 'SR') {
+      } else if (this.checkSR) {
         windowProps.name = `OHIF-${this.studyInstanceUID}`;
         windowProps.id = 'OHIF';
       }
