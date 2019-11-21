@@ -108,7 +108,7 @@ public enum TokenGrantType {
             try {
                 subject = AccessTokenVerifier.authenticateAccessToken(servletContext, subjectToken).getSubject();
             } catch (AccessTokenVerificationException e) {
-                throw new TokenRequestException(INVALID_REQUEST, "Bad subject_token");
+                throw new TokenRequestException(INVALID_REQUEST, "Bad subject_token", e);
             }
 
             if (scope.equals("pep")) {

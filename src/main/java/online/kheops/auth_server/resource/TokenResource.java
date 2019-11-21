@@ -56,7 +56,7 @@ public class TokenResource
         try {
             grantType = TokenGrantType.from(grantTypes.get(0));
         } catch (IllegalArgumentException e) {
-            throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE);
+            throw new TokenRequestException(UNSUPPORTED_GRANT_TYPE, e);
         }
 
         try {
