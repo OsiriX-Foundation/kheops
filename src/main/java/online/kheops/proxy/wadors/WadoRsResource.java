@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,6 +120,7 @@ public final class WadoRsResource {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
 
+    final static AtomicInteger closeCounter = new AtomicInteger();
 
     private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
@@ -168,6 +170,7 @@ public final class WadoRsResource {
         final Response upstreamResponse;
         try {
             upstreamResponse = invocationBuilder.get();
+            LOG.log(SEVERE, "closeCounter:" + closeCounter.getAndIncrement());
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
             throw new WebApplicationException(BAD_GATEWAY);
@@ -188,6 +191,7 @@ public final class WadoRsResource {
                 throw new IOException(e);
             } finally {
                 upstreamResponse.close();
+                closeCounter.decrementAndGet();
             }
         };
 
