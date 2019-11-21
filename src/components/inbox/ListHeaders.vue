@@ -363,10 +363,6 @@ export default {
       }
       return this.albums.filter((album) => album.album_id !== this.albumId);
     },
-    source() {
-      let source = this.getSource()
-      return source.inbox !== undefined ? 'inbox' : 'album'
-    }
   },
 
   watch: {
