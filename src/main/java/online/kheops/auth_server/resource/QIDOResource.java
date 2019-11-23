@@ -93,15 +93,15 @@ public class QIDOResource {
             LOG.info(() -> "QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
-            return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
+            return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component.").build();
         } catch (BadQueryParametersException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).build();
         } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).build();
         } catch (AlbumForbiddenException e) {
-            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+            return Response.status(FORBIDDEN).build();
         } catch (NoResultException e) {
             return Response.status(OK).entity("[]").build();
         } catch (Exception e) {
@@ -175,7 +175,7 @@ public class QIDOResource {
         try {
             sortComparator = SeriesQIDOSortParams.sortComparator(uriInfo.getQueryParameters());
         } catch (BadQueryParametersException e) {
-            return Response.status(BAD_REQUEST).entity("Unknown query parameters " + e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity("Unknown query parameters").build();
         }
 
         fromInbox = fromInbox != null;
@@ -243,7 +243,8 @@ public class QIDOResource {
         try {
             availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
         } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            LOG.log(WARNING, "not found", e);
+            return Response.status(NOT_FOUND).build();
         }
 
         if (availableSeriesUIDs.isEmpty()) {

@@ -102,7 +102,7 @@ public class ReportProviderResource {
 
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
-                return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
+                return Response.status(BAD_REQUEST).entity("Bad studyUID").build();
             }
         }
 
@@ -150,7 +150,7 @@ public class ReportProviderResource {
             albumId = reportProvider.getAlbum().getId();
         } catch (NoResultException e) {
             LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
-            return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
+            return Response.status(NOT_FOUND).entity("Bad clientId").build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -167,7 +167,7 @@ public class ReportProviderResource {
             album = getAlbum(albumId);
             for (String uid : studyInstanceUIDs) {
                 if (!canAccessStudy(album, uid)) {
-                    return Response.status(NOT_FOUND).entity("Study uid: " + uid + "not found").build();
+                    return Response.status(NOT_FOUND).entity("StudyUID not found").build();
                 }
             }
         } catch (AlbumNotFoundException e) {
