@@ -13,7 +13,9 @@
     "create": "Create",
     "cancel": "Cancel",
     "newalbum": "New album",
-    "usersettings": "Album user settings"
+    "usersettings": "Album user settings",
+    "authorizationerror": "You don't have the permissions to add the study {study}",
+    "studynotfound": "The study {study} is not found"
   },
   "fr": {
     "albumName": "Nom de l'album",
@@ -28,7 +30,9 @@
     "create": "Créer",
     "cancel": "Annuler",
     "newalbum": "Nouvel album",
-    "usersettings": "Réglages des utilisateurs de l'album"
+    "usersettings": "Réglages des utilisateurs de l'album",
+    "authorizationerror": "Vous n'avez pas les droits d'ajouter l'étude {study}",
+    "studynotfound": "l'étude {study} n'a pas été trouvée"
   }
 }
 </i18n>
@@ -337,7 +341,21 @@ export default {
     putStudiesInAlbum(albumCreated, data) {
       let queries = {};
       queries = this.$route.query.source === 'inbox' ? { inbox: true } : { album: this.$route.query.source };
-      return this.$store.dispatch('putStudiesInAlbum', { queries, data });
+      return this.$store.dispatch('putStudiesInAlbum', { queries, data }).then(results => {
+        results.forEach(result => {
+          const { res } = result
+          if (res.request !== undefined && res.request.status !== 201) {
+            const { studyId } = result
+            if (res.request.status === 403) {
+              this.$snotify.error(this.$t('authorizationerror', {study: studyId}));
+            } else if (res.request.status === 404) {
+              this.$snotify.error(this.$t('studynotfound', {study: studyId}));
+            } else {
+              this.$snotify.error(this.$t('sorryerror'));
+            }
+          }
+        });
+      });
     },
     dataToUpload(albumId) {
       const data = [];
