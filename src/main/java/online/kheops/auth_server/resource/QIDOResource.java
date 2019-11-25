@@ -102,8 +102,8 @@ public class QIDOResource {
             return Response.status(NOT_FOUND).build();
         } catch (AlbumForbiddenException e) {
             return Response.status(FORBIDDEN).build();
-        } catch (NoResultException e) {
-            return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
+        //} catch (NoResultException e) {
+        //    return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
