@@ -48,6 +48,7 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
                 if(pathParam.containsKey(ALBUM)) {
                     final String albumID = pathParam.get(ALBUM).get(0);
                     tryPermission(kheopsPrincipal, albumID, requestContext);
+                    return;
                 }
 
                 final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
