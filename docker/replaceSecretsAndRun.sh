@@ -76,11 +76,11 @@ if [ -z "$KHEOPS_KEYCLOAK_REALMS" ]; then
     missing_env_var_secret=true
 fi
 if [ -z "$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID" ]; then
-    echo "Missing $KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID environment variable"
+    echo "Missing KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID environment variable"
     missing_env_var_secret=true
 fi
 if [ -z "$KHEOPS_CLIENT_ZIPPERCLIENTID" ]; then
-    echo "Missing $KHEOPS_CLIENT_ZIPPERCLIENTID environment variable"
+    echo "Missing KHEOPS_CLIENT_ZIPPERCLIENTID environment variable"
     missing_env_var=true
 fi
 

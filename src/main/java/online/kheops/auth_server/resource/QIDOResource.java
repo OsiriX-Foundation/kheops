@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,9 +103,9 @@ public class QIDOResource {
             return Response.status(NOT_FOUND).build();
         } catch (AlbumForbiddenException e) {
             return Response.status(FORBIDDEN).build();
-        //} catch (NoResultException e) {
-        //    return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
-        } catch (Exception e) {
+        } catch (NoResultException e) {
+            return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
+        } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
             return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
         }
