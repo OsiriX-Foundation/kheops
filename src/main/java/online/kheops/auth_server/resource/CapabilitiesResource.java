@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.generateCapability;
 import static online.kheops.auth_server.capability.CapabilityId.ID_PATTERN;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
+import static online.kheops.auth_server.user.AlbumUserPermissions.MANAGE_CAPABILITIES_TOKEN;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -144,7 +146,7 @@ public class CapabilitiesResource {
     @Secured
     @CapabilitySecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_CAPABILITIES_TOKEN)
+    @AlbumPermissionSecured(permission = MANAGE_CAPABILITIES_TOKEN, context = QUERY_PARAM)
     @Path("capabilities")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)

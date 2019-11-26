@@ -91,7 +91,6 @@ public final class StudyQIDOParams {
             orderByTag = Tag.StudyDate;
         }
 
-
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
             limit = JOOQTools.getLimit(queryParameters);
         } else {

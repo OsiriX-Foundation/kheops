@@ -11,7 +11,6 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -26,6 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
+import static online.kheops.auth_server.user.AlbumUserPermissions.READ_COMMENT;
+import static online.kheops.auth_server.user.AlbumUserPermissions.WRITE_COMMENT;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -43,7 +45,7 @@ public class EventResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.READ_COMMENT)
+    @AlbumPermissionSecured(permission = READ_COMMENT, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -94,7 +96,7 @@ public class EventResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.WRITE_COMMENT)
+    @AlbumPermissionSecured(permission = WRITE_COMMENT, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)

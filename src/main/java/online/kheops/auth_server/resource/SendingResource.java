@@ -10,6 +10,7 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.filter.AlbumPermissionSecuredContext;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
@@ -30,6 +31,9 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
+import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOKEN_SOURCE;
@@ -52,7 +56,7 @@ public class SendingResource
     @PUT
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.SEND_SERIES)
+    @AlbumPermissionSecured(permission = SEND_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
                                        @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -177,7 +181,7 @@ public class SendingResource
         try {
             if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
-                if (kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumID)) {
+                if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
                     Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     LOG.warning(() -> "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
@@ -197,7 +201,7 @@ public class SendingResource
     @PUT
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.SEND_SERIES)
+    @AlbumPermissionSecured(permission = SEND_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateStudy(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @QueryParam(ALBUM) String albumId) {
@@ -245,7 +249,7 @@ public class SendingResource
         try {
             if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
-                if (kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.ADD_SERIES, albumID)) {
+                if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
                     Sending.putStudyInAlbum(kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     return Response.status(FORBIDDEN).entity("No write access with this credential").build();
@@ -287,7 +291,7 @@ public class SendingResource
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 String albumId = kheopsPrincipal.getAlbumID();
-                if(kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.DELETE_SERIES,albumId)) {
+                if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
                     Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                     LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
                     return Response.status(NO_CONTENT).build();
@@ -340,7 +344,7 @@ public class SendingResource
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 String albumId = kheopsPrincipal.getAlbumID();
-                if(kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.DELETE_SERIES,albumId)) {
+                if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
                     Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                     LOG.info(() -> "finished removing StudyInstanceUID:" + studyInstanceUID + " SeriesInstanceUID:" + seriesInstanceUID + " from albumId " + albumId);
                     return Response.status(NO_CONTENT).build();
@@ -369,7 +373,7 @@ public class SendingResource
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.ADD_SERIES)
+    @AlbumPermissionSecured(permission = ADD_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response putSeriesInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -425,7 +429,8 @@ public class SendingResource
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.ADD_SERIES)
+    @AlbumPermissionSecured(permission = ADD_SERIES, context = QUERY_PARAM)
+    @AlbumPermissionSecured(permission = SEND_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}")
     public Response putStudyInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -460,7 +465,7 @@ public class SendingResource
             {
                 try {
                     fromAlbumId = tokenPrincipal.getAlbumID();
-                    if (!tokenPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
+                    if (!tokenPrincipal.hasAlbumPermission(SEND_SERIES, fromAlbumId)) {
                         return Response.status(FORBIDDEN).build();
                     }
                     if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
@@ -475,7 +480,7 @@ public class SendingResource
             }
 
         } else {
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.SEND_SERIES, fromAlbumId)) {
+            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(SEND_SERIES, fromAlbumId)) {
                 return Response.status(FORBIDDEN).build();
             }
         }
@@ -494,7 +499,7 @@ public class SendingResource
     @DELETE
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.DELETE_SERIES)
+    @AlbumPermissionSecured(permission = DELETE_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteStudyFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
@@ -514,7 +519,7 @@ public class SendingResource
     @DELETE
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.DELETE_SERIES)
+    @AlbumPermissionSecured(permission = DELETE_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteSeriesFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,

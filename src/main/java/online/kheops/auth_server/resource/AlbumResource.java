@@ -8,7 +8,6 @@ import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
@@ -25,6 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
+import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -131,7 +132,7 @@ public class AlbumResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal) securityContext.getUserPrincipal());
         final AlbumResponse albumResponse;
 
-        if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.LIST_USERS, albumId) && includeUsers) {
+        if (!kheopsPrincipal.hasAlbumPermission(LIST_USERS, albumId) && includeUsers) {
             return Response.status(FORBIDDEN).entity("Include users : forbidden").build();
         }
 
@@ -157,7 +158,7 @@ public class AlbumResource {
     @PATCH
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_ALBUM)
+    @AlbumPermissionSecured(permission = EDIT_ALBUM, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -225,7 +226,7 @@ public class AlbumResource {
     @DELETE
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.DELETE_ALBUM)
+    @AlbumPermissionSecured(permission = DELETE_ALBUM, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId) {
@@ -250,7 +251,7 @@ public class AlbumResource {
     @Secured
     @AlbumAccessSecured
     @UserAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.LIST_USERS)
+    @AlbumPermissionSecured(permission = LIST_USERS, context = PATH_PARAM)
     @Path("albums/{album:"+AlbumId.ID_PATTERN+"}/users")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -280,7 +281,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.ADD_USER)
+    @AlbumPermissionSecured(permission = ADD_USER, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -311,7 +312,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.ADD_ADMIN)
+    @AlbumPermissionSecured(permission = ADD_ADMIN, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -342,7 +343,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.REMOVE_ADMIN)
+    @AlbumPermissionSecured(permission = REMOVE_ADMIN, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}/admin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -370,7 +371,7 @@ public class AlbumResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.REMOVE_USER)
+    @AlbumPermissionSecured(permission = REMOVE_USER, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/users/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,

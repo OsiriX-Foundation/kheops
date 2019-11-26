@@ -26,16 +26,18 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
 
         AlbumPermissionSecured aps = resourceInfo.getResourceMethod().getAnnotation(AlbumPermissionSecured.class);
         if (aps != null) {
-            featureContext.register(new AlbumPermissionFilter(aps.value()));
+            featureContext.register(new AlbumPermissionFilter(aps.permission(), aps.context()));
         }
     }
 
     @Priority(ALBUM_PERMISSION_ACCESS_PRIORITY)
     private static class AlbumPermissionFilter implements ContainerRequestFilter {
         private final AlbumUserPermissions permission;
+        private final AlbumPermissionSecuredContext context;
 
-        AlbumPermissionFilter(AlbumUserPermissions permission) {
+        AlbumPermissionFilter(AlbumUserPermissions permission, AlbumPermissionSecuredContext context) {
             this.permission = permission;
+            this.context = context;
         }
 
         @Override
@@ -44,17 +46,19 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
             if (permission != null) {
                 final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)requestContext.getSecurityContext().getUserPrincipal());
 
-                final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
-                if(pathParam.containsKey(ALBUM)) {
-                    final String albumID = pathParam.get(ALBUM).get(0);
-                    tryPermission(kheopsPrincipal, albumID, requestContext);
-                    return;
-                }
+                if(context.equals(AlbumPermissionSecuredContext.PATH_PARAM)) {
+                    final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
+                    if (pathParam.containsKey(ALBUM)) {
+                        final String albumID = pathParam.get(ALBUM).get(0);
+                        tryPermission(kheopsPrincipal, albumID, requestContext);
+                    }
+                } else if (context.equals(AlbumPermissionSecuredContext.QUERY_PARAM)) {
 
-                final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
-                if(queryParam.containsKey(ALBUM)) {
-                    final String albumID = queryParam.get(ALBUM).get(0);
-                    tryPermission(kheopsPrincipal, albumID, requestContext);
+                    final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
+                    if (queryParam.containsKey(ALBUM)) {
+                        final String albumID = queryParam.get(ALBUM).get(0);
+                        tryPermission(kheopsPrincipal, albumID, requestContext);
+                    }
                 }
             }
         }

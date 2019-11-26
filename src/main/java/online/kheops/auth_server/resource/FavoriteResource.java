@@ -16,6 +16,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
+import static online.kheops.auth_server.user.AlbumUserPermissions.EDIT_FAVORITES;
 import static online.kheops.auth_server.util.Consts.*;
 
 
@@ -30,7 +33,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
+    @AlbumPermissionSecured(permission = EDIT_FAVORITES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -44,7 +47,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
+    @AlbumPermissionSecured(permission = EDIT_FAVORITES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -80,7 +83,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
+    @AlbumPermissionSecured(permission = EDIT_FAVORITES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -95,7 +98,7 @@ public class FavoriteResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.EDIT_FAVORITES)
+    @AlbumPermissionSecured(permission = EDIT_FAVORITES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/favorites")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
