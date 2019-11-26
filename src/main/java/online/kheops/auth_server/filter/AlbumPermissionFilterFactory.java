@@ -28,8 +28,7 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
         if (aps != null) {
             featureContext.register(new AlbumPermissionFilter(aps.permission(), aps.context()));
         }
-
-
+        
         AlbumPermissionSecured.List aps2 = resourceInfo.getResourceMethod().getAnnotation(AlbumPermissionSecured.List.class);
         if (aps != null) {
             for (AlbumPermissionSecured a:aps2.value()) {
