@@ -14,6 +14,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import java.lang.annotation.Repeatable;
+import java.util.Map;
+
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
@@ -26,25 +29,57 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
 
         AlbumPermissionSecured aps = resourceInfo.getResourceMethod().getAnnotation(AlbumPermissionSecured.class);
         if (aps != null) {
-            featureContext.register(new AlbumPermissionFilter(aps.permission(), aps.context()));
+            if (aps.context().equals(AlbumPermissionSecuredContext.PATH_PARAM)) {
+                featureContext.register(new AlbumPermissionFilterPP(aps.permission()));
+            } else if (aps.context().equals(AlbumPermissionSecuredContext.QUERY_PARAM)) {
+                featureContext.register(new AlbumPermissionFilterQP(aps.permission()));
+            }
         }
 
         AlbumPermissionSecured.List aps2 = resourceInfo.getResourceMethod().getAnnotation(AlbumPermissionSecured.List.class);
         if (aps2 != null) {
-            for (AlbumPermissionSecured a:aps2.value()) {
-                featureContext.register(new AlbumPermissionFilter(a.permission(), a.context()));
+            for (int i =0; i<aps2.value().length; i++) {
+                if (aps2.value()[i].context().equals(AlbumPermissionSecuredContext.PATH_PARAM)) {
+                    featureContext.register(new AlbumPermissionFilterPP(aps2.value()[i].permission()));
+                } else if (aps2.value()[i].context().equals(AlbumPermissionSecuredContext.QUERY_PARAM)) {
+                    featureContext.register(new AlbumPermissionFilterQP(aps2.value()[i].permission()));
+                }
             }
         }
     }
 
     @Priority(ALBUM_PERMISSION_ACCESS_PRIORITY)
-    private static class AlbumPermissionFilter implements ContainerRequestFilter {
+    private static class AlbumPermissionFilterQP implements ContainerRequestFilter {
         private final AlbumUserPermissions permission;
-        private final AlbumPermissionSecuredContext context;
 
-        AlbumPermissionFilter(AlbumUserPermissions permission, AlbumPermissionSecuredContext context) {
+        AlbumPermissionFilterQP(AlbumUserPermissions permission) {
             this.permission = permission;
-            this.context = context;
+        }
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) {
+
+        if (permission != null) {
+            final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)requestContext.getSecurityContext().getUserPrincipal());
+
+            final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
+            if (queryParam.containsKey(ALBUM)) {
+                final String albumID = queryParam.get(ALBUM).get(0);
+                if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
+                    requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : Forbidden").build());
+                }
+            }
+            }
+        }
+    }
+
+
+    @Priority(ALBUM_PERMISSION_ACCESS_PRIORITY)
+    private static class AlbumPermissionFilterPP implements ContainerRequestFilter {
+        private final AlbumUserPermissions permission;
+
+        AlbumPermissionFilterPP(AlbumUserPermissions permission) {
+            this.permission = permission;
         }
 
         @Override
@@ -53,29 +88,15 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
             if (permission != null) {
                 final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)requestContext.getSecurityContext().getUserPrincipal());
 
-                if(context.equals(AlbumPermissionSecuredContext.PATH_PARAM)) {
-                    final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
-                    if (pathParam.containsKey(ALBUM)) {
-                        final String albumID = pathParam.get(ALBUM).get(0);
-                        tryPermission(kheopsPrincipal, albumID, requestContext);
-                    }
-                } else if (context.equals(AlbumPermissionSecuredContext.QUERY_PARAM)) {
-
-                    final MultivaluedMap<String, String> queryParam = requestContext.getUriInfo().getQueryParameters();
-                    if (queryParam.containsKey(ALBUM)) {
-                        final String albumID = queryParam.get(ALBUM).get(0);
-                        tryPermission(kheopsPrincipal, albumID, requestContext);
+                final MultivaluedMap<String, String> pathParam = requestContext.getUriInfo().getPathParameters();
+                if (pathParam.containsKey(ALBUM)) {
+                    final String albumID = pathParam.get(ALBUM).get(0);
+                    if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
+                        requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : Forbidden").build());
                     }
                 }
             }
         }
-
-        private void tryPermission(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
-
-            if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : " + albumID + " Forbidden").build());
-            }
-
-        }
     }
+
 }

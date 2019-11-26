@@ -429,8 +429,8 @@ public class SendingResource
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(permission = ADD_SERIES, context = QUERY_PARAM)
-    @AlbumPermissionSecured(permission = SEND_SERIES, context = PATH_PARAM)
+    @AlbumPermissionSecured(permission = SEND_SERIES, context = QUERY_PARAM)
+    @AlbumPermissionSecured(permission = ADD_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}")
     public Response putStudyInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -479,10 +479,6 @@ public class SendingResource
                 return Response.status(FORBIDDEN).build();
             }
 
-        } else {
-            if (fromAlbumId != null && !kheopsPrincipal.hasAlbumPermission(SEND_SERIES, fromAlbumId)) {
-                return Response.status(FORBIDDEN).build();
-            }
         }
 
         try {
