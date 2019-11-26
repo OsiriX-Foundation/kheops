@@ -1,29 +1,26 @@
-package online.kheops.zipper.accesstoken;
+package online.kheops.zipper;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class AccessToken {
-    private static final Logger LOG = Logger.getLogger(AccessToken.class.getName());
-
-    public static final String UNKNOWN_TOKEN_URN = "urn:x-kheops:params:oauth:grant-type:unknown-bearer";
+public class AuthorizationToken {
+    private static final Logger LOG = Logger.getLogger(AuthorizationToken.class.getName());
 
     private final String token;
 
-    private AccessToken(String token) {
-        this.token = Objects.requireNonNull(token, "accesstoken");
+    private AuthorizationToken(String token) {
+        this.token = token;
     }
 
-    private static AccessToken from(String token) {
-        return new AccessToken(token);
+    public static AuthorizationToken from(String token) {
+        return new AuthorizationToken(token);
     }
 
-    public static AccessToken fromAuthorizationHeader(String authorizationHeader) {
+    public static AuthorizationToken fromAuthorizationHeader(String authorizationHeader) {
         final String token;
         if (authorizationHeader != null) {
 
@@ -46,7 +43,7 @@ public final class AccessToken {
             }
 
             if (token.length() == 0) {
-                LOG.log(Level.WARNING, "Empty authorization accesstoken");
+                LOG.log(Level.WARNING, "Empty authorization token");
                 throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
             }
         } else {
@@ -54,11 +51,30 @@ public final class AccessToken {
             throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
 
-        return AccessToken.from(token);
+        return AuthorizationToken.from(token);
+    }
+
+
+    public String getToken() {
+        return token;
     }
 
     @Override
     public String toString() {
-        return token;
+        return getToken();
+    }
+
+    public String getHeaderValue() {
+        return "Bearer " + getToken();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof AuthorizationToken && token.equals(((AuthorizationToken) o).getToken());
+    }
+
+    @Override
+    public int hashCode() {
+        return token.hashCode();
     }
 }

@@ -2,34 +2,13 @@
 
 missing_env_var=false
 
-if ! [ -f ${SECRET_FILE_PATH}/kheops_client_zippersecret ]; then
-    echo "Missing kheops_client_zippersecret secret"
-    missing_env_var_secret=true
-fi
-
 #Verify environment variables
-if [ -z "$KHEOPS_AUTHORIZATION_HOST" ]; then
-    echo "Missing KHEOPS_AUTHORIZATION_HOST environment variable"
+if [ -z "$KHEOPS_DICOMWEB_PROXY_HOST" ]; then
+    echo "Missing KHEOPS_DICOMWEB_PROXY_HOST environment variable"
     missing_env_var=true
 fi
-if [ -z "$KHEOPS_AUTHORIZATION_PORT" ]; then
-    echo "Missing KHEOPS_AUTHORIZATION_PORT environment variable"
-    missing_env_var=true
-fi
-if [ -z "$KHEOPS_AUTHORIZATION_PATH" ]; then
-    echo "Missing KHEOPS_AUTHORIZATION_PATH environment variable"
-    missing_env_var=true
-fi
-if [ -z "$KHEOPS_PACS_PEP_HOST" ]; then
-    echo "Missing KHEOPS_PACS_PEP_HOST environment variable"
-    missing_env_var=true
-fi
-if [ -z "$KHEOPS_PACS_PEP_PORT" ]; then
-    echo "Missing KHEOPS_PACS_PEP_PORT environment variable"
-    missing_env_var=true
-fi
-if [ -z "$KHEOPS_CLIENT_ZIPPERCLIENTID" ]; then
-    echo "Missing $KHEOPS_CLIENT_ZIPPERCLIENTID environment variable"
+if [ -z "$KHEOPS_DICOMWEB_PROXY_PORT" ]; then
+    echo "Missing KHEOPS_DICOMWEB_PROXY_PORT environment variable"
     missing_env_var=true
 fi
 
@@ -59,9 +38,7 @@ do
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
 done
 
-sed -i "s|\${kheops_auth_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT$KHEOPS_AUTHORIZATION_PATH|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_dicomwebproxy_url}|http://$KHEOPS_DICOMWEB_PROXY_HOST:$KHEOPS_DICOMWEB_PROXY_PORT|" ${REPLACE_FILE_PATH}
 
 #######################################################################################
 #ELASTIC SEARCH
