@@ -1,8 +1,5 @@
-package online.kheops.zipper.resource;
+package online.kheops.zipper;
 
-import online.kheops.zipper.AuthorizationToken;
-import online.kheops.zipper.TeeInputStream;
-import online.kheops.zipper.dicomdir.DicomDirGenerator;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.mime.MultipartParser;
 import org.ietf.jgss.GSSException;
@@ -53,8 +50,6 @@ public final class ZipStudyResource {
                                 @QueryParam(INBOX) Boolean fromInbox) {
         checkValidUID(studyInstanceUID, STUDY_INSTANCE_UID);
 
-        final AuthorizationToken authorizationToken = AuthorizationToken.fromAuthorizationHeader(authorizationHeader);
-
         final URI dicomWebProxyURI = dicomWebProxyURI();
 
         final Response upstreamResponse;
@@ -63,7 +58,7 @@ public final class ZipStudyResource {
                     .path("/capabilities/password/dicomweb/studies/{StudyInstanceUID}")
                     .resolveTemplate("StudyInstanceUID", studyInstanceUID)
                     .request("multipart/related;type=\"application/dicom\"")
-                    .header(AUTHORIZATION, authorizationToken.getHeaderValue())
+                    .header(AUTHORIZATION, authorizationHeader)
                     .get();
         } catch (ProcessingException e) {
             LOG.log(WARNING, "Unable to get the upstream", e);

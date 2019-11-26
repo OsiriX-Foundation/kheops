@@ -1,4 +1,4 @@
-package online.kheops.zipper.dicomdir;
+package online.kheops.zipper;
 
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
@@ -13,7 +13,6 @@ import org.dcm4che3.util.UIDUtils;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.Callable;
 import java.util.stream.StreamSupport;
 
 public final class DicomDirGenerator implements Closeable {
