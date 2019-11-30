@@ -12,7 +12,7 @@
     "PatientName": "Patient Name",
     "Modality": "Modality",
     "StudyDate": "Study Date",
-    "StudyDescription": "Study description",
+    "StudyDescription": "Study Description",
     "PatientID": "Patient ID",
     "filter": "Filter",
     "fromDate": "From",
