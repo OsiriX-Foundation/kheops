@@ -17,6 +17,6 @@
     <context-param>
         <description>Base URI for the dicomwebproxy server</description>
         <param-name>online.kheops.dicomwebproxy.uri</param-name>
-        <param-value>https://itmi.kheops.online/authorization</param-value>
+        <param-value>https://google.kheops.online</param-value>
     </context-param>
 </web-app>

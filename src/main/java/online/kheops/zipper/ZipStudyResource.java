@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
 import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
@@ -52,11 +53,18 @@ public final class ZipStudyResource {
 
         final URI dicomWebProxyURI = dicomWebProxyURI();
 
+        final WebTarget upstreamTarget =  CLIENT.target(dicomWebProxyURI)
+                .path("/capabilities/password/dicomweb/studies/{StudyInstanceUID}");
+        if (fromAlbum != null) {
+            upstreamTarget.queryParam(ALBUM, fromAlbum);
+        }
+        if (fromInbox != null) {
+            upstreamTarget.queryParam(INBOX, fromInbox);
+        }
+
         final Response upstreamResponse;
         try {
-            upstreamResponse = CLIENT.target(dicomWebProxyURI)
-                    .path("/capabilities/password/dicomweb/studies/{StudyInstanceUID}")
-                    .resolveTemplate("StudyInstanceUID", studyInstanceUID)
+            upstreamResponse = upstreamTarget.resolveTemplate("StudyInstanceUID", studyInstanceUID)
                     .request("multipart/related;type=\"application/dicom\"")
                     .header(AUTHORIZATION, authorizationHeader)
                     .get();
