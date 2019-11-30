@@ -536,7 +536,8 @@ export default {
             message[403] = `Forbidden to send in album ${data.albumId}`;
             message[404] = 'Not found';
             message.unknown = `Error unknown for the study ${data.studyId}`;
-            this.checkErrorStatus(data.res !== undefined ? data.res.status : '', message);
+            const status = data.res !== undefined && data.res.status !== undefined ? data.res.status : data.res.request.status;
+            this.checkErrorStatus(status, message);
           }
         });
         if (sendStudy > 0 || sendSerie > 0) {

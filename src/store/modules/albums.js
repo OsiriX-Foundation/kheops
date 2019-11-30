@@ -76,7 +76,7 @@ const actions = {
         );
       }
     });
-    return axios.all(promises).then((results) => results);
+    return axios.all(promises);
   },
   addUser(context, params) {
     const request = `albums/${params.album_id}/users/${params.user_id}`;

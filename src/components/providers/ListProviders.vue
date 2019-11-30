@@ -27,7 +27,7 @@
     <div class="d-flex">
       <div>
         <h4>
-          Report providers
+          Report Providers
         </h4>
       </div>
       <div class="ml-auto">

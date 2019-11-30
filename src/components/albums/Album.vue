@@ -4,21 +4,23 @@
     "studies": "Studies",
     "comments": "Comments",
     "settings": "Settings",
-    "twitterEnable": "Twitter link enable",
+    "twitterEnable": "Twitter link enabled",
     "twitterDisable": "No twitter link",
-    "sharingEnable": "Sharing link enable",
+    "sharingEnable": "Sharing link enabled",
     "sharingDisable": "No sharing link",
-    "sharingTitle": "URL to share"
+    "sharingTitle": "Sharing URL",
+    "twitterText": "My KHEOPS shared album. {link} #KHEOPS"
   },
   "fr": {
     "studies": "Etudes",
     "comments": "Commentaires",
     "settings": "Réglages",
-    "twitterEnable": "Lien twitter déjà actif",
+    "twitterEnable": "Lien twitter actif",
     "twitterDisable": "Pas de lien twitter",
-    "sharingEnable": "Lien de partage déjà actif",
+    "sharingEnable": "Lien de partage actif",
     "sharingDisable": "Pas de lien de partage",
-    "sharingTitle": "URL à partager"
+    "sharingTitle": "URL à partager",
+    "twitterText": "Mon album KHEOPS partagé. {link} #KHEOPS"
   }
 }
 </i18n>
@@ -326,7 +328,8 @@ export default {
       const twitterWindow = window.open('', 'twitter');
       this.createToken(this.twitterTokenParams).then((res) => {
         const urlTwitter = 'https://twitter.com/intent/tweet';
-        const urlSharing = `I want to show you my study album ! Click on this link ${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token} #Kheops`;
+        const link = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
+        const urlSharing = this.$t('twitterText', { link });
         const queries = `?text=${encodeURIComponent(urlSharing)}`;
         twitterWindow.location.href = urlTwitter + queries;
       }).catch(() => {

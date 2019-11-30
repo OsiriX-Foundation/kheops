@@ -4,16 +4,16 @@
 {
   "en": {
     "general": "General",
-    "user": "User",
+    "user": "Users",
     "tokens": "Tokens",
-    "providerSR": "Report providers",
+    "providerSR": "Report Providers",
     "socialmedia": "Social Media"
   },
   "fr": {
     "general": "Général",
-    "user": "Utilisateur",
+    "user": "Utilisateurs",
     "tokens": "Tokens",
-    "providerSR": "Report providers",
+    "providerSR": "Report Providers",
     "socialmedia": "Réseaux sociaux"
   }
 }
