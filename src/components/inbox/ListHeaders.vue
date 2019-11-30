@@ -9,7 +9,7 @@
     "cancel": "Cancel",
     "addfavorites": "Add too favorites",
     "addfavorites": "Remove too favorites",
-    "confirmDelete": "Are you sure you want to delete {countStudies} study containing {countSeries} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countStudies} studies containing {countSeries} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+    "confirmDelete": "Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
     "importdir": "Import directory",
     "importfiles": "Import files",
     "draganddrop": "Or drag and drop",
