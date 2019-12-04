@@ -34,6 +34,9 @@ const actions = {
         Object.assign(album, { flag: JSON.parse(JSON.stringify(state.defaultFlagAlbum)) });
         albums.push(album);
       });
+      if (params.queries.offset === 0) {
+        commit('INIT_ALBUMS');
+      }
       commit('SET_ALBUMS', albums);
       return res;
     }).catch((err) => Promise.reject(err));
