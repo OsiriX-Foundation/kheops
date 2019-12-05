@@ -82,6 +82,13 @@ Vue.use(VueKeyCloak, {
   },
 });
 
+// https://fr.vuejs.org/v2/guide/custom-directive.html
+Vue.directive('focus', {
+  inserted: function (el) {
+    el.focus()
+  }
+})
+
 // if we don't need authentication...
 
 // new Vue({

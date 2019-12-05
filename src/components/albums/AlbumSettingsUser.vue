@@ -38,7 +38,6 @@
 <template>
   <div class="container">
     <h3
-      v-if="!form_add_user"
       class="d-sm-inline-flex full-width"
     >
       <div
@@ -47,7 +46,7 @@
         {{ $t('userlist') }}
       </div>
       <button
-        v-if="album.add_user||album.is_admin"
+        v-if="(album.add_user||album.is_admin) && form_add_user === false"
         class="btn btn-secondary"
         @click="form_add_user=true"
       >
@@ -57,45 +56,41 @@
           class="mr-2"
         />{{ $t('add_user') }}
       </button>
-    </h3>
-    <div
-      v-if="form_add_user"
-      class="card"
-    >
-      <div class="card-body">
-        <form @submit.prevent="addUser">
-          <div class="input-group mb-2">
-            <div>
-              <input
-                v-model="new_user_name"
-                type="email"
-                class="form-control"
-                autofocus
-                :placeholder="'email '+$t('user')"
-              >
-            </div>
-            <div class="input-group-append">
-              <button
-                class="btn btn-primary"
-                type="submit"
-                :disabled="!validEmail(new_user_name)"
-              >
-                {{ $t('add') }}
-              </button>
-              <button
-                class="btn btn-secondary"
-                type="reset"
-                tabindex="0"
-                @keyup.esc="new_user_name=''"
-                @click="new_user_name='';form_add_user=!form_add_user"
-              >
-                {{ $t('cancel') }}
-              </button>
-            </div>
+      <form
+        v-if="form_add_user"
+        @submit.prevent="addUser"
+      >
+        <div class="input-group">
+          <div>
+            <input
+              v-model="new_user_name"
+              type="email"
+              class="form-control"
+              v-focus
+              :placeholder="'email '+$t('user')"
+            >
           </div>
-        </form>
-      </div>
-    </div>
+          <div class="input-group-append">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              :disabled="!validEmail(new_user_name)"
+            >
+              {{ $t('add') }}
+            </button>
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              tabindex="0"
+              @keyup.esc="new_user_name=''"
+              @click="new_user_name='';form_add_user=!form_add_user"
+            >
+              {{ $t('cancel') }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </h3>
 
     <album-users
       :album="album"
