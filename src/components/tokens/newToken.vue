@@ -67,6 +67,7 @@
           <div class="col-xs-12 col-sm-12 col-md-10 mb-3">
             <input
               v-model="token.title"
+              v-focus
               type="text"
               :placeholder="$t('description')"
               class="form-control"

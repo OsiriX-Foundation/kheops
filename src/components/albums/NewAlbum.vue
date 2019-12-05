@@ -57,6 +57,7 @@
             <dd>
               <input
                 v-model="album.name"
+                v-focus
                 type="text"
                 :placeholder="$t('albumName')"
                 class="form-control"

@@ -40,6 +40,7 @@
               <div>
                 <input
                   v-model="edit.name"
+                  v-focus
                   type="text"
                   class="form-control"
                   maxlength="255"
@@ -94,6 +95,7 @@
               <div>
                 <textarea
                   v-model="edit.description"
+                  v-focus
                   rows="5"
                   class="form-control no-resize"
                   maxlength="2048"

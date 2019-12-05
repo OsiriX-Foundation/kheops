@@ -25,7 +25,7 @@
               v-model="new_user_name"
               type="email"
               class="form-control"
-              autofocus
+              v-focus
               :placeholder="'email '+$t('user')"
             >
           </div>
