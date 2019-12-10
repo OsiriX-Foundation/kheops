@@ -7,7 +7,6 @@ import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.user.AlbumUserPermissions.EDIT_FAVORITES;
 import static online.kheops.auth_server.util.Consts.*;

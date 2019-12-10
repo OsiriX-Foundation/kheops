@@ -13,7 +13,6 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
 import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;

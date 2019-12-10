@@ -14,9 +14,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import java.lang.annotation.Repeatable;
-import java.util.Map;
-
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
