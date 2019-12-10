@@ -117,13 +117,20 @@
                 {{ $t('you') }}
               </span>
               <a
-                v-else-if="comment.origin.can_access === true "
+                v-else-if="comment.origin.can_access === true && writeComments === true"
                 class="font-white"
                 :title="comment.origin.email"
                 @click="clickPrivateUser(comment.origin.email)"
               >
                 {{ comment.origin|getUsername }}
               </a>
+              <span
+                v-else-if="comment.origin.can_access === true"
+                color="white"
+                :title="comment.origin.email"
+              >
+                {{ comment.origin|getUsername }}
+              </span>
               <span
                 v-else
                 class="font-neutral"
