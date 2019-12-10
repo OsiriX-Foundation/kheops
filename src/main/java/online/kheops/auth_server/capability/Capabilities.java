@@ -277,7 +277,19 @@ public class Capabilities {
     public static Capability getCapability(String secret, EntityManager em)
             throws CapabilityNotFoundException {
 
-            final String hashSecret = hashCapability(secret);
-            return findCapabilityByCapabilityToken(hashSecret, em);
+        final String hashSecret = hashCapability(secret);
+        return findCapabilityByCapabilityToken(hashSecret, em);
+    }
+
+    public static Capability getCapability(String secret)
+            throws CapabilityNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            return  getCapability(secret, em);
+        } finally {
+            em.close();
+        }
     }
 }

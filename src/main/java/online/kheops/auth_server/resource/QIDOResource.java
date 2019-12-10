@@ -98,7 +98,7 @@ public class QIDOResource {
             return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component.").build();
         } catch (BadQueryParametersException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(BAD_REQUEST).build();
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
         } catch (AlbumNotFoundException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
             return Response.status(NOT_FOUND).build();
