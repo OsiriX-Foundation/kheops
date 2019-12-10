@@ -287,11 +287,12 @@ public class AlbumQueries {
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
             query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
             query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(SERIES.POPULATED.isTrue());
             query.addConditions(STUDIES.POPULATED.isTrue());
+
+            query.addGroupBy(ALBUMS.PK);
 
             Record result = query.fetchOne();
 
