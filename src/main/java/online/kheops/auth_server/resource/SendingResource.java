@@ -10,14 +10,12 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.filter.AlbumPermissionSecuredContext;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -540,5 +538,54 @@ public class SendingResource
         final User user = getOrCreateUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);
+    }
+
+
+
+    @OPTIONS
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
+    public Response appropriateSeriesOptions(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
+        return options();
+    }
+
+    @OPTIONS
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
+    public Response appropriateStudyOptions(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                                                          @QueryParam(ALBUM) String albumId) {
+        return options();
+    }
+
+
+    @OPTIONS
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
+    public Response putSeriesInAlbumOptions(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                            @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                            @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID) {
+        return options();
+    }
+
+    @OPTIONS
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}")
+    public Response putStudyInAlbumOptions(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
+        return options();
+    }
+
+
+    private Response options() {
+        return Response.ok()
+                .header("Allow", "GET")
+                .header("Allow", "POST")
+                .header("Allow", "PUT")
+                .header("Allow", "OPTIONS")
+                .header("Allow", "DELETE")
+                .header("Access-Control-Allow-Headers", X_TOKEN_SOURCE)
+                .header("Access-Control-Allow-Headers", "origin")
+                .header("Access-Control-Allow-Headers", "content-type")
+                .header("Access-Control-Allow-Headers", "accept")
+                .header("Access-Control-Allow-Headers", "authorization")
+                .header("Access-Control-Allow-Headers", "accept-charset")
+                .build();
     }
 }
