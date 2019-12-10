@@ -167,7 +167,7 @@ public class TokenResource
                     return Response.status(BAD_REQUEST).build();
                 }
 
-                introspectResponse.setAlbumId(capability.getId());
+                introspectResponse.setAlbumId(capability.getAlbum().getId());
             }
             if (headerXForwardedFor != null) {
                 logBuilder.ip(headerXForwardedFor);
