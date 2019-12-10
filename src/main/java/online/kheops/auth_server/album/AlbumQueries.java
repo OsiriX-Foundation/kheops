@@ -292,7 +292,7 @@ public class AlbumQueries {
             query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(SERIES.POPULATED.isTrue());
             query.addConditions(STUDIES.POPULATED.isTrue());
-            
+
             Record result = query.fetchOne();
 
             return new AlbumResponseBuilder().setAlbumFromCapabilityToken(result).build();
