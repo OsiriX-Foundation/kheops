@@ -280,7 +280,7 @@ public class AlbumQueries {
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
                     countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
-                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
+                    countDistinct(SERIES.PK).as("number_of_series"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUMS);
