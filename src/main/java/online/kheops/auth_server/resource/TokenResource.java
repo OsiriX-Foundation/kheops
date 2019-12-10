@@ -5,7 +5,6 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.capability.CapabilityNotFoundException;
-import online.kheops.auth_server.capability.CapabilityToken;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
@@ -25,7 +24,7 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.capability.Capabilities.getCapability;
+import static online.kheops.auth_server.capability.Capabilities.getCapabilityWithID;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getRedirectUri;
 import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
@@ -163,11 +162,12 @@ public class TokenResource
             if (accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN) {
                 final Capability capability;
                 try {
-                    capability = getCapability(accessToken.getCapabilityTokenId().get());
+                    capability = getCapabilityWithID(accessToken.getCapabilityTokenId().get());
                 } catch (CapabilityNotFoundException e) {
                     return Response.status(BAD_REQUEST).build();
                 }
-                introspectResponse.setAlbumId(capability.getAlbum().getId());
+
+                introspectResponse.setAlbumId(capability.getId());
             }
             if (headerXForwardedFor != null) {
                 logBuilder.ip(headerXForwardedFor);

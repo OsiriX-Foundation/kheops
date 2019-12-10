@@ -254,6 +254,18 @@ public class Capabilities {
         }
     }
 
+    public static Capability getCapabilityWithID(String capabilityId)
+            throws CapabilityNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            return findCapabilityByCapabilityID(capabilityId, em);
+        } finally {
+            em.close();
+        }
+    }
+
     public static boolean capabilitySecretExist(String capabilitySecret) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
