@@ -16,7 +16,7 @@ const state = {
   },
   modalities: [
     'DOC',
-    'CT',
+    'XC',
     'SR',
   ],
 };
@@ -61,8 +61,9 @@ const actions = {
   },
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
-    if ((serie.Modality !== undefined && serie.Modality.Value !== undefined && state.modalities.includes(serie.Modality.Value[0]))
-      || (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1)) {
+    const checkNumberOfSeriesRelatedInstance = (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1);
+    const checkModalities = !checkNumberOfSeriesRelatedInstance && (serie.Modality !== undefined && serie.Modality.Value !== undefined && state.modalities.includes(serie.Modality.Value[0]));
+    if ((checkModalities) || (checkNumberOfSeriesRelatedInstance)) {
       return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
           const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : '';
