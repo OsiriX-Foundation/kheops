@@ -289,8 +289,8 @@ public class AlbumQueries {
             query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
 
             query.addConditions(ALBUMS.ID.eq(albumId));
-            query.addConditions(SERIES.POPULATED.isTrue());
-            query.addConditions(STUDIES.POPULATED.isTrue());
+            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
+            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
             query.addGroupBy(ALBUMS.PK);
 
