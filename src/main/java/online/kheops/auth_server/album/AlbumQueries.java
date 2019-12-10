@@ -279,7 +279,7 @@ public class AlbumQueries {
                     ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    countDistinct(EVENTS.PK).as("number_of_comments"),
+                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
                     countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
@@ -289,16 +289,10 @@ public class AlbumQueries {
             query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
-            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
-                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
-                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
-
             query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(SERIES.POPULATED.isTrue());
             query.addConditions(STUDIES.POPULATED.isTrue());
-
-            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
-
+            
             Record result = query.fetchOne();
 
             return new AlbumResponseBuilder().setAlbumFromCapabilityToken(result).build();
