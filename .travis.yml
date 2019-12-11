@@ -13,6 +13,8 @@ notifications:
 install:
   - java -version
   - gradle -v
+  - gradle wrapper --gradle-version 6.0.1
+  - gradle -v
 
 #before_cache:
 #  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
