@@ -5,7 +5,7 @@ services:
   - docker
 
 jdk:
-  - openjdk11
+  - openjdk13
 
 notifications:
   email: false
@@ -16,13 +16,13 @@ install:
   - gradle wrapper --gradle-version 6.0.1
   - gradle -v
 
-#before_cache:
-#  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-#  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-#cache:
-#  directories:
-#    - $HOME/.gradle/caches/
-#    - $HOME/.gradle/wrapper/
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 after_success:
   - export BRANCH=$TRAVIS_BRANCH
