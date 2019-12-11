@@ -10,7 +10,7 @@ jdk:
 notifications:
   email: false
 
-before_script:
+install:
   - java -version
   - gradle -v
 
