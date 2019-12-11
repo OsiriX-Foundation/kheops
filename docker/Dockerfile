@@ -1,4 +1,4 @@
-FROM tomcat:9-jdk11
+FROM tomcat:9-jdk8
 
 ARG VCS_REF
 
