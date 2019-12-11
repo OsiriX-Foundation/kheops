@@ -1,6 +1,9 @@
 #!/bin/bash
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
+ls build
+ls build/libs
+
 mv build/libs/KheopsAuthorization.war docker/KheopsAuthorization.war
 mv filebeat docker
 mv metricbeat docker
