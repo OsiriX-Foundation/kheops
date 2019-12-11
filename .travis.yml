@@ -5,7 +5,7 @@ services:
   - docker
 
 jdk:
-  - openjdk8
+  - openjdk13
 
 notifications:
   email: false
