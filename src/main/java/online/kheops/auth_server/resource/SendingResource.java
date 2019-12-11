@@ -31,10 +31,11 @@ import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
+import static online.kheops.auth_server.filter.SecuredFilter.getToken;
 import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
-import static online.kheops.auth_server.util.HttpHeaders.X_TOKEN_SOURCE;
+import static online.kheops.auth_server.util.HttpHeaders.X_AUTHORIZATION_SOURCE;
 
 @Path("/")
 public class SendingResource
@@ -48,8 +49,8 @@ public class SendingResource
     @Context
     private SecurityContext securityContext;
 
-    @HeaderParam(X_TOKEN_SOURCE)
-    private String headerXTokenSource;
+    @HeaderParam(X_AUTHORIZATION_SOURCE)
+    private String headerXAuthorizationSource;
 
     @PUT
     @Secured
@@ -139,11 +140,11 @@ public class SendingResource
 
         boolean fromToken;
 
-        if (headerXTokenSource != null) {
+        if (headerXAuthorizationSource != null) {
             fromToken = true;
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXAuthorizationSource);
             } catch (AccessTokenVerificationException e) {
                 LOG.log(WARNING, "forbidden", e);
                 return Response.status(FORBIDDEN).build();
@@ -206,10 +207,10 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (headerXTokenSource != null) {
+        if (headerXAuthorizationSource != null) {
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXAuthorizationSource);
             } catch (AccessTokenVerificationException e) {
                 LOG.log(WARNING, "verification error", e);
                 return Response.status(FORBIDDEN).build();
@@ -379,10 +380,10 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (headerXTokenSource != null) {
+        if (headerXAuthorizationSource != null) {
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXAuthorizationSource);
             } catch (AccessTokenVerificationException e) {
                 LOG.log(WARNING, "verification error", e);
                 return Response.status(FORBIDDEN).build();
@@ -437,7 +438,7 @@ public class SendingResource
 
 
         if (((fromAlbumId == null && fromInbox == null) ||
-                (fromAlbumId != null && fromInbox != null && fromInbox)) && headerXTokenSource == null) {
+                (fromAlbumId != null && fromInbox != null && fromInbox)) && headerXAuthorizationSource == null) {
             return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
         }
 
@@ -447,10 +448,10 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (headerXTokenSource != null) {
+        if (headerXAuthorizationSource != null) {
             final KheopsPrincipal tokenPrincipal;
             try {
-                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXTokenSource);
+                tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXAuthorizationSource);
             } catch (AccessTokenVerificationException e) {
                 LOG.log(WARNING, "verification error", e);
                 return Response.status(FORBIDDEN).build();
@@ -534,7 +535,7 @@ public class SendingResource
     private KheopsPrincipal getPrincipalFromHeadersXTokenSource(String token)
             throws AccessTokenVerificationException, UserNotFoundException {
 
-        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, token);
+        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, getToken(token));
         final User user = getOrCreateUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);

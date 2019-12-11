@@ -97,7 +97,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         });
     }
 
-    private static String getToken(String authorizationHeader) {
+    public static String getToken(String authorizationHeader) {
         final String token;
         if (authorizationHeader != null) {
 
