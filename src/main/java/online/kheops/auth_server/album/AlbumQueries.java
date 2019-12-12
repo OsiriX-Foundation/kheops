@@ -43,7 +43,7 @@ public class AlbumQueries {
                     .setParameter("albumId", albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new AlbumNotFoundException("Album id:" + albumId + " not found", e);
+            throw new AlbumNotFoundException();
         }
     }
 
@@ -56,7 +56,7 @@ public class AlbumQueries {
                     .setParameter("targetAlbum", album)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new UserNotMemberException("User : " + user.getKeycloakId() + " is not a member of the album :"+album.getId(), e);
+            throw new UserNotMemberException();
         }
     }
 

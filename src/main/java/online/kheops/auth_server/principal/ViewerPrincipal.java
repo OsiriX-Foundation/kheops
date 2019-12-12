@@ -176,7 +176,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
         if(kheopsPrincipal.hasAlbumAccess(albumID)) {
             return albumID;
         } else {
-            throw new AlbumNotFoundException("");
+            throw new AlbumNotFoundException();
         }
     }
 

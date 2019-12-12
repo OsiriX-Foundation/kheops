@@ -27,10 +27,18 @@ public abstract class JOOQTools {
         try {
             limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
         } catch (Exception e) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("'" + Consts.QUERY_PARAMETER_LIMIT + "' must be an integer >= 1")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
         if (limit < 1) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_LIMIT + ": " + queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("'" + Consts.QUERY_PARAMETER_LIMIT + "' must be an integer >= 1")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
         return OptionalInt.of(limit);
     }
@@ -40,11 +48,19 @@ public abstract class JOOQTools {
         try {
             offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
         } catch (Exception e) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("'" + Consts.QUERY_PARAMETER_OFFSET + "' must be an integer >= 1")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
 
         if (offset < 0) {
-            throw new BadQueryParametersException(Consts.QUERY_PARAMETER_OFFSET + ": " + queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("'" + Consts.QUERY_PARAMETER_OFFSET + "' must be an integer >= 0")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
         return OptionalInt.of(offset);
     }

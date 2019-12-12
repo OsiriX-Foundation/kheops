@@ -1,18 +1,19 @@
 package online.kheops.auth_server.album;
 
-public class AlbumNotFoundException extends Exception{
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
 
-    public AlbumNotFoundException(String message) {
-        super(message);
-    }
+public class AlbumNotFoundException extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
 
     public AlbumNotFoundException() {
-        super("Unknown album");
+        super();
+        errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message("Album not found")
+                .detail("The album does not exist or you don't have access")
+                .build();
     }
 
-    public AlbumNotFoundException(String message, Throwable e) {
-        super(message, e);
-    }
-
-    public AlbumNotFoundException(Throwable e) { super("Unknown album", e); }
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 }

@@ -73,7 +73,11 @@ public final class StudyQIDOParams {
             }
 
             if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.READ_SERIES, albumIDLocal)) {
-                throw new AlbumForbiddenException("Token doesn't have read access");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Action forbidden")
+                        .detail("Token doesn't have read access to this album")
+                        .build();
+                throw new AlbumForbiddenException(errorResponse);
             }
         }
 

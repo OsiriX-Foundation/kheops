@@ -84,7 +84,7 @@ public class Keycloak {
                     .get(UserRepresentation.class);
         } catch (ProcessingException | WebApplicationException e) {
             token.removeToken();
-            throw new UserNotFoundException("unable to find the userinfo", e);
+            throw new UserNotFoundException(e);
         }
     }
 

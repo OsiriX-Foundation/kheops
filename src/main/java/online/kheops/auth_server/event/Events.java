@@ -7,6 +7,7 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
@@ -53,7 +54,11 @@ public class Events {
                 final User targetUser = em.merge(getOrCreateUser(user));
 
                 if (targetUser != callingUser && !isMemberOfAlbum(targetUser, album, em)) {
-                    throw new UserNotFoundException("Target user is not a member of the album : " + albumId);
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Not a member")
+                            .detail("Target user is not a member of the album ")
+                            .build();
+                    throw new UserNotFoundException(errorResponse);
                 }
 
                 comment.setPrivateTargetUser(targetUser);
@@ -257,7 +262,11 @@ public class Events {
                 User targetUser = em.merge(getOrCreateUser(targetUserPk));
 
                 if (targetUser != callingUser && !Studies.canAccessStudy(targetUser, study, em)) {
-                    throw new UserNotFoundException("Target user can't access to this study : " + studyInstanceUID);
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("No access")
+                            .detail("Target user can't access to this study")
+                            .build();
+                    throw new UserNotFoundException(errorResponse);
                 }
 
                 comment.setPrivateTargetUser(targetUser);

@@ -1,18 +1,20 @@
 package online.kheops.auth_server.album;
 
-public class UserNotMemberException extends Exception{
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
 
-    public UserNotMemberException(String message) {
-        super(message);
-    }
+public class UserNotMemberException extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
 
     public UserNotMemberException() {
-        super("User not a member of the album");
+        super();
+        errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message("Album not found")
+                .detail("The album does not exist or you don't have access")
+                .build();
     }
 
-    public UserNotMemberException(String message, Throwable e) {
-        super(message, e);
-    }
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 
-    public UserNotMemberException(Throwable e) { super("User not a member of the album", e); }
 }
