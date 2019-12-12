@@ -241,7 +241,10 @@
           {{ $t('warning') }}
         </dt>
       </dl>
-      <dl class="my-2 row">
+      <dl
+        v-if="token.scope_type === 'album'"
+        class="my-2 row"
+      >
         <dt class="col-xs-12 col-sm-3 token-title">
           {{ $t('urlvalue') }}
         </dt>
