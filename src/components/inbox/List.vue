@@ -811,10 +811,11 @@ export default {
       const params = {
         limit,
         offset,
-        includefield: ['favorite', 'comments', '00081030'],
+        includefield: ['comments', '00081030'],
         sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy,
       };
       if (Object.keys(this.source).length > 0) {
+        params.includefield.push('favorite')
         params[this.source.key] = this.source.value;
       }
       const queries = Object.assign(params, this.prepareFilters());

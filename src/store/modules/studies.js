@@ -54,8 +54,8 @@ const actions = {
         const studies = dicomoperations.translateDICOM(res.data);
         studies.forEach((study) => {
           study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
-          study.flag.is_favorite = study.SumFavorites.Value[0] > 0;
-          study.flag.is_commented = study.SumComments.Value[0] > 0;
+          study.flag.is_favorite = study.SumFavorites !== undefined ? study.SumFavorites.Value[0] > 0 : false;
+          study.flag.is_commented = study.SumComments !== undefined ? study.SumComments.Value[0] > 0 : false;
           // https://bootstrap-vue.js.org/docs/components/table/
           // chapter - Row details support
           study._showDetails = false;
@@ -86,8 +86,8 @@ const actions = {
           const stateUID = state.studies[index] !== undefined ? state.studies[index].StudyInstanceUID.Value[0] : undefined;
 
           study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
-          study.flag.is_favorite = study.SumFavorites.Value[0] > 0;
-          study.flag.is_commented = study.SumComments.Value[0] > 0;
+          study.flag.is_favorite = study.SumFavorites !== undefined ? study.SumFavorites.Value[0] > 0 : false;
+          study.flag.is_commented = study.SumComments !== undefined ? study.SumComments.Value[0] > 0 : false;
           study._showDetails = false;
           study.showIcons = false;
           if (state.studies.length > 0 && currentUID !== stateUID) {
