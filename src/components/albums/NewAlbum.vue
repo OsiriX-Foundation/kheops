@@ -342,15 +342,15 @@ export default {
     putStudiesInAlbum(albumCreated, data) {
       let queries = {};
       queries = this.$route.query.source === 'inbox' ? { inbox: true } : { album: this.$route.query.source };
-      return this.$store.dispatch('putStudiesInAlbum', { queries, data }).then(results => {
-        results.forEach(result => {
-          const { res } = result
+      return this.$store.dispatch('putStudiesInAlbum', { queries, data }).then((results) => {
+        results.forEach((result) => {
+          const { res } = result;
           if (res.request !== undefined && res.request.status !== 201) {
-            const { studyId } = result
+            const { studyId } = result;
             if (res.request.status === 403) {
-              this.$snotify.error(this.$t('authorizationerror', {study: studyId}));
+              this.$snotify.error(this.$t('authorizationerror', { study: studyId }));
             } else if (res.request.status === 404) {
-              this.$snotify.error(this.$t('studynotfound', {study: studyId}));
+              this.$snotify.error(this.$t('studynotfound', { study: studyId }));
             } else {
               this.$snotify.error(this.$t('sorryerror'));
             }

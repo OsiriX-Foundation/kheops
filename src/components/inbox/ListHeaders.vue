@@ -466,15 +466,15 @@ export default {
       if (this.source.key !== undefined || this.source.value !== undefined) {
         return {
           [this.source.key]: this.source.value,
-        }
-      };
+        };
+      }
     },
     getHeaders() {
       if (this.currentuserCapabilitiesToken !== undefined && this.currentuserKeycloakToken !== undefined) {
         return {
           Authorization: `Bearer ${this.currentuserKeycloakToken}`,
           'X-Authorization-Source': `Bearer ${this.currentuserCapabilitiesToken}`,
-        }
+        };
       }
       return undefined;
     },
@@ -534,7 +534,7 @@ export default {
         404: '',
         unknown: '',
       };
-      this.$store.dispatch('putStudiesInAlbum', { queries, data: studySerieData, headers: headers }).then((res) => {
+      this.$store.dispatch('putStudiesInAlbum', { queries, data: studySerieData, headers }).then((res) => {
         res.forEach((data) => {
           if (data.res !== undefined && data.res.status === 201) {
             if (data.serieId !== undefined) {

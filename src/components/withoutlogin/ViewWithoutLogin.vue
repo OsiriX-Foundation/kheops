@@ -74,20 +74,20 @@ export default {
       queries = httpoperations.getFormData(params.queries);
     }
     HTTP.post('token/introspect', queries).then((res) => {
-      const active = res.data.active;
+      const { active } = res.data;
       if (active === true) {
         this.scope = res.data.scope.split(' ');
         this.albumID = res.data.album_id;
         if (this.albumID === undefined) {
-          this.active = active
+          this.active = active;
         } else {
-          this.getAlbum(this.albumID).then(res => {
+          this.getAlbum(this.albumID).then((res) => {
             this.active = active;
             this.album = res.data;
-          })
+          });
         }
       } else {
-        this.active = active
+        this.active = active;
       }
     }).catch((err) => {
       console.log(err);

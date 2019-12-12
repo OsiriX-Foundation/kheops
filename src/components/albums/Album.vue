@@ -285,7 +285,7 @@ export default {
     const source = {
       key: 'album',
       value: this.albumID,
-    }
+    };
     this.$store.dispatch('setSource', source);
   },
   beforeDestroy() {

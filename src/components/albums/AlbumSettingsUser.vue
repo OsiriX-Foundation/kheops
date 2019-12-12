@@ -64,9 +64,9 @@
           <div>
             <input
               v-model="new_user_name"
+              v-focus
               type="email"
               class="form-control"
-              v-focus
               :placeholder="'email '+$t('user')"
             >
           </div>

@@ -23,9 +23,9 @@
           <div>
             <input
               v-model="new_user_name"
+              v-focus
               type="email"
               class="form-control"
-              v-focus
               :placeholder="'email '+$t('user')"
             >
           </div>
@@ -55,6 +55,7 @@
 
 <script>
 import { CurrentUser } from '@/mixins/currentuser.js';
+
 export default {
   name: 'FormGetUser',
   mixins: [CurrentUser],
@@ -70,7 +71,7 @@ export default {
     },
     getUser() {
       const headers = this.getHeaders();
-      this.$store.dispatch('checkUser', { user: this.new_user_name, headers: headers }).then((sub) => {
+      this.$store.dispatch('checkUser', { user: this.new_user_name, headers }).then((sub) => {
         if (!sub) this.$snotify.error('Sorry, unknown user');
         else {
           this.$emit('get-user', sub);
@@ -83,11 +84,11 @@ export default {
         return {
           Authorization: `Bearer ${this.currentuserKeycloakToken}`,
           Accept: 'application/json',
-        }
+        };
       }
       return {
         Accept: 'application/json',
-      }
+      };
     },
     cancel() {
       this.new_user_name = '';

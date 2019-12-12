@@ -351,8 +351,8 @@
             <div class="input-group mb-3">
               <textarea
                 ref="textcomment"
-                v-focus
                 v-model="newComment.comment"
+                v-focus
                 class="form-control form-control-sm"
                 :placeholder="$t('writecomment')"
                 rows="2"

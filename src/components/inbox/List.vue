@@ -729,8 +729,8 @@ export default {
           canAddSeries: true,
         };
         const headers = {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`
-        }
+          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+        };
         this.$store.dispatch('getAlbums', { queries: queriesAlbums, headers });
       }
     },
@@ -815,7 +815,7 @@ export default {
         sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy,
       };
       if (Object.keys(this.source).length > 0) {
-        params.includefield.push('favorite')
+        params.includefield.push('favorite');
         params[this.source.key] = this.source.value;
       }
       const queries = Object.assign(params, this.prepareFilters());
