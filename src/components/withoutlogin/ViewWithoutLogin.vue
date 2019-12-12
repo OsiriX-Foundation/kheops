@@ -42,6 +42,7 @@ export default {
       scope: [],
       active: -1,
       albumID: '',
+      album: {},
     };
   },
   computed: {
@@ -81,7 +82,8 @@ export default {
           this.active = active
         } else {
           this.getAlbum(this.albumID).then(res => {
-            this.active = active
+            this.active = active;
+            this.album = res.data;
           })
         }
       } else {
