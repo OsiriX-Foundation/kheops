@@ -63,9 +63,13 @@ export default {
       if (active === true) {
         this.scope = res.data.scope.split(' ');
         this.albumID = res.data.album_id;
-        this.getAlbum(res.data.album_id).then(res => {
+        if (this.albumID === undefined) {
           this.active = active
-        })
+        } else {
+          this.getAlbum(this.albumID).then(res => {
+            this.active = active
+          })
+        }
       } else {
         this.active = active
       }
