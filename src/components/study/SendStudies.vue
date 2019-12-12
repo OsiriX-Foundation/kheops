@@ -415,7 +415,7 @@ export default {
       return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
     },
     sourceIsAlbum() {
-      return (this.source !== 'inbox' && this.source !== undefined);
+      return (this.source.key !== 'inbox' && this.source !== undefined && Object.keys(this.source).length > 0);
     },
   },
   watch: {
@@ -535,7 +535,7 @@ export default {
       return new Promise((resolve, reject) => {
         const formData = new FormData();
         formData.append(idFile, data);
-        const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
+        const request = `/studies${this.sourceIsAlbum ? `?${this.source.key}=${this.source.value}` : ''}`;
         HTTP.post(request, data, this.config.dicomizeData).then((res) => {
           resolve(res);
         }).catch((err) => {
@@ -598,7 +598,7 @@ export default {
         if (!this.UI.cancel && this.files.length > 0) {
           const formData = this.createFormData(files);
           this.currentFilesLength = files.length;
-          const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
+          const request = `/studies${this.sourceIsAlbum ? `?${this.source.key}=${this.source.value}` : ''}`;
           HTTP.post(request, formData, this.config.formData).then((res) => {
             this.manageResult(files, res.data, res.status);
             resolve(res);

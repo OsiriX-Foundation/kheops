@@ -132,8 +132,7 @@
         </div>
       </div>
       <component-import-study
-        :album="album"
-        :source="source"
+        :album-i-d="albumID"
         :permissions="permissions"
       />
     </span>
@@ -238,12 +237,6 @@ export default {
     albumID() {
       return this.$route.params.album_id;
     },
-    source() {
-      return {
-        key: 'album',
-        value: this.albumID,
-      };
-    },
     permissions() {
       return {
         add_series: this.album.add_series || this.album.is_admin,
@@ -289,6 +282,11 @@ export default {
         this.loading = false;
       }
     });
+    const source = {
+      key: 'album',
+      value: this.albumID,
+    }
+    this.$store.dispatch('setSource', source);
   },
   beforeDestroy() {
     this.$store.commit('INIT_ALBUM');

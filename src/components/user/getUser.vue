@@ -54,8 +54,10 @@
 </template>
 
 <script>
+import { CurrentUser } from '@/mixins/currentuser.js';
 export default {
   name: 'FormGetUser',
+  mixins: [CurrentUser],
   data() {
     return {
       new_user_name: '',
@@ -67,13 +69,25 @@ export default {
       return re.test(email);
     },
     getUser() {
-      this.$store.dispatch('checkUser', this.new_user_name).then((sub) => {
+      const headers = this.getHeaders();
+      this.$store.dispatch('checkUser', { user: this.new_user_name, headers: headers }).then((sub) => {
         if (!sub) this.$snotify.error('Sorry, unknown user');
         else {
           this.$emit('get-user', sub);
           this.new_user_name = '';
         }
       });
+    },
+    getHeaders() {
+      if (this.authenticated) {
+        return {
+          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+          Accept: 'application/json',
+        }
+      }
+      return {
+        Accept: 'application/json',
+      }
     },
     cancel() {
       this.new_user_name = '';

@@ -255,10 +255,12 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'ListHeaders',
   components: { formGetUser, ConfirmButton },
+  mixins: [CurrentUser],
   props: {
     studies: {
       type: Array,
@@ -318,6 +320,7 @@ export default {
     ...mapGetters({
       sendingFiles: 'sending',
       series: 'series',
+      source: 'source',
     }),
     selectedStudiesNb() {
       return _.filter(this.studies, (s) => (s.flag.is_selected === true || s.flag.is_indeterminate === true)).length;
@@ -460,14 +463,20 @@ export default {
       });
     },
     getSource() {
-      if (this.albumId === '') {
+      if (this.source.key !== undefined || this.source.value !== undefined) {
         return {
-          inbox: true,
-        };
-      }
-      return {
-        album: this.albumId,
+          [this.source.key]: this.source.value,
+        }
       };
+    },
+    getHeaders() {
+      if (this.currentuserCapabilitiesToken !== undefined && this.currentuserKeycloakToken !== undefined) {
+        return {
+          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+          'X-Authorization-Source': `Bearer ${this.currentuserCapabilitiesToken}`,
+        }
+      }
+      return undefined;
     },
     deleteStudies() {
       this.deleteSelectedStudies();
@@ -516,6 +525,7 @@ export default {
     },
     addToAlbum(albumId) {
       const queries = this.getSource();
+      const headers = this.getHeaders();
       let sendSerie = 0;
       let sendStudy = 0;
       const studySerieData = this.generateStudySerieData(albumId);
@@ -524,7 +534,7 @@ export default {
         404: '',
         unknown: '',
       };
-      this.$store.dispatch('putStudiesInAlbum', { queries, data: studySerieData }).then((res) => {
+      this.$store.dispatch('putStudiesInAlbum', { queries, data: studySerieData, headers: headers }).then((res) => {
         res.forEach((data) => {
           if (data.res !== undefined && data.res.status === 201) {
             if (data.serieId !== undefined) {
@@ -567,6 +577,7 @@ export default {
     },
     addToInbox() {
       const queries = this.getSource();
+      const headers = this.getHeaders();
       const studySerieData = this.generateStudySerieData(this.albumId);
       let sendStudy = 0;
       let sendSerie = 0;
@@ -575,7 +586,7 @@ export default {
         404: '',
         unknown: '',
       };
-      this.$store.dispatch('selfAppropriateStudy', { data: studySerieData, queries }).then((res) => {
+      this.$store.dispatch('selfAppropriateStudy', { data: studySerieData, queries, headers }).then((res) => {
         res.forEach((data) => {
           if (data.res !== undefined && data.res.status === 201) {
             if (data.serieId !== undefined) {

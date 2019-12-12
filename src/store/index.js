@@ -9,6 +9,7 @@ import comments from './modules/comments';
 import albums from './modules/albums';
 import album from './modules/album';
 import tokens from './modules/tokens';
+import source from './modules/source';
 
 Vue.use(Vuex);
 
@@ -23,5 +24,6 @@ export default new Vuex.Store({
     albums,
     album,
     tokens,
+    source,
   },
 });

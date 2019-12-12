@@ -168,10 +168,11 @@ const actions = {
     if (params.queries !== undefined) {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
+    const { headers } = params;
     const promises = [];
     params.data.forEach((d) => {
       if (d.serie_id) {
-        promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`)
+        promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`, {}, { headers })
           .then((res) => ({
             res,
             studyId: d.study_id,
@@ -185,7 +186,7 @@ const actions = {
             albumId: d.album_id,
           })));
       } else {
-        promises.push(HTTP.put(`${request}/${d.study_id}${queries}`)
+        promises.push(HTTP.put(`${request}/${d.study_id}${queries}`, {}, { headers })
           .then((res) => ({
             res,
             studyId: d.study_id,

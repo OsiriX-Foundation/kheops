@@ -1,8 +1,15 @@
 <template>
   <div>
     <component-import-study
+      v-if="active === true"
       :permissions="permissions"
+      :album-i-d="albumID"
     />
+    <span
+      v-if="active === false"
+    >
+      This link is not active
+    </span>
   </div>
 </template>
 
@@ -19,6 +26,8 @@ export default {
   data() {
     return {
       scope: [],
+      active: -1,
+      albumID: '',
     };
   },
   computed: {
@@ -30,15 +39,16 @@ export default {
         add_series: this.scope.includes('write'),
         delete_series: this.scope.includes('write'),
         download_series: this.scope.includes('downloadbutton'),
-        send_series: false,
+        send_series: this.scope.includes('send') && this.logged,
         write_comments: false,
-        add_inbox: false,
+        add_inbox: this.scope.includes('send') && this.logged,
       };
     },
   },
   watch: {
   },
   created() {
+    this.$store.dispatch('setSource', {});
     const params = {
       queries: {
         token: this.$route.params.token,
@@ -49,8 +59,15 @@ export default {
       queries = httpoperations.getFormData(params.queries);
     }
     HTTP.post('token/introspect', queries).then((res) => {
-      if (res.data.active === true) {
+      const active = res.data.active;
+      if (active === true) {
         this.scope = res.data.scope.split(' ');
+        this.albumID = res.data.album_id;
+        this.getAlbum(res.data.album_id).then(res => {
+          this.active = active
+        })
+      } else {
+        this.active = active
       }
     }).catch((err) => {
       console.log(err);
@@ -59,6 +76,13 @@ export default {
   mounted() {
   },
   methods: {
+    getAlbum(albumID) {
+      return this.$store.dispatch('getAlbum', { album_id: albumID }).then((res) => res)
+        .catch((err) => {
+          this.$router.push('/albums');
+          Promise.reject(err);
+        });
+    },
   },
 };
 

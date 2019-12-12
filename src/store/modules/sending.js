@@ -5,7 +5,6 @@ const state = {
   files: [],
   totalSize: 0,
   error: [],
-  source: '',
   studyUIDToSend: '',
   demoDragAndDrop: false,
 };
@@ -16,7 +15,6 @@ const getters = {
   files: (state) => state.files,
   totalSize: (state) => state.totalSize,
   error: (state) => state.error,
-  source: (state) => state.source,
   studyUIDToSend: (state) => state.studyUIDToSend,
   demoDragAndDrop: (state) => state.demoDragAndDrop,
 };
@@ -35,9 +33,6 @@ const actions = {
   setErrorFiles({ commit }, params) {
     commit('SET_ERROR', params);
   },
-  setSource({ commit }, params) {
-    commit('SET_SOURCE', params);
-  },
   setStudyUIDtoSend({ commit }, params) {
     commit('SET_STUDYUID', params);
   },
@@ -52,9 +47,6 @@ const actions = {
   },
   initSentFiles({ commit }) {
     commit('INIT_SENTFILES');
-  },
-  initSource({ commit }) {
-    commit('INIT_SOURCE');
   },
   removeFilesId({ commit }, params) {
     params.files.forEach((val) => {
@@ -82,9 +74,6 @@ const mutations = {
   SET_ERROR(state, params) {
     state.error.push(params.error);
   },
-  SET_SOURCE(state, params) {
-    state.source = params.source;
-  },
   SET_STUDYUID(state, params) {
     state.studyUIDToSend = params.studyUID;
   },
@@ -96,9 +85,6 @@ const mutations = {
   },
   INIT_FILES(state) {
     state.files = [];
-  },
-  INIT_SOURCE(state) {
-    state.source = '';
   },
   REMOVE_FILE_ID(state, params) {
     const index = state.files.findIndex((x) => x.id === params.id);

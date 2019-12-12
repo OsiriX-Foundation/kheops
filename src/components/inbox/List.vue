@@ -108,7 +108,7 @@
       :show-delete-button="permissions.delete_series"
       :show-import-button="permissions.add_series"
       :show-inbox-button="permissions.add_inbox"
-      :album-id="source.key === 'album' ? source.value : ''"
+      :album-id="albumID"
       @setFilters="changeFilterValue"
       @reloadStudies="reloadStudies"
     />
@@ -464,23 +464,24 @@ import ListItemDetails from '@/components/inbox/ListItemDetails.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import SortList from '@/components/inbox/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'Studies',
   components: {
     ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders, PulseLoader,
   },
-  mixins: [],
+  mixins: [CurrentUser],
   props: {
     permissions: {
       type: Object,
       required: true,
       default: () => ({}),
     },
-    source: {
-      type: Object,
-      required: true,
-      default: () => ({}),
+    albumID: {
+      type: String,
+      required: false,
+      default: undefined,
     },
   },
   data() {
@@ -598,6 +599,7 @@ export default {
       sendingFiles: 'sending',
       providers: 'providers',
       modalities: 'modalities',
+      source: 'source',
     }),
     OS() {
       return navigator.platform;
@@ -615,12 +617,6 @@ export default {
     },
     mobiledetect() {
       return mobiledetect.mobileAndTabletcheck();
-    },
-    albumID() {
-      if (this.source.key === 'album') {
-        return this.source.value;
-      }
-      return undefined;
     },
     providersEnable() {
       return this.providers.filter((provider) => provider.stateURL.checkURL === true);
@@ -656,16 +652,8 @@ export default {
   },
   created() {
     this.initData();
-    if (Object.keys(this.source).length > 0) {
-      const queriesAlbums = {
-        canAddSeries: true,
-      };
-      this.$store.dispatch('getAlbums', { queries: queriesAlbums });
-      this.setAlbumInbox();
-    } else {
-      const modalities = ['CT', 'SM', 'CR', 'RG', 'DX', 'NM', 'XC', 'AU', 'SR', 'OP'];
-      this.$store.commit('SET_MODALITIES', modalities);
-    }
+    this.setAlbumsList();
+    this.setAlbumInbox();
   },
   destroyed() {
     this.$store.dispatch('initStudies', {});
@@ -721,14 +709,12 @@ export default {
     },
     reloadStudies() {
       this.searchStudies();
-      if (Object.keys(this.source).length > 0) {
-        if (this.albumID !== undefined) {
-          this.getAlbum().then(() => {
-            this.setAlbumInbox();
-          });
-        } else {
+      if (this.albumID !== undefined) {
+        this.getAlbum().then(() => {
           this.setAlbumInbox();
-        }
+        });
+      } else {
+        this.setAlbumInbox();
       }
     },
     getAlbum() {
@@ -737,9 +723,22 @@ export default {
         return err;
       });
     },
+    setAlbumsList() {
+      if (this.currentuserKeycloakToken !== null) {
+        const queriesAlbums = {
+          canAddSeries: true,
+        };
+        const headers = {
+          Authorization: `Bearer ${this.currentuserKeycloakToken}`
+        }
+        this.$store.dispatch('getAlbums', { queries: queriesAlbums, headers });
+      }
+    },
     setAlbumInbox() {
       if (this.albumID !== undefined) {
-        this.$store.dispatch('getProviders', { albumID: this.albumID });
+        if (!this.currentuserOnView) {
+          this.$store.dispatch('getProviders', { albumID: this.albumID });
+        }
         this.$store.dispatch('setModalitiesAlbum');
       } else {
         this.$store.dispatch('getInboxInfo');

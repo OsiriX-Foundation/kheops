@@ -71,7 +71,7 @@
           <list
             ref="list"
             :permissions="permissions"
-            :source="source"
+            :album-i-d="albumID"
             @loadfiles="inputLoadFiles"
             @loaddirectories="inputLoadFiles"
           />
@@ -100,6 +100,11 @@ export default {
       type: Object,
       required: true,
       default: () => ({}),
+    },
+    albumID: {
+      type: String,
+      required: false,
+      default: undefined,
     },
   },
   data() {
@@ -186,7 +191,6 @@ export default {
     storeFiles(files) {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files });
-      this.$store.dispatch('setSource', { source: this.source.key === 'inbox' ? this.source.key : this.source.value });
     },
     createObjFiles(file, path, name) {
       if (!this.excludeFileName(name)) {

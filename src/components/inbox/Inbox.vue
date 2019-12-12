@@ -36,6 +36,7 @@ export default {
   watch: {
   },
   created() {
+    this.$store.dispatch('setSource', this.source);
   },
   mounted() {
   },
