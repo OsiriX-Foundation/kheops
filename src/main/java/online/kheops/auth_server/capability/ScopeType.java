@@ -8,6 +8,7 @@ import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import java.time.format.DateTimeParseException;
@@ -51,7 +52,11 @@ public enum ScopeType {
         public CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
                 throws CapabilityBadRequestException {
             if (albumId == null) {
-                throw new CapabilityBadRequestException("The {album} query parameter must be set");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Baq Query Parameter")
+                        .detail("'album' query parameter muste be set with an album id")
+                        .build();
+                throw new CapabilityBadRequestException(errorResponse);
             }
             return capabilityParametersBuilder.scope().albumScope(albumId);
         }
@@ -70,7 +75,11 @@ public enum ScopeType {
         @Override
         public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException {
             if (album == null) {
-                throw new CapabilityBadRequestException("\"album\" must be set");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Baq Query Parameter")
+                        .detail("'album' query parameter muste be set with an album id")
+                        .build();
+                throw new CapabilityBadRequestException(errorResponse);
             }
             capability.setAlbum(album);
             capability.setScopeType(this.name().toLowerCase());

@@ -39,8 +39,8 @@ public class Users {
                 userReference= keycloak.getUser(userReference).getSub();
             } catch (KeycloakException e) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Error during request the entity provider")
-                        .detail("An error occure during request the entity provider")
+                        .message("Error during request the authority provider")
+                        .detail("An error occure during request the authority provider")
                         .build();
                 throw new UserNotFoundException(errorResponse, e);
             }
@@ -74,8 +74,8 @@ public class Users {
             userReference = keycloak.getUser(userReference).getSub();
         } catch (KeycloakException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Error during request the entity provider")
-                    .detail("An error occure during request the entity provider")
+                    .message("Error during request the authority provider")
+                    .detail("An error occure during request the authority provider")
                     .build();
             throw new UserNotFoundException(errorResponse, e);
         }

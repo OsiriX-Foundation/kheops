@@ -1,13 +1,21 @@
 package online.kheops.auth_server.capability;
 
-public class NewCapabilityForbidden extends Exception {
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
 
-    public NewCapabilityForbidden(String message) {
-        super(message);
+public class NewCapabilityForbidden extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
+
+    public NewCapabilityForbidden() {
+        super();
+        this.errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message("Not admin")
+                .detail("Only an admin can generate a capability token for an album")
+                .build();
     }
 
-    public NewCapabilityForbidden(String message, Throwable e) {
-        super(message, e);
-    }
+    @Override
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 
 }

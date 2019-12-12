@@ -2,6 +2,7 @@ package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -23,7 +24,11 @@ public class CapabilitiesQueries {
             query.setParameter("secret", secret);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capability token search by secret not found", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Not Found")
+                    .detail("Capability token not found")
+                    .build();
+            throw new CapabilityNotFoundException(errorResponse);
         }
     }
 
@@ -36,7 +41,11 @@ public class CapabilitiesQueries {
             query.setParameter("capabilityId", capabilityId);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capability token : " + capabilityId + " not found with the user : " + user.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Not Found")
+                    .detail("Capability token not found")
+                    .build();
+            throw new CapabilityNotFoundException(errorResponse);
         }
     }
 
@@ -48,7 +57,11 @@ public class CapabilitiesQueries {
             query.setParameter("capabilityId", capabilityId);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new CapabilityNotFoundException("Capability token : " + capabilityId + "not found", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Not Found")
+                    .detail("Capability token not found")
+                    .build();
+            throw new CapabilityNotFoundException(errorResponse);
         }
     }
 

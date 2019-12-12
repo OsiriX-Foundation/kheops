@@ -5,6 +5,7 @@ import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -68,7 +69,11 @@ public class AlbumQueries {
                     .setParameter("albumID", albumID)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("SeriesInstanceUID : " + seriesUID + " not found in the album : " + albumID, e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist in the album")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 

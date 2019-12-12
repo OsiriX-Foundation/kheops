@@ -10,6 +10,7 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -92,7 +93,11 @@ public class UserResource {
 
         if(reference == null && search != null) {
             if (search.length() < 1) {
-                return Response.status(BAD_REQUEST).entity("'search' query param must have minimum 1 characters").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad Query Parameter")
+                        .detail("'search' query param must have minimum 1 characters")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
 
             kheopsLogBuilder.action(ActionType.USERS_LIST);
@@ -104,7 +109,11 @@ public class UserResource {
                     result = searchUsersInAlbum(search, albumId, limit, offset);
                 } else if (studyInstanceUID != null) {
                     if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                        return Response.status(NOT_FOUND).entity("StudyInstanceUID : " + studyInstanceUID + " not found").build();
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message("Study not found")
+                                .detail("The study does not exist or you don't have access")
+                                .build();
+                        return Response.status(NOT_FOUND).entity(errorResponse).build();
                     }
                     result = searchUsersInStudy(search, studyInstanceUID, limit, offset);
                 } else {
@@ -121,7 +130,7 @@ public class UserResource {
                 return Response.status(OK).entity(genericUsersResponsesList).build();
             } catch (KeycloakException e) {
                 LOG.log(Level.WARNING, "Keycloak error", e);
-                return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
+                return Response.status(BAD_GATEWAY).entity(e.getErrorResponse()).build();
             }
         } else if(reference != null && search == null) {
             final UserResponseBuilder userResponseBuilder;
@@ -144,7 +153,6 @@ public class UserResource {
                 kheopsLogBuilder.log();
                 return Response.status(OK).entity(userResponseBuilder.build()).build();
             } catch (UserNotFoundException e) {
-                LOG.log(Level.WARNING, "User not found", e);
                 return Response.status(NO_CONTENT).build();
             } catch (KeycloakException e) {
                 LOG.log(Level.WARNING, "Keycloak error", e);

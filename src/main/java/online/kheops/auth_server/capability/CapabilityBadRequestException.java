@@ -1,18 +1,17 @@
 package online.kheops.auth_server.capability;
 
-public class CapabilityBadRequestException extends Exception {
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
 
-    public CapabilityBadRequestException(String message) {
-        super(message);
+public class CapabilityBadRequestException extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
+
+    public CapabilityBadRequestException(ErrorResponse errorResponse) {
+        super();
+        this.errorResponse = errorResponse;
     }
 
-    public CapabilityBadRequestException() {
-        super("Bad request");
-    }
 
-    public CapabilityBadRequestException(String message, Throwable e) {
-        super(message, e);
-    }
-
-    public CapabilityBadRequestException(Throwable e) { super("Bad request", e); }
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 }

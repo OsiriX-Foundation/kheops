@@ -5,6 +5,7 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -52,7 +53,11 @@ public class SeriesQueries {
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found for the user :" + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist in your inbox")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -66,7 +71,11 @@ public class SeriesQueries {
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found in the album :" + album.getId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist in the album")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
     public static Series findSeriesByStudyUIDandSeriesUID(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em)
@@ -79,7 +88,11 @@ public class SeriesQueries {
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found all albums and inbox for the user :" + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -93,7 +106,11 @@ public class SeriesQueries {
             seriesQuery.setParameter("callingUser", callingUser);
             return seriesQuery.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found with share permission for the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist or you don't have the èermission to share it")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -106,7 +123,11 @@ public class SeriesQueries {
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -119,7 +140,11 @@ public class SeriesQueries {
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist in your album or you don't hae the permission to share it")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -132,7 +157,11 @@ public class SeriesQueries {
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("Series : " + series.getSeriesInstanceUID() + "not found inside the inbox of user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist in your inbox")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -157,7 +186,11 @@ public class SeriesQueries {
             query.setParameter("user", callingUser);
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found inside the album : " + album.getId() + " for the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study not found in the album")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -170,7 +203,11 @@ public class SeriesQueries {
             query.setParameter("user", callingUser);
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found inside the inbox of the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study not found in the inbox")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -183,7 +220,11 @@ public class SeriesQueries {
             query.setParameter("user", callingUser);
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found inside all album or inbox for the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study does not exist or you don't have access")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 }

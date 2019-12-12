@@ -87,7 +87,7 @@ public class Capabilities {
             final Album album = getAlbum(capabilityParameters.getAlbumId(), em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
             if (!albumUser.isAdmin()) {
-                throw new NewCapabilityForbidden("Only an admin can generate a capability token for an album");
+                throw new NewCapabilityForbidden();
             }
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)

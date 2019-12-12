@@ -4,6 +4,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -23,7 +24,11 @@ public class StudyQueries {
             query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study does not exist or you don't have access")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -36,7 +41,11 @@ public class StudyQueries {
             query.setParameter("user", user);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + study.getStudyInstanceUID() + " is not accessible by the user :" + user.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study does not exist or you don't have access")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -49,7 +58,11 @@ public class StudyQueries {
             query.setParameter("user", user);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + study.getStudyInstanceUID() + " is not in the inbox of the user :" + user.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study not found in the inbox")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -62,7 +75,11 @@ public class StudyQueries {
             query.setParameter("album", album);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + study.getStudyInstanceUID() + " is not in the album :" + album.getId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study not found in the album")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -75,7 +92,11 @@ public class StudyQueries {
             query.setParameter("album", album);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyUID + " is not in the album :" + album.getId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study not found in the album")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 }

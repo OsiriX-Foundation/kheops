@@ -1,11 +1,17 @@
 package online.kheops.auth_server.study;
 
-public class StudyNotFoundException extends Exception{
-    public StudyNotFoundException(String message) {
-        super(message);
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
+
+public class StudyNotFoundException extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
+
+    public StudyNotFoundException(ErrorResponse errorResponse) {
+
+        super();
+        this.errorResponse = errorResponse;
     }
 
-    public StudyNotFoundException(String message, Throwable e) {
-        super(message, e);
-    }
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 }

@@ -1,11 +1,15 @@
 package online.kheops.auth_server.series;
 
-public class SeriesNotFoundException extends Exception{
-    public SeriesNotFoundException(String message) {
-        super(message);
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
+
+public class SeriesNotFoundException extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
+
+    public SeriesNotFoundException (ErrorResponse errorResponse) {
+        this.errorResponse = errorResponse;
     }
 
-    public SeriesNotFoundException(String message, Throwable e) {
-        super(message, e);
-    }
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 }

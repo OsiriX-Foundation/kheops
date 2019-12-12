@@ -7,6 +7,7 @@ import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -57,7 +58,11 @@ public class CapabilitiesResource {
                                         @DefaultValue("false") @FormParam("write_permission") boolean writePermission) {
 
         if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
-            return Response.status(BAD_REQUEST).entity("Param 'title' is too long. max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length()).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Param 'title' is too long")
+                    .detail("max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length())
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
@@ -71,10 +76,18 @@ public class CapabilitiesResource {
 
         if (!readPermission) {
             if (appropriatePermission) {
-                return Response.status(BAD_REQUEST).entity("'appropriatePermission' is availble only if 'readPermission' is True").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad Query Parameter")
+                        .detail("'appropriatePermission' is availble only if 'readPermission' is True")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if (downloadPermission) {
-                return Response.status(BAD_REQUEST).entity("'downloadPermission' is availble only if 'readPermission' is True").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad Query Parameter")
+                        .detail("'downloadPermission' is availble only if 'readPermission' is True")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
         capabilityParametersBuilder.appropriatePermission(appropriatePermission)
@@ -83,23 +96,35 @@ public class CapabilitiesResource {
             try {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
             } catch (DateTimeParseException e) {
-                return Response.status(BAD_REQUEST).entity("Bad query parameter 'not_before_time'").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad Query Parameter")
+                        .detail("An error occured during parssing 'not_before_time'")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
         if(expirationTime != null) {
             try {
                 capabilityParametersBuilder.expirationTime(expirationTime);
             } catch (DateTimeParseException e) {
-                return Response.status(BAD_REQUEST).entity("Bad query parameter 'expiration_time'").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad Query Parameter")
+                        .detail("An error occured during parssing 'expiration_time'")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
         try {
             capabilityParametersBuilder.scope(scopeType, albumId);
         } catch (CapabilityBadRequestException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(BAD_REQUEST).entity("'scope_type' must be 'user' or 'album'. Not : "+scopeType).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Baq Query Parameter")
+                    .detail("'scope_type' must be 'user' or 'album'")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final CapabilityParameters capabilityParameters = capabilityParametersBuilder.build();
@@ -107,14 +132,11 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = generateCapability(capabilityParameters, kheopsPrincipal.getKheopsLogBuilder());
         } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
-            LOG.log(Level.WARNING, "Bad Request", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         } catch (NewCapabilityForbidden e) {
-            LOG.log(Level.WARNING, "Forbidden", e);
-            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+            return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
         } catch (CapabilityBadRequestException e) {
-            LOG.log(Level.WARNING, "Bad Request", e);
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(CREATED).entity(capabilityResponse).build();
@@ -134,8 +156,7 @@ public class CapabilitiesResource {
         try {
             capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId, kheopsPrincipal.getKheopsLogBuilder());
         } catch (CapabilityNotFoundException e) {
-            LOG.log(Level.WARNING, "Not Found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(OK).entity(capabilityResponse).build();
@@ -187,8 +208,7 @@ public class CapabilitiesResource {
         try {
             capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getUser());
         } catch (CapabilityNotFoundException e) {
-            LOG.log(Level.WARNING, "Not Found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
         kheopsPrincipal.getKheopsLogBuilder().action(ActionType.GET_CAPABILITY)
                 .capabilityID(capabilityTokenID)

@@ -7,6 +7,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -509,7 +510,11 @@ public class Studies {
                 kheopsLogBuilder.album(fromAlbumId);
             }
             if(seriesList.isEmpty()) {
-                throw new StudyNotFoundException("Study not found");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Study not found")
+                        .detail("Study does not exist or you don't have access")
+                        .build();
+                throw new StudyNotFoundException(errorResponse);
             }
 
             for(Series s: seriesList) {

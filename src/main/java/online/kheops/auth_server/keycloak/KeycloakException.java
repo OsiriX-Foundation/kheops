@@ -1,10 +1,24 @@
 package online.kheops.auth_server.keycloak;
 
-public class KeycloakException extends Exception{
-    public KeycloakException(String message) {
-        super(message);
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
+
+public class KeycloakException extends Exception implements KheopsException {
+
+    private ErrorResponse errorResponse;
+
+    public KeycloakException(ErrorResponse errorResponse) {
+
+        super();
+        this.errorResponse = errorResponse;
     }
-    public KeycloakException(String message, Throwable e) {
-        super(message, e);
+
+    public KeycloakException(ErrorResponse errorResponse, Throwable e) {
+
+        super(e);
+        this.errorResponse = errorResponse;
     }
+
+    @Override
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 }

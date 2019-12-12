@@ -7,6 +7,7 @@ import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -59,19 +60,27 @@ public class FavoriteResource {
                                         boolean favorite, SecurityContext securityContext) {
 
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
-            return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("Use album XOR inbox query param")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("The study does not exist or you don't have access")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         try {
             Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(NO_CONTENT).build();
@@ -111,19 +120,27 @@ public class FavoriteResource {
                                         boolean favorite, SecurityContext securityContext) {
 
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
-            return Response.status(BAD_REQUEST).entity("Use album XOR inbox query param").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("Use album XOR inbox query param")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         try {
             Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(NO_CONTENT).build();

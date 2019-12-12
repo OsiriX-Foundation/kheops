@@ -84,7 +84,7 @@ public class TokenResource
             return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
-            throw e;
+            throw e; //TODO and return ????
         }
     }
 
@@ -164,7 +164,7 @@ public class TokenResource
                 try {
                     capability = getCapabilityWithID(accessToken.getCapabilityTokenId().get());
                 } catch (CapabilityNotFoundException e) {
-                    return Response.status(BAD_REQUEST).build();
+                    return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
                 }
 
                 introspectResponse.setAlbumId(capability.getAlbum().getId());

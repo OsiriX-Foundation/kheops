@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
@@ -73,7 +74,11 @@ class PepAccessTokenGenerator {
         try {
             final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
             if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-                throw new SeriesNotFoundException("");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Series not found")
+                        .detail("The series does not exist or you don't have access")
+                        .build();
+                throw new SeriesNotFoundException(errorResponse);
             }
         } catch (SeriesNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "The user does not have access to the given StudyInstanceUID and SeriesInstanceUID pair", e);
