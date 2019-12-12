@@ -13,6 +13,7 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
 import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -77,7 +78,11 @@ public class ReportProviderResource {
                             @FormParam("name") @NotNull @NotEmpty final String name) {
 
         if ( !isValidConfigUrl(url)) {
-            return Response.status(BAD_REQUEST).entity("'url' formparam is not valid").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Baq Form Parameter")
+                    .detail("'url' formparam is not valid")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -86,7 +91,7 @@ public class ReportProviderResource {
         try {
             dicomSrResponse = ReportProviders.newReportProvider(kheopsPrincipal.getUser(), albumId, name, url, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(CREATED).entity(dicomSrResponse).build();
@@ -102,7 +107,11 @@ public class ReportProviderResource {
 
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
-                return Response.status(BAD_REQUEST).entity("Bad studyUID").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Baq Form Parameter")
+                        .detail("'studyUID' formparam is not valid")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
@@ -110,23 +119,35 @@ public class ReportProviderResource {
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
         } catch (AccessTokenVerificationException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Authorization error")
+                    .detail("error with the access_token")
+                    .build();
             LOG.log(Level.WARNING, "Error validating a token", e);
-            return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
         } catch (DownloadKeyException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Authorization error")
+                    .detail("Error downloading the public key")
+                    .build();
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
-            return Response.status(BAD_GATEWAY).entity("Error downloading the public key").build();
+            return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
         try {
             getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(UNAUTHORIZED).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
-        if (!  (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
+        if (! (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Authorization error")
+                    .detail("The token is not a user capability token or a keycloak token")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         final User callingUser;
@@ -134,7 +155,7 @@ public class ReportProviderResource {
             callingUser = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(UNAUTHORIZED).entity("User not found").build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
@@ -150,7 +171,11 @@ public class ReportProviderResource {
             albumId = reportProvider.getAlbum().getId();
         } catch (NoResultException e) {
             LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
-            return Response.status(NOT_FOUND).entity("Bad clientId").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Client ID not found")
+                    .detail("Client ID not found")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -167,18 +192,22 @@ public class ReportProviderResource {
             album = getAlbum(albumId);
             for (String uid : studyInstanceUIDs) {
                 if (!canAccessStudy(album, uid)) {
-                    return Response.status(NOT_FOUND).entity("StudyUID not found").build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Study not found")
+                            .detail("The study does not exist or you don't have access")
+                            .build();
+                    return Response.status(NOT_FOUND).entity(errorResponse).build();
                 }
             }
         } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         final String responseType;
         try {
             responseType = getResponseType(reportProvider);
         } catch (ReportProviderUriNotValidException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         }
 
         final String kheopsConfigUrl = getHostRoot() + "/api/.well-known/report-provider-configuration";
@@ -241,7 +270,11 @@ public class ReportProviderResource {
                         .toString();
 
             } else {
-                return Response.status(BAD_REQUEST).entity("bad response type").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad 'response type'")
+                        .detail("'response type' can be 'code' or 'token'")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
                     .action(ActionType.NEW_REPORT)
@@ -263,7 +296,7 @@ public class ReportProviderResource {
 
             return Response.status(OK).entity(html).build();
         } catch (ReportProviderUriNotValidException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (UnsupportedEncodingException e) {
             return Response.status(FORBIDDEN).entity("ERROR").build();
         }
@@ -310,7 +343,7 @@ public class ReportProviderResource {
         try {
             reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return  Response.status(OK).entity(reportProvider).build();
@@ -330,7 +363,7 @@ public class ReportProviderResource {
         try {
             deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return  Response.status(NO_CONTENT).build();
@@ -352,7 +385,11 @@ public class ReportProviderResource {
 
         if(!(url == null || url.isEmpty() )) {
             if(!isValidConfigUrl(url)) {
-                return Response.status(BAD_REQUEST).entity("url not valid").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Baq Form Parameter")
+                        .detail("'url' formparam is not valid")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
@@ -363,7 +400,7 @@ public class ReportProviderResource {
         try {
             reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return  Response.status(OK).entity(reportProvider).build();
@@ -376,7 +413,11 @@ public class ReportProviderResource {
     public Response testUri(@FormParam("url") final String url) {
 
         if (url == null || url.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("Missing formParam 'url'").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Baq Form Parameter")
+                    .detail("Missing formParam 'url'")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         ReportProviderClientMetadata clientMetadataResponse = new ReportProviderClientMetadata();

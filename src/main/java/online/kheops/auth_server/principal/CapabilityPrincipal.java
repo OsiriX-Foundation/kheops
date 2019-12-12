@@ -10,6 +10,7 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
@@ -255,7 +256,11 @@ public class CapabilityPrincipal implements KheopsPrincipal {
         if(getScope() == ScopeType.ALBUM) {
             return capability.getAlbum().getId();
         } else {
-            throw new NotAlbumScopeTypeException("");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error")
+                    .detail("this token is not an token with album scope")
+                    .build();
+            throw new NotAlbumScopeTypeException(errorResponse);
         }
     }
 

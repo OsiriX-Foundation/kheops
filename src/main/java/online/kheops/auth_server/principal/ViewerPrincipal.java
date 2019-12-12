@@ -12,6 +12,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
@@ -170,7 +171,11 @@ public class ViewerPrincipal implements KheopsPrincipal {
         } else if (!viewerAccessToken.isInbox()) {
             albumID = viewerAccessToken.getSourceId();
         } else {
-            throw new NotAlbumScopeTypeException("");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error")
+                    .detail("this token is not an token with album scope")
+                    .build();
+            throw new NotAlbumScopeTypeException(errorResponse);
         }
 
         if(kheopsPrincipal.hasAlbumAccess(albumID)) {

@@ -16,6 +16,7 @@ import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -70,12 +71,18 @@ public class SendingResource
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 if (fromInbox != null || (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID()))) {
-                    return Response.status(BAD_REQUEST).build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Baq Query Parameter")
+                            .detail("With an album capability token, 'inbox' and 'album' must not be set")
+                            .build();
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 } else if (fromAlbumId == null) {
                     request.getRequestDispatcher("/studies/" + studyInstanceUID + "/users/" + username + "?&album=" + kheopsPrincipal.getAlbumID()).forward(request, response);
                     return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
                 }
-            } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException e) {
+                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
+            } catch (IOException | ServletException e) {
                 LOG.log(WARNING, "Bad Request", e);
                 return Response.status(BAD_REQUEST).build();
             }
@@ -83,7 +90,11 @@ public class SendingResource
 
         if ((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) {
-            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Baq Query Parameter")
+                    .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         if(fromAlbumId != null) {
@@ -91,14 +102,17 @@ public class SendingResource
         }
 
         if(fromInbox && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
-            return Response.status(UNAUTHORIZED).entity("You can't send study:"+studyInstanceUID+" from inbox").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("Study not found in the inbox")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
         try {
             Sending.shareStudyWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, fromAlbumId, fromInbox, kheopsPrincipal.getKheopsLogBuilder());
         } catch (UserNotFoundException | AlbumNotFoundException | SeriesNotFoundException e) {
-            LOG.log(WARNING, "Not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         } catch (BadRequestException e) {
             LOG.log(WARNING, "Bad request", e);
             return Response.status(BAD_REQUEST).build();
@@ -117,14 +131,17 @@ public class SendingResource
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Series not found")
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
         try {
             Sending.shareSeriesWithUser(kheopsPrincipal.getUser(), username, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (UserNotFoundException | SeriesNotFoundException e) {
-            LOG.log(WARNING, "not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(CREATED).build();
@@ -146,30 +163,44 @@ public class SendingResource
                 LOG.log(WARNING, "forbidden", e);
                 return Response.status(FORBIDDEN).build();
             } catch (UserNotFoundException e) {
-                LOG.log(WARNING, "user not found", e);
-                return Response.status(FORBIDDEN).build();
+                return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
             if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Series not found")
+                        .detail("The series does not exist or you don't have access")
+                        .build();
+                return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Forbidden")
+                        .detail("The token in the header 'X-Authorization-Source' is not a capability token")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
 
             final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
             if (optionalCapability.isPresent()) {
                 final Capability capability = optionalCapability.get();
                 if (!capability.hasAppropriatePermission()) {
-                    return Response.status(FORBIDDEN).build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Forbidden")
+                            .detail("The token in the header 'X-Authorization-Source' as not the appropriate permission")
+                            .build();
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             }
 
         } else {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Series not found")
+                        .detail("The series does not exist or you don't have access")
+                        .build();
+                return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
         }
 
@@ -179,15 +210,17 @@ public class SendingResource
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
                     Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
-                    LOG.warning(() -> "Principal:" + kheopsPrincipal + " does not have write access to albumID:" + albumID);
-                    return Response.status(FORBIDDEN).entity("No write access with this credential").build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Forbidden")
+                            .detail("No write access with this credential")
+                            .build();
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             } else {
                 Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException | ClientIdNotFoundException e) {
-            LOG.log(WARNING, "Unable to add series", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
         return Response.status(CREATED).build();
 
