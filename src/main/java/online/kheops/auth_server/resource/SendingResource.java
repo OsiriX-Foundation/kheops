@@ -138,10 +138,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        boolean fromToken;
-
         if (headerXAuthorizationSource != null) {
-            fromToken = true;
             final KheopsPrincipal tokenPrincipal;
             try {
                 tokenPrincipal = getPrincipalFromHeadersXTokenSource(headerXAuthorizationSource);
@@ -170,7 +167,6 @@ public class SendingResource
             }
 
         } else {
-            fromToken = false;
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                 LOG.warning(() -> "Principal " + kheopsPrincipal + ", does not have write access");
                 return Response.status(FORBIDDEN).build();
@@ -187,7 +183,7 @@ public class SendingResource
                     return Response.status(FORBIDDEN).entity("No write access with this credential").build();
                 }
             } else {
-                Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromToken, kheopsPrincipal.getKheopsLogBuilder());
+                Sending.appropriateSeries(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException | ClientIdNotFoundException e) {
             LOG.log(WARNING, "Unable to add series", e);

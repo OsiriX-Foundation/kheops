@@ -384,7 +384,7 @@ public class Sending {
                     .series(seriesInstanceUID);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, false, kheopsLogBuilder);
+                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, kheopsLogBuilder);
             }
 
             final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
@@ -411,7 +411,7 @@ public class Sending {
         }
     }
 
-    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, boolean fromToken, KheopsLogBuilder kheopsLogBuilder)
+    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -429,9 +429,8 @@ public class Sending {
             try {
                 final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-
-                if(isOrphan(storedSeries, em) || fromToken) {
-                    //here the series exists but she is orphan or it's an appropriate from an album capability token
+                if(isOrphan(storedSeries, em)) {
+                    //here the series exists but she is orphan
                     final Album inbox = callingUser.getInbox();
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
                     storedSeries.addAlbumSeries(inboxSeries);
