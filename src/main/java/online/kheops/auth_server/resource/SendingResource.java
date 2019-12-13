@@ -245,15 +245,23 @@ public class SendingResource
                 return Response.status(FORBIDDEN).build();
             } catch (UserNotFoundException e) {
                 LOG.log(WARNING, "user not found", e);
-                return Response.status(FORBIDDEN).build();
+                return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
             if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Study not found")
+                        .detail("The study does not exist or you don't have access")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Forbidden")
+                        .detail("The token in the header 'X-Authorization-Source' is not a capability token")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
 
             final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
@@ -263,14 +271,22 @@ public class SendingResource
                     return Response.status(FORBIDDEN).build();
                 }
                 if (albumId != null) {
-                    return Response.status(BAD_REQUEST).build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Bad Query Parameter")
+                            .detail("With the header 'X-Authorization-Source' the query parameter 'album' must not be set")
+                            .build();
+                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
                 }
                 albumId = capability.getAlbum().getId();
             }
 
         } else {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Study not found")
+                        .detail("The study does not exist or you don't have access with the appropriate permission")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
         }
 
@@ -280,14 +296,18 @@ public class SendingResource
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
                     Sending.putStudyInAlbum(kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
-                    return Response.status(FORBIDDEN).entity("No write access with this credential").build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Authorization error")
+                            .detail("No write access with this credential")
+                            .build();
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             } else {
                 Sending.appropriateStudy(kheopsPrincipal.getUser(), studyInstanceUID, albumId, kheopsPrincipal.getKheopsLogBuilder());
             }
         } catch (AlbumNotFoundException | NotAlbumScopeTypeException | SeriesNotFoundException e) {
             LOG.log(WARNING, "Not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
         return Response.status(CREATED).build();
     }
@@ -313,7 +333,11 @@ public class SendingResource
         }
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Study not found")
+                    .detail("The study does not exist or you don't have access with the delete permission")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
@@ -321,25 +345,25 @@ public class SendingResource
                 String albumId = kheopsPrincipal.getAlbumID();
                 if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
                     Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-                    LOG.info(() -> "finished removing StudyInstanceUID:"+studyInstanceUID+" from albumId "+albumId);
                     return Response.status(NO_CONTENT).build();
                 } else {
-                    return Response.status(FORBIDDEN).build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Authorization error")
+                            .detail("The token not allow you to delete a study")
+                            .build();
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             } catch (NotAlbumScopeTypeException e) {
-                LOG.log(WARNING, "Bad request", e);
-                return Response.status(BAD_REQUEST).build();
+                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
             } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-                LOG.log(WARNING, "Not found", e);
-                return Response.status(NOT_FOUND).build();
+                return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
             }
         }
 
         try {
             Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (SeriesNotFoundException e) {
-            LOG.log(WARNING, "Series not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
         return Response.status(NO_CONTENT).build();
     }
@@ -359,14 +383,23 @@ public class SendingResource
             try {
                 request.getRequestDispatcher("/studies/" + studyInstanceUID + "/series/" + seriesInstanceUID + "/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
-            } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
-                LOG.log(WARNING, "bad request", e);
-                return Response.status(BAD_REQUEST).build();
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException e) {
+                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
+            } catch (IOException | ServletException e) {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("error")
+                        .detail(e.getMessage())
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Authorization error")
+                    .detail("The token not allow you to delete a study")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
@@ -374,25 +407,25 @@ public class SendingResource
                 String albumId = kheopsPrincipal.getAlbumID();
                 if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
                     Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-                    LOG.info(() -> "finished removing StudyInstanceUID:" + studyInstanceUID + " SeriesInstanceUID:" + seriesInstanceUID + " from albumId " + albumId);
                     return Response.status(NO_CONTENT).build();
                 } else {
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Authorization error")
+                            .detail("The token not allow you to delete a study")
+                            .build();
                     return Response.status(FORBIDDEN).build();
                 }
             } catch (NotAlbumScopeTypeException e) {
-                LOG.log(WARNING, "bad scope type", e);
-                return Response.status(BAD_REQUEST).build();
+                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
             } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-                LOG.log(WARNING, "not found", e);
-                return Response.status(NOT_FOUND).build();
+                return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
             }
         }
 
         try {
             Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (SeriesNotFoundException e) {
-            LOG.log(WARNING, "series not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
         return Response.status(NO_CONTENT).build();
     }
@@ -533,8 +566,7 @@ public class SendingResource
         try {
             Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-            LOG.log(WARNING, "not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(NO_CONTENT).build();
@@ -554,8 +586,7 @@ public class SendingResource
         try {
             Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-            LOG.log(WARNING, "not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(NO_CONTENT).build();
