@@ -508,6 +508,11 @@ public class Sending {
 
             final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
+            if(isSeriesInInbox(callingUser, storedSeries, em)) {
+                kheopsLogBuilder.log();
+                return;
+            }
+
             final Album inbox = callingUser.getInbox();
             final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
             storedSeries.addAlbumSeries(inboxSeries);
