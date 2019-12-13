@@ -2,6 +2,7 @@ package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.UserAccessSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -17,12 +18,17 @@ import static online.kheops.auth_server.util.Consts.USER_ACCESS_PRIORITY;
 @Priority(USER_ACCESS_PRIORITY)
 public class UserAccessSecuredFilter implements ContainerRequestFilter {
 
+    final private static ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+            .message("Authorization error")
+            .detail("You don't have the permission to do this with this type of token")
+            .build();
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)requestContext.getSecurityContext().getUserPrincipal());
 
         if (!kheopsPrincipal.hasUserAccess()) {
-            requestContext.abortWith(Response.status(FORBIDDEN).build());
+            requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).build());
         }
     }
 }

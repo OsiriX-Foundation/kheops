@@ -2,6 +2,7 @@ package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -18,6 +19,11 @@ import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
 @Provider
 @Priority(ALBUM_ACCESS_PRIORITY)
 public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
+
+    final private static ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+            .message("Album not found")
+            .detail("The album does not exist or you don't have access")
+            .build();
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -40,7 +46,7 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
     private void tryAccess(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
 
         if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
-            requestContext.abortWith(Response.status(NOT_FOUND).entity("Album ID : " + albumID + " Not Found").build());
+            requestContext.abortWith(Response.status(NOT_FOUND).entity(errorResponse).build());
         }
     }
 }

@@ -3,6 +3,7 @@ package online.kheops.auth_server.filter;
 import online.kheops.auth_server.annotation.AlbumPermissionSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -20,6 +21,11 @@ import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIO
 
 @Provider
 public class AlbumPermissionFilterFactory implements DynamicFeature {
+
+    final private static ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+            .message("Authorization error")
+            .detail("You don't have the permission to do this on this album")
+            .build();
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
@@ -63,7 +69,7 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
             if (queryParam.containsKey(ALBUM)) {
                 final String albumID = queryParam.get(ALBUM).get(0);
                 if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                    requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : Forbidden").build());
+                    requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).build());
                 }
             }
             }
@@ -89,7 +95,7 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
                 if (pathParam.containsKey(ALBUM)) {
                     final String albumID = pathParam.get(ALBUM).get(0);
                     if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                        requestContext.abortWith(Response.status(FORBIDDEN).entity("Album ID : Forbidden").build());
+                        requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).build());
                     }
                 }
             }
