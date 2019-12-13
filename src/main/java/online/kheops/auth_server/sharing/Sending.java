@@ -491,6 +491,40 @@ public class Sending {
         }
     }
 
+    public static void appropriateSeriesFromToken(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+            throws SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            callingUser = em.merge(callingUser);
+
+            kheopsLogBuilder.study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .action(ActionType.APPROPRIATE_SERIES);
+
+            final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
+
+            final Album inbox = callingUser.getInbox();
+            final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
+            storedSeries.addAlbumSeries(inboxSeries);
+            inbox.addSeries(inboxSeries);
+            em.persist(inboxSeries);
+            tx.commit();
+
+            kheopsLogBuilder.log();
+
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+
     public static void appropriateStudy(User callingUser, String studyInstanceUID, String albumId, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException {
 

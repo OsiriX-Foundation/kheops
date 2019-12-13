@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -192,6 +193,13 @@ public class SendingResource
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
+            }
+
+            try {
+                Sending.appropriateSeriesFromToken(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                return Response.status(CREATED).build();
+            } catch (SeriesNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
             }
 
         } else {
