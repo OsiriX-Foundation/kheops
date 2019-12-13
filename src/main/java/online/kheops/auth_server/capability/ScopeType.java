@@ -53,7 +53,7 @@ public enum ScopeType {
                 throws CapabilityBadRequestException {
             if (albumId == null) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Baq Query Parameter")
+                        .message("Bad Query Parameter")
                         .detail("'album' query parameter muste be set with an album id")
                         .build();
                 throw new CapabilityBadRequestException(errorResponse);
@@ -76,7 +76,7 @@ public enum ScopeType {
         public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException {
             if (album == null) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Baq Query Parameter")
+                        .message("Bad Query Parameter")
                         .detail("'album' query parameter muste be set with an album id")
                         .build();
                 throw new CapabilityBadRequestException(errorResponse);

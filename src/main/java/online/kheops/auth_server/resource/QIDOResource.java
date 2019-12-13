@@ -75,7 +75,7 @@ public class QIDOResource {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Query Parameter")
+                    .message("Bad Query Parameter")
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -169,7 +169,7 @@ public class QIDOResource {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Query Parameter")
+                    .message("Bad Query Parameter")
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -182,14 +182,14 @@ public class QIDOResource {
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Baq Query Parameter")
+                        .message("Bad Query Parameter")
                         .detail("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if(favoriteFilter != null) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Baq Query Parameter")
+                        .message("Bad Query Parameter")
                         .detail("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={album_ID} as query param")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -375,7 +375,7 @@ public class QIDOResource {
 
         if ((fromAlbumId != null && fromInbox != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Query Parameter")
+                    .message("Bad Query Parameter")
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();

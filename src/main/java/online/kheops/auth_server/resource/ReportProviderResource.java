@@ -79,7 +79,7 @@ public class ReportProviderResource {
 
         if ( !isValidConfigUrl(url)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Form Parameter")
+                    .message("Bad Form Parameter")
                     .detail("'url' formparam is not valid")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -108,7 +108,7 @@ public class ReportProviderResource {
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Baq Form Parameter")
+                        .message("Bad Form Parameter")
                         .detail("'studyUID' formparam is not valid")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -386,7 +386,7 @@ public class ReportProviderResource {
         if(!(url == null || url.isEmpty() )) {
             if(!isValidConfigUrl(url)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Baq Form Parameter")
+                        .message("Bad Form Parameter")
                         .detail("'url' formparam is not valid")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -414,7 +414,7 @@ public class ReportProviderResource {
 
         if (url == null || url.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Form Parameter")
+                    .message("Bad Form Parameter")
                     .detail("Missing formParam 'url'")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();

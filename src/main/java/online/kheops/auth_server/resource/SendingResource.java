@@ -72,7 +72,7 @@ public class SendingResource
             try {
                 if (fromInbox != null || (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID()))) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Baq Query Parameter")
+                            .message("Bad Query Parameter")
                             .detail("With an album capability token, 'inbox' and 'album' must not be set")
                             .build();
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -91,7 +91,7 @@ public class SendingResource
         if ((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Query Parameter")
+                    .message("Bad Query Parameter")
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -326,8 +326,10 @@ public class SendingResource
             try {
                 request.getRequestDispatcher("/studies/" + studyInstanceUID + "/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
-            } catch (NotAlbumScopeTypeException | AlbumNotFoundException | IOException | ServletException e) {
-                LOG.log(WARNING, "Bad request", e);
+            } catch (NotAlbumScopeTypeException | AlbumNotFoundException e) {
+                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
+            } catch (IOException | ServletException e) {
+                LOG.log(WARNING, "Bad Request", e);
                 return Response.status(BAD_REQUEST).build();
             }
         }
@@ -386,11 +388,8 @@ public class SendingResource
             } catch (NotAlbumScopeTypeException | AlbumNotFoundException e) {
                 return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
             } catch (IOException | ServletException e) {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("error")
-                        .detail(e.getMessage())
-                        .build();
-                return Response.status(BAD_REQUEST).entity(errorResponse).build();
+                LOG.log(WARNING, "Bad Request", e);
+                return Response.status(BAD_REQUEST).build();
             }
         }
 
@@ -413,7 +412,7 @@ public class SendingResource
                             .message("Authorization error")
                             .detail("The token not allow you to delete a study")
                             .build();
-                    return Response.status(FORBIDDEN).build();
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             } catch (NotAlbumScopeTypeException e) {
                 return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
@@ -451,35 +450,50 @@ public class SendingResource
                 return Response.status(FORBIDDEN).build();
             } catch (UserNotFoundException e) {
                 LOG.log(WARNING, "user not found", e);
-                return Response.status(FORBIDDEN).build();
+                return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
             if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Series not found")
+                        .detail("The series does not exist or you don't have access")
+                        .build();
+                return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Forbidden")
+                        .detail("The token in the header 'X-Authorization-Source' is not a capability token")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
             final Optional<Capability> optionalCapability = tokenPrincipal.getCapability();
             if (optionalCapability.isPresent()) {
                 final Capability capability = optionalCapability.get();
                 if (!capability.hasAppropriatePermission()) {
-                    return Response.status(FORBIDDEN).build();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Forbidden")
+                            .detail("The token in the header 'X-Authorization-Source' as not the appropriate permission")
+                            .build();
+                    return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             }
 
         } else {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Series not found")
+                        .detail("The series does not exist or you don't have the send permission")
+                        .build();
+                return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
         }
 
         try {
             Sending.putSeriesInAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
-            LOG.log(WARNING, "Album not found", e);
-            return Response.status(NOT_FOUND).build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
 
@@ -501,7 +515,11 @@ public class SendingResource
 
         if (((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) && headerXAuthorizationSource == null) {
-            return Response.status(BAD_REQUEST).entity("Use only {"+ALBUM+"} xor {"+INBOX+"}").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Bad Query Parameter")
+                    .detail("Use 'album' xor 'inbox' query param")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         if(fromAlbumId != null) {
@@ -518,8 +536,7 @@ public class SendingResource
                 LOG.log(WARNING, "verification error", e);
                 return Response.status(FORBIDDEN).build();
             } catch (UserNotFoundException e) {
-                LOG.log(WARNING, "user not found", e);
-                return Response.status(FORBIDDEN).build();
+                return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
             if (tokenPrincipal.getScope() == ScopeType.ALBUM)
@@ -527,19 +544,30 @@ public class SendingResource
                 try {
                     fromAlbumId = tokenPrincipal.getAlbumID();
                     if (!tokenPrincipal.hasAlbumPermission(SEND_SERIES, fromAlbumId)) {
-                        return Response.status(FORBIDDEN).build();
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message("Authorization error")
+                                .detail("The token not allow you to send a study")
+                                .build();
+                        return Response.status(FORBIDDEN).entity(errorResponse).build();
                     }
                     if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-                        return Response.status(FORBIDDEN).build();
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message("Study not found")
+                                .detail("The study does not exist or you don't have access")
+                                .build();
+                        return Response.status(NOT_FOUND).entity(errorResponse).build();
                     }
 
                 } catch (AlbumNotFoundException | NotAlbumScopeTypeException e) {
-                    throw new IllegalStateException(e);
+                    return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
                 }
             } else {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Authorization error")
+                        .detail("The token in the header 'X-Authorization-Source' must be an album token")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
-
         }
 
         try {

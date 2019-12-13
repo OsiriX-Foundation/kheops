@@ -121,7 +121,7 @@ public class CapabilitiesResource {
             return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (IllegalArgumentException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Baq Query Parameter")
+                    .message("Bad Query Parameter")
                     .detail("'scope_type' must be 'user' or 'album'")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
