@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 <i18n>
 {
   "en": {
