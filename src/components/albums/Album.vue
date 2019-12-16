@@ -280,15 +280,7 @@ export default {
   },
   watch: {
     albumID() {
-      this.loading = true;
-      this.loadAlbum().then(() => {
-        this.loading = false;
-      });
-      const source = {
-        key: 'album',
-        value: this.albumID,
-      };
-      this.$store.dispatch('setSource', source);
+      this.initAlbum();
     },
     currentView() {
       if (this.currentView !== undefined) {
@@ -302,26 +294,28 @@ export default {
     },
   },
   created() {
-    this.loading = true;
-    this.loadAlbum().then((res) => {
-      if (res !== undefined && res.status === 200) {
-        if (this.album.is_admin === true) {
-          this.getTokens();
-        }
-        this.loading = false;
-      }
-    });
-    const source = {
-      key: 'album',
-      value: this.albumID,
-    };
-    this.$store.dispatch('setSource', source);
-  },
-  beforeDestroy() {
-    this.$store.commit('INIT_ALBUM');
-    this.$store.commit('INIT_ALBUM_USERS');
+    this.initAlbum();
   },
   methods: {
+    initAlbum() {
+      this.$store.commit('INIT_ALBUM');
+      this.$store.commit('INIT_ALBUM_USERS');
+      this.$store.commit('INIT_TOKENS');
+      this.loading = true;
+      this.loadAlbum().then((res) => {
+        if (res !== undefined && res.status === 200) {
+          if (this.album.is_admin === true) {
+            this.getTokens();
+          }
+          this.loading = false;
+        }
+      });
+      const source = {
+        key: 'album',
+        value: this.albumID,
+      };
+      this.$store.dispatch('setSource', source);
+    },
     getTokens() {
       const queries = {
         valid: this.validParamsToken,
