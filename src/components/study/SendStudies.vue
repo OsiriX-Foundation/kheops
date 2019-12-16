@@ -236,12 +236,11 @@
             <span
               v-if="sourceIsAlbum"
             >
-              <a
-                href="#"
-                @click="goToAlbum()"
+              <router-link
+                :to="{ name: 'album', params: { album_id: this.sourceSending.value }}"
               >
                 {{ $t("album") }}
-              </a>
+              </router-link>
             </span>
 
             <span
@@ -408,14 +407,14 @@ export default {
       files: 'files',
       totalSize: 'totalSize',
       error: 'error',
-      source: 'source',
+      sourceSending: 'sourceSending',
       studyUIDToSend: 'studyUIDToSend',
     }),
     totalSizeFiles() {
       return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
     },
     sourceIsAlbum() {
-      return (this.source.key !== 'inbox' && this.source !== undefined && Object.keys(this.source).length > 0);
+      return (this.sourceSending.key !== 'inbox' && this.sourceSending !== undefined && Object.keys(this.sourceSending).length > 0);
     },
   },
   watch: {
@@ -441,9 +440,6 @@ export default {
     retry() {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files: this.error });
-    },
-    goToAlbum() {
-      this.$router.push(`/albums/${this.source}`);
     },
     closeWindow() {
       this.UI.show = !this.UI.show;
@@ -535,7 +531,7 @@ export default {
       return new Promise((resolve, reject) => {
         const formData = new FormData();
         formData.append(idFile, data);
-        const request = `/studies${this.sourceIsAlbum ? `?${this.source.key}=${this.source.value}` : ''}`;
+        const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
         HTTP.post(request, data, this.config.dicomizeData).then((res) => {
           resolve(res);
         }).catch((err) => {
@@ -598,7 +594,7 @@ export default {
         if (!this.UI.cancel && this.files.length > 0) {
           const formData = this.createFormData(files);
           this.currentFilesLength = files.length;
-          const request = `/studies${this.sourceIsAlbum ? `?${this.source.key}=${this.source.value}` : ''}`;
+          const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
           HTTP.post(request, formData, this.config.formData).then((res) => {
             this.manageResult(files, res.data, res.status);
             resolve(res);

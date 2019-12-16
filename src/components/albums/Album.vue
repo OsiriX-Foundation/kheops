@@ -260,6 +260,11 @@ export default {
       this.loadAlbum().then(() => {
         this.loading = false;
       });
+      const source = {
+        key: 'album',
+        value: this.albumID,
+      };
+      this.$store.dispatch('setSource', source);
     },
     currentView() {
       if (this.currentView !== undefined) {
