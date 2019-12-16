@@ -67,10 +67,13 @@ public abstract class JOOQTools {
         return OptionalInt.of(offset);
     }
 
-
     public static void checkDate(String date) throws BadQueryParametersException {
         if (!date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
-            throw new BadQueryParametersException("Bad date format : yyyyMMdd");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("Bad date format : yyyyMMdd")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
     }
 
@@ -78,11 +81,16 @@ public abstract class JOOQTools {
             throws BadQueryParametersException {
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
+        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message(BAD_QUERY_PARAMETER)
+                .detail("Bad date format : yyyyMMdd")
+                .build();
+
         if (parameter.contains("-")) {
             String[] parameters = parameter.split("-");
-            if (parameters.length == 2) {
+            if (parameters.length == 2) { //case yyyyMMdd-yyyyMMdd
                 try {
-                    if(parameters[0].length() == 0) {
+                    if(parameters[0].length() == 0) {//case -yyyyMMdd = all before yyyyMMdd
                         parameters[0] = "00010101";
                     }
                     checkDate(parameters[0]);
@@ -93,10 +101,10 @@ public abstract class JOOQTools {
                     Date parsedDateEnd = dateFormat.parse(parameters[1] + "235959");
                     Timestamp end = new java.sql.Timestamp(parsedDateEnd.getTime());
                     return column.between(begin, end);
-                } catch (ParseException | BadQueryParametersException e) {
-                    throw new BadQueryParametersException(column.getName() + ": " + parameter);
+                } catch (ParseException e) {
+                    throw new BadQueryParametersException(errorResponse);
                 }
-            } else if(parameters.length == 1) {
+            } else if(parameters.length == 1) { //case yyyyMMdd- = all after yyyyMMdd
                 try {
                 checkDate(parameters[0]);
                 Date parsedDateBegin = dateFormat.parse(parameters[0]+"000000");
@@ -104,13 +112,13 @@ public abstract class JOOQTools {
                 Date parsedDateEnd = dateFormat.parse("99991231235959");
                 Timestamp end = new java.sql.Timestamp(parsedDateEnd.getTime());
                 return column.between(begin, end);
-                } catch (ParseException | BadQueryParametersException e) {
-                    throw new BadQueryParametersException(column.getName() + ": " + parameter);
+                } catch (ParseException e) {
+                    throw new BadQueryParametersException(errorResponse);
                 }
             } else {
-                throw new BadQueryParametersException(column.getName() + ": " + parameter);
+                throw new BadQueryParametersException(errorResponse);
             }
-        } else {
+        } else {  //case only at this date yyyyMMdd
             try {
                 checkDate(parameter);
                 Date parsedDateBegin = dateFormat.parse(parameter+"000000");
@@ -118,8 +126,8 @@ public abstract class JOOQTools {
                 Date parsedDateEnd = dateFormat.parse(parameter+"235959");
                 Timestamp end = new java.sql.Timestamp(parsedDateEnd.getTime());
                 return column.between(begin, end);
-            } catch (ParseException | BadQueryParametersException e) {
-                throw new BadQueryParametersException(column.getName() + ": " + parameter);
+            } catch (ParseException e) {
+                throw new BadQueryParametersException(errorResponse);
             }
         }
     }
