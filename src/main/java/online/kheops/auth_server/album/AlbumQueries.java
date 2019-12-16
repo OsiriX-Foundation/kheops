@@ -26,6 +26,7 @@ import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
@@ -70,7 +71,7 @@ public class AlbumQueries {
                     .getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist in the album")
                     .build();
             throw new SeriesNotFoundException(errorResponse);

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 
 class PepAccessTokenGenerator {
     private static final Logger LOG = Logger.getLogger(PepAccessTokenGenerator.class.getName());
@@ -75,7 +76,7 @@ class PepAccessTokenGenerator {
             final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
             if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
                         .build();
                 throw new SeriesNotFoundException(errorResponse);

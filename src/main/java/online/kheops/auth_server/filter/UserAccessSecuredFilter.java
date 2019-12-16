@@ -12,6 +12,7 @@ import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static online.kheops.auth_server.util.Consts.USER_ACCESS_PRIORITY;
+import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 
 @UserAccessSecured
 @Provider
@@ -19,7 +20,7 @@ import static online.kheops.auth_server.util.Consts.USER_ACCESS_PRIORITY;
 public class UserAccessSecuredFilter implements ContainerRequestFilter {
 
     private static final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-            .message("Authorization error")
+            .message(AUTHORIZATION_ERROR)
             .detail("You don't have the permission to do this with this type of token")
             .build();
 

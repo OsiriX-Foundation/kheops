@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 
 public class SeriesQueries {
 
@@ -54,7 +56,7 @@ public class SeriesQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist in your inbox")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -72,7 +74,7 @@ public class SeriesQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist in the album")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -89,7 +91,7 @@ public class SeriesQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -107,7 +109,7 @@ public class SeriesQueries {
             return seriesQuery.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have the èermission to share it")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -124,7 +126,7 @@ public class SeriesQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -141,7 +143,7 @@ public class SeriesQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist in your album or you don't hae the permission to share it")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -158,7 +160,7 @@ public class SeriesQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist in your inbox")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
@@ -187,7 +189,7 @@ public class SeriesQueries {
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the album")
                     .build();
             throw new StudyNotFoundException(errorResponse);
@@ -204,7 +206,7 @@ public class SeriesQueries {
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the inbox")
                     .build();
             throw new StudyNotFoundException(errorResponse);
@@ -221,7 +223,7 @@ public class SeriesQueries {
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study does not exist or you don't have access")
                     .build();
             throw new StudyNotFoundException(errorResponse);

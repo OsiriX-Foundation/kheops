@@ -9,6 +9,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 
@@ -53,7 +54,7 @@ public final class AlbumQueryParams {
             orderBy = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
             if (!ACCEPTED_VALUES_FOR_SORTING.contains(orderBy)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("'sort' can only be : " + ACCEPTED_VALUES_FOR_SORTING_ARRAY)
                         .build();
                 throw new BadQueryParametersException(errorResponse);

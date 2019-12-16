@@ -15,6 +15,7 @@ import java.time.format.DateTimeParseException;
 
 import static online.kheops.auth_server.capability.Capabilities.createAlbumCapability;
 import static online.kheops.auth_server.capability.Capabilities.createUserCapability;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 public enum ScopeType {
     USER {
@@ -53,7 +54,7 @@ public enum ScopeType {
                 throws CapabilityBadRequestException {
             if (albumId == null) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("'album' query parameter muste be set with an album id")
                         .build();
                 throw new CapabilityBadRequestException(errorResponse);
@@ -76,7 +77,7 @@ public enum ScopeType {
         public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws CapabilityBadRequestException {
             if (album == null) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("'album' query parameter muste be set with an album id")
                         .build();
                 throw new CapabilityBadRequestException(errorResponse);

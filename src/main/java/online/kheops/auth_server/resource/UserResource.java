@@ -33,6 +33,8 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
 import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 
 @Path("/")
 public class UserResource {
@@ -94,7 +96,7 @@ public class UserResource {
         if(reference == null && search != null) {
             if (search.length() < 1) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("'search' query param must have minimum 1 characters")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -110,7 +112,7 @@ public class UserResource {
                 } else if (studyInstanceUID != null) {
                     if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                                .message("Study not found")
+                                .message(STUDY_NOT_FOUND)
                                 .detail("The study does not exist or you don't have access")
                                 .build();
                         return Response.status(NOT_FOUND).entity(errorResponse).build();

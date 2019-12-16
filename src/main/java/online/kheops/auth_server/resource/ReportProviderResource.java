@@ -46,6 +46,7 @@ import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.Tools.checkValidUID;
 
@@ -79,7 +80,7 @@ public class ReportProviderResource {
 
         if ( !isValidConfigUrl(url)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Form Parameter")
+                    .message(BAD_FORM_PARAMETER)
                     .detail("'url' formparam is not valid")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -108,7 +109,7 @@ public class ReportProviderResource {
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Form Parameter")
+                        .message(BAD_FORM_PARAMETER)
                         .detail("'studyUID' formparam is not valid")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -120,14 +121,14 @@ public class ReportProviderResource {
             accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
         } catch (AccessTokenVerificationException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("error with the access_token")
                     .build();
             LOG.log(Level.WARNING, "Error validating a token", e);
             return Response.status(UNAUTHORIZED).entity(errorResponse).build();
         } catch (DownloadKeyException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("Error downloading the public key")
                     .build();
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
@@ -144,7 +145,7 @@ public class ReportProviderResource {
         if (! (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("The token is not a user capability token or a keycloak token")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -193,7 +194,7 @@ public class ReportProviderResource {
             for (String uid : studyInstanceUIDs) {
                 if (!canAccessStudy(album, uid)) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Study not found")
+                            .message(STUDY_NOT_FOUND)
                             .detail("The study does not exist or you don't have access")
                             .build();
                     return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -386,7 +387,7 @@ public class ReportProviderResource {
         if(!(url == null || url.isEmpty() )) {
             if(!isValidConfigUrl(url)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Form Parameter")
+                        .message(BAD_FORM_PARAMETER)
                         .detail("'url' formparam is not valid")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -414,7 +415,7 @@ public class ReportProviderResource {
 
         if (url == null || url.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Form Parameter")
+                    .message(BAD_FORM_PARAMETER)
                     .detail("Missing formParam 'url'")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();

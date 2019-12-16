@@ -45,6 +45,7 @@ import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
@@ -75,7 +76,7 @@ public class QIDOResource {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -86,7 +87,7 @@ public class QIDOResource {
 
         if(fromInbox != null && fromInbox && !kheopsPrincipal.hasUserAccess()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("This authorization is not available for access to the inbox")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -169,7 +170,7 @@ public class QIDOResource {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -182,14 +183,14 @@ public class QIDOResource {
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if(favoriteFilter != null) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={album_ID} as query param")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -224,7 +225,7 @@ public class QIDOResource {
         //BEGIN kheopsPrincipal
         if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("This authorization is not available for access to the inbox")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -233,7 +234,7 @@ public class QIDOResource {
         try {
             if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Authorization error")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("This authorization is not available for access to this album")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -375,7 +376,7 @@ public class QIDOResource {
 
         if ((fromAlbumId != null && fromInbox != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -390,7 +391,7 @@ public class QIDOResource {
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")
                     .build();
             return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -399,7 +400,7 @@ public class QIDOResource {
         //BEGIN kheopsPrincipal
         if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("This authorization is not available for access to the inbox")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -408,7 +409,7 @@ public class QIDOResource {
         try {
             if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Authorization error")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("This authorization is not available for access to this album")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();

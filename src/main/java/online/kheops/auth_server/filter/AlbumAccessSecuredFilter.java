@@ -14,6 +14,7 @@ import javax.ws.rs.ext.Provider;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
+import static online.kheops.auth_server.util.ErrorResponse.Message.ALBUM_NOT_FOUND;
 
 @AlbumAccessSecured
 @Provider
@@ -21,7 +22,7 @@ import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
 public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
 
     private static final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-            .message("Album not found")
+            .message(ALBUM_NOT_FOUND)
             .detail("The album does not exist or you don't have access")
             .build();
 

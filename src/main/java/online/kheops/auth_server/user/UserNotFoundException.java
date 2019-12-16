@@ -3,6 +3,8 @@ package online.kheops.auth_server.user;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsException;
 
+import static online.kheops.auth_server.util.ErrorResponse.Message.USER_NOT_FOUND;
+
 public class UserNotFoundException extends Exception implements KheopsException {
 
     private ErrorResponse errorResponse;
@@ -15,7 +17,7 @@ public class UserNotFoundException extends Exception implements KheopsException 
     public UserNotFoundException() {
         super();
         this.errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                .message("User not found")
+                .message(USER_NOT_FOUND)
                 .detail("The user is unknown by Kheops")
                 .build();
     }
@@ -23,7 +25,7 @@ public class UserNotFoundException extends Exception implements KheopsException 
     public UserNotFoundException(Throwable e) {
         super(e);
         this.errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                .message("User not found")
+                .message(USER_NOT_FOUND)
                 .detail("The user is unknown by Kheops")
                 .build();
     }

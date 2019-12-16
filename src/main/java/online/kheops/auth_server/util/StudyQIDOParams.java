@@ -15,6 +15,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class StudyQIDOParams {
@@ -74,7 +75,7 @@ public final class StudyQIDOParams {
 
             if (!kheopsPrincipal.hasAlbumPermission(AlbumUserPermissions.READ_SERIES, albumIDLocal)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Action forbidden")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("Token doesn't have read access to this album")
                         .build();
                 throw new AlbumForbiddenException(errorResponse);

@@ -29,6 +29,8 @@ import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PAT
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_COMMENT;
 import static online.kheops.auth_server.user.AlbumUserPermissions.WRITE_COMMENT;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
@@ -106,8 +108,8 @@ public class EventResource {
 
         if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Param 'comment' is too long")
-                    .detail("Max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'comment' is too long max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -139,7 +141,7 @@ public class EventResource {
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -170,7 +172,7 @@ public class EventResource {
 
         if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -178,8 +180,8 @@ public class EventResource {
 
         if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Param 'comment' is too long")
-                    .detail("Max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'comment' is too long max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }

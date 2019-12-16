@@ -44,6 +44,7 @@ import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_COMMENTS;
 import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_FAVORITE;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static org.jooq.impl.DSL.*;
 
 public class Studies {
@@ -511,7 +512,7 @@ public class Studies {
             }
             if(seriesList.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Study not found")
+                        .message(STUDY_NOT_FOUND)
                         .detail("Study does not exist or you don't have access")
                         .build();
                 throw new StudyNotFoundException(errorResponse);

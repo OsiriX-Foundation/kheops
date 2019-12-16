@@ -16,6 +16,8 @@ import java.util.OptionalInt;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
+
 public abstract class JOOQTools {
 
     private JOOQTools() { throw new IllegalStateException("Utility class"); }
@@ -28,14 +30,14 @@ public abstract class JOOQTools {
             limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
         } catch (Exception e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("'" + Consts.QUERY_PARAMETER_LIMIT + "' must be an integer >= 1")
                     .build();
             throw new BadQueryParametersException(errorResponse);
         }
         if (limit < 1) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("'" + Consts.QUERY_PARAMETER_LIMIT + "' must be an integer >= 1")
                     .build();
             throw new BadQueryParametersException(errorResponse);
@@ -49,7 +51,7 @@ public abstract class JOOQTools {
             offset = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_OFFSET).get(0));
         } catch (Exception e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("'" + Consts.QUERY_PARAMETER_OFFSET + "' must be an integer >= 1")
                     .build();
             throw new BadQueryParametersException(errorResponse);
@@ -57,7 +59,7 @@ public abstract class JOOQTools {
 
         if (offset < 0) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("'" + Consts.QUERY_PARAMETER_OFFSET + "' must be an integer >= 0")
                     .build();
             throw new BadQueryParametersException(errorResponse);

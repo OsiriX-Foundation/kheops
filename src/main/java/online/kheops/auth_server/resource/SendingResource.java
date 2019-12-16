@@ -36,6 +36,7 @@ import static online.kheops.auth_server.filter.SecuredFilter.getToken;
 import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_AUTHORIZATION_SOURCE;
 
 @Path("/")
@@ -72,7 +73,7 @@ public class SendingResource
             try {
                 if (fromInbox != null || (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID()))) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Bad Query Parameter")
+                            .message(BAD_QUERY_PARAMETER)
                             .detail("With an album capability token, 'inbox' and 'album' must not be set")
                             .build();
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -91,7 +92,7 @@ public class SendingResource
         if ((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -103,7 +104,7 @@ public class SendingResource
 
         if(fromInbox && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the inbox")
                     .build();
             return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -132,7 +133,7 @@ public class SendingResource
 
         if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")
                     .build();
             return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -168,7 +169,7 @@ public class SendingResource
 
             if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
                         .build();
                 return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -176,7 +177,7 @@ public class SendingResource
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Forbidden")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("The token in the header 'X-Authorization-Source' is not a capability token")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -187,7 +188,7 @@ public class SendingResource
                 final Capability capability = optionalCapability.get();
                 if (!capability.hasAppropriatePermission()) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Forbidden")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("The token in the header 'X-Authorization-Source' as not the appropriate permission")
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -204,7 +205,7 @@ public class SendingResource
         } else {
             if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
                         .build();
                 return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -218,7 +219,7 @@ public class SendingResource
                     Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Forbidden")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("No write access with this credential")
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -257,7 +258,7 @@ public class SendingResource
 
             if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Study not found")
+                        .message(STUDY_NOT_FOUND)
                         .detail("The study does not exist or you don't have access")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -265,7 +266,7 @@ public class SendingResource
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Forbidden")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("The token in the header 'X-Authorization-Source' is not a capability token")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -279,7 +280,7 @@ public class SendingResource
                 }
                 if (albumId != null) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Bad Query Parameter")
+                            .message(BAD_QUERY_PARAMETER)
                             .detail("With the header 'X-Authorization-Source' the query parameter 'album' must not be set")
                             .build();
                     return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -290,7 +291,7 @@ public class SendingResource
         } else {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Study not found")
+                        .message(STUDY_NOT_FOUND)
                         .detail("The study does not exist or you don't have access with the appropriate permission")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -304,7 +305,7 @@ public class SendingResource
                     Sending.putStudyInAlbum(kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Authorization error")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("No write access with this credential")
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -343,7 +344,7 @@ public class SendingResource
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access with the delete permission")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -357,7 +358,7 @@ public class SendingResource
                     return Response.status(NO_CONTENT).build();
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Authorization error")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("The token not allow you to delete a study")
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -402,7 +403,7 @@ public class SendingResource
 
         if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Authorization error")
+                    .message(AUTHORIZATION_ERROR)
                     .detail("The token not allow you to delete a study")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -416,7 +417,7 @@ public class SendingResource
                     return Response.status(NO_CONTENT).build();
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Authorization error")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("The token not allow you to delete a study")
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -462,7 +463,7 @@ public class SendingResource
 
             if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
                         .build();
                 return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -470,7 +471,7 @@ public class SendingResource
 
             if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Forbidden")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("The token in the header 'X-Authorization-Source' is not a capability token")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -480,7 +481,7 @@ public class SendingResource
                 final Capability capability = optionalCapability.get();
                 if (!capability.hasAppropriatePermission()) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Forbidden")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("The token in the header 'X-Authorization-Source' as not the appropriate permission")
                             .build();
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -490,7 +491,7 @@ public class SendingResource
         } else {
             if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have the send permission")
                         .build();
                 return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -523,7 +524,7 @@ public class SendingResource
         if (((fromAlbumId == null && fromInbox == null) ||
                 (fromAlbumId != null && fromInbox != null && fromInbox)) && headerXAuthorizationSource == null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use 'album' xor 'inbox' query param")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -552,14 +553,14 @@ public class SendingResource
                     fromAlbumId = tokenPrincipal.getAlbumID();
                     if (!tokenPrincipal.hasAlbumPermission(SEND_SERIES, fromAlbumId)) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                                .message("Authorization error")
+                                .message(AUTHORIZATION_ERROR)
                                 .detail("The token not allow you to send a study")
                                 .build();
                         return Response.status(FORBIDDEN).entity(errorResponse).build();
                     }
                     if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                                .message("Study not found")
+                                .message(STUDY_NOT_FOUND)
                                 .detail("The study does not exist or you don't have access")
                                 .build();
                         return Response.status(NOT_FOUND).entity(errorResponse).build();
@@ -570,7 +571,7 @@ public class SendingResource
                 }
             } else {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Authorization error")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("The token in the header 'X-Authorization-Source' must be an album token")
                         .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();

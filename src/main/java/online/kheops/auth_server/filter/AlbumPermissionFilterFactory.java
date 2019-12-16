@@ -18,12 +18,13 @@ import javax.ws.rs.ext.Provider;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
+import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 
 @Provider
 public class AlbumPermissionFilterFactory implements DynamicFeature {
 
     private static final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-            .message("Authorization error")
+            .message(AUTHORIZATION_ERROR)
             .detail("You don't have the permission to do this on this album")
             .build();
 

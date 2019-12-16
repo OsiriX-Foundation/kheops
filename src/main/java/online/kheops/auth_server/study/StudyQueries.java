@@ -10,6 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
+
 public class StudyQueries {
 
     private StudyQueries() {
@@ -25,7 +27,7 @@ public class StudyQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study does not exist or you don't have access")
                     .build();
             throw new StudyNotFoundException(errorResponse);
@@ -42,7 +44,7 @@ public class StudyQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study does not exist or you don't have access")
                     .build();
             throw new StudyNotFoundException(errorResponse);
@@ -59,7 +61,7 @@ public class StudyQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the inbox")
                     .build();
             throw new StudyNotFoundException(errorResponse);
@@ -76,7 +78,7 @@ public class StudyQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the album")
                     .build();
             throw new StudyNotFoundException(errorResponse);
@@ -93,7 +95,7 @@ public class StudyQueries {
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the album")
                     .build();
             throw new StudyNotFoundException(errorResponse);

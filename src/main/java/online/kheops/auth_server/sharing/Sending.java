@@ -27,6 +27,7 @@ import static online.kheops.auth_server.series.Series.isSeriesInInbox;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 
 public class Sending {
 
@@ -49,7 +50,7 @@ public class Sending {
 
             if (seriesList.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist in your inbox")
                         .build();
                 throw new SeriesNotFoundException(errorResponse);
@@ -116,7 +117,7 @@ public class Sending {
 
             if (availableSeries.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Series not found")
+                        .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist in the album")
                         .build();
                 throw new SeriesNotFoundException(errorResponse);
@@ -608,7 +609,7 @@ public class Sending {
 
         if (availableSeries.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")
                     .build();
             throw new SeriesNotFoundException(errorResponse);

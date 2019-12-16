@@ -27,6 +27,8 @@ import static online.kheops.auth_server.capability.CapabilityId.ID_PATTERN;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.user.AlbumUserPermissions.MANAGE_CAPABILITIES_TOKEN;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 
@@ -58,8 +60,8 @@ public class CapabilitiesResource {
 
         if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Param 'title' is too long")
-                    .detail("max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length())
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'title' is too long max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -76,14 +78,14 @@ public class CapabilitiesResource {
         if (!readPermission) {
             if (appropriatePermission) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("'appropriatePermission' is availble only if 'readPermission' is True")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if (downloadPermission) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("'downloadPermission' is availble only if 'readPermission' is True")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -96,7 +98,7 @@ public class CapabilitiesResource {
             capabilityParametersBuilder.notBeforeTime(notBeforeTime);
             } catch (DateTimeParseException e) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("An error occured during parssing 'not_before_time'")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -107,7 +109,7 @@ public class CapabilitiesResource {
                 capabilityParametersBuilder.expirationTime(expirationTime);
             } catch (DateTimeParseException e) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Bad Query Parameter")
+                        .message(BAD_QUERY_PARAMETER)
                         .detail("An error occured during parssing 'expiration_time'")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -120,7 +122,7 @@ public class CapabilitiesResource {
             return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (IllegalArgumentException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("'scope_type' must be 'user' or 'album'")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();

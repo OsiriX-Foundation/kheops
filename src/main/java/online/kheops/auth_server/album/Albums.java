@@ -18,6 +18,7 @@ import java.util.List;
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 
 public class Albums {
 
@@ -100,7 +101,7 @@ public class Albums {
 
             } else if (name != null || description != null || usersPermission.areSet()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Action forbidden: not an admin")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("The user must be an admin for editing name, description or permissions")
                         .build();
                 throw new AlbumForbiddenException(errorResponse);
@@ -227,7 +228,7 @@ public class Albums {
 
             if (targetUser.getPk() == callingUser.getPk()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message("Action forbidden")
+                        .message(AUTHORIZATION_ERROR)
                         .detail("You can not add yourself to the album")
                         .build();
                 throw new AlbumForbiddenException(errorResponse);
@@ -308,7 +309,7 @@ public class Albums {
                     mutationType = Events.MutationType.REMOVE_USER;
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("Action forbidden")
+                            .message(AUTHORIZATION_ERROR)
                             .detail("You must be an admin for removing another user")
                             .build();
                     throw new AlbumForbiddenException(errorResponse);

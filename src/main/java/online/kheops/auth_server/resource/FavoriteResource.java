@@ -19,6 +19,7 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.user.AlbumUserPermissions.EDIT_FAVORITES;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 
 
 @Path("/")
@@ -61,7 +62,7 @@ public class FavoriteResource {
 
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use album XOR inbox query param")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -71,7 +72,7 @@ public class FavoriteResource {
 
         if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Study not found")
+                    .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
@@ -121,7 +122,7 @@ public class FavoriteResource {
 
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Bad Query Parameter")
+                    .message(BAD_QUERY_PARAMETER)
                     .detail("Use album XOR inbox query param")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
@@ -131,7 +132,7 @@ public class FavoriteResource {
 
         if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Series not found")
+                    .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
