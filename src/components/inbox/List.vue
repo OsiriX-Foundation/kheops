@@ -667,22 +667,22 @@ export default {
   methods: {
     setFilters() {
       let filterValue = false;
-      for (let key in this.$route.query){
-        let value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
+      for (const key in this.$route.query) {
+        const value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
         if (this.filters[key] !== undefined) {
           this.filters[key] = (key !== 'StudyDateFrom' && key !== 'StudyDateTo') ? value : this.dateFormatter(value);
           filterValue = true;
         }
         if (key === 'StudyDate') {
-          let date = []
+          let date = [];
           if (value.includes('-')) {
-            date = value.split('-')
+            date = value.split('-');
           } else {
-            date.push(value)
-            date.push(value)
+            date.push(value);
+            date.push(value);
           }
-          this.filters['StudyDateFrom'] = this.dateFormatter(date[0])
-          this.filters['StudyDateTo'] = this.dateFormatter(date[1])
+          this.filters.StudyDateFrom = this.dateFormatter(date[0]);
+          this.filters.StudyDateTo = this.dateFormatter(date[1]);
           filterValue = true;
         }
       }
@@ -880,14 +880,14 @@ export default {
       return moment(date).format('YYYYMMDD');
     },
     validDate(date) {
-      return moment(date, 'YYYYMMDD', true).isValid()
+      return moment(date, 'YYYYMMDD', true).isValid();
     },
     dateFormatter(date) {
       if (this.validDate(date)) {
-        var newDate = moment(date, 'YYYYMMDD').format('YYYY-MM-DD');
-        return new Date(`${newDate}T00:00:00.000Z`)
+        const newDate = moment(date, 'YYYYMMDD').format('YYYY-MM-DD');
+        return new Date(`${newDate}T00:00:00.000Z`);
       }
-      return ''
+      return '';
     },
     showRowDetails(item) {
       if (!item._showDetails) {
