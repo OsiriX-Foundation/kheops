@@ -84,7 +84,7 @@ public class TokenResource
             return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
-            throw e; //TODO and return ????
+            return Response.status(BAD_REQUEST).build();
         }
     }
 

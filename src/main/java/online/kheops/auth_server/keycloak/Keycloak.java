@@ -181,7 +181,6 @@ public class Keycloak {
             } else {
                 token.removeToken();
                 try {
-                    String responseString = response.readEntity(String.class);
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message("Error with authority provider")
                             .detail("Unsuccessful response from keycloak server, status: " + response.getStatus())

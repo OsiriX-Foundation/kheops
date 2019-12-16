@@ -18,7 +18,7 @@ import static online.kheops.auth_server.util.Consts.USER_ACCESS_PRIORITY;
 @Priority(USER_ACCESS_PRIORITY)
 public class UserAccessSecuredFilter implements ContainerRequestFilter {
 
-    final private static ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+    private static final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
             .message("Authorization error")
             .detail("You don't have the permission to do this with this type of token")
             .build();

@@ -402,7 +402,7 @@ public class QIDOResource {
                     .message("Authorization error")
                     .detail("This authorization is not available for access to the inbox")
                     .build();
-            return Response.status(FORBIDDEN).build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         try {

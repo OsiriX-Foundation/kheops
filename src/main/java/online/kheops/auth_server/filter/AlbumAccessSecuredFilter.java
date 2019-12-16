@@ -20,7 +20,7 @@ import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
 @Priority(ALBUM_ACCESS_PRIORITY)
 public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
 
-    final private static ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+    private static final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
             .message("Album not found")
             .detail("The album does not exist or you don't have access")
             .build();

@@ -22,7 +22,7 @@ import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIO
 @Provider
 public class AlbumPermissionFilterFactory implements DynamicFeature {
 
-    final private static ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+    private static final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
             .message("Authorization error")
             .detail("You don't have the permission to do this on this album")
             .build();

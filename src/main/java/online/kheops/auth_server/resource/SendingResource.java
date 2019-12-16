@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.Optional;
 import java.util.logging.Logger;
 
