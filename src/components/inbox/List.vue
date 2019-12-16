@@ -161,8 +161,7 @@
           HEADER TABLE
         -->
         <template
-          slot="HEAD_PatientName"
-          slot-scope="data"
+          v-slot:head(PatientName)="data"
         >
           <div
             v-if="showFilters"
@@ -205,8 +204,7 @@
         </template>
 
         <template
-          slot="HEAD_PatientID"
-          slot-scope="data"
+          v-slot:head(PatientID)="data"
         >
           <div
             v-if="showFilters"
@@ -228,8 +226,7 @@
         </template>
 
         <template
-          slot="HEAD_StudyDescription"
-          slot-scope="data"
+          v-slot:head(StudyDescription)="data"
         >
           <div
             v-if="showFilters"
@@ -246,8 +243,7 @@
         </template>
 
         <template
-          slot="HEAD_StudyDate"
-          slot-scope="data"
+          v-slot:head(StudyDate)="data"
         >
           <div
             v-if="showFilters"
@@ -294,8 +290,7 @@
         </template>
 
         <template
-          slot="HEAD_ModalitiesInStudy"
-          slot-scope="data"
+          v-slot:head(ModalitiesInStudy)="data"
         >
           <div
             v-if="showFilters"
@@ -323,8 +318,7 @@
           CONTENT TABLE
         -->
         <template
-          slot="is_selected"
-          slot-scope="row"
+          v-slot:cell(is_selected)="row"
         >
           <b-button-group>
             <b-button
@@ -349,8 +343,7 @@
           </b-button-group>
         </template>
         <template
-          slot="PatientName"
-          slot-scope="row"
+          v-slot:cell(PatientName)="row"
         >
           <div
             :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
@@ -390,8 +383,7 @@
           </div>
         </template>
         <template
-          slot="StudyDate"
-          slot-scope="row"
+          v-slot:cell(StudyDate)="row"
         >
           {{ row.value | formatDate }}
         </template>
@@ -498,8 +490,8 @@ export default {
         sortDesc: true,
         sortBy: 'StudyDate',
       },
-      fields: {
-        isSelected: {
+      fields: [
+        {
           key: 'is_selected',
           label: '',
           sortable: false,
@@ -508,7 +500,8 @@ export default {
             width: '100px',
           },
         },
-        PatientName: {
+        {
+          key: 'PatientName',
           label: this.$t('PatientName'),
           sortable: true,
           thClass: 'pointer',
@@ -523,7 +516,8 @@ export default {
             width: '250px',
           },
         },
-        PatientID: {
+        {
+          key: 'PatientID',
           label: this.$t('PatientID'),
           sortable: true,
           thClass: 'pointer',
@@ -539,7 +533,8 @@ export default {
             width: '250px',
           },
         },
-        StudyDescription: {
+        {
+          key: 'StudyDescription',
           label: this.$t('StudyDescription'),
           sortable: false,
           tdClass: 'word-break',
@@ -554,7 +549,8 @@ export default {
             width: '400px',
           },
         },
-        StudyDate: {
+        {
+          key: 'StudyDate',
           label: this.$t('StudyDate'),
           sortable: true,
           thClass: 'pointer',
@@ -570,17 +566,23 @@ export default {
             width: '150px',
           },
         },
-        ModalitiesInStudy: {
+        {
+          key: 'ModalitiesInStudy',
           label: this.$t('Modality'),
           sortable: false,
           tdClass: 'word-break',
           class: 'word-break d-none d-sm-table-cell',
-          formatter: (value) => value.Value.join(', '),
+          formatter: (value) => {
+            if (value !== null && value.Value !== undefined) {
+              return value.Value.join(', ');
+            }
+            return '';
+          },
           thStyle: {
             width: '150px',
           },
         },
-      },
+      ],
       filters: {
         PatientName: '',
         PatientID: '',

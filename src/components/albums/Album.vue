@@ -83,6 +83,29 @@
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
           <nav class="nav nav-pills nav-fill flex-column flex-lg-row text-center justify-content-lg-end">
+            <router-link
+              :to="{ name: 'albumview', params: { view: 'studies' }}"
+              class="nav-link"
+              :class="(currentView === 'studies' || currentView === undefined)?'active':''"
+              active-class="active"
+            >
+              {{ $t('studies') }}
+            </router-link>
+            <router-link
+              :to="{ name: 'albumview', params: { view: 'comments' }}"
+              class="nav-link"
+              active-class="active"
+            >
+              {{ $t('comments') }}
+            </router-link>
+            <router-link
+              :to="{ name: 'albumview', params: { view: 'settings' }}"
+              class="nav-link"
+              active-class="active"
+            >
+              {{ $t('settings') }}
+            </router-link>
+            <!--
             <a
               class="nav-link"
               :class="(currentView === 'studies' || currentView === undefined)?'active':''"
@@ -104,6 +127,7 @@
             >
               {{ $t('settings') }}
             </a>
+            -->
           </nav>
         </div>
         <!-- <div class = 'col-md'></div> -->
