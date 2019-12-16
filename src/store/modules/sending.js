@@ -1,6 +1,9 @@
+import Vue from 'vue';
+
 // initial state
 const state = {
   sending: false,
+  sourceSending: {},
   loading: false,
   files: [],
   totalSize: 0,
@@ -11,6 +14,7 @@ const state = {
 
 const getters = {
   sending: (state) => state.sending,
+  sourceSending: (state) => state.sourceSending,
   loading: (state) => state.loading,
   files: (state) => state.files,
   totalSize: (state) => state.totalSize,
@@ -20,11 +24,14 @@ const getters = {
 };
 
 const actions = {
-  setLoading({ commit }, params) {
-    commit('SET_LOADING', params);
-  },
   setSending({ commit }, params) {
     commit('SET_SENDING', params);
+  },
+  setSourceSending({ commit }, params) {
+    commit('SET_SOURCE_SENDING', params);
+  },
+  setLoading({ commit }, params) {
+    commit('SET_LOADING', params);
   },
   setFiles({ commit }, params) {
     commit('SET_TOTAL_SIZE', params);
@@ -64,6 +71,10 @@ const mutations = {
   },
   SET_SENDING(state, params) {
     state.sending = params.sending;
+  },
+  SET_SOURCE_SENDING(state, params){
+    Vue.set(state.sourceSending, 'key', params.source.key);
+    Vue.set(state.sourceSending, 'value', params.source.value);
   },
   SET_FILES(state, params) {
     state.files = params.files;

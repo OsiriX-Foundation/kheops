@@ -1,7 +1,6 @@
 <template>
   <div>
     <component-import-study
-      :source="source"
       :permissions="permissions"
     />
   </div>
