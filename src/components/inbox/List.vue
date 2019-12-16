@@ -654,6 +654,7 @@ export default {
     this.initData();
     this.setAlbumsList();
     this.setAlbumInbox();
+    this.setFilters();
   },
   destroyed() {
     this.$store.dispatch('initStudies', {});
@@ -664,6 +665,29 @@ export default {
     this.scroll();
   },
   methods: {
+    setFilters() {
+      let filterValue = false;
+      for (let key in this.$route.query){
+        let value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
+        if (this.filters[key] !== undefined) {
+          this.filters[key] = (key !== 'StudyDateFrom' && key !== 'StudyDateTo') ? value : this.dateFormatter(value);
+          filterValue = true;
+        }
+        if (key === 'StudyDate') {
+          let date = []
+          if (value.includes('-')) {
+            date = value.split('-')
+          } else {
+            date.push(value)
+            date.push(value)
+          }
+          this.filters['StudyDateFrom'] = this.dateFormatter(date[0])
+          this.filters['StudyDateTo'] = this.dateFormatter(date[1])
+          filterValue = true;
+        }
+      }
+      this.changeFilterValue(filterValue);
+    },
     scroll() {
       window.onscroll = () => {
         if (this.$refs.myHeader !== undefined && this.$refs.studiesList !== undefined) {
@@ -854,6 +878,16 @@ export default {
     },
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
+    },
+    validDate(date) {
+      return moment(date, 'YYYYMMDD', true).isValid()
+    },
+    dateFormatter(date) {
+      if (this.validDate(date)) {
+        var newDate = moment(date, 'YYYYMMDD').format('YYYY-MM-DD');
+        return new Date(`${newDate}T00:00:00.000Z`)
+      }
+      return ''
     },
     showRowDetails(item) {
       if (!item._showDetails) {
