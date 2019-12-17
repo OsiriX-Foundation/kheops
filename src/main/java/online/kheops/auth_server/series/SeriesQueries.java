@@ -110,7 +110,7 @@ public class SeriesQueries {
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(SERIES_NOT_FOUND)
-                    .detail("The series does not exist or you don't have the èermission to share it")
+                    .detail("The series does not exist or you don't have the permission to share it")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
         }
@@ -144,7 +144,7 @@ public class SeriesQueries {
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(SERIES_NOT_FOUND)
-                    .detail("The series does not exist in your album or you don't hae the permission to share it")
+                    .detail("The series does not exist in your albums or you don't hae the permission to share it")
                     .build();
             throw new SeriesNotFoundException(errorResponse);
         }
