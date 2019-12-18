@@ -44,6 +44,7 @@ import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_COMMENTS;
 import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_FAVORITE;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static org.jooq.impl.DSL.*;
 
@@ -338,7 +339,11 @@ public class Studies {
 
         public void check(String time) throws BadQueryParametersException {
             if (! time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$") ) {
-                throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyTime) + " :" + time);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("A time must be hhmmss.SSSSSS")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
         }
     }
@@ -349,16 +354,23 @@ public class Studies {
         public TableField<? extends Record, String> getColumn() {return STUDIES.STUDY_DATE;}
 
         public void check(String date) throws BadQueryParametersException {
+
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message(BAD_QUERY_PARAMETER)
+                .detail("A date must be yyyyMMdd")
+                .build();
+
             if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
                 dateFormat.setLenient(false);
                 try {
                     dateFormat.parse(date);
                 } catch (ParseException e) {
-                    throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
+
+                    throw new BadQueryParametersException(errorResponse);
                 }
             } else {
-                throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
+                throw new BadQueryParametersException(errorResponse);
             }
         }
     }

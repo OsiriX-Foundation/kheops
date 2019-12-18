@@ -21,6 +21,7 @@ import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 public class Events {
 
@@ -245,7 +246,11 @@ public class Events {
         final EntityTransaction tx = em.getTransaction();
 
         if (commentContent.isEmpty()) {
-            throw new BadQueryParametersException("Comment is empty");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("'comment' is empty")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
 
         try {

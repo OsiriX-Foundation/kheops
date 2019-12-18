@@ -26,6 +26,7 @@ import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
@@ -202,8 +203,6 @@ public class AlbumQueries {
             final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getUser().getPk(), conditionArrayList, connection);
 
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
-        } catch (BadQueryParametersException e) {
-            throw new BadQueryParametersException(e.getMessage());
         } catch (SQLException e) {
             throw new JOOQException("Error during request", e);
         }
@@ -340,7 +339,13 @@ public class AlbumQueries {
             else if (orderByParameter.equals("number_of_comments")) {
                 ord = field("number_of_comments");
             }
-            else throw new BadQueryParametersException("sort: " + orderByParameter);
+            else {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("'sort' query parameter is bad")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
+            }
 
             return descending ? ord.desc() : ord.asc();
 

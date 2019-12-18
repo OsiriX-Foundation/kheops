@@ -16,6 +16,7 @@ import java.util.*;
 
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class StudyQIDOParams {
@@ -65,7 +66,11 @@ public final class StudyQIDOParams {
 
         if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             if(fromInboxLocal) {
-                throw new BadQueryParametersException("from inbox forbidden with a capability token with an album scope");//todo good message
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("from inbox forbidden with a capability token with an album scope")//todo good message
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
             try {
                 albumIDLocal = kheopsPrincipal.getAlbumID();
@@ -89,7 +94,11 @@ public final class StudyQIDOParams {
             final String orderByParameter = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
             orderByTag = org.dcm4che3.util.TagUtils.forName(orderByParameter);
             if (orderByTag == -1 || !ACCEPTED_TAGS_FOR_SORTING.contains(orderByTag)) {
-                throw new BadQueryParametersException("sort: " + queryParameters.get(QUERY_PARAMETER_SORT).get(0));
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("'sort' query parameter is bad")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
         } else {
             descending = true;
@@ -147,10 +156,18 @@ public final class StudyQIDOParams {
 
         if(!albumID.isPresent() && !fromInbox) {
             if(favoriteField) {
-                throw new BadQueryParametersException("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
             if(favoriteFilter.isPresent()) {
-                throw new BadQueryParametersException("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
         }
 
@@ -257,7 +274,11 @@ public final class StudyQIDOParams {
     private Optional<Boolean> getFavoriteFilter(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
         if (queryParameters.containsKey(FAVORITE)) {
             if(!Boolean.valueOf(queryParameters.get(FAVORITE).get(0))) {
-                throw new BadQueryParametersException("Favorite filter can only be true");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("'favorite' filter can only be true")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
             return Optional.of(true);
         } else {
