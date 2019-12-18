@@ -72,9 +72,13 @@ const mutations = {
   SET_SENDING(state, params) {
     state.sending = params.sending;
   },
-  SET_SOURCE_SENDING(state, params){
-    Vue.set(state.sourceSending, 'key', params.source.key);
-    Vue.set(state.sourceSending, 'value', params.source.value);
+  SET_SOURCE_SENDING(state, params) {
+    if (params.source.key !== undefined && params.source.value !== undefined) {
+      Vue.set(state.sourceSending, 'key', params.source.key);
+      Vue.set(state.sourceSending, 'value', params.source.value);
+    } else {
+      state.sourceSending = {};
+    }
   },
   SET_FILES(state, params) {
     state.files = params.files;
