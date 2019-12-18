@@ -1,6 +1,5 @@
 package online.kheops.auth_server.filter;
 
-import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.util.ErrorResponse;
