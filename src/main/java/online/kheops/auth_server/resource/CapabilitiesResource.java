@@ -56,7 +56,8 @@ public class CapabilitiesResource {
                                         @DefaultValue("false") @FormParam("read_permission") boolean readPermission,
                                         @DefaultValue("false") @FormParam("appropriate_permission") boolean appropriatePermission,
                                         @DefaultValue("false") @FormParam("download_permission") boolean downloadPermission,
-                                        @DefaultValue("false") @FormParam("write_permission") boolean writePermission) {
+                                        @DefaultValue("false") @FormParam("write_permission") boolean writePermission)
+            throws AlbumNotFoundException, UserNotFoundException {
 
         if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -132,7 +133,7 @@ public class CapabilitiesResource {
 
         try {
             capabilityResponse = generateCapability(capabilityParameters, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (UserNotFoundException | AlbumNotFoundException | UserNotMemberException e) {
+        } catch (UserNotMemberException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         } catch (NewCapabilityForbidden e) {
             return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();

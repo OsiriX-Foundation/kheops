@@ -72,7 +72,8 @@ public class QIDOResource {
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
-                               @QueryParam(INBOX) Boolean fromInbox) {
+                               @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, AlbumForbiddenException {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -108,10 +109,6 @@ public class QIDOResource {
         } catch (BadQueryParametersException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
             return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
         } catch (NoResultException e) {
             return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
         } catch (SQLException e) {
@@ -166,7 +163,8 @@ public class QIDOResource {
                               @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(FAVORITE) Boolean favoriteFilter,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
-                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit) {
+                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit)
+            throws AlbumNotFoundException, StudyNotFoundException {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -274,11 +272,7 @@ public class QIDOResource {
         }
 
         final Set<String> availableSeriesUIDs;
-        try {
-            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
 
         if (availableSeriesUIDs.isEmpty()) {
             return Response.status(NO_CONTENT)
@@ -372,7 +366,8 @@ public class QIDOResource {
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) String fromAlbumId,
-                                       @QueryParam(INBOX) Boolean fromInbox) {
+                                       @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, StudyNotFoundException {
 
         if ((fromAlbumId != null && fromInbox != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -445,11 +440,7 @@ public class QIDOResource {
         }
 
         final Set<String> availableSeriesUIDs;
-        try {
-            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
 
         final StreamingOutput stream = os -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);

@@ -54,7 +54,8 @@ public class EventResource {
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                               @QueryParam("types") final List<String> types,
                               @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                              @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
+                              @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
+            throws AlbumNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -67,22 +68,18 @@ public class EventResource {
 
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
-        try {
-            if (types.contains("comments") && types.contains("mutations")) {
-                pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments_mutations");
-            } else if (types.contains("comments")) {
-                pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments");
-            } else if (types.contains("mutations")) {
-                pair = Events.getMutationsAlbum(albumId, offset, limit);
-                kheopsLogBuilder.scope("mutations");
-            } else {
-                pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments_mutations");
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
+        if (types.contains("comments") && types.contains("mutations")) {
+            pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            kheopsLogBuilder.scope("comments_mutations");
+        } else if (types.contains("comments")) {
+            pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            kheopsLogBuilder.scope("comments");
+        } else if (types.contains("mutations")) {
+            pair = Events.getMutationsAlbum(albumId, offset, limit);
+            kheopsLogBuilder.scope("mutations");
+        } else {
+            pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            kheopsLogBuilder.scope("comments_mutations");
         }
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
@@ -104,7 +101,8 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @FormParam("to_user") String user,
-                                     @FormParam("comment") @NotNull @NotEmpty String comment) {
+                                     @FormParam("comment") @NotNull @NotEmpty String comment)
+            throws AlbumNotFoundException, UserNotFoundException {
 
         if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -116,11 +114,7 @@ public class EventResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
 
         kheopsPrincipal.getKheopsLogBuilder().album(albumId)
                 .action(KheopsLogBuilder.ActionType.POST_COMMENT)
@@ -166,7 +160,8 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @FormParam("to_user") String user,
-                                       @FormParam("comment") @NotNull @NotEmpty String comment) {
+                                       @FormParam("comment") @NotNull @NotEmpty String comment)
+            throws StudyNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -188,7 +183,7 @@ public class EventResource {
 
         try {
             Events.studyPostComment(kheopsPrincipal.getUser(), studyInstanceUID, comment, user);
-        } catch (UserNotFoundException | StudyNotFoundException e) {
+        } catch (UserNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         } catch (BadQueryParametersException e) {
             return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();

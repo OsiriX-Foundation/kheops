@@ -1,8 +1,9 @@
 package online.kheops.auth_server.util;
 
 import javax.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
 
-public class ErrorResponse {
+public class ErrorResponse implements Serializable {
 
     public class Message {
 

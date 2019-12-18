@@ -1,5 +1,6 @@
 package online.kheops.auth_server.filter;
 
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.annotation.AlbumAccessSecured;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -11,6 +12,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_ACCESS_PRIORITY;
@@ -47,7 +50,7 @@ public class AlbumAccessSecuredFilter implements ContainerRequestFilter {
     private void tryAccess(KheopsPrincipal kheopsPrincipal, String albumID, ContainerRequestContext requestContext) {
 
         if (!kheopsPrincipal.hasAlbumAccess(albumID)) {
-            requestContext.abortWith(Response.status(NOT_FOUND).entity(errorResponse).build());
+            requestContext.abortWith(Response.status(NOT_FOUND).header(CONTENT_TYPE, APPLICATION_JSON).entity(errorResponse).build());
         }
     }
 }

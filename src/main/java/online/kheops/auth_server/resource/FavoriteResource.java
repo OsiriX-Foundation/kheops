@@ -38,7 +38,8 @@ public class FavoriteResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addStudyToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                         @QueryParam(ALBUM) String fromAlbumId,
-                                        @QueryParam(INBOX) Boolean fromInbox) {
+                                        @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, StudyNotFoundException {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, true, securityContext);
     }
@@ -52,13 +53,15 @@ public class FavoriteResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response removeStudyFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                              @QueryParam(ALBUM) String fromAlbumId,
-                                             @QueryParam(INBOX) Boolean fromInbox) {
+                                             @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, StudyNotFoundException {
 
         return editStudyFavorites(studyInstanceUID, fromAlbumId, fromInbox, false, securityContext);
     }
 
     private Response editStudyFavorites(String studyInstanceUID, String fromAlbumId, Boolean fromInbox,
-                                        boolean favorite, SecurityContext securityContext) {
+                                        boolean favorite, SecurityContext securityContext)
+            throws AlbumNotFoundException, StudyNotFoundException {
 
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -78,12 +81,7 @@ public class FavoriteResource {
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        try {
-            Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
-
+        Studies.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -97,7 +95,8 @@ public class FavoriteResource {
     public Response addSeriesToFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                          @QueryParam(ALBUM) String fromAlbumId,
-                                         @QueryParam(INBOX) Boolean fromInbox) {
+                                         @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, SeriesNotFoundException {
 
         return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumId, fromInbox, true, securityContext);
     }
@@ -112,13 +111,15 @@ public class FavoriteResource {
     public Response removeSeriesFromFavorites(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                               @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                               @QueryParam(ALBUM) String fromAlbumId,
-                                              @QueryParam(INBOX) Boolean fromInbox) {
+                                              @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, SeriesNotFoundException {
 
         return editSeriesFavorites(studyInstanceUID, seriesInstanceUID, fromAlbumId, fromInbox, false, securityContext);
     }
 
     private Response editSeriesFavorites(String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, Boolean fromInbox,
-                                        boolean favorite, SecurityContext securityContext) {
+                                        boolean favorite, SecurityContext securityContext)
+            throws AlbumNotFoundException, SeriesNotFoundException {
 
         if ((fromInbox == null && fromAlbumId == null) || (fromInbox != null && fromAlbumId != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -138,11 +139,7 @@ public class FavoriteResource {
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        try {
-            Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (AlbumNotFoundException | SeriesNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        Series.editFavorites(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, fromAlbumId, favorite, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(NO_CONTENT).build();
     }

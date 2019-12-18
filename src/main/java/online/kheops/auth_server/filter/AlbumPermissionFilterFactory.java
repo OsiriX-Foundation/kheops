@@ -15,6 +15,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.ALBUM_PERMISSION_ACCESS_PRIORITY;
@@ -70,7 +72,7 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
             if (queryParam.containsKey(ALBUM)) {
                 final String albumID = queryParam.get(ALBUM).get(0);
                 if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                    requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).build());
+                    requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).header(CONTENT_TYPE, APPLICATION_JSON).build());
                 }
             }
             }
@@ -96,7 +98,7 @@ public class AlbumPermissionFilterFactory implements DynamicFeature {
                 if (pathParam.containsKey(ALBUM)) {
                     final String albumID = pathParam.get(ALBUM).get(0);
                     if (!kheopsPrincipal.hasAlbumPermission(permission, albumID)) {
-                        requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).build());
+                        requestContext.abortWith(Response.status(FORBIDDEN).entity(errorResponse).header(CONTENT_TYPE, APPLICATION_JSON).build());
                     }
                 }
             }
