@@ -5,7 +5,7 @@ import online.kheops.auth_server.util.KheopsException;
 
 public class CapabilityNotFoundException extends Exception implements KheopsException {
 
-    private ErrorResponse errorResponse;
+    private final ErrorResponse errorResponse;
 
     public CapabilityNotFoundException(ErrorResponse errorResponse) {
         super();

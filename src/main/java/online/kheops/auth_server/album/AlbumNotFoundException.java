@@ -7,7 +7,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.ALBUM_NOT_FOU
 
 public class AlbumNotFoundException extends Exception implements KheopsException {
 
-    private ErrorResponse errorResponse;
+    private final ErrorResponse errorResponse;
 
     public AlbumNotFoundException() {
         super();

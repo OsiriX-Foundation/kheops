@@ -4,7 +4,7 @@ import online.kheops.auth_server.util.ErrorResponse;
 
 public class BadQueryParametersException extends Exception{
 
-    private ErrorResponse errorResponse;
+    private final ErrorResponse errorResponse;
 
     public BadQueryParametersException(String message) {
         super(message);

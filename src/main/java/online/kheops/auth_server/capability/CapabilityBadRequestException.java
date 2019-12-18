@@ -5,7 +5,7 @@ import online.kheops.auth_server.util.KheopsException;
 
 public class CapabilityBadRequestException extends Exception implements KheopsException {
 
-    private ErrorResponse errorResponse;
+    private final ErrorResponse errorResponse;
 
     public CapabilityBadRequestException(ErrorResponse errorResponse) {
         super();

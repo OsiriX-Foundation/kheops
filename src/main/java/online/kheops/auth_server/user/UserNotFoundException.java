@@ -7,7 +7,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.USER_NOT_FOUN
 
 public class UserNotFoundException extends Exception implements KheopsException {
 
-    private ErrorResponse errorResponse;
+    private final ErrorResponse errorResponse;
 
     public UserNotFoundException(ErrorResponse errorResponse) {
         super();
