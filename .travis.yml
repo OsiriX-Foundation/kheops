@@ -25,8 +25,10 @@ cache:
     - $HOME/.gradle/wrapper/
 
 after_success:
-  - export BRANCH=$TRAVIS_BRANCH
-  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
+  - 'if [ "$TRAVIS_TAG" = "" ]; then export BRANCH=$TRAVIS_BRANCH; else export BRANCH=$TRAVIS_TAG; fi'
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH, TAG=$TRAVIS_TAG"
+  #- export BRANCH=$TRAVIS_BRANCH
+  #- echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, BRANCH=$BRANCH"
   - git fetch --unshallow
   - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
 
