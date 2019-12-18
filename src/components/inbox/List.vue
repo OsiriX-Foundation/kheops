@@ -669,8 +669,8 @@ export default {
       let filterValue = false;
       for (const key in this.$route.query) {
         const value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
-        if (this.filters[key] !== undefined) {
-          this.filters[key] = (key !== 'StudyDateFrom' && key !== 'StudyDateTo') ? value : this.dateFormatter(value);
+        if (this.filters[key] !== undefined && key !== 'StudyDateFrom' && key !== 'StudyDateTo') {
+          this.filters[key] = value;
           filterValue = true;
         }
         if (key === 'StudyDate') {
