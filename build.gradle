@@ -122,7 +122,7 @@ gretty {
 
     httpPort = 7575
     contextPath = ''
-    servletContainer = 'tomcat8'
+    servletContainer = 'tomcat9'
 
     contextConfigFile = 'tomcat-config.xml'
 }
