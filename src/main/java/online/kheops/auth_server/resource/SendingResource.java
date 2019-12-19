@@ -176,7 +176,7 @@ public class SendingResource
                 return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
 
-            if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
+            if (!(tokenPrincipal instanceof CapabilityPrincipal)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(AUTHORIZATION_ERROR)
                         .detail("The token in the header 'X-Authorization-Source' is not a capability token")
@@ -263,11 +263,11 @@ public class SendingResource
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
 
-            if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
+            if (!(tokenPrincipal instanceof CapabilityPrincipal)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(AUTHORIZATION_ERROR)
-                        .detail("The token in the header 'X-Authorization-Source' is not a capability token")
-                        .build();
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("The token in the header 'X-Authorization-Source' is not a capability token")
+                    .build();
                 return Response.status(FORBIDDEN).entity(errorResponse).build();
             }
 
@@ -459,7 +459,7 @@ public class SendingResource
                 return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
 
-            if (tokenPrincipal.getClass() != CapabilityPrincipal.class) {
+            if (!(tokenPrincipal instanceof CapabilityPrincipal)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(AUTHORIZATION_ERROR)
                         .detail("The token in the header 'X-Authorization-Source' is not a capability token")

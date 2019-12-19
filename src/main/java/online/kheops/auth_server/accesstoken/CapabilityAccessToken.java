@@ -4,8 +4,9 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.CapabilityPrincipal;
+import online.kheops.auth_server.principal.AlbumCapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.principal.UserCapabilityPrincipal;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -109,7 +110,11 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new CapabilityPrincipal(capability, user, token);
+        if (capability.getScopeType().equals(ScopeType.ALBUM)) {
+            return new AlbumCapabilityPrincipal(capability, user, token);
+        } else {
+            return new UserCapabilityPrincipal(capability, user, token);
+        }
     }
 
     @Override
