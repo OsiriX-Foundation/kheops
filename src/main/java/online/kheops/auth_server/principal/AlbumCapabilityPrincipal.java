@@ -113,7 +113,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
             }
 
             if(mergeCapability.getAlbum().containsSeries(series, em)) {
-                return capability.hasAppropriatePermission();
+                return capability.hasWritePermission();
             }
         } catch (UserNotMemberException e) {
             return false;
