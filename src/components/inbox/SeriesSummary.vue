@@ -229,6 +229,7 @@ export default {
     openTab(series) {
       const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1';
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
+      const token = this.currentuserAccessToken();
       const openWSI = series.Modality !== undefined
         && series.Modality.Value !== undefined
         && series.Modality.Value[0] === 'SM';
@@ -244,7 +245,7 @@ export default {
         windowProps.id = 'OHIF';
       }
       const openWindow = window.open('', windowProps.name);
-      this.getViewerToken(this.currentuserAccessToken, this.studyInstanceUID, this.source).then((res) => {
+      this.getViewerToken(token, this.studyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;
         const sourceQuery = this.getSourceQueries();
         let url = '';
