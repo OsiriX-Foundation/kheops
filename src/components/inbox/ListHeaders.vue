@@ -251,7 +251,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
@@ -468,6 +467,7 @@ export default {
           [this.source.key]: this.source.value,
         };
       }
+      return {};
     },
     getHeaders() {
       if (this.currentuserCapabilitiesToken !== undefined && this.currentuserKeycloakToken !== undefined) {

@@ -53,13 +53,16 @@ const actions = {
       if (res.data !== '') {
         const studies = dicomoperations.translateDICOM(res.data);
         studies.forEach((study) => {
+          /* eslint-disable no-param-reassign */
           study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
           study.flag.is_favorite = study.SumFavorites !== undefined ? study.SumFavorites.Value[0] > 0 : false;
           study.flag.is_commented = study.SumComments !== undefined ? study.SumComments.Value[0] > 0 : false;
           // https://bootstrap-vue.js.org/docs/components/table/
           // chapter - Row details support
+          // eslint-disable-next-line
           study._showDetails = false;
           study.showIcons = false;
+          /* eslint-enable no-param-reassign */
         });
         if (params.queries.offset === 0) {
           commit('INIT_STUDIES');
@@ -85,11 +88,14 @@ const actions = {
           const currentUID = study.StudyInstanceUID.Value[0];
           const stateUID = state.studies[index] !== undefined ? state.studies[index].StudyInstanceUID.Value[0] : undefined;
 
+          /* eslint-disable no-param-reassign */
           study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
           study.flag.is_favorite = study.SumFavorites !== undefined ? study.SumFavorites.Value[0] > 0 : false;
           study.flag.is_commented = study.SumComments !== undefined ? study.SumComments.Value[0] > 0 : false;
+          // eslint-disable-next-line
           study._showDetails = false;
           study.showIcons = false;
+          /* eslint-enable no-param-reassign */
           if (state.studies.length > 0 && currentUID !== stateUID) {
             const paramsUpdate = {
               index,
@@ -252,6 +258,7 @@ const mutations = {
   },
   SET_STUDY_SHOW_DETAILS(state, params) {
     const study = state.studies[params.index];
+    // eslint-disable-next-line
     study._showDetails = params.value;
     Vue.set(state.studies, params.indexStudy, study);
   },

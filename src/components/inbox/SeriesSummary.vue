@@ -105,13 +105,13 @@ export default {
       let description = '';
       let numberInstances = '';
       if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
-        modality = this.serie.Modality.Value[0];
+        [modality] = this.serie.Modality.Value;
       }
       if (this.serie.NumberOfSeriesRelatedInstances !== undefined && this.serie.NumberOfSeriesRelatedInstances.Value !== undefined) {
         numberInstances = `[ ${this.serie.NumberOfSeriesRelatedInstances.Value[0]} ]`;
       }
       if (this.serie.SeriesDescription !== undefined && this.serie.SeriesDescription.Value !== undefined) {
-        description = this.serie.SeriesDescription.Value[0];
+        [description] = this.serie.SeriesDescription.Value;
       }
       return `${modality} - ${description} ${numberInstances}`;
     },
@@ -247,7 +247,6 @@ export default {
       const openWindow = window.open('', windowProps.name);
       this.getViewerToken(token, this.studyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;
-        const sourceQuery = this.getSourceQueries();
         let url = '';
         if (windowProps.id === 'WADO') {
           const contentType = series.SOPClassUID.Value[0] === SOPPdf ? 'application/pdf' : 'video/mp4';

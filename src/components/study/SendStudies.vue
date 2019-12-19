@@ -237,7 +237,7 @@
               v-if="sourceIsAlbum"
             >
               <router-link
-                :to="{ name: 'album', params: { album_id: this.sourceSending.value }}"
+                :to="{ name: 'album', params: { album_id: sourceSending.value }}"
               >
                 {{ $t("album") }}
               </router-link>
@@ -339,7 +339,6 @@ import InputDicomize from '@/components/study/InputDicomize';
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue';
 import BlockIcon from '@/components/kheopsSVG/BlockIcon';
 import CloseIcon from '@/components/kheopsSVG/CloseIcon';
-import RemoveIcon from '@/components/kheopsSVG/RemoveIcon';
 import DoneIcon from '@/components/kheopsSVG/DoneIcon';
 import { DicomOperations } from '@/mixins/dicomoperations';
 import { CurrentUser } from '@/mixins/currentuser.js';
@@ -347,7 +346,7 @@ import { CurrentUser } from '@/mixins/currentuser.js';
 export default {
   name: 'SendStudies',
   components: {
-    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, RemoveIcon, DoneIcon, InputDicomize,
+    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, DoneIcon, InputDicomize,
   },
   mixins: [DicomOperations, CurrentUser],
   props: {
@@ -504,8 +503,8 @@ export default {
         const study = res.data[0];
         files.forEach((file) => {
           promiseSequential = promiseSequential.then(() => new Promise((resolve, reject) => {
-            this.dicomize(study, file, dicomValue[file.name]).then((res) => {
-              const data = res;
+            this.dicomize(study, file, dicomValue[file.name]).then((resdicomize) => {
+              const data = resdicomize;
               this.sendDicomizeDataPromise(file.id, data).then(() => {
                 this.$store.dispatch('removeFileId', { id: file.id });
                 this.countSentFiles += 1;

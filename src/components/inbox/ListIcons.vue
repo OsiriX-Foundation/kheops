@@ -211,6 +211,7 @@ export default {
       return '';
     },
     showIcons() {
+      // eslint-disable-next-line
       return (this.study.flag.is_hover || this.study._showDetails || this.study.showIcons);
     },
   },
@@ -306,6 +307,7 @@ export default {
       this.$store.dispatch('setFlagByStudyUID', params);
       this.$store.dispatch('setShowDetails', {
         StudyInstanceUID: study.StudyInstanceUID.Value[0],
+        // eslint-disable-next-line
         value: !study._showDetails,
       });
     },

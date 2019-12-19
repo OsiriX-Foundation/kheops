@@ -81,9 +81,9 @@ export default {
         if (this.albumID === undefined) {
           this.active = active;
         } else {
-          this.getAlbum(this.albumID).then((res) => {
+          this.getAlbum(this.albumID).then((resAlbum) => {
             this.active = active;
-            this.album = res.data;
+            this.album = resAlbum.data;
           });
         }
       } else {

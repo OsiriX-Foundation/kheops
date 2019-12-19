@@ -350,7 +350,7 @@ export default {
       return 'active';
     },
     revoke(tokenId) {
-      this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
+      this.$store.dispatch('revokeToken', { token_id: tokenId }).then(() => {
         this.getTokens();
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));

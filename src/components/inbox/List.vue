@@ -667,7 +667,8 @@ export default {
   methods: {
     setFilters() {
       let filterValue = false;
-      for (const key in this.$route.query) {
+
+      Object.keys(this.$route.query).forEach((key) => {
         const value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
         if (this.filters[key] !== undefined && key !== 'StudyDateFrom' && key !== 'StudyDateTo') {
           this.filters[key] = value;
@@ -685,7 +686,7 @@ export default {
           this.filters.StudyDateTo = this.dateFormatter(date[1]);
           filterValue = true;
         }
-      }
+      });
       this.changeFilterValue(filterValue);
     },
     scroll() {
@@ -890,10 +891,13 @@ export default {
       return '';
     },
     showRowDetails(item) {
+      // eslint-disable-next-line
       if (!item._showDetails) {
         this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view);
+        // eslint-disable-next-line
         item._showDetails = true;
       } else {
+        // eslint-disable-next-line
         item._showDetails = false;
       }
     },
