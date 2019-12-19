@@ -543,7 +543,7 @@ export default {
       });
     },
     sendFormData(files) {
-      this.config.formData.headers = { ...this.config.headers, ...this.config.formData.headers }
+      this.config.formData.headers = { ...this.config.headers, ...this.config.formData.headers };
       if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
         this.sendFormDataPromise(files);
       } else if (files.length > 0) {
@@ -559,7 +559,7 @@ export default {
       this.listErrorUnknownFiles = {};
       this.totalUnknownFilesError = 0;
       if (this.currentuserAccessToken() !== '') {
-        this.config.headers['Authorization'] = `Bearer ${this.currentuserAccessToken()}`;
+        this.config.headers.Authorization = `Bearer ${this.currentuserAccessToken()}`;
       }
 
       this.$store.dispatch('setSending', { sending: true });

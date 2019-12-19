@@ -187,7 +187,7 @@ export default {
     storeFiles(files) {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files });
-      this.$store.dispatch('setSourceSending', { source: this.source })
+      this.$store.dispatch('setSourceSending', { source: this.source });
     },
     createObjFiles(file, path, name) {
       if (!this.excludeFileName(name)) {
