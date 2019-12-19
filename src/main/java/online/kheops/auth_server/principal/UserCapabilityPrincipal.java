@@ -165,7 +165,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public ScopeType getScope() {
-        return ScopeType.valueOf(capability.getScopeType().toUpperCase());
+        return ScopeType.USER;
     }
 
     @Override
