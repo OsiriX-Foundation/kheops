@@ -329,14 +329,10 @@ public class ReportProviderResource {
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                       @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
+                                       @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId)
+            throws ClientIdNotFoundException {
 
-        final ReportProviderResponse reportProvider;
-        try {
-            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        final ReportProviderResponse reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
 
         return  Response.status(OK).entity(reportProvider).build();
     }
@@ -349,15 +345,12 @@ public class ReportProviderResource {
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId)
-            throws AlbumNotFoundException {
+            throws AlbumNotFoundException, ClientIdNotFoundException{
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
-        try {
-            deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+
+        deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
 
         return  Response.status(NO_CONTENT).build();
     }
@@ -374,8 +367,7 @@ public class ReportProviderResource {
                                         @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId,
                                         @FormParam("url") final String url,
                                         @FormParam("name") final String name)
-            throws AlbumNotFoundException {
-
+            throws AlbumNotFoundException, ClientIdNotFoundException {
 
         if(!(url == null || url.isEmpty() )) {
             if(!isValidConfigUrl(url)) {
@@ -390,12 +382,8 @@ public class ReportProviderResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
 
-        final ReportProviderResponse reportProvider;
-        try {
-            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        final ReportProviderResponse reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
+
 
         return  Response.status(OK).entity(reportProvider).build();
     }

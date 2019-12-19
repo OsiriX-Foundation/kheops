@@ -230,7 +230,6 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
         return Response.status(CREATED).build();
-
     }
 
     @PUT
@@ -494,7 +493,6 @@ public class SendingResource
         } catch (ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
-
 
         return Response.status(CREATED).build();
     }
