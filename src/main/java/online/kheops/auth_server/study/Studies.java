@@ -13,7 +13,6 @@ import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
-import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.jooq.*;

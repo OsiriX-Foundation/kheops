@@ -106,7 +106,7 @@ public class AlbumResource {
     @UserAccessSecured
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getAlbums() {
+    public Response getAlbums() throws BadQueryParametersException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
@@ -117,9 +117,6 @@ public class AlbumResource {
         } catch (JOOQException e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        } catch (BadQueryParametersException e) {
-            LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         }
 
         final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};

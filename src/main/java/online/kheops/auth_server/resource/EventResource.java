@@ -161,7 +161,7 @@ public class EventResource {
     public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @FormParam("to_user") String user,
                                        @FormParam("comment") @NotNull @NotEmpty String comment)
-            throws StudyNotFoundException {
+            throws StudyNotFoundException, BadQueryParametersException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -185,8 +185,6 @@ public class EventResource {
             Events.studyPostComment(kheopsPrincipal.getUser(), studyInstanceUID, comment, user);
         } catch (UserNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        } catch (BadQueryParametersException e) {
-            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         }
 
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)

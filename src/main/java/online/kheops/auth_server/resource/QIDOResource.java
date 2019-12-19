@@ -73,7 +73,7 @@ public class QIDOResource {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
                                @QueryParam(INBOX) Boolean fromInbox)
-            throws AlbumNotFoundException, AlbumForbiddenException {
+            throws AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -106,9 +106,6 @@ public class QIDOResource {
                     .detail("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component.")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        } catch (BadQueryParametersException e) {
-            LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (NoResultException e) {
             return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
         } catch (SQLException e) {
@@ -164,7 +161,7 @@ public class QIDOResource {
                               @QueryParam(FAVORITE) Boolean favoriteFilter,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
                               @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit)
-            throws AlbumNotFoundException, StudyNotFoundException {
+            throws AlbumNotFoundException, StudyNotFoundException, BadQueryParametersException{
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -195,12 +192,7 @@ public class QIDOResource {
             }
         }
 
-        final Comparator<Attributes> sortComparator;
-        try {
-            sortComparator = SeriesQIDOSortParams.sortComparator(uriInfo.getQueryParameters());
-        } catch (BadQueryParametersException e) {
-            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
-        }
+        final Comparator<Attributes> sortComparator = SeriesQIDOSortParams.sortComparator(uriInfo.getQueryParameters());
 
         fromInbox = fromInbox != null;
 
