@@ -2,6 +2,7 @@ package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
@@ -30,12 +31,12 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException, UserNotMemberException {
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , BadQueryParametersException, UserNotMemberException {
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters, kheopsLogBuilder);
     }
 
     public static CapabilitiesResponse createUserCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
-            throws CapabilityBadRequestException {
+            throws BadQueryParametersException {
 
         final CapabilitiesResponse capabilityResponse;
 
@@ -73,7 +74,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse createAlbumCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
+            throws AlbumNotFoundException, NewCapabilityForbidden, BadQueryParametersException, UserNotMemberException {
 
         final CapabilitiesResponse capabilityResponse;
 

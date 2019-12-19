@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.*;
@@ -119,7 +120,7 @@ public class CapabilitiesResource {
 
         try {
             capabilityParametersBuilder.scope(scopeType, albumId);
-        } catch (CapabilityBadRequestException e) {
+        } catch (BadQueryParametersException e) {
             return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (IllegalArgumentException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -137,7 +138,7 @@ public class CapabilitiesResource {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         } catch (NewCapabilityForbidden e) {
             return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
-        } catch (CapabilityBadRequestException e) {
+        } catch (BadQueryParametersException e) {
             return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         }
 
