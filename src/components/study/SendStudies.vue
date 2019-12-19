@@ -342,13 +342,14 @@ import CloseIcon from '@/components/kheopsSVG/CloseIcon';
 import RemoveIcon from '@/components/kheopsSVG/RemoveIcon';
 import DoneIcon from '@/components/kheopsSVG/DoneIcon';
 import { DicomOperations } from '@/mixins/dicomoperations';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'SendStudies',
   components: {
     ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, RemoveIcon, DoneIcon, InputDicomize,
   },
-  mixins: [DicomOperations],
+  mixins: [DicomOperations, CurrentUser],
   props: {
   },
   data() {
@@ -381,6 +382,7 @@ export default {
             'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary',
           },
         },
+        headers: {},
       },
       errorValues: {
         292: 'authorizationerror',
@@ -497,6 +499,7 @@ export default {
     },
     sendDicomizeFiles(files, dicomValue) {
       let promiseSequential = Promise.resolve();
+      this.config.dicomizeData.headers = { ...this.config.headers, ...this.config.dicomizeData.headers };
       this.getStudy(this.studyUIDToSend).then((res) => {
         const study = res.data[0];
         files.forEach((file) => {
@@ -540,6 +543,7 @@ export default {
       });
     },
     sendFormData(files) {
+      this.config.formData.headers = { ...this.config.headers, ...this.config.formData.headers }
       if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
         this.sendFormDataPromise(files);
       } else if (files.length > 0) {
@@ -554,6 +558,9 @@ export default {
       this.progress = 0;
       this.listErrorUnknownFiles = {};
       this.totalUnknownFilesError = 0;
+      if (this.currentuserAccessToken() !== '') {
+        this.config.headers['Authorization'] = `Bearer ${this.currentuserAccessToken()}`;
+      }
 
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('initErrorFiles');

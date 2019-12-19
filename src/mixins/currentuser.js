@@ -19,15 +19,6 @@ export const CurrentUser = {
     currentuserKeycloakToken() {
       return Vue.prototype.$keycloak.token;
     },
-    currentuserAccessToken() {
-      if (window.location.pathname.includes('view')) {
-        const [, , token] = window.location.pathname.split('/');
-        return token;
-      } if (Vue.prototype.$keycloak.authenticated) {
-        return Vue.prototype.$keycloak.token;
-      }
-      return '';
-    },
     currentuserSub() {
       return Vue.prototype.$keycloak.idTokenParsed.sub;
     },
@@ -36,6 +27,17 @@ export const CurrentUser = {
     },
     currentuserFullname() {
       return Vue.prototype.$keycloak.idTokenParsed.name;
+    },
+  },
+  methods: {
+    currentuserAccessToken() {
+      if (window.location.pathname.includes('view')) {
+        const [, , token] = window.location.pathname.split('/');
+        return token;
+      } if (Vue.prototype.$keycloak.authenticated) {
+        return Vue.prototype.$keycloak.token;
+      }
+      return '';
     },
   },
 };
