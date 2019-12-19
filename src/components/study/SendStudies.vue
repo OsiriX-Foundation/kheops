@@ -498,7 +498,7 @@ export default {
     },
     sendDicomizeFiles(files, dicomValue) {
       let promiseSequential = Promise.resolve();
-      this.config.dicomizeData.headers = { ...this.config.headers, ...this.config.dicomizeData.headers };
+      this.config.dicomizeData.headers = { ...this.config.dicomizeData.headers, ...this.config.headers };
       this.getStudy(this.studyUIDToSend).then((res) => {
         const study = res.data[0];
         files.forEach((file) => {
@@ -542,7 +542,7 @@ export default {
       });
     },
     sendFormData(files) {
-      this.config.formData.headers = { ...this.config.headers, ...this.config.formData.headers };
+      this.config.formData.headers = { ...this.config.formData.headers, ...this.config.headers };
       if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
         this.sendFormDataPromise(files);
       } else if (files.length > 0) {
