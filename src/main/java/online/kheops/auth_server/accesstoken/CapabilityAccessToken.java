@@ -110,7 +110,7 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        if (capability.getScopeType().equals(ScopeType.ALBUM)) {
+        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
             return new AlbumCapabilityPrincipal(capability, user, token);
         } else {
             return new UserCapabilityPrincipal(capability, user, token);

@@ -3,7 +3,6 @@ package online.kheops.auth_server.principal;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.accesstoken.AccessToken.TokenType;
-import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
@@ -18,7 +17,6 @@ import java.util.Optional;
 
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.*;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesBySeriesAndAlbumWithSendPermission;
 import static online.kheops.auth_server.series.SeriesQueries.isOrphan;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
