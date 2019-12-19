@@ -150,16 +150,11 @@ public class CapabilitiesResource {
     @Path("capabilities/{capability_id:"+ID_PATTERN+"}/revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId) {
+    public Response revokeCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_id") String capabilityId)
+            throws CapabilityNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
-        final CapabilitiesResponse capabilityResponse;
-
-        try {
-            capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (CapabilityNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
+        final CapabilitiesResponse capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(capabilityResponse).build();
     }
@@ -202,16 +197,12 @@ public class CapabilitiesResource {
     @Path("capabilities/{capability_token_id:" + ID_PATTERN + "}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID) {
+    public Response getCapability(@SuppressWarnings("RSReferenceInspection") @PathParam("capability_token_id") String capabilityTokenID)
+            throws CapabilityNotFoundException {
 
-        final CapabilitiesResponse capabilityResponses;
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
+        final CapabilitiesResponse capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getUser());
 
-        try {
-            capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getUser());
-        } catch (CapabilityNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
         kheopsPrincipal.getKheopsLogBuilder().action(ActionType.GET_CAPABILITY)
                 .capabilityID(capabilityTokenID)
                 .log();
