@@ -133,7 +133,7 @@ public class EventResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")
@@ -165,7 +165,7 @@ public class EventResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+        if(!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")

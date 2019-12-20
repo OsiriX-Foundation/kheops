@@ -49,7 +49,10 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasUserAccess() { return false; }
+
+    @Override
+    public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             if (capability.hasReadPermission()) {
@@ -68,7 +71,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) {
+    public boolean hasStudyViewAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
@@ -88,10 +91,85 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     }
 
     @Override
-    public boolean hasUserAccess() { return false; }
+    public boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            if (capability.hasReadPermission() && capability.hasWritePermission()) {
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
+                if (!albumUser.isAdmin()) { //the user who created the token is not longer an admin => normally the token should be removed
+                    return false;
+                }
+                return canAccessSeries(capability.getAlbum(), studyInstanceUID, seriesInstanceUID, em);
+            }
+        } catch (UserNotMemberException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+        return false;
+    }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasStudyDeleteAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            final Study study = getStudy(studyInstanceUID, em);
+            if (capability.hasReadPermission() && capability.hasWritePermission()) {
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
+                return canAccessStudy(capability.getAlbum(), study, em);
+            }
+        } catch (StudyNotFoundException | UserNotMemberException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            if (capability.hasAppropriatePermission()) {
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
+                if (!albumUser.isAdmin()) { //the user who created the token is not longer an admin => normally the token should be removed
+                    return false;
+                }
+                return canAccessSeries(capability.getAlbum(), studyInstanceUID, seriesInstanceUID, em);
+            }
+        } catch (UserNotMemberException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasStudyShareAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            final Study study = getStudy(studyInstanceUID, em);
+            if (capability.hasAppropriatePermission()) {
+                final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
+                if (!albumUser.isAdmin()) {
+                    return false;
+                }
+                return canAccessStudy(capability.getAlbum(), study, em);
+            }
+        } catch (StudyNotFoundException | UserNotMemberException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         final User mergeUser = em.merge(user);
         try {
@@ -124,7 +202,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     }
 
     @Override
-    public boolean hasStudyWriteAccess(String studyInstanceUID) {
+    public boolean hasStudyAddAccess(String studyInstanceUID) {
         if (!canAccessStudy(capability.getAlbum(), studyInstanceUID)) {
             return capability.hasWritePermission();
         }

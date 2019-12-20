@@ -208,7 +208,7 @@ public class QIDOResource {
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY)
                 .study(studyInstanceUID);
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
         }
 
@@ -376,7 +376,7 @@ public class QIDOResource {
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY_METADATA)
                 .study(studyInstanceUID);
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")

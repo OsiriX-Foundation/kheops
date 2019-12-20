@@ -60,9 +60,11 @@ public class ViewerPrincipal implements KheopsPrincipal {
     public String getName() { return kheopsPrincipal.getName(); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasUserAccess() { return false; }
 
-        if(!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+    @Override
+    public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
+        if(!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID)) {
             return false;
         }
 
@@ -90,22 +92,13 @@ public class ViewerPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) {
-        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+    public boolean hasStudyViewAccess(String studyInstanceUID) {
+        if(!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             return false;
         }
 
         return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
     }
-
-    @Override
-    public boolean hasUserAccess() { return false; }
-
-    @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) { return false; }
-
-    @Override
-    public boolean hasStudyWriteAccess(String study) { return false; }
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {

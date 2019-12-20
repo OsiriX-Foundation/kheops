@@ -73,7 +73,7 @@ public class FavoriteResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access")
@@ -131,7 +131,7 @@ public class FavoriteResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+        if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")

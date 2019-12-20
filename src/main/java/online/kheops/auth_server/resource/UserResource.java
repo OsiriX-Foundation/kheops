@@ -110,7 +110,7 @@ public class UserResource {
                 if (albumId != null) {
                     result = searchUsersInAlbum(search, albumId, limit, offset);
                 } else if (studyInstanceUID != null) {
-                    if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                    if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message(STUDY_NOT_FOUND)
                                 .detail("The study does not exist or you don't have access")

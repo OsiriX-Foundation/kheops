@@ -103,7 +103,7 @@ public class SendingResource
             fromInbox = false;
         }
 
-        if(fromInbox && !kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+        if(fromInbox && !kheopsPrincipal.hasStudyShareAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the inbox")
@@ -131,7 +131,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+        if (!kheopsPrincipal.hasSeriesShareAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(SERIES_NOT_FOUND)
                     .detail("The series does not exist or you don't have access")
@@ -168,7 +168,7 @@ public class SendingResource
                 return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
-            if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+            if (!tokenPrincipal.hasSeriesShareAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
@@ -202,7 +202,7 @@ public class SendingResource
 
 
         } else {
-            if (!kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            if (!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
@@ -255,7 +255,7 @@ public class SendingResource
                 return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
-            if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+            if (!tokenPrincipal.hasStudyShareAccess(studyInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(STUDY_NOT_FOUND)
                         .detail("The study does not exist or you don't have access")
@@ -288,7 +288,7 @@ public class SendingResource
             }
 
         } else {
-            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+            if (!kheopsPrincipal.hasStudyShareAccess(studyInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(STUDY_NOT_FOUND)
                         .detail("The study does not exist or you don't have access with the appropriate permission")
@@ -342,7 +342,7 @@ public class SendingResource
             }
         }
 
-        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have access with the delete permission")
@@ -396,7 +396,7 @@ public class SendingResource
             }
         }
 
-        if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+        if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
                     .detail("The token not allow you to delete a study")
@@ -451,7 +451,7 @@ public class SendingResource
                 return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
             }
 
-            if (!tokenPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+            if (!tokenPrincipal.hasSeriesShareAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")
@@ -479,7 +479,7 @@ public class SendingResource
             }
 
         } else {
-            if (!kheopsPrincipal.hasStudyWriteAccess(studyInstanceUID) || !kheopsPrincipal.hasSeriesWriteAccess(studyInstanceUID, seriesInstanceUID)) {
+            if (!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have the send permission")
@@ -548,7 +548,7 @@ public class SendingResource
                                 .build();
                         return Response.status(FORBIDDEN).entity(errorResponse).build();
                     }
-                    if (!tokenPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+                    if (!tokenPrincipal.hasStudyShareAccess(studyInstanceUID)) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message(STUDY_NOT_FOUND)
                                 .detail("The study does not exist or you don't have access")

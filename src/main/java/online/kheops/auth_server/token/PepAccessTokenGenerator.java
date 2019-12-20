@@ -74,7 +74,7 @@ class PepAccessTokenGenerator {
 
         try {
             final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
-            if (!principal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+            if (!principal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(SERIES_NOT_FOUND)
                         .detail("The series does not exist or you don't have access")

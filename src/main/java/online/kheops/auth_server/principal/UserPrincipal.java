@@ -46,7 +46,10 @@ public class UserPrincipal implements KheopsPrincipal {
     public String getName() { return user.getKeycloakId(); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasUserAccess() { return true; }
+
+    @Override
+    public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
@@ -56,7 +59,7 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) {
+    public boolean hasStudyViewAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
@@ -69,10 +72,53 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasUserAccess() { return true; }
+    public boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
+        } finally {
+            em.close();
+        }
+    }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasStudyDeleteAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            final Study study = getStudy(studyInstanceUID, em);
+            return canAccessStudy(user, study, em);
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean hasStudyShareAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            final Study study = getStudy(studyInstanceUID, em);
+            return canAccessStudy(user, study, em);
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             //find if the series exist
@@ -103,7 +149,9 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyWriteAccess(String study) { return true; }
+    public boolean hasStudyAddAccess(String studyInstanceUID) {
+        return true;
+    }
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
