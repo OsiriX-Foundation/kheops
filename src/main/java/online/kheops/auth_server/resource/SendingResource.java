@@ -342,10 +342,18 @@ public class SendingResource
             }
         }
 
-        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
-                    .detail("The study does not exist or you don't have access with the delete permission")
+                    .detail("The study does not exist or you don't have")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
+        }
+
+        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID)) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("You don't have access with the delete permission")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
@@ -396,10 +404,18 @@ public class SendingResource
             }
         }
 
+        if (!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID)) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("Series does not exist or you don't have access")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
+        }
+
         if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
-                    .detail("The token not allow you to delete a study")
+                    .detail("The token not allow you to delete a series")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
