@@ -29,7 +29,7 @@ const actions = {
     }
 
     return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
-      commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() });
+      commit('SET_COMMENTS', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() });
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -50,7 +50,7 @@ const actions = {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
     return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
-      commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.album_id, comments: res.data.reverse() });
+      commit('SET_COMMENTS', { StudyInstanceUID: params.album_id, comments: res.data.reverse() });
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -67,10 +67,10 @@ const actions = {
 
 // mutations
 const mutations = {
-  INIT_COMMENTS_TEST(state) {
+  INIT_COMMENTS(state) {
     state.comments = {};
   },
-  SET_COMMENTS_TEST(state, params) {
+  SET_COMMENTS(state, params) {
     Vue.set(state.comments, params.StudyInstanceUID, params.comments);
   },
 };

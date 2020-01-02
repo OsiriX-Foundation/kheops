@@ -442,6 +442,9 @@ export default {
   created() {
     this.getComments();
   },
+  destroyed() {
+    this.$store.commit('INIT_COMMENTS');
+  },
   methods: {
     checkUserFromTextarea() {
       if (this.disabledText) {
