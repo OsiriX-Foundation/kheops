@@ -307,8 +307,7 @@ export default {
       this.$store.dispatch('setFlagByStudyUID', params);
       this.$store.dispatch('setShowDetails', {
         StudyInstanceUID: study.StudyInstanceUID.Value[0],
-        // eslint-disable-next-line
-        value: !study._showDetails,
+        value: true,
       });
     },
     setStudyUID() {
