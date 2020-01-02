@@ -100,6 +100,7 @@
       @change="inputLoadDirectories"
     >
     <list-headers
+      :id="headerID"
       :studies="studies"
       :albums="albums"
       :show-send-button="permissions.send_series"
@@ -484,6 +485,7 @@ export default {
       isActive: false,
       showIcons: false,
       statusList: 200,
+      headerID: 'listheaders',
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -669,10 +671,11 @@ export default {
   methods: {
     setFilters() {
       let filterValue = false;
-      for (const key in this.$route.query) {
+
+      Object.keys(this.$route.query).forEach((key) => {
         const value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
-        if (this.filters[key] !== undefined) {
-          this.filters[key] = (key !== 'StudyDateFrom' && key !== 'StudyDateTo') ? value : this.dateFormatter(value);
+        if (this.filters[key] !== undefined && key !== 'StudyDateFrom' && key !== 'StudyDateTo') {
+          this.filters[key] = value;
           filterValue = true;
         }
         if (key === 'StudyDate') {
@@ -687,8 +690,10 @@ export default {
           this.filters.StudyDateTo = this.dateFormatter(date[1]);
           filterValue = true;
         }
+      });
+      if (filterValue === true) {
+        this.changeFilterValue();
       }
-      this.changeFilterValue(filterValue);
     },
     scroll() {
       window.onscroll = () => {
@@ -892,10 +897,13 @@ export default {
       return '';
     },
     showRowDetails(item) {
+      // eslint-disable-next-line
       if (!item._showDetails) {
         this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view);
+        // eslint-disable-next-line
         item._showDetails = true;
       } else {
+        // eslint-disable-next-line
         item._showDetails = false;
       }
     },
@@ -911,8 +919,11 @@ export default {
         this.$emit('loaddirectories', filesFromInput);
       }
     },
-    changeFilterValue(value) {
-      this.showFilters = value;
+    changeFilterValue() {
+      this.showFilters = !this.showFilters;
+      if (this.showFilters === true && this.isActive === true) {
+        this.scrollTo(this.headerID);
+      }
     },
     setShowIcons(value, studyUID, index = -1) {
       let studyIndex = index;
@@ -920,6 +931,17 @@ export default {
         studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === studyUID);
       }
       this.studies[studyIndex].showIcons = value;
+    },
+    scrollTo(id) {
+      const target = this.$el.querySelector(`#${id}`);
+      if (target !== null) {
+        const options = {
+          top: target.scrollHeight,
+          left: 0,
+          behavior: 'smooth',
+        };
+        window.scrollTo(options);
+      }
     },
   },
 };

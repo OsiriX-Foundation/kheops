@@ -161,28 +161,28 @@
           >
             <div class="col-xl-1" />
             <div
-              v-for="(value, idx) in numberCol"
+              v-for="(valuex, idx) in numberCol"
               :key="idx"
               class="col-md-12 col-lg-6 col-xl-5"
             >
               <span
-                v-for="(value,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*value)"
+                v-for="(valuey,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*valuex)"
                 :key="idy"
               >
                 <div
                   class="mt-2"
-                  :class="(value[0]=='sendSeries')?'offset-1':''"
+                  :class="(valuey[0]=='sendSeries')?'offset-1':''"
                 >
                   <toggle-button
-                    v-model="album.userSettings[value[0]]"
-                    :disabled="(!album.userSettings.downloadSeries && value[0]=='sendSeries')"
+                    v-model="album.userSettings[valuey[0]]"
+                    :disabled="(!album.userSettings.downloadSeries && valuey[0]=='sendSeries')"
                     :color="{checked: '#5fc04c', unchecked: 'grey'}"
                     :sync="true"
                   />
                   <label
                     class="user-settings ml-2 mt-2 word-break"
                   >
-                    {{ $t(value[0]) }}
+                    {{ $t(valuey[0]) }}
                   </label>
                 </div>
               </span>
@@ -267,9 +267,12 @@ export default {
     userSettingsLength() {
       return Object.keys(this.album.userSettings).length;
     },
+    downloadSeries() {
+      return this.album.userSettings.downloadSeries;
+    },
   },
   watch: {
-    'album.userSettings.downloadSeries': function () {
+    downloadSeries() {
       if (!this.album.userSettings.downloadSeries) {
         this.album.userSettings.sendSeries = false;
       }

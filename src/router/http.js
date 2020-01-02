@@ -2,6 +2,7 @@ import axios from 'axios';
 import Vue from 'vue';
 import { serverURL } from '@/app_config';
 
+// eslint-disable-next-line
 export const HTTP = axios.create({ baseURL: serverURL });
 
 HTTP.interceptors.request.use((config) => {

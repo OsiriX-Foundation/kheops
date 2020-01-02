@@ -72,7 +72,9 @@
 
 <template>
   <div class="container">
-    <div class="row justify-content-center">
+    <div
+      class="row justify-content-center"
+    >
       <p
         v-if="scope === 'album'"
         class="col-sm-12 col-md-10 offset-md-1 text-right"
@@ -92,6 +94,13 @@
         :id="container_id"
         class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3 comment-section card-main"
       >
+        <div
+          v-if="loading === true"
+        >
+          <pulse-loader
+            color="white"
+          />
+        </div>
         <div
           v-for="comment in comments"
           :key="comment.id"
@@ -379,12 +388,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
 
 export default {
   name: 'CommentsAndNotifications',
-  components: { AddUser },
+  components: { AddUser, PulseLoader },
   mixins: [CurrentUser],
   props: {
     scope: {
@@ -413,6 +423,7 @@ export default {
       enablePrivate: false,
       disabledText: false,
       statusMsgPrivate: false,
+      loading: true,
     };
   },
   computed: {
@@ -441,6 +452,9 @@ export default {
   },
   created() {
     this.getComments();
+  },
+  destroyed() {
+    this.$store.commit('INIT_COMMENTS');
   },
   methods: {
     checkUserFromTextarea() {
@@ -527,10 +541,12 @@ export default {
       const types = (this.includeNotifications) ? undefined : { types: 'comments' };
       if (this.scope === 'album') {
         this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
+          this.loading = false;
           this.scrollBottom();
         });
       } else if (this.scope === 'studies') {
         this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
+          this.loading = false;
           this.scrollBottom();
         });
       }

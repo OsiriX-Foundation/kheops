@@ -11,8 +11,8 @@
     "disable": "Revoke",
     "urlsharing": "Your sharing url :",
     "copysuccess": "Successfully copied",
-	  "sorryerror": "Sorry, an error occured",
-    "addalbum": "Add to album / inbox"
+    "sorryerror": "Sorry, an error occured",
+    "addalbum": "Sharing"
   },
   "fr": {
     "write": "Ajouter et supprimer des séries dans l'album",
@@ -25,8 +25,8 @@
     "disable": "Désactiver",
     "urlsharing": "Votre url de partage :",
     "copysuccess": "Copié avec succès",
-  	"sorryerror": "Désolé, une erreur est survenue",
-    "addalbum": "Ajouter à un album / inbox"
+    "sorryerror": "Désolé, une erreur est survenue",
+    "addalbum": "Partager"
   }
 }
 </i18n>
@@ -181,11 +181,10 @@
 <script>
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
-import CloseIcon from '@/components/kheopsSVG/CloseIcon';
 
 export default {
   name: 'SharingLink',
-  components: { Datepicker, CloseIcon },
+  components: { Datepicker },
   props: {
     albumId: {
       type: String,

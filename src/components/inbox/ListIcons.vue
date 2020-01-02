@@ -211,6 +211,7 @@ export default {
       return '';
     },
     showIcons() {
+      // eslint-disable-next-line
       return (this.study.flag.is_hover || this.study._showDetails || this.study.showIcons);
     },
   },
@@ -256,7 +257,8 @@ export default {
     getURLDownload() {
       const sourceQuery = this.getSourceQueries();
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
+      const token = this.currentuserAccessToken();
+      this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
         location.href = URL;
@@ -276,7 +278,8 @@ export default {
       } else if (viewer === 'default' && openWSI === true) {
         openWindow.wsi = window.open('', `WSIViewer-${StudyInstanceUID}`);
       }
-      this.getViewerToken(this.currentuserAccessToken, StudyInstanceUID, this.source).then((res) => {
+      const token = this.currentuserAccessToken();
+      this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;
         let url = '';
         if (viewer === 'Osirix') {
@@ -304,7 +307,7 @@ export default {
       this.$store.dispatch('setFlagByStudyUID', params);
       this.$store.dispatch('setShowDetails', {
         StudyInstanceUID: study.StudyInstanceUID.Value[0],
-        value: !study._showDetails,
+        value: true,
       });
     },
     setStudyUID() {
