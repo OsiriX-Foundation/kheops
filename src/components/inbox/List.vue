@@ -100,6 +100,7 @@
       @change="inputLoadDirectories"
     >
     <list-headers
+      :id="headerID"
       :studies="studies"
       :albums="albums"
       :show-send-button="permissions.send_series"
@@ -492,6 +493,7 @@ export default {
       isActive: false,
       showIcons: false,
       statusList: 200,
+      headerID: 'listheaders',
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -913,8 +915,11 @@ export default {
         this.$emit('loaddirectories', filesFromInput);
       }
     },
-    changeFilterValue(value) {
-      this.showFilters = value;
+    changeFilterValue() {
+      this.showFilters = !this.showFilters;
+      if (this.showFilters === true && this.isActive === true) {
+        this.scrollTo(this.headerID);
+      }
     },
     setShowIcons(value, studyUID, index = -1) {
       let studyIndex = index;
@@ -922,6 +927,17 @@ export default {
         studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === studyUID);
       }
       this.studies[studyIndex].showIcons = value;
+    },
+    scrollTo(id) {
+      const target = this.$el.querySelector(`#${id}`);
+      if (target !== null) {
+        const options = {
+          top: target.scrollHeight,
+          left: 0,
+          behavior: 'smooth',
+        };
+        window.scrollTo(options);
+      }
     },
   },
 };
