@@ -689,7 +689,9 @@ export default {
           filterValue = true;
         }
       });
-      this.changeFilterValue(filterValue);
+      if (filterValue === true) {
+        this.changeFilterValue();
+      }
     },
     scroll() {
       window.onscroll = () => {
