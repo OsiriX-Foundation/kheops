@@ -114,8 +114,8 @@
       @reloadStudies="reloadStudies"
     />
     <div
-      id="myHeader"
-      ref="myHeader"
+      id="stickyHeader"
+      ref="stickyHeader"
       :class="isActive ? 'pt-2 sticky' : ''"
     >
       <list-headers
@@ -695,13 +695,13 @@ export default {
     },
     scroll() {
       window.onscroll = () => {
-        if (this.$refs.myHeader !== undefined && this.$refs.studiesList !== undefined) {
-          const sticky = this.$refs.myHeader.offsetTop;
-          const heightSticky = this.$refs.myHeader.clientHeight;
+        if (this.$refs.stickyHeader !== undefined && this.$refs.studiesList !== undefined) {
+          const sticky = this.$refs.stickyHeader.offsetTop;
+          const heightSticky = this.$refs.stickyHeader.clientHeight;
           const studiesList = this.$refs.studiesList.offsetTop;
           if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
             this.isActive = true;
-          } else if (window.pageYOffset < studiesList - heightSticky) {
+          } else if ((window.pageYOffset < studiesList - heightSticky) && this.isActive) {
             this.isActive = false;
           }
         }
