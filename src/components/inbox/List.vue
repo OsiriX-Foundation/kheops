@@ -458,6 +458,7 @@ import mobiledetect from '@/mixins/mobiledetect.js';
 import SortList from '@/components/inbox/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
+import { filter } from 'minimatch';
 
 export default {
   name: 'Studies',
@@ -635,6 +636,7 @@ export default {
     },
     filters: {
       handler() {
+        // const noFiltersSet = Object.values(this.filters).every((filterValue) => filterValue === '');
         this.searchStudies();
       },
       deep: true,
