@@ -624,8 +624,6 @@ export default {
       this.$emit('reloadStudies');
     },
     goToCreateAlbum() {
-      this.$router.push({ path: '/albums/new' });
-
       const StudiesUID = [];
       this.selectedStudies.forEach((study) => {
         StudiesUID.push(study.StudyInstanceUID.Value[0]);
