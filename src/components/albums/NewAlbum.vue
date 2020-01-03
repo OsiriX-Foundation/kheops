@@ -364,7 +364,8 @@ export default {
     dataToUpload(albumId) {
       const data = [];
       if (this.$route.query && this.$route.query.StudyInstanceUID) {
-        this.$route.query.StudyInstanceUID.forEach((study) => {
+        const studies = Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID : [this.$route.query.StudyInstanceUID]
+        studies.forEach((study) => {
           data.push({
             album_id: albumId,
             study_id: study,
@@ -372,7 +373,8 @@ export default {
         });
       }
       if (this.$route.query && this.$route.query.SeriesInstanceUID) {
-        this.$route.query.SeriesInstanceUID.forEach((serie) => {
+        const series = Array.isArray(this.$route.query.SeriesInstanceUID) ? this.$route.query.SeriesInstanceUID : [this.$route.query.SeriesInstanceUID]
+        series.forEach((serie) => {
           const infoSerie = serie.split(',');
           if (infoSerie.length === 2) {
             data.push({
