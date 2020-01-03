@@ -198,7 +198,8 @@ export default {
   computed: {
     lastAdmin() {
       const last = this.users.filter((user) => user.is_admin && user.email !== this.currentuserEmail);
-      return !(last.length > 0);
+      const currentUserAdmin = this.users.filter((user) => user.is_admin && user.email === this.currentuserEmail);
+      return (!(last.length > 0) && currentUserAdmin.length > 0);
     },
     lastUser() {
       return !(this.users.length > 1);
