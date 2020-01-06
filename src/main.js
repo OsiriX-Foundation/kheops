@@ -17,12 +17,12 @@ import VeeValidate from 'vee-validate';
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js';
 import '@/filters/filters.js';
 import VueI18n from 'vue-i18n';
+import VueScrollTo from 'vue-scrollto';
 import store from './store';
 import Access from '@/directives/access';
 import router from './router';
 import App from './App';
 import messages from '@/lang/messages';
-import VueScrollTo from 'vue-scrollto';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;

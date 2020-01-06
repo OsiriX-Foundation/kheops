@@ -79,7 +79,6 @@
 
 <template>
   <div>
-    <span id="1234"/>
     <input
       id="file"
       ref="inputfiles"
