@@ -458,7 +458,6 @@ import mobiledetect from '@/mixins/mobiledetect.js';
 import SortList from '@/components/inbox/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
-import { filter } from 'minimatch';
 
 export default {
   name: 'Studies',
@@ -936,6 +935,8 @@ export default {
     },
     scrollTo(id) {
       const target = this.$el.querySelector(`#${id}`);
+      this.$scrollTo(target);
+      /*
       if (target !== null) {
         const options = {
           top: target.scrollHeight,
@@ -944,6 +945,7 @@ export default {
         };
         window.scrollTo(options);
       }
+      */
     },
   },
 };

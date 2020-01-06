@@ -22,6 +22,7 @@ import Access from '@/directives/access';
 import router from './router';
 import App from './App';
 import messages from '@/lang/messages';
+import VueScrollTo from 'vue-scrollto';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;
@@ -39,6 +40,7 @@ Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
 Vue.use(VueI18n);
 Vue.use(lodash);
 Vue.use(ToggleButton);
+Vue.use(VueScrollTo);
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon);
 Vue.directive('access', Access);
