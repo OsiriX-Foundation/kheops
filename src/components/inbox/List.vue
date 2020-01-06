@@ -79,6 +79,7 @@
 
 <template>
   <div>
+    <span id="1234"/>
     <input
       id="file"
       ref="inputfiles"
@@ -321,6 +322,10 @@
         <template
           v-slot:cell(is_selected)="row"
         >
+          <span
+            v-if="row.item.StudyInstanceUID !== undefined && row.item.StudyInstanceUID.Value !== undefined"
+            :id="`${row.item.StudyInstanceUID.Value[0]}`"
+          />
           <b-button-group>
             <b-button
               variant="link"
@@ -486,6 +491,7 @@ export default {
       showIcons: false,
       statusList: 200,
       headerID: 'listheaders',
+      firstScrollTo: '',
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -660,6 +666,9 @@ export default {
     this.setAlbumsList();
     this.setAlbumInbox();
     this.setFilters();
+    if (this.$route.query.StudyInstanceUID !== undefined) {
+      this.firstScrollTo = decodeURIComponent(Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID[0] : this.$route.query.StudyInstanceUID);
+    }
   },
   destroyed() {
     this.$store.dispatch('initStudies', {});
@@ -710,6 +719,14 @@ export default {
         }
       };
     },
+    getStudyByUID(StudyUID) {
+      return this.studies.filter((study) => {
+        if (study.StudyInstanceUID !== undefined && study.StudyInstanceUID.Value !== undefined) {
+          return study.StudyInstanceUID.Value[0] === StudyUID;
+        }
+        return false;
+      });
+    },
     // https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
     infiniteHandler($state) {
       this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then((res) => {
@@ -725,7 +742,25 @@ export default {
         } else if (res.status === 204 && res.data.length === 0) {
           $state.complete();
         }
+        if (this.firstScrollTo !== '') {
+          const study = this.getStudyByUID(this.firstScrollTo);
+          if (study.length > 0) {
+            const el = this.$el.querySelector(`[id='${this.firstScrollTo}']`);
+            const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
+            let offset = 0;
+            if (el !== null) {
+              offset = el.offsetHeight + 75;
+            }
+            if (elStickyHeader !== null) {
+              offset += elStickyHeader.offsetHeight;
+            }
+            this.scrollTo(el, -offset);
+            this.showRowDetails(study[0]);
+          }
+          this.firstScrollTo = '';
+        }
       }).catch((err) => {
+        console.log(err);
         if (err.response !== undefined && err.response.status !== undefined) {
           this.statusList = err.response.status;
         }
@@ -787,7 +822,7 @@ export default {
         this.toggleDetails(row);
       }
     },
-    setViewDetails(StudyInstanceUID, flagView) {
+    setViewDetails(StudyInstanceUID, flagView = '') {
       const viewSelected = flagView === '' ? 'series' : flagView;
       const params = {
         StudyInstanceUID,
@@ -923,7 +958,9 @@ export default {
     changeFilterValue() {
       this.showFilters = !this.showFilters;
       if (this.showFilters === true && this.isActive === true) {
-        this.scrollTo(this.headerID);
+        const el = this.$el.querySelector(`[id='${this.headerID}']`);
+        const offset = -el.offsetHeight;
+        this.scrollTo(el, offset);
       }
     },
     setShowIcons(value, studyUID, index = -1) {
@@ -933,19 +970,14 @@ export default {
       }
       this.studies[studyIndex].showIcons = value;
     },
-    scrollTo(id) {
-      const target = this.$el.querySelector(`#${id}`);
-      this.$scrollTo(target);
-      /*
-      if (target !== null) {
+    scrollTo(el, offset = 0) {
+      if (el !== null) {
         const options = {
-          top: target.scrollHeight,
-          left: 0,
-          behavior: 'smooth',
+          offset,
+          cancelable: true,
         };
-        window.scrollTo(options);
+        this.$scrollTo(el, options);
       }
-      */
     },
   },
 };
