@@ -959,8 +959,10 @@ export default {
       this.showFilters = !this.showFilters;
       if (this.showFilters === true && this.isActive === true) {
         const el = this.$el.querySelector(`[id='${this.headerID}']`);
-        const offset = -el.offsetHeight;
-        this.scrollTo(el, offset);
+        if (el !== null) {
+          const offset = -el.offsetHeight;
+          this.scrollTo(el, offset);
+        }
       }
     },
     setShowIcons(value, studyUID, index = -1) {
