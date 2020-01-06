@@ -491,9 +491,14 @@ export default {
       statusList: 200,
       headerID: 'listheaders',
       firstScrollTo: '',
+      sortable: [
+        'StudyDate',
+        'PatientID',
+        'PatientName',
+      ],
       studiesParams: {
         offset: 0,
-        limit: 50,
+        limit: 100,
         sortDesc: true,
         sortBy: 'StudyDate',
       },
@@ -665,9 +670,7 @@ export default {
     this.setAlbumsList();
     this.setAlbumInbox();
     this.setFilters();
-    if (this.$route.query.StudyInstanceUID !== undefined) {
-      this.firstScrollTo = decodeURIComponent(Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID[0] : this.$route.query.StudyInstanceUID);
-    }
+    this.setQueryParams();
   },
   destroyed() {
     this.$store.dispatch('initStudies', {});
@@ -678,6 +681,18 @@ export default {
     this.scroll();
   },
   methods: {
+    setQueryParams() {
+      if (this.$route.query.StudyInstanceUID !== undefined) {
+        this.firstScrollTo = decodeURIComponent(Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID[0] : this.$route.query.StudyInstanceUID);
+      }
+      if (this.$route.query.sort !== undefined) {
+        const sort = decodeURIComponent(Array.isArray(this.$route.query.sort) ? this.$route.query.sort[0] : this.$route.query.sort);
+        if (this.sortable.includes(sort.replace('-', ''))) {
+          this.studiesParams.sortDesc = sort.includes('-');
+          this.studiesParams.sortBy = sort.replace('-', '');
+        }
+      }
+    },
     setFilters() {
       let filterValue = false;
 
