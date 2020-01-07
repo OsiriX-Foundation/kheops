@@ -637,8 +637,8 @@ export default {
     },
     canUploadFiles() {
       let canUpload = true;
-      if (process.env.VUE_APP_UPLOAD !== undefined) {
-        canUpload = !process.env.VUE_APP_UPLOAD.includes('false');
+      if (process.env.VUE_APP_DISABLE_UPLOAD !== undefined) {
+        canUpload = !process.env.VUE_APP_DISABLE_UPLOAD.includes('true');
       }
       return canUpload;
     },
