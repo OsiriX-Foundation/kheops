@@ -270,7 +270,7 @@ export default {
       const div = document.createElement('div');
       let canUpload = this.permissions.add_series;
       if (process.env.VUE_APP_UPLOAD !== undefined) {
-        canUpload = canUpload && process.env.VUE_APP_UPLOAD !== 'false';
+        canUpload = canUpload && !process.env.VUE_APP_UPLOAD.includes('false');
       }
       return ((('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window && canUpload);
     },

@@ -79,7 +79,6 @@
 
 <template>
   <div>
-    {{ canUploadFiles }}
     <input
       id="file"
       ref="inputfiles"
@@ -638,12 +637,8 @@ export default {
     },
     canUploadFiles() {
       let canUpload = true;
-      console.log(process.env.VUE_APP_UPLOAD);
-      console.log(process.env.VUE_APP_UPLOAD !== 'false');
-      console.log(process.env.VUE_APP_UPLOAD);
-      console.log(process.env.VUE_APP_UPLOAD.includes('false'));
       if (process.env.VUE_APP_UPLOAD !== undefined) {
-        canUpload = process.env.VUE_APP_UPLOAD !== 'false';
+        canUpload = !process.env.VUE_APP_UPLOAD.includes('false');
       }
       return canUpload;
     },
