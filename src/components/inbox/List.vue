@@ -79,6 +79,7 @@
 
 <template>
   <div>
+    {{ process.env.VUE_APP_UPLOAD }}
     <input
       id="file"
       ref="inputfiles"
