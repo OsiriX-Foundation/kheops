@@ -268,7 +268,11 @@ export default {
     },
     determineDragAndDropCapable() {
       const div = document.createElement('div');
-      return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+      let canUpload = this.permissions.add_series;
+      if (process.env.VUE_APP_UPLOAD !== undefined) {
+        canUpload = canUpload && process.env.VUE_APP_UPLOAD !== 'false';
+      }
+      return ((('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window && canUpload);
     },
     determineGetAsEntry(item) {
       if (item.getAsEntry !== undefined) {

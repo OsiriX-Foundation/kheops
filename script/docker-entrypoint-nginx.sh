@@ -68,6 +68,7 @@ api="${KHEOPS_ROOT_SCHEME}://${KHEOPS_ROOT_HOST}:${KHEOPS_ROOT_PORT}${KHEOPS_API
 sed -i "s|\%{kheops_api_url}|$api|g" $FILENAME
 sed -i "s|\%{kheops_viewer_url}|$KHEOPS_VIEWER_URL|g" $FILENAME
 sed -i "s|\%{kheops_viewer_sm_url}|$KHEOPS_VIEWER_SM_URL|g" $FILENAME
+sed -i "s|\%{kheops_ui_upload}|$KHEOPS_UI_UPLOAD|g" $FILENAME
 root="${KHEOPS_ROOT_SCHEME}://${KHEOPS_ROOT_HOST}"
 sed -i "s|\%{kheops_root_url}|$root|g" $FILENAME
 
