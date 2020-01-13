@@ -10,7 +10,7 @@ mv liquibase docker
 docker build ./docker/ --build-arg VCS_REF=`git rev-parse --short HEAD` -t osirixfoundation/kheops-authorization:$TRAVIS_BRANCH
 docker push osirixfoundation/kheops-authorization:$TRAVIS_BRANCH
 
-echo $TRAVIS_TAG
+printenv
 
 if [ "$TRAVIS_TAG" != "" ]; then
     docker build ./docker/ --build-arg VCS_REF=`git rev-parse --short HEAD` -t osirixfoundation/kheops-authorization:$TRAVIS_TAG
