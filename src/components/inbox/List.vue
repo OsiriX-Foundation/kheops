@@ -380,6 +380,7 @@
                   <icon-list-providers
                     :study="row.item"
                     :providers="providersEnable"
+                    :album-id="source.key === 'album' ? source.value : ''"
                     @dropdownState="setShowIcons"
                   />
                 </template>
