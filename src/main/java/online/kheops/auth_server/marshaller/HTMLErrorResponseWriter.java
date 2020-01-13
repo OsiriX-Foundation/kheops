@@ -27,9 +27,7 @@ public class HTMLErrorResponseWriter implements MessageBodyWriter<ErrorResponse>
             "<html lang=\"en\">\n" +
             "  <head>\n" +
             "    <meta charset=\"utf-8\">\n" +
-            "    <title>title</title>\n" +
-            "    <link rel=\"stylesheet\" href=\"style.css\">\n" +
-            "    <script src=\"script.js\"></script>\n" +
+            "    <title>error</title>\n" +
             "  </head>\n" +
             "  <body>\n";
 
