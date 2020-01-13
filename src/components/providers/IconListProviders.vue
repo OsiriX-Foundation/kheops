@@ -48,7 +48,7 @@
           v-if="checkProviderModalities(study, provider)"
           type="text"
           hidden
-          name="returnuri"
+          name="return_uri"
           :value="returnuri"
         />
         <button
