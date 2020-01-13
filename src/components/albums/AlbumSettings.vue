@@ -23,7 +23,7 @@
     class="container"
   >
     <div class="row">
-      <div class="d-none d-md-block col-md-2">
+      <div class="d-none d-md-block col-md-3 col-lg-2">
         <nav class="nav nav-pills nav-justified flex-column">
           <router-link
             v-for="(cat,idx) in categories"
@@ -61,7 +61,7 @@
           </b-dropdown-item>
         </b-dropdown>
       </div>
-      <div class="col-sm-12 col-md-10">
+      <div class="col-sm-12 col-md-9 col-lg-10">
         <album-settings-general
           v-if="currentCategory === 'general' || currentCategory === undefined"
           :album="album"
