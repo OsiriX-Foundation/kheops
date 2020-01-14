@@ -17,7 +17,6 @@ import online.kheops.auth_server.generated.tables.records.EventsRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Events extends TableImpl<EventsRecord> {
 
-    private static final long serialVersionUID = -868413618;
+    private static final long serialVersionUID = -462120320;
 
     /**
      * The reference instance of <code>public.events</code>
@@ -60,7 +59,7 @@ public class Events extends TableImpl<EventsRecord> {
     /**
      * The column <code>public.events.pk</code>.
      */
-    public final TableField<EventsRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('event_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<EventsRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.events.event_type</code>.
@@ -169,14 +168,6 @@ public class Events extends TableImpl<EventsRecord> {
     @Override
     public List<Index> getIndexes() {
         return Arrays.<Index>asList(Indexes.EVENT_PK);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<EventsRecord, Long> getIdentity() {
-        return Keys.IDENTITY_EVENTS;
     }
 
     /**

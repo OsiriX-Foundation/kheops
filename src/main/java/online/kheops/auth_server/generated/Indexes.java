@@ -10,11 +10,14 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.Webhooks;
+import online.kheops.auth_server.generated.tables.WebhooksHistory;
 
 import org.jooq.Index;
 import org.jooq.OrderField;
@@ -46,17 +49,15 @@ public class Indexes {
     public static final Index ALBUMS_ID_UNIQUE = Indexes0.ALBUMS_ID_UNIQUE;
     public static final Index CAPABILITIES_ID_UNIQUE = Indexes0.CAPABILITIES_ID_UNIQUE;
     public static final Index CAPABILITIES_PK = Indexes0.CAPABILITIES_PK;
-    public static final Index CAPABILITIES_SECRET_INDEX = Indexes0.CAPABILITIES_SECRET_INDEX;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
     public static final Index CAPABILITIES_USER_FK_INDEX = Indexes0.CAPABILITIES_USER_FK_INDEX;
+    public static final Index DATABASECHANGELOGLOCK_PKEY = Indexes0.DATABASECHANGELOGLOCK_PKEY;
     public static final Index EVENT_PK = Indexes0.EVENT_PK;
     public static final Index REPORT_PROVIDERS_ALBUM_FK_INDEX = Indexes0.REPORT_PROVIDERS_ALBUM_FK_INDEX;
-    public static final Index REPORT_PROVIDERS_CLIENT_ID_INDEX = Indexes0.REPORT_PROVIDERS_CLIENT_ID_INDEX;
     public static final Index REPORT_PROVIDERS_CLIENT_ID_UNIQUE = Indexes0.REPORT_PROVIDERS_CLIENT_ID_UNIQUE;
     public static final Index REPORT_PROVIDERS_PK = Indexes0.REPORT_PROVIDERS_PK;
     public static final Index SERIES_PK = Indexes0.SERIES_PK;
     public static final Index SERIES_POPULATED_INDEX = Indexes0.SERIES_POPULATED_INDEX;
-    public static final Index SERIES_UID_INDEX = Indexes0.SERIES_UID_INDEX;
     public static final Index SERIES_UID_UNIQUE = Indexes0.SERIES_UID_UNIQUE;
     public static final Index STUDY_FK_INDEX = Indexes0.STUDY_FK_INDEX;
     public static final Index ACCESSION_NUMBER_INDEX = Indexes0.ACCESSION_NUMBER_INDEX;
@@ -66,11 +67,11 @@ public class Indexes {
     public static final Index STUDY_DATE_INDEX = Indexes0.STUDY_DATE_INDEX;
     public static final Index STUDY_ID_INDEX = Indexes0.STUDY_ID_INDEX;
     public static final Index STUDY_TIME_INDEX = Indexes0.STUDY_TIME_INDEX;
-    public static final Index STUDY_UID_INDEX = Indexes0.STUDY_UID_INDEX;
     public static final Index STUDY_UID_UNIQUE = Indexes0.STUDY_UID_UNIQUE;
-    public static final Index KEYCLOAK_ID_INDEX = Indexes0.KEYCLOAK_ID_INDEX;
     public static final Index KEYCLOAK_ID_UNIQUE = Indexes0.KEYCLOAK_ID_UNIQUE;
     public static final Index USERS_PK = Indexes0.USERS_PK;
+    public static final Index WEBHOOKS_PK = Indexes0.WEBHOOKS_PK;
+    public static final Index WEBHOOKS_HISTORY_PK = Indexes0.WEBHOOKS_HISTORY_PK;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -85,17 +86,15 @@ public class Indexes {
         public static Index ALBUMS_ID_UNIQUE = Internal.createIndex("albums_id_unique", Albums.ALBUMS, new OrderField[] { Albums.ALBUMS.ID }, true);
         public static Index CAPABILITIES_ID_UNIQUE = Internal.createIndex("capabilities_id_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.ID }, true);
         public static Index CAPABILITIES_PK = Internal.createIndex("capabilities_pk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.PK }, true);
-        public static Index CAPABILITIES_SECRET_INDEX = Internal.createIndex("capabilities_secret_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, false);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("capabilities_secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("capabilities_user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
+        public static Index DATABASECHANGELOGLOCK_PKEY = Internal.createIndex("databasechangeloglock_pkey", Databasechangeloglock.DATABASECHANGELOGLOCK, new OrderField[] { Databasechangeloglock.DATABASECHANGELOGLOCK.ID }, true);
         public static Index EVENT_PK = Internal.createIndex("event_pk", Events.EVENTS, new OrderField[] { Events.EVENTS.PK }, true);
         public static Index REPORT_PROVIDERS_ALBUM_FK_INDEX = Internal.createIndex("report_providers_album_fk_index", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.ALBUM_FK }, false);
-        public static Index REPORT_PROVIDERS_CLIENT_ID_INDEX = Internal.createIndex("report_providers_client_id_index", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.CLIENT_ID }, false);
         public static Index REPORT_PROVIDERS_CLIENT_ID_UNIQUE = Internal.createIndex("report_providers_client_id_unique", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.CLIENT_ID }, true);
         public static Index REPORT_PROVIDERS_PK = Internal.createIndex("report_providers_pk", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.PK }, true);
         public static Index SERIES_PK = Internal.createIndex("series_pk", Series.SERIES, new OrderField[] { Series.SERIES.PK }, true);
         public static Index SERIES_POPULATED_INDEX = Internal.createIndex("series_populated_index", Series.SERIES, new OrderField[] { Series.SERIES.POPULATED }, false);
-        public static Index SERIES_UID_INDEX = Internal.createIndex("series_uid_index", Series.SERIES, new OrderField[] { Series.SERIES.SERIES_UID }, false);
         public static Index SERIES_UID_UNIQUE = Internal.createIndex("series_uid_unique", Series.SERIES, new OrderField[] { Series.SERIES.SERIES_UID }, true);
         public static Index STUDY_FK_INDEX = Internal.createIndex("study_fk_index", Series.SERIES, new OrderField[] { Series.SERIES.STUDY_FK }, false);
         public static Index ACCESSION_NUMBER_INDEX = Internal.createIndex("accession_number_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.ACCESSION_NUMBER }, false);
@@ -105,10 +104,10 @@ public class Indexes {
         public static Index STUDY_DATE_INDEX = Internal.createIndex("study_date_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_DATE }, false);
         public static Index STUDY_ID_INDEX = Internal.createIndex("study_id_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_ID }, false);
         public static Index STUDY_TIME_INDEX = Internal.createIndex("study_time_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_TIME }, false);
-        public static Index STUDY_UID_INDEX = Internal.createIndex("study_uid_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_UID }, false);
         public static Index STUDY_UID_UNIQUE = Internal.createIndex("study_uid_unique", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_UID }, true);
-        public static Index KEYCLOAK_ID_INDEX = Internal.createIndex("keycloak_id_index", Users.USERS, new OrderField[] { Users.USERS.KEYCLOAK_ID }, false);
         public static Index KEYCLOAK_ID_UNIQUE = Internal.createIndex("keycloak_id_unique", Users.USERS, new OrderField[] { Users.USERS.KEYCLOAK_ID }, true);
         public static Index USERS_PK = Internal.createIndex("users_pk", Users.USERS, new OrderField[] { Users.USERS.PK }, true);
+        public static Index WEBHOOKS_PK = Internal.createIndex("webhooks_pk", Webhooks.WEBHOOKS, new OrderField[] { Webhooks.WEBHOOKS.PK }, true);
+        public static Index WEBHOOKS_HISTORY_PK = Internal.createIndex("webhooks_history_pk", WebhooksHistory.WEBHOOKS_HISTORY, new OrderField[] { WebhooksHistory.WEBHOOKS_HISTORY.PK }, true);
     }
 }

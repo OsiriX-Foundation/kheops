@@ -1,0 +1,99 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="kheops" id="v2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="webhook_pk_seq" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="webhook_pk_seq"/>
+    </changeSet>
+    <changeSet author="kheops" id="v2.0-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="webhook_history_pk_seq" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createSequence sequenceName="webhook_history_pk_seq"/>
+    </changeSet>
+
+
+
+    <changeSet author="kheops" id="v2.0-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="version" schemaName="public"/>
+        </preConditions>
+        <dropTable tableName="version"/>
+    </changeSet>
+
+
+
+    <changeSet author="kheops" id="v2.0-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhooks" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhooks">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhooks_pk"/>
+            </column>
+            <column name="id" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret" type="VARCHAR(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="new_series" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="new_user" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="album_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="kheops" id="v2.0-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhooks_history" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhooks_history">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhooks_history_pk"/>
+            </column>
+            <column name="status" type="BIGINT"/>
+            <column name="time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="webhook_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_manual_trigger" type="BOOLEAN"/>
+            <column name="new_series" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="new_user" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-6">
+       <tagDatabase tag="v2"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -17,7 +17,6 @@ import online.kheops.auth_server.generated.tables.records.ReportProvidersRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReportProviders extends TableImpl<ReportProvidersRecord> {
 
-    private static final long serialVersionUID = -793984388;
+    private static final long serialVersionUID = -401387512;
 
     /**
      * The reference instance of <code>public.report_providers</code>
@@ -60,7 +59,7 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
     /**
      * The column <code>public.report_providers.pk</code>.
      */
-    public final TableField<ReportProvidersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('report_providers_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<ReportProvidersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.album_fk</code>.
@@ -138,15 +137,7 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.REPORT_PROVIDERS_ALBUM_FK_INDEX, Indexes.REPORT_PROVIDERS_CLIENT_ID_INDEX, Indexes.REPORT_PROVIDERS_CLIENT_ID_UNIQUE, Indexes.REPORT_PROVIDERS_PK);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<ReportProvidersRecord, Long> getIdentity() {
-        return Keys.IDENTITY_REPORT_PROVIDERS;
+        return Arrays.<Index>asList(Indexes.REPORT_PROVIDERS_ALBUM_FK_INDEX, Indexes.REPORT_PROVIDERS_CLIENT_ID_UNIQUE, Indexes.REPORT_PROVIDERS_PK);
     }
 
     /**

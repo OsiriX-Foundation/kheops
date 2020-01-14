@@ -38,6 +38,10 @@ public class User {
 
     @OneToMany
     @JoinColumn (name = "user_fk", nullable=false)
+    private Set<Webhook> webhooks = new HashSet<>();
+
+    @OneToMany
+    @JoinColumn (name = "user_fk", nullable=false)
     private Set<Event> events = new HashSet<>();
 
     @OneToMany
@@ -126,6 +130,8 @@ public class User {
     public Album getInbox() { return inbox; }
 
     public void setInbox(Album inbox) { this.inbox = inbox; }
+
+    public void addWebhook(Webhook webhook) { this.webhooks.add(webhook); }
 
     @Override
     public String toString() {

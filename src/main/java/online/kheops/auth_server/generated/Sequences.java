@@ -67,4 +67,14 @@ public class Sequences {
      * The sequence <code>public.users_pk_seq</code>
      */
     public static final Sequence<Long> USERS_PK_SEQ = new SequenceImpl<Long>("users_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>public.webhook_history_pk_seq</code>
+     */
+    public static final Sequence<Long> WEBHOOK_HISTORY_PK_SEQ = new SequenceImpl<Long>("webhook_history_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>public.webhook_pk_seq</code>
+     */
+    public static final Sequence<Long> WEBHOOK_PK_SEQ = new SequenceImpl<Long>("webhook_pk_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 }

@@ -17,7 +17,6 @@ import online.kheops.auth_server.generated.tables.records.StudiesRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Studies extends TableImpl<StudiesRecord> {
 
-    private static final long serialVersionUID = 268800595;
+    private static final long serialVersionUID = 654842953;
 
     /**
      * The reference instance of <code>public.studies</code>
@@ -60,7 +59,7 @@ public class Studies extends TableImpl<StudiesRecord> {
     /**
      * The column <code>public.studies.pk</code>.
      */
-    public final TableField<StudiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('studies_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<StudiesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.studies.created_time</code>.
@@ -183,15 +182,7 @@ public class Studies extends TableImpl<StudiesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ACCESSION_NUMBER_INDEX, Indexes.PATIENT_ID_INDEX, Indexes.POPULATED_INDEX, Indexes.STUDIES_PK, Indexes.STUDY_DATE_INDEX, Indexes.STUDY_ID_INDEX, Indexes.STUDY_TIME_INDEX, Indexes.STUDY_UID_INDEX, Indexes.STUDY_UID_UNIQUE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<StudiesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_STUDIES;
+        return Arrays.<Index>asList(Indexes.ACCESSION_NUMBER_INDEX, Indexes.PATIENT_ID_INDEX, Indexes.POPULATED_INDEX, Indexes.STUDIES_PK, Indexes.STUDY_DATE_INDEX, Indexes.STUDY_ID_INDEX, Indexes.STUDY_TIME_INDEX, Indexes.STUDY_UID_UNIQUE);
     }
 
     /**

@@ -33,7 +33,8 @@ public class Events {
         CREATE_ALBUM, LEAVE_ALBUM,
         IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES,
         EDIT_ALBUM, ADD_FAV, REMOVE_FAV,
-        CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT}
+        CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT,
+        CREATE_WEBHOOK, DELETE_WEBHOOK}
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException {
@@ -113,6 +114,10 @@ public class Events {
 
     public static Mutation albumPostEditMutation(User callingUser, Album album) {
         return new Mutation(callingUser, album, MutationType.EDIT_ALBUM);
+    }
+
+    public static Mutation albumPostMutation(User callingUser, Album album, MutationType mutation) {
+        return new Mutation(callingUser, album, mutation);
     }
 
     public static PairListXTotalCount<EventResponse> getEventsAlbum(User callingUser, String albumId, Integer offset, Integer limit)

@@ -55,6 +55,8 @@ public class Consts {
     //size column in db
     public static class DB_COLUMN_SIZE {
         public static final int ALBUM_NAME = 255;
+        public static final int WEBHOOK_NAME = 255;
+        public static final int WEBHOOK_URL = 1024;
         public static final int ALBUM_DESCRIPTION = 2048;
         public static final int COMMENT = 1024;
         public static final int CAPABILITY_DESCRIPTION = 255;

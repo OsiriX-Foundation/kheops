@@ -11,6 +11,7 @@ public class ErrorResponse implements Serializable {
         public static final String BAD_FORM_PARAMETER = "Bad Form Parameter";
         public static final String USER_NOT_FOUND = "User Not Found";
         public static final String ALBUM_NOT_FOUND = "Album Not Found";
+        public static final String WEBHOOK_NOT_FOUND = "Webhook Not Found";
         public static final String SERIES_NOT_FOUND = "Series Not Found";
         public static final String STUDY_NOT_FOUND = "Study Not Found";
         public static final String AUTHORIZATION_ERROR = "Authorization error";

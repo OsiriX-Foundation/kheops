@@ -17,7 +17,6 @@ import online.kheops.auth_server.generated.tables.records.SeriesRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Series extends TableImpl<SeriesRecord> {
 
-    private static final long serialVersionUID = 1077087058;
+    private static final long serialVersionUID = -937850834;
 
     /**
      * The reference instance of <code>public.series</code>
@@ -60,7 +59,7 @@ public class Series extends TableImpl<SeriesRecord> {
     /**
      * The column <code>public.series.pk</code>.
      */
-    public final TableField<SeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('series_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<SeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.series.created_time</code>.
@@ -163,15 +162,7 @@ public class Series extends TableImpl<SeriesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SERIES_PK, Indexes.SERIES_POPULATED_INDEX, Indexes.SERIES_UID_INDEX, Indexes.SERIES_UID_UNIQUE, Indexes.STUDY_FK_INDEX);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<SeriesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_SERIES;
+        return Arrays.<Index>asList(Indexes.SERIES_PK, Indexes.SERIES_POPULATED_INDEX, Indexes.SERIES_UID_UNIQUE, Indexes.STUDY_FK_INDEX);
     }
 
     /**

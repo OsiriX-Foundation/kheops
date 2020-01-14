@@ -10,12 +10,15 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Databasechangelog;
+import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
-import online.kheops.auth_server.generated.tables.Version;
+import online.kheops.auth_server.generated.tables.Webhooks;
+import online.kheops.auth_server.generated.tables.WebhooksHistory;
 
 
 /**
@@ -52,6 +55,16 @@ public class Tables {
     public static final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
 
     /**
+     * The table <code>public.databasechangelog</code>.
+     */
+    public static final Databasechangelog DATABASECHANGELOG = online.kheops.auth_server.generated.tables.Databasechangelog.DATABASECHANGELOG;
+
+    /**
+     * The table <code>public.databasechangeloglock</code>.
+     */
+    public static final Databasechangeloglock DATABASECHANGELOGLOCK = online.kheops.auth_server.generated.tables.Databasechangeloglock.DATABASECHANGELOGLOCK;
+
+    /**
      * The table <code>public.events</code>.
      */
     public static final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
@@ -77,7 +90,12 @@ public class Tables {
     public static final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
 
     /**
-     * The table <code>public.version</code>.
+     * The table <code>public.webhooks</code>.
      */
-    public static final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
+    public static final Webhooks WEBHOOKS = online.kheops.auth_server.generated.tables.Webhooks.WEBHOOKS;
+
+    /**
+     * The table <code>public.webhooks_history</code>.
+     */
+    public static final WebhooksHistory WEBHOOKS_HISTORY = online.kheops.auth_server.generated.tables.WebhooksHistory.WEBHOOKS_HISTORY;
 }

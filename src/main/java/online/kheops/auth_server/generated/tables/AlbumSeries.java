@@ -16,7 +16,6 @@ import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -41,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
-    private static final long serialVersionUID = -1898231029;
+    private static final long serialVersionUID = -1767864541;
 
     /**
      * The reference instance of <code>public.album_series</code>
@@ -59,7 +58,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
     /**
      * The column <code>public.album_series.pk</code>.
      */
-    public final TableField<AlbumSeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('album_series_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<AlbumSeriesRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.album_series.album_fk</code>.
@@ -123,14 +122,6 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
     @Override
     public List<Index> getIndexes() {
         return Arrays.<Index>asList(Indexes.ALBUM_SERIES_PK, Indexes.ALBUM_SERIES_UNIQUE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<AlbumSeriesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_ALBUM_SERIES;
     }
 
     /**

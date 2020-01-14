@@ -109,7 +109,8 @@ public enum AlbumUserPermissions {
     GET_DICOM_SR {
         @Override
         public boolean hasUserPermission(Album album) { return true; }
-    };
+    },
+    MANAGE_WEBHOOK;
 
     /**
      * @param album For overrides

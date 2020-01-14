@@ -162,6 +162,14 @@ public class Albums {
                 em.remove(albumSeries);
             }
 
+            for (Webhook webhook:album.getWebhooks()) {
+                for (WebhookHistory webhookHistory:webhook.getWebhookHistory()) {
+                    em.remove(webhookHistory);
+                }
+                em.remove(webhook);
+            }
+
+
             em.remove(album);
 
             tx.commit();

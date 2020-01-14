@@ -14,7 +14,8 @@
         <class>online.kheops.auth_server.entity.Comment</class>
         <class>online.kheops.auth_server.entity.Mutation</class>
         <class>online.kheops.auth_server.entity.ReportProvider</class>
-        <class>online.kheops.auth_server.entity.Version</class>
+        <class>online.kheops.auth_server.entity.Webhook</class>
+        <class>online.kheops.auth_server.entity.WebhookHistory</class>
         <class>online.kheops.auth_server.metric.AlbumUserHistogram</class>
         <class>online.kheops.auth_server.metric.StudySeriesHistogram</class>
         <class>online.kheops.auth_server.metric.AlbumSeriesHistogram</class>

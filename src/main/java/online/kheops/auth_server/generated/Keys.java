@@ -10,23 +10,28 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.Webhooks;
+import online.kheops.auth_server.generated.tables.WebhooksHistory;
 import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
 import online.kheops.auth_server.generated.tables.records.CapabilitiesRecord;
+import online.kheops.auth_server.generated.tables.records.DatabasechangeloglockRecord;
 import online.kheops.auth_server.generated.tables.records.EventsRecord;
 import online.kheops.auth_server.generated.tables.records.ReportProvidersRecord;
 import online.kheops.auth_server.generated.tables.records.SeriesRecord;
 import online.kheops.auth_server.generated.tables.records.StudiesRecord;
 import online.kheops.auth_server.generated.tables.records.UsersRecord;
+import online.kheops.auth_server.generated.tables.records.WebhooksHistoryRecord;
+import online.kheops.auth_server.generated.tables.records.WebhooksRecord;
 
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
 
@@ -49,15 +54,6 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
-    public static final Identity<AlbumSeriesRecord, Long> IDENTITY_ALBUM_SERIES = Identities0.IDENTITY_ALBUM_SERIES;
-    public static final Identity<AlbumUserRecord, Long> IDENTITY_ALBUM_USER = Identities0.IDENTITY_ALBUM_USER;
-    public static final Identity<AlbumsRecord, Long> IDENTITY_ALBUMS = Identities0.IDENTITY_ALBUMS;
-    public static final Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Identities0.IDENTITY_CAPABILITIES;
-    public static final Identity<EventsRecord, Long> IDENTITY_EVENTS = Identities0.IDENTITY_EVENTS;
-    public static final Identity<ReportProvidersRecord, Long> IDENTITY_REPORT_PROVIDERS = Identities0.IDENTITY_REPORT_PROVIDERS;
-    public static final Identity<SeriesRecord, Long> IDENTITY_SERIES = Identities0.IDENTITY_SERIES;
-    public static final Identity<StudiesRecord, Long> IDENTITY_STUDIES = Identities0.IDENTITY_STUDIES;
-    public static final Identity<UsersRecord, Long> IDENTITY_USERS = Identities0.IDENTITY_USERS;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -72,6 +68,7 @@ public class Keys {
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = UniqueKeys0.CAPABILITIES_PK;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = UniqueKeys0.CAPABILITIES_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = UniqueKeys0.CAPABILITIES_SECRET_UNIQUE;
+    public static final UniqueKey<DatabasechangeloglockRecord> DATABASECHANGELOGLOCK_PKEY = UniqueKeys0.DATABASECHANGELOGLOCK_PKEY;
     public static final UniqueKey<EventsRecord> EVENT_PK = UniqueKeys0.EVENT_PK;
     public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = UniqueKeys0.REPORT_PROVIDERS_PK;
     public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = UniqueKeys0.REPORT_PROVIDERS_CLIENT_ID_UNIQUE;
@@ -81,6 +78,8 @@ public class Keys {
     public static final UniqueKey<StudiesRecord> STUDY_UID_UNIQUE = UniqueKeys0.STUDY_UID_UNIQUE;
     public static final UniqueKey<UsersRecord> USERS_PK = UniqueKeys0.USERS_PK;
     public static final UniqueKey<UsersRecord> KEYCLOAK_ID_UNIQUE = UniqueKeys0.KEYCLOAK_ID_UNIQUE;
+    public static final UniqueKey<WebhooksRecord> WEBHOOKS_PK = UniqueKeys0.WEBHOOKS_PK;
+    public static final UniqueKey<WebhooksHistoryRecord> WEBHOOKS_HISTORY_PK = UniqueKeys0.WEBHOOKS_HISTORY_PK;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -108,18 +107,6 @@ public class Keys {
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
-    private static class Identities0 {
-        public static Identity<AlbumSeriesRecord, Long> IDENTITY_ALBUM_SERIES = Internal.createIdentity(AlbumSeries.ALBUM_SERIES, AlbumSeries.ALBUM_SERIES.PK);
-        public static Identity<AlbumUserRecord, Long> IDENTITY_ALBUM_USER = Internal.createIdentity(AlbumUser.ALBUM_USER, AlbumUser.ALBUM_USER.PK);
-        public static Identity<AlbumsRecord, Long> IDENTITY_ALBUMS = Internal.createIdentity(Albums.ALBUMS, Albums.ALBUMS.PK);
-        public static Identity<CapabilitiesRecord, Long> IDENTITY_CAPABILITIES = Internal.createIdentity(Capabilities.CAPABILITIES, Capabilities.CAPABILITIES.PK);
-        public static Identity<EventsRecord, Long> IDENTITY_EVENTS = Internal.createIdentity(Events.EVENTS, Events.EVENTS.PK);
-        public static Identity<ReportProvidersRecord, Long> IDENTITY_REPORT_PROVIDERS = Internal.createIdentity(ReportProviders.REPORT_PROVIDERS, ReportProviders.REPORT_PROVIDERS.PK);
-        public static Identity<SeriesRecord, Long> IDENTITY_SERIES = Internal.createIdentity(Series.SERIES, Series.SERIES.PK);
-        public static Identity<StudiesRecord, Long> IDENTITY_STUDIES = Internal.createIdentity(Studies.STUDIES, Studies.STUDIES.PK);
-        public static Identity<UsersRecord, Long> IDENTITY_USERS = Internal.createIdentity(Users.USERS, Users.USERS.PK);
-    }
-
     private static class UniqueKeys0 {
         public static final UniqueKey<AlbumSeriesRecord> ALBUM_SERIES_PK = Internal.createUniqueKey(AlbumSeries.ALBUM_SERIES, "album_series_pk", AlbumSeries.ALBUM_SERIES.PK);
         public static final UniqueKey<AlbumSeriesRecord> ALBUM_SERIES_UNIQUE = Internal.createUniqueKey(AlbumSeries.ALBUM_SERIES, "album_series_unique", AlbumSeries.ALBUM_SERIES.ALBUM_FK, AlbumSeries.ALBUM_SERIES.SERIES_FK);
@@ -130,6 +117,7 @@ public class Keys {
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_pk", Capabilities.CAPABILITIES.PK);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_id_unique", Capabilities.CAPABILITIES.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_secret_unique", Capabilities.CAPABILITIES.SECRET);
+        public static final UniqueKey<DatabasechangeloglockRecord> DATABASECHANGELOGLOCK_PKEY = Internal.createUniqueKey(Databasechangeloglock.DATABASECHANGELOGLOCK, "databasechangeloglock_pkey", Databasechangeloglock.DATABASECHANGELOGLOCK.ID);
         public static final UniqueKey<EventsRecord> EVENT_PK = Internal.createUniqueKey(Events.EVENTS, "event_pk", Events.EVENTS.PK);
         public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_pk", ReportProviders.REPORT_PROVIDERS.PK);
         public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_client_id_unique", ReportProviders.REPORT_PROVIDERS.CLIENT_ID);
@@ -139,6 +127,8 @@ public class Keys {
         public static final UniqueKey<StudiesRecord> STUDY_UID_UNIQUE = Internal.createUniqueKey(Studies.STUDIES, "study_uid_unique", Studies.STUDIES.STUDY_UID);
         public static final UniqueKey<UsersRecord> USERS_PK = Internal.createUniqueKey(Users.USERS, "users_pk", Users.USERS.PK);
         public static final UniqueKey<UsersRecord> KEYCLOAK_ID_UNIQUE = Internal.createUniqueKey(Users.USERS, "keycloak_id_unique", Users.USERS.KEYCLOAK_ID);
+        public static final UniqueKey<WebhooksRecord> WEBHOOKS_PK = Internal.createUniqueKey(Webhooks.WEBHOOKS, "webhooks_pk", Webhooks.WEBHOOKS.PK);
+        public static final UniqueKey<WebhooksHistoryRecord> WEBHOOKS_HISTORY_PK = Internal.createUniqueKey(WebhooksHistory.WEBHOOKS_HISTORY, "webhooks_history_pk", WebhooksHistory.WEBHOOKS_HISTORY.PK);
     }
 
     private static class ForeignKeys0 {

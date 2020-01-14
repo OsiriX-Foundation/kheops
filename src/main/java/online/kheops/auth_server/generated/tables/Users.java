@@ -16,7 +16,6 @@ import online.kheops.auth_server.generated.tables.records.UsersRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -41,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = 1912717531;
+    private static final long serialVersionUID = 755002167;
 
     /**
      * The reference instance of <code>public.users</code>
@@ -59,7 +58,7 @@ public class Users extends TableImpl<UsersRecord> {
     /**
      * The column <code>public.users.pk</code>.
      */
-    public final TableField<UsersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('users_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<UsersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.users.keycloak_id</code>.
@@ -117,15 +116,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.KEYCLOAK_ID_INDEX, Indexes.KEYCLOAK_ID_UNIQUE, Indexes.USERS_PK);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<UsersRecord, Long> getIdentity() {
-        return Keys.IDENTITY_USERS;
+        return Arrays.<Index>asList(Indexes.KEYCLOAK_ID_UNIQUE, Indexes.USERS_PK);
     }
 
     /**
