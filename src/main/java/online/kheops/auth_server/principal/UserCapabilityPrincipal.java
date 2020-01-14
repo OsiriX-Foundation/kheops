@@ -41,7 +41,6 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
         kheopsLogBuilder = new KheopsLogBuilder()
                 .provenance(this)
                 .user(user.getKeycloakId())
-                .scope(capability.getScopeType())
                 .tokenType(getTokenType());
     }
 

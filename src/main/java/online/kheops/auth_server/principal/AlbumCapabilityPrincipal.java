@@ -39,7 +39,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
         kheopsLogBuilder = new KheopsLogBuilder()
                 .provenance(this)
                 .user(user.getKeycloakId())
-                .scope(capability.getScopeType())
+                .albumScope(capability.getAlbum().getId())
                 .tokenType(getTokenType());
     }
 

@@ -40,6 +40,10 @@ public class KheopsLogBuilder {
         logEntry.add(new LogEntry("scope", scope));
         return this;
     }
+    public KheopsLogBuilder albumScope(String albumId) {
+        logEntry.add(new LogEntry("albumScope", albumId));
+        return this;
+    }
 
     public KheopsLogBuilder clientID(String clientID) {
         logEntry.add(new LogEntry("clientID", clientID));
@@ -86,6 +90,10 @@ public class KheopsLogBuilder {
     }
     public KheopsLogBuilder action(ActionType action) {
         logEntry.add(new LogEntry("action", action.name()));
+        return this;
+    }
+    public KheopsLogBuilder events(String events) {
+        logEntry.add(new LogEntry("events", events));
         return this;
     }
     public KheopsLogBuilder userPermission(UsersPermission usersPermission) {

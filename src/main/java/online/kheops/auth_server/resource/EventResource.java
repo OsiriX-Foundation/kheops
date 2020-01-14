@@ -70,16 +70,16 @@ public class EventResource {
 
         if (types.contains("comments") && types.contains("mutations")) {
             pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-            kheopsLogBuilder.scope("comments_mutations");
+            kheopsLogBuilder.events("comments_mutations");
         } else if (types.contains("comments")) {
             pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-            kheopsLogBuilder.scope("comments");
+            kheopsLogBuilder.events("comments");
         } else if (types.contains("mutations")) {
             pair = Events.getMutationsAlbum(albumId, offset, limit);
-            kheopsLogBuilder.scope("mutations");
+            kheopsLogBuilder.events("mutations");
         } else {
             pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-            kheopsLogBuilder.scope("comments_mutations");
+            kheopsLogBuilder.events("comments_mutations");
         }
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};

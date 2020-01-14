@@ -503,11 +503,7 @@ public class Studies {
 
         try {
             tx.begin();
-            if(favorite) {
-                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_STUDY);
-            } else {
-                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
-            }
+
             callingUser = em.merge(callingUser);
             List<Series> seriesList;
             final Album album;
@@ -537,8 +533,10 @@ public class Studies {
             final Events.MutationType mutation;
             if (favorite) {
                 mutation = Events.MutationType.ADD_FAV;
+                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_STUDY);
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
+                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
             }
             final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
             em.persist(favAlbumMutation);

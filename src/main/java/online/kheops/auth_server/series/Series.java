@@ -90,19 +90,17 @@ public class Series {
             final Events.MutationType mutation;
             if (favorite) {
                 mutation = Events.MutationType.ADD_FAV;
+                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_SERIES);
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
+                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_SERIES);
+
             }
             final Mutation favSeriesMutation = Events.albumPostSeriesMutation(callingUser, album, mutation, series);
             em.persist(favSeriesMutation);
             album.updateLastEventTime();
             tx.commit();
 
-            if(favorite) {
-                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_SERIES);
-            } else {
-                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_SERIES);
-            }
             kheopsLogBuilder.series(seriesInstanceUID)
                     .study(studyInstanceUID)
                     .log();
