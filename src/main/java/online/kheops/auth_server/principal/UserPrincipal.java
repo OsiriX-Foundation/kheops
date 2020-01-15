@@ -10,6 +10,7 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
@@ -27,29 +28,28 @@ public class UserPrincipal implements KheopsPrincipal {
     private EntityManager em;
     private final User user;
     private final String actingParty;
-    private final boolean linkAuthorization;
     private final String originalToken;
+    private final KheopsLogBuilder kheopsLogBuilder;
 
-    //old version
-    private final Long dbid;
-    public UserPrincipal(User user, String actingParty, boolean linkAuthorization, String originalToken) {
-        this.dbid = user.getPk();
+    public UserPrincipal(User user, String actingParty, String originalToken) {
         this.user = user;
         this.actingParty = actingParty;
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
+
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .tokenType(TokenType.KEYCLOAK_TOKEN);
     }
-    @Override
-    public long getDBID() {
-        return dbid;
-    }
-    //end old version
 
     @Override
-    public String getName() { return Long.toString(dbid); }
+    public String getName() { return user.getKeycloakId(); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasUserAccess() { return true; }
+
+    @Override
+    public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
@@ -59,7 +59,7 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) {
+    public boolean hasStudyViewAccess(String studyInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
@@ -72,10 +72,53 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasUserAccess() { return true; }
+    public boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
+        } finally {
+            em.close();
+        }
+    }
 
     @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasStudyDeleteAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            final Study study = getStudy(studyInstanceUID, em);
+            return canAccessStudy(user, study, em);
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean hasStudyShareAccess(String studyInstanceUID) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            final Study study = getStudy(studyInstanceUID, em);
+            return canAccessStudy(user, study, em);
+        } catch (StudyNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
         this.em = EntityManagerListener.createEntityManager();
         try {
             //find if the series exist
@@ -106,7 +149,9 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyWriteAccess(String study) { return true; }
+    public boolean hasStudyAddAccess(String studyInstanceUID) {
+        return true;
+    }
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
@@ -157,14 +202,17 @@ public class UserPrincipal implements KheopsPrincipal {
     public ScopeType getScope() { return ScopeType.USER; }
 
     @Override
-    public String getAlbumID() throws NotAlbumScopeTypeException { throw new NotAlbumScopeTypeException(""); }
+    public String getAlbumID() throws NotAlbumScopeTypeException {
+        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message("Error")
+                .detail("this token is not an token with album scope")
+                .build();
+        throw new NotAlbumScopeTypeException(errorResponse);
+    }
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(getUser().getKeycloakId())
-                .tokenType(TokenType.KEYCLOAK_TOKEN);
+        return kheopsLogBuilder;
     }
 
     @Override
@@ -174,7 +222,13 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public String toString() {
-        return "[UserPrincipal user:" + getUser() + " dbid:" + getDBID() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+        return "[UserPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
+    }
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
     }
 
     @Override

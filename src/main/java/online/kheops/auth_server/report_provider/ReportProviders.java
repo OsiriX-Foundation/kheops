@@ -7,6 +7,7 @@ import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -79,11 +80,19 @@ public class ReportProviders {
 
             ReportProviderClientMetadata.ValidationResult validationResult = clientMetadata.validateForConfigUri(reportProvider.getUrl());
             if (validationResult != ReportProviderClientMetadata.ValidationResult.OK) {
-                throw new ReportProviderUriNotValidException(validationResult.getDescription());
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("error")
+                        .detail(validationResult.getDescription())
+                        .build();
+                throw new ReportProviderUriNotValidException(errorResponse);
             }
             return clientMetadata;
         } catch (ProcessingException | WebApplicationException e) {
-            throw new ReportProviderUriNotValidException("report provider uri not valid", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("error")
+                    .detail("report provider uri not valid")
+                    .build();
+            throw new ReportProviderUriNotValidException(errorResponse, e);
         }
     }
 
@@ -110,7 +119,11 @@ public class ReportProviders {
         try {
             configurationUri = new URI(reportProvider.getUrl());
         } catch (URISyntaxException e) {
-            throw new ReportProviderUriNotValidException("Unable to get issuer from the report provider configuration URL", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("error")
+                    .detail("Unable to get issuer from the report provider configuration URL")
+                    .build();
+            throw new ReportProviderUriNotValidException(errorResponse, e);
         }
 
         return configurationUri.getScheme() + "://" + configurationUri.getAuthority();
@@ -131,7 +144,11 @@ public class ReportProviders {
         try {
             new URI(configUrl);
         } catch (URISyntaxException e) {
-            throw new ReportProviderUriNotValidException("syntax not valid");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("error")
+                    .detail("syntax not valid")
+                    .build();
+            throw new ReportProviderUriNotValidException(errorResponse);
         }
 
         try {
@@ -144,11 +161,19 @@ public class ReportProviders {
 
             ReportProviderClientMetadata.ValidationResult validationResult = clientMetadata.validateForConfigUri(configUrl);
             if (validationResult != ReportProviderClientMetadata.ValidationResult.OK) {
-                throw new ReportProviderUriNotValidException(validationResult.getDescription());
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("error")
+                        .detail(validationResult.getDescription())
+                        .build();
+                throw new ReportProviderUriNotValidException(errorResponse);
             }
             return clientMetadata;
         } catch (ProcessingException | WebApplicationException e) {
-            throw new ReportProviderUriNotValidException("error during request");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("error")
+                    .detail("error during request")
+                    .build();
+            throw new ReportProviderUriNotValidException(errorResponse);
         }
     }
 
@@ -187,11 +212,19 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
-                throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Client ID not found")
+                        .detail("Client ID not found")
+                        .build();
+                throw new ClientIdNotFoundException(errorResponse);
             }
 
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Client ID not found")
+                    .detail("Client ID not found")
+                    .build();
+            throw new ClientIdNotFoundException(errorResponse);
         } finally {
             em.close();
         }
@@ -215,7 +248,11 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
-                throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Client ID not found")
+                        .detail("Client ID not found")
+                        .build();
+                throw new ClientIdNotFoundException(errorResponse);
             }
 
             reportProvider.setAsRemoved();
@@ -227,7 +264,11 @@ public class ReportProviders {
             album.updateLastEventTime();
             tx.commit();
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Client ID not found")
+                    .detail("Client ID not found")
+                    .build();
+            throw new ClientIdNotFoundException(errorResponse);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -252,7 +293,11 @@ public class ReportProviders {
             reportProvider = getReportProviderWithClientId(clientId, em);
 
             if (!reportProvider.getAlbum().getId().equals(albumId)) {
-                throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found for the album " + albumId);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Client ID not found")
+                        .detail("Client ID not found")
+                        .build();
+                throw new ClientIdNotFoundException(errorResponse);
             }
 
             if (!(url == null || url.isEmpty())) {
@@ -272,7 +317,11 @@ public class ReportProviders {
             album.updateLastEventTime();
             tx.commit();
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Client ID not found")
+                    .detail("Client ID not found")
+                    .build();
+            throw new ClientIdNotFoundException(errorResponse);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -295,7 +344,11 @@ public class ReportProviders {
         try {
             reportProvider = getReportProviderWithClientId(clientId, em);
         } catch (NoResultException e) {
-            throw new ClientIdNotFoundException("ClientId: " + clientId + " Not Found");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Client ID not found")
+                    .detail("Client ID not found")
+                    .build();
+            throw new ClientIdNotFoundException(errorResponse);
         } finally {
             em.close();
         }

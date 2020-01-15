@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.keycloak.Keycloak;
 import online.kheops.auth_server.keycloak.KeycloakException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
@@ -37,7 +38,11 @@ public class Users {
                 final Keycloak keycloak = Keycloak.getInstance();
                 userReference= keycloak.getUser(userReference).getSub();
             } catch (KeycloakException e) {
-                throw new UserNotFoundException("Error during request to keycloak", e);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Error during request the authority provider")
+                        .detail("An error occure during request the authority provider")
+                        .build();
+                throw new UserNotFoundException(errorResponse, e);
             }
         }
 
@@ -68,7 +73,11 @@ public class Users {
             final Keycloak keycloak = Keycloak.getInstance();
             userReference = keycloak.getUser(userReference).getSub();
         } catch (KeycloakException e) {
-            throw new UserNotFoundException("Error during request to keycloak", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error during request the authority provider")
+                    .detail("An error occure during request the authority provider")
+                    .build();
+            throw new UserNotFoundException(errorResponse, e);
         }
 
         //the user is in keycloak but not in kheops => add the user in kheops
@@ -109,7 +118,11 @@ public class Users {
                 secondTryEntityManager.close();
             }
         } catch (Exception e) {
-            throw new UserNotFoundException("Error while adding a new user to the kheops db", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error")
+                    .detail("Error while adding a new user to the kheops db")
+                    .build();
+            throw new UserNotFoundException(errorResponse, e);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

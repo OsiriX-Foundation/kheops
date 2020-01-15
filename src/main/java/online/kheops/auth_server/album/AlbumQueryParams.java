@@ -2,12 +2,14 @@ package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.JOOQTools;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 
@@ -51,7 +53,11 @@ public final class AlbumQueryParams {
             descending = queryParameters.get(QUERY_PARAMETER_SORT).get(0).startsWith("-");
             orderBy = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
             if (!ACCEPTED_VALUES_FOR_SORTING.contains(orderBy)) {
-                throw new BadQueryParametersException("sort: " + orderBy);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("'sort' can only be : " + ACCEPTED_VALUES_FOR_SORTING_ARRAY)
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
         } else {
             descending = true;

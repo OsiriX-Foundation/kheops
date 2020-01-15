@@ -1,5 +1,6 @@
 package online.kheops.auth_server.capability;
 
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.User;
 
 import java.time.LocalDateTime;
@@ -60,7 +61,7 @@ public class CapabilityParametersBuilder {
     }
 
     public CapabilityParametersBuilder scope(String scopeType, String albumId)
-    throws CapabilityBadRequestException {
+            throws BadQueryParametersException {
         ScopeType.valueOf(scopeType.toUpperCase()).initScope(this, albumId);
         return this;
     }

@@ -40,6 +40,10 @@ public class KheopsLogBuilder {
         logEntry.add(new LogEntry("scope", scope));
         return this;
     }
+    public KheopsLogBuilder albumScope(String albumId) {
+        logEntry.add(new LogEntry("albumScope", albumId));
+        return this;
+    }
 
     public KheopsLogBuilder clientID(String clientID) {
         logEntry.add(new LogEntry("clientID", clientID));
@@ -48,6 +52,11 @@ public class KheopsLogBuilder {
 
     public KheopsLogBuilder capabilityID(String capabilityID) {
         logEntry.add(new LogEntry("capabilityID", capabilityID));
+        return this;
+    }
+
+    public KheopsLogBuilder ip(String ip) {
+        logEntry.add(new LogEntry("sourceIP", ip.split(", ")[0]));
         return this;
     }
 
@@ -60,10 +69,13 @@ public class KheopsLogBuilder {
         tokenProvenance.getActingParty().ifPresent(actingParty -> logEntry.add(new LogEntry("actingParty", actingParty)));
         tokenProvenance.getAuthorizedParty().ifPresent(authorizedParty -> logEntry.add(new LogEntry("authorizedParty", authorizedParty)));
         tokenProvenance.getCapabilityTokenId().ifPresent(capabilityTokenId -> logEntry.add(new LogEntry("authorizedCapabilityTokenId", capabilityTokenId)));
-        logEntry.add(new LogEntry("link", String.valueOf(tokenProvenance.isLink())));
         return this;
     }
 
+    public KheopsLogBuilder link(boolean link) {
+        logEntry.add(new LogEntry("link", String.valueOf(link)));
+        return this;
+    }
     public KheopsLogBuilder targetUser(String userId) {
         logEntry.add(new LogEntry("target_user", userId));
         return this;
@@ -78,6 +90,10 @@ public class KheopsLogBuilder {
     }
     public KheopsLogBuilder action(ActionType action) {
         logEntry.add(new LogEntry("action", action.name()));
+        return this;
+    }
+    public KheopsLogBuilder events(String events) {
+        logEntry.add(new LogEntry("events", events));
         return this;
     }
     public KheopsLogBuilder userPermission(UsersPermission usersPermission) {
@@ -98,7 +114,6 @@ public class KheopsLogBuilder {
         logEntry.add(new LogEntry("seriesUID", seriesUID));
         return this;
     }
-
 
     public void log() {
         StringBuilder logString = new StringBuilder();

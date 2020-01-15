@@ -5,9 +5,9 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.util.Consts;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.HashSet;
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 
 public class SeriesQueries {
 
@@ -33,7 +35,6 @@ public class SeriesQueries {
         TypedQuery<Series> query = em.createQuery("select s from Album a join a.albumSeries alS join alS.series s where :album = a and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(StudyInstanceUID,studyInstanceUID);
         query.setParameter("album",album);
-        //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         return query.getResultList();
     }
 
@@ -41,7 +42,6 @@ public class SeriesQueries {
         TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
         query.setParameter(StudyInstanceUID,studyInstanceUID);
         query.setParameter("callingUser",callingUser);
-        //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         return query.getResultList();
     }
 
@@ -55,7 +55,11 @@ public class SeriesQueries {
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found for the user :" + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist in your inbox")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -67,10 +71,13 @@ public class SeriesQueries {
             query.setParameter("album", album);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
-            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found in the album :" + album.getId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist in the album")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
     public static Series findSeriesByStudyUIDandSeriesUID(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em)
@@ -81,10 +88,13 @@ public class SeriesQueries {
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter("callingUser", callingUser);
-            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found all albums and inbox for the user :" + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -96,10 +106,13 @@ public class SeriesQueries {
             seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
             seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             seriesQuery.setParameter("callingUser", callingUser);
-            //seriesQuery.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             return seriesQuery.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found with share permission for the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist or you don't have the permission to share it")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -108,12 +121,15 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from Series s join s.study st where s.seriesInstanceUID = :SeriesInstanceUID and st.studyInstanceUID = :StudyInstanceUID", Series.class);
-            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("StudyInstanceUID : " + studyInstanceUID + "SeriesInstanceUID : " + seriesInstanceUID + "not found", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -122,12 +138,15 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and (au.admin = true or a.sendSeries = true)", Series.class);
-            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist in your albums or you don't hae the permission to share it")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -136,19 +155,21 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and a = u.inbox", Series.class);
-            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("Series : " + series.getSeriesInstanceUID() + "not found inside the inbox of user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist in your inbox")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
     public static boolean isOrphan(Series series, EntityManager em) {
         try {
             TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s = :series", Series.class);
-            //query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             query.setParameter("series", series);
             query.getSingleResult();
             return false;
@@ -167,7 +188,11 @@ public class SeriesQueries {
             query.setParameter("user", callingUser);
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found inside the album : " + album.getId() + " for the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(STUDY_NOT_FOUND)
+                    .detail("Study not found in the album")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -180,7 +205,11 @@ public class SeriesQueries {
             query.setParameter("user", callingUser);
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found inside the inbox of the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(STUDY_NOT_FOUND)
+                    .detail("Study not found in the inbox")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 
@@ -193,7 +222,11 @@ public class SeriesQueries {
             query.setParameter("user", callingUser);
             return new HashSet<>(query.getResultList());
         } catch (NoResultException e) {
-            throw new StudyNotFoundException("StudyInstanceUID : " + studyInstanceUID + " not found inside all album or inbox for the user : " + callingUser.getKeycloakId(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(STUDY_NOT_FOUND)
+                    .detail("Study does not exist or you don't have access")
+                    .build();
+            throw new StudyNotFoundException(errorResponse);
         }
     }
 }

@@ -13,17 +13,17 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
 import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -38,13 +38,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Level.INFO;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
-import static online.kheops.auth_server.user.AlbumUserPermissions.ADD_SERIES;
+import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.Tools.checkValidUID;
 
@@ -62,32 +64,34 @@ public class ReportProviderResource {
     private SecurityContext securityContext;
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @POST
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(permission = MANAGE_DICOM_SR, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newReportProvider(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                             @FormParam("url") @NotNull @NotEmpty final String url,
-                            @FormParam("name") @NotNull @NotEmpty final String name) {
+                            @FormParam("name") @NotNull @NotEmpty final String name)
+            throws AlbumNotFoundException {
 
         if ( !isValidConfigUrl(url)) {
-            return Response.status(BAD_REQUEST).entity("'url' formparam is not valid").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("'url' formparam is not valid")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         final ReportProviderResponse dicomSrResponse;
-        try {
-            dicomSrResponse = ReportProviders.newReportProvider(kheopsPrincipal.getUser(), albumId, name, url, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).build();
-        }
+        dicomSrResponse = ReportProviders.newReportProvider(kheopsPrincipal.getUser(), albumId, name, url, kheopsPrincipal.getKheopsLogBuilder());
+
 
         return Response.status(CREATED).entity(dicomSrResponse).build();
     }
@@ -98,11 +102,16 @@ public class ReportProviderResource {
     @Produces(MediaType.TEXT_HTML)
     public Response newReport(@FormParam("access_token") @NotNull @NotEmpty final String tokenParam,
                               @FormParam("client_id") final String clientId,
-                              @FormParam("studyUID") @NotNull @NotEmpty List<String> studyInstanceUIDs) {//Edit UidValidator for work with @FormParam
+                              @FormParam("studyUID") @NotNull @NotEmpty List<String> studyInstanceUIDs)
+            throws AlbumNotFoundException, UserNotFoundException {//Edit UidValidator for work with @FormParam
 
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {
-                return Response.status(BAD_REQUEST).entity(uid + "is not a valid uid").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("'studyUID' formparam is not valid")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
@@ -110,23 +119,30 @@ public class ReportProviderResource {
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
         } catch (AccessTokenVerificationException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("error with the access_token")
+                    .build();
             LOG.log(Level.WARNING, "Error validating a token", e);
-            return Response.status(UNAUTHORIZED).entity("error with the access_token").build();
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
         } catch (DownloadKeyException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("Error downloading the public key")
+                    .build();
             LOG.log(Level.SEVERE, "Error downloading the public key", e);
-            return Response.status(BAD_GATEWAY).entity("Error downloading the public key").build();
+            return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
-        try {
-            getOrCreateUser(accessToken.getSubject());
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(UNAUTHORIZED).build();
-        }
+        getOrCreateUser(accessToken.getSubject());
 
-        if (!  (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
+        if (! (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("The token is not a user capability token or a keycloak token")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         final User callingUser;
@@ -134,7 +150,7 @@ public class ReportProviderResource {
             callingUser = getOrCreateUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(UNAUTHORIZED).entity("User not found").build();
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
@@ -150,7 +166,11 @@ public class ReportProviderResource {
             albumId = reportProvider.getAlbum().getId();
         } catch (NoResultException e) {
             LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
-            return Response.status(NOT_FOUND).entity("Report provider with clientId: " + clientId + "not found").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Client ID not found")
+                    .detail("Client ID not found")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -159,26 +179,27 @@ public class ReportProviderResource {
         }
 
         final Album album;
-        try {
-            if (!(principal.hasUserAccess() && principal.hasAlbumAccess(albumId))) {
-                return Response.status(FORBIDDEN).build();
-            }
 
-            album = getAlbum(albumId);
-            for (String uid : studyInstanceUIDs) {
-                if (!canAccessStudy(album, uid)) {
-                    return Response.status(NOT_FOUND).entity("Study uid: " + uid + "not found").build();
-                }
+        if (!(principal.hasUserAccess() && principal.hasAlbumAccess(albumId))) {
+            return Response.status(FORBIDDEN).build();
+        }
+
+        album = getAlbum(albumId);
+        for (String uid : studyInstanceUIDs) {
+            if (!canAccessStudy(album, uid)) {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(STUDY_NOT_FOUND)
+                        .detail("The study does not exist or you don't have access")
+                        .build();
+                return Response.status(NOT_FOUND).entity(errorResponse).build();
             }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 
         final String responseType;
         try {
             responseType = getResponseType(reportProvider);
         } catch (ReportProviderUriNotValidException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         }
 
         final String kheopsConfigUrl = getHostRoot() + "/api/.well-known/report-provider-configuration";
@@ -241,7 +262,11 @@ public class ReportProviderResource {
                         .toString();
 
             } else {
-                return Response.status(BAD_REQUEST).entity("bad response type").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Bad 'response type'")
+                        .detail("'response type' can be 'code' or 'token'")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
                     .action(ActionType.NEW_REPORT)
@@ -263,7 +288,7 @@ public class ReportProviderResource {
 
             return Response.status(OK).entity(html).build();
         } catch (ReportProviderUriNotValidException e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
         } catch (UnsupportedEncodingException e) {
             return Response.status(FORBIDDEN).entity("ERROR").build();
         }
@@ -281,7 +306,7 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.GET_DICOM_SR)
+    @AlbumPermissionSecured(permission = GET_DICOM_SR, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
@@ -300,18 +325,14 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.GET_DICOM_SR)
+    @AlbumPermissionSecured(permission = GET_DICOM_SR, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                       @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
+                                       @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId)
+            throws ClientIdNotFoundException {
 
-        final ReportProviderResponse reportProvider;
-        try {
-            reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
-        } catch (ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+        final ReportProviderResponse reportProvider = getReportProvider(albumId, clientId, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
 
         return  Response.status(OK).entity(reportProvider).build();
     }
@@ -320,18 +341,16 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(permission = MANAGE_DICOM_SR, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     public Response deleteReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                          @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId) {
+                                          @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId)
+            throws AlbumNotFoundException, ClientIdNotFoundException{
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
-        try {
-            deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+
+        deleteReportProvider(callingUser, albumId, clientId, kheopsPrincipal.getKheopsLogBuilder());
 
         return  Response.status(NO_CONTENT).build();
     }
@@ -340,31 +359,31 @@ public class ReportProviderResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.MANAGE_DICOM_SR)
+    @AlbumPermissionSecured(permission = MANAGE_DICOM_SR, context = PATH_PARAM)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/reportproviders/{clientId:"+ ClientId.CLIENT_ID_PATTERN+"}")
     public Response editReportProviders(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                         @SuppressWarnings("RSReferenceInspection") @PathParam("clientId") String clientId,
                                         @FormParam("url") final String url,
-                                        @FormParam("name") final String name) {
-
+                                        @FormParam("name") final String name)
+            throws AlbumNotFoundException, ClientIdNotFoundException {
 
         if(!(url == null || url.isEmpty() )) {
             if(!isValidConfigUrl(url)) {
-                return Response.status(BAD_REQUEST).entity("url not valid").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("'url' formparam is not valid")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User callingUser = kheopsPrincipal.getUser();
 
-        final ReportProviderResponse reportProvider;
-        try {
-            reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
-        } catch (AlbumNotFoundException | ClientIdNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+        final ReportProviderResponse reportProvider = editReportProvider(callingUser, albumId, clientId, url, name, kheopsPrincipal.getKheopsLogBuilder());
+
 
         return  Response.status(OK).entity(reportProvider).build();
     }
@@ -376,7 +395,11 @@ public class ReportProviderResource {
     public Response testUri(@FormParam("url") final String url) {
 
         if (url == null || url.isEmpty()) {
-            return Response.status(BAD_REQUEST).entity("Missing formParam 'url'").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Missing formParam 'url'")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         ReportProviderClientMetadata clientMetadataResponse = new ReportProviderClientMetadata();

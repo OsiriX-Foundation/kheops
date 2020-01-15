@@ -1,11 +1,16 @@
 package online.kheops.auth_server.album;
 
-public class BadQueryParametersException extends Exception{
-    public BadQueryParametersException(String message) {
-        super(message);
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
+
+public class BadQueryParametersException extends Exception implements KheopsException {
+
+    private final ErrorResponse errorResponse;
+
+    public BadQueryParametersException(ErrorResponse errorResponse ) {
+        super(errorResponse.toString());
+        this.errorResponse = errorResponse;
     }
 
-    public BadQueryParametersException(String message, Throwable e) {
-        super(message, e);
-    }
+    public ErrorResponse getErrorResponse() {return errorResponse; }
 }

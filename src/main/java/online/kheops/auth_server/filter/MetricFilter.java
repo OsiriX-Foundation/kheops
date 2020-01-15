@@ -26,7 +26,7 @@ public class MetricFilter implements ContainerRequestFilter {
     private static final Logger LOG = Logger.getLogger(MetricFilter.class.getName());
 
     @Context
-    ServletContext servletContext;
+    private ServletContext servletContext;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {

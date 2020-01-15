@@ -1,13 +1,19 @@
 package online.kheops.auth_server.report_provider;
 
-public class ClientIdNotFoundException extends Exception{
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
 
-    public ClientIdNotFoundException(String message) {
-        super(message);
+public class ClientIdNotFoundException extends Exception implements KheopsException {
+
+    private final ErrorResponse errorResponse;
+
+    public ClientIdNotFoundException(ErrorResponse errorResponse) {
+
+        super();
+        this.errorResponse = errorResponse;
     }
 
-    public ClientIdNotFoundException(String message, Throwable e) {
-        super(message, e);
+    public ErrorResponse getErrorResponse() {
+        return errorResponse;
     }
-
 }

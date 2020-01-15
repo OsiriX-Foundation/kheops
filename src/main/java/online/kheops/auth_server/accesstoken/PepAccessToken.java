@@ -22,7 +22,7 @@ final class PepAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        public PepAccessToken build(String assertionToken, boolean linkAuthorization) throws AccessTokenVerificationException {
+        public PepAccessToken build(String assertionToken) throws AccessTokenVerificationException {
             final DecodedJWT jwt;
             try {
                 jwt = JWT.require(Algorithm.HMAC256(authorizationSecret()))

@@ -27,7 +27,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
     private static final Logger LOG = Logger.getLogger(TokenSecurityFilter.class.getName());
 
     @Context
-    ServletContext servletContext;
+    private ServletContext servletContext;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {

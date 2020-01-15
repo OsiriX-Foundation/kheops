@@ -27,17 +27,15 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private final boolean hasWriteAccess;
     private final String actingParty;
     private final String capabilityTokenId;
+    private final KheopsLogBuilder kheopsLogBuilder;
 
     private List<String> studyUids;
     private String clientId;
     private Album album;
-    private final boolean linkAuthorization;
     private final String originalToken;
 
-    //old version
-    private final Long dbid;
     public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids,
-                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, boolean linkAuthorization, String originalToken) {
+                                   String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, String originalToken) {
         try {
             album = getReportProvider(clientId).getAlbum();
         } catch (ClientIdNotFoundException e) {
@@ -45,27 +43,45 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         }
         this.clientId = clientId;
         this.studyUids = studyUids;
-        this.dbid = user.getPk();
         this.user = user;
         this.actingParty = actingParty;
         this.capabilityTokenId = capabilityTokenId;
         this.hasReadAccess = hasReadAccessAccess;
         this.hasWriteAccess = hasWriteAccess;
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
+
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .clientID(clientId)
+                .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
     }
+
     @Override
-    public long getDBID() {
-        return dbid;
+    public String getName() { return user.getKeycloakId(); }
+
+    @Override
+    public boolean hasUserAccess() { return false; }
+
+    @Override
+    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+             album = em.merge(album);
+
+             if(!album.getId().equals(albumId))  {
+                 return false;
+             }
+
+            return usersPermission.hasProviderPermission(album);
+
+        } finally {
+            em.close();
+        }
     }
-    //end old version
 
     @Override
-    public String getName() { return Long.toString(dbid); }
-
-    @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
-
+    public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
         if (!hasReadAccess) {
             return false;
         }
@@ -78,23 +94,23 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         try {
             album = em.merge(album);
             return canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em);
-
         } finally {
             em.close();
         }
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) {
-        return hasStudyAccess(studyInstanceUID);
+    public boolean hasStudyViewAccess(String studyInstanceUID) {
+        if (!studyUids.contains(studyInstanceUID)) {
+            return false;
+        }
+
+        return canAccessStudy(album, studyInstanceUID);
+
     }
 
     @Override
-    public boolean hasUserAccess() { return false; }
-
-    @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) {
-
+    public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
         if (!hasWriteAccess) {
             return false;
         }
@@ -128,25 +144,17 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyWriteAccess(String studyInstanceUID) {
-        return hasStudyAccess(studyInstanceUID);
-    }
-
-    @Override
-    public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
-        this.em = EntityManagerListener.createEntityManager();
-        try {
-             album = em.merge(album);
-
-             if(!album.getId().equals(albumId))  {
-                 return false;
-             }
-
-            return usersPermission.hasProviderPermission(album);
-
-        } finally {
-            em.close();
+    public boolean hasStudyAddAccess(String studyInstanceUID) {
+        if (!hasWriteAccess) {
+            return false;
         }
+        if (!studyUids.contains(studyInstanceUID)) {
+            return false;
+        }
+        if (!canAccessStudy(album, studyInstanceUID)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -167,17 +175,11 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     public String getAlbumID() { return album.getId(); }
 
     @Override
-    public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(getUser().getKeycloakId())
-                .clientID(clientId)
-                .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
-    }
+    public KheopsLogBuilder getKheopsLogBuilder() { return kheopsLogBuilder; }
 
     @Override
     public String toString() {
-        return "[ReportProviderPrincipal user:" + getUser() + " dbid:" + getDBID() + " albumId:" + album.getId() + " clientID:" + clientId + "]";
+        return "[ReportProviderPrincipal user:" + getUser() + " albumId:" + album.getId() + " clientID:" + clientId + "]";
     }
 
     @Override
@@ -205,6 +207,13 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         return Optional.ofNullable(capabilityTokenId);
     }
 
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
+    }
+
     @Override
     public boolean isLink() { return linkAuthorization;  }
 
@@ -213,17 +222,4 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         return originalToken;
     }
 
-    private boolean hasStudyAccess(String studyInstanceUID) {
-        if (!studyUids.contains(studyInstanceUID)) {
-            return false;
-        }
-
-        this.em = EntityManagerListener.createEntityManager();
-        try {
-            album = em.merge(album);
-            return canAccessStudy(album, studyInstanceUID);
-        } finally {
-            em.close();
-        }
-    }
 }

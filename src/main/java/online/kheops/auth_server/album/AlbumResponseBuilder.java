@@ -80,7 +80,7 @@ public class AlbumResponseBuilder {
         this.name = r.getValue("album_name").toString();
         this.description = r.getValue("album_description").toString();
         this.numberOfStudies = (Integer) r.getValue("number_of_studies");
-        this.numberOfComments = (Integer) r.getValue("number_of_comments");
+        this.numberOfSeries = (Integer) r.getValue("number_of_series");
         if(r.getValue("modalities") != null) {
             this.modalities = r.getValue("modalities").toString().split(",");
         } else {

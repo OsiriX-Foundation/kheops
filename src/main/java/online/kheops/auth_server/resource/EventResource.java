@@ -11,22 +11,26 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
+import static online.kheops.auth_server.user.AlbumUserPermissions.READ_COMMENT;
+import static online.kheops.auth_server.user.AlbumUserPermissions.WRITE_COMMENT;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
 @Path("/")
@@ -35,7 +39,7 @@ public class EventResource {
     private static final Logger LOG = Logger.getLogger(EventResource.class.getName());
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
     private SecurityContext securityContext;
@@ -43,14 +47,15 @@ public class EventResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.READ_COMMENT)
+    @AlbumPermissionSecured(permission = READ_COMMENT, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/events")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEvents(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                               @QueryParam("types") final List<String> types,
                               @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                              @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
+                              @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
+            throws AlbumNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -63,22 +68,18 @@ public class EventResource {
 
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
-        try {
-            if (types.contains("comments") && types.contains("mutations")) {
-                pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments_mutations");
-            } else if (types.contains("comments")) {
-                pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments");
-            } else if (types.contains("mutations")) {
-                pair = Events.getMutationsAlbum(albumId, offset, limit);
-                kheopsLogBuilder.scope("mutations");
-            } else {
-                pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
-                kheopsLogBuilder.scope("comments_mutations");
-            }
-        } catch (AlbumNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
+        if (types.contains("comments") && types.contains("mutations")) {
+            pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            kheopsLogBuilder.events("comments_mutations");
+        } else if (types.contains("comments")) {
+            pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            kheopsLogBuilder.events("comments");
+        } else if (types.contains("mutations")) {
+            pair = Events.getMutationsAlbum(albumId, offset, limit);
+            kheopsLogBuilder.events("mutations");
+        } else {
+            pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            kheopsLogBuilder.events("comments_mutations");
         }
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
@@ -94,26 +95,26 @@ public class EventResource {
     @Secured
     @UserAccessSecured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.WRITE_COMMENT)
+    @AlbumPermissionSecured(permission = WRITE_COMMENT, context = PATH_PARAM)
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postAlbumComment(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @FormParam("to_user") String user,
-                                     @FormParam("comment") @NotNull @NotEmpty String comment) {
+                                     @FormParam("comment") @NotNull @NotEmpty String comment)
+            throws AlbumNotFoundException, UserNotFoundException {
 
         if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
-            return Response.status(BAD_REQUEST).entity("Param 'comment' is too long. max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length()).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'comment' is too long max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        try {
-            Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
-        } catch (UserNotFoundException | AlbumNotFoundException e) {
-            LOG.log(Level.WARNING, "Not found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+        Events.albumPostComment(kheopsPrincipal.getUser(), albumId, comment, user);
 
         kheopsPrincipal.getKheopsLogBuilder().album(albumId)
                 .action(KheopsLogBuilder.ActionType.POST_COMMENT)
@@ -132,8 +133,12 @@ public class EventResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return Response.status(FORBIDDEN).entity("You don't have access to the Study:" + studyInstanceUID + " or it does not exist").build();
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(STUDY_NOT_FOUND)
+                    .detail("The study does not exist or you don't have access")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         final PairListXTotalCount<EventResponse> pair;
@@ -155,26 +160,31 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @FormParam("to_user") String user,
-                                       @FormParam("comment") @NotNull @NotEmpty String comment) {
+                                       @FormParam("comment") @NotNull @NotEmpty String comment)
+            throws StudyNotFoundException, BadQueryParametersException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return Response.status(FORBIDDEN).entity("You don't have access to the Study:"+studyInstanceUID+" or it does not exist").build();
+        if(!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(STUDY_NOT_FOUND)
+                    .detail("The study does not exist or you don't have access")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
-            return Response.status(BAD_REQUEST).entity("Param 'comment' is too long. max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length()).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'comment' is too long max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         try {
             Events.studyPostComment(kheopsPrincipal.getUser(), studyInstanceUID, comment, user);
-        } catch (UserNotFoundException | StudyNotFoundException e) {
-            LOG.log(Level.WARNING, "Not Found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        } catch (BadQueryParametersException e) {
-            LOG.log(Level.WARNING, "Bad Request", e);
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
 
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)

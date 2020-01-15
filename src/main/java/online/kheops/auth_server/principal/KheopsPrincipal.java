@@ -16,17 +16,19 @@ import java.util.Optional;
 
 public interface KheopsPrincipal extends Principal, TokenProvenance {
 
-    long getDBID();
     String getAlbumID() throws NotAlbumScopeTypeException, AlbumNotFoundException;
 
-    boolean hasSeriesReadAccess(String study, String series);
-    boolean hasStudyReadAccess(String study);
     boolean hasUserAccess();
     boolean hasInboxAccess();
 
-    boolean hasSeriesWriteAccess(String study, String series);
-
-    boolean hasStudyWriteAccess(String study);
+    default boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {return false;}
+    default boolean hasStudyViewAccess(String studyInstanceUID) {return false;}
+    default boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {return false;}
+    default boolean hasStudyDeleteAccess(String studyInstanceUID) {return false;}
+    default boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {return false;}
+    default boolean hasStudyShareAccess(String studyInstanceUID) {return false;}
+    default boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {return false;}
+    default boolean hasStudyAddAccess(String studyInstanceUID) {return false;}
 
     boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId);
 
@@ -39,6 +41,8 @@ public interface KheopsPrincipal extends Principal, TokenProvenance {
     default Optional<List<String>> getStudyList() {return Optional.empty();}
 
     default Optional<String> getClientId() {return Optional.empty();}
+
+    void setLink(boolean linkAuthorization);
 
     boolean isLink();
 
