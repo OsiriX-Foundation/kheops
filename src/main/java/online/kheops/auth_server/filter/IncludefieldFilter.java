@@ -28,7 +28,7 @@ public class IncludefieldFilter implements ContainerRequestFilter {
 
                 builder.replaceQueryParam(key);
                 for (String value : values) {
-                    String[] lstValues = value.split(",");
+                    String[] lstValues = value.split("\\s*,\\s*");
                     for (String uniqueValue : lstValues) {
                         builder.queryParam(key, uniqueValue);
                     }
