@@ -34,7 +34,7 @@ public class CapabilityToken {
 
     public String getToken() { return token; }
 
-    public static Boolean isValidFormat(String token) {
+    public static boolean isValidFormat(String token) {
         return tokenPattern.matcher(token).matches();
     }
 

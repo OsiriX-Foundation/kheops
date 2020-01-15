@@ -7,12 +7,12 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
-import org.dcm4che3.data.Keyword;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.jooq.*;
@@ -43,6 +43,8 @@ import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_COMMENTS;
 import static online.kheops.auth_server.util.Consts.CUSTOM_DICOM_TAG_FAVORITE;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static org.jooq.impl.DSL.*;
 
 public class Studies {
@@ -336,7 +338,11 @@ public class Studies {
 
         public void check(String time) throws BadQueryParametersException {
             if (! time.matches("^(2[0-3]|[01][0-9])([0-5][0-9]){2}.[0-9]{6}$") ) {
-                throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyTime) + " :" + time);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("A time must be hhmmss.SSSSSS")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
         }
     }
@@ -347,21 +353,28 @@ public class Studies {
         public TableField<? extends Record, String> getColumn() {return STUDIES.STUDY_DATE;}
 
         public void check(String date) throws BadQueryParametersException {
+
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message(BAD_QUERY_PARAMETER)
+                .detail("A date must be yyyyMMdd")
+                .build();
+
             if (date.matches("^([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$")) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
                 dateFormat.setLenient(false);
                 try {
                     dateFormat.parse(date);
                 } catch (ParseException e) {
-                    throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
+
+                    throw new BadQueryParametersException(errorResponse);
                 }
             } else {
-                throw new BadQueryParametersException(Keyword.valueOf(Tag.StudyDate) + " :" + date);
+                throw new BadQueryParametersException(errorResponse);
             }
         }
     }
 
-    private static Condition createCondition(String filter, TableField<? extends Record, String> column, Boolean isFuzzyMatching) {
+    private static Condition createCondition(String filter, TableField<? extends Record, String> column, boolean isFuzzyMatching) {
         String parameterNoStar = filter.replace("*", "");
 
         if (parameterNoStar.length() == 0) {
@@ -490,11 +503,7 @@ public class Studies {
 
         try {
             tx.begin();
-            if(favorite) {
-                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_STUDY);
-            } else {
-                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
-            }
+
             callingUser = em.merge(callingUser);
             List<Series> seriesList;
             final Album album;
@@ -509,7 +518,11 @@ public class Studies {
                 kheopsLogBuilder.album(fromAlbumId);
             }
             if(seriesList.isEmpty()) {
-                throw new StudyNotFoundException("Study not found");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(STUDY_NOT_FOUND)
+                        .detail("Study does not exist or you don't have access")
+                        .build();
+                throw new StudyNotFoundException(errorResponse);
             }
 
             for(Series s: seriesList) {
@@ -520,8 +533,10 @@ public class Studies {
             final Events.MutationType mutation;
             if (favorite) {
                 mutation = Events.MutationType.ADD_FAV;
+                kheopsLogBuilder.action(ActionType.ADD_FAVORITE_STUDY);
             } else {
                 mutation = Events.MutationType.REMOVE_FAV;
+                kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
             }
             final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
             em.persist(favAlbumMutation);

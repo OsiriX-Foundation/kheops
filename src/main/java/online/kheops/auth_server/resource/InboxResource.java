@@ -21,8 +21,6 @@ public class InboxResource {
     @Context
     private SecurityContext securityContext;
 
-
-
     @GET
     @Secured
     @UserAccessSecured
@@ -36,7 +34,7 @@ public class InboxResource {
         try {
             inboxInfoResponse = Inbox.getInboxInfo(kheopsPrincipal.getUser(), kheopsPrincipal.getKheopsLogBuilder());
         } catch (JOOQException e) {
-            return Response.status(INTERNAL_SERVER_ERROR).build();
+            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
         }
 
         return Response.status(OK).entity(inboxInfoResponse).build();

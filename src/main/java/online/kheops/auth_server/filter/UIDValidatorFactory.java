@@ -28,14 +28,14 @@ public class UIDValidatorFactory implements DynamicFeature {
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
 
         Annotation[][] parameterAnnotations = resourceInfo.getResourceMethod().getParameterAnnotations();
-        ArrayList<String> uid = new ArrayList<>();
+        ArrayList<String> uids = new ArrayList<>();
 
         for(Annotation[] annotations : parameterAnnotations) {
             for (Annotation annotation1 : annotations) {
                 if (annotation1 instanceof UIDValidator) {
                     for (Annotation annotation2 : annotations) {
                         if (annotation2 instanceof PathParam) {
-                            uid.add(((PathParam)annotation2).value());
+                            uids.add(((PathParam)annotation2).value());
                             break;
                         }
                     }
@@ -43,8 +43,8 @@ public class UIDValidatorFactory implements DynamicFeature {
                 }
             }
         }
-        if (!uid.isEmpty()) {
-            featureContext.register(new CheckUID(uid));
+        if (!uids.isEmpty()) {
+            featureContext.register(new CheckUID(uids));
         }
     }
 
@@ -69,7 +69,7 @@ public class UIDValidatorFactory implements DynamicFeature {
                 final String uid = pathParam.get(type).get(0);
 
                 if (!checkValidUID(uid)) {
-                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(type + " is not a valid UID : " + uid).build());
+                    throw new WebApplicationException(Response.status(BAD_REQUEST).entity(type + " is not a valid UID.").build());
                 }
             }
         }

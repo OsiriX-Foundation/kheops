@@ -1,5 +1,6 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.*;
 
 import javax.persistence.*;
@@ -108,7 +109,7 @@ public class Capability {
 
     private Capability() {}
 
-    private Capability(CapabilityBuilder builder) throws CapabilityBadRequestException {
+    private Capability(CapabilityBuilder builder) throws BadQueryParametersException {
         secretBeforeHash = new CapabilityToken().getToken();
         this.secret = hashCapability(secretBeforeHash);
         this.expirationTime = builder.expirationTime;
@@ -271,7 +272,7 @@ public class Capability {
             return this;
         }
 
-        public Capability build() throws CapabilityBadRequestException {
+        public Capability build() throws BadQueryParametersException {
             if (user == null) {
                 throw new IllegalStateException("Missing user");
             }

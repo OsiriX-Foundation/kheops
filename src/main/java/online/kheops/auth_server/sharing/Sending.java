@@ -10,6 +10,7 @@ import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
@@ -26,6 +27,7 @@ import static online.kheops.auth_server.series.Series.isSeriesInInbox;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 
 public class Sending {
 
@@ -47,7 +49,11 @@ public class Sending {
             final List<Series> seriesList = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
 
             if (seriesList.isEmpty()) {
-                throw new SeriesNotFoundException("No access to any series with the given studyInstanceUID");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(SERIES_NOT_FOUND)
+                        .detail("The series does not exist in your inbox")
+                        .build();
+                throw new SeriesNotFoundException(errorResponse);
             }
 
             for (final Series series: seriesList) {
@@ -110,7 +116,11 @@ public class Sending {
             final List<Series> availableSeries = findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em);
 
             if (availableSeries.isEmpty()) {
-                throw new SeriesNotFoundException("No study with the given StudyInstanceUID in the album");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(SERIES_NOT_FOUND)
+                        .detail("The series does not exist in the album")
+                        .build();
+                throw new SeriesNotFoundException(errorResponse);
             }
 
             for (Series series: availableSeries) {
@@ -384,7 +394,7 @@ public class Sending {
                     .series(seriesInstanceUID);
 
             if (targetUser == callingUser) { // the user is requesting access to a new series
-                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, false, kheopsLogBuilder);
+                appropriateSeries(callingUser, studyInstanceUID, seriesInstanceUID, kheopsLogBuilder);
             }
 
             final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
@@ -411,7 +421,7 @@ public class Sending {
         }
     }
 
-    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, boolean fromToken, KheopsLogBuilder kheopsLogBuilder)
+    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -429,9 +439,8 @@ public class Sending {
             try {
                 final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-
-                if(isOrphan(storedSeries, em) || fromToken) {
-                    //here the series exists but she is orphan or it's an appropriate from an album capability token
+                if(isOrphan(storedSeries, em)) {
+                    //here the series exists but she is orphan
                     final Album inbox = callingUser.getInbox();
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
                     storedSeries.addAlbumSeries(inboxSeries);
@@ -445,20 +454,16 @@ public class Sending {
                     kheopsLogBuilder.log();
                     return;
                 } else {
-                    try {
-                        final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
-                        final Album inbox = callingUser.getInbox();
-                        final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-                        series.addAlbumSeries(inboxSeries);
-                        inbox.addSeries(inboxSeries);
+                    final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
+                    final Album inbox = callingUser.getInbox();
+                    final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
+                    series.addAlbumSeries(inboxSeries);
+                    inbox.addSeries(inboxSeries);
 
-                        em.persist(inboxSeries);
-                        tx.commit();
-                        kheopsLogBuilder.log();
-                        return;
-                    } catch (SeriesNotFoundException e2) {
-                        throw new SeriesNotFoundException(e2.getMessage());
-                    }
+                    em.persist(inboxSeries);
+                    tx.commit();
+                    kheopsLogBuilder.log();
+                    return;
                 }
 
             } catch (SeriesNotFoundException ignored) {/*empty*/}
@@ -479,6 +484,45 @@ public class Sending {
 
             tx.commit();
             kheopsLogBuilder.log();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+
+    public static void appropriateSeriesFromToken(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+            throws SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            callingUser = em.merge(callingUser);
+
+            kheopsLogBuilder.study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .action(ActionType.APPROPRIATE_SERIES);
+
+            final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
+
+            if(isSeriesInInbox(callingUser, storedSeries, em)) {
+                kheopsLogBuilder.log();
+                return;
+            }
+
+            final Album inbox = callingUser.getInbox();
+            final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
+            storedSeries.addAlbumSeries(inboxSeries);
+            inbox.addSeries(inboxSeries);
+            em.persist(inboxSeries);
+            tx.commit();
+
+            kheopsLogBuilder.log();
+
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -564,7 +608,11 @@ public class Sending {
         }
 
         if (availableSeries.isEmpty()) {
-            throw new SeriesNotFoundException("No study with the given StudyInstanceUID");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
         return availableSeries;
     }

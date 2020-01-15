@@ -7,7 +7,7 @@ import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.Map;
 
 public class EventResponse {
 
@@ -72,7 +72,7 @@ public class EventResponse {
 
     private EventResponse() { /*empty*/ }
 
-    public EventResponse(Comment comment, HashMap<String, Boolean> userMember) {
+    public EventResponse(Comment comment, Map<String, Boolean> userMember) {
 
         eventType = "Comment";
         origin = new UserResponseBuilder()
@@ -92,7 +92,7 @@ public class EventResponse {
         }
     }
 
-    public EventResponse(Mutation mutation, HashMap<String, Boolean> userMember) {
+    public EventResponse(Mutation mutation, Map<String, Boolean> userMember) {
 
         eventType = "Mutation";
 

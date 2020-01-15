@@ -34,7 +34,7 @@ public class SecuredFilter implements ContainerRequestFilter {
     private static final Logger LOG = Logger.getLogger(SecuredFilter.class.getName());
 
     @Context
-    ServletContext servletContext;
+    private ServletContext servletContext;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -49,16 +49,9 @@ public class SecuredFilter implements ContainerRequestFilter {
             return;
         }
 
-        boolean linkAuthorization;
-        try {
-            linkAuthorization = Boolean.valueOf(requestContext.getHeaderString("X-Link-Authorization"));
-        } catch (Exception e) {
-            linkAuthorization = false;
-        }
-
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token, linkAuthorization);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Received bad accesstoken" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
@@ -77,12 +70,10 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
         final User finalUser = user;
-        final boolean isLinkAuthorization = linkAuthorization;
+        final KheopsPrincipal principal = accessToken.newPrincipal(servletContext, finalUser);
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
-            public KheopsPrincipal getUserPrincipal() {
-                return accessToken.newPrincipal(servletContext, finalUser);
-            }
+            public KheopsPrincipal getUserPrincipal() { return principal; }
 
             @Override
             public boolean isUserInRole(String role) {
@@ -106,7 +97,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         });
     }
 
-    private static String getToken(String authorizationHeader) {
+    public static String getToken(String authorizationHeader) {
         final String token;
         if (authorizationHeader != null) {
 

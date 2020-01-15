@@ -12,6 +12,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
@@ -31,11 +32,10 @@ public class ViewerPrincipal implements KheopsPrincipal {
     private EntityManager em;
     private final ViewerAccessToken viewerAccessToken;
     private final KheopsPrincipal kheopsPrincipal;
-    private final boolean linkAuthorization;
     private final String originalToken;
+    private final KheopsLogBuilder kheopsLogBuilder;
 
-
-    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, boolean linkAuthorization, String originalToken) {
+    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, String originalToken) {
 
         final AccessToken accessToken = viewerAccessToken.getAccessToken();
 
@@ -48,23 +48,23 @@ public class ViewerPrincipal implements KheopsPrincipal {
         kheopsPrincipal = accessToken.newPrincipal(servletContext, user);
 
         this.viewerAccessToken = viewerAccessToken;
-        this.linkAuthorization = linkAuthorization;
         this.originalToken = originalToken;
-    }
 
-    @Override
-    public long getDBID() {
-        return kheopsPrincipal.getDBID();
+        kheopsLogBuilder = new KheopsLogBuilder()
+                .provenance(this)
+                .user(getUser().getKeycloakId())
+                .tokenType(AccessToken.TokenType.VIEWER_TOKEN);
     }
-    //end old version
 
     @Override
     public String getName() { return kheopsPrincipal.getName(); }
 
     @Override
-    public boolean hasSeriesReadAccess(String studyInstanceUID, String seriesInstanceUID) {
+    public boolean hasUserAccess() { return false; }
 
-        if(!kheopsPrincipal.hasSeriesReadAccess(studyInstanceUID, seriesInstanceUID)) {
+    @Override
+    public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
+        if(!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID)) {
             return false;
         }
 
@@ -92,22 +92,13 @@ public class ViewerPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyReadAccess(String studyInstanceUID) {
-        if(!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+    public boolean hasStudyViewAccess(String studyInstanceUID) {
+        if(!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             return false;
         }
 
         return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
     }
-
-    @Override
-    public boolean hasUserAccess() { return false; }
-
-    @Override
-    public boolean hasSeriesWriteAccess(String studyInstanceUID, String seriesInstanceUID) { return false; }
-
-    @Override
-    public boolean hasStudyWriteAccess(String study) { return false; }
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
@@ -173,13 +164,17 @@ public class ViewerPrincipal implements KheopsPrincipal {
         } else if (!viewerAccessToken.isInbox()) {
             albumID = viewerAccessToken.getSourceId();
         } else {
-            throw new NotAlbumScopeTypeException("");
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error")
+                    .detail("this token is not an token with album scope")
+                    .build();
+            throw new NotAlbumScopeTypeException(errorResponse);
         }
 
         if(kheopsPrincipal.hasAlbumAccess(albumID)) {
             return albumID;
         } else {
-            throw new AlbumNotFoundException("");
+            throw new AlbumNotFoundException();
         }
     }
 
@@ -200,10 +195,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() {
-        return new KheopsLogBuilder()
-                .provenance(this)
-                .user(getUser().getKeycloakId())
-                .tokenType(AccessToken.TokenType.VIEWER_TOKEN);
+        return kheopsLogBuilder;
     }
 
     @Override
@@ -214,6 +206,12 @@ public class ViewerPrincipal implements KheopsPrincipal {
     @Override
     public Optional<List<String>> getStudyList() {
         return Optional.of(Collections.singletonList(viewerAccessToken.getStudyInstanceUID()));
+    }
+
+    private boolean linkAuthorization;
+    @Override
+    public void setLink(boolean linkAuthorization) {
+        this.linkAuthorization = linkAuthorization;
     }
 
     @Override

@@ -5,6 +5,7 @@ import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -25,6 +26,8 @@ import static online.kheops.auth_server.generated.tables.Events.EVENTS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
@@ -43,7 +46,7 @@ public class AlbumQueries {
                     .setParameter("albumId", albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new AlbumNotFoundException("Album id:" + albumId + " not found", e);
+            throw new AlbumNotFoundException();
         }
     }
 
@@ -56,7 +59,7 @@ public class AlbumQueries {
                     .setParameter("targetAlbum", album)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new UserNotMemberException("User : " + user.getKeycloakId() + " is not a member of the album :"+album.getId(), e);
+            throw new UserNotMemberException();
         }
     }
 
@@ -68,7 +71,11 @@ public class AlbumQueries {
                     .setParameter("albumID", albumID)
                     .getSingleResult();
         } catch (NoResultException e) {
-            throw new SeriesNotFoundException("SeriesInstanceUID : " + seriesUID + " not found in the album : " + albumID, e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist in the album")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -196,16 +203,16 @@ public class AlbumQueries {
             final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getUser().getPk(), conditionArrayList, connection);
 
             return new PairListXTotalCount<>(albumTotalCount, albumResponses);
-        } catch (BadQueryParametersException e) {
-            throw new BadQueryParametersException(e.getMessage());
         } catch (SQLException e) {
             throw new JOOQException("Error during request", e);
         }
     }
 
-    public static AlbumResponse findAlbumByUserPkAndAlbumId(String albumId, long userPK)
+    public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user)
             throws JOOQException {
         try (Connection connection = getDataSource().getConnection()) {
+
+            final long userPK = user.getPk();
 
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
@@ -277,25 +284,20 @@ public class AlbumQueries {
                     ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    countDistinct(EVENTS.PK).as("number_of_comments"),
                     countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
+                    countDistinct(SERIES.PK).as("number_of_series"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
             query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
             query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
-
-            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
-                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
-                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()));
 
             query.addConditions(ALBUMS.ID.eq(albumId));
-            query.addConditions(SERIES.POPULATED.isTrue());
-            query.addConditions(STUDIES.POPULATED.isTrue());
+            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
+            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
-            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
+            query.addGroupBy(ALBUMS.PK);
 
             Record result = query.fetchOne();
 
@@ -337,7 +339,13 @@ public class AlbumQueries {
             else if (orderByParameter.equals("number_of_comments")) {
                 ord = field("number_of_comments");
             }
-            else throw new BadQueryParametersException("sort: " + orderByParameter);
+            else {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("'sort' query parameter is bad")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
+            }
 
             return descending ? ord.desc() : ord.asc();
 

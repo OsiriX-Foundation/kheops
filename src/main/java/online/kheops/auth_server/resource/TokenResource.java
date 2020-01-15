@@ -4,6 +4,8 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.annotation.TokenSecurity;
 import online.kheops.auth_server.accesstoken.*;
+import online.kheops.auth_server.capability.CapabilityNotFoundException;
+import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.token.*;
@@ -22,10 +24,12 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.capability.Capabilities.getCapabilityWithID;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getRedirectUri;
 import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 
 
 @Path("/")
@@ -34,10 +38,13 @@ public class TokenResource
     private static final Logger LOG = Logger.getLogger(TokenResource.class.getName());
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
-    SecurityContext securityContext;
+    private SecurityContext securityContext;
+
+    @HeaderParam(X_FORWARDED_FOR)
+    private String headerXForwardedFor;
 
     @POST
     @TokenSecurity
@@ -64,16 +71,20 @@ public class TokenResource
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
-                    .action(grantType.getLogActionType());
+                    .action(grantType.getLogActionType())
+                    .link(false);
             result.getScope().ifPresent(logBuilder::scope);
             result.getStudyInstanceUID().ifPresent(logBuilder::study);
             result.getSeriesInstanceUID().ifPresent(logBuilder::series);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
+            }
             logBuilder.log();
 
             return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
-            throw e;
+            return Response.status(BAD_REQUEST).build();
         }
     }
 
@@ -127,10 +138,14 @@ public class TokenResource
                 em.close();
             }
 
-            new KheopsLogBuilder().user(accessToken.getSubject())
+            final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
-                    .log();
+                    .link(false);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
+            }
+            logBuilder.log();
 
             final IntrospectResponse introspectResponse = IntrospectResponse.from(accessToken);
             introspectResponse.setAlbumId(albumId);
@@ -139,12 +154,27 @@ public class TokenResource
         } else if (securityContext.isUserInRole(TokenClientKind.INTERNAL.getRoleString()) ||
                 accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) {
-            new KheopsLogBuilder().user(accessToken.getSubject())
+            final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
-                    .log();
+                    .link(false);
+            final IntrospectResponse introspectResponse = IntrospectResponse.from(accessToken);
+            if (accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN) {
+                final Capability capability;
+                try {
+                    capability = getCapabilityWithID(accessToken.getCapabilityTokenId().get());
+                } catch (CapabilityNotFoundException e) {
+                    return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
+                }
 
-            return Response.status(OK).entity(IntrospectResponse.from(accessToken).toJson()).build();
+                introspectResponse.setAlbumId(capability.getAlbum().getId());
+            }
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
+            }
+            logBuilder.log();
+
+            return Response.status(OK).entity(introspectResponse.toJson()).build();
         } else {
             LOG.log(WARNING, "Public or Report Provider attempting to introspect a valid non-report provider token");
             return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();

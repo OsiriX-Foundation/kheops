@@ -2,6 +2,7 @@ package online.kheops.auth_server.capability;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
@@ -22,7 +23,6 @@ import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findAllCapabilitiesByAlbum;
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
-import static online.kheops.auth_server.user.UserQueries.findUserByPk;
 
 public class Capabilities {
 
@@ -31,12 +31,12 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
-            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , CapabilityBadRequestException, UserNotMemberException {
+            throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden , BadQueryParametersException, UserNotMemberException {
         return capabilityParameters.getScopeType().generateCapability(capabilityParameters, kheopsLogBuilder);
     }
 
     public static CapabilitiesResponse createUserCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
-            throws CapabilityBadRequestException {
+            throws BadQueryParametersException {
 
         final CapabilitiesResponse capabilityResponse;
 
@@ -74,7 +74,7 @@ public class Capabilities {
     }
 
     public static CapabilitiesResponse createAlbumCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, NewCapabilityForbidden, CapabilityBadRequestException, UserNotMemberException {
+            throws AlbumNotFoundException, NewCapabilityForbidden, BadQueryParametersException, UserNotMemberException {
 
         final CapabilitiesResponse capabilityResponse;
 
@@ -88,7 +88,7 @@ public class Capabilities {
             final Album album = getAlbum(capabilityParameters.getAlbumId(), em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
             if (!albumUser.isAdmin()) {
-                throw new NewCapabilityForbidden("Only an admin can generate a capability token for an album");
+                throw new NewCapabilityForbidden();
             }
             final Capability capability = new Capability.CapabilityBuilder()
                     .user(user)
@@ -225,15 +225,14 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static CapabilitiesResponse getCapability(String capabilityTokenID, long callingUserPk)
+    public static CapabilitiesResponse getCapability(String capabilityTokenID, User user)
             throws CapabilityNotFoundException {
 
         final CapabilitiesResponse capabilityResponse;
-
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final User user = findUserByPk(callingUserPk, em);
 
         try {
+            user = em.merge(user);
             Capability capability = getCapability(user, capabilityTokenID, em);
             capabilityResponse = new CapabilitiesResponse(capability, false, false);
         } finally {
@@ -251,6 +250,18 @@ public class Capabilities {
             return true;
         } catch (CapabilityNotFoundException e) {
             return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static Capability getCapabilityWithID(String capabilityId)
+            throws CapabilityNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            return findCapabilityByCapabilityID(capabilityId, em);
         } finally {
             em.close();
         }
@@ -279,7 +290,19 @@ public class Capabilities {
     public static Capability getCapability(String secret, EntityManager em)
             throws CapabilityNotFoundException {
 
-            final String hashSecret = hashCapability(secret);
-            return findCapabilityByCapabilityToken(hashSecret, em);
+        final String hashSecret = hashCapability(secret);
+        return findCapabilityByCapabilityToken(hashSecret, em);
+    }
+
+    public static Capability getCapability(String secret)
+            throws CapabilityNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            return  getCapability(secret, em);
+        } finally {
+            em.close();
+        }
     }
 }

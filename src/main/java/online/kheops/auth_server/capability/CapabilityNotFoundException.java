@@ -1,18 +1,16 @@
 package online.kheops.auth_server.capability;
 
-public class CapabilityNotFoundException extends Exception {
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
 
-    public CapabilityNotFoundException(String message) {
-        super(message);
+public class CapabilityNotFoundException extends Exception implements KheopsException {
+
+    private final ErrorResponse errorResponse;
+
+    public CapabilityNotFoundException(ErrorResponse errorResponse) {
+        super();
+        this.errorResponse = errorResponse;
     }
 
-    public CapabilityNotFoundException() {
-        super("Unknown capability");
-    }
-
-    public CapabilityNotFoundException(String message, Throwable e) {
-        super(message, e);
-    }
-
-    public CapabilityNotFoundException(Throwable e) { super("Unknown capability", e); }
+    public ErrorResponse getErrorResponse() { return errorResponse; }
 }

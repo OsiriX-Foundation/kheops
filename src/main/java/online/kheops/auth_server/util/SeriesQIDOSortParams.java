@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_SORT;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 public final class SeriesQIDOSortParams {
     private static final Set<Integer> ACCEPTED_TAGS_FOR_SORTING = new HashSet<>(Arrays.asList(Tag.Modality, Tag.SeriesInstanceUID, Tag.SeriesNumber, Tag.NumberOfSeriesRelatedInstances));
@@ -27,7 +28,11 @@ public final class SeriesQIDOSortParams {
             final String orderByParameter = queryParameters.get(QUERY_PARAMETER_SORT).get(0).replace("-", "");
             orderByTag = org.dcm4che3.util.TagUtils.forName(orderByParameter);
             if (orderByTag == -1 || !ACCEPTED_TAGS_FOR_SORTING.contains(orderByTag)) {
-                throw new BadQueryParametersException("sort: " + queryParameters.get(QUERY_PARAMETER_SORT).get(0));
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("'sort' query parameter is bad")
+                        .build();
+                throw new BadQueryParametersException(errorResponse);
             }
         }
 

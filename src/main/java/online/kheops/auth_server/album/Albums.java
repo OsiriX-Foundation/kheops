@@ -6,6 +6,7 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import java.util.List;
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 
 public class Albums {
 
@@ -46,7 +48,7 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(newAlbum.getId(), callingUser.getPk());
+            albumResponse = findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -98,12 +100,16 @@ public class Albums {
                 em.persist(mutation);
 
             } else if (name != null || description != null || usersPermission.areSet()) {
-                throw new AlbumForbiddenException("Not admin: The user must be an admin for editing name, description or permissions");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(AUTHORIZATION_ERROR)
+                        .detail("The user must be an admin for editing name, description or permissions")
+                        .build();
+                throw new AlbumForbiddenException(errorResponse);
             }
 
             tx.commit();
 
-            albumResponse = findAlbumByUserPkAndAlbumId(editAlbum.getId(), callingUser.getPk());
+            albumResponse = findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -167,11 +173,11 @@ public class Albums {
         }
     }
 
-    public static AlbumResponse getAlbum(long callingUserPk, String albumId, boolean withUserAccess, boolean withUsersList)
+    public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
            throws JOOQException, AlbumNotFoundException {
         AlbumResponse albumResponse;
         if (withUserAccess) {
-            albumResponse = findAlbumByUserPkAndAlbumId(albumId, callingUserPk);
+            albumResponse = findAlbumByUserAndAlbumId(albumId, user);
             if(withUsersList) {
                 albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
             }
@@ -221,7 +227,11 @@ public class Albums {
             final User targetUser = em.merge(getOrCreateUser(userName));
 
             if (targetUser.getPk() == callingUser.getPk()) {
-                throw new AlbumForbiddenException("Add yourself forbidden");
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(AUTHORIZATION_ERROR)
+                        .detail("You can not add yourself to the album")
+                        .build();
+                throw new AlbumForbiddenException(errorResponse);
             }
 
             final Album album = getAlbum(albumId, em);
@@ -237,7 +247,7 @@ public class Albums {
                     }
 
                 } catch (UserNotMemberException e) {
-                    throw new AlbumNotFoundException("Album not found");//normally, this exception should never happen
+                    throw new AlbumNotFoundException();//normally, this exception should never happen
                 }
             } else {
                 final AlbumUser targetAlbumUser = new AlbumUser(album, targetUser, isAdmin);
@@ -298,7 +308,11 @@ public class Albums {
                 } else if (callingAlbumUser.isAdmin()){
                     mutationType = Events.MutationType.REMOVE_USER;
                 } else {
-                    throw new AlbumForbiddenException("You must be an admin for removing another user");
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message(AUTHORIZATION_ERROR)
+                            .detail("You must be an admin for removing another user")
+                            .build();
+                    throw new AlbumForbiddenException(errorResponse);
                 }
 
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);

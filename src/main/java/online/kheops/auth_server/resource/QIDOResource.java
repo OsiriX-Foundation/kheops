@@ -11,12 +11,8 @@ import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.user.AlbumUserPermissions;
-import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.*;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
-import online.kheops.auth_server.util.PairListXTotalCount;
-import online.kheops.auth_server.util.SeriesQIDOSortParams;
-import online.kheops.auth_server.util.StudyQIDOParams;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -37,15 +33,19 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
+import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
@@ -60,7 +60,7 @@ public class QIDOResource {
     private UriInfo uriInfo;
 
     @Context
-    ServletContext context;
+    private ServletContext context;
 
     @Context
     private SecurityContext securityContext;
@@ -68,21 +68,30 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.READ_SERIES)
+    @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
-                               @QueryParam(INBOX) Boolean fromInbox) {
+                               @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException {
 
         if (fromAlbumId != null && fromInbox != null) {
-            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-        final long callingUserPk = kheopsPrincipal.getDBID();
+        final long callingUserPk = kheopsPrincipal.getUser().getPk();
 
         if(fromInbox != null && fromInbox && !kheopsPrincipal.hasUserAccess()) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("This authorization is not available for access to the inbox")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         final PairListXTotalCount<Attributes> pair;
@@ -90,23 +99,22 @@ public class QIDOResource {
         try (Connection connection = getDataSource().getConnection()) {
             qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
-            LOG.info(() -> "QueryParameters : " + uriInfo.getQueryParameters().toString());
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
-            return Response.status(BAD_REQUEST).entity("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component. [" + e.getMessage() + "]").build();
-        } catch (BadQueryParametersException e) {
-            LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (AlbumNotFoundException e) {
-            LOG.log(Level.INFO, e.getMessage(), e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        } catch (AlbumForbiddenException e) {
-            return Response.status(FORBIDDEN).entity(e.getMessage()).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("error")
+                    .detail("The QIDO-RS Provider was unable to perform the query because the Service Provider cannot understand the query component.")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         } catch (NoResultException e) {
-            return Response.status(OK).entity("[]").build();
-        } catch (Exception e) {
+            return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
+        } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error while connecting to the database", e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity("Database Connection Error").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Database error")
+                    .detail("Database Connection Error")
+                    .build();
+            return Response.status(INTERNAL_SERVER_ERROR).entity(errorResponse).build();
         }
         if(pair.getAttributesList().isEmpty()) {
             return Response.status(NO_CONTENT)
@@ -144,7 +152,7 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.READ_SERIES)
+    @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
@@ -152,10 +160,15 @@ public class QIDOResource {
                               @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(FAVORITE) Boolean favoriteFilter,
                               @QueryParam(QUERY_PARAMETER_OFFSET) Integer offset,
-                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit) {
+                              @QueryParam(QUERY_PARAMETER_LIMIT) Integer limit)
+            throws AlbumNotFoundException, StudyNotFoundException, BadQueryParametersException{
 
         if (fromAlbumId != null && fromInbox != null) {
-            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         final boolean includeFieldFavorite;
@@ -164,19 +177,22 @@ public class QIDOResource {
 
         if(fromAlbumId == null && fromInbox == null) {
             if(includeFieldFavorite) {
-                return Response.status(BAD_REQUEST).entity("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if(favoriteFilter != null) {
-                return Response.status(BAD_REQUEST).entity("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={album_ID} as query param").build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_QUERY_PARAMETER)
+                        .detail("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={album_ID} as query param")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
-        final Comparator<Attributes> sortComparator;
-        try {
-            sortComparator = SeriesQIDOSortParams.sortComparator(uriInfo.getQueryParameters());
-        } catch (BadQueryParametersException e) {
-            return Response.status(BAD_REQUEST).entity("Unknown query parameters " + e.getMessage()).build();
-        }
+        final Comparator<Attributes> sortComparator = SeriesQIDOSortParams.sortComparator(uriInfo.getQueryParameters());
 
         fromInbox = fromInbox != null;
 
@@ -192,25 +208,33 @@ public class QIDOResource {
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY)
                 .study(studyInstanceUID);
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
             return Response.status(NOT_FOUND).build();
         }
 
         //BEGIN kheopsPrincipal
         if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("This authorization is not available for access to the inbox")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         try {
             if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(AUTHORIZATION_ERROR)
+                        .detail("This authorization is not available for access to this album")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
             }
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
-          catch (AlbumNotFoundException e) {
-              return Response.status(FORBIDDEN).build();
-          }
+        catch (AlbumNotFoundException e) {
+              return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
+        }
 
         if(securityContext.isUserInRole("tokenViewer")) {
             fromInbox = kheopsPrincipal.hasInboxAccess();
@@ -240,11 +264,7 @@ public class QIDOResource {
         }
 
         final Set<String> availableSeriesUIDs;
-        try {
-            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+        availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
 
         if (availableSeriesUIDs.isEmpty()) {
             return Response.status(NO_CONTENT)
@@ -259,7 +279,11 @@ public class QIDOResource {
                     .get(new GenericType<List<Attributes>>() {});
         } catch (WebApplicationException | ProcessingException e) {
             LOG.log(Level.SEVERE, "Error getting the list of series from the DCM server", e);
-            return Response.status(BAD_GATEWAY).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("PACS error")
+                    .detail("Error getting the list of series from the DCM server")
+                    .build();
+            return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
         List<Attributes> availableSeries = new ArrayList<>();
@@ -329,15 +353,20 @@ public class QIDOResource {
     @GET
     @Secured
     @AlbumAccessSecured
-    @AlbumPermissionSecured(AlbumUserPermissions.READ_SERIES)
+    @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
     public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) String fromAlbumId,
-                                       @QueryParam(INBOX) Boolean fromInbox) {
+                                       @QueryParam(INBOX) Boolean fromInbox)
+            throws AlbumNotFoundException, StudyNotFoundException {
 
         if ((fromAlbumId != null && fromInbox != null)) {
-            return Response.status(BAD_REQUEST).entity("Use only {album} or {inbox} not both").build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         fromInbox = fromInbox != null;
@@ -347,24 +376,36 @@ public class QIDOResource {
         KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY_METADATA)
                 .study(studyInstanceUID);
 
-        if (!kheopsPrincipal.hasStudyReadAccess(studyInstanceUID)) {
-            return Response.status(NOT_FOUND).build();
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(STUDY_NOT_FOUND)
+                    .detail("The study does not exist or you don't have access")
+                    .build();
+            return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
         //BEGIN kheopsPrincipal
         if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
-            return Response.status(FORBIDDEN).build();
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(AUTHORIZATION_ERROR)
+                    .detail("This authorization is not available for access to the inbox")
+                    .build();
+            return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
         try {
             if (fromAlbumId != null && !fromAlbumId.equals(kheopsPrincipal.getAlbumID())) {
-                return Response.status(FORBIDDEN).build();
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(AUTHORIZATION_ERROR)
+                        .detail("This authorization is not available for access to this album")
+                        .build();
+                return Response.status(FORBIDDEN).entity(errorResponse).build();
             } else if (fromAlbumId == null) {
                 fromAlbumId = kheopsPrincipal.getAlbumID();
             }
         } catch (NotAlbumScopeTypeException e) { /*empty*/ }
         catch (AlbumNotFoundException e) {
-            return Response.status(FORBIDDEN).build();
+            return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
         }
 
         if(securityContext.isUserInRole("tokenViewer")) {
@@ -391,12 +432,7 @@ public class QIDOResource {
         }
 
         final Set<String> availableSeriesUIDs;
-        try {
-            availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
-        } catch (AlbumNotFoundException | StudyNotFoundException e) {
-            LOG.log(WARNING, "study or album not found", e);
-            return Response.status(NOT_FOUND).entity(e.getMessage()).build();
-        }
+        availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
 
         final StreamingOutput stream = os -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);

@@ -1,6 +1,7 @@
 package online.kheops.auth_server.keycloak;
 
 import online.kheops.auth_server.user.*;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -84,7 +85,7 @@ public class Keycloak {
                     .get(UserRepresentation.class);
         } catch (ProcessingException | WebApplicationException e) {
             token.removeToken();
-            throw new UserNotFoundException("unable to find the userinfo", e);
+            throw new UserNotFoundException(e);
         }
     }
 
@@ -92,33 +93,38 @@ public class Keycloak {
             throws UserNotFoundException, KeycloakException {
 
         if(user.contains("@")) {
-            final Response response;
             final String userLowerCase = user.toLowerCase();
-            try {
-                response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
+            try (final Response response = ClientBuilder.newClient().target(usersUri).queryParam("email", userLowerCase).request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get()){
+                if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                    String output = response.readEntity(String.class);
+                    try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
+                        JsonArray reply = jsonReader.readArray();
+                        final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
+                        if (keycloakUsers.size() > 0) {
+                            final int index = keycloakUsers.verifyEmail(userLowerCase);
+                            return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index))
+                                    .setSub(keycloakUsers.getId(0))
+                                    .setFirstName(keycloakUsers.getFirstName(index))
+                                    .setLastName(keycloakUsers.getLastName(index));
+                        } else {
+                            throw new UserNotFoundException();
+                        }
+                    }
+                } else {
+                    token.removeToken();
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Error with authority provider")
+                            .detail("Response status code: " + response.getStatus() + " with this url :" + response.getLocation())
+                            .build();
+                    throw new KeycloakException(errorResponse);
+                }
             } catch (ProcessingException e) {
                 token.removeToken();
-                throw new KeycloakException("Error during introspect token", e);
-            }
-
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                String output = response.readEntity(String.class);
-                try(JsonReader jsonReader = Json.createReader(new StringReader(output))) {
-                    JsonArray reply = jsonReader.readArray();
-                    final KeycloakUsers keycloakUsers = new KeycloakUsers(reply);
-                    if (keycloakUsers.size() > 0) {
-                        final int index = keycloakUsers.verifyEmail(userLowerCase);
-                        return new UserResponseBuilder().setEmail(keycloakUsers.getEmail(index))
-                                .setSub(keycloakUsers.getId(0))
-                                .setFirstName(keycloakUsers.getFirstName(index))
-                                .setLastName(keycloakUsers.getLastName(index));
-                    } else {
-                        throw new UserNotFoundException();
-                    }
-                }
-            } else {
-                token.removeToken();
-                throw new KeycloakException("Response status code: " + response.getStatus() + " with this url :" + response.getLocation());
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Error with authority provider")
+                        .detail("Error during introspect token")
+                        .build();
+                throw new KeycloakException(errorResponse, e);
             }
         } else {
 
@@ -141,7 +147,11 @@ public class Keycloak {
                 response = builder.get();
             } catch (ProcessingException e) {
                 token.removeToken();
-                throw new KeycloakException("Error during introspect token", e);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Error with authority provider")
+                        .detail("Error during introspect token")
+                        .build();
+                throw new KeycloakException(errorResponse, e);
             }
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 String output = response.readEntity(String.class);
@@ -160,17 +170,28 @@ public class Keycloak {
                     }
                 } catch (Exception e) {
                     token.removeToken();
-                    throw new KeycloakException("error during parsing response : " + output, e);
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Error with authority provider")
+                            .detail("Error during parsing users response")
+                            .build();
+                    throw new KeycloakException(errorResponse, e);
                 }
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new UserNotFoundException();
             } else {
                 token.removeToken();
                 try {
-                    String responseString = response.readEntity(String.class);
-                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString + "\n" + responseString);
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Error with authority provider")
+                            .detail("Unsuccessful response from keycloak server, status: " + response.getStatus())
+                            .build();
+                    throw new KeycloakException(errorResponse);
                 } catch (ProcessingException e) {
-                    throw new KeycloakException("Unsuccessful response from keycloak server, status:" + response.getStatus() + "with the following token: " + tokenString, e);
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("Error with authority provider")
+                            .detail("Unsuccessful response from keycloak server, status: " + response.getStatus())
+                            .build();
+                    throw new KeycloakException(errorResponse, e);
                 }
             }
         }
@@ -189,7 +210,11 @@ public class Keycloak {
                     .request().header(HttpHeaders.AUTHORIZATION, "Bearer "+token.getToken()).get();
         } catch (ProcessingException e) {
             token.removeToken();
-            throw new KeycloakException("Error during introspect token", e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error with authority provider")
+                    .detail("Error during introspect token")
+                    .build();
+            throw new KeycloakException(errorResponse, e);
         }
 
         if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -212,7 +237,11 @@ public class Keycloak {
             }
         }
         token.removeToken();
-        throw new KeycloakException("ERROR:");
+        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message("Error with authority provider")
+                .detail("Error unkunown")
+                .build();
+        throw new KeycloakException(errorResponse);
     }
 }
 

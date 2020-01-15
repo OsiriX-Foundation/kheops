@@ -1,5 +1,7 @@
 package online.kheops.auth_server.keycloak;
 
+import online.kheops.auth_server.util.ErrorResponse;
+
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -11,7 +13,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.annotation.XmlElement;
 import java.net.URI;
 import java.time.Instant;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
@@ -65,13 +66,15 @@ public class KeycloakToken {
             final TokenResponse tokenResponse;
             try {
                 Invocation.Builder builder = CLIENT.target(tokenUri).request().header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED);
-                LOG.log(Level.WARNING, "tokenUri: " + tokenUri);
-                LOG.log(Level.WARNING, "form: " + form);
                 tokenResponse = builder.post(Entity.form(form), TokenResponse.class);
                 accessToken = tokenResponse.accessToken;
                 renewTime = Instant.now().plusSeconds(tokenResponse.expiresIn - MINIMUM_VALIDITY);
             } catch (ProcessingException | WebApplicationException e) {
-                throw new KeycloakException("Error getting an access token from: " + tokenUri, e);
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("Error with authority provider")
+                        .detail("Error getting an access token from: " + tokenUri)
+                        .build();
+                throw new KeycloakException(errorResponse, e);
             }
         }
 
@@ -89,7 +92,11 @@ public class KeycloakToken {
             response = CLIENT.target(KeycloakContextListener.getKeycloakOIDCConfigurationURI()).request().get(ConfigurationResponse.class);
             return UriBuilder.fromUri(response.tokenEndpoint).build();
         } catch (ProcessingException | WebApplicationException e) {
-            throw new KeycloakException("Error during request OpenID Connect well-known from: " + KeycloakContextListener.getKeycloakOIDCConfigurationURI(), e);
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Error with authority provider")
+                    .detail("Error during request OpenID Connect well-known from: " + KeycloakContextListener.getKeycloakOIDCConfigurationURI())
+                    .build();
+            throw new KeycloakException(errorResponse, e);
         }
     }
 
