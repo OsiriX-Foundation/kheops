@@ -34,7 +34,7 @@ public class Events {
         IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES,
         EDIT_ALBUM, ADD_FAV, REMOVE_FAV,
         CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT,
-        CREATE_WEBHOOK, DELETE_WEBHOOK}
+        CREATE_WEBHOOK, DELETE_WEBHOOK, EDIT_WEBHOOK, TRIGGER_WEBHOOK}
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException {

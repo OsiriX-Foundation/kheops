@@ -1,11 +1,11 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.Webhook;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.util.List;
 
 public class WebhookQueries {
 
@@ -35,7 +35,22 @@ public class WebhookQueries {
         } catch (NoResultException e) {
             throw new WebhookNotFoundException();
         }
+    }
 
+    public static List<Webhook> getWebhooks(Album album, Integer limit, Integer offset, EntityManager em) {
+            return em.createQuery("SELECT w from Webhook w join w.album a where a = :album", Webhook.class)
+                    .setParameter("album", album)
+                    .setFirstResult(offset)
+                    .setMaxResults(limit)
+                    .getResultList();
+
+    }
+
+
+    public static Long getNumberOfWebhooks( Album album, EntityManager em) {
+        return em.createQuery("SELECT count(w) from Webhook w join w.album a where a = :album", Long.class)
+                .setParameter("album", album)
+                .getSingleResult();
     }
 
 }

@@ -1,8 +1,11 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.Webhook;
+import online.kheops.auth_server.entity.WebhookHistory;
 
 import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebhookResponse {
 
@@ -19,6 +22,12 @@ public class WebhookResponse {
     private boolean newSeries;
     @XmlElement(name = "new_user")
     private boolean newUser;
+    @XmlElement(name = "last_history")
+    private List<String> history;
+    @XmlElement(name = "number_of_history")
+    private Integer numberOfHistory;
+    @XmlElement(name = "history")
+    private List<WebhookHistoryResponse> fullHistory;
 
     private WebhookResponse() { /*Empty*/ }
 
@@ -30,5 +39,21 @@ public class WebhookResponse {
         this.useSecret = webhook.useSecret();
         this.newSeries = webhook.getNewSeries();
         this.newUser = webhook.getNewUser();
+        this.numberOfHistory = webhook.getWebhookHistory().size();
+
+        history = new ArrayList<>();
+        fullHistory = new ArrayList<>();
+    }
+
+    public void addHistory(WebhookHistory webhookHistory) {
+        if(webhookHistory.getStatus() >= 200 && webhookHistory.getStatus() <=299) {
+            this.history.add("Pass");
+        } else {
+            this.history.add("Fail");
+        }
+    }
+
+    public void addFullHistory(WebhookHistory webhookHistory) {
+        this.fullHistory.add(new WebhookHistoryResponse(webhookHistory));
     }
 }

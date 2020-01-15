@@ -109,4 +109,24 @@ public class Webhook {
     public Set<WebhookHistory> getWebhookHistory() {
         return webhookHistory;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setNewSeries(Boolean newSeries) {
+        this.newSeries = newSeries;
+    }
+
+    public void setNewUser(Boolean newUser) {
+        this.newUser = newUser;
+    }
 }

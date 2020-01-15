@@ -36,4 +36,9 @@ public class WebhookHistory {
     @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
     private Webhook webhook;
 
+    public Integer getStatus() { return status; }
+    public LocalDateTime getTime() { return time; }
+    public Boolean getManualTrigger() { return isManualTrigger; }
+    public Boolean getNewSeries() { return newSeries; }
+    public Boolean getNewUser() { return newUser; }
 }
