@@ -51,8 +51,7 @@
       @row-clicked="selectProvider"
     >
       <template
-        slot="url_check"
-        slot-scope="data"
+        v-slot:cell(url_check)="data"
       >
         <state-provider
           :loading="data.item.stateURL.loading"
@@ -62,8 +61,7 @@
       </template>
       <template
         v-if="writePermission"
-        slot="btn_edit"
-        slot-scope="data"
+        v-slot:cell(btn_edit)="data"
       >
         <button
           class="btn btn-sm btn-primary"
@@ -111,33 +109,38 @@ export default {
   },
   data() {
     return {
-      fields: {
-        name: {
+      fields: [
+        {
+          key: 'name',
           label: this.$t('name_provider'),
           sortable: true,
           tdClass: 'word-break',
         },
-        url: {
+        {
+          key: 'url',
           label: this.$t('url'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-sm-table-cell',
         },
-        created_time: {
+        {
+          key: 'created_time',
           label: this.$t('created_time'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
         },
-        btn_edit: {
+        {
+          key: 'btn_edit',
           label: '',
           sortable: false,
         },
-        url_check: {
+        {
+          key: 'url_check',
           label: '',
           sortable: false,
         },
-      },
+      ],
     };
   },
   computed: {

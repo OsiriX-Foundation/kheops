@@ -100,21 +100,22 @@
       @change="inputLoadDirectories"
     >
     <list-headers
+      :id="headerID"
       :studies="studies"
       :albums="albums"
       :show-send-button="permissions.send_series"
       :show-album-button="permissions.send_series"
       :show-favorite-button="permissions.add_series && $route.name !== 'viewnologin'"
       :show-delete-button="permissions.delete_series"
-      :show-import-button="permissions.add_series"
+      :show-import-button="permissions.add_series && canUploadFiles"
       :show-inbox-button="permissions.add_inbox"
-      :album-id="source.key === 'album' ? source.value : ''"
+      :album-id="albumID"
       @setFilters="changeFilterValue"
       @reloadStudies="reloadStudies"
     />
     <div
-      id="myHeader"
-      ref="myHeader"
+      id="stickyHeader"
+      ref="stickyHeader"
       :class="isActive ? 'pt-2 sticky' : ''"
     >
       <list-headers
@@ -125,7 +126,7 @@
         :show-album-button="permissions.send_series"
         :show-favorite-button="permissions.add_series && $route.name !== 'viewnologin'"
         :show-delete-button="permissions.delete_series"
-        :show-import-button="permissions.add_series"
+        :show-import-button="permissions.add_series && canUploadFiles"
         :show-inbox-button="permissions.add_inbox"
         :album-id="source.key === 'album' ? source.value : ''"
         @setFilters="changeFilterValue"
@@ -161,8 +162,7 @@
           HEADER TABLE
         -->
         <template
-          slot="HEAD_PatientName"
-          slot-scope="data"
+          v-slot:head(PatientName)="data"
         >
           <div
             v-if="showFilters"
@@ -205,8 +205,7 @@
         </template>
 
         <template
-          slot="HEAD_PatientID"
-          slot-scope="data"
+          v-slot:head(PatientID)="data"
         >
           <div
             v-if="showFilters"
@@ -228,8 +227,7 @@
         </template>
 
         <template
-          slot="HEAD_StudyDescription"
-          slot-scope="data"
+          v-slot:head(StudyDescription)="data"
         >
           <div
             v-if="showFilters"
@@ -246,8 +244,7 @@
         </template>
 
         <template
-          slot="HEAD_StudyDate"
-          slot-scope="data"
+          v-slot:head(StudyDate)="data"
         >
           <div
             v-if="showFilters"
@@ -294,8 +291,7 @@
         </template>
 
         <template
-          slot="HEAD_ModalitiesInStudy"
-          slot-scope="data"
+          v-slot:head(ModalitiesInStudy)="data"
         >
           <div
             v-if="showFilters"
@@ -323,9 +319,12 @@
           CONTENT TABLE
         -->
         <template
-          slot="is_selected"
-          slot-scope="row"
+          v-slot:cell(is_selected)="row"
         >
+          <span
+            v-if="row.item.StudyInstanceUID !== undefined && row.item.StudyInstanceUID.Value !== undefined"
+            :id="`${row.item.StudyInstanceUID.Value[0]}`"
+          />
           <b-button-group>
             <b-button
               variant="link"
@@ -349,8 +348,7 @@
           </b-button-group>
         </template>
         <template
-          slot="PatientName"
-          slot-scope="row"
+          v-slot:cell(PatientName)="row"
         >
           <div
             :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
@@ -370,7 +368,7 @@
                 :show-favorite-icon="permissions.add_series && $route.name !== 'viewnologin'"
                 :show-comment-icon="true"
                 :show-download-icon="permissions.download_series"
-                :show-import-icon="permissions.add_series"
+                :show-import-icon="permissions.add_series && canUploadFiles"
                 :show-report-provider-icon="source.key === 'album' ? true : false"
                 :show-weasis-icon="!mobiledetect"
                 :album-id="source.key === 'album' ? source.value : ''"
@@ -382,6 +380,7 @@
                   <icon-list-providers
                     :study="row.item"
                     :providers="providersEnable"
+                    :album-id="source.key === 'album' ? source.value : ''"
                     @dropdownState="setShowIcons"
                   />
                 </template>
@@ -390,8 +389,7 @@
           </div>
         </template>
         <template
-          slot="StudyDate"
-          slot-scope="row"
+          v-slot:cell(StudyDate)="row"
         >
           {{ row.value | formatDate }}
         </template>
@@ -464,23 +462,24 @@ import ListItemDetails from '@/components/inbox/ListItemDetails.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import SortList from '@/components/inbox/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'Studies',
   components: {
     ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders, PulseLoader,
   },
-  mixins: [],
+  mixins: [CurrentUser],
   props: {
     permissions: {
       type: Object,
       required: true,
       default: () => ({}),
     },
-    source: {
-      type: Object,
-      required: true,
-      default: () => ({}),
+    albumID: {
+      type: String,
+      required: false,
+      default: undefined,
     },
   },
   data() {
@@ -491,14 +490,21 @@ export default {
       isActive: false,
       showIcons: false,
       statusList: 200,
+      headerID: 'listheaders',
+      firstScrollTo: '',
+      sortable: [
+        'StudyDate',
+        'PatientID',
+        'PatientName',
+      ],
       studiesParams: {
         offset: 0,
-        limit: 50,
+        limit: 100,
         sortDesc: true,
         sortBy: 'StudyDate',
       },
-      fields: {
-        isSelected: {
+      fields: [
+        {
           key: 'is_selected',
           label: '',
           sortable: false,
@@ -507,7 +513,8 @@ export default {
             width: '100px',
           },
         },
-        PatientName: {
+        {
+          key: 'PatientName',
           label: this.$t('PatientName'),
           sortable: true,
           thClass: 'pointer',
@@ -522,7 +529,8 @@ export default {
             width: '250px',
           },
         },
-        PatientID: {
+        {
+          key: 'PatientID',
           label: this.$t('PatientID'),
           sortable: true,
           thClass: 'pointer',
@@ -538,7 +546,8 @@ export default {
             width: '250px',
           },
         },
-        StudyDescription: {
+        {
+          key: 'StudyDescription',
           label: this.$t('StudyDescription'),
           sortable: false,
           tdClass: 'word-break',
@@ -553,7 +562,8 @@ export default {
             width: '400px',
           },
         },
-        StudyDate: {
+        {
+          key: 'StudyDate',
           label: this.$t('StudyDate'),
           sortable: true,
           thClass: 'pointer',
@@ -569,17 +579,23 @@ export default {
             width: '150px',
           },
         },
-        ModalitiesInStudy: {
+        {
+          key: 'ModalitiesInStudy',
           label: this.$t('Modality'),
           sortable: false,
           tdClass: 'word-break',
           class: 'word-break d-none d-sm-table-cell',
-          formatter: (value) => value.Value.join(', '),
+          formatter: (value) => {
+            if (value !== null && value.Value !== undefined) {
+              return value.Value.join(', ');
+            }
+            return '';
+          },
           thStyle: {
             width: '150px',
           },
         },
-      },
+      ],
       filters: {
         PatientName: '',
         PatientID: '',
@@ -598,6 +614,7 @@ export default {
       sendingFiles: 'sending',
       providers: 'providers',
       modalities: 'modalities',
+      source: 'source',
     }),
     OS() {
       return navigator.platform;
@@ -616,14 +633,15 @@ export default {
     mobiledetect() {
       return mobiledetect.mobileAndTabletcheck();
     },
-    albumID() {
-      if (this.source.key === 'album') {
-        return this.source.value;
-      }
-      return undefined;
-    },
     providersEnable() {
       return this.providers.filter((provider) => provider.stateURL.checkURL === true);
+    },
+    canUploadFiles() {
+      let canUpload = true;
+      if (process.env.VUE_APP_DISABLE_UPLOAD !== undefined) {
+        canUpload = !process.env.VUE_APP_DISABLE_UPLOAD.includes('true');
+      }
+      return canUpload;
     },
   },
   watch: {
@@ -635,6 +653,7 @@ export default {
     },
     filters: {
       handler() {
+        // const noFiltersSet = Object.values(this.filters).every((filterValue) => filterValue === '');
         this.searchStudies();
       },
       deep: true,
@@ -654,18 +673,13 @@ export default {
       },
     },
   },
-  created() {    
+  created() {
     this.initData();
-    if (Object.keys(this.source).length > 0) {
-      const queriesAlbums = {
-        canAddSeries: true,
-      };
-      setTimeout(() => this.$store.dispatch('getAlbums', { queries: queriesAlbums }), 300)
-      this.setAlbumInbox();
-    } else {
-      const modalities = ['CT', 'SM', 'CR', 'RG', 'DX', 'NM', 'XC', 'AU', 'SR', 'OP'];
-      this.$store.commit('SET_MODALITIES', modalities);
-    }
+    setTimeout(() => this.setAlbumsList(), 300);
+    this.setAlbumsList();
+    this.setAlbumInbox();
+    this.setFilters();
+    this.setQueryParams();
   },
   destroyed() {
     this.$store.dispatch('initStudies', {});
@@ -676,19 +690,65 @@ export default {
     this.scroll();
   },
   methods: {
+    setQueryParams() {
+      if (this.$route.query.StudyInstanceUID !== undefined) {
+        this.firstScrollTo = decodeURIComponent(Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID[0] : this.$route.query.StudyInstanceUID);
+      }
+      if (this.$route.query.sort !== undefined) {
+        const sort = decodeURIComponent(Array.isArray(this.$route.query.sort) ? this.$route.query.sort[0] : this.$route.query.sort);
+        if (this.sortable.includes(sort.replace('-', ''))) {
+          this.studiesParams.sortDesc = sort.includes('-');
+          this.studiesParams.sortBy = sort.replace('-', '');
+        }
+      }
+    },
+    setFilters() {
+      let filterValue = false;
+
+      Object.keys(this.$route.query).forEach((key) => {
+        const value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
+        if (this.filters[key] !== undefined && key !== 'StudyDateFrom' && key !== 'StudyDateTo') {
+          this.filters[key] = value;
+          filterValue = true;
+        }
+        if (key === 'StudyDate') {
+          let date = [];
+          if (value.includes('-')) {
+            date = value.split('-');
+          } else {
+            date.push(value);
+            date.push(value);
+          }
+          this.filters.StudyDateFrom = this.dateFormatter(date[0]);
+          this.filters.StudyDateTo = this.dateFormatter(date[1]);
+          filterValue = true;
+        }
+      });
+      if (filterValue === true) {
+        this.changeFilterValue();
+      }
+    },
     scroll() {
       window.onscroll = () => {
-        if (this.$refs.myHeader !== undefined && this.$refs.studiesList !== undefined) {
-          const sticky = this.$refs.myHeader.offsetTop;
-          const heightSticky = this.$refs.myHeader.clientHeight;
+        if (this.$refs.stickyHeader !== undefined && this.$refs.studiesList !== undefined) {
+          const sticky = this.$refs.stickyHeader.offsetTop;
+          const heightSticky = this.$refs.stickyHeader.clientHeight;
           const studiesList = this.$refs.studiesList.offsetTop;
           if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
             this.isActive = true;
-          } else if (window.pageYOffset < studiesList - heightSticky) {
+          } else if ((window.pageYOffset < studiesList - heightSticky) && this.isActive) {
             this.isActive = false;
           }
         }
       };
+    },
+    getStudyByUID(StudyUID) {
+      return this.studies.filter((study) => {
+        if (study.StudyInstanceUID !== undefined && study.StudyInstanceUID.Value !== undefined) {
+          return study.StudyInstanceUID.Value[0] === StudyUID;
+        }
+        return false;
+      });
     },
     // https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
     infiniteHandler($state) {
@@ -705,7 +765,25 @@ export default {
         } else if (res.status === 204 && res.data.length === 0) {
           $state.complete();
         }
+        if (this.firstScrollTo !== '') {
+          const study = this.getStudyByUID(this.firstScrollTo);
+          if (study.length > 0) {
+            const el = this.$el.querySelector(`[id='${this.firstScrollTo}']`);
+            const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
+            let offset = 0;
+            if (el !== null) {
+              offset = el.offsetHeight + 75;
+            }
+            if (elStickyHeader !== null) {
+              offset += elStickyHeader.offsetHeight;
+            }
+            this.scrollTo(el, -offset);
+            this.showRowDetails(study[0]);
+          }
+          this.firstScrollTo = '';
+        }
       }).catch((err) => {
+        console.log(err);
         if (err.response !== undefined && err.response.status !== undefined) {
           this.statusList = err.response.status;
         }
@@ -721,14 +799,12 @@ export default {
     },
     reloadStudies() {
       this.searchStudies();
-      if (Object.keys(this.source).length > 0) {
-        if (this.albumID !== undefined) {
-          this.getAlbum().then(() => {
-            this.setAlbumInbox();
-          });
-        } else {
+      if (this.albumID !== undefined) {
+        this.getAlbum().then(() => {
           this.setAlbumInbox();
-        }
+        });
+      } else {
+        this.setAlbumInbox();
       }
     },
     getAlbum() {
@@ -737,9 +813,22 @@ export default {
         return err;
       });
     },
+    setAlbumsList() {
+      if (this.currentuserKeycloakToken !== null) {
+        const queriesAlbums = {
+          canAddSeries: true,
+        };
+        const headers = {
+          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+        };
+        this.$store.dispatch('getAlbums', { queries: queriesAlbums, headers });
+      }
+    },
     setAlbumInbox() {
       if (this.albumID !== undefined) {
-        this.$store.dispatch('getProviders', { albumID: this.albumID });
+        if (!this.currentuserOnView) {
+          this.$store.dispatch('getProviders', { albumID: this.albumID });
+        }
         this.$store.dispatch('setModalitiesAlbum');
       } else {
         this.$store.dispatch('getInboxInfo');
@@ -756,7 +845,7 @@ export default {
         this.toggleDetails(row);
       }
     },
-    setViewDetails(StudyInstanceUID, flagView) {
+    setViewDetails(StudyInstanceUID, flagView = '') {
       const viewSelected = flagView === '' ? 'series' : flagView;
       const params = {
         StudyInstanceUID,
@@ -811,10 +900,11 @@ export default {
       const params = {
         limit,
         offset,
-        includefield: ['favorite', 'comments', '00081030'],
+        includefield: ['comments', '00081030'],
         sort: (this.studiesParams.sortDesc ? '-' : '') + this.studiesParams.sortBy,
       };
       if (Object.keys(this.source).length > 0) {
+        params.includefield.push('favorite');
         params[this.source.key] = this.source.value;
       }
       const queries = Object.assign(params, this.prepareFilters());
@@ -854,11 +944,24 @@ export default {
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
     },
+    validDate(date) {
+      return moment(date, 'YYYYMMDD', true).isValid();
+    },
+    dateFormatter(date) {
+      if (this.validDate(date)) {
+        const newDate = moment(date, 'YYYYMMDD').format('YYYY-MM-DD');
+        return new Date(`${newDate}T00:00:00.000Z`);
+      }
+      return '';
+    },
     showRowDetails(item) {
+      // eslint-disable-next-line
       if (!item._showDetails) {
         this.setViewDetails(item.StudyInstanceUID.Value[0], item.flag.view);
+        // eslint-disable-next-line
         item._showDetails = true;
       } else {
+        // eslint-disable-next-line
         item._showDetails = false;
       }
     },
@@ -874,8 +977,15 @@ export default {
         this.$emit('loaddirectories', filesFromInput);
       }
     },
-    changeFilterValue(value) {
-      this.showFilters = value;
+    changeFilterValue() {
+      this.showFilters = !this.showFilters;
+      if (this.showFilters === true && this.isActive === true) {
+        const el = this.$el.querySelector(`[id='${this.headerID}']`);
+        if (el !== null) {
+          const offset = -el.offsetHeight;
+          this.scrollTo(el, offset);
+        }
+      }
     },
     setShowIcons(value, studyUID, index = -1) {
       let studyIndex = index;
@@ -883,6 +993,15 @@ export default {
         studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === studyUID);
       }
       this.studies[studyIndex].showIcons = value;
+    },
+    scrollTo(el, offset = 0) {
+      if (el !== null) {
+        const options = {
+          offset,
+          cancelable: true,
+        };
+        this.$scrollTo(el, options);
+      }
     },
   },
 };

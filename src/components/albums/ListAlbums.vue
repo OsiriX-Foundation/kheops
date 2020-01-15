@@ -70,8 +70,7 @@
       @row-unhovered="setItemUnhover"
     >
       <template
-        slot="HEAD_name"
-        slot-scope="data"
+        v-slot:head(name)="data"
       >
         <div
           v-if="showFilters"
@@ -92,8 +91,7 @@
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_number_of_studies"
-        slot-scope="data"
+        v-slot:head(number_of_studies)="data"
       >
         <sort-list
           :sort-desc="albumsParams.sortDesc"
@@ -103,8 +101,7 @@
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_number_of_users"
-        slot-scope="data"
+        v-slot:head(number_of_users)="data"
       >
         <sort-list
           :sort-desc="albumsParams.sortDesc"
@@ -114,8 +111,7 @@
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_number_of_comments"
-        slot-scope="data"
+        v-slot:head(number_of_comments)="data"
       >
         <sort-list
           :sort-desc="albumsParams.sortDesc"
@@ -125,8 +121,7 @@
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_created_time"
-        slot-scope="data"
+        v-slot:head(created_time)="data"
       >
         <div
           v-if="showFilters"
@@ -165,8 +160,7 @@
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_last_event_time"
-        slot-scope="data"
+        v-slot:head(last_event_time)="data"
       >
         <div
           v-if="showFilters"
@@ -206,8 +200,7 @@
         {{ data.label }}
       </template>
       <template
-        slot="is_selected"
-        slot-scope="row"
+        v-slot:cell(is_selected)="row"
       >
         <b-button-group>
           <b-form-checkbox
@@ -219,8 +212,7 @@
         </b-button-group>
       </template>
       <template
-        slot="name"
-        slot-scope="row"
+        v-slot:cell(name)="row"
       >
         <div
           :class="'d-flex flex-wrap'"
@@ -242,14 +234,12 @@
         </div>
       </template>
       <template
-        slot="created_time"
-        slot-scope="data"
+        v-slot:cell(created_time)="data"
       >
         {{ data.item.created_time | formatDate }}
       </template>
       <template
-        slot="last_event_time"
-        slot-scope="data"
+        v-slot:cell(last_event_time)="data"
       >
         {{ data.item.last_event_time | formatDate }}
       </template>

@@ -1,7 +1,6 @@
 <template>
   <div>
     <component-import-study
-      :source="source"
       :permissions="permissions"
     />
   </div>
@@ -36,6 +35,7 @@ export default {
   watch: {
   },
   created() {
+    this.$store.dispatch('setSource', this.source);
   },
   mounted() {
   },

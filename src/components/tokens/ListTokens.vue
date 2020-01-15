@@ -81,8 +81,7 @@
       @row-clicked="loadToken"
     >
       <template
-        slot="scope_type"
-        slot-scope="data"
+        v-slot:cell(scope_type)="data"
       >
         <div v-if="data.value=='album'">
           <router-link
@@ -105,8 +104,7 @@
         </div>
       </template>
       <template
-        slot="status"
-        slot-scope="data"
+        v-slot:cell(status)="data"
       >
         <div
           v-if="tokenStatus(data.item)=='active'"
@@ -145,34 +143,29 @@
         </div>
       </template>
       <template
-        slot="expiration_time"
-        slot-scope="data"
+        v-slot:cell(expiration_time)="data"
       >
         <span :class="(data.item.revoked)?'text-danger':''">
           {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
         </span>
       </template>
       <template
-        slot="issued_at_time"
-        slot-scope="data"
+        v-slot:cell(issued_at_time)="data"
       >
         {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
-        slot="last_used"
-        slot-scope="data"
+        v-slot:cell(last_used)="data"
       >
         {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
-        slot="permission"
-        slot-scope="data"
+        v-slot:cell(permission)="data"
       >
         {{ data.item|formatPermissions }}
       </template>
       <template
-        slot="actions"
-        slot-scope="data"
+        v-slot:cell(actions)="data"
       >
         <button
           v-if="!data.item.revoked"
@@ -350,7 +343,7 @@ export default {
       return 'active';
     },
     revoke(tokenId) {
-      this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
+      this.$store.dispatch('revokeToken', { token_id: tokenId }).then(() => {
         this.getTokens();
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));

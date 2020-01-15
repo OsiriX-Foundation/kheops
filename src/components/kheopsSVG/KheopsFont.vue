@@ -72,9 +72,9 @@ export default {
 };
 </script>
 <style type="text/css">
-	.st0{fill:#808080;}
-	.st1{fill:#103866;}
-	.st2{fill:#F8A638;}
-	.st3{fill:#FFFFFF;}
+  .st0{fill:#808080;}
+  .st1{fill:#103866;}
+  .st2{fill:#F8A638;}
+  .st3{fill:#FFFFFF;}
   .st4{fill:#fca638}
 </style>

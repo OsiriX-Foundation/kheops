@@ -140,7 +140,6 @@ export default {
     checkUser() {
       if (this.newUserName.length > 0) {
         const username = this.newUserName;
-        const request = `users?reference=${username}&${this.scope === 'album' ? 'album' : 'studyInstanceUID'}=${this.id}`;
         this.checkSpecificUser(username).then((res) => {
           if (res.status === 204) {
             this.$snotify.error(this.$t('userunknown', { user: username }));

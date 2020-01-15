@@ -24,11 +24,16 @@ const actions = {
   },
   getAlbums({ commit }, params) {
     const request = 'albums';
+    let headers = {};
+    if (params.headers !== undefined) {
+      headers = params.headers;
+    }
+    headers.Accept = 'application/json';
     let queries = '';
     if (params.queries !== undefined) {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
-    return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
+    return HTTP.get(`${request}${queries}`, { headers }).then((res) => {
       const albums = [];
       res.data.forEach((album) => {
         Object.assign(album, { flag: JSON.parse(JSON.stringify(state.defaultFlagAlbum)) });
@@ -47,11 +52,12 @@ const actions = {
     if (params.queries !== undefined) {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
+    const { headers } = params;
     const promises = [];
     params.data.forEach((d) => {
       if (d.serie_id) {
         promises.push(
-          HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}/albums/${d.album_id}${queries}`)
+          HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}/albums/${d.album_id}${queries}`, {}, { headers })
             .then((res) => ({
               res,
               studyId: d.study_id,
@@ -67,7 +73,7 @@ const actions = {
         );
       } else {
         promises.push(
-          HTTP.put(`${request}/${d.study_id}/albums/${d.album_id}${queries}`).then((res) => ({
+          HTTP.put(`${request}/${d.study_id}/albums/${d.album_id}${queries}`, {}, { headers }).then((res) => ({
             res,
             studyId: d.study_id,
             albumId: d.album_id,

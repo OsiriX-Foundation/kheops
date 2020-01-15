@@ -1,32 +1,37 @@
+import Vue from 'vue';
+
 // initial state
 const state = {
   sending: false,
+  sourceSending: {},
   loading: false,
   files: [],
   totalSize: 0,
   error: [],
-  source: '',
   studyUIDToSend: '',
   demoDragAndDrop: false,
 };
 
 const getters = {
   sending: (state) => state.sending,
+  sourceSending: (state) => state.sourceSending,
   loading: (state) => state.loading,
   files: (state) => state.files,
   totalSize: (state) => state.totalSize,
   error: (state) => state.error,
-  source: (state) => state.source,
   studyUIDToSend: (state) => state.studyUIDToSend,
   demoDragAndDrop: (state) => state.demoDragAndDrop,
 };
 
 const actions = {
-  setLoading({ commit }, params) {
-    commit('SET_LOADING', params);
-  },
   setSending({ commit }, params) {
     commit('SET_SENDING', params);
+  },
+  setSourceSending({ commit }, params) {
+    commit('SET_SOURCE_SENDING', params);
+  },
+  setLoading({ commit }, params) {
+    commit('SET_LOADING', params);
   },
   setFiles({ commit }, params) {
     commit('SET_TOTAL_SIZE', params);
@@ -34,9 +39,6 @@ const actions = {
   },
   setErrorFiles({ commit }, params) {
     commit('SET_ERROR', params);
-  },
-  setSource({ commit }, params) {
-    commit('SET_SOURCE', params);
   },
   setStudyUIDtoSend({ commit }, params) {
     commit('SET_STUDYUID', params);
@@ -52,9 +54,6 @@ const actions = {
   },
   initSentFiles({ commit }) {
     commit('INIT_SENTFILES');
-  },
-  initSource({ commit }) {
-    commit('INIT_SOURCE');
   },
   removeFilesId({ commit }, params) {
     params.files.forEach((val) => {
@@ -73,6 +72,14 @@ const mutations = {
   SET_SENDING(state, params) {
     state.sending = params.sending;
   },
+  SET_SOURCE_SENDING(state, params) {
+    if (params.source.key !== undefined && params.source.value !== undefined) {
+      Vue.set(state.sourceSending, 'key', params.source.key);
+      Vue.set(state.sourceSending, 'value', params.source.value);
+    } else {
+      state.sourceSending = {};
+    }
+  },
   SET_FILES(state, params) {
     state.files = params.files;
   },
@@ -81,9 +88,6 @@ const mutations = {
   },
   SET_ERROR(state, params) {
     state.error.push(params.error);
-  },
-  SET_SOURCE(state, params) {
-    state.source = params.source;
   },
   SET_STUDYUID(state, params) {
     state.studyUIDToSend = params.studyUID;
@@ -96,9 +100,6 @@ const mutations = {
   },
   INIT_FILES(state) {
     state.files = [];
-  },
-  INIT_SOURCE(state) {
-    state.source = '';
   },
   REMOVE_FILE_ID(state, params) {
     const index = state.files.findIndex((x) => x.id === params.id);

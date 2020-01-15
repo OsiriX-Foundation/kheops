@@ -161,28 +161,28 @@
           >
             <div class="col-xl-1" />
             <div
-              v-for="(value, idx) in numberCol"
+              v-for="(valuex, idx) in numberCol"
               :key="idx"
               class="col-md-12 col-lg-6 col-xl-5"
             >
               <span
-                v-for="(value,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*value)"
+                v-for="(valuey,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*valuex)"
                 :key="idy"
               >
                 <div
                   class="mt-2"
-                  :class="(value[0]=='sendSeries')?'offset-1':''"
+                  :class="(valuey[0]=='sendSeries')?'offset-1':''"
                 >
                   <toggle-button
-                    v-model="album.userSettings[value[0]]"
-                    :disabled="(!album.userSettings.downloadSeries && value[0]=='sendSeries')"
+                    v-model="album.userSettings[valuey[0]]"
+                    :disabled="(!album.userSettings.downloadSeries && valuey[0]=='sendSeries')"
                     :color="{checked: '#5fc04c', unchecked: 'grey'}"
                     :sync="true"
                   />
                   <label
                     class="user-settings ml-2 mt-2 word-break"
                   >
-                    {{ $t(value[0]) }}
+                    {{ $t(valuey[0]) }}
                   </label>
                 </div>
               </span>
@@ -267,9 +267,12 @@ export default {
     userSettingsLength() {
       return Object.keys(this.album.userSettings).length;
     },
+    downloadSeries() {
+      return this.album.userSettings.downloadSeries;
+    },
   },
   watch: {
-    'album.userSettings.downloadSeries': function () {
+    downloadSeries() {
       if (!this.album.userSettings.downloadSeries) {
         this.album.userSettings.sendSeries = false;
       }
@@ -342,15 +345,15 @@ export default {
     putStudiesInAlbum(albumCreated, data) {
       let queries = {};
       queries = this.$route.query.source === 'inbox' ? { inbox: true } : { album: this.$route.query.source };
-      return this.$store.dispatch('putStudiesInAlbum', { queries, data }).then(results => {
-        results.forEach(result => {
-          const { res } = result
+      return this.$store.dispatch('putStudiesInAlbum', { queries, data }).then((results) => {
+        results.forEach((result) => {
+          const { res } = result;
           if (res.request !== undefined && res.request.status !== 201) {
-            const { studyId } = result
+            const { studyId } = result;
             if (res.request.status === 403) {
-              this.$snotify.error(this.$t('authorizationerror', {study: studyId}));
+              this.$snotify.error(this.$t('authorizationerror', { study: studyId }));
             } else if (res.request.status === 404) {
-              this.$snotify.error(this.$t('studynotfound', {study: studyId}));
+              this.$snotify.error(this.$t('studynotfound', { study: studyId }));
             } else {
               this.$snotify.error(this.$t('sorryerror'));
             }
@@ -361,7 +364,8 @@ export default {
     dataToUpload(albumId) {
       const data = [];
       if (this.$route.query && this.$route.query.StudyInstanceUID) {
-        this.$route.query.StudyInstanceUID.forEach((study) => {
+        const studies = Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID : [this.$route.query.StudyInstanceUID];
+        studies.forEach((study) => {
           data.push({
             album_id: albumId,
             study_id: study,
@@ -369,7 +373,8 @@ export default {
         });
       }
       if (this.$route.query && this.$route.query.SeriesInstanceUID) {
-        this.$route.query.SeriesInstanceUID.forEach((serie) => {
+        const series = Array.isArray(this.$route.query.SeriesInstanceUID) ? this.$route.query.SeriesInstanceUID : [this.$route.query.SeriesInstanceUID];
+        series.forEach((serie) => {
           const infoSerie = serie.split(',');
           if (infoSerie.length === 2) {
             data.push({

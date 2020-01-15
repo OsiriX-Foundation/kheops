@@ -83,6 +83,29 @@
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-6 mb-3">
           <nav class="nav nav-pills nav-fill flex-column flex-lg-row text-center justify-content-lg-end">
+            <router-link
+              :to="{ name: 'albumview', params: { view: 'studies' }}"
+              class="nav-link"
+              :class="(currentView === 'studies' || currentView === undefined)?'active':''"
+              active-class="active"
+            >
+              {{ $t('studies') }}
+            </router-link>
+            <router-link
+              :to="{ name: 'albumview', params: { view: 'comments' }}"
+              class="nav-link"
+              active-class="active"
+            >
+              {{ $t('comments') }}
+            </router-link>
+            <router-link
+              :to="{ name: 'albumview', params: { view: 'settings' }}"
+              class="nav-link"
+              active-class="active"
+            >
+              {{ $t('settings') }}
+            </router-link>
+            <!--
             <a
               class="nav-link"
               :class="(currentView === 'studies' || currentView === undefined)?'active':''"
@@ -104,6 +127,7 @@
             >
               {{ $t('settings') }}
             </a>
+            -->
           </nav>
         </div>
         <!-- <div class = 'col-md'></div> -->
@@ -132,8 +156,7 @@
         </div>
       </div>
       <component-import-study
-        :album="album"
-        :source="source"
+        :album-i-d="albumID"
         :permissions="permissions"
       />
     </span>
@@ -238,12 +261,6 @@ export default {
     albumID() {
       return this.$route.params.album_id;
     },
-    source() {
-      return {
-        key: 'album',
-        value: this.albumID,
-      };
-    },
     permissions() {
       return {
         add_series: this.album.add_series || this.album.is_admin,
@@ -263,10 +280,7 @@ export default {
   },
   watch: {
     albumID() {
-      this.loading = true;
-      this.loadAlbum().then(() => {
-        this.loading = false;
-      });
+      this.initAlbum();
     },
     currentView() {
       if (this.currentView !== undefined) {
@@ -280,21 +294,28 @@ export default {
     },
   },
   created() {
-    this.loading = true;
-    this.loadAlbum().then((res) => {
-      if (res !== undefined && res.status === 200) {
-        if (this.album.is_admin === true) {
-          this.getTokens();
-        }
-        this.loading = false;
-      }
-    });
-  },
-  beforeDestroy() {
-    this.$store.commit('INIT_ALBUM');
-    this.$store.commit('INIT_ALBUM_USERS');
+    this.initAlbum();
   },
   methods: {
+    initAlbum() {
+      this.$store.commit('INIT_ALBUM');
+      this.$store.commit('INIT_ALBUM_USERS');
+      this.$store.commit('INIT_TOKENS');
+      this.loading = true;
+      this.loadAlbum().then((res) => {
+        if (res !== undefined && res.status === 200) {
+          if (this.album.is_admin === true) {
+            this.getTokens();
+          }
+          this.loading = false;
+        }
+      });
+      const source = {
+        key: 'album',
+        value: this.albumID,
+      };
+      this.$store.dispatch('setSource', source);
+    },
     getTokens() {
       const queries = {
         valid: this.validParamsToken,

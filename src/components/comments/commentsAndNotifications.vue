@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 <i18n>
 {
   "en": {
@@ -74,7 +72,9 @@
 
 <template>
   <div class="container">
-    <div class="row justify-content-center">
+    <div
+      class="row justify-content-center"
+    >
       <p
         v-if="scope === 'album'"
         class="col-sm-12 col-md-10 offset-md-1 text-right"
@@ -94,6 +94,13 @@
         :id="container_id"
         class="card col-sm-12 col-md-10 offset-md-1 pt-3 pb-3 comment-section card-main"
       >
+        <div
+          v-if="loading === true"
+        >
+          <pulse-loader
+            color="white"
+          />
+        </div>
         <div
           v-for="comment in comments"
           :key="comment.id"
@@ -117,13 +124,20 @@
                 {{ $t('you') }}
               </span>
               <a
-                v-else-if="comment.origin.can_access === true "
+                v-else-if="comment.origin.can_access === true && writeComments === true"
                 class="font-white"
                 :title="comment.origin.email"
                 @click="clickPrivateUser(comment.origin.email)"
               >
                 {{ comment.origin|getUsername }}
               </a>
+              <span
+                v-else-if="comment.origin.can_access === true"
+                color="white"
+                :title="comment.origin.email"
+              >
+                {{ comment.origin|getUsername }}
+              </span>
               <span
                 v-else
                 class="font-neutral"
@@ -344,8 +358,8 @@
             <div class="input-group mb-3">
               <textarea
                 ref="textcomment"
-                v-focus
                 v-model="newComment.comment"
+                v-focus
                 class="form-control form-control-sm"
                 :placeholder="$t('writecomment')"
                 rows="2"
@@ -374,12 +388,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
 
 export default {
   name: 'CommentsAndNotifications',
-  components: { AddUser },
+  components: { AddUser, PulseLoader },
   mixins: [CurrentUser],
   props: {
     scope: {
@@ -408,6 +423,7 @@ export default {
       enablePrivate: false,
       disabledText: false,
       statusMsgPrivate: false,
+      loading: true,
     };
   },
   computed: {
@@ -436,6 +452,9 @@ export default {
   },
   created() {
     this.getComments();
+  },
+  destroyed() {
+    this.$store.commit('INIT_COMMENTS');
   },
   methods: {
     checkUserFromTextarea() {
@@ -522,10 +541,12 @@ export default {
       const types = (this.includeNotifications) ? undefined : { types: 'comments' };
       if (this.scope === 'album') {
         this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
+          this.loading = false;
           this.scrollBottom();
         });
       } else if (this.scope === 'studies') {
         this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
+          this.loading = false;
           this.scrollBottom();
         });
       }

@@ -162,9 +162,12 @@ export default {
   },
   methods: {
     setFromLocalStorage() {
-      const language = localStorage.getItem('language');
-      if (language !== null) {
-        this.changeLang(language);
+      const storageLanguage = localStorage.getItem('language');
+      const navigatorLanguage = (navigator.language || navigator.userLanguage).split('-')[0];
+      if (storageLanguage !== null) {
+        this.changeLang(storageLanguage);
+      } else {
+        this.changeLang(navigatorLanguage);
       }
     },
     logout() {

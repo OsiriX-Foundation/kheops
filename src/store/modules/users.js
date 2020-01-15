@@ -57,8 +57,10 @@ const actions = {
     localStorage.removeItem('currentUser');
     commit('LOGOUT');
   },
-  checkUser(context, user) {
-    return HTTP.get(`users?reference=${user}`, { headers: { Accept: 'application/json' } }).then((res) => {
+  checkUser(context, params) {
+    const { user } = params;
+    const { headers } = params;
+    return HTTP.get(`users?reference=${user}`, { headers }).then((res) => {
       if (res.status === 200) return res.data.sub;
       return false;
     }).catch(() => false);

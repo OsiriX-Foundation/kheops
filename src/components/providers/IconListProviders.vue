@@ -44,6 +44,13 @@
           name="studyUID"
           :value="study.StudyInstanceUID.Value[0]"
         />
+        <b-form-input
+          v-if="checkProviderModalities(study, provider)"
+          type="text"
+          hidden
+          name="return_uri"
+          :value="returnuri"
+        />
         <button
           v-if="checkProviderModalities(study, provider)"
           type="submit"
@@ -75,6 +82,11 @@ export default {
       required: true,
       default: () => ({}),
     },
+    albumId: {
+      type: String,
+      required: true,
+      default: '',
+    },
   },
   data() {
     return {
@@ -85,6 +97,9 @@ export default {
   computed: {
     accessToken() {
       return Vue.prototype.$keycloak.token;
+    },
+    returnuri() {
+      return `${process.env.VUE_APP_URL_ROOT}/albums/${this.albumId}?StudyInstanceUID=${encodeURIComponent(this.study.StudyInstanceUID.Value[0])}`;
     },
   },
   watch: {

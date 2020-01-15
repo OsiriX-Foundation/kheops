@@ -11,7 +11,8 @@
     "disable": "Revoke",
     "urlsharing": "Your sharing url :",
     "copysuccess": "Successfully copied",
-	  "sorryerror": "Sorry, an error occured"
+    "sorryerror": "Sorry, an error occured",
+    "addalbum": "Sharing"
   },
   "fr": {
     "write": "Ajouter et supprimer des séries dans l'album",
@@ -24,7 +25,8 @@
     "disable": "Désactiver",
     "urlsharing": "Votre url de partage :",
     "copysuccess": "Copié avec succès",
-  	"sorryerror": "Désolé, une erreur est survenue"
+    "sorryerror": "Désolé, une erreur est survenue",
+    "addalbum": "Partager"
   }
 }
 </i18n>
@@ -57,6 +59,19 @@
           <toggle-button
             v-if="token.read_permission"
             v-model="token.download_permission"
+            :color="{checked: '#5fc04c', unchecked: 'grey'}"
+          />
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-xs-12 col-sm-12 col-md-8">
+          <label>
+            {{ $t('addalbum') }}
+          </label>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-4">
+          <toggle-button
+            v-model="token.appropriate_permission"
             :color="{checked: '#5fc04c', unchecked: 'grey'}"
           />
         </div>
@@ -166,11 +181,10 @@
 <script>
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
-import CloseIcon from '@/components/kheopsSVG/CloseIcon';
 
 export default {
   name: 'SharingLink',
-  components: { Datepicker, CloseIcon },
+  components: { Datepicker },
   props: {
     albumId: {
       type: String,
