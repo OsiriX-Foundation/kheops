@@ -3,12 +3,11 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.AlbumResponse;
-import online.kheops.auth_server.annotation.AlbumAccessSecured;
-import online.kheops.auth_server.annotation.AlbumPermissionSecured;
-import online.kheops.auth_server.annotation.Secured;
-import online.kheops.auth_server.annotation.UserAccessSecured;
+import online.kheops.auth_server.album.UserNotMemberException;
+import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -18,6 +17,7 @@ import online.kheops.auth_server.webhook.WebhookNotFoundException;
 import online.kheops.auth_server.webhook.WebhookResponse;
 import online.kheops.auth_server.webhook.Webhooks;
 
+import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -40,6 +40,9 @@ public class WebhookResource {
 
     @Context
     private SecurityContext securityContext;
+
+    @Context
+    private ServletContext context;
 
     @POST
     @Secured
@@ -154,7 +157,7 @@ public class WebhookResource {
     public Response getWebhooks(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
-            throws AlbumNotFoundException, WebhookNotFoundException {
+            throws AlbumNotFoundException {
 
 
         final PairListXTotalCount<WebhookResponse> pairWebhooksTotalWebhook;
@@ -201,9 +204,10 @@ public class WebhookResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response triggerWebhook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                    @SuppressWarnings("RSReferenceInspection") @PathParam("webhook") String webhookId,
-                                   @FormParam(SeriesInstanceUID) String seriesUID,
+                                   @FormParam(SeriesInstanceUID) @UIDValidator String seriesUID,
+                                   @FormParam(StudyInstanceUID) @UIDValidator String studyUID,
                                    @FormParam("user") String user)
-            throws AlbumNotFoundException, WebhookNotFoundException {
+            throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
 
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -216,8 +220,15 @@ public class WebhookResource {
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
+        if ((studyUID != null && seriesUID == null) || (seriesUID != null && studyUID == null)) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("'"+StudyInstanceUID+"' and '"+StudyInstanceUID+"' must be set")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
 
-        Webhooks.triggerWebhook(webhookId, albumId, user, seriesUID, kheopsPrincipal.getUser());
+        Webhooks.triggerWebhook(context, webhookId, albumId, user, studyUID, seriesUID, kheopsPrincipal.getUser());
 
         kheopsPrincipal.getKheopsLogBuilder()
                 .action(KheopsLogBuilder.ActionType.TRIGGER_WEBHOOK)

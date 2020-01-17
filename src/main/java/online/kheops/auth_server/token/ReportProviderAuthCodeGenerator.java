@@ -11,8 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+
 public class ReportProviderAuthCodeGenerator {
-    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
     private final ServletContext servletContext;

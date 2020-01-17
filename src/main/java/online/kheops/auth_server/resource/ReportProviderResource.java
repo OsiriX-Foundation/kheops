@@ -55,8 +55,6 @@ import static online.kheops.auth_server.util.Tools.checkValidUID;
 public class ReportProviderResource {
     private static final Logger LOG = Logger.getLogger(ReportProviderResource.class.getName());
 
-    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
-
     @Context
     private UriInfo uriInfo;
 

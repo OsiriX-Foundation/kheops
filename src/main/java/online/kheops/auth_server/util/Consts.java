@@ -29,6 +29,10 @@ public class Consts {
         public static final String RP_TOKEN = "reportProviderToken";
     }
 
+    public static final int NUMBER_OF_RETRY_WEBHOOK = 5;
+
+    public static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
+
     //AlbumQueryParams.java
     public static final String FAVORITE = "favorite";
     public static final int CUSTOM_DICOM_TAG_FAVORITE = 0x00012345;

@@ -106,8 +106,14 @@ public class Webhook {
         return user;
     }
 
+
+
     public Set<WebhookHistory> getWebhookHistory() {
         return webhookHistory;
+    }
+
+    public void addWebhookHistory(WebhookHistory webhookHistory) {
+        this.webhookHistory.add(webhookHistory);
     }
 
     public void setName(String name) {

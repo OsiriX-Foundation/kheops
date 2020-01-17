@@ -26,9 +26,9 @@ import java.util.Objects;
 
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_CLIENT;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 
 class PrivateKeyJWTAuthenticator {
-    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String RS256 = "RS256";
 
     private final ServletContext context;

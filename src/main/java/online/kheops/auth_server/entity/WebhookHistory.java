@@ -1,5 +1,7 @@
 package online.kheops.auth_server.entity;
 
+import online.kheops.auth_server.webhook.WebhookTypes;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -14,7 +16,7 @@ public class WebhookHistory {
 
     @Basic(optional = false)
     @Column(name = "status")
-    private Integer status;
+    private long status;
 
     @Basic(optional = false)
     @Column(name = "time", updatable = false)
@@ -36,7 +38,24 @@ public class WebhookHistory {
     @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
     private Webhook webhook;
 
-    public Integer getStatus() { return status; }
+    public WebhookHistory() {}
+
+    public WebhookHistory(Integer status, boolean isManualTrigger, WebhookTypes type, Webhook webhook) {
+        this.status = status;
+        this.time = time.now();
+        this.isManualTrigger = isManualTrigger;
+        this.webhook = webhook;
+        webhook.addWebhookHistory(this);
+        if(type.equals(WebhookTypes.NEW_USER)) {
+            this.newUser = true;
+            this.newSeries = false;
+        } else if (type.equals(WebhookTypes.NEW_SERIES)) {
+            this.newUser = false;
+            this.newSeries = true;
+        }
+    }
+
+    public long getStatus() { return status; }
     public LocalDateTime getTime() { return time; }
     public Boolean getManualTrigger() { return isManualTrigger; }
     public Boolean getNewSeries() { return newSeries; }

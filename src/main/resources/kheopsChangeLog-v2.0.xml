@@ -83,11 +83,11 @@
                 <constraints nullable="false"/>
             </column>
             <column name="is_manual_trigger" type="BOOLEAN"/>
-            <column name="new_series" type="BIGINT">
-                <constraints nullable="true"/>
+            <column name="new_series" type="BOOLEAN">
+                <constraints nullable="false"/>
             </column>
-            <column name="new_user" type="BIGINT">
-                <constraints nullable="true"/>
+            <column name="new_user" type="BOOLEAN">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>

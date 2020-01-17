@@ -2,24 +2,32 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.event.Events.MutationType.*;
 import static online.kheops.auth_server.event.Events.MutationType.EDIT_WEBHOOK;
 import static online.kheops.auth_server.event.Events.MutationType.TRIGGER_WEBHOOK;
+import static online.kheops.auth_server.series.Series.getSeries;
+import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.KheopsLogBuilder.ActionType.*;
 import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookById;
-import static online.kheops.auth_server.webhook.WebhookQueries.getNumberOfWebhooks;
 
 public class Webhooks {
 
@@ -243,8 +251,8 @@ public class Webhooks {
         return new PairListXTotalCount<>(numberOfWebhook, webhookResponseList);
     }
 
-    public static void triggerWebhook(String webhookID, String albumId, String user, String seriesInstanceUID, User callingUser)
-            throws WebhookNotFoundException, AlbumNotFoundException {
+    public static void triggerWebhook(ServletContext context, String webhookID, String albumId, String user, String studyInstanceUID, String seriesInstanceUID, User callingUser)
+            throws WebhookNotFoundException, AlbumNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -255,12 +263,34 @@ public class Webhooks {
 
             final Album album = getAlbum(albumId, em);
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
+            final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
 
-            //call the webhook first valid if the user or the series is in the album
             if (user != null) {
+                final User targetUser = getOrCreateUser(user);
+                final AlbumUser albumTargetUser = getAlbumUser(album, targetUser, em);
 
+                if (isMemberOfAlbum(targetUser, album, em)) {
+                    final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
+                    new WebhookAsyncRequest(webhook, newUserWebhook, true);
+                } else {
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message("User not a member")
+                            .detail("The trigged user is not a member of the album")
+                            .build();
+                    throw new UserNotMemberException(errorResponse);
+                }
             } else if (seriesInstanceUID != null) {
-
+                Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+                if(album.containsSeries(series, em)) {
+                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),true);
+                    new WebhookAsyncRequest(webhook, newSeriesWebhook, true);
+                } else {
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message(SERIES_NOT_FOUND)
+                            .detail("The series does not exist or she is not in the album")
+                            .build();
+                    throw new SeriesNotFoundException(errorResponse);
+                }
             }
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);
@@ -274,7 +304,6 @@ public class Webhooks {
             }
             em.close();
         }
-
     }
 
 

@@ -8,9 +8,12 @@ import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
+import online.kheops.auth_server.webhook.NewUserWebhook;
+import online.kheops.auth_server.webhook.WebhookAsyncRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 
 public class Albums {
@@ -222,8 +226,8 @@ public class Albums {
         return new PairListXTotalCount<>(totalCount, listUserAlbumResponse);
     }
 
-    public static User addUser(User callingUser, String userName,  String albumId, boolean isAdmin)
-            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
+    public static User addUser(User callingUser, String userName, String albumId, boolean isAdmin, ServletContext context)
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -247,7 +251,7 @@ public class Albums {
             if (isMemberOfAlbum(targetUser, album, em)) {
                 try {
                     final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
-                    if (! targetAlbumUser.isAdmin() && isAdmin) {
+                    if (!targetAlbumUser.isAdmin() && isAdmin) {
                         //Here, the targetUser is an normal member and he will be promot as admin
                         targetAlbumUser.setAdmin(isAdmin);
                         final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
@@ -270,6 +274,14 @@ public class Albums {
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, targetUser);
                 em.persist(mutation);
                 em.persist(targetAlbumUser);
+
+                final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
+                for (Webhook webhook : album.getWebhooks()) {
+                    if (webhook.getNewUser()) {
+                        final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
+                        new WebhookAsyncRequest(webhook, newUserWebhook, false);
+                    }
+                }
             }
             album.updateLastEventTime();
             tx.commit();
