@@ -29,7 +29,7 @@ final class ViewerAccessTokenBuilder implements AccessTokenBuilder {
 
             jwe.setCompactSerialization(assertionToken);
 
-            return ViewerAccessToken.getBuilder(servletContext).build(jwe.getPayload());
+            return ViewerAccessToken.getBuilder(servletContext).build(assertionToken, jwe.getPayload());
         } catch (JoseException e) {
             throw new AccessTokenVerificationException("Unable to decode JWT", e);
         }

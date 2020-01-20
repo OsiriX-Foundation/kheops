@@ -25,10 +25,10 @@ public final class ViewerAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        ViewerAccessToken build(String assertionToken)
+        ViewerAccessToken build(String assertionToken, String jwePayloadJson)
                 throws AccessTokenVerificationException {
 
-            try(JsonReader jsonReader = Json.createReader(new StringReader(assertionToken))) {
+            try(JsonReader jsonReader = Json.createReader(new StringReader(jwePayloadJson))) {
                 JsonObject jwe = jsonReader.readObject();
                 return new ViewerAccessToken(servletContext, jwe, assertionToken);
             }
