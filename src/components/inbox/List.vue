@@ -172,6 +172,7 @@
               <div class="flex-fill">
                 <input
                   v-model="filters.PatientName"
+                  v-focus
                   type="search"
                   class="form-control form-control-sm"
                   :placeholder="$t('filter')"
@@ -484,6 +485,7 @@ export default {
   },
   data() {
     return {
+      defaultTimeOut: 300,
       selectedDate: null,
       infiniteId: 0,
       showFilters: false,
@@ -675,8 +677,8 @@ export default {
   },
   created() {
     this.initData();
-    this.setAlbumsList();
-    this.setAlbumInbox();
+    setTimeout(() => this.setAlbumsList(), this.defaultTimeOut);
+    setTimeout(() => this.setAlbumInbox(), this.defaultTimeOut);
     this.setFilters();
     this.setQueryParams();
   },
@@ -869,7 +871,6 @@ export default {
       const value = row.item.flag.is_selected;
       const StudyInstanceUID = row.item.StudyInstanceUID.Value[0];
       const studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === StudyInstanceUID);
-
       const paramsSelected = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_selected', !value);
       this.$store.dispatch('setFlagByStudyUID', paramsSelected);
       const paramsIndeterminate = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_indeterminate', false);
