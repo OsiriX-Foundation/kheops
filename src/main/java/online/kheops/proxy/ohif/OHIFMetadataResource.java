@@ -67,6 +67,45 @@ public class OHIFMetadataResource {
         return ohifMetadata(studyInstanceUID, firstSeriesInstanceUID, AuthorizationToken.from(capabilityToken), inbox, album);
     }
 
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("password/dicomweb/ohifservermetadata")
+    public String ohifServerMetadataResource(@HeaderParam(AUTHORIZATION) String authorizationHeader) {
+        return ohifServerMetadata(AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+    }
+
+    private String ohifServerMetadata(AuthorizationToken authorizationToken) {
+
+        final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
+
+        final URI rootURI = getParameterURI("online.kheops.root.uri");
+        final URI dicomWebURI;
+        if (linkAuthorization) {
+            dicomWebURI = UriBuilder.fromUri(rootURI).path("/api/link/" + authorizationToken.getToken()).build();
+        } else {
+            dicomWebURI = UriBuilder.fromUri(rootURI).path("/api").build();
+        }
+
+        return String.format("{\n" +
+                "   \"transactionId\":\"testDICOMs\",\n" +
+                "   \"servers\": {\n" +
+                "      \"dicomWeb\": [\n" +
+                "         {\n" +
+                "            \"name\": \"DCM4CHEE\",\n" +
+                "            \"wadoUriRoot\": \"%s/wado\",\n" +
+                "            \"qidoRoot\": \"%s\",\n" +
+                "            \"wadoRoot\": \"%s\",\n" +
+                "            \"qidoSupportsIncludeField\": true,\n" +
+                "            \"imageRendering\": \"wadouri\",\n" +
+                "            \"thumbnailRendering\": \"wadouri\",\n" +
+                "            \"enableStudyLazyLoad\": true\n" +
+                "         }\n" +
+                "      ]\n" +
+                "   }\n" +
+                "}\n" +
+                "\n", dicomWebURI, dicomWebURI, dicomWebURI);
+    }
+
     private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken, Boolean inbox, String album) {
         final URI authorizationServerURI = getParameterURI("online.kheops.auth_server.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
