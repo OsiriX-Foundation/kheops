@@ -258,7 +258,7 @@ export default {
           openWindow.location.href = url;
         } else if (windowProps.id === 'OHIF') {
           const sourceQuery = this.getSourceQueries();
-          url = this.openOhif(this.studyInstanceUID, viewerToken, sourceQuery);
+          url = this.openOhif(this.studyInstanceUID, viewerToken);
           openWindow.location.href = url;
         }
       }).catch((err) => {
