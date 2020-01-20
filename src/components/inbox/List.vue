@@ -484,6 +484,9 @@ export default {
   },
   data() {
     return {
+      defaultTimeOut: {
+        album: 300,
+      },
       selectedDate: null,
       infiniteId: 0,
       showFilters: false,
@@ -675,8 +678,7 @@ export default {
   },
   created() {
     this.initData();
-    setTimeout(() => this.setAlbumsList(), 300);
-    this.setAlbumsList();
+    setTimeout(() => this.setAlbumsList(), this.defaultTimeOut.album);
     this.setAlbumInbox();
     this.setFilters();
     this.setQueryParams();
