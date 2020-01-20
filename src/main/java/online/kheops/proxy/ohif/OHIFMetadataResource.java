@@ -96,8 +96,8 @@ public class OHIFMetadataResource {
                 "            \"qidoRoot\": \"%s\",\n" +
                 "            \"wadoRoot\": \"%s\",\n" +
                 "            \"qidoSupportsIncludeField\": true,\n" +
-                "            \"imageRendering\": \"wadouri\",\n" +
-                "            \"thumbnailRendering\": \"wadouri\",\n" +
+                "            \"imageRendering\": \"wadors\",\n" +
+                "            \"thumbnailRendering\": \"wadors\",\n" +
                 "            \"enableStudyLazyLoad\": true\n" +
                 "         }\n" +
                 "      ]\n" +
