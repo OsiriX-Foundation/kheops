@@ -17,7 +17,10 @@
     "noresults": "No album found",
     "albumshared": "Album shared",
     "error": "An error occur please reload the albums.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "filter": "Filter",
+    "fromDate": "From",
+    "toDate": "To"
   },
   "fr": {
     "newalbum": "Nouvel album",
@@ -36,7 +39,10 @@
     "noresults": "Aucun album trouvé",
     "albumshared": "Album partagé",
     "error": "Une erreur s'est produite, veuillez recharger les albums.",
-    "reload": "Recharger"
+    "reload": "Recharger",
+    "filter": "Filtrer",
+    "fromDate": "De",
+    "toDate": "A"
   }
 }
 </i18n>
@@ -78,6 +84,7 @@
         >
           <input
             v-model="filters.name"
+            v-focus
             type="search"
             class="form-control form-control-sm"
             :placeholder="$t('filter')"

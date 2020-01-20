@@ -172,6 +172,7 @@
               <div class="flex-fill">
                 <input
                   v-model="filters.PatientName"
+                  v-focus
                   type="search"
                   class="form-control form-control-sm"
                   :placeholder="$t('filter')"
