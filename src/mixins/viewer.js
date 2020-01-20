@@ -14,9 +14,9 @@ export const Viewer = {
       const url = `$dicom:rs --url="${process.env.VUE_APP_URL_API}" --request="studyUID=${StudyInstanceUID}" --header="Authorization: Bearer ${token}"`;
       return `weasis://?${encodeURIComponent(url)}`;
     },
-    openOhif(StudyInstanceUID, token, queryparams) {
-      const url = `${process.env.VUE_APP_URL_API}/link/${token}/studies/${StudyInstanceUID}/ohifmetadata${queryparams !== '' ? '?' : ''}${queryparams}`;
-      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}`;
+    openOhif(StudyInstanceUID, token) {
+      const url = `${process.env.VUE_APP_URL_API}/link/${token}/ohifservermetadata`;
+      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}&studyInstanceUids=${encodeURIComponent(StudyInstanceUID)}`;
     },
     openWSI(StudyInstanceUID, token) {
       const url = `${process.env.VUE_APP_URL_API}`
