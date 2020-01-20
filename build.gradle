@@ -59,13 +59,13 @@ repositories {
 
 dependencies {
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    compile group: 'javax.xml.bind', name: 'jaxb-core', version: '2.3.1'
-    compile group: 'javax.xml.bind', name: 'jaxb-impl', version: '2.3.1'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.2'
 
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.29.1'
-    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.29.1'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.29.1'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.29.1'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.30'
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.30'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.30'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.30'
 
     compile group: 'com.auth0', name: 'java-jwt', version: '3.4.1'
 
