@@ -45,6 +45,7 @@ import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.Consts.USER_IN_ROLE.VIEWER_TOKEN;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 import static online.kheops.auth_server.util.JOOQTools.getDataSource;
@@ -236,7 +237,7 @@ public class QIDOResource {
               return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
         }
 
-        if(securityContext.isUserInRole("tokenViewer")) {
+        if(securityContext.isUserInRole(VIEWER_TOKEN)) {
             fromInbox = kheopsPrincipal.hasInboxAccess();
         }
         //END kheopsPrincipal
@@ -408,7 +409,7 @@ public class QIDOResource {
             return Response.status(FORBIDDEN).entity(e.getErrorResponse()).build();
         }
 
-        if(securityContext.isUserInRole("tokenViewer")) {
+        if(securityContext.isUserInRole(VIEWER_TOKEN)) {
             fromInbox = kheopsPrincipal.hasInboxAccess();
         }
         //END kheopsPrincipal
