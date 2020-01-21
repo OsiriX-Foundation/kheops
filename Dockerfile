@@ -7,7 +7,7 @@ COPY . .
 COPY .env.prod .env
 RUN npm run build
 
-FROM nginx:stable as production-stage
+FROM nginx:1.17.6-alpine as production-stage
 
 ENV SECRET_FILE_PATH=/run/secrets
 
