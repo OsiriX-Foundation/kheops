@@ -75,7 +75,11 @@ public final class ViewerAccessToken implements AccessToken {
 
     @Override
     public Optional<String> getScope() {
-        return Optional.of("read");
+        if (jwe.containsKey(Consts.JWE.SCOPE)) {
+            return Optional.of(jwe.getString(Consts.JWE.SCOPE));
+        } else {
+            return Optional.of("read");
+        }
     }
 
     @Override
