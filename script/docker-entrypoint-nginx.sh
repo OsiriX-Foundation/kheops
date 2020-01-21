@@ -31,11 +31,6 @@ if [ -z "$KHEOPS_VIEWER_URL" ]; then
     missing_env_var_secret=true
 fi
 
-if [ -z "$KHEOPS_VIEWER_SM_URL" ]; then
-    echo "Missing KHEOPS_VIEWER_SM_URL environment variable"
-    missing_env_var_secret=true
-fi
-
 if [ -z "$KHEOPS_ROOT_SCHEME" ]; then
     echo "Missing KHEOPS_ROOT_SCHEME environment variable"
     missing_env_var_secret=true
