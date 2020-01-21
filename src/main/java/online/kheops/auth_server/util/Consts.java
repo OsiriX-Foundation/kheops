@@ -67,6 +67,7 @@ public class Consts {
         public static final String IS_INBOX = "isInbox";
         public static final String STUDY_INSTANCE_UID = "studyInstanceUID";
         public static final String EXP = "exp";
+        public static final String SCOPE = "scope";
     }
 
 

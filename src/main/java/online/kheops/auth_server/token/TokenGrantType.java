@@ -11,8 +11,11 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static online.kheops.auth_server.accesstoken.AccessTokenUtils.StringContainsScope;
+import static online.kheops.auth_server.accesstoken.AccessTokenUtils.ValidateScopeString;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -92,7 +95,7 @@ public enum TokenGrantType {
             verifySingleHeader(form, "subject_token_type");
             verifySingleHeader(form, "studyUID");
 
-            final String scope = form.getFirst("scope");
+            final String scopeString = form.getFirst("scope");
             final String subjectToken = form.getFirst("subject_token");
             final String subjectTokenType = form.getFirst("subject_token_type");
             final String studyInstanceUID = form.getFirst("studyUID");
@@ -103,6 +106,9 @@ public enum TokenGrantType {
             if (!subjectTokenType.equals("urn:ietf:params:oauth:token-type:access_token")) {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown subject token type");
             }
+            if (ValidateScopeString(scopeString)) {
+                throw new TokenRequestException(INVALID_REQUEST, "Bad scope");
+            }
 
             final String subject;
             try {
@@ -111,7 +117,7 @@ public enum TokenGrantType {
                 throw new TokenRequestException(INVALID_REQUEST, "Bad subject_token", e);
             }
 
-            if (scope.equals("pep")) {
+            if (StringContainsScope(scopeString, "pep")) {
                 verifySingleHeader(form, "seriesUID");
                 final String seriesInstanceUID = form.getFirst("seriesUID");
                 if (!checkValidUID(seriesInstanceUID)) {
@@ -129,7 +135,7 @@ public enum TokenGrantType {
                         .generate(PEP_TOKEN_LIFETIME);
 
                 return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject, "pep", studyInstanceUID, seriesInstanceUID);
-            } else if (scope.equals("viewer")) {
+            } else if (StringContainsScope(scopeString,"viewer")) {
                 verifyNotDuplicateHeader(form, "source_type");
                 final String sourceType = form.getFirst("source_type");
 
@@ -147,11 +153,20 @@ public enum TokenGrantType {
                     sourceId = null;
                 }
 
+                final List<String> scopes = new ArrayList<>();
+                if (StringContainsScope(scopeString,"read")) {
+                    scopes.add("read");
+                }
+                if (StringContainsScope(scopeString,"write")) {
+                    scopes.add("write");
+                }
+
                 final String viewerToken = ViewerAccessTokenGenerator.createGenerator(servletContext)
                         .withToken(subjectToken)
                         .withStudyInstanceUID(studyInstanceUID)
                         .withSourceType(sourceType)
                         .withSourceId(sourceId)
+                        .withScopes(scopes)
                         .generate(VIEWER_TOKEN_LIFETIME);
 
                 return new TokenGrantResult(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME), subject, "viewer", studyInstanceUID, null);

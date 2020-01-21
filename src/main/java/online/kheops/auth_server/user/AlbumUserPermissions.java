@@ -71,8 +71,6 @@ public enum AlbumUserPermissions {
             return capability.hasReadPermission();
         }
         @Override
-        public boolean hasViewerPermission(Album album) { return true; }
-        @Override
         public boolean hasProviderPermission(Album album) { return true; }
     },
     WRITE_COMMENT {
@@ -122,13 +120,6 @@ public enum AlbumUserPermissions {
      * @param capability For overrides
      */
     public boolean hasCapabilityPermission(Capability capability) {
-        return false;
-    }
-
-    /**
-     * @param album For overrides
-     */
-    public boolean hasViewerPermission(Album album) {
         return false;
     }
 

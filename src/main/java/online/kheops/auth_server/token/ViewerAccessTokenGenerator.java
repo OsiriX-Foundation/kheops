@@ -15,6 +15,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -34,6 +35,7 @@ class ViewerAccessTokenGenerator {
     private String studyInstanceUID;
     private String sourceType;
     private String sourceId;
+    private Collection<String> scopes;
 
     private ViewerAccessTokenGenerator(ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -56,6 +58,11 @@ class ViewerAccessTokenGenerator {
 
     ViewerAccessTokenGenerator withSourceId(final String sourceId) {
         this.sourceId = sourceId;
+        return this;
+    }
+
+    ViewerAccessTokenGenerator withScopes(final Collection<String> scopes) {
+        this.scopes = scopes;
         return this;
     }
 
@@ -106,6 +113,9 @@ class ViewerAccessTokenGenerator {
             data.put(Consts.JWE.IS_INBOX, (sourceType != null && sourceType.equals(INBOX)));
             data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
             data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
+            if (scopes != null && scopes.size() > 0) {
+                data.put(Consts.JWE.SCOPE, String.join(" ", scopes));
+            }
 
             final JsonWebEncryption jwe = new JsonWebEncryption();
             jwe.setPayload(data.toJSONString());

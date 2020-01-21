@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static online.kheops.auth_server.accesstoken.AccessTokenUtils.StringContainsScope;
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
@@ -64,7 +65,8 @@ public class ViewerPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
-        if(!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID)) {
+        if(!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID) ||
+                !StringContainsScope(viewerAccessToken.getScope().orElse(""), "read")) {
             return false;
         }
 
@@ -97,7 +99,18 @@ public class ViewerPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
+        return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID()) &&
+                StringContainsScope(viewerAccessToken.getScope().orElse(""), "read");
+    }
+
+    @Override
+    public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
+        if(!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
+            return false;
+        }
+
+        return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID()) &&
+                StringContainsScope(viewerAccessToken.getScope().orElse(""), "write");
     }
 
     @Override
@@ -124,7 +137,13 @@ public class ViewerPrincipal implements KheopsPrincipal {
                     return false;
                 }
 
-                return usersPermission.hasViewerPermission(album);
+                if (usersPermission == AlbumUserPermissions.READ_SERIES) {
+                    return StringContainsScope(viewerAccessToken.getScope().orElse(""), "read");
+                } else if (usersPermission == AlbumUserPermissions.ADD_SERIES) {
+                    return StringContainsScope(viewerAccessToken.getScope().orElse(""), "write");
+                }
+
+                return false;
             } finally {
                 em.close();
             }
