@@ -272,8 +272,7 @@ export default {
       const openWindow = {};
       const openWSI = this.study.ModalitiesInStudy !== undefined
         && this.study.ModalitiesInStudy.Value.length === 1
-        && this.study.ModalitiesInStudy.Value[0] === 'SM'
-        && process.env.VUE_APP_URL_VIEWER_SM !== '' && process.env.VUE_APP_URL_VIEWER_SM !== undefined;
+        && this.study.ModalitiesInStudy.Value[0] === 'SM';
       if (viewer === 'default' && openWSI === false) {
         openWindow.ohif = window.open('', `OHIFViewer-${StudyInstanceUID}`);
       } else if (viewer === 'default' && openWSI === true) {

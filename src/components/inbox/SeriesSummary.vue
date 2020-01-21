@@ -232,8 +232,7 @@ export default {
       const token = this.currentuserAccessToken();
       const openWSI = series.Modality !== undefined
         && series.Modality.Value !== undefined
-        && series.Modality.Value[0] === 'SM'
-        && process.env.VUE_APP_URL_VIEWER_SM !== '' && process.env.VUE_APP_URL_VIEWER_SM !== undefined;
+        && series.Modality.Value[0] === 'SM';
       const windowProps = {};
       if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
         windowProps.name = `WADO-${this.seriesInstanceUID}`;
