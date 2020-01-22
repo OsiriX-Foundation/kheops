@@ -276,9 +276,9 @@ public class Albums {
                 em.persist(targetAlbumUser);
 
                 final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
+                final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                 for (Webhook webhook : album.getWebhooks()) {
                     if (webhook.getNewUser()) {
-                        final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                         new WebhookAsyncRequest(webhook, newUserWebhook, false);
                     }
                 }

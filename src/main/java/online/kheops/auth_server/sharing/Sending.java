@@ -261,9 +261,9 @@ public class Sending {
                     .series(seriesInstanceUID)
                     .log();
 
+            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER),false);
             for (Webhook webhook : targetAlbum.getWebhooks()) {
                 if (webhook.getNewSeries()) {
-                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                     new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
                 }
             }
@@ -275,8 +275,8 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+    public static void putStudyInAlbum(ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
         EntityManager em = EntityManagerListener.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -285,6 +285,8 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
+            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
+            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
 
@@ -296,6 +298,7 @@ public class Sending {
                     targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
+                    newSeriesWebhook.addSeries(series);
                 }
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
@@ -332,6 +335,12 @@ public class Sending {
                     .action(ActionType.SHARE_STUDY_WITH_ALBUM)
                     .study(studyInstanceUID)
                     .log();
+
+            for (Webhook webhook : targetAlbum.getWebhooks()) {
+                if (webhook.getNewSeries()) {
+                    new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                }
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
