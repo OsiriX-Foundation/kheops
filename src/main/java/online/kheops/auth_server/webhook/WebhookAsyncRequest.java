@@ -34,6 +34,7 @@ public class WebhookAsyncRequest<T> {
 
     private void request(int cnt) {
         Entity s = Entity.json(data);
+        String a = s.toString();
         Future<Response> f = CLIENT.target(webhook.getUrl()).request().async()
                 .post(Entity.json(data),
                         new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
