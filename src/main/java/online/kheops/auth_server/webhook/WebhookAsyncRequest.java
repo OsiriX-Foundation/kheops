@@ -7,6 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
 import java.security.Key;
 import java.util.concurrent.Future;
@@ -38,22 +39,23 @@ public class WebhookAsyncRequest<T> {
     private void request(int cnt) {
         Entity<T> s = Entity.json(data);
         String a = s.getEntity().toString();
-        try {
-            String donnee = "This class represents application/x-www-form-urlencoded";
-            Mac m = Mac.getInstance("HmacSHA1");
-            Key k = new SecretKeySpec(webhook.getSecret().getBytes(), "HmacSHA1");
-            m.init(k);
-            byte[]b = m.doFinal(donnee.getBytes());
-            String res = bytesToHex(b);
-            res=res.split(":sdwdwdw").toString();
-        } catch (Exception e) {
+        Invocation.Builder builder = CLIENT.target(webhook.getUrl()).request();
+        if(webhook.useSecret()) {
+            try {
+                final String donnee = "This class represents application/x-www-form-urlencoded";
+                final Mac m = Mac.getInstance("HmacSHA1");
+                final Key k = new SecretKeySpec(webhook.getSecret().getBytes(), "HmacSHA1");
+                m.init(k);
+                final byte[] b = m.doFinal(donnee.getBytes());
+                final String hash = bytesToHex(b);
+                builder.header("X-Kheops-Signature", hash);
+            } catch (Exception e) {
 
+            }
         }
 
-
-        Future<Response> f = CLIENT.target(webhook.getUrl()).request().async()
-                .post(Entity.json(data),
-                        new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
+        Future<Response> f = builder.async()
+                .post(Entity.json(data), new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
     }
 
     public T getType() {
