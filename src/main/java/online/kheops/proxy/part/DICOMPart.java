@@ -22,20 +22,20 @@ class DICOMPart extends DICOMMetadataPart {
 
     private static Attributes parseInputStream(InputStream inputStream) throws IOException{
         final DicomInputStream dicomInputStream = new DicomInputStream(inputStream);
-        dicomInputStream.setBulkDataDescriptor(new BulkDataDescriptor() {
-            @Override
-            public boolean isBulkData(List<ItemPointer> itemPointer, String privateCreator, int tag, VR vr, int length) {
-                switch (tag) {
-                    case Tag.StudyInstanceUID:
-                    case Tag.SeriesInstanceUID:
-                    case Tag.SOPInstanceUID:
-                    case Tag.SOPClassUID:
-                        return false;
-                    default:
-                        return true;
-                }
-            }
-        });
+//        dicomInputStream.setBulkDataDescriptor(new BulkDataDescriptor() {
+//            @Override
+//            public boolean isBulkData(List<ItemPointer> itemPointer, String privateCreator, int tag, VR vr, int length) {
+//                switch (tag) {
+//                    case Tag.StudyInstanceUID:
+//                    case Tag.SeriesInstanceUID:
+//                    case Tag.SOPInstanceUID:
+//                    case Tag.SOPClassUID:
+//                        return false;
+//                    default:
+//                        return true;
+//                }
+//            }
+//        });
         dicomInputStream.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
 
         return dicomInputStream.readDataset(-1, -1);
