@@ -2,6 +2,7 @@ package online.kheops.auth_server.sharing;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
@@ -13,20 +14,26 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
+import online.kheops.auth_server.webhook.NewSeriesWebhook;
+import online.kheops.auth_server.webhook.NewUserWebhook;
+import online.kheops.auth_server.webhook.WebhookAsyncRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Set;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.Series.isSeriesInInbox;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 
 public class Sending {
@@ -191,8 +198,8 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, ClientIdNotFoundException {
+    public static void putSeriesInAlbum(ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+            throws AlbumNotFoundException, ClientIdNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -202,6 +209,7 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
+            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
 
             Series availableSeries;
             try {
@@ -252,6 +260,13 @@ public class Sending {
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID)
                     .log();
+
+            for (Webhook webhook : targetAlbum.getWebhooks()) {
+                if (webhook.getNewSeries()) {
+                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER),false);
+                    new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                }
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

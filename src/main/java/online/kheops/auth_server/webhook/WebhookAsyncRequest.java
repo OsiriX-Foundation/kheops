@@ -39,9 +39,9 @@ public class WebhookAsyncRequest<T> {
 
     private void request(int cnt) {
         final Entity<T> entity = Entity.json(data);
-        Annotation[] annotations = entity.getAnnotations();
 
-        String a = entity.getEntity().toString();
+        //TODO recuperer le contenu de entity pour le hash avec le secret
+
         Invocation.Builder builder = CLIENT.target(webhook.getUrl()).request();
         if(webhook.useSecret()) {
             try {

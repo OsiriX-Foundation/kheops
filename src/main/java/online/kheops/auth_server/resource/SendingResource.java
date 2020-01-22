@@ -6,6 +6,7 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
@@ -153,7 +154,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                       @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -215,7 +216,7 @@ public class SendingResource
             if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                    Sending.putSeriesInAlbum(kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                    Sending.putSeriesInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(AUTHORIZATION_ERROR)
@@ -451,7 +452,7 @@ public class SendingResource
     public Response putSeriesInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
-            throws AlbumNotFoundException {
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -505,7 +506,7 @@ public class SendingResource
         }
 
         try {
-            Sending.putSeriesInAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+            Sending.putSeriesInAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
