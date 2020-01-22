@@ -227,16 +227,50 @@ export default {
       return '';
     },
     openTab(series) {
-      const SOPVideo = '1.2.840.10008.5.1.4.1.1.77.1.4.1';
-      const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
+      const SOP = {
+        video: '1.2.840.10008.5.1.4.1.1.77.1.4.1',
+        PDF: '1.2.840.10008.5.1.4.1.1.104.1',
+      };
       const token = this.currentuserAccessToken();
-      const openWSI = series.Modality !== undefined
+
+      this.getViewerToken(token, this.studyInstanceUID, this.source).then((res) => {
+        const viewerToken = res.data.access_token;
+        this.openViewer(viewerToken, series, SOP);
+      }).catch((err) => {
+        console.log(err);
+      });
+    },
+    openViewer(viewerToken, series, SOP) {
+      let url = '';
+      const windowProps = this.getWindowProps(series, SOP);
+      const openWindow = window.open('', windowProps.name);
+      if (windowProps.id === 'WADO') {
+        const contentType = series.SOPClassUID.Value[0] === SOP.PDF ? 'application/pdf' : 'video/mp4';
+        const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
+        url = this.openWADO(this.studyInstanceUID, viewerToken, queryparams);
+      } else if (windowProps.id === 'WSI') {
+        url = this.openWSI(this.studyInstanceUID, viewerToken);
+      } else if (windowProps.id === 'OHIF') {
+        const queryparams = {
+          url: `${process.env.VUE_APP_URL_API}/link/${viewerToken}/ohifservermetadata`,
+          studyInstanceUids: this.studyInstanceUID,
+          serieInstanceUids: this.seriesInstanceUID,
+        };
+        url = this.openOhif(queryparams);
+      }
+      openWindow.location.href = url;
+    },
+    openViewerWSI(series) {
+      return series.Modality !== undefined
         && series.Modality.Value !== undefined
         && series.Modality.Value[0] === 'SM'
         && process.env.VUE_APP_URL_VIEWER_SM !== undefined
         && process.env.VUE_APP_URL_VIEWER_SM.length > 0;
+    },
+    getWindowProps(series, SOP) {
       const windowProps = {};
-      if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOPPdf || series.SOPClassUID.Value[0] === SOPVideo)) {
+      const openWSI = this.openViewerWSI(series);
+      if (series.SOPClassUID !== undefined && (series.SOPClassUID.Value[0] === SOP.PDF || series.SOPClassUID.Value[0] === SOP.video)) {
         windowProps.name = `WADO-${this.seriesInstanceUID}`;
         windowProps.id = 'WADO';
       } else if (openWSI) {
@@ -246,25 +280,7 @@ export default {
         windowProps.name = `OHIF-${this.studyInstanceUID}`;
         windowProps.id = 'OHIF';
       }
-      const openWindow = window.open('', windowProps.name);
-      this.getViewerToken(token, this.studyInstanceUID, this.source).then((res) => {
-        const viewerToken = res.data.access_token;
-        let url = '';
-        if (windowProps.id === 'WADO') {
-          const contentType = series.SOPClassUID.Value[0] === SOPPdf ? 'application/pdf' : 'video/mp4';
-          const queryparams = `?studyUID=${this.studyInstanceUID}&seriesUID=${this.seriesInstanceUID}&requestType=WADO&contentType=${contentType}`;
-          url = this.openWADO(this.studyInstanceUID, viewerToken, queryparams);
-          openWindow.location.href = url;
-        } else if (windowProps.id === 'WSI') {
-          url = this.openWSI(this.studyInstanceUID, viewerToken);
-          openWindow.location.href = url;
-        } else if (windowProps.id === 'OHIF') {
-          url = this.openOhif(this.studyInstanceUID, viewerToken);
-          openWindow.location.href = url;
-        }
-      }).catch((err) => {
-        console.log(err);
-      });
+      return windowProps;
     },
   },
 };
