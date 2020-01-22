@@ -107,7 +107,7 @@ public enum TokenGrantType {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown subject token type");
             }
             if (ValidateScopeString(scopeString)) {
-                throw new TokenRequestException(INVALID_REQUEST, "Bad scope");
+                throw new TokenRequestException(INVALID_SCOPE);
             }
 
             final String subject;
