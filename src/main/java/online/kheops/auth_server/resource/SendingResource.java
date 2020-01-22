@@ -240,7 +240,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateStudy(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @QueryParam(ALBUM) String albumId)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -525,7 +525,7 @@ public class SendingResource
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox)
-            throws AlbumNotFoundException{
+            throws AlbumNotFoundException, UserNotMemberException {
 
 
         if (((fromAlbumId == null && fromInbox == null) ||
