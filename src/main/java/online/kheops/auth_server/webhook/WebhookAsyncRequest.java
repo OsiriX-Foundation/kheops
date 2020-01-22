@@ -9,6 +9,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
+import java.lang.annotation.Annotation;
 import java.security.Key;
 import java.util.concurrent.Future;
 
@@ -38,6 +39,8 @@ public class WebhookAsyncRequest<T> {
 
     private void request(int cnt) {
         Entity<T> s = Entity.json(data);
+        Annotation[] annotations = s.getAnnotations();
+
         String a = s.getEntity().toString();
         Invocation.Builder builder = CLIENT.target(webhook.getUrl()).request();
         if(webhook.useSecret()) {
