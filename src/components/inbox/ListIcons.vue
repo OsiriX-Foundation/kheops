@@ -5,6 +5,7 @@
     "osirix": "Open OsiriX",
     "ohif": "Open OHIF",
     "weasis": "Open Weasis",
+    "slicer": "Open 3D Slicer",
     "import": "Import data",
     "comments": "Open comments",
     "favorite": "Favorite"
@@ -14,6 +15,7 @@
     "osirix": "Ouvrir OsiriX",
     "ohif": "Ouvrir OHIF",
     "weasis": "Ouvrir Weasis",
+    "slicer": "Ouvrir 3D Slicer",
     "import": "Importer des données",
     "comments": "Ouvrir les commentaires",
     "favorite": "Favori"
@@ -57,6 +59,17 @@
         @click.stop="openViewer('Weasis')"
       >
         <weasis-icon
+          width="24"
+          height="24"
+        />
+      </span>
+      <span
+        v-if="showSlicerIcon"
+        class="ml-1"
+        :title="$t('slicer')"
+        @click.stop="openViewer('Slicer')"
+      >
+        <slicer-icon
           width="24"
           height="24"
         />
@@ -123,6 +136,7 @@
 <script>
 import Vue from 'vue';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
+import SlicerIcon from '@/components/kheopsSVG/SlicerIcon.vue';
 import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 import { ViewerToken } from '@/mixins/tokens.js';
@@ -132,7 +146,7 @@ import { Viewer } from '@/mixins/viewer.js';
 export default {
   name: 'ListIcons',
   components: {
-    OsirixIcon, VisibilityIcon, WeasisIcon,
+    OsirixIcon, VisibilityIcon, WeasisIcon, SlicerIcon,
   },
   mixins: [ViewerToken, CurrentUser, Viewer],
   props: {
@@ -182,6 +196,11 @@ export default {
       default: true,
     },
     showWeasisIcon: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showSlicerIcon: {
       type: Boolean,
       required: false,
       default: true,
@@ -293,6 +312,9 @@ export default {
           openWindow.wsi.location.href = this.openWSI(StudyInstanceUID, viewerToken, sourceQuery);
         } else if (viewer === 'Weasis') {
           url = this.openWeasis(StudyInstanceUID, res.data.access_token);
+          window.open(url, '_self');
+        } else if (viewer === 'Slicer') {
+          url = this.openSlicer(StudyInstanceUID, res.data.access_token);
           window.open(url, '_self');
         }
       }).catch((err) => {
