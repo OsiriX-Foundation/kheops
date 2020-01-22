@@ -38,10 +38,10 @@ public class WebhookAsyncRequest<T> {
     }
 
     private void request(int cnt) {
-        Entity<T> s = Entity.json(data);
-        Annotation[] annotations = s.getAnnotations();
+        final Entity<T> entity = Entity.json(data);
+        Annotation[] annotations = entity.getAnnotations();
 
-        String a = s.getEntity().toString();
+        String a = entity.getEntity().toString();
         Invocation.Builder builder = CLIENT.target(webhook.getUrl()).request();
         if(webhook.useSecret()) {
             try {
@@ -58,7 +58,7 @@ public class WebhookAsyncRequest<T> {
         }
 
         Future<Response> f = builder.async()
-                .post(Entity.json(data), new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
+                .post(entity, new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
     }
 
     public T getType() {
