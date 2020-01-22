@@ -106,8 +106,8 @@ public enum TokenGrantType {
             if (!subjectTokenType.equals("urn:ietf:params:oauth:token-type:access_token")) {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown subject token type");
             }
-            if (ValidateScopeString(scopeString)) {
-                throw new TokenRequestException(INVALID_REQUEST, "Bad scope");
+            if (!ValidateScopeString(scopeString)) {
+                throw new TokenRequestException(INVALID_SCOPE);
             }
 
             final String subject;
