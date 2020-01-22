@@ -4,7 +4,7 @@ import { HTTP } from '@/router/http';
 export const ViewerToken = {
   data() {
     return {
-      scope: 'viewer',
+      scope: 'viewer read write',
       grant_type: 'urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange',
       subject_token_type: 'urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token',
     };
