@@ -258,7 +258,6 @@ export default {
           url = this.openWSI(this.studyInstanceUID, viewerToken);
           openWindow.location.href = url;
         } else if (windowProps.id === 'OHIF') {
-          const sourceQuery = this.getSourceQueries();
           url = this.openOhif(this.studyInstanceUID, viewerToken);
           openWindow.location.href = url;
         }
