@@ -45,7 +45,6 @@ public class WebhookResponse {
         this.numberOfHistory = webhook.getWebhookHistory().size();
 
         history = new ArrayList<>();
-        fullHistory = new ArrayList<>();
     }
 
     public void addHistory(WebhookHistory webhookHistory) {
@@ -57,6 +56,9 @@ public class WebhookResponse {
     }
 
     public void addFullHistory(WebhookHistory webhookHistory) {
+        if (fullHistory == null) {
+            fullHistory = new ArrayList<>();
+        }
         this.fullHistory.add(new WebhookHistoryResponse(webhookHistory));
     }
 }
