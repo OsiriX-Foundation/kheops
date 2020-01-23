@@ -29,6 +29,8 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private final String capabilityTokenId;
     private final KheopsLogBuilder kheopsLogBuilder;
 
+    private boolean linkAuthorization;
+
     private List<String> studyUids;
     private String clientId;
     private Album album;
@@ -207,8 +209,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         return Optional.ofNullable(capabilityTokenId);
     }
 
-
-    private boolean linkAuthorization;
     @Override
     public void setLink(boolean linkAuthorization) {
         this.linkAuthorization = linkAuthorization;

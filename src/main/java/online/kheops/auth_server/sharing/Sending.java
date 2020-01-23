@@ -241,6 +241,8 @@ public class Sending {
             targetAlbum.addSeries(albumSeries);
             em.persist(albumSeries);
 
+            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER),false);
+
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
@@ -248,6 +250,7 @@ public class Sending {
             } else if(kheopsPrincipal.getClientId().isPresent()) {
                 ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
                 reportProvider = em.merge(reportProvider);
+                newSeriesWebhook.setReportProvider(reportProvider);
                 mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
@@ -261,7 +264,6 @@ public class Sending {
                     .series(seriesInstanceUID)
                     .log();
 
-            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER),false);
             for (Webhook webhook : targetAlbum.getWebhooks()) {
                 if (webhook.getNewSeries()) {
                     new WebhookAsyncRequest(webhook, newSeriesWebhook, false);

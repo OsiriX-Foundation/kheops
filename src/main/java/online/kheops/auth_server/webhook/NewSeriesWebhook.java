@@ -1,7 +1,9 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.series.SeriesResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
@@ -29,6 +31,8 @@ public class NewSeriesWebhook {
     private ArrayList<SeriesResponse> newSeries;
     @XmlElement(name = "new_study")
     private StudyResponse newStudy;
+    @XmlElement(name = "report_provider")
+    private ReportProviderResponse reportProvider;
 
     private NewSeriesWebhook() { /*empty*/ }
 
@@ -55,5 +59,8 @@ public class NewSeriesWebhook {
         }
     }
 
-
+    public void setReportProvider(ReportProvider reportProvider) {
+        this.reportProvider = new ReportProviderResponse(reportProvider);
+        this.reportProvider.WebhookResponse();
+    }
 }
