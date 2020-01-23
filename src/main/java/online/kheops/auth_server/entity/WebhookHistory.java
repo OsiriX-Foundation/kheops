@@ -15,8 +15,16 @@ public class WebhookHistory {
     private long pk;
 
     @Basic(optional = false)
+    @Column(name = "id")
+    private String id;
+
+    @Basic(optional = false)
     @Column(name = "status")
     private long status;
+
+    @Basic(optional = false)
+    @Column(name = "attempt")
+    private long attempt;
 
     @Basic(optional = false)
     @Column(name = "time", updatable = false)
@@ -40,7 +48,10 @@ public class WebhookHistory {
 
     public WebhookHistory() {}
 
-    public WebhookHistory(Integer status, boolean isManualTrigger, WebhookTypes type, Webhook webhook) {
+    public WebhookHistory(String id, long attempt, Integer status, boolean isManualTrigger, WebhookTypes type, Webhook webhook) {
+
+        this.id = id;
+        this.attempt = attempt;
         this.status = status;
         this.time = time.now();
         this.isManualTrigger = isManualTrigger;
@@ -60,4 +71,6 @@ public class WebhookHistory {
     public Boolean getManualTrigger() { return isManualTrigger; }
     public Boolean getNewSeries() { return newSeries; }
     public Boolean getNewUser() { return newUser; }
+    public String getId() { return id; }
+    public long getAttempt() { return attempt; }
 }

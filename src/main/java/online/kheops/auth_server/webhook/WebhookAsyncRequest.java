@@ -23,12 +23,15 @@ public class WebhookAsyncRequest<T> {
     private Webhook webhook;
     private boolean isManualTrigger;
     private T data;
+    private String requestId;
 
     public WebhookAsyncRequest(Webhook webhook, T data, boolean isManualTrigger) {
 
         this.webhook = webhook;
         this.isManualTrigger = isManualTrigger;
         this.data = data;
+
+        this.requestId = new WebhookRequestId().getRequestId();
 
         request(NUMBER_OF_RETRY_WEBHOOK);
     }
@@ -57,12 +60,18 @@ public class WebhookAsyncRequest<T> {
             }
         }
 
-        Future<Response> f = builder.async()
+        Future<Response> f = builder
+                .header("X-Kheops-Delivery", requestId)
+                .async()
                 .post(entity, new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
     }
 
     public T getType() {
         return data;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     private static String bytesToHex(byte[] hash) {

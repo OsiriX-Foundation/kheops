@@ -9,6 +9,8 @@ import javax.persistence.EntityTransaction;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
 
+import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
+
 public class WebhooksCallbacks<T> implements InvocationCallback<Response> {
     private Webhook webhook;
     private boolean isManualTrigger;
@@ -46,7 +48,7 @@ public class WebhooksCallbacks<T> implements InvocationCallback<Response> {
                     webhookType = WebhookTypes.NEW_SERIES;
                 }
 
-                final WebhookHistory webhookHistory = new WebhookHistory(response.getStatus(), isManualTrigger, webhookType, webhook);
+                final WebhookHistory webhookHistory = new WebhookHistory(asyncRequest.getRequestId(), NUMBER_OF_RETRY_WEBHOOK - cnt, response.getStatus(), isManualTrigger, webhookType, webhook);
 
                 em.persist(webhookHistory);
                 tx.commit();
@@ -86,7 +88,7 @@ public class WebhooksCallbacks<T> implements InvocationCallback<Response> {
                     webhookType = WebhookTypes.NEW_SERIES;
                 }
 
-                final WebhookHistory webhookHistory = new WebhookHistory(-1, isManualTrigger, webhookType, webhook);
+                final WebhookHistory webhookHistory = new WebhookHistory(asyncRequest.getRequestId(), NUMBER_OF_RETRY_WEBHOOK - cnt,-1, isManualTrigger, webhookType, webhook);
 
                 em.persist(webhookHistory);
                 tx.commit();
