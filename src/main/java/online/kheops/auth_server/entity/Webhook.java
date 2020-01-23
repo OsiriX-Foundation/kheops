@@ -38,6 +38,10 @@ public class Webhook {
     @Column(name = "new_user")
     private Boolean newUser;
 
+    @Basic(optional = false)
+    @Column(name = "enable")
+    private Boolean enable;
+
     @ManyToOne
     @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
     private Album album;
@@ -57,7 +61,7 @@ public class Webhook {
 
     public Webhook() {}
 
-    public Webhook(String name, String url, Album album, User user, String secret, boolean newSeries, boolean newUser) {
+    public Webhook(String name, String url, Album album, User user, String secret, boolean newSeries, boolean newUser, boolean enable) {
         this.name = name;
         this.url = url;
         this.secret = secret;
@@ -65,6 +69,7 @@ public class Webhook {
         this.newUser = newUser;
         this.album = album;
         this.user = user;
+        this.enable = enable;
 
         album.addWebhook(this);
         user.addWebhook(this);
@@ -97,6 +102,8 @@ public class Webhook {
     public Boolean getNewUser() {
         return newUser;
     }
+
+    public Boolean isEnable() { return enable; }
 
     public Album getAlbum() {
         return album;
@@ -135,4 +142,6 @@ public class Webhook {
     public void setNewUser(Boolean newUser) {
         this.newUser = newUser;
     }
+
+    public void setEnable(Boolean enable) { this.enable = enable; }
 }

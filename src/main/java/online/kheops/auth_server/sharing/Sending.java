@@ -265,7 +265,7 @@ public class Sending {
                     .log();
 
             for (Webhook webhook : targetAlbum.getWebhooks()) {
-                if (webhook.getNewSeries()) {
+                if (webhook.getNewSeries() && webhook.isEnable()) {
                     new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
                 }
             }
@@ -339,7 +339,7 @@ public class Sending {
                     .log();
 
             for (Webhook webhook : targetAlbum.getWebhooks()) {
-                if (webhook.getNewSeries()) {
+                if (webhook.getNewSeries() && webhook.isEnable()) {
                     new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
                 }
             }

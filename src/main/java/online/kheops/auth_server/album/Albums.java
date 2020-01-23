@@ -278,7 +278,7 @@ public class Albums {
                 final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
                 final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                 for (Webhook webhook : album.getWebhooks()) {
-                    if (webhook.getNewUser()) {
+                    if (webhook.getNewUser() && webhook.isEnable()) {
                         new WebhookAsyncRequest(webhook, newUserWebhook, false);
                     }
                 }

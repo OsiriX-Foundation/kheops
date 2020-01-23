@@ -22,6 +22,8 @@ public class WebhookResponse {
     private boolean newSeries;
     @XmlElement(name = "new_user")
     private boolean newUser;
+    @XmlElement(name = "enable")
+    private boolean enable;
     @XmlElement(name = "last_history")
     private List<String> history;
     @XmlElement(name = "number_of_history")

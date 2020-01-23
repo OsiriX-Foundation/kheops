@@ -35,7 +35,7 @@ public class Webhooks {
         throw new IllegalStateException("Utility class");
     }
 
-    public static WebhookResponse createWebhook(String url, String albumId, User callingUser, String name, String secret, boolean newSeries, boolean newUser, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse createWebhook(String url, String albumId, User callingUser, String name, String secret, boolean newSeries, boolean newUser, boolean enable, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -48,7 +48,7 @@ public class Webhooks {
             callingUser = em.merge(callingUser);
 
             final Album album = getAlbum(albumId, em);
-            final Webhook newWebhook = new Webhook(name, url, album, callingUser, secret, newSeries, newUser);
+            final Webhook newWebhook = new Webhook(name, url, album, callingUser, secret, newSeries, newUser, enable);
 
             em.persist(newWebhook);
 
@@ -73,7 +73,7 @@ public class Webhooks {
         return webhookResponse;
     }
 
-    public static WebhookResponse editWebhook(String webhookId, String url, String albumId, User callingUser, String name, String secret, Boolean newSeries, Boolean newUser, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse editWebhook(String webhookId, String url, String albumId, User callingUser, String name, String secret, Boolean newSeries, Boolean newUser, Boolean enable, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -102,6 +102,9 @@ public class Webhooks {
             }
             if (newUser != null) {
                 webhook.setNewUser(newUser);
+            }
+            if (enable != null) {
+                webhook.setEnable(enable);
             }
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, EDIT_WEBHOOK);

@@ -57,7 +57,8 @@ public class WebhookResource {
                                @FormParam("name") String name,
                                @FormParam("secret") String secret,
                                @FormParam("new_series")@DefaultValue("false") boolean newSeries,
-                               @FormParam("new_user")@DefaultValue("false") boolean newUser)
+                               @FormParam("new_user")@DefaultValue("false") boolean newUser,
+                               @FormParam("enable")@DefaultValue("true") boolean enable)
             throws AlbumNotFoundException {
 
         name = name.trim();
@@ -79,7 +80,7 @@ public class WebhookResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final WebhookResponse webhookResponse = createWebhook(url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, kheopsPrincipal.getKheopsLogBuilder());
+        final WebhookResponse webhookResponse = createWebhook(url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, enable, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(CREATED).entity(webhookResponse).build();
     }
@@ -98,7 +99,9 @@ public class WebhookResource {
                                @FormParam("name") String name,
                                @FormParam("secret") String secret,
                                @FormParam("new_series") Boolean newSeries,
-                               @FormParam("new_user") Boolean newUser)
+                               @FormParam("new_user") Boolean newUser,
+                               @FormParam("enable") boolean enable)
+
             throws AlbumNotFoundException, WebhookNotFoundException {
 
         name = name.trim();
@@ -120,7 +123,7 @@ public class WebhookResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final WebhookResponse webhookResponse = editWebhook(webhookId, url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, kheopsPrincipal.getKheopsLogBuilder());
+        final WebhookResponse webhookResponse = editWebhook(webhookId, url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, enable, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(webhookResponse).build();
     }

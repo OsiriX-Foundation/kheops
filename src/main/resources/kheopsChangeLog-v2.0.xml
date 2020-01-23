@@ -48,6 +48,9 @@
             <column name="url" type="VARCHAR(1024)">
                 <constraints nullable="false"/>
             </column>
+            <column name="enable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
             <column name="user_fk" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
