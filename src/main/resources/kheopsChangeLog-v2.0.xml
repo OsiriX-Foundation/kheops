@@ -75,6 +75,9 @@
             <column autoIncrement="true" name="pk" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="webhooks_history_pk"/>
             </column>
+            <column name="id" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
             <column name="status" type="BIGINT"/>
             <column name="time" type="TIMESTAMP WITHOUT TIME ZONE">
                 <constraints nullable="false"/>
@@ -87,6 +90,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="new_user" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempt" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>

@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhooksHistory extends TableImpl<WebhooksHistoryRecord> {
 
-    private static final long serialVersionUID = -528858792;
+    private static final long serialVersionUID = -1479278961;
 
     /**
      * The reference instance of <code>public.webhooks_history</code>
@@ -60,6 +60,11 @@ public class WebhooksHistory extends TableImpl<WebhooksHistoryRecord> {
      * The column <code>public.webhooks_history.pk</code>.
      */
     public final TableField<WebhooksHistoryRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.webhooks_history.id</code>.
+     */
+    public final TableField<WebhooksHistoryRecord, String> ID = createField("id", org.jooq.impl.SQLDataType.VARCHAR(30).nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks_history.status</code>.
@@ -84,12 +89,17 @@ public class WebhooksHistory extends TableImpl<WebhooksHistoryRecord> {
     /**
      * The column <code>public.webhooks_history.new_series</code>.
      */
-    public final TableField<WebhooksHistoryRecord, Long> NEW_SERIES = createField("new_series", org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<WebhooksHistoryRecord, Boolean> NEW_SERIES = createField("new_series", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks_history.new_user</code>.
      */
-    public final TableField<WebhooksHistoryRecord, Long> NEW_USER = createField("new_user", org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<WebhooksHistoryRecord, Boolean> NEW_USER = createField("new_user", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
+     * The column <code>public.webhooks_history.attempt</code>.
+     */
+    public final TableField<WebhooksHistoryRecord, Long> ATTEMPT = createField("attempt", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.webhooks_history</code> table reference
