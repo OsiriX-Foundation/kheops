@@ -9,11 +9,11 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
-import java.lang.annotation.Annotation;
 import java.security.Key;
 import java.util.concurrent.Future;
 
 import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
+import static online.kheops.auth_server.util.HttpHeaders.*;
 
 public class WebhookAsyncRequest<T> {
 
@@ -48,20 +48,20 @@ public class WebhookAsyncRequest<T> {
         Invocation.Builder builder = CLIENT.target(webhook.getUrl()).request();
         if(webhook.useSecret()) {
             try {
-                final String donnee = "This class represents application/x-www-form-urlencoded";
                 final Mac m = Mac.getInstance("HmacSHA1");
                 final Key k = new SecretKeySpec(webhook.getSecret().getBytes(), "HmacSHA1");
                 m.init(k);
-                final byte[] b = m.doFinal(donnee.getBytes());
+                final byte[] b = m.doFinal(requestId.getBytes());
                 final String hash = bytesToHex(b);
-                builder.header("X-Kheops-Signature", hash);
+                builder.header(X_KHEOPS_SIGNATURE, hash);
             } catch (Exception e) {
 
             }
         }
 
         Future<Response> f = builder
-                .header("X-Kheops-Delivery", requestId)
+                .header(X_KHEOPS_DELIVERY, requestId)
+                .header(X_KHEOPS_ATTEMPT, NUMBER_OF_RETRY_WEBHOOK - cnt + 1 + "/" + NUMBER_OF_RETRY_WEBHOOK)
                 .async()
                 .post(entity, new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
     }

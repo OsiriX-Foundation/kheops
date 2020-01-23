@@ -18,7 +18,7 @@ public class WebhookHistoryResponse {
     @XmlElement(name = "type")
     private String type;
 
-    
+
     private WebhookHistoryResponse() { /*Empty*/ }
 
     public WebhookHistoryResponse(WebhookHistory webhookHistory) {

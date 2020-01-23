@@ -8,5 +8,8 @@ public abstract class HttpHeaders {
     public static final String X_AUTHORIZATION_SOURCE = "X-Authorization-Source";
     public static final String X_FORWARDED_FOR = "X-Forwarded-For";
     public static final String X_LINK_AUTHORIZATION = "X-Link-Authorization";
+    public static final String X_KHEOPS_SIGNATURE = "X-Kheops-Signature";
+    public static final String X_KHEOPS_DELIVERY = "X-Kheops-Delivery";
+    public static final String X_KHEOPS_ATTEMPT = "X-Kheops-Attempt";
 
 }

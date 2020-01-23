@@ -23,6 +23,5 @@ public class SeriesResponse {
         this.numberOfSeriesRelatedInstance = series.getNumberOfSeriesRelatedInstances();
         this.seriesDescription = series.getSeriesDescription();
         this.seriesUid = series.getSeriesInstanceUID();
-
     }
 }
