@@ -41,6 +41,7 @@ public class WebhookResponse {
         this.useSecret = webhook.useSecret();
         this.newSeries = webhook.getNewSeries();
         this.newUser = webhook.getNewUser();
+        this.enable = webhook.isEnable();
         this.numberOfHistory = webhook.getWebhookHistory().size();
 
         history = new ArrayList<>();
