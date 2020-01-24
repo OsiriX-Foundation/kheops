@@ -63,7 +63,7 @@ public class WebhookAsyncRequest<T> {
                 .header(X_KHEOPS_DELIVERY, requestId)
                 .header(X_KHEOPS_ATTEMPT, NUMBER_OF_RETRY_WEBHOOK - cnt + 1 + "/" + NUMBER_OF_RETRY_WEBHOOK)
                 .async()
-                .post(entity, new WebhooksCallbacks<T>(webhook, isManualTrigger, cnt, this));
+                .post(entity, new WebhooksCallbacks(webhook, isManualTrigger, cnt, this));
     }
 
     public T getType() {

@@ -27,7 +27,7 @@ public class ReportProviderResponse {
         createdTime = reportProvider.getCreationTime();
     }
 
-    public void WebhookResponse() {
+    public void webhookResponse() {
         url = null;
         createdTime = null;
     }

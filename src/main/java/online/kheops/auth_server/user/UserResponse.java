@@ -1,7 +1,6 @@
 package online.kheops.auth_server.user;
 
 import online.kheops.auth_server.entity.AlbumUser;
-import online.kheops.auth_server.entity.User;
 
 import javax.xml.bind.annotation.XmlElement;
 

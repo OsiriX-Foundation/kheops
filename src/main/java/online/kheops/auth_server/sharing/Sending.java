@@ -15,7 +15,6 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.NewSeriesWebhook;
-import online.kheops.auth_server.webhook.NewUserWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
 
 import javax.persistence.EntityManager;

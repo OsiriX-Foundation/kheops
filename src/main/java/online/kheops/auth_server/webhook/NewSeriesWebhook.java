@@ -61,6 +61,6 @@ public class NewSeriesWebhook {
 
     public void setReportProvider(ReportProvider reportProvider) {
         this.reportProvider = new ReportProviderResponse(reportProvider);
-        this.reportProvider.WebhookResponse();
+        this.reportProvider.webhookResponse();
     }
 }

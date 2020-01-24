@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 
 import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
 
-public class WebhooksCallbacks<T> implements InvocationCallback<Response> {
+public class WebhooksCallbacks implements InvocationCallback<Response> {
     private Webhook webhook;
     private boolean isManualTrigger;
     private int cnt;
