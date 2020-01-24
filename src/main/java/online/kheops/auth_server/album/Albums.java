@@ -321,7 +321,7 @@ public class Albums {
                         }
                     }
                 }
-                
+
                 final Events.MutationType mutationType;
 
                 if (callingUser.getPk() == removedUser.getPk()) {
