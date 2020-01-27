@@ -39,14 +39,7 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
                 webhook = em.merge(webhook);
 
-                final WebhookTypes webhookType;
-                if (asyncRequest.getType() instanceof NewUserWebhook) {
-                    webhookType = WebhookTypes.NEW_USER;
-                } else if (asyncRequest.getType() instanceof NewSeriesWebhook) {
-                    webhookType = WebhookTypes.NEW_SERIES;
-                } else {
-                    webhookType = WebhookTypes.NEW_SERIES;
-                }
+                final WebhookTypes webhookType = setWebhookType();
 
                 final WebhookHistory webhookHistory = new WebhookHistory(asyncRequest.getRequestId(), NUMBER_OF_RETRY_WEBHOOK - cnt, response.getStatus(), isManualTrigger, webhookType, webhook);
 
@@ -79,14 +72,7 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
                 webhook = em.merge(webhook);
 
-                final WebhookTypes webhookType;
-                if (asyncRequest.getType() instanceof NewUserWebhook) {
-                    webhookType = WebhookTypes.NEW_USER;
-                } else if (asyncRequest.getType() instanceof NewSeriesWebhook) {
-                    webhookType = WebhookTypes.NEW_SERIES;
-                } else {
-                    webhookType = WebhookTypes.NEW_SERIES;
-                }
+                final WebhookTypes webhookType = setWebhookType();
 
                 final WebhookHistory webhookHistory = new WebhookHistory(asyncRequest.getRequestId(), NUMBER_OF_RETRY_WEBHOOK - cnt,-1, isManualTrigger, webhookType, webhook);
 
@@ -103,6 +89,15 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
         } else {
             asyncRequest.retry(cnt);
         }
+    }
 
+    private WebhookTypes setWebhookType() {
+        if (asyncRequest.getType() instanceof NewUserWebhook) {
+            return  WebhookTypes.NEW_USER;
+        } else if (asyncRequest.getType() instanceof NewSeriesWebhook) {
+            return  WebhookTypes.NEW_SERIES;
+        } else {
+            return WebhookTypes.NEW_SERIES;
+        }
     }
 }

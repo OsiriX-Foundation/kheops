@@ -61,6 +61,7 @@ public class Consts {
         public static final int ALBUM_NAME = 255;
         public static final int WEBHOOK_NAME = 255;
         public static final int WEBHOOK_URL = 1024;
+        public static final int WEBHOOK_SECRET = 1024;
         public static final int ALBUM_DESCRIPTION = 2048;
         public static final int COMMENT = 1024;
         public static final int CAPABILITY_DESCRIPTION = 255;

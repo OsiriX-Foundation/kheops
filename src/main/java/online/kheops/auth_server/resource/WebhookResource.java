@@ -78,6 +78,16 @@ public class WebhookResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
+        if (secret != null) {
+            if (secret.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET) {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("Param 'secret' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET + " characters but got :" + secret.length())
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
+            }
+        }
+
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         final WebhookResponse webhookResponse = createWebhook(url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, enable, kheopsPrincipal.getKheopsLogBuilder());
