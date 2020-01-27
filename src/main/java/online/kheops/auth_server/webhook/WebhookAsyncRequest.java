@@ -48,8 +48,8 @@ public class WebhookAsyncRequest<T> {
         Invocation.Builder builder = CLIENT.target(webhook.getUrl()).request();
         if(webhook.useSecret()) {
             try {
-                final Mac m = Mac.getInstance("HmacSHA1");
-                final Key k = new SecretKeySpec(webhook.getSecret().getBytes(), "HmacSHA1");
+                final Mac m = Mac.getInstance("HmacSHA256");
+                final Key k = new SecretKeySpec(webhook.getSecret().getBytes(), "HmacSHA256");
                 m.init(k);
                 final byte[] b = m.doFinal(requestId.getBytes());
                 final String hash = bytesToHex(b);
