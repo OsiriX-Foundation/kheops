@@ -68,13 +68,15 @@
         <div
           :class="['dropzone-area', classDragIn]"
         >
-          <list
-            ref="list"
-            :permissions="permissions"
-            :album-i-d="albumID"
-            @loadfiles="inputLoadFiles"
-            @loaddirectories="inputLoadFiles"
-          />
+          <slot name="dropzone-content">
+            <list
+              ref="list"
+              :permissions="permissions"
+              :album-i-d="albumID"
+              @loadfiles="inputLoadFiles"
+              @loaddirectories="inputLoadFiles"
+            />
+          </slot>
         </div>
       </div>
     </form>
