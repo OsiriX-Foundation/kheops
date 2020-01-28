@@ -7,7 +7,6 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
@@ -31,7 +30,6 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.getSeries;
-import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.util.Consts.*;
 
 @Path("/")
