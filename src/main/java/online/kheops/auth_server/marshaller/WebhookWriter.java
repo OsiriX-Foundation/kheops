@@ -45,7 +45,6 @@ public class WebhookWriter implements MessageBodyWriter<SignedEntity> {
 
         try(final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             messageBodyWriter.writeTo(signedEntity.getEntity(), webhookEntityClass, webhookEntityClass, annotations, mediaType, httpHeaders, byteArrayOutputStream);
-            byteArrayOutputStream.close();
 
             try {
                 final Mac m = Mac.getInstance("HmacSHA256");
