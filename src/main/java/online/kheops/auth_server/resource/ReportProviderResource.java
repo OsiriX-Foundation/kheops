@@ -315,7 +315,7 @@ public class ReportProviderResource {
 
         pair = ReportProviders.getReportProviders(albumId, limit, offset, ((KheopsPrincipal)securityContext.getUserPrincipal()).getKheopsLogBuilder());
 
-        final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<List<ReportProviderResponse>>(pair.getAttributesList()) {};
+        final GenericEntity<List<ReportProviderResponse>> genericReportProvidersResponsesList = new GenericEntity<>(pair.getAttributesList()) {};
         return  Response.status(OK).entity(genericReportProvidersResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 

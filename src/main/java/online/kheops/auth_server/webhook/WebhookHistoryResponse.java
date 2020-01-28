@@ -28,9 +28,9 @@ public class WebhookHistoryResponse {
         this.status = webhookHistory.getStatus();
         this.isManualTrigger = webhookHistory.getManualTrigger();
         if(webhookHistory.getNewSeries()) {
-            type = WebhookTypes.NEW_SERIES.name();
+            type = WebhookType.NEW_SERIES.name();
         } else if(webhookHistory.getNewUser()) {
-            type = WebhookTypes.NEW_USER.name();
+            type = WebhookType.NEW_USER.name();
         }
     }
 }

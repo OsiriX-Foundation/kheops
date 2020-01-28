@@ -6,7 +6,7 @@ import online.kheops.auth_server.user.UserResponse;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 
-public class NewUserWebhook {
+public class NewUserWebhook implements WebhookResult {
 
     @XmlElement(name = "host")
     private String instance;
@@ -30,10 +30,15 @@ public class NewUserWebhook {
     public NewUserWebhook(String albumId, AlbumUser sourceUser, AlbumUser newUser, String instance, boolean isManualTrigger) {
         this.instance = instance;
         this.albumId = albumId;
-        this.eventType = WebhookTypes.NEW_USER.name();
+        this.eventType = WebhookType.NEW_USER.name();
         this.eventTime = eventTime.now();
         this.newUser = new UserResponse(newUser);
         this.sourceUser = new UserResponse(sourceUser);
         this.isManualTrigger = isManualTrigger;
+    }
+
+    @Override
+    public WebhookType getType() {
+        return WebhookType.NEW_USER;
     }
 }

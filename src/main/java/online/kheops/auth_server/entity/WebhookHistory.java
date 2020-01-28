@@ -1,6 +1,6 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.webhook.WebhookTypes;
+import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -48,7 +48,7 @@ public class WebhookHistory {
 
     public WebhookHistory() {}
 
-    public WebhookHistory(String id, long attempt, Integer status, boolean isManualTrigger, WebhookTypes type, Webhook webhook) {
+    public WebhookHistory(String id, long attempt, Integer status, boolean isManualTrigger, WebhookType type, Webhook webhook) {
 
         this.id = id;
         this.attempt = attempt;
@@ -57,10 +57,10 @@ public class WebhookHistory {
         this.isManualTrigger = isManualTrigger;
         this.webhook = webhook;
         webhook.addWebhookHistory(this);
-        if(type.equals(WebhookTypes.NEW_USER)) {
+        if(type.equals(WebhookType.NEW_USER)) {
             this.newUser = true;
             this.newSeries = false;
-        } else if (type.equals(WebhookTypes.NEW_SERIES)) {
+        } else if (type.equals(WebhookType.NEW_SERIES)) {
             this.newUser = false;
             this.newSeries = true;
         }

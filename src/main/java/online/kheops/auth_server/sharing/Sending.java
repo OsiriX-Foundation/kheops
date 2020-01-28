@@ -263,9 +263,11 @@ public class Sending {
                     .series(seriesInstanceUID)
                     .log();
 
-            for (Webhook webhook : targetAlbum.getWebhooks()) {
-                if (webhook.getNewSeries() && webhook.isEnable()) {
-                    new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+            if(availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
+                for (Webhook webhook : targetAlbum.getWebhooks()) {
+                    if (webhook.getNewSeries() && webhook.isEnable()) {
+                        new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                    }
                 }
             }
         } finally {
@@ -299,7 +301,9 @@ public class Sending {
                     targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
-                    newSeriesWebhook.addSeries(series);
+                    if(series.isPopulated() && series.getStudy().isPopulated()) {
+                        newSeriesWebhook.addSeries(series);
+                    }
                 }
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
@@ -337,9 +341,11 @@ public class Sending {
                     .study(studyInstanceUID)
                     .log();
 
-            for (Webhook webhook : targetAlbum.getWebhooks()) {
-                if (webhook.getNewSeries() && webhook.isEnable()) {
-                    new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+            if(newSeriesWebhook.containSeries()) {
+                for (Webhook webhook : targetAlbum.getWebhooks()) {
+                    if (webhook.getNewSeries() && webhook.isEnable()) {
+                        new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                    }
                 }
             }
         } finally {

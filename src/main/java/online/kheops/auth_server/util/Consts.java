@@ -30,6 +30,7 @@ public class Consts {
     }
 
     public static final int NUMBER_OF_RETRY_WEBHOOK = 5;
+    public static final int SECONDE_BEFORE_RETRY_WEBHOOK = 5;
 
     public static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 

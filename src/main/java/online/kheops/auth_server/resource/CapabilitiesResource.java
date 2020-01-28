@@ -188,7 +188,7 @@ public class CapabilitiesResource {
 
         kheopsLogBuilder.action(ActionType.GET_CAPABILITIES)
                 .log();
-        GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(pair.getAttributesList()) {};
+        GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<>(pair.getAttributesList()) {};
         return Response.status(OK).entity(genericCapabilityResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 

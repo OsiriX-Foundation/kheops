@@ -183,7 +183,7 @@ public class WebhookResource {
                 .album(albumId)
                 .log();
 
-        final GenericEntity<List<WebhookResponse>> genericWebhookResponsesList = new GenericEntity<List<WebhookResponse>>(pairWebhooksTotalWebhook.getAttributesList()) {};
+        final GenericEntity<List<WebhookResponse>> genericWebhookResponsesList = new GenericEntity<>(pairWebhooksTotalWebhook.getAttributesList()) {};
         return Response.status(OK).entity(genericWebhookResponsesList)
                 .header(X_TOTAL_COUNT, pairWebhooksTotalWebhook.getXTotalCount())
                 .build();

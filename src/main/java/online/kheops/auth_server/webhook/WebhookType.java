@@ -1,5 +1,5 @@
 package online.kheops.auth_server.webhook;
 
-public enum WebhookTypes {
+public enum WebhookType {
     NEW_USER, NEW_SERIES;
 }

@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class NewSeriesWebhook {
+public class NewSeriesWebhook implements WebhookResult{
 
     @XmlElement(name = "host")
     private String instance;
@@ -45,7 +45,7 @@ public class NewSeriesWebhook {
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, String instance, boolean isManualTrigger) {
         this.instance = instance;
         this.albumId = albumId;
-        this.eventType = WebhookTypes.NEW_SERIES.name();
+        this.eventType = WebhookType.NEW_SERIES.name();
         this.eventTime = eventTime.now();
         this.sourceUser = new UserResponse(sourceUser);
         this.isManualTrigger = isManualTrigger;
@@ -62,5 +62,14 @@ public class NewSeriesWebhook {
     public void setReportProvider(ReportProvider reportProvider) {
         this.reportProvider = new ReportProviderResponse(reportProvider);
         this.reportProvider.webhookResponse();
+    }
+
+    public boolean containSeries() {
+        return !newSeries.isEmpty();
+    }
+
+    @Override
+    public WebhookType getType() {
+        return WebhookType.NEW_SERIES;
     }
 }
