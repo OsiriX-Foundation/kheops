@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.Secured;
@@ -59,7 +60,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
                                @FormParam("album") String albumId)
-            throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException, NotAlbumScopeTypeException {
         Fetcher.fetchStudy(studyInstanceUID);
         ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .study(studyInstanceUID)
@@ -69,45 +70,54 @@ public class FetchResource {
 
 
 
+
+
+
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
+        if(albumId != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            if (albumId != null && !kheopsPrincipal.getAlbumID().equals(albumId)) {
+                
+                final EntityManager em = EntityManagerListener.createEntityManager();
+                final EntityTransaction tx = em.getTransaction();
 
-        try {
-            tx.begin();
+                try {
+                    tx.begin();
 
-            final User callingUser = em.merge(kheopsPrincipal.getUser());
-            final Album targetAlbum = getAlbum(albumId, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-            final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-            final Study study = series.getStudy();
+                    final User callingUser = em.merge(kheopsPrincipal.getUser());
+                    final Album targetAlbum = getAlbum(albumId, em);
+                    final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
+                    final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+                    final Study study = series.getStudy();
 
-            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),false);
+                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, series, context.getInitParameter(HOST_ROOT_PARAMETER), false);
 
-            if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                newSeriesWebhook.setCapabilityToken(capability);
-            } else if(kheopsPrincipal.getClientId().isPresent()) {
-                ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
-                newSeriesWebhook.setReportProvider(reportProvider);
-            }
-
-            tx.commit();
-
-            if(series.isPopulated() && study.isPopulated()) {
-                for (Webhook webhook : targetAlbum.getWebhooks()) {
-                    if (webhook.getNewSeries() && webhook.isEnable()) {
-                        new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                    if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                        final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
+                        newSeriesWebhook.setCapabilityToken(capability);
+                    } else if (kheopsPrincipal.getClientId().isPresent()) {
+                        ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
+                        newSeriesWebhook.setReportProvider(reportProvider);
                     }
+
+                    tx.commit();
+
+                    if (series.isPopulated() && study.isPopulated()) {
+                        for (Webhook webhook : targetAlbum.getWebhooks()) {
+                            if (webhook.getNewSeries() && webhook.isEnable()) {
+                                new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                            }
+                        }
+                    }
+                } finally {
+                    if (tx.isActive()) {
+                        tx.rollback();
+                    }
+                    em.close();
                 }
             }
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
         }
+
 
 
 
