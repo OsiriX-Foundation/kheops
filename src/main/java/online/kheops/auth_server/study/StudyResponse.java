@@ -35,7 +35,7 @@ public class StudyResponse {
     }
 
     public void addSeries(Series series) {
-        if(series == null) {
+        if(this.series == null) {
             this.series = new ArrayList<>();
         }
         this.series.add(new SeriesResponse(series));
