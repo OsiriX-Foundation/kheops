@@ -1,8 +1,11 @@
 package online.kheops.auth_server.study;
 
+import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
+import online.kheops.auth_server.series.SeriesResponse;
 
 import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
 
 public class StudyResponse {
 
@@ -17,6 +20,9 @@ public class StudyResponse {
     @XmlElement(name = "patient_ID")
     private String patientID;
 
+    @XmlElement(name = "series")
+    private ArrayList<SeriesResponse> series;
+
 
     private StudyResponse() { /*empty*/ }
 
@@ -26,5 +32,20 @@ public class StudyResponse {
         this.studyDate = study.getStudyDate();
         this.studyDescription = study.getStudyDescription();
         this.patientID = study.getPatientID();
+    }
+
+    public void addSeries(Series series) {
+        if(series == null) {
+            this.series = new ArrayList<>();
+        }
+        this.series.add(new SeriesResponse(series));
+    }
+
+    public boolean containSeries() {
+        if (series == null) {
+            return false;
+        } else {
+            return !series.isEmpty();
+        }
     }
 }

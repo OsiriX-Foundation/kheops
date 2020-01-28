@@ -88,6 +88,10 @@ public class CapabilitiesResponse {
         ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(this, capability);
     }
 
+    public CapabilitiesResponse(Capability capability) {
+        id = capability.getId();
+    }
+
     public void setScopeType(String scopeType) { this.scopeType = scopeType; }
     public void setReadPermission(Boolean readPermission) { this.readPermission = readPermission; }
     public void setWritePermission(Boolean writePermission) { this.writePermission = writePermission; }
