@@ -19,13 +19,14 @@ import online.kheops.auth_server.webhook.WebhookAsyncRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
@@ -56,17 +57,21 @@ public class FetchResource {
 
     @POST
     @Secured
-    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/fetch")
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                               @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
+                               @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDs,
                                @FormParam("album") String albumId)
             throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException, NotAlbumScopeTypeException {
         Fetcher.fetchStudy(studyInstanceUID);
-        ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                .study(studyInstanceUID)
-                .series(seriesInstanceUID)
-                .action(ActionType.FETCH)
-                .log();
+        for (String seriesInstanceUID: seriesInstanceUIDs) {
+            ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .action(ActionType.FETCH)
+                    .log();
+        }
+
 
 
 
@@ -77,7 +82,7 @@ public class FetchResource {
 
         if(albumId != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             if (albumId != null && !kheopsPrincipal.getAlbumID().equals(albumId)) {
-                
+
                 final EntityManager em = EntityManagerListener.createEntityManager();
                 final EntityTransaction tx = em.getTransaction();
 
@@ -87,10 +92,19 @@ public class FetchResource {
                     final User callingUser = em.merge(kheopsPrincipal.getUser());
                     final Album targetAlbum = getAlbum(albumId, em);
                     final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-                    final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-                    final Study study = series.getStudy();
+                    final List<Series> seriesList = new ArrayList<>();
+                    for (String seriesInstanceUID: seriesInstanceUIDs) {
+                        seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
+                    }
+                    final Study study = seriesList.get(0).getStudy();
 
-                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, series, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+
+                    for (Series series: seriesList){
+                        if (series.isPopulated()) {
+                            newSeriesWebhook.addSeries(series);
+                        }
+                    }
 
                     if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                         final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
@@ -102,7 +116,7 @@ public class FetchResource {
 
                     tx.commit();
 
-                    if (series.isPopulated() && study.isPopulated()) {
+                    if (study.isPopulated() && newSeriesWebhook.containSeries()) {
                         for (Webhook webhook : targetAlbum.getWebhooks()) {
                             if (webhook.getNewSeries() && webhook.isEnable()) {
                                 new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
