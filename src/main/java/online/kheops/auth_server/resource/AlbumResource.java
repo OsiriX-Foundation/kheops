@@ -123,7 +123,7 @@ public class AlbumResource {
             return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
         }
 
-        final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<>(pairAlbumsTotalAlbum.getAttributesList()) {};
+        final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder()
                 .action(ActionType.LIST_ALBUMS)
                 .log();
@@ -290,7 +290,7 @@ public class AlbumResource {
 
         pair = Albums.getUsers(albumId, limit, offset);
 
-        final GenericEntity<List<UserResponse>> genericUsersAlbumResponsesList = new GenericEntity<>(pair.getAttributesList()) {};
+        final GenericEntity<List<UserResponse>> genericUsersAlbumResponsesList = new GenericEntity<List<UserResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.LIST_USERS)

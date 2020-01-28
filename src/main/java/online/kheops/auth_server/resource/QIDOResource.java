@@ -121,7 +121,7 @@ public class QIDOResource {
                     .build();
         }
 
-        GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<>(pair.getAttributesList()) {};
+        GenericEntity<List<Attributes>> genericAttributesList = new GenericEntity<List<Attributes>>(pair.getAttributesList()) {};
         Response.ResponseBuilder response = Response.ok(genericAttributesList)
                 .header(X_TOTAL_COUNT, pair.getXTotalCount());
 
@@ -329,7 +329,7 @@ public class QIDOResource {
 
         availableSeries.sort(sortComparator);
 
-        GenericEntity<List<Attributes>> genericAvailableSeries = new GenericEntity<>(availableSeries) {};
+        GenericEntity<List<Attributes>> genericAvailableSeries = new GenericEntity<List<Attributes>>(availableSeries) {};
 
         Response.ResponseBuilder responseBuilder = Response.ok(genericAvailableSeries)
                 .header(X_TOTAL_COUNT, totalAvailableSeries);

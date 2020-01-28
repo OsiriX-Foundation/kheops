@@ -128,7 +128,7 @@ public class UserResource {
                     return Response.status(NO_CONTENT).build();
                 }
 
-                final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<>(result) {};
+                final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<List<UserResponse>>(result) {};
                 return Response.status(OK).entity(genericUsersResponsesList).build();
             } catch (KeycloakException e) {
                 LOG.log(Level.WARNING, "Keycloak error", e);

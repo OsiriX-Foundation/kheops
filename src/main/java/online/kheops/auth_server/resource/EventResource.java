@@ -82,7 +82,7 @@ public class EventResource {
             kheopsLogBuilder.events("comments_mutations");
         }
 
-        final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<>(pair.getAttributesList()) {};
+        final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         kheopsLogBuilder.album(albumId)
                 .action(KheopsLogBuilder.ActionType.LIST_EVENTS)
                 .log();
@@ -144,7 +144,7 @@ public class EventResource {
         final PairListXTotalCount<EventResponse> pair;
         pair = Events.getCommentsByStudyUID(kheopsPrincipal.getUser(), studyInstanceUID, offset, limit);
 
-        final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<>(pair.getAttributesList()) {};
+        final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)
                 .action(KheopsLogBuilder.ActionType.LIST_EVENTS)
                 .log();
