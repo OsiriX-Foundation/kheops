@@ -288,39 +288,47 @@ export default {
     openViewer(viewer) {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       const sourceQuery = this.getSourceQueries();
-      const openWindow = {};
-      const openWSI = this.study.ModalitiesInStudy !== undefined
-        && this.study.ModalitiesInStudy.Value.length === 1
-        && this.study.ModalitiesInStudy.Value[0] === 'SM'
-        && process.env.VUE_APP_URL_VIEWER_SM !== undefined
-        && process.env.VUE_APP_URL_VIEWER_SM.length > 0;
-      if (viewer === 'default' && openWSI === false) {
-        openWindow.ohif = window.open('', `OHIFViewer-${StudyInstanceUID}`);
-      } else if (viewer === 'default' && openWSI === true) {
-        openWindow.wsi = window.open('', `WSIViewer-${StudyInstanceUID}`);
-      }
+      const openWindow = this.setWindowsProps(viewer, StudyInstanceUID);
       const token = this.currentuserAccessToken();
+
       this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;
         let url = '';
         if (viewer === 'Osirix') {
           url = this.openOsiriX(StudyInstanceUID, viewerToken);
           window.open(url, '_self');
+        } else if (viewer === 'Weasis') {
+          url = this.openWeasis(StudyInstanceUID, viewerToken);
+          window.open(url, '_self');
+        } else if (viewer === 'Slicer') {
+          url = this.openSlicer(StudyInstanceUID, viewerToken);
+          window.open(url, '_self');
         } else if (viewer === 'default' && openWindow.ohif !== undefined) {
           url = this.openOhif(StudyInstanceUID, viewerToken);
           openWindow.ohif.location.href = url;
         } else if (viewer === 'default' && openWindow.wsi !== undefined) {
           openWindow.wsi.location.href = this.openWSI(StudyInstanceUID, viewerToken, sourceQuery);
-        } else if (viewer === 'Weasis') {
-          url = this.openWeasis(StudyInstanceUID, res.data.access_token);
-          window.open(url, '_self');
-        } else if (viewer === 'Slicer') {
-          url = this.openSlicer(StudyInstanceUID, res.data.access_token);
-          window.open(url, '_self');
         }
       }).catch((err) => {
         console.log(err);
       });
+    },
+    setWindowsProps(viewer, StudyInstanceUID) {
+      const openWSI = this.mustOpenWSI();
+      const openWindow = {};
+      if (viewer === 'default' && openWSI === false) {
+        openWindow.ohif = window.open('', `OHIFViewer-${StudyInstanceUID}`);
+      } else if (viewer === 'default' && openWSI === true) {
+        openWindow.wsi = window.open('', `WSIViewer-${StudyInstanceUID}`);
+      }
+      return openWindow;
+    },
+    mustOpenWSI() {
+      return (this.study.ModalitiesInStudy !== undefined
+        && this.study.ModalitiesInStudy.Value.length === 1
+        && this.study.ModalitiesInStudy.Value[0] === 'SM'
+        && process.env.VUE_APP_URL_VIEWER_SM !== undefined
+        && process.env.VUE_APP_URL_VIEWER_SM.length > 0);
     },
     showComments(study, flagView) {
       const params = {
