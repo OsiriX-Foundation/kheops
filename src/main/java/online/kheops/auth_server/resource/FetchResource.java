@@ -95,7 +95,7 @@ public class FetchResource {
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
         if(albumId != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            if (albumId != null && kheopsPrincipal.getAlbumID().compareTo(albumId) == 0) {
+            if (albumId != null && kheopsPrincipal.getScope() == ScopeType.ALBUM && kheopsPrincipal.getAlbumID().compareTo(albumId) == 0) {
 
                 final EntityManager em = EntityManagerListener.createEntityManager();
                 final EntityTransaction tx = em.getTransaction();
