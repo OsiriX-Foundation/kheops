@@ -138,6 +138,7 @@ public class FetchResource {
                 final Study study = seriesList.get(0).getStudy();
 
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                newSeriesWebhook.setFetch(true);
 
                 for (Series series: seriesList){
                     if (series.isPopulated()) {

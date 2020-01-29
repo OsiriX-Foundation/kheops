@@ -26,6 +26,8 @@ public class NewSeriesWebhook implements WebhookResult{
     private UserResponse sourceUser;
     @XmlElement(name = "is_manual_trigger")
     private boolean isManualTrigger;
+    @XmlElement(name = "is_fetch")
+    private boolean isFetch;
 
     @XmlElement(name = "updated_study")
     private StudyResponse updatedStudy;
@@ -40,6 +42,7 @@ public class NewSeriesWebhook implements WebhookResult{
         this(albumId, sourceUser, instance, isManualTrigger);
         updatedStudy = new StudyResponse(series.getStudy());
         updatedStudy.addSeries(series);
+        isFetch = false;
     }
 
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, String instance, boolean isManualTrigger) {
@@ -49,6 +52,7 @@ public class NewSeriesWebhook implements WebhookResult{
         this.eventTime = eventTime.now();
         this.sourceUser = new UserResponse(sourceUser);
         this.isManualTrigger = isManualTrigger;
+        isFetch = false;
 
     }
 
@@ -70,6 +74,10 @@ public class NewSeriesWebhook implements WebhookResult{
 
     public boolean containSeries() {
         return updatedStudy.containSeries();
+    }
+
+    public void setFetch(boolean fetch) {
+        isFetch = fetch;
     }
 
     @Override
