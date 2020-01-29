@@ -242,7 +242,12 @@ export default {
         } else if (windowProps.id === 'WSI') {
           url = this.openWSI(this.studyInstanceUID, viewerToken);
         } else if (windowProps.id === 'OHIF') {
-          url = this.openOhif(this.studyInstanceUID, viewerToken);
+          const queryparams = {
+            url: `${process.env.VUE_APP_URL_API}/link/${viewerToken}/ohifservermetadata`,
+            studyInstanceUids: this.studyInstanceUID,
+            serieInstanceUids: this.seriesInstanceUID,
+          };
+          url = this.openOhif(queryparams);
         }
         openWindow.location.href = url;
       }).catch((err) => {

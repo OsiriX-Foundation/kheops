@@ -304,7 +304,11 @@ export default {
           url = this.openSlicer(StudyInstanceUID, viewerToken);
           window.open(url, '_self');
         } else if (viewer === 'default' && openWindow.ohif !== undefined) {
-          url = this.openOhif(StudyInstanceUID, viewerToken);
+          const queryparams = {
+            url: `${process.env.VUE_APP_URL_API}/link/${viewerToken}/ohifservermetadata`,
+            studyInstanceUids: StudyInstanceUID,
+          };
+          url = this.openOhif(queryparams);
           openWindow.ohif.location.href = url;
         } else if (viewer === 'default' && openWindow.wsi !== undefined) {
           openWindow.wsi.location.href = this.openWSI(StudyInstanceUID, viewerToken, sourceQuery);
