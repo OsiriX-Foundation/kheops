@@ -12,6 +12,7 @@ import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.NewSeriesWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
@@ -28,11 +29,13 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.util.Consts.*;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
 
 @Path("/")
 public class FetchResource {
@@ -60,11 +63,11 @@ public class FetchResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/fetch")
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                               @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDs,
+                               @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumId)
             throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException, NotAlbumScopeTypeException {
         Fetcher.fetchStudy(studyInstanceUID);
-        for (String seriesInstanceUID: seriesInstanceUIDs) {
+        for (String seriesInstanceUID: seriesInstanceUIDList) {
             ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID)
@@ -73,6 +76,17 @@ public class FetchResource {
         }
 
 
+
+
+
+
+        if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("'" + SeriesInstanceUID + "' formparam is empty")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
 
 
 
@@ -93,7 +107,7 @@ public class FetchResource {
                     final Album targetAlbum = getAlbum(albumId, em);
                     final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
                     final List<Series> seriesList = new ArrayList<>();
-                    for (String seriesInstanceUID: seriesInstanceUIDs) {
+                    for (String seriesInstanceUID: seriesInstanceUIDList) {
                         seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
                     }
                     final Study study = seriesList.get(0).getStudy();
