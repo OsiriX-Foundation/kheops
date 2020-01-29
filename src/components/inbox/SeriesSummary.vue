@@ -254,7 +254,7 @@ export default {
         const queryparams = {
           url: `${process.env.VUE_APP_URL_API}/link/${viewerToken}/ohifservermetadata`,
           studyInstanceUids: this.studyInstanceUID,
-          serieInstanceUids: this.seriesInstanceUID,
+          seriesInstanceUids: this.seriesInstanceUID,
         };
         url = this.openOhif(queryparams);
       }
