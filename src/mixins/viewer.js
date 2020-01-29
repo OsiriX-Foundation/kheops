@@ -25,9 +25,9 @@ export const Viewer = {
 
       return `slicer://viewer${queryparams}`
     },
-    openOhif(queryparams) {
-      const queryparamsString = httpoperations.getQueriesParameters(queryparams);
-      return `${process.env.VUE_APP_URL_VIEWER}/viewer${queryparamsString}`;
+    openOhif(StudyInstanceUID, token) {
+      const url = `${process.env.VUE_APP_URL_API}/link/${token}/ohifservermetadata`;
+      return `${process.env.VUE_APP_URL_VIEWER}/viewer/?url=${encodeURIComponent(url)}&studyInstanceUids=${encodeURIComponent(StudyInstanceUID)}`;
     },
     openWSI(StudyInstanceUID, token) {
       const url = `${process.env.VUE_APP_URL_API}`
