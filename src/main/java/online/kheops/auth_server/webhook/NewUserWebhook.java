@@ -12,8 +12,6 @@ public class NewUserWebhook implements WebhookResult {
     private String instance;
     @XmlElement(name = "album_id")
     private String albumId;
-    @XmlElement(name = "event_type")
-    private String eventType;
     @XmlElement(name = "event_time")
     private LocalDateTime eventTime;
     @XmlElement(name = "source")
@@ -30,8 +28,7 @@ public class NewUserWebhook implements WebhookResult {
     public NewUserWebhook(String albumId, AlbumUser sourceUser, AlbumUser newUser, String instance, boolean isManualTrigger) {
         this.instance = instance;
         this.albumId = albumId;
-        this.eventType = WebhookType.NEW_USER.name();
-        this.eventTime = eventTime.now();
+        this.eventTime = LocalDateTime.now();
         this.newUser = new UserResponse(newUser);
         this.sourceUser = new UserResponse(sourceUser);
         this.isManualTrigger = isManualTrigger;

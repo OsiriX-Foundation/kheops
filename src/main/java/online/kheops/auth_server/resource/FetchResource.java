@@ -66,7 +66,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
-            throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException, NotAlbumScopeTypeException {
+            throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException {
         Fetcher.fetchStudy(studyInstanceUID);
         for (String seriesInstanceUID: seriesInstanceUIDList) {
             ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
@@ -138,7 +138,7 @@ public class FetchResource {
                 final Study study = seriesList.get(0).getStudy();
 
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
-                newSeriesWebhook.setFetch(true);
+                newSeriesWebhook.setFetch();
 
                 for (Series series: seriesList){
                     if (series.isPopulated()) {

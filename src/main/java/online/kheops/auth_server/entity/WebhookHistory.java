@@ -53,7 +53,7 @@ public class WebhookHistory {
         this.id = id;
         this.attempt = attempt;
         this.status = status;
-        this.time = time.now();
+        this.time = LocalDateTime.now();
         this.isManualTrigger = isManualTrigger;
         this.webhook = webhook;
         webhook.addWebhookHistory(this);

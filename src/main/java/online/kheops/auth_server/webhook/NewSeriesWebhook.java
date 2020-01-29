@@ -18,16 +18,14 @@ public class NewSeriesWebhook implements WebhookResult{
     private String instance;
     @XmlElement(name = "album_id")
     private String albumId;
-    @XmlElement(name = "event_type")
-    private String eventType;
     @XmlElement(name = "event_time")
     private LocalDateTime eventTime;
     @XmlElement(name = "source")
     private UserResponse sourceUser;
     @XmlElement(name = "is_manual_trigger")
     private boolean isManualTrigger;
-    @XmlElement(name = "is_fetch")
-    private boolean isFetch;
+    @XmlElement(name = "import_source")
+    private String importSource;
 
     @XmlElement(name = "updated_study")
     private StudyResponse updatedStudy;
@@ -42,17 +40,16 @@ public class NewSeriesWebhook implements WebhookResult{
         this(albumId, sourceUser, instance, isManualTrigger);
         updatedStudy = new StudyResponse(series.getStudy());
         updatedStudy.addSeries(series);
-        isFetch = false;
+        importSource = "send";
     }
 
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, String instance, boolean isManualTrigger) {
         this.instance = instance;
         this.albumId = albumId;
-        this.eventType = WebhookType.NEW_SERIES.name();
-        this.eventTime = eventTime.now();
+        this.eventTime = LocalDateTime.now();
         this.sourceUser = new UserResponse(sourceUser);
         this.isManualTrigger = isManualTrigger;
-        isFetch = false;
+        importSource = "send";
 
     }
 
@@ -76,8 +73,8 @@ public class NewSeriesWebhook implements WebhookResult{
         return updatedStudy.containSeries();
     }
 
-    public void setFetch(boolean fetch) {
-        isFetch = fetch;
+    public void setFetch() {
+        importSource = "upload";
     }
 
     @Override

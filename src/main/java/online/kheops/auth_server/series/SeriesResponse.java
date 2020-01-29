@@ -14,14 +14,23 @@ public class SeriesResponse {
     private String seriesUid;
     @XmlElement(name = "number_of_series_related_instance")
     private long numberOfSeriesRelatedInstance;
+    @XmlElement(name = "time_zone_offset_from_utc")
+    private String timeZoneOffsetFromUTC;
+    @XmlElement(name = "series_number")
+    private long seriesNumber;
+    @XmlElement(name = "body_part_examined")
+    private String bodyPartExamined;
 
 
     private SeriesResponse() { /*empty*/ }
 
     public SeriesResponse(Series series) {
-        this.modality = series.getModality();
-        this.numberOfSeriesRelatedInstance = series.getNumberOfSeriesRelatedInstances();
-        this.seriesDescription = series.getSeriesDescription();
-        this.seriesUid = series.getSeriesInstanceUID();
+        modality = series.getModality();
+        numberOfSeriesRelatedInstance = series.getNumberOfSeriesRelatedInstances();
+        seriesDescription = series.getSeriesDescription();
+        seriesUid = series.getSeriesInstanceUID();
+        timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
+        seriesNumber = series.getSeriesNumber();
+        bodyPartExamined = series.getBodyPartExamined();
     }
 }

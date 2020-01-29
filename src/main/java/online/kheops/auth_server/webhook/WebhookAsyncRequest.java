@@ -45,6 +45,7 @@ public class WebhookAsyncRequest {
         AsyncInvoker asyncInvoker = CLIENT.target(webhook.getUrl()).request()
                 .header(X_KHEOPS_DELIVERY, requestId)
                 .header(X_KHEOPS_ATTEMPT, NUMBER_OF_RETRY_WEBHOOK - cnt + 1 + "/" + NUMBER_OF_RETRY_WEBHOOK)
+                .header(X_KHEOPS_EVENT, data.getType().name().toLowerCase())
                 .async();
 
         if(webhook.useSecret()) {
