@@ -1,6 +1,7 @@
 package online.kheops.proxy.stow;
 
 import online.kheops.proxy.id.InstanceID;
+import online.kheops.proxy.id.SeriesID;
 import online.kheops.proxy.multipart.MultipartOutputStream;
 import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.part.Part;
@@ -34,15 +35,15 @@ public final class Proxy {
 
     private MultipartOutputStream multipartOutputStream;
 
-    private final Consumer<Set<String>> sentStudies;
+    private final Consumer<Set<SeriesID>> sentSeries;
 
-    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final AuthorizationManager authorizationManager, Consumer<Set<String>> sentStudies)
+    public Proxy(final Providers providers, final MediaType contentType, final InputStream inputStream, final AuthorizationManager authorizationManager, Consumer<Set<SeriesID>> sentSeries)
     {
         this.providers = Objects.requireNonNull(providers);
         this.contentType = Objects.requireNonNull(contentType);
         this.inputStream = Objects.requireNonNull(inputStream);
         this.authorizationManager = Objects.requireNonNull(authorizationManager);
-        this.sentStudies = sentStudies;
+        this.sentSeries = sentSeries;
     }
 
     public void processStream(final MultipartOutputStream multipartOutputStream) throws GatewayException, RequestException
@@ -68,9 +69,9 @@ public final class Proxy {
             partString = part.toString();
             Set<InstanceID> authorizedInstanceIDs = authorizationManager.getAuthorization(part, fileID.isEmpty() ? null : fileID.get(0));
             writePart(partNumber, authorizedInstanceIDs, part);
-            if (sentStudies != null) {
-                sentStudies.accept(authorizedInstanceIDs.stream()
-                        .map((instanceID -> instanceID.getSeriesID().getStudyUID()))
+            if (sentSeries != null) {
+                sentSeries.accept(authorizedInstanceIDs.stream()
+                        .map((InstanceID::getSeriesID))
                         .collect(Collectors.toSet()));
             }
         } catch (GatewayException e) {

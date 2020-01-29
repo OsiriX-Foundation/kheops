@@ -137,11 +137,11 @@ public final class Resource {
             throw new WebApplicationException(Response.status(BAD_GATEWAY).build());
         }
 
-        final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken);
+        final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken, albumId);
         final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId, headerXLinkAuthorization);
 
         try (InputStream inputStream = getConvertedInputStream(request.getInputStream())) {
-            final Proxy proxy = new Proxy(providers, getConvertedContentType(), inputStream, authorizationManager, fetchRequester::addStudies);
+            final Proxy proxy = new Proxy(providers, getConvertedContentType(), inputStream, authorizationManager, fetchRequester::addSeries);
             return processProxy(proxy, authorizationManager, studyInstanceUID, introspectResponse);
         } catch (IOException e) {
             LOG.log(Level.WARNING, "", e);

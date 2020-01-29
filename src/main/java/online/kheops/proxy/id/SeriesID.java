@@ -41,6 +41,7 @@ public final class SeriesID extends MultiPart {
                 seriesUID.equals(((SeriesID) o).getSeriesUID());
     }
 
+
     @Override
     public int hashCode() {
         return studyUID.hashCode() | seriesUID.hashCode();
