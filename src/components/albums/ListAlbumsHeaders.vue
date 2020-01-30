@@ -18,7 +18,7 @@
       <div
         class="d-flex flex-wrap"
       >
-        <div class="p-2 align-self-center d-none d-sm-block">
+        <div class="p-2 align-self-center">
           <button
             class="btn btn-secondary ml-2"
             @click="goNewAlbum"
@@ -48,9 +48,8 @@
             {{ $t("share") }}
           </button>
         </div>
-        <div class="ml-auto" />
         <div
-          class="align-self-center"
+          class="ml-auto align-self-center"
         >
           <button
             type="button"
@@ -62,10 +61,6 @@
               scale="2"
             />
           </button>
-        </div>
-        <div
-          class="align-self-center"
-        >
           <button
             type="button"
             class="btn btn-link kheopsicon"

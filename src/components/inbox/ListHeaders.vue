@@ -158,53 +158,46 @@
             <span>{{ $t("delete") }}</span>
           </button>
         </div>
-        <div class="ml-auto" />
         <div
-          v-if="showImportButton === true"
-          class="align-self-center"
+          class="align-self-center ml-auto"
         >
-          <div>
-            <b-dropdown
-              id="dropdown-divider"
-              toggle-class="kheopsicon"
-              variant="link"
-              right
+          <b-dropdown
+            v-if="showImportButton === true"
+            id="dropdown-divider"
+            toggle-class="kheopsicon"
+            variant="link"
+            right
+          >
+            <template slot="button-content">
+              <v-icon
+                name="add"
+                width="34px"
+                height="34px"
+              />
+            </template>
+            <b-dropdown-item-button
+              :disabled="sendingFiles"
             >
-              <template slot="button-content">
-                <v-icon
-                  name="add"
-                  width="34px"
-                  height="34px"
-                />
-              </template>
-              <b-dropdown-item-button
-                :disabled="sendingFiles"
-              >
-                <label for="file">
-                  {{ $t("importfiles") }}
-                </label>
-              </b-dropdown-item-button>
-              <b-dropdown-item-button
-                v-if="determineWebkitDirectory()"
-                :disabled="sendingFiles"
-              >
-                <label for="directory">
-                  {{ $t("importdir") }}
-                </label>
-              </b-dropdown-item-button>
-              <b-dropdown-divider />
-              <b-dropdown-item-button
-                v-if="determineWebkitDirectory()"
-                @click="showDragAndDrop"
-              >
-                {{ $t("draganddrop") }}
-              </b-dropdown-item-button>
-            </b-dropdown>
-          </div>
-        </div>
-        <div
-          class="align-self-center"
-        >
+              <label for="file">
+                {{ $t("importfiles") }}
+              </label>
+            </b-dropdown-item-button>
+            <b-dropdown-item-button
+              v-if="determineWebkitDirectory()"
+              :disabled="sendingFiles"
+            >
+              <label for="directory">
+                {{ $t("importdir") }}
+              </label>
+            </b-dropdown-item-button>
+            <b-dropdown-divider />
+            <b-dropdown-item-button
+              v-if="determineWebkitDirectory()"
+              @click="showDragAndDrop"
+            >
+              {{ $t("draganddrop") }}
+            </b-dropdown-item-button>
+          </b-dropdown>
           <button
             type="button"
             class=" btn btn-link "
@@ -216,10 +209,6 @@
               class="kheopsicon"
             />
           </button>
-        </div>
-        <div
-          class="align-self-center"
-        >
           <button
             type="button"
             class=" btn btn-link"
