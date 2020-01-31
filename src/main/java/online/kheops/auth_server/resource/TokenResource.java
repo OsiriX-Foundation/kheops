@@ -52,6 +52,10 @@ public class TokenResource
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response token(MultivaluedMap<String, String> form) {
+        if (form == null) {
+            throw new TokenRequestException(INVALID_REQUEST, "Missing form data");
+        }
+
         final List<String> grantTypes = form.get("grant_type");
 
         if (grantTypes == null || grantTypes.size() != 1) {
@@ -84,7 +88,7 @@ public class TokenResource
             return Response.ok(result.getTokenResponseEntity()).build();
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
-            return Response.status(BAD_REQUEST).build();
+            throw e; //NOSONAR
         }
     }
 
