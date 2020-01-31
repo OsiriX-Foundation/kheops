@@ -162,7 +162,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import AlbumUsers from '@/components/albums/AlbumUsers';
+import AlbumUsers from '@/components/albumsettings/AlbumUsers';
 
 export default {
   name: 'AlbumSettingsUser',

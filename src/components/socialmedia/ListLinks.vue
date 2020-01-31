@@ -1,151 +1,101 @@
-<i18n>
+<i18n scoped>
 {
   "en": {
+    "twitterEnable": "Twitter link enabled",
+    "twitterDisable": "No twitter link",
+    "sharingEnable": "Sharing link enabled",
+    "sharingDisable": "No sharing link",
+    "sharingTitle": "Sharing URL",
+    "twitterText": "My KHEOPS shared album. {link} #KHEOPS"
   },
   "fr": {
+    "twitterEnable": "Lien twitter actif",
+    "twitterDisable": "Pas de lien twitter",
+    "sharingEnable": "Lien de partage actif",
+    "sharingDisable": "Pas de lien de partage",
+    "sharingTitle": "URL à partager",
+    "twitterText": "Mon album KHEOPS partagé. {link} #KHEOPS"
   }
 }
 </i18n>
 <template>
-  <div>
-    <h4>
-      <span
-        class="link"
-        @click="clickNew()"
-      >
-        <v-icon
-          name="plus"
-          scale="1"
-          class="mr-3"
-        />
-        {{ $t('newlink') }}
-      </span>
-    </h4>
-    <div class="d-flex flex-row">
-      <div class="mt-2">
-        <h4>
-          {{ $t('links') }}
-        </h4>
-      </div>
-    </div>
-    <b-table
-      v-if="loadingData === false"
-      stacked="sm"
-      striped
-      hover
-      :items="links"
-      :fields="fields"
-      :sort-desc="true"
-      :sort-by.sync="sortBy"
-      tbody-tr-class="link"
+  <span>
+    <span
+      id="twitter-link"
+      :text="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
+      class="pointer"
+      @click.stop="toggleTwitter(albumid)"
     >
-      <template
-        slot="scope_type"
-        slot-scope="data"
-      >
-        <div v-if="data.value=='album'">
-          <router-link
-            :to="`/albums/${data.item.album.album_id}`"
-            @click.stop
-          >
-            <v-icon
-              name="book"
-              class="mr-2"
-            />
-            {{ data.item.album.name }}
-          </router-link>
-        </div>
-        <div v-if="data.value=='user'">
-          <v-icon
-            name="user"
-            class="mr-2"
-          />
-          {{ $t('user') }}
-        </div>
+      <v-icon
+        name="twitter"
+        :color="(twitterToken.length > 0) ? '#1da1f2' : '#657786'"
+        scale="3"
+      />
+    </span>
+    <span
+      id="sharing-link"
+      :text="sharingToken.length > 0 ? $t('sharingEnable') : $t('sharingDisable')"
+      class="btn btn-link p-0"
+      @click.stop="sharingTokenParams.show = !sharingTokenParams.show"
+    >
+      <v-icon
+        name="link"
+        :color="(sharingToken.length > 0) ? 'white' : 'grey'"
+        scale="2"
+      />
+    </span>
+    <b-popover
+      v-if="showRevokeTwitter"
+      target="twitter-link"
+      :show="showRevokeTwitter"
+      placement="auto"
+    >
+      <template v-slot:title>
+        <pop-over-title
+          title="Twitter"
+          @cancel="showRevokeTwitter = false"
+        />
       </template>
-      <template
-        slot="link"
-        slot-scope="data"
-      >
-        {{ data }}
+      <twitter-link-popover
+        :tokens="twitterToken"
+        @revoke="revokeTwitterTokens"
+        @cancel="showRevokeTwitter = false"
+      />
+    </b-popover>
+    <b-popover
+      v-if="sharingTokenParams.show"
+      target="sharing-link"
+      :show.sync="sharingTokenParams.show"
+      placement="auto"
+    >
+      <template v-slot:title>
+        <pop-over-title
+          :title="$t('sharingTitle')"
+          @cancel="cancelSharingToken"
+        />
       </template>
-      <template
-        slot="status"
-        slot-scope="data"
-      >
-        <div
-          v-if="linkStatus(data.item)=='active'"
-          class="text-success"
-        >
-          <span class="nowrap">
-            <v-icon
-              name="check-circle"
-              class="mr-2"
-            />{{ $t("active") }}
-          </span>
-        </div>
-        <div
-          v-if="linkStatus(data.item)=='revoked'"
-          class="text-danger"
-        >
-          <v-icon
-            name="ban"
-            class="mr-2"
-          />{{ $t("revoked") }}<br>{{ data.item.revoke_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.revoke_time|formatTime }}</small>
-        </div>
-        <div
-          v-if="linkStatus(data.item)=='expired'"
-          class="text-danger"
-        >
-          <v-icon
-            name="ban"
-            class="mr-2"
-          />{{ $t("expired") }}<br>{{ data.item.expiration_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.expiration_time|formatTime }}</small>
-        </div>
-        <div v-if="linkStatus(data.item)=='wait'">
-          <v-icon
-            name="clock"
-            class="mr-2"
-          /><br>{{ data.item.not_before_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.not_before_time|formatTime }}</small>
-        </div>
-      </template>
-      <template
-        slot="expiration_time"
-        slot-scope="data"
-      >
-        <span :class="(data.item.revoked)?'text-danger':''">
-          {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
-        </span>
-      </template>
-      <template
-        slot="issued_at_time"
-        slot-scope="data"
-      >
-        {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
-      </template>
-      <template
-        slot="last_used"
-        slot-scope="data"
-      >
-        {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
-      </template>
-      <template
-        slot="permission"
-        slot-scope="data"
-      >
-        {{ data.item|formatPermissions }}
-      </template>
-    </b-table>
-  </div>
+      <sharing-link-popover
+        :album-id="albumid"
+        :url="urlSharing"
+        :tokens="sharingToken"
+        @cancel="cancelSharingToken"
+        @revoke="revokeSharingTokens"
+        @create="createSharingToken"
+      />
+    </b-popover>
+  </span>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import moment from 'moment';
+import PopOverTitle from '@/components/socialmedia/PopOverTitle';
+import SharingLinkPopover from '@/components/socialmedia/SharingLinkPopover';
+import TwitterLinkPopover from '@/components/socialmedia/TwitterLinkPopover';
 
 export default {
-  name: 'ListTokens',
-  components: { },
+  name: 'ListLinks',
+  components: { PopOverTitle, SharingLinkPopover, TwitterLinkPopover },
   props: {
     albumid: {
       type: String,
@@ -155,85 +105,95 @@ export default {
   },
   data() {
     return {
-      loadingData: false,
-      showInvalid: false,
-      sortBy: 'expiration_date',
-      fields: [
-        {
-          key: 'status',
-          label: this.$t('status'),
-          sortable: true,
-        },
-        {
-          key: 'title',
-          label: this.$t('description'),
-          sortable: true,
-        },
-        {
-          key: 'link',
-          label: this.$t('description'),
-          sortable: true,
-        },
-        {
-          key: 'expiration_time',
-          label: this.$t('expiration date'),
-          sortable: true,
-          class: 'd-none d-sm-table-cell',
-        },
-        {
-          key: 'permission',
-          label: this.$t('permission'),
-          sortable: true,
-          class: 'd-none d-sm-table-cell',
-        },
-      ],
+      twitterTokenParams: {
+        title: 'twitter_link',
+        scope_type: 'album',
+        album: '',
+        read_permission: true,
+        write_permission: false,
+        download_permission: true,
+        appropriate_permission: false,
+        expiration_time: '',
+      },
+      showRevokeTwitter: false,
+      sharingTokenParams: {
+        show: false,
+      },
+      urlSharing: '',
     };
   },
   computed: {
     ...mapGetters({
       albumTokens: 'albumTokens',
     }),
-    links() {
-      return this.albumTokens;
+    twitterToken() {
+      return this.albumTokens.filter((token) => token.title.includes('twitter_link') && moment(token.expiration_time) > moment() && !token.revoked);
+    },
+    sharingToken() {
+      return this.albumTokens.filter((token) => token.title.includes('sharing_link') && moment(token.expiration_time) > moment() && !token.revoked);
     },
   },
   created() {
-    this.loadingData = true;
-    this.getTokens().then(() => {
-      this.loadingData = false;
-    });
   },
   methods: {
     getTokens() {
       const queries = {
-        valid: !this.showInvalid,
+        valid: this.validParamsToken,
         album: this.albumid,
       };
       return this.$store.dispatch('getAlbumTokens', { queries });
     },
-    loadToken(item) {
-      const action = 'token';
-      const { id } = item;
-      this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
+    revokeTokens(tokens) {
+      tokens.forEach((token) => {
+        this.$store.dispatch('revokeToken', { token_id: token.id }).then((res) => {
+          if (res.status === 200) {
+            this.getTokens();
+          }
+        }).catch(() => {
+          this.$snotify.error(this.$t('sorryerror'));
+        });
+      });
     },
-    clickNew() {
-      const action = 'newtoken';
-      this.$router.push({ name: 'albumsettingsaction', params: { action } });
+    revokeTwitterTokens(tokens) {
+      this.showRevokeTwitter = false;
+      this.revokeTokens(tokens);
     },
-    linkStatus(itemToken) {
-      if (itemToken.revoked) {
-        return 'revoked';
-      } if (moment(itemToken.not_before_time) > moment()) {
-        return 'wait';
-      } if (moment(itemToken.expiration_time) < moment()) {
-        return 'expired';
+    toggleTwitter(albumID) {
+      if (this.twitterToken.length === 0) {
+        this.createTwitterToken(albumID);
+      } else {
+        this.showRevokeTwitter = this.twitterToken.length > 0 && !this.showRevokeTwitter;
       }
-      return 'active';
     },
-    revoke(tokenId) {
-      this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
-        this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
-        this.getTokens();
+    createToken(token) {
+      return this.$store.dispatch('createToken', { token });
+    },
+    createTwitterToken(albumID) {
+      this.twitterTokenParams.album = albumID;
+      this.twitterTokenParams.expiration_time = moment().add(100, 'Y').format();
+      const twitterWindow = window.open('', 'twitter');
+      this.createToken(this.twitterTokenParams).then((res) => {
+        const urlTwitter = 'https://twitter.com/intent/tweet';
+        const link = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
+        const urlSharing = this.$t('twitterText', { link });
+        const queries = `?text=${encodeURIComponent(urlSharing)}`;
+        twitterWindow.location.href = urlTwitter + queries;
+      }).catch(() => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
+    },
+    cancelSharingToken() {
+      this.sharingTokenParams.show = false;
+    },
+    revokeSharingTokens(tokens) {
+      this.cancelSharingToken();
+      this.urlSharing = '';
+      this.revokeTokens(tokens);
+    },
+    createSharingToken(token) {
+      this.createToken(token).then((res) => {
+        const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
+        this.urlSharing = urlSharing;
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
       });
