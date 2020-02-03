@@ -62,22 +62,19 @@
           class="p-2"
         >
           <done-icon
-            v-if="error.length === 0"
+            v-if="error.length === 0 && totalUnknownFilesError === 0"
             :height="'20'"
             :width="'20'"
           />
-          <span
-            v-if="error.length > 0 && error.length < totalSize"
-          >
-            <v-icon
-              name="warning"
-              :height="'20'"
-              :width="'20'"
-              color="red"
-            />
-          </span>
+          <v-icon
+            v-if="(error.length > 0 || totalUnknownFilesError > 0) && (error.length + totalUnknownFilesError) < totalSize"
+            name="warning"
+            :height="'20'"
+            :width="'20'"
+            color="red"
+          />
           <error-icon
-            v-if="error.length === totalSize && totalSize !== 0"
+            v-if="(error.length === totalSize || totalUnknownFilesError === totalSize) && totalSize !== 0"
             :height="'20'"
             :width="'20'"
             color="red"
@@ -638,7 +635,7 @@ export default {
       Object.keys(this.errorDicom).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(data, key)) {
           const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key]);
-          this.generateListError(data[key].Value, this.errorDicom[key]);
+          this.createListUnknownError(data[key].Value, this.errorDicom[key]);
           this.createListError(errorInResponse);
           error = 0;
         }
@@ -658,21 +655,26 @@ export default {
         if (fileError) {
           const textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`;
           this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError) });
+        } else {
+          this.updateListUnknownError(errorCode);
         }
       });
     },
-    generateListError(dicom, dicomTagFile) {
+    createListUnknownError(dicom, dicomTagFile) {
       dicom.forEach((x) => {
         if (!Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
           const errorCode = x[this.dicomTagError].Value[0];
-          if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
-            this.listErrorUnknownFiles[errorCode] += 1;
-          } else {
-            this.listErrorUnknownFiles[errorCode] = 1;
-          }
-          this.totalUnknownFilesError += 1;
+          this.updateListUnknownError(errorCode);
         }
       });
+    },
+    updateListUnknownError(errorCode) {
+      if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
+        this.listErrorUnknownFiles[errorCode] += 1;
+      } else {
+        this.listErrorUnknownFiles[errorCode] = 1;
+      }
+      this.totalUnknownFilesError += 1;
     },
     dicom2map(dicom, dicomTagFile) {
       const map = new Map();
