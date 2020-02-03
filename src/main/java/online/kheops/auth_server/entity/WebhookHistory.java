@@ -48,7 +48,7 @@ public class WebhookHistory {
 
     public WebhookHistory() {}
 
-    public WebhookHistory(String id, long attempt, Integer status, boolean isManualTrigger, WebhookType type, Webhook webhook) {
+    public WebhookHistory(String id, int attempt, Integer status, boolean isManualTrigger, WebhookType type, Webhook webhook) {
 
         this.id = id;
         this.attempt = attempt;
