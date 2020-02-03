@@ -1,82 +1,8 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
+
     <changeSet author="kheops" id="v1.0-1">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="album_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="album_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-2">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="album_series_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="album_series_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-3">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="album_user_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="album_user_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-4">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="capabilities_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="capabilities_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-5">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="event_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="event_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-6">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="report_providers_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="report_providers_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-7">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="series_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="series_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-8">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="studies_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="studies_pk_seq"/>
-    </changeSet>
-    <changeSet author="kheops" id="v1.0-9">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sequenceExists sequenceName="users_pk_seq" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createSequence sequenceName="users_pk_seq"/>
-    </changeSet>
-
-
-
-    <changeSet author="kheops" id="v1.0-10">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="album_series" schemaName="public"/>
@@ -97,7 +23,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-11">
+    <changeSet author="kheops" id="v1.0-2">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="album_user" schemaName="public"/>
@@ -127,7 +53,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-12">
+    <changeSet author="kheops" id="v1.0-3">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="albums" schemaName="public"/>
@@ -170,7 +96,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-13">
+    <changeSet author="kheops" id="v1.0-4">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="capabilities" schemaName="public"/>
@@ -210,7 +136,7 @@
             <column name="album_fk" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-14">
+    <changeSet author="kheops" id="v1.0-5">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="events" schemaName="public"/>
@@ -238,7 +164,7 @@
             <column name="report_provider_fk" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-15">
+    <changeSet author="kheops" id="v1.0-6">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="report_providers" schemaName="public"/>
@@ -268,7 +194,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-16">
+    <changeSet author="kheops" id="v1.0-7">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="series" schemaName="public"/>
@@ -299,7 +225,7 @@
             <column name="populated" type="BOOLEAN"/>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-17">
+    <changeSet author="kheops" id="v1.0-8">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="studies" schemaName="public"/>
@@ -332,7 +258,7 @@
             <column name="populated" type="BOOLEAN"/>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-18">
+    <changeSet author="kheops" id="v1.0-9">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="users" schemaName="public"/>
@@ -350,7 +276,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-19">
+    <changeSet author="kheops" id="v1.0-10">
          <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="version" schemaName="public"/>
@@ -365,55 +291,55 @@
 
 
 
-    <changeSet author="kheops" id="v1.0-20">
+    <changeSet author="kheops" id="v1.0-11">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='album_series_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="album_fk, series_fk" constraintName="album_series_unique" tableName="album_series"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-21">
+    <changeSet author="kheops" id="v1.0-12">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='album_user_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="album_fk, user_fk" constraintName="album_user_unique" tableName="album_user"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-22">
+    <changeSet author="kheops" id="v1.0-13">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='albums_id_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="id" constraintName="albums_id_unique" tableName="albums"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-23">
+    <changeSet author="kheops" id="v1.0-14">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='capabilities_id_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="id" constraintName="capabilities_id_unique" tableName="capabilities"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-24">
+    <changeSet author="kheops" id="v1.0-15">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='capabilities_secret_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="secret" constraintName="capabilities_secret_unique" tableName="capabilities"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-25">
+    <changeSet author="kheops" id="v1.0-16">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='keycloak_id_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="keycloak_id" constraintName="keycloak_id_unique" tableName="users"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-26">
+    <changeSet author="kheops" id="v1.0-17">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='report_providers_client_id_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="client_id" constraintName="report_providers_client_id_unique" tableName="report_providers"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-27">
+    <changeSet author="kheops" id="v1.0-18">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='series_uid_unique'</sqlCheck>
         </preConditions>
         <addUniqueConstraint columnNames="series_uid" constraintName="series_uid_unique" tableName="series"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-28">
+    <changeSet author="kheops" id="v1.0-19">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='study_uid_unique'</sqlCheck>
         </preConditions>
@@ -421,7 +347,7 @@
     </changeSet>
 
 
-    <changeSet author="kheops" id="v1.0-29">
+    <changeSet author="kheops" id="v1.0-20">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="accession_number_index" schemaName="public"/>
@@ -431,7 +357,7 @@
             <column name="accession_number"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-30">
+    <changeSet author="kheops" id="v1.0-21">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="capabilities_user_fk_index" schemaName="public"/>
@@ -441,7 +367,7 @@
             <column name="user_fk"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-31">
+    <changeSet author="kheops" id="v1.0-22">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="patient_id_index" schemaName="public"/>
@@ -451,7 +377,7 @@
             <column name="patient_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-32">
+    <changeSet author="kheops" id="v1.0-23">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="populated_index" schemaName="public"/>
@@ -461,7 +387,7 @@
             <column name="populated"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-33">
+    <changeSet author="kheops" id="v1.0-24">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="report_providers_album_fk_index" schemaName="public"/>
@@ -471,7 +397,7 @@
             <column name="album_fk"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-34">
+    <changeSet author="kheops" id="v1.0-25">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="series_populated_index" schemaName="public"/>
@@ -481,7 +407,7 @@
             <column name="populated"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-35">
+    <changeSet author="kheops" id="v1.0-26">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="study_date_index" schemaName="public"/>
@@ -491,7 +417,7 @@
             <column name="study_date"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-36">
+    <changeSet author="kheops" id="v1.0-27">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="study_fk_index" schemaName="public"/>
@@ -501,7 +427,7 @@
             <column name="study_fk"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-37">
+    <changeSet author="kheops" id="v1.0-28">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="study_id_index" schemaName="public"/>
@@ -511,7 +437,7 @@
             <column name="study_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-38">
+    <changeSet author="kheops" id="v1.0-29">
          <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="study_time_index" schemaName="public"/>
@@ -524,7 +450,7 @@
 
 
 
-    <changeSet author="kheops" id="v1.0-39">
+    <changeSet author="kheops" id="v1.0-30">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="album_series_album_fk_fkey" schemaName="public"/>
@@ -532,7 +458,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="album_fk" baseTableName="album_series" constraintName="album_series_album_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-40">
+    <changeSet author="kheops" id="v1.0-31">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="album_series_series_fk_fkey" schemaName="public"/>
@@ -540,7 +466,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="series_fk" baseTableName="album_series" constraintName="album_series_series_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="series" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-41">
+    <changeSet author="kheops" id="v1.0-32">
          <preConditions onFail="MARK_RAN">
         <not>
             <foreignKeyConstraintExists foreignKeyName="album_user_album_fk_fkey" schemaName="public"/>
@@ -548,7 +474,7 @@
     </preConditions>
         <addForeignKeyConstraint baseColumnNames="album_fk" baseTableName="album_user" constraintName="album_user_album_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-42">
+    <changeSet author="kheops" id="v1.0-33">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="album_user_user_fk_fkey" schemaName="public"/>
@@ -556,7 +482,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="user_fk" baseTableName="album_user" constraintName="album_user_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-43">
+    <changeSet author="kheops" id="v1.0-34">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="capabilities_album_fk_fkey" schemaName="public"/>
@@ -564,7 +490,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="album_fk" baseTableName="capabilities" constraintName="capabilities_album_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-44">
+    <changeSet author="kheops" id="v1.0-35">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="capabilities_user_fk_fkey" schemaName="public"/>
@@ -572,7 +498,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="user_fk" baseTableName="capabilities" constraintName="capabilities_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-45">
+    <changeSet author="kheops" id="v1.0-36">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_album_fk_fkey" schemaName="public"/>
@@ -580,7 +506,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="album_fk" baseTableName="events" constraintName="event_album_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-46">
+    <changeSet author="kheops" id="v1.0-37">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_capability_fk_fkey" schemaName="public"/>
@@ -588,7 +514,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="capability_fk" baseTableName="events" constraintName="event_capability_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="capabilities" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-47">
+    <changeSet author="kheops" id="v1.0-38">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_private_target_user_fk_fkey" schemaName="public"/>
@@ -596,7 +522,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="private_target_user_fk" baseTableName="events" constraintName="event_private_target_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-48">
+    <changeSet author="kheops" id="v1.0-39">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_report_provider_fk_fkey" schemaName="public"/>
@@ -604,7 +530,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="report_provider_fk" baseTableName="events" constraintName="event_report_provider_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="report_providers" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-49">
+    <changeSet author="kheops" id="v1.0-40">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_series_fk_fkey" schemaName="public"/>
@@ -612,7 +538,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="series_fk" baseTableName="events" constraintName="event_series_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="series" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-50">
+    <changeSet author="kheops" id="v1.0-41">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_study_fk_fkey" schemaName="public"/>
@@ -620,7 +546,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="study_fk" baseTableName="events" constraintName="event_study_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="studies" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-51">
+    <changeSet author="kheops" id="v1.0-42">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_to_user_fk_fkey" schemaName="public"/>
@@ -628,7 +554,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="to_user_fk" baseTableName="events" constraintName="event_to_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-52">
+    <changeSet author="kheops" id="v1.0-43">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="event_user_fk_fkey" schemaName="public"/>
@@ -636,7 +562,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="user_fk" baseTableName="events" constraintName="event_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-53">
+    <changeSet author="kheops" id="v1.0-44">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="report_providers_album_fk_fkey" schemaName="public"/>
@@ -644,7 +570,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="album_fk" baseTableName="report_providers" constraintName="report_providers_album_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-54">
+    <changeSet author="kheops" id="v1.0-45">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="series_study_fk_fkey" schemaName="public"/>
@@ -652,7 +578,7 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="study_fk" baseTableName="series" constraintName="series_study_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="studies" validate="true"/>
     </changeSet>
-    <changeSet author="kheops" id="v1.0-55">
+    <changeSet author="kheops" id="v1.0-46">
          <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyName="users_inbox_fk_fkey" schemaName="public"/>
@@ -661,8 +587,14 @@
         <addForeignKeyConstraint baseColumnNames="inbox_fk" baseTableName="users" constraintName="users_inbox_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
 
-    <changeSet author="kheops" id="v1.0-56">
-       <tagDatabase tag="v1"/> 
+    <changeSet author="kheops" id="v1.0-47">
+        <sql>CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA public</sql>
     </changeSet>
+
+    <changeSet author="kheops" id="v1.0-48">
+        <tagDatabase tag="v1"/>
+    </changeSet>
+
+
 
 </databaseChangeLog>
