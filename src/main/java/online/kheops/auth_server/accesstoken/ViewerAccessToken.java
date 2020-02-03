@@ -16,6 +16,7 @@ public final class ViewerAccessToken implements AccessToken {
 
     private final JsonObject jwe;
     private final AccessToken accessToken;
+    private final String originalToken;
 
     static final class Builder {
         private final ServletContext servletContext;
@@ -24,23 +25,24 @@ public final class ViewerAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        ViewerAccessToken build(String assertionToken)
+        ViewerAccessToken build(String assertionToken, String jwePayloadJson)
                 throws AccessTokenVerificationException {
 
-            try(JsonReader jsonReader = Json.createReader(new StringReader(assertionToken))) {
+            try(JsonReader jsonReader = Json.createReader(new StringReader(jwePayloadJson))) {
                 JsonObject jwe = jsonReader.readObject();
-                return new ViewerAccessToken(servletContext, jwe);
+                return new ViewerAccessToken(servletContext, jwe, assertionToken);
             }
         }
     }
 
     static Builder getBuilder(ServletContext servletContext) { return new Builder(servletContext); }
 
-    private ViewerAccessToken(ServletContext servletContext, JsonObject jwe)
+    private ViewerAccessToken(ServletContext servletContext, JsonObject jwe, String originalToken)
             throws AccessTokenVerificationException {
 
         this.jwe = jwe;
         this.accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
+        this.originalToken = originalToken;
     }
 
     public AccessToken getAccessToken() {
@@ -73,7 +75,11 @@ public final class ViewerAccessToken implements AccessToken {
 
     @Override
     public Optional<String> getScope() {
-        return Optional.of("read");
+        if (jwe.containsKey(Consts.JWE.SCOPE)) {
+            return Optional.of(jwe.getString(Consts.JWE.SCOPE));
+        } else {
+            return Optional.of("read");
+        }
     }
 
     @Override
@@ -93,7 +99,7 @@ public final class ViewerAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new ViewerPrincipal(servletContext, this, jwe.toString());
+        return new ViewerPrincipal(servletContext, this, originalToken);
     }
 
 }

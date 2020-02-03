@@ -306,13 +306,14 @@ public class Albums {
             callingUser = em.merge(callingUser);
             final User removedUser = em.merge(getOrCreateUser(userName));
             final Album album = getAlbum(albumId, em);
-            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
-            final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
             //Delete the album if it is the last User
             if (album.getAlbumUser().size() == 1) {
                 deleteAlbum(callingUser, albumId);
             } else {
+
+                final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
+                final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
                 if (removedAlbumUser.isAdmin()) {
                     for (Capability capability: album.getCapabilities()) {
