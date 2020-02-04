@@ -205,7 +205,6 @@ public class Webhooks {
                     }
                 }
             }
-            webhookResponse.sortFullTrigers();
 
             tx.commit();
         } finally {

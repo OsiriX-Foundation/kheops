@@ -69,10 +69,4 @@ public class WebhookResponse {
         }
         this.fullTriggers.add(new WebhookTriggerResponse(webhookTrigger));
     }
-
-    public void sortFullTrigers() {
-        if (fullTriggers!= null) {
-            Collections.sort(fullTriggers);
-        }
-    }
 }
