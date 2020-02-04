@@ -16,6 +16,10 @@
     "authorizationerror": "Authorization Error",
     "processingfailure": "Processing failure",
     "sopnotsupported": "Referenced SOP Class not supported",
+    "transfersyntaxnotsupported":"Referenced Transfer Syntax not supported",
+    "refused": "Refused out of Resources",
+    "notmatchsop": "Error: Data Set does not match SOP Class",
+    "cannotunderstand": "Error: Cannot understand",
     "unknownerror": "Unknown Error",
     "reload": "Reload erroneous files"
   },
@@ -35,6 +39,10 @@
     "authorizationerror": "Erreur d'authorisation",
     "processingfailure": "Echec de traitement",
     "sopnotsupported": "Classe SOP référencée non prise en charge",
+    "transfersyntaxnotsupported":"Syntaxe de transfert référencée non prise en charge",
+    "refused": "Refusé: Plus de ressources",
+    "notmatchsop": "Erreur: L'ensemble de données ne correspond pas à la classe SOP",
+    "cannotunderstand": "Erreur: Incompréhensible",
     "unknownerror": "Erreur inconnue",
     "reload": "Recharger les fichiers erronés"
   }
@@ -260,7 +268,7 @@
                 <span
                   class="text-warning"
                 >
-                  {{ errorValues[key] !== undefined ? `${$t(errorValues[key])} (${key})` : `${$t('unknownerror')} (${key})` }}
+                  {{ generateTextError(key) }}
                 </span>
               </div>
             </div>
@@ -383,11 +391,29 @@ export default {
         headers: {},
       },
       errorValues: {
+        0xC122: 'transfersyntaxnotsupported',
         292: 'authorizationerror',
         290: 'sopnotsupported',
         272: 'processingfailure',
         0: 'unknownerror',
       },
+      hexErrorValues: [
+        {
+          pattern: 255,
+          value: 0xA7FF,
+          error: 'refused',
+        },
+        {
+          pattern: 255,
+          value: 0xA9FF,
+          error: 'notmatchsop',
+        },
+        {
+          pattern: 4095,
+          value: 0xCFFF,
+          error: 'cannotunderstand',
+        },
+      ],
       errorDicom: {
         '0008119A': '00041500',
         '00081198': '00041500',
@@ -678,6 +704,23 @@ export default {
         this.listErrorUnknownFiles[errorCode] = 1;
       }
       this.totalUnknownFilesError += 1;
+    },
+    generateTextError(errorCode) {
+      const code = parseInt(errorCode, 10);
+      if (this.errorValues[code] !== undefined) {
+        return `${this.$t(this.errorValues[code])} (${code})`;
+      }
+      let errorText = '';
+      this.hexErrorValues.forEach((error) => {
+        // eslint-disable-next-line no-bitwise
+        if ((code | error.pattern) === error.value) {
+          errorText = `${this.$t(error.error)} (${code})`;
+        }
+      });
+      if (errorText !== '') {
+        return errorText;
+      }
+      return `${this.$t('unknownerror')} (${errorCode})`;
     },
     dicom2map(dicom, dicomTagFile) {
       const map = new Map();
