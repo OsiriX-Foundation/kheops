@@ -64,15 +64,15 @@ export default {
   data() {
     return {
       basicCategories: ['general', 'user', 'providerSR'],
+      adminCategories: ['tokens'],
     };
   },
   computed: {
     categories() {
-      const categories = [...this.basicCategories];
       if (this.album.is_admin) {
-        categories.push('tokens');
+        return this.basicCategories.concat(this.adminCategories);
       }
-      return categories;
+      return this.basicCategories;
     },
     currentCategory() {
       return this.$route.params.category !== undefined ? this.$route.params.category : this.basicCategories[0];
