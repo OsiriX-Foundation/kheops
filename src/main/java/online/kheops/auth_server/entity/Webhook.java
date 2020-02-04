@@ -52,6 +52,7 @@ public class Webhook {
 
     @OneToMany
     @JoinColumn (name = "webhook_fk", nullable = false)
+    @OrderBy("pk ASC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
     @PrePersist
