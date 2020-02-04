@@ -1,7 +1,6 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.entity.Webhook;
 import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
 
@@ -33,26 +32,9 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
         cnt--;
 
-        if ((response.getStatus() >= 200 && response.getStatus() <= 299) || cnt == 0) {
+        addWebhookAttemptToDb(cnt, response.getStatus());
 
-            final EntityManager em = EntityManagerListener.createEntityManager();
-            final EntityTransaction tx = em.getTransaction();
-
-            try {
-                tx.begin();
-                webhookTrigger = em.merge(webhookTrigger);
-                final WebhookAttempt webhookAttempt = new WebhookAttempt(response.getStatus(), NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
-                em.persist(webhookAttempt);
-                tx.commit();
-            } catch (Exception e) {
-                LOG.log(Level.WARNING,"Error adding a webhook attempt to the DB",e);
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-        } else {
+        if (!Response.Status.Family.familyOf(response.getStatus()).equals(Response.Status.Family.SUCCESSFUL) && cnt > 0) {
             asyncRequest.retry(cnt);
         }
     }
@@ -61,27 +43,30 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
     public void failed(Throwable throwable) {
         cnt--;
 
-        if (cnt == 0) {
+        addWebhookAttemptToDb(cnt, -1);
 
-            final EntityManager em = EntityManagerListener.createEntityManager();
-            final EntityTransaction tx = em.getTransaction();
-
-            try {
-                tx.begin();
-                em.merge(webhookTrigger);
-                final WebhookAttempt webhookAttempt = new WebhookAttempt(-1, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
-                em.persist(webhookAttempt);
-                tx.commit();
-            } catch (Exception e) {
-                LOG.log(Level.WARNING,"Error adding a webhook attempt to the DB",e);
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
-            }
-        } else {
+        if (cnt > 0) {
             asyncRequest.retry(cnt);
+        }
+    }
+
+    private void addWebhookAttemptToDb(int cnt, int status) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+            webhookTrigger = em.merge(webhookTrigger);
+            final WebhookAttempt webhookAttempt = new WebhookAttempt(status, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
+            em.persist(webhookAttempt);
+            tx.commit();
+        } catch (Exception e) {
+            LOG.log(Level.WARNING,"Error adding a webhook attempt to the DB",e);
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
     }
 }
