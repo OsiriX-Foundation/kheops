@@ -6,6 +6,7 @@ import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -67,5 +68,9 @@ public class WebhookResponse {
             fullTriggers = new ArrayList<>();
         }
         this.fullTriggers.add(new WebhookTriggerResponse(webhookTrigger));
+    }
+
+    public void sortFullTrigers() {
+        Collections.sort(fullTriggers);
     }
 }
