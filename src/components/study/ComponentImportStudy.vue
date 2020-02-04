@@ -86,7 +86,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
-import List from '@/components/inbox/List';
+import List from '@/components/studieslist/List';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {

@@ -242,7 +242,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
-import ConfirmButton from '@/components/inbox/ConfirmButton.vue';
+import ConfirmButton from '@/components/globals/ConfirmButton.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {

@@ -456,11 +456,11 @@ import InfiniteLoading from 'vue-infinite-loading';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import ListHeaders from '@/components/inbox/ListHeaders';
-import ListIcons from '@/components/inbox/ListIcons';
-import ListItemDetails from '@/components/inbox/ListItemDetails.vue';
+import ListHeaders from '@/components/studieslist/ListHeaders';
+import ListIcons from '@/components/studieslist/ListIcons';
+import ListItemDetails from '@/components/studieslist/ListItemDetails.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
-import SortList from '@/components/inbox/SortList.vue';
+import SortList from '@/components/globals/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
 

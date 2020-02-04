@@ -57,7 +57,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import SeriesSummary from '@/components/inbox/SeriesSummary';
+import SeriesSummary from '@/components/series/SeriesSummary';
 
 export default {
   name: 'ListSeries',
