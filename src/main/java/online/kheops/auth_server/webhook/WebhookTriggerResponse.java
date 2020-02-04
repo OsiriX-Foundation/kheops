@@ -27,6 +27,8 @@ public class WebhookTriggerResponse implements Comparable<WebhookTriggerResponse
 
     public WebhookTriggerResponse(WebhookTrigger webhookTrigger) {
 
+        pk = webhookTrigger.getPk();
+
         id = webhookTrigger.getId();
         isManualTrigger = webhookTrigger.isManualTrigger();
         if(webhookTrigger.getNewSeries()) {
