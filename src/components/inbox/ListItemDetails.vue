@@ -8,9 +8,6 @@
     "addfavorites": "Remove too favorites",
     "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
     "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
-    "series": "Series",
-    "comments": "Comments",
-    "metadata": "Metadata",
     "errorSeries": "An error occured, please reload the series list",
     "reload": "Reload"
   },
@@ -22,9 +19,6 @@
     "addfavorites": "Supprimer des favoris",
     "confirmDelete": "Etes vous de sûr de vouloir supprimer {count} étude | Etes vous de sûr de vouloir supprimer {count} études",
     "confirmDeleteSeries": "contenant {count} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série. | contenant {count} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
-    "series": "Séries",
-    "comments": "Commentaires",
-    "metadata": "Métadonnées",
     "errorSeries": "Une erreur est survenue, veuillez recharger les séries.",
     "reload": "Recharger"
   }
@@ -34,29 +28,9 @@
 <template>
   <div class="row">
     <div class="col-lg-2 col-xl-auto mb-4">
-      <nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
-        <a
-          class="nav-link"
-          :class="(study.flag.view === 'series')?'active':''"
-          @click="setViewDetails(study.StudyInstanceUID.Value[0], 'series')"
-        >
-          {{ $t('series') }}
-        </a>
-        <a
-          class="nav-link"
-          :class="(study.flag.view === 'comments')?'active':''"
-          @click="setViewDetails(study.StudyInstanceUID.Value[0], 'comments')"
-        >
-          {{ $t('comments') }}
-        </a>
-        <a
-          class="nav-link"
-          :class="(study.flag.view === 'study')?'active':''"
-          @click="setViewDetails(study.StudyInstanceUID.Value[0], 'study')"
-        >
-          {{ $t('metadata') }}
-        </a>
-      </nav>
+      <study-menu
+        :study="study"
+      />
     </div>
     <div
       class="col-sm-12 col-md-12 col-lg-10 col-xl-10"
@@ -126,11 +100,12 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import commentsAndNotifications from '@/components/comments/commentsAndNotifications';
 import studyMetadata from '@/components/study/studyMetadata';
 import SeriesSummary from '@/components/inbox/SeriesSummary';
+import StudyMenu from '@/components/studieslist/StudyMenu';
 
 export default {
   name: 'ListItemDetails',
   components: {
-    commentsAndNotifications, studyMetadata, PulseLoader, SeriesSummary,
+    commentsAndNotifications, studyMetadata, PulseLoader, SeriesSummary, StudyMenu,
   },
   props: {
     studyUID: {
@@ -197,15 +172,6 @@ export default {
         this.loadingSerie = false;
         this.errorSeries = true;
       });
-    },
-    setViewDetails(StudyInstanceUID, flagView) {
-      const viewSelected = flagView === '' ? 'series' : flagView;
-      const params = {
-        StudyInstanceUID,
-        flag: 'view',
-        value: viewSelected,
-      };
-      this.$store.dispatch('setFlagByStudyUID', params);
     },
   },
 };
