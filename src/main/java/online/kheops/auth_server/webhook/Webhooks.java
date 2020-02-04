@@ -110,15 +110,23 @@ public class Webhooks {
             final Mutation mutation = Events.albumPostMutation(callingUser, album, EDIT_WEBHOOK);
             em.persist(mutation);
 
-            tx.commit();
-
             webhookResponse = new WebhookResponse(webhook);
+
+            int maxHistory = 5;
+            for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+                webhookResponse.addTrigger(webhookTrigger);
+                maxHistory--;
+                if(maxHistory == 0) {
+                    break;
+                }
+            }
 
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.EDIT_WEBHOOK)
                     .album(albumId)
                     .webhookID(webhook.getId())
                     .log();
 
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
