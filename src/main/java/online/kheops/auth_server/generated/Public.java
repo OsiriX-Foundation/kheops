@@ -14,18 +14,16 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Databasechangelog;
-import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.WebhookAttempts;
+import online.kheops.auth_server.generated.tables.WebhookTriggers;
 import online.kheops.auth_server.generated.tables.Webhooks;
-import online.kheops.auth_server.generated.tables.WebhooksHistory;
 
 import org.jooq.Catalog;
-import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -43,7 +41,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = -212121241;
+    private static final long serialVersionUID = -699272521;
 
     /**
      * The reference instance of <code>public</code>
@@ -71,16 +69,6 @@ public class Public extends SchemaImpl {
     public final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
 
     /**
-     * The table <code>public.databasechangelog</code>.
-     */
-    public final Databasechangelog DATABASECHANGELOG = online.kheops.auth_server.generated.tables.Databasechangelog.DATABASECHANGELOG;
-
-    /**
-     * The table <code>public.databasechangeloglock</code>.
-     */
-    public final Databasechangeloglock DATABASECHANGELOGLOCK = online.kheops.auth_server.generated.tables.Databasechangeloglock.DATABASECHANGELOGLOCK;
-
-    /**
      * The table <code>public.events</code>.
      */
     public final Events EVENTS = online.kheops.auth_server.generated.tables.Events.EVENTS;
@@ -106,14 +94,19 @@ public class Public extends SchemaImpl {
     public final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
 
     /**
+     * The table <code>public.webhook_attempts</code>.
+     */
+    public final WebhookAttempts WEBHOOK_ATTEMPTS = online.kheops.auth_server.generated.tables.WebhookAttempts.WEBHOOK_ATTEMPTS;
+
+    /**
+     * The table <code>public.webhook_triggers</code>.
+     */
+    public final WebhookTriggers WEBHOOK_TRIGGERS = online.kheops.auth_server.generated.tables.WebhookTriggers.WEBHOOK_TRIGGERS;
+
+    /**
      * The table <code>public.webhooks</code>.
      */
     public final Webhooks WEBHOOKS = online.kheops.auth_server.generated.tables.Webhooks.WEBHOOKS;
-
-    /**
-     * The table <code>public.webhooks_history</code>.
-     */
-    public final WebhooksHistory WEBHOOKS_HISTORY = online.kheops.auth_server.generated.tables.WebhooksHistory.WEBHOOKS_HISTORY;
 
     /**
      * No further instances allowed
@@ -132,28 +125,6 @@ public class Public extends SchemaImpl {
     }
 
     @Override
-    public final List<Sequence<?>> getSequences() {
-        List result = new ArrayList();
-        result.addAll(getSequences0());
-        return result;
-    }
-
-    private final List<Sequence<?>> getSequences0() {
-        return Arrays.<Sequence<?>>asList(
-            Sequences.ALBUM_PK_SEQ,
-            Sequences.ALBUM_SERIES_PK_SEQ,
-            Sequences.ALBUM_USER_PK_SEQ,
-            Sequences.CAPABILITIES_PK_SEQ,
-            Sequences.EVENT_PK_SEQ,
-            Sequences.REPORT_PROVIDERS_PK_SEQ,
-            Sequences.SERIES_PK_SEQ,
-            Sequences.STUDIES_PK_SEQ,
-            Sequences.USERS_PK_SEQ,
-            Sequences.WEBHOOK_HISTORY_PK_SEQ,
-            Sequences.WEBHOOK_PK_SEQ);
-    }
-
-    @Override
     public final List<Table<?>> getTables() {
         List result = new ArrayList();
         result.addAll(getTables0());
@@ -166,14 +137,13 @@ public class Public extends SchemaImpl {
             AlbumUser.ALBUM_USER,
             Albums.ALBUMS,
             Capabilities.CAPABILITIES,
-            Databasechangelog.DATABASECHANGELOG,
-            Databasechangeloglock.DATABASECHANGELOGLOCK,
             Events.EVENTS,
             ReportProviders.REPORT_PROVIDERS,
             Series.SERIES,
             Studies.STUDIES,
             Users.USERS,
-            Webhooks.WEBHOOKS,
-            WebhooksHistory.WEBHOOKS_HISTORY);
+            WebhookAttempts.WEBHOOK_ATTEMPTS,
+            WebhookTriggers.WEBHOOK_TRIGGERS,
+            Webhooks.WEBHOOKS);
     }
 }

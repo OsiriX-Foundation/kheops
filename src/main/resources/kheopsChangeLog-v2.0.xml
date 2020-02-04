@@ -31,7 +31,7 @@
             <column name="url" type="VARCHAR(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="enable" type="BOOLEAN">
+            <column name="enabled" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="user_fk" type="BIGINT">
@@ -51,21 +51,18 @@
             </column>
         </createTable>
     </changeSet>
+
     <changeSet author="kheops" id="v2.0-3">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="webhooks_history" schemaName="public"/>
+                <tableExists tableName="webhook_triggers" schemaName="public"/>
             </not>
         </preConditions>
-        <createTable tableName="webhooks_history">
+        <createTable tableName="webhook_triggers">
             <column autoIncrement="true" name="pk" type="BIGINT">
-                <constraints primaryKey="true" primaryKeyName="webhooks_history_pk"/>
+                <constraints primaryKey="true" primaryKeyName="webhook_triggers_pk"/>
             </column>
             <column name="id" type="VARCHAR(30)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="status" type="BIGINT"/>
-            <column name="time" type="TIMESTAMP WITHOUT TIME ZONE">
                 <constraints nullable="false"/>
             </column>
             <column name="webhook_fk" type="BIGINT">
@@ -78,13 +75,33 @@
             <column name="new_user" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhook_attempts" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhook_attempts">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhook_attempt_pk"/>
+            </column>
+            <column name="status" type="BIGINT"/>
+            <column name="time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="webhook_trigger_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
             <column name="attempt" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
 
-    <changeSet author="kheops" id="v2.0-4">
+    <changeSet author="kheops" id="v2.0-5">
        <tagDatabase tag="v2"/>
     </changeSet>
 

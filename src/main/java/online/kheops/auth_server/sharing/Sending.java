@@ -16,6 +16,8 @@ import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.NewSeriesWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
+import online.kheops.auth_server.webhook.WebhookRequestId;
+import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -257,7 +259,7 @@ public class Sending {
             }
             em.persist(mutation);
             targetAlbum.updateLastEventTime();
-            tx.commit();
+
             kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
                     .album(albumId)
                     .study(studyInstanceUID)
@@ -266,11 +268,14 @@ public class Sending {
 
             if(availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
                 for (Webhook webhook : targetAlbum.getWebhooks()) {
-                    if (webhook.getNewSeries() && webhook.isEnable()) {
-                        new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                    if (webhook.getNewSeries() && webhook.isEnabled()) {
+                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                        em.persist(webhookTrigger);
+                        new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                     }
                 }
             }
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -332,7 +337,7 @@ public class Sending {
             }
             em.persist(mutation);
             targetAlbum.updateLastEventTime();
-            tx.commit();
+
             if(fromAlbumId != null) {
                 kheopsLogBuilder.fromAlbum(fromAlbumId);
             } else {
@@ -345,11 +350,14 @@ public class Sending {
 
             if(newSeriesWebhook.containSeries()) {
                 for (Webhook webhook : targetAlbum.getWebhooks()) {
-                    if (webhook.getNewSeries() && webhook.isEnable()) {
-                        new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                    if (webhook.getNewSeries() && webhook.isEnabled()) {
+                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                        em.persist(webhookTrigger);
+                        new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                     }
                 }
             }
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

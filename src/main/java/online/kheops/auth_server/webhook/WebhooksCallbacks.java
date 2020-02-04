@@ -2,24 +2,28 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.Webhook;
-import online.kheops.auth_server.entity.WebhookHistory;
+import online.kheops.auth_server.entity.WebhookAttempt;
+import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
 
 public class WebhooksCallbacks implements InvocationCallback<Response> {
-    private Webhook webhook;
-    private boolean isManualTrigger;
+    private static final Logger LOG = Logger.getLogger(WebhooksCallbacks.class.getName());
+
+    private WebhookTrigger webhookTrigger;
     private int cnt;
     private WebhookAsyncRequest asyncRequest;
 
-    public WebhooksCallbacks(Webhook webhook, boolean isManualTrigger, int cnt, WebhookAsyncRequest asyncRequest) {
-        this.webhook = webhook;
-        this.isManualTrigger = isManualTrigger;
+    public WebhooksCallbacks(WebhookTrigger webhookTrigger, int cnt, WebhookAsyncRequest asyncRequest) {
+        this.webhookTrigger = webhookTrigger;
         this.cnt = cnt;
         this.asyncRequest = asyncRequest;
     }
@@ -36,17 +40,11 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
             try {
                 tx.begin();
-
-                webhook = em.merge(webhook);
-
-                final WebhookType webhookType = asyncRequest.getType();
-
-                final WebhookHistory webhookHistory = new WebhookHistory(asyncRequest.getRequestId(), NUMBER_OF_RETRY_WEBHOOK - cnt, response.getStatus(), isManualTrigger, webhookType, webhook);
-
-                em.persist(webhookHistory);
+                final WebhookAttempt webhookAttempt = new WebhookAttempt(response.getStatus(), NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
+                em.persist(webhookAttempt);
                 tx.commit();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.log(Level.WARNING,"Error adding a webhook trigger to the DB",e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -69,17 +67,11 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
             try {
                 tx.begin();
-
-                webhook = em.merge(webhook);
-
-                final WebhookType webhookType = asyncRequest.getType();
-
-                final WebhookHistory webhookHistory = new WebhookHistory(asyncRequest.getRequestId(), NUMBER_OF_RETRY_WEBHOOK - cnt,-1, isManualTrigger, webhookType, webhook);
-
-                em.persist(webhookHistory);
+                final WebhookAttempt webhookAttempt = new WebhookAttempt(-1, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
+                em.persist(webhookAttempt);
                 tx.commit();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.log(Level.WARNING,"Error adding a webhook trigger to the DB",e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();

@@ -10,25 +10,25 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
+import online.kheops.auth_server.generated.tables.WebhookAttempts;
+import online.kheops.auth_server.generated.tables.WebhookTriggers;
 import online.kheops.auth_server.generated.tables.Webhooks;
-import online.kheops.auth_server.generated.tables.WebhooksHistory;
 import online.kheops.auth_server.generated.tables.records.AlbumSeriesRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumUserRecord;
 import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
 import online.kheops.auth_server.generated.tables.records.CapabilitiesRecord;
-import online.kheops.auth_server.generated.tables.records.DatabasechangeloglockRecord;
 import online.kheops.auth_server.generated.tables.records.EventsRecord;
 import online.kheops.auth_server.generated.tables.records.ReportProvidersRecord;
 import online.kheops.auth_server.generated.tables.records.SeriesRecord;
 import online.kheops.auth_server.generated.tables.records.StudiesRecord;
 import online.kheops.auth_server.generated.tables.records.UsersRecord;
-import online.kheops.auth_server.generated.tables.records.WebhooksHistoryRecord;
+import online.kheops.auth_server.generated.tables.records.WebhookAttemptsRecord;
+import online.kheops.auth_server.generated.tables.records.WebhookTriggersRecord;
 import online.kheops.auth_server.generated.tables.records.WebhooksRecord;
 
 import org.jooq.ForeignKey;
@@ -68,7 +68,6 @@ public class Keys {
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = UniqueKeys0.CAPABILITIES_PK;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = UniqueKeys0.CAPABILITIES_ID_UNIQUE;
     public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = UniqueKeys0.CAPABILITIES_SECRET_UNIQUE;
-    public static final UniqueKey<DatabasechangeloglockRecord> DATABASECHANGELOGLOCK_PKEY = UniqueKeys0.DATABASECHANGELOGLOCK_PKEY;
     public static final UniqueKey<EventsRecord> EVENT_PK = UniqueKeys0.EVENT_PK;
     public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = UniqueKeys0.REPORT_PROVIDERS_PK;
     public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = UniqueKeys0.REPORT_PROVIDERS_CLIENT_ID_UNIQUE;
@@ -78,8 +77,9 @@ public class Keys {
     public static final UniqueKey<StudiesRecord> STUDY_UID_UNIQUE = UniqueKeys0.STUDY_UID_UNIQUE;
     public static final UniqueKey<UsersRecord> USERS_PK = UniqueKeys0.USERS_PK;
     public static final UniqueKey<UsersRecord> KEYCLOAK_ID_UNIQUE = UniqueKeys0.KEYCLOAK_ID_UNIQUE;
+    public static final UniqueKey<WebhookAttemptsRecord> WEBHOOK_ATTEMPT_PK = UniqueKeys0.WEBHOOK_ATTEMPT_PK;
+    public static final UniqueKey<WebhookTriggersRecord> WEBHOOK_TRIGGERS_PK = UniqueKeys0.WEBHOOK_TRIGGERS_PK;
     public static final UniqueKey<WebhooksRecord> WEBHOOKS_PK = UniqueKeys0.WEBHOOKS_PK;
-    public static final UniqueKey<WebhooksHistoryRecord> WEBHOOKS_HISTORY_PK = UniqueKeys0.WEBHOOKS_HISTORY_PK;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -117,7 +117,6 @@ public class Keys {
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_PK = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_pk", Capabilities.CAPABILITIES.PK);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_ID_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_id_unique", Capabilities.CAPABILITIES.ID);
         public static final UniqueKey<CapabilitiesRecord> CAPABILITIES_SECRET_UNIQUE = Internal.createUniqueKey(Capabilities.CAPABILITIES, "capabilities_secret_unique", Capabilities.CAPABILITIES.SECRET);
-        public static final UniqueKey<DatabasechangeloglockRecord> DATABASECHANGELOGLOCK_PKEY = Internal.createUniqueKey(Databasechangeloglock.DATABASECHANGELOGLOCK, "databasechangeloglock_pkey", Databasechangeloglock.DATABASECHANGELOGLOCK.ID);
         public static final UniqueKey<EventsRecord> EVENT_PK = Internal.createUniqueKey(Events.EVENTS, "event_pk", Events.EVENTS.PK);
         public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_PK = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_pk", ReportProviders.REPORT_PROVIDERS.PK);
         public static final UniqueKey<ReportProvidersRecord> REPORT_PROVIDERS_CLIENT_ID_UNIQUE = Internal.createUniqueKey(ReportProviders.REPORT_PROVIDERS, "report_providers_client_id_unique", ReportProviders.REPORT_PROVIDERS.CLIENT_ID);
@@ -127,8 +126,9 @@ public class Keys {
         public static final UniqueKey<StudiesRecord> STUDY_UID_UNIQUE = Internal.createUniqueKey(Studies.STUDIES, "study_uid_unique", Studies.STUDIES.STUDY_UID);
         public static final UniqueKey<UsersRecord> USERS_PK = Internal.createUniqueKey(Users.USERS, "users_pk", Users.USERS.PK);
         public static final UniqueKey<UsersRecord> KEYCLOAK_ID_UNIQUE = Internal.createUniqueKey(Users.USERS, "keycloak_id_unique", Users.USERS.KEYCLOAK_ID);
+        public static final UniqueKey<WebhookAttemptsRecord> WEBHOOK_ATTEMPT_PK = Internal.createUniqueKey(WebhookAttempts.WEBHOOK_ATTEMPTS, "webhook_attempt_pk", WebhookAttempts.WEBHOOK_ATTEMPTS.PK);
+        public static final UniqueKey<WebhookTriggersRecord> WEBHOOK_TRIGGERS_PK = Internal.createUniqueKey(WebhookTriggers.WEBHOOK_TRIGGERS, "webhook_triggers_pk", WebhookTriggers.WEBHOOK_TRIGGERS.PK);
         public static final UniqueKey<WebhooksRecord> WEBHOOKS_PK = Internal.createUniqueKey(Webhooks.WEBHOOKS, "webhooks_pk", Webhooks.WEBHOOKS.PK);
-        public static final UniqueKey<WebhooksHistoryRecord> WEBHOOKS_HISTORY_PK = Internal.createUniqueKey(WebhooksHistory.WEBHOOKS_HISTORY, "webhooks_history_pk", WebhooksHistory.WEBHOOKS_HISTORY.PK);
     }
 
     private static class ForeignKeys0 {

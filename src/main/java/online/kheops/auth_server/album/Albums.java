@@ -10,6 +10,8 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.webhook.NewUserWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
+import online.kheops.auth_server.webhook.WebhookRequestId;
+import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -167,8 +169,8 @@ public class Albums {
             }
 
             for (Webhook webhook:album.getWebhooks()) {
-                for (WebhookHistory webhookHistory:webhook.getWebhookHistory()) {
-                    em.remove(webhookHistory);
+                for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+                    em.remove(webhookTrigger);
                 }
                 em.remove(webhook);
             }
@@ -278,8 +280,10 @@ public class Albums {
                 final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
                 final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                 for (Webhook webhook : album.getWebhooks()) {
-                    if (webhook.getNewUser() && webhook.isEnable()) {
-                        new WebhookAsyncRequest(webhook, newUserWebhook, false);
+                    if (webhook.getNewUser() && webhook.isEnabled()) {
+                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_USER, webhook);
+                        em.persist(webhookTrigger);
+                        new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
                     }
                 }
             }

@@ -16,6 +16,8 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.NewSeriesWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
+import online.kheops.auth_server.webhook.WebhookRequestId;
+import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -154,15 +156,17 @@ public class FetchResource {
                     newSeriesWebhook.setReportProvider(reportProvider);
                 }
 
-                tx.commit();
-
                 if (study.isPopulated() && newSeriesWebhook.containSeries()) {
                     for (Webhook webhook : targetAlbum.getWebhooks()) {
-                        if (webhook.getNewSeries() && webhook.isEnable()) {
-                            new WebhookAsyncRequest(webhook, newSeriesWebhook, false);
+                        if (webhook.getNewSeries() && webhook.isEnabled()) {
+                            WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                            em.persist(webhookTrigger);
+                            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                         }
                     }
                 }
+
+                tx.commit();
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();

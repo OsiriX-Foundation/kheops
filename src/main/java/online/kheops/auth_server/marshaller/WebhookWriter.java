@@ -18,12 +18,16 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.security.Key;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static online.kheops.auth_server.util.HttpHeaders.X_KHEOPS_SIGNATURE;
 
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
 public class WebhookWriter implements MessageBodyWriter<SignedEntity> {
+
+    private static final Logger LOG = Logger.getLogger(WebhookWriter.class.getName());
 
     private final Providers providers;
 
@@ -54,8 +58,8 @@ public class WebhookWriter implements MessageBodyWriter<SignedEntity> {
                 final String hash = bytesToHex(b);
                 httpHeaders.add(X_KHEOPS_SIGNATURE, hash);
             } catch (Exception e) {
-                e.printStackTrace();
-                //TODO faire qqch
+                LOG.log(Level.SEVERE,"Error signing the webhook",e);
+                //TODO faire qqch mais quoi
             }
 
             entityStream.write(byteArrayOutputStream.toByteArray());

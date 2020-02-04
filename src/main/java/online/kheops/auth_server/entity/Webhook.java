@@ -39,8 +39,8 @@ public class Webhook {
     private Boolean newUser;
 
     @Basic(optional = false)
-    @Column(name = "enable")
-    private Boolean enable;
+    @Column(name = "enabled")
+    private Boolean enabled;
 
     @ManyToOne
     @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
@@ -52,7 +52,7 @@ public class Webhook {
 
     @OneToMany
     @JoinColumn (name = "webhook_fk", nullable = false)
-    private Set<WebhookHistory> webhookHistory  = new HashSet<>();
+    private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -61,7 +61,7 @@ public class Webhook {
 
     public Webhook() {}
 
-    public Webhook(String name, String url, Album album, User user, String secret, boolean newSeries, boolean newUser, boolean enable) {
+    public Webhook(String name, String url, Album album, User user, String secret, boolean newSeries, boolean newUser, boolean enabled) {
         this.name = name;
         this.url = url;
         this.secret = secret;
@@ -69,7 +69,7 @@ public class Webhook {
         this.newUser = newUser;
         this.album = album;
         this.user = user;
-        this.enable = enable;
+        this.enabled = enabled;
 
         album.addWebhook(this);
         user.addWebhook(this);
@@ -95,15 +95,13 @@ public class Webhook {
         return url;
     }
 
-    public Boolean getNewSeries() {
-        return newSeries;
-    }
+    public boolean getNewSeries() { return newSeries; }
 
-    public Boolean getNewUser() {
+    public boolean getNewUser() {
         return newUser;
     }
 
-    public Boolean isEnable() { return enable; }
+    public Boolean isEnabled() { return enabled; }
 
     public Album getAlbum() {
         return album;
@@ -115,12 +113,12 @@ public class Webhook {
 
 
 
-    public Set<WebhookHistory> getWebhookHistory() {
-        return webhookHistory;
+    public Set<WebhookTrigger> getWebhookTriggers() {
+        return webhookTriggers;
     }
 
-    public void addWebhookHistory(WebhookHistory webhookHistory) {
-        this.webhookHistory.add(webhookHistory);
+    public void addWebhookTrigger(WebhookTrigger webhookTrigger) {
+        this.webhookTriggers.add(webhookTrigger);
     }
 
     public void setName(String name) {
@@ -143,5 +141,5 @@ public class Webhook {
         this.newUser = newUser;
     }
 
-    public void setEnable(Boolean enable) { this.enable = enable; }
+    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
 }

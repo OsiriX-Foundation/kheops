@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Webhooks extends TableImpl<WebhooksRecord> {
 
-    private static final long serialVersionUID = -208728177;
+    private static final long serialVersionUID = -667909123;
 
     /**
      * The reference instance of <code>public.webhooks</code>
@@ -76,9 +76,9 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
     public final TableField<WebhooksRecord, String> URL = createField("url", org.jooq.impl.SQLDataType.VARCHAR(1024).nullable(false), this, "");
 
     /**
-     * The column <code>public.webhooks.enable</code>.
+     * The column <code>public.webhooks.enabled</code>.
      */
-    public final TableField<WebhooksRecord, Boolean> ENABLE = createField("enable", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<WebhooksRecord, Boolean> ENABLED = createField("enabled", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.user_fk</code>.

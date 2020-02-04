@@ -1,11 +1,13 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.Webhook;
-import online.kheops.auth_server.entity.WebhookHistory;
+import online.kheops.auth_server.entity.WebhookAttempt;
+import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class WebhookResponse {
 
@@ -18,47 +20,52 @@ public class WebhookResponse {
     private String name;
     @XmlElement(name = "use_secret")
     private boolean useSecret;
-    @XmlElement(name = "new_series")
-    private boolean newSeries;
-    @XmlElement(name = "new_user")
-    private boolean newUser;
-    @XmlElement(name = "enable")
-    private boolean enable;
-    @XmlElement(name = "last_history")
-    private List<String> history;
-    @XmlElement(name = "number_of_history")
-    private Integer numberOfHistory;
-    @XmlElement(name = "history")
-    private List<WebhookHistoryResponse> fullHistory;
+    @XmlElement(name = "events")
+    private List<String> events;
+    @XmlElement(name = "enabled")
+    private boolean enabled;
+    @XmlElement(name = "last_triggers")
+    private List<String> lastTriggers;
+    @XmlElement(name = "number_of_triggers")
+    private Integer numberOfTriggers;
+    @XmlElement(name = "triggers")
+    private List<WebhookTriggerResponse> fullTriggers;
 
     private WebhookResponse() { /*Empty*/ }
 
     public WebhookResponse(Webhook webhook) {
 
-        this.id = webhook.getId();
-        this.name = webhook.getName();
-        this.url = webhook.getUrl();
-        this.useSecret = webhook.useSecret();
-        this.newSeries = webhook.getNewSeries();
-        this.newUser = webhook.getNewUser();
-        this.enable = webhook.isEnable();
-        this.numberOfHistory = webhook.getWebhookHistory().size();
+        id = webhook.getId();
+        name = webhook.getName();
+        url = webhook.getUrl();
+        useSecret = webhook.useSecret();
+        events = new ArrayList<>();
+        if(webhook.getNewSeries()) {
+            events.add(WebhookType.NEW_SERIES.name().toLowerCase());
+        }
+        if(webhook.getNewUser()) {
+            events.add(WebhookType.NEW_USER.name().toLowerCase());
+        }
 
-        history = new ArrayList<>();
+        enabled = webhook.isEnabled();
+        numberOfTriggers = webhook.getWebhookTriggers().size();
     }
 
-    public void addHistory(WebhookHistory webhookHistory) {
-        if(webhookHistory.getStatus() >= 200 && webhookHistory.getStatus() <=299) {
-            this.history.add("Pass");
+    public void addTrigger(WebhookTrigger webhookTrigger) {
+        if (lastTriggers == null) {
+            lastTriggers = new ArrayList<>();
+        }
+        if(webhookTrigger.isSuccess()) {
+            this.lastTriggers.add("pass");
         } else {
-            this.history.add("Fail");
+            this.lastTriggers.add("fail");
         }
     }
 
-    public void addFullHistory(WebhookHistory webhookHistory) {
-        if (fullHistory == null) {
-            fullHistory = new ArrayList<>();
+    public void addFullTriggers(WebhookTrigger webhookTrigger) {
+        if (fullTriggers == null) {
+            fullTriggers = new ArrayList<>();
         }
-        this.fullHistory.add(new WebhookHistoryResponse(webhookHistory));
+        this.fullTriggers.add(new WebhookTriggerResponse(webhookTrigger));
     }
 }

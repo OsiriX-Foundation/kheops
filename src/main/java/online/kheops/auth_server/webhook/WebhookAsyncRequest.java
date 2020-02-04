@@ -1,6 +1,7 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.Webhook;
+import online.kheops.auth_server.entity.WebhookTrigger;
 import online.kheops.auth_server.marshaller.WebhookWriter;
 
 import javax.ws.rs.client.*;
@@ -21,17 +22,14 @@ public class WebhookAsyncRequest {
     private static final Client CLIENT = ClientBuilder.newClient().register(WebhookWriter.class);
 
     private Webhook webhook;
-    private boolean isManualTrigger;
     private WebhookResult data;
-    private String requestId;
+    private WebhookTrigger webhookTrigger;
 
-    public WebhookAsyncRequest(Webhook webhook, WebhookResult data, boolean isManualTrigger) {
+    public WebhookAsyncRequest(Webhook webhook, WebhookResult data, WebhookTrigger webhookTrigger) {
 
+        this.webhookTrigger = webhookTrigger;
         this.webhook = webhook;
-        this.isManualTrigger = isManualTrigger;
         this.data = data;
-
-        this.requestId = new WebhookRequestId().getRequestId();
 
         request(NUMBER_OF_RETRY_WEBHOOK);
     }
@@ -43,18 +41,18 @@ public class WebhookAsyncRequest {
     private void request(int cnt) {
 
         AsyncInvoker asyncInvoker = CLIENT.target(webhook.getUrl()).request()
-                .header(X_KHEOPS_DELIVERY, requestId)
+                .header(X_KHEOPS_DELIVERY, webhookTrigger.getId())
                 .header(X_KHEOPS_ATTEMPT, NUMBER_OF_RETRY_WEBHOOK - cnt + 1 + "/" + NUMBER_OF_RETRY_WEBHOOK)
                 .header(X_KHEOPS_EVENT, data.getType().name().toLowerCase())
                 .async();
 
         if(webhook.useSecret()) {
             final SignedEntity signedEntity = new SignedEntity(data, webhook.getSecret());
-            asyncInvoker.post(Entity.entity(signedEntity, MediaType.APPLICATION_JSON), new WebhooksCallbacks(webhook, isManualTrigger, cnt, this));
+            asyncInvoker.post(Entity.entity(signedEntity, MediaType.APPLICATION_JSON), new WebhooksCallbacks(webhookTrigger, cnt, this));
 
         } else {
             final Entity entity = Entity.json(data);
-            asyncInvoker.post(entity, new WebhooksCallbacks(webhook, isManualTrigger, cnt, this));
+            asyncInvoker.post(entity, new WebhooksCallbacks(webhookTrigger, cnt, this));
         }
     }
 
@@ -63,7 +61,7 @@ public class WebhookAsyncRequest {
     }
 
     public String getRequestId() {
-        return requestId;
+        return webhookTrigger.getId();
     }
 
 }

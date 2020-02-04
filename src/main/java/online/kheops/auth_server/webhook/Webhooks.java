@@ -35,7 +35,7 @@ public class Webhooks {
         throw new IllegalStateException("Utility class");
     }
 
-    public static WebhookResponse createWebhook(String url, String albumId, User callingUser, String name, String secret, boolean newSeries, boolean newUser, boolean enable, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse createWebhook(String url, String albumId, User callingUser, String name, String secret, boolean newSeries, boolean newUser, boolean enabled, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -48,7 +48,7 @@ public class Webhooks {
             callingUser = em.merge(callingUser);
 
             final Album album = getAlbum(albumId, em);
-            final Webhook newWebhook = new Webhook(name, url, album, callingUser, secret, newSeries, newUser, enable);
+            final Webhook newWebhook = new Webhook(name, url, album, callingUser, secret, newSeries, newUser, enabled);
 
             em.persist(newWebhook);
 
@@ -73,7 +73,7 @@ public class Webhooks {
         return webhookResponse;
     }
 
-    public static WebhookResponse editWebhook(String webhookId, String url, String albumId, User callingUser, String name, String secret, Boolean newSeries, Boolean newUser, Boolean enable, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse editWebhook(String webhookId, String url, String albumId, User callingUser, String name, String secret, Boolean newSeries, Boolean newUser, Boolean enabled, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -103,8 +103,8 @@ public class Webhooks {
             if (newUser != null) {
                 webhook.setNewUser(newUser);
             }
-            if (enable != null) {
-                webhook.setEnable(enable);
+            if (enabled != null) {
+                webhook.setEnabled(enabled);
             }
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, EDIT_WEBHOOK);
@@ -142,8 +142,8 @@ public class Webhooks {
             final Album album = getAlbum(albumId, em);
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
 
-            for (WebhookHistory webhookHistory:webhook.getWebhookHistory()) {
-                em.remove(webhookHistory);
+            for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+                em.remove(webhookTrigger);
             }
             em.remove(webhook);
 
@@ -166,7 +166,7 @@ public class Webhooks {
     }
 
 
-    public static WebhookResponse getWebhook(String webhookID, String albumId, Integer historyLimit, Integer historyOffset, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse getWebhook(String webhookID, String albumId, Integer triggerLimit, Integer triggerOffset, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -179,8 +179,6 @@ public class Webhooks {
             final Album album = getAlbum(albumId, em);
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
 
-            tx.commit();
-
             kheopsLogBuilder.action(GET_WEBHOOK)
                     .album(albumId)
                     .webhookID(webhookID)
@@ -188,27 +186,19 @@ public class Webhooks {
 
             webhookResponse = new WebhookResponse(webhook);
 
-            int maxHistory = 5;
-            for(WebhookHistory webhookHistory:webhook.getWebhookHistory()) {
-                webhookResponse.addHistory(webhookHistory);
-                maxHistory--;
-                if(maxHistory == 0) {
-                    break;
-                }
-            }
-
-            for(WebhookHistory webhookHistory:webhook.getWebhookHistory()) {
-                if (historyOffset > 0) {
-                    historyOffset--;
+            for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+                if (triggerOffset > 0) {
+                    triggerOffset--;
                 } else {
-                    webhookResponse.addFullHistory(webhookHistory);
-                    historyLimit--;
-                    if (historyLimit == 0) {
+                    webhookResponse.addFullTriggers(webhookTrigger);
+                    triggerLimit--;
+                    if (triggerLimit == 0) {
                         break;
                     }
                 }
             }
 
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -236,8 +226,8 @@ public class Webhooks {
                 final WebhookResponse webhookResponse = new WebhookResponse(webhook);
                 webhookResponseList.add(webhookResponse);
                 int maxHistory = 5;
-                for(WebhookHistory webhookHistory:webhook.getWebhookHistory()) {
-                    webhookResponse.addHistory(webhookHistory);
+                for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+                    webhookResponse.addTrigger(webhookTrigger);
                     maxHistory--;
                     if(maxHistory == 0) {
                         break;
@@ -254,8 +244,8 @@ public class Webhooks {
         return new PairListXTotalCount<>(numberOfWebhook, webhookResponseList);
     }
 
-    public static void triggerWebhook(ServletContext context, String webhookID, String albumId, String user, String studyInstanceUID, String seriesInstanceUID, User callingUser)
-            throws WebhookNotFoundException, AlbumNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
+    public static void triggerNewSeriesWebhook(ServletContext context, String webhookID, String albumId, String studyInstanceUID, String seriesInstanceUID, User callingUser)
+            throws WebhookNotFoundException, AlbumNotFoundException, UserNotMemberException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -268,32 +258,60 @@ public class Webhooks {
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
             final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
 
-            if (user != null) {
-                final User targetUser = getOrCreateUser(user);
-                final AlbumUser albumTargetUser = getAlbumUser(album, targetUser, em);
+            Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+            if(album.containsSeries(series, em)) {
+                final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),true);
+                final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
+                em.persist(webhookTrigger);
+                new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+            } else {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(SERIES_NOT_FOUND)
+                        .detail("The series does not exist or she is not in the album")
+                        .build();
+                throw new SeriesNotFoundException(errorResponse);
+            }
 
-                if (isMemberOfAlbum(targetUser, album, em)) {
-                    final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
-                    new WebhookAsyncRequest(webhook, newUserWebhook, true);
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message("User not a member")
-                            .detail("The trigged user is not a member of the album")
-                            .build();
-                    throw new UserNotMemberException(errorResponse);
-                }
-            } else if (seriesInstanceUID != null) {
-                Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-                if(album.containsSeries(series, em)) {
-                    final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),true);
-                    new WebhookAsyncRequest(webhook, newSeriesWebhook, true);
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(SERIES_NOT_FOUND)
-                            .detail("The series does not exist or she is not in the album")
-                            .build();
-                    throw new SeriesNotFoundException(errorResponse);
-                }
+            final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);
+            em.persist(mutation);
+
+            tx.commit();
+
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+    public static void triggerNewUserWebhook(ServletContext context, String webhookID, String albumId, String user, User callingUser)
+            throws WebhookNotFoundException, AlbumNotFoundException, UserNotMemberException, UserNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            callingUser = em.merge(callingUser);
+
+            final Album album = getAlbum(albumId, em);
+            final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
+            final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
+
+            final User targetUser = getOrCreateUser(user);
+            final AlbumUser albumTargetUser = getAlbumUser(album, targetUser, em);
+
+            if (isMemberOfAlbum(targetUser, album, em)) {
+                final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
+                final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_USER, webhook);
+                em.persist(webhookTrigger);
+                new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
+            } else {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message("User not a member")
+                        .detail("The trigged 'user' is not a member of the album")
+                        .build();
+                throw new UserNotMemberException(errorResponse);
             }
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);

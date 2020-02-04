@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implements Record10<Long, String, String, String, Boolean, Long, String, Boolean, Boolean, Long> {
 
-    private static final long serialVersionUID = 169293665;
+    private static final long serialVersionUID = 914793173;
 
     /**
      * Setter for <code>public.webhooks.pk</code>.
@@ -87,16 +87,16 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
     }
 
     /**
-     * Setter for <code>public.webhooks.enable</code>.
+     * Setter for <code>public.webhooks.enabled</code>.
      */
-    public void setEnable(Boolean value) {
+    public void setEnabled(Boolean value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>public.webhooks.enable</code>.
+     * Getter for <code>public.webhooks.enabled</code>.
      */
-    public Boolean getEnable() {
+    public Boolean getEnabled() {
         return (Boolean) get(4);
     }
 
@@ -239,7 +239,7 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
      */
     @Override
     public Field<Boolean> field5() {
-        return Webhooks.WEBHOOKS.ENABLE;
+        return Webhooks.WEBHOOKS.ENABLED;
     }
 
     /**
@@ -319,7 +319,7 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
      */
     @Override
     public Boolean component5() {
-        return getEnable();
+        return getEnabled();
     }
 
     /**
@@ -399,7 +399,7 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
      */
     @Override
     public Boolean value5() {
-        return getEnable();
+        return getEnabled();
     }
 
     /**
@@ -483,7 +483,7 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
      */
     @Override
     public WebhooksRecord value5(Boolean value) {
-        setEnable(value);
+        setEnabled(value);
         return this;
     }
 
@@ -564,14 +564,14 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
     /**
      * Create a detached, initialised WebhooksRecord
      */
-    public WebhooksRecord(Long pk, String id, String name, String url, Boolean enable, Long userFk, String secret, Boolean newSeries, Boolean newUser, Long albumFk) {
+    public WebhooksRecord(Long pk, String id, String name, String url, Boolean enabled, Long userFk, String secret, Boolean newSeries, Boolean newUser, Long albumFk) {
         super(Webhooks.WEBHOOKS);
 
         set(0, pk);
         set(1, id);
         set(2, name);
         set(3, url);
-        set(4, enable);
+        set(4, enabled);
         set(5, userFk);
         set(6, secret);
         set(7, newSeries);
