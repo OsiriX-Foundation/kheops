@@ -71,6 +71,8 @@ public class WebhookResponse {
     }
 
     public void sortFullTrigers() {
-        Collections.sort(fullTriggers);
+        if (fullTriggers!= null) {
+            Collections.sort(fullTriggers);
+        }
     }
 }
