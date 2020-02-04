@@ -50,10 +50,10 @@ public class WebhookResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newWebHook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                               @FormParam("url") String url,
-                               @FormParam("name") String name,
-                               @FormParam("secret") String secret,
-                               @FormParam("events") List<String> events,
+                               @FormParam("url") @NotNull String url,
+                               @FormParam("name") @NotNull String name,
+                               @FormParam("secret") @NotNull String secret,
+                               @FormParam("events") @NotNull List<String> events,
                                @FormParam("enabled")@DefaultValue("true") boolean enabled)
             throws AlbumNotFoundException {
 
@@ -126,13 +126,15 @@ public class WebhookResource {
 
             throws AlbumNotFoundException, WebhookNotFoundException {
 
-        name = name.trim();
-        if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        if (name != null) {
+            name = name.trim();
+            if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
+            }
         }
 
         if(url != null && url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
