@@ -39,7 +39,6 @@ public class WebhookTriggerResponse {
             for (WebhookAttempt webhookAttempt : webhookTrigger.getWebhookAttempts()) {
                 webhookAttemptResponseList.add(new WebhookAttemptResponse(webhookAttempt));
             }
-            Collections.sort(webhookAttemptResponseList);
         }
     }
 }
