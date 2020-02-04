@@ -122,7 +122,7 @@ public class WebhookResource {
                                @FormParam("name") String name,
                                @FormParam("secret") String secret,
                                @FormParam("events") List<String> events,
-                               @FormParam("enabled") boolean enabled)
+                               @FormParam("enabled") Boolean enabled)
 
             throws AlbumNotFoundException, WebhookNotFoundException {
 
