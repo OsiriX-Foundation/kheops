@@ -68,6 +68,7 @@ public class WebhookTrigger {
     public Boolean getNewSeries() { return newSeries; }
     public Boolean getNewUser() { return newUser; }
     public String getId() { return id; }
+    public long getPk() { return pk; }
 
     public Set<WebhookAttempt> getWebhookAttempts() { return webhookAttempts; }
 
