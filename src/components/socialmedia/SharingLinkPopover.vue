@@ -33,7 +33,7 @@
 <template>
   <span>
     <div
-      v-if="url === '' && tokens.length === 0"
+      v-if="tokens.length === 0"
     >
       <div class="row mt-2 mb-2">
         <div class="col-xs-12 col-sm-12 col-md-8">

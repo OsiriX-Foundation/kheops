@@ -33,7 +33,10 @@
       placement="auto"
     >
       <template v-slot:title>
-        <pop-over-title :title="$t('sharingTitle')" @cancel="cancelSharingToken" />
+        <pop-over-title
+          :title="$t('sharingTitle')"
+          @cancel="cancelSharingToken"
+        />
       </template>
       <sharing-link-popover
         :album-id="albumid"
@@ -47,7 +50,7 @@
   </span>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import moment from 'moment';
 import PopOverTitle from '@/components/socialmedia/PopOverTitle';
 import SharingLinkPopover from '@/components/socialmedia/SharingLinkPopover';
 
@@ -60,6 +63,11 @@ export default {
       required: true,
       default: null,
     },
+    tokens: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -70,11 +78,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      albumTokens: 'albumTokens',
-    }),
     sharingToken() {
-      return this.albumTokens.filter((token) => token.title.includes('sharing_link') && moment(token.expiration_time) > moment() && !token.revoked);
+      return this.tokens.filter((token) => token.title.includes('sharing_link') && moment(token.expiration_time) > moment() && !token.revoked);
     },
   },
   methods: {
@@ -87,12 +92,13 @@ export default {
     revokeSharingTokens(tokens) {
       this.cancelSharingToken();
       this.urlSharing = '';
-      this.revokeTokens(tokens);
+      this.$emit('revoketokens', tokens);
     },
     createSharingToken(token) {
       this.createToken(token).then((res) => {
         const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
         this.urlSharing = urlSharing;
+        this.$emit('gettokens');
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
       });
