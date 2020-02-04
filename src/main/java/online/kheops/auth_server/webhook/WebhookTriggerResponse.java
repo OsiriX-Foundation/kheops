@@ -13,10 +13,6 @@ public class WebhookTriggerResponse {
 
     @XmlElement(name = "id")
     private String id;
-    @XmlElement(name = "attempt")
-    private long attempt;
-    @XmlElement(name = "status")
-    private long status;
     @XmlElement(name = "is_manual_trigger")
     private boolean isManualTrigger;
     @XmlElement(name = "type")
