@@ -20,7 +20,8 @@
     "reload": "Reload",
     "filter": "Filter",
     "fromDate": "From",
-    "toDate": "To"
+    "toDate": "To",
+    "nopermissions": "You don't have the permissions to show the albums list."
   },
   "fr": {
     "newalbum": "Nouvel album",
@@ -42,7 +43,8 @@
     "reload": "Recharger",
     "filter": "Filtrer",
     "fromDate": "De",
-    "toDate": "A"
+    "toDate": "A",
+    "nopermissions": "Vous n'avez pas les autorisations pour afficher la liste des albums."
   }
 }
 </i18n>
@@ -267,14 +269,23 @@
         {{ $t('noresults') }}
       </div>
       <div slot="error">
-        {{ $t('error') }}<br>
-        <button
-          type="button"
-          class=" btn btn-md"
-          @click="searchAlbums()"
+        <span
+          v-if="statusList === 401 || statusList === 403"
         >
-          {{ $t('reload') }}
-        </button>
+          {{ $t('nopermissions') }}
+        </span>
+        <span
+          v-else
+        >
+          {{ $t('error') }}<br><br>
+          <button
+            type="button"
+            class=" btn btn-md"
+            @click="searchAlbums()"
+          >
+            {{ $t('reload') }}
+          </button>
+        </span>
       </div>
     </infinite-loading>
   </div>
@@ -298,6 +309,7 @@ export default {
   },
   data() {
     return {
+      statusList: 200,
       form_send_album: false,
       showFilters: false,
       infiniteId: 0,
@@ -481,6 +493,9 @@ export default {
     },
     infiniteHandler($state) {
       this.getAlbums(this.albumsParams.offset, this.albumsParams.limit).then((res) => {
+        if (res.status !== undefined) {
+          this.statusList = res.status;
+        }
         if (this.albums.length === parseInt(res.headers['x-total-count'], 10)) {
           $state.complete();
         }
@@ -491,6 +506,9 @@ export default {
           $state.complete();
         }
       }).catch((err) => {
+        if (err.response !== undefined && err.response.status !== undefined) {
+          this.statusList = err.response.status;
+        }
         $state.error();
         return err;
       });

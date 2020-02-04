@@ -14,7 +14,12 @@
     "unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
     "errorcode": "Error code",
     "authorizationerror": "Authorization Error",
-    "nondicomfile": "Non DICOM file",
+    "processingfailure": "Processing failure",
+    "sopnotsupported": "Referenced SOP Class not supported",
+    "transfersyntaxnotsupported":"Referenced Transfer Syntax not supported",
+    "refused": "Refused out of Resources",
+    "notmatchsop": "Error: Data Set does not match SOP Class",
+    "cannotunderstand": "Error: Cannot understand",
     "unknownerror": "Unknown Error",
     "reload": "Reload erroneous files"
   },
@@ -32,7 +37,12 @@
     "unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
     "errorcode": "Code d'erreur",
     "authorizationerror": "Erreur d'authorisation",
-    "nondicomfile": "Fichier non DICOM",
+    "processingfailure": "Echec de traitement",
+    "sopnotsupported": "Classe SOP référencée non prise en charge",
+    "transfersyntaxnotsupported":"Syntaxe de transfert référencée non prise en charge",
+    "refused": "Refusé: Plus de ressources",
+    "notmatchsop": "Erreur: L'ensemble de données ne correspond pas à la classe SOP",
+    "cannotunderstand": "Erreur: Incompréhensible",
     "unknownerror": "Erreur inconnue",
     "reload": "Recharger les fichiers erronés"
   }
@@ -62,22 +72,19 @@
           class="p-2"
         >
           <done-icon
-            v-if="error.length === 0"
+            v-if="error.length === 0 && totalUnknownFilesError === 0"
             :height="'20'"
             :width="'20'"
           />
-          <span
-            v-if="error.length > 0 && error.length < totalSize"
-          >
-            <v-icon
-              name="warning"
-              :height="'20'"
-              :width="'20'"
-              color="red"
-            />
-          </span>
+          <v-icon
+            v-if="(error.length > 0 || totalUnknownFilesError > 0) && (error.length + totalUnknownFilesError) < totalSize"
+            name="warning"
+            :height="'20'"
+            :width="'20'"
+            color="red"
+          />
           <error-icon
-            v-if="error.length === totalSize && totalSize !== 0"
+            v-if="(error.length === totalSize || totalUnknownFilesError === totalSize) && totalSize !== 0"
             :height="'20'"
             :width="'20'"
             color="red"
@@ -261,7 +268,7 @@
                 <span
                   class="text-warning"
                 >
-                  {{ $t(errorValues[key]) }}
+                  {{ generateTextError(key) }}
                 </span>
               </div>
             </div>
@@ -384,10 +391,29 @@ export default {
         headers: {},
       },
       errorValues: {
+        0xC122: 'transfersyntaxnotsupported',
         292: 'authorizationerror',
-        272: 'nondicomfile',
+        290: 'sopnotsupported',
+        272: 'processingfailure',
         0: 'unknownerror',
       },
+      hexErrorValues: [
+        {
+          pattern: 255,
+          value: 0xA7FF,
+          error: 'refused',
+        },
+        {
+          pattern: 255,
+          value: 0xA9FF,
+          error: 'notmatchsop',
+        },
+        {
+          pattern: 4095,
+          value: 0xCFFF,
+          error: 'cannotunderstand',
+        },
+      ],
       errorDicom: {
         '0008119A': '00041500',
         '00081198': '00041500',
@@ -638,7 +664,7 @@ export default {
       Object.keys(this.errorDicom).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(data, key)) {
           const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key]);
-          this.generateListError(data[key].Value, this.errorDicom[key]);
+          this.createListUnknownError(data[key].Value, this.errorDicom[key]);
           this.createListError(errorInResponse);
           error = 0;
         }
@@ -656,23 +682,45 @@ export default {
       error.forEach((errorCode, id) => {
         const fileError = this.copyFiles.find((file) => file.id === id);
         if (fileError) {
-          const textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`;
+          const textError = this.errorValues[errorCode] !== undefined ? `${this.$t(this.errorValues[errorCode])} (${errorCode})` : `${this.$t('errorcode')}: ${errorCode}`;
           this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError) });
+        } else {
+          this.updateListUnknownError(errorCode);
         }
       });
     },
-    generateListError(dicom, dicomTagFile) {
+    createListUnknownError(dicom, dicomTagFile) {
       dicom.forEach((x) => {
         if (!Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
           const errorCode = x[this.dicomTagError].Value[0];
-          if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
-            this.listErrorUnknownFiles[errorCode] += 1;
-          } else {
-            this.listErrorUnknownFiles[errorCode] = 1;
-          }
-          this.totalUnknownFilesError += 1;
+          this.updateListUnknownError(errorCode);
         }
       });
+    },
+    updateListUnknownError(errorCode) {
+      if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
+        this.listErrorUnknownFiles[errorCode] += 1;
+      } else {
+        this.listErrorUnknownFiles[errorCode] = 1;
+      }
+      this.totalUnknownFilesError += 1;
+    },
+    generateTextError(errorCode) {
+      const code = parseInt(errorCode, 10);
+      if (this.errorValues[code] !== undefined) {
+        return `${this.$t(this.errorValues[code])} (${code})`;
+      }
+      let errorText = '';
+      this.hexErrorValues.forEach((error) => {
+        // eslint-disable-next-line no-bitwise
+        if ((code | error.pattern) === error.value) {
+          errorText = `${this.$t(error.error)} (${code})`;
+        }
+      });
+      if (errorText !== '') {
+        return errorText;
+      }
+      return `${this.$t('unknownerror')} (${errorCode})`;
     },
     dicom2map(dicom, dicomTagFile) {
       const map = new Map();
