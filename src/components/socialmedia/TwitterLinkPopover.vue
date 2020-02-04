@@ -53,7 +53,7 @@
 </template>
 <script>
 export default {
-  name: 'TwitterLink',
+  name: 'TwitterLinkPopover',
   props: {
     tokens: {
       type: Array,

@@ -52,7 +52,7 @@ import PopOverTitle from '@/components/socialmedia/PopOverTitle';
 import TwitterLinkPopover from '@/components/socialmedia/TwitterLinkPopover';
 
 export default {
-  name: 'SharingLink',
+  name: 'TwitterLink',
   components: { PopOverTitle, TwitterLinkPopover },
   props: {
     albumid: {
