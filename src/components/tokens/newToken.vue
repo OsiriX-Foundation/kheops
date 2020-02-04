@@ -420,6 +420,7 @@ export default {
       const token = { ...this.token, ...this.permissions };
       token.expiration_time = moment(this.token.expiration_time).format();
       token.not_before_time = moment(this.token.not_before_time).format();
+      delete token.access_token;
       this.$store.dispatch('createToken', { token }).then((res) => {
         this.token.access_token = res.data.access_token;
         this.sharingurl = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
