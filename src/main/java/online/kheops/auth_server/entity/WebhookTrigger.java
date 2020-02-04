@@ -34,6 +34,7 @@ public class WebhookTrigger {
 
     @OneToMany
     @JoinColumn (name = "webhook_trigger_fk", nullable = false)
+    @OrderBy("attempt desc")
     private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
 
     @ManyToOne
