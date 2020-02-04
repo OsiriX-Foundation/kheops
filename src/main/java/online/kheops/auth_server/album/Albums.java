@@ -10,7 +10,6 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.webhook.NewUserWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
-import online.kheops.auth_server.webhook.WebhookRequestId;
 import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
