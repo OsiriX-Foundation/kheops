@@ -62,9 +62,7 @@ public class WebhookTrigger {
     }
 
 
-    public void addWebhookAttempt(WebhookAttempt webhookAttempt) {
-        this.webhookAttempts.add(webhookAttempt);
-    }
+    public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
 
     public Boolean isManualTrigger() { return isManualTrigger; }
     public Boolean getNewSeries() { return newSeries; }

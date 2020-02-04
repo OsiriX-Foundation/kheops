@@ -40,11 +40,12 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
             try {
                 tx.begin();
+                em.merge(webhookTrigger);
                 final WebhookAttempt webhookAttempt = new WebhookAttempt(response.getStatus(), NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
                 em.persist(webhookAttempt);
                 tx.commit();
             } catch (Exception e) {
-                LOG.log(Level.WARNING,"Error adding a webhook trigger to the DB",e);
+                LOG.log(Level.WARNING,"Error adding a webhook attempt to the DB",e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
@@ -67,11 +68,12 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
 
             try {
                 tx.begin();
+                em.merge(webhookTrigger);
                 final WebhookAttempt webhookAttempt = new WebhookAttempt(-1, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
                 em.persist(webhookAttempt);
                 tx.commit();
             } catch (Exception e) {
-                LOG.log(Level.WARNING,"Error adding a webhook trigger to the DB",e);
+                LOG.log(Level.WARNING,"Error adding a webhook attempt to the DB",e);
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
