@@ -64,6 +64,12 @@ public class WebhookResource {
                     .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        } else if (name.length() == 0) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'name' is too short min expected: 1 character but got : 0")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         if(url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
@@ -91,24 +97,21 @@ public class WebhookResource {
         boolean newSeries = false;
         boolean newUser = false;
 
-        if(events != null) {
-            for (String event : events) {
-                if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                    newSeries = true;
-                } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                    newUser = true;
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(BAD_FORM_PARAMETER)
-                            .detail("Param 'events' contain an unknown value")
-                            .build();
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
+        for (String event : events) {
+            if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
+                newSeries = true;
+            } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
+                newUser = true;
+            } else {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("Param 'events' contain an unknown value")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-
         final WebhookResponse webhookResponse = createWebhook(url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, enabled, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(CREATED).entity(webhookResponse).build();
