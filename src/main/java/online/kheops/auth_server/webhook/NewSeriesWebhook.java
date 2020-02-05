@@ -9,6 +9,8 @@ import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 

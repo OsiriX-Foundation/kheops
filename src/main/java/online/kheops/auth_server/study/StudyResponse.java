@@ -4,10 +4,17 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.series.SeriesResponse;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+
 public class StudyResponse {
+
+    @Context
+    private ServletContext context;
 
     @XmlElement(name = "patient_name")
     private String patientName;
@@ -34,6 +41,9 @@ public class StudyResponse {
     @XmlElement(name = "patient_sex")
     private String patientSex;
 
+    @XmlElement(name = "retrieve_url")
+    private String retrieveUrl;
+
     @XmlElement(name = "series")
     private ArrayList<SeriesResponse> series;
 
@@ -53,6 +63,7 @@ public class StudyResponse {
         studyId = study.getStudyID();
         timezoneOffsetFromUtc = study.getTimezoneOffsetFromUTC();
         studyTime = study.getStudyTime();
+        retrieveUrl = getHostRoot() + "/api/studies/" + study.getStudyInstanceUID();
     }
 
     public void addSeries(Series series) {
@@ -68,5 +79,9 @@ public class StudyResponse {
         } else {
             return !series.isEmpty();
         }
+    }
+
+    private String getHostRoot() {
+        return context.getInitParameter(HOST_ROOT_PARAMETER);
     }
 }

@@ -2,9 +2,16 @@ package online.kheops.auth_server.series;
 
 import online.kheops.auth_server.entity.Series;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlElement;
 
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+
 public class SeriesResponse {
+
+    @Context
+    private ServletContext context;
 
     @XmlElement(name = "modality")
     private String modality;
@@ -21,6 +28,8 @@ public class SeriesResponse {
     @XmlElement(name = "body_part_examined")
     private String bodyPartExamined;
 
+    @XmlElement(name = "retrieve_url")
+    private String retrieveUrl;
 
     private SeriesResponse() { /*empty*/ }
 
@@ -32,5 +41,11 @@ public class SeriesResponse {
         timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
         seriesNumber = series.getSeriesNumber();
         bodyPartExamined = series.getBodyPartExamined();
+        retrieveUrl = getHostRoot() + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
     }
+
+    private String getHostRoot() {
+        return context.getInitParameter(HOST_ROOT_PARAMETER);
+    }
+
 }
