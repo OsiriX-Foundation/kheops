@@ -53,7 +53,7 @@ public class WebhookResource {
                                @FormParam("url") @NotNull String url,
                                @FormParam("name") @NotNull String name,
                                @FormParam("secret") String secret,
-                               @FormParam("events") List<String> events,
+                               @FormParam("event") List<String> events,
                                @FormParam("enabled")@DefaultValue("true") boolean enabled)
             throws AlbumNotFoundException {
 
@@ -78,6 +78,12 @@ public class WebhookResource {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
                     .detail("Param 'secret' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET + " characters but got :" + secret.length())
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        } else if (secret != null && secret.length() == 0) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'secret' is too short min expected: 1 character but got : 0")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -121,7 +127,7 @@ public class WebhookResource {
                                @FormParam("url") String url,
                                @FormParam("name") String name,
                                @FormParam("secret") String secret,
-                               @FormParam("events") List<String> events,
+                               @FormParam("event") List<String> events,
                                @FormParam("enabled") Boolean enabled)
 
             throws AlbumNotFoundException, WebhookNotFoundException {
