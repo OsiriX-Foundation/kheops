@@ -52,8 +52,8 @@ public class WebhookResource {
     public Response newWebHook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                @FormParam("url") @NotNull String url,
                                @FormParam("name") @NotNull String name,
-                               @FormParam("secret") @NotNull String secret,
-                               @FormParam("events") @NotNull List<String> events,
+                               @FormParam("secret") String secret,
+                               @FormParam("events") List<String> events,
                                @FormParam("enabled")@DefaultValue("true") boolean enabled)
             throws AlbumNotFoundException {
 
