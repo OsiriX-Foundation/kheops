@@ -3,6 +3,7 @@ package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
@@ -57,60 +58,11 @@ public class WebhookResource {
                                @FormParam("secret") String secret,
                                @FormParam("event") List<String> events,
                                @FormParam("enabled")@DefaultValue("true") boolean enabled)
-            throws AlbumNotFoundException {
+            throws AlbumNotFoundException, BadQueryParametersException {
 
-        name = name.trim();
-        if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        } else if (name.length() == 0) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'name' is too short min expected: 1 character but got : 0")
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        }
-
-        if(url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'url' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_URL + " characters but got :" + url.length())
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        }
-        try {
-            final String protocol = new URL(url).getProtocol();
-            if (!VALID_SCHEMES_WEBHOOK_URL.contains(protocol)) {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(BAD_FORM_PARAMETER)
-                        .detail("'url' not valid, the scheme must be 'http' or 'https'")
-                        .build();
-                return Response.status(BAD_REQUEST).entity(errorResponse).build();
-            }
-        } catch (MalformedURLException e) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("'url' not valid")
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        }
-
-        if (secret != null && secret.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'secret' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET + " characters but got :" + secret.length())
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        } else if (secret != null && secret.length() == 0) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'secret' is too short min expected: 1 character but got : 0")
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        }
+        validName(name);
+        validUrl(url);
+        validSecret(secret);
 
         boolean newSeries = false;
         boolean newUser = false;
@@ -151,26 +103,17 @@ public class WebhookResource {
                                @FormParam("event") List<String> events,
                                @FormParam("enabled") Boolean enabled)
 
-            throws AlbumNotFoundException, WebhookNotFoundException {
+            throws AlbumNotFoundException, WebhookNotFoundException, BadQueryParametersException {
 
         if (name != null) {
-            name = name.trim();
-            if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
-                        .build();
-                return Response.status(BAD_REQUEST).entity(errorResponse).build();
-            }
+            validName(name);
         }
 
-        if(url != null && url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'url' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_URL + " characters but got :" + url.length())
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        if(url != null ) {
+            validUrl(url);
         }
+
+        validSecret(secret);
 
         Boolean newSeries = null;
         Boolean newUser = null;

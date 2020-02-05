@@ -2,11 +2,13 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -14,10 +16,14 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
+import javax.ws.rs.core.Response;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.event.Events.MutationType.*;
 import static online.kheops.auth_server.event.Events.MutationType.EDIT_WEBHOOK;
@@ -25,6 +31,8 @@ import static online.kheops.auth_server.event.Events.MutationType.TRIGGER_WEBHOO
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+import static online.kheops.auth_server.util.Consts.VALID_SCHEMES_WEBHOOK_URL;
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.KheopsLogBuilder.ActionType.*;
 import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookById;
@@ -348,4 +356,65 @@ public class Webhooks {
         return true;
     }
 
-}
+    public static void validName(String name) throws BadQueryParametersException {
+        name = name.trim();
+        if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
+                    .build();
+            throw new  BadQueryParametersException(errorResponse);
+        } else if (name.length() == 0) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'name' is too short min expected: 1 character but got : 0")
+                    .build();
+            throw new  BadQueryParametersException(errorResponse);
+        }
+    }
+
+    public static void validSecret(String secret) throws BadQueryParametersException {
+        if (secret != null && secret.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'secret' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET + " characters but got :" + secret.length())
+                    .build();
+            throw new  BadQueryParametersException(errorResponse);
+        } else if (secret != null && secret.length() == 0) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'secret' is too short min expected: 1 character but got : 0")
+                    .build();
+            throw new  BadQueryParametersException(errorResponse);
+        }
+    }
+
+    public static void validUrl(String url) throws BadQueryParametersException {
+        if(url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'url' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_URL + " characters but got :" + url.length())
+                    .build();
+            throw new  BadQueryParametersException(errorResponse);
+        }
+        try {
+            final String protocol = new URL(url).getProtocol();
+            if (!VALID_SCHEMES_WEBHOOK_URL.contains(protocol)) {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("'url' not valid, the scheme must be 'http' or 'https'")
+                        .build();
+                throw new  BadQueryParametersException(errorResponse);
+            }
+        } catch (MalformedURLException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("'url' not valid")
+                    .build();
+            throw new  BadQueryParametersException(errorResponse);
+        }
+    }
+
+
+
+    }
