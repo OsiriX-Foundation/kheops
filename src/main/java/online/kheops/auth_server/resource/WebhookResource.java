@@ -6,6 +6,7 @@ import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.Consts;
@@ -19,6 +20,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -76,6 +79,15 @@ public class WebhookResource {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
                     .detail("Param 'url' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_URL + " characters but got :" + url.length())
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
+        try {
+            new URI(url);
+        } catch (URISyntaxException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("'url' not valid")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
