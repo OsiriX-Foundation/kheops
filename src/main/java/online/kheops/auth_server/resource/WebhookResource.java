@@ -20,8 +20,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -85,6 +87,15 @@ public class WebhookResource {
         try {
             new URI(url);
         } catch (URISyntaxException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("'url' not valid")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
+        try {
+            new URL(url);
+        } catch (MalformedURLException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
                     .detail("'url' not valid")
