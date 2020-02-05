@@ -21,7 +21,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -83,9 +82,8 @@ public class WebhookResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
         try {
-            final List<String> schemes = new ArrayList<>(List.of("http","https"));
             final String protocol = new URL(url).getProtocol();
-            if (!schemes.contains(protocol)) {
+            if (!VALID_SCHEMES_WEBHOOK_URL.contains(protocol)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
                         .detail("'url' not valid, the scheme must be 'http' or 'https'")
