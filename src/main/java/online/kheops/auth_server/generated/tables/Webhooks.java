@@ -4,6 +4,7 @@
 package online.kheops.auth_server.generated.tables;
 
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Webhooks extends TableImpl<WebhooksRecord> {
 
-    private static final long serialVersionUID = -667909123;
+    private static final long serialVersionUID = -794002470;
 
     /**
      * The reference instance of <code>public.webhooks</code>
@@ -79,6 +80,11 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
      * The column <code>public.webhooks.enabled</code>.
      */
     public final TableField<WebhooksRecord, Boolean> ENABLED = createField("enabled", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
+     * The column <code>public.webhooks.creation_time</code>.
+     */
+    public final TableField<WebhooksRecord, Timestamp> CREATION_TIME = createField("creation_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.user_fk</code>.

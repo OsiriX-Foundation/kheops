@@ -38,7 +38,7 @@ public class WebhookQueries {
     }
 
     public static List<Webhook> getWebhooks(Album album, Integer limit, Integer offset, EntityManager em) {
-            return em.createQuery("SELECT w from Webhook w join w.album a where a = :album", Webhook.class)
+            return em.createQuery("SELECT w from Webhook w join w.album a where a = :album order by w.creationTime desc", Webhook.class)
                     .setParameter("album", album)
                     .setFirstResult(offset)
                     .setMaxResults(limit)

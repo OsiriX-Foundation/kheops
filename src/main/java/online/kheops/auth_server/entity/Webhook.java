@@ -3,6 +3,7 @@ package online.kheops.auth_server.entity;
 import online.kheops.auth_server.webhook.WebhookId;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,10 @@ public class Webhook {
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
+
+    @Basic(optional = false)
+    @Column(name = "creation_time")
+    private LocalDateTime creationTime;
 
     @Column(name = "secret")
     private String secret;
@@ -60,7 +65,7 @@ public class Webhook {
         id = new WebhookId().getId();
     }
 
-    public Webhook() {}
+    private Webhook() {}
 
     public Webhook(String name, String url, Album album, User user, String secret, boolean newSeries, boolean newUser, boolean enabled) {
         this.name = name;
@@ -71,6 +76,7 @@ public class Webhook {
         this.album = album;
         this.user = user;
         this.enabled = enabled;
+        creationTime = LocalDateTime.now();
 
         album.addWebhook(this);
         user.addWebhook(this);
