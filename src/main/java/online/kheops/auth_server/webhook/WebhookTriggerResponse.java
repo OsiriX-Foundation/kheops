@@ -5,7 +5,6 @@ import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class WebhookTriggerResponse {
@@ -15,8 +14,8 @@ public class WebhookTriggerResponse {
     private String id;
     @XmlElement(name = "is_manual_trigger")
     private boolean isManualTrigger;
-    @XmlElement(name = "type")
-    private String type;
+    @XmlElement(name = "event")
+    private String event;
     @XmlElement(name = "attempts")
     private List<WebhookAttemptResponse> webhookAttemptResponseList;
 
@@ -29,9 +28,9 @@ public class WebhookTriggerResponse {
         id = webhookTrigger.getId();
         isManualTrigger = webhookTrigger.isManualTrigger();
         if(webhookTrigger.getNewSeries()) {
-            type = WebhookType.NEW_SERIES.name().toLowerCase();
+            event = WebhookType.NEW_SERIES.name().toLowerCase();
         } else if(webhookTrigger.getNewUser()) {
-            type = WebhookType.NEW_USER.name().toLowerCase();
+            event = WebhookType.NEW_USER.name().toLowerCase();
         }
 
         if(!webhookTrigger.getWebhookAttempts().isEmpty()) {
