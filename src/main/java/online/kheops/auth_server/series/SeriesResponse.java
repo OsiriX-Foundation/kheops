@@ -10,9 +10,6 @@ import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 
 public class SeriesResponse {
 
-    @Context
-    private ServletContext context;
-
     @XmlElement(name = "modality")
     private String modality;
     @XmlElement(name = "series_description")
@@ -33,7 +30,7 @@ public class SeriesResponse {
 
     private SeriesResponse() { /*empty*/ }
 
-    public SeriesResponse(Series series) {
+    public SeriesResponse(Series series, String instance) {
         modality = series.getModality();
         numberOfSeriesRelatedInstance = series.getNumberOfSeriesRelatedInstances();
         seriesDescription = series.getSeriesDescription();
@@ -41,11 +38,6 @@ public class SeriesResponse {
         timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
         seriesNumber = series.getSeriesNumber();
         bodyPartExamined = series.getBodyPartExamined();
-        retrieveUrl = getHostRoot() + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
+        retrieveUrl = instance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
     }
-
-    private String getHostRoot() {
-        return context.getInitParameter(HOST_ROOT_PARAMETER);
-    }
-
 }

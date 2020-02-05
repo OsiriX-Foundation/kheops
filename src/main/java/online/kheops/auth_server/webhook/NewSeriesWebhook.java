@@ -36,13 +36,13 @@ public class NewSeriesWebhook implements WebhookResult{
     @XmlElement(name = "capability_token")
     private CapabilitiesResponse capability;
 
+
     private NewSeriesWebhook() { /*empty*/ }
 
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, Series series, String instance, boolean isManualTrigger) {
         this(albumId, sourceUser, instance, isManualTrigger);
-        updatedStudy = new StudyResponse(series.getStudy());
+        updatedStudy = new StudyResponse(series.getStudy(), instance);
         updatedStudy.addSeries(series);
-        importSource = "send";
     }
 
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, String instance, boolean isManualTrigger) {
@@ -52,12 +52,11 @@ public class NewSeriesWebhook implements WebhookResult{
         this.sourceUser = new UserResponse(sourceUser);
         this.isManualTrigger = isManualTrigger;
         importSource = "send";
-
     }
 
     public void addSeries(Series series) {
         if(updatedStudy == null) {
-            updatedStudy = new StudyResponse(series.getStudy());
+            updatedStudy = new StudyResponse(series.getStudy(), instance);
         }
         updatedStudy.addSeries(series);
     }
