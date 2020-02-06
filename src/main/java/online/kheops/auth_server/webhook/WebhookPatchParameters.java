@@ -121,7 +121,7 @@ public class WebhookPatchParameters {
                         newSeries = Optional.of(true);
                     } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
                         newUser = Optional.of(true);
-                    } else {
+                    } else if (!event.equalsIgnoreCase("")) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message(BAD_FORM_PARAMETER)
                                 .detail("Param 'event' contain an unknown value")
