@@ -23,10 +23,6 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_client_zippersecret ]; then
     echo "Missing kheops_client_zippersecret secret"
     missing_env_var_secret=true
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_metric_ressource_password ]; then
-    echo "Missing kheops_metric_ressource_password secret"
-    missing_env_var_secret=true
-fi
 
 
 
@@ -156,14 +152,6 @@ if ! [ -z "$KHEOPS_AUTHORIZATION_ENABLE_ELASTIC" ]; then
            echo "environment variable KHEOPS_AUTHORIZATION_LOGSTASH_URL \e[92mOK\e[0m"
            sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_LOGSTASH_URL|" /etc/filebeat/filebeat.yml
            sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_LOGSTASH_URL|" /etc/metricbeat/metricbeat.yml
-        fi
-
-        kheops_metric_ressource_password=/run/secrets/kheops_metric_ressource_password
-        if [ -f $kheops_metric_ressource_password ]; then
-          sed -i "s|\${metrics_password}|$(cat $kheops_metric_ressource_password)|" /etc/metricbeat/modules.d/http.yml
-        else
-           echo "Missing kheops_metric_ressource_password secret"
-           missing_env_var_secret=true
         fi
 
         #if missing env var or secret => exit

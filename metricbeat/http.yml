@@ -5,5 +5,3 @@
     hosts: ["http://localhost:8080"]
     namespace: "kheopsmetrics"
     path: "/authorization/metrics"
-    username: "metricUser"
-    password: "${metrics_password}"
