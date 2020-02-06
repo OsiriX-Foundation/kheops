@@ -114,8 +114,8 @@ public class AlbumQueries {
                     nbUsers.as("number_of_users"),
                     countDistinct(EVENTS.PK).as("number_of_comments"),
                     countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))).as("number_of_series"),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))), 0).as("number_of_instances"),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as("number_of_series"),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as("number_of_instances"),
                     ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
                     ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
                     ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
@@ -229,8 +229,8 @@ public class AlbumQueries {
                     nbUsers.as("number_of_users"),
                     countDistinct(EVENTS.PK).as("number_of_comments"),
                     countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))).as("number_of_series"),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))), 0).as("number_of_instances"),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as("number_of_series"),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as("number_of_instances"),
                     ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
                     ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
                     ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
@@ -281,8 +281,8 @@ public class AlbumQueries {
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
                     countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))).as("number_of_series"),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))), 0).as("number_of_instances"),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as("number_of_series"),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as("number_of_instances"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUMS);
