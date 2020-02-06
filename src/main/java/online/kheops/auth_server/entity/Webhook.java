@@ -67,22 +67,7 @@ public class Webhook {
     }
 
     private Webhook() {}
-
-    public Webhook(String name, String url, Album album, User user, String secret, boolean newSeries, boolean newUser, boolean enabled) {
-        this.name = name;
-        this.url = url;
-        this.secret = secret;
-        this.newSeries = newSeries;
-        this.newUser = newUser;
-        this.album = album;
-        this.user = user;
-        this.enabled = enabled;
-        creationTime = LocalDateTime.now();
-
-        album.addWebhook(this);
-        user.addWebhook(this);
-    }
-
+    
     public Webhook(WebhookPostParameters webhookPostParameters, Album album, User user) {
         this.name = webhookPostParameters.getName();
         this.url = webhookPostParameters.getUrl();
