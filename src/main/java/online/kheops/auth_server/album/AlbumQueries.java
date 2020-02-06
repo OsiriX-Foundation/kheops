@@ -228,9 +228,9 @@ public class AlbumQueries {
                     ALBUMS.LAST_EVENT_TIME.as("album_last_event_time"),
                     nbUsers.as("number_of_users"),
                     countDistinct(EVENTS.PK).as("number_of_comments"),
-                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
-                    countDistinct(SERIES.PK).as("number_of_series"),
-                    sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("number_of_instances"),
+                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))).as("number_of_series"),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))), 0).as("number_of_instances"),
                     ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
                     ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
                     ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
@@ -258,8 +258,6 @@ public class AlbumQueries {
             query.addConditions(ALBUMS.ID.eq(albumId));
             query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
             query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
-            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
-            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
             query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
 
@@ -282,8 +280,9 @@ public class AlbumQueries {
                     ALBUMS.ID.as("album_id"),
                     ALBUMS.NAME.as("album_name"),
                     isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
-                    countDistinct(SERIES.PK).as("number_of_series"),
+                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))).as("number_of_series"),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(SERIES.studies().POPULATED.isTrue().or(SERIES.studies().POPULATED.isNull()))), 0).as("number_of_instances"),
                     groupConcatDistinct(SERIES.MODALITY).as("modalities"));
 
             query.addFrom(ALBUMS);
@@ -292,8 +291,6 @@ public class AlbumQueries {
             query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
 
             query.addConditions(ALBUMS.ID.eq(albumId));
-            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
-            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
             query.addGroupBy(ALBUMS.PK);
 
