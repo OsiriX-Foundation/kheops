@@ -95,7 +95,7 @@ public class Webhooks {
             webhookPatchParameters.getName().ifPresent(webhook::setName);
             webhookPatchParameters.isNewSeries().ifPresent(webhook::setNewSeries);
             webhookPatchParameters.isNewUser().ifPresent(webhook::setNewUser);
-            webhookPatchParameters.isEnabled().ifPresent(webhook::setNewUser);
+            webhookPatchParameters.isEnabled().ifPresent(webhook::setEnabled);
 
             if(webhookPatchParameters.isRemoveSecret()) {
                 webhook.setSecret(null);
