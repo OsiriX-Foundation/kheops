@@ -86,6 +86,11 @@ public class AlbumResponseBuilder {
         } else {
             this.modalities = new String[0];
         }
+        try {
+            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
+        } catch(NullPointerException e) {
+            this.numberOfInstances = 0;
+        }
         return this;
     }
 
