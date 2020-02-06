@@ -113,9 +113,9 @@ public class AlbumQueries {
                     ALBUMS.LAST_EVENT_TIME.as("album_last_event_time"),
                     nbUsers.as("number_of_users"),
                     countDistinct(EVENTS.PK).as("number_of_comments"),
-                    countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
-                    countDistinct(SERIES.PK).as("number_of_series"),
-                    sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("number_of_instances"),
+                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
+                    countDistinct(SERIES.PK).filterWhere(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).as("number_of_series"),
+                    sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).as("number_of_instances"),
                     ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
                     ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
                     ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
@@ -142,8 +142,6 @@ public class AlbumQueries {
                             .or(EVENTS.USER_FK.eq(albumQueryParams.getUser().getPk()))));
 
             conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
-            query.addConditions(SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull()));
-            query.addConditions(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()));
 
             applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
             applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
