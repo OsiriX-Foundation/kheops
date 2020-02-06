@@ -66,7 +66,7 @@ public class WebhookPatchParameters {
             return this;
         }
 
-        public WebhookPatchParametersBuilder setEnabled(boolean enabled) {
+        public WebhookPatchParametersBuilder setEnabled(Boolean enabled) {
             this.enabled = Optional.of(enabled);
             return this;
         }
