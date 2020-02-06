@@ -660,8 +660,12 @@
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="inbox_fk" baseTableName="users" constraintName="users_inbox_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
-
+    
     <changeSet author="kheops" id="v1.0-56">
+        <sql>CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA public</sql>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.0-57">
        <tagDatabase tag="v1"/> 
     </changeSet>
 
