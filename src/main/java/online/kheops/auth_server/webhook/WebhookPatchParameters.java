@@ -115,7 +115,7 @@ public class WebhookPatchParameters {
 
             if(!events.isEmpty()) {
                 newSeries = Optional.of(false);
-                newUser = Optional.of(true);
+                newUser = Optional.of(false);
                 for (String event : events) {
                     if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
                         newSeries = Optional.of(true);
