@@ -34,6 +34,7 @@ public class WebhookPostParameters {
 
     public WebhookPostParameters setName(String name)
             throws BadQueryParametersException {
+        name = name.trim();
         validName(name);
         this.name = name;
         return this;

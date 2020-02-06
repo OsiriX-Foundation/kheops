@@ -67,7 +67,7 @@ public class Webhook {
     }
 
     private Webhook() {}
-    
+
     public Webhook(WebhookPostParameters webhookPostParameters, Album album, User user) {
         this.name = webhookPostParameters.getName();
         this.url = webhookPostParameters.getUrl();

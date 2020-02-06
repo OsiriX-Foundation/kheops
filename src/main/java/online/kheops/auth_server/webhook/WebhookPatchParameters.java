@@ -46,6 +46,7 @@ public class WebhookPatchParameters {
         public WebhookPatchParametersBuilder setName(String name)
                 throws BadQueryParametersException {
             if (name != null) {
+                name = name.trim();
                 validName(name);
                 this.name = Optional.of(name);
             }

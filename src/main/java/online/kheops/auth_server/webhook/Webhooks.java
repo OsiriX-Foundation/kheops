@@ -345,7 +345,6 @@ public class Webhooks {
     }
 
     public static void validName(String name) throws BadQueryParametersException {
-        name = name.trim();
         if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
