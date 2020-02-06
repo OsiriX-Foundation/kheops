@@ -113,43 +113,49 @@ public class WebhookPatchParameters {
                 throw new BadQueryParametersException(errorResponse);
             }
 
-            for (String event : events) {
-                if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                    newSeries = Optional.of(true);
-                } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                    newUser = Optional.of(true);
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(BAD_FORM_PARAMETER)
-                            .detail("Param 'event' contain an unknown value")
-                            .build();
-                    throw new  BadQueryParametersException(errorResponse);
+            if(!events.isEmpty()) {
+                newSeries = Optional.of(false);
+                newUser = Optional.of(true);
+                for (String event : events) {
+                    if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
+                        newSeries = Optional.of(true);
+                    } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
+                        newUser = Optional.of(true);
+                    } else {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message(BAD_FORM_PARAMETER)
+                                .detail("Param 'event' contain an unknown value")
+                                .build();
+                        throw new BadQueryParametersException(errorResponse);
+                    }
                 }
-            }
-            for (String event : addEvents) {
-                if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                    newSeries = Optional.of(true);
-                } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                    newUser = Optional.of(true);
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(BAD_FORM_PARAMETER)
-                            .detail("Param 'add_event' contain an unknown value")
-                            .build();
-                    throw new  BadQueryParametersException(errorResponse);
+            } else if (!addEvents.isEmpty()) {
+                for (String event : addEvents) {
+                    if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
+                        newSeries = Optional.of(true);
+                    } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
+                        newUser = Optional.of(true);
+                    } else {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message(BAD_FORM_PARAMETER)
+                                .detail("Param 'add_event' contain an unknown value")
+                                .build();
+                        throw new BadQueryParametersException(errorResponse);
+                    }
                 }
-            }
-            for (String event : removeEvents) {
-                if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                    newSeries = Optional.of(false);
-                } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                    newUser = Optional.of(false);
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(BAD_FORM_PARAMETER)
-                            .detail("Param 'remove_event' contain an unknown value")
-                            .build();
-                    throw new  BadQueryParametersException(errorResponse);
+            } else if (!removeEvents.isEmpty()) {
+                for (String event : removeEvents) {
+                    if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
+                        newSeries = Optional.of(false);
+                    } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
+                        newUser = Optional.of(false);
+                    } else {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message(BAD_FORM_PARAMETER)
+                                .detail("Param 'remove_event' contain an unknown value")
+                                .build();
+                        throw new BadQueryParametersException(errorResponse);
+                    }
                 }
             }
 
