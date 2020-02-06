@@ -75,7 +75,7 @@ public class WebhookResource {
             } else {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'events' contain an unknown value")
+                        .detail("Param 'event' contain an unknown value")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
@@ -118,19 +118,17 @@ public class WebhookResource {
         Boolean newSeries = null;
         Boolean newUser = null;
 
-        if(events != null) {
-            for (String event : events) {
-                if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                    newSeries = true;
-                } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                    newUser = true;
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(BAD_FORM_PARAMETER)
-                            .detail("Param 'events' contain an unknown value")
-                            .build();
-                    return Response.status(BAD_REQUEST).entity(errorResponse).build();
-                }
+        for (String event : events) {
+            if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
+                newSeries = true;
+            } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
+                newUser = true;
+            } else {
+                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                        .message(BAD_FORM_PARAMETER)
+                        .detail("Param 'event' contain an unknown value")
+                        .build();
+                return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
 
