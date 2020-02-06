@@ -16,14 +16,12 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
-import javax.ws.rs.core.Response;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.event.Events.MutationType.*;
 import static online.kheops.auth_server.event.Events.MutationType.EDIT_WEBHOOK;
@@ -43,7 +41,7 @@ public class Webhooks {
         throw new IllegalStateException("Utility class");
     }
 
-    public static WebhookResponse createWebhook(String url, String albumId, User callingUser, String name, String secret, boolean newSeries, boolean newUser, boolean enabled, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse createWebhook(WebhookPostParameters webhookPostParameters, User callingUser, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -55,23 +53,20 @@ public class Webhooks {
 
             callingUser = em.merge(callingUser);
 
-            final Album album = getAlbum(albumId, em);
-            final Webhook newWebhook = new Webhook(name, url, album, callingUser, secret, newSeries, newUser, enabled);
+            final Album album = getAlbum(webhookPostParameters.getAlbumId(), em);
+            final Webhook newWebhook = new Webhook(webhookPostParameters, album, callingUser);
 
             em.persist(newWebhook);
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, CREATE_WEBHOOK);
             em.persist(mutation);
 
-            tx.commit();
-
             webhookResponse = new WebhookResponse(newWebhook);
-
             kheopsLogBuilder.action(NEW_WEBHOOK)
-                    .album(albumId)
+                    .album(webhookPostParameters.getAlbumId())
                     .webhookID(newWebhook.getId())
                     .log();
-
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -81,7 +76,7 @@ public class Webhooks {
         return webhookResponse;
     }
 
-    public static WebhookResponse editWebhook(String webhookId, String url, String albumId, User callingUser, String name, String secret, Boolean newSeries, Boolean newUser, Boolean enabled, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse editWebhook(WebhookPatchParameters webhookPatchParameters, User callingUser, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -93,26 +88,19 @@ public class Webhooks {
 
             callingUser = em.merge(callingUser);
 
-            final Album album = getAlbum(albumId, em);
-            final Webhook webhook = WebhookQueries.getWebhook(webhookId, album, em);
+            final Album album = getAlbum(webhookPatchParameters.getAlbumId(), em);
+            final Webhook webhook = WebhookQueries.getWebhook(webhookPatchParameters.getwebhookId(), album, em);
 
-            if (url != null) {
-                webhook.setUrl(url);
-            }
-            if (name != null) {
-                webhook.setName(name);
-            }
-            if (secret != null) {
-                webhook.setSecret(secret);
-            }
-            if (newSeries != null) {
-                webhook.setNewSeries(newSeries);
-            }
-            if (newUser != null) {
-                webhook.setNewUser(newUser);
-            }
-            if (enabled != null) {
-                webhook.setEnabled(enabled);
+            webhookPatchParameters.getUrl().ifPresent(webhook::setUrl);
+            webhookPatchParameters.getName().ifPresent(webhook::setName);
+            webhookPatchParameters.isNewSeries().ifPresent(webhook::setNewSeries);
+            webhookPatchParameters.isNewUser().ifPresent(webhook::setNewUser);
+            webhookPatchParameters.isEnabled().ifPresent(webhook::setNewUser);
+
+            if(webhookPatchParameters.isRemoveSecret()) {
+                webhook.setSecret(null);
+            } else {
+                webhookPatchParameters.getSecret().ifPresent(webhook::setSecret);
             }
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, EDIT_WEBHOOK);
@@ -130,7 +118,7 @@ public class Webhooks {
             }
 
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.EDIT_WEBHOOK)
-                    .album(albumId)
+                    .album(webhookPatchParameters.getAlbumId())
                     .webhookID(webhook.getId())
                     .log();
 

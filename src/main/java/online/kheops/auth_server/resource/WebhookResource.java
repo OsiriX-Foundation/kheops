@@ -9,7 +9,6 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -20,8 +19,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -60,29 +57,17 @@ public class WebhookResource {
                                @FormParam("enabled")@DefaultValue("true") boolean enabled)
             throws AlbumNotFoundException, BadQueryParametersException {
 
-        validName(name);
-        validUrl(url);
-        validSecret(secret);
+        final WebhookPostParameters webhookPostParameters = new WebhookPostParameters()
+                .setAlbumId(albumId)
+                .setEnabled(enabled)
+                .setEvents(events)
+                .setUrl(url)
+                .setName(name)
+                .setSecret(secret);
 
-        boolean newSeries = false;
-        boolean newUser = false;
-
-        for (String event : events) {
-            if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                newSeries = true;
-            } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                newUser = true;
-            } else {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'event' contain an unknown value")
-                        .build();
-                return Response.status(BAD_REQUEST).entity(errorResponse).build();
-            }
-        }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-        final WebhookResponse webhookResponse = createWebhook(url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, enabled, kheopsPrincipal.getKheopsLogBuilder());
+        final WebhookResponse webhookResponse = createWebhook(webhookPostParameters, kheopsPrincipal.getUser(), kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(CREATED).entity(webhookResponse).build();
     }
@@ -101,40 +86,25 @@ public class WebhookResource {
                                @FormParam("name") String name,
                                @FormParam("secret") String secret,
                                @FormParam("event") List<String> events,
+                               @FormParam("add_event") List<String> addEvents,
+                               @FormParam("remove_event") List<String> removeEvents,
                                @FormParam("enabled") Boolean enabled)
 
             throws AlbumNotFoundException, WebhookNotFoundException, BadQueryParametersException {
 
-        if (name != null) {
-            validName(name);
-        }
-
-        if(url != null ) {
-            validUrl(url);
-        }
-
-        validSecret(secret);
-
-        Boolean newSeries = null;
-        Boolean newUser = null;
-
-        for (String event : events) {
-            if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-                newSeries = true;
-            } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
-                newUser = true;
-            } else {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'event' contain an unknown value")
-                        .build();
-                return Response.status(BAD_REQUEST).entity(errorResponse).build();
-            }
-        }
+        final WebhookPatchParameters webhookPatchParameters = new WebhookPatchParameters.WebhookPatchParametersBuilder()
+                .setWebhookId(webhookId)
+                .setAlbumId(albumId)
+                .setEnabled(enabled)
+                .setName(name)
+                .setSecret(secret)
+                .setUrl(url)
+                .setEvents(events)
+                .setAddEvents(addEvents)
+                .setRemoveEvents(removeEvents).build();
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-
-        final WebhookResponse webhookResponse = editWebhook(webhookId, url, albumId, kheopsPrincipal.getUser(), name, secret, newSeries, newUser, enabled, kheopsPrincipal.getKheopsLogBuilder());
+        final WebhookResponse webhookResponse = editWebhook(webhookPatchParameters, kheopsPrincipal.getUser(), kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(webhookResponse).build();
     }

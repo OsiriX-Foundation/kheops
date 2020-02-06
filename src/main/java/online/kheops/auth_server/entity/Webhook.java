@@ -1,6 +1,7 @@
 package online.kheops.auth_server.entity;
 
 import online.kheops.auth_server.webhook.WebhookId;
+import online.kheops.auth_server.webhook.WebhookPostParameters;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -76,6 +77,26 @@ public class Webhook {
         this.album = album;
         this.user = user;
         this.enabled = enabled;
+        creationTime = LocalDateTime.now();
+
+        album.addWebhook(this);
+        user.addWebhook(this);
+    }
+
+    public Webhook(WebhookPostParameters webhookPostParameters, Album album, User user) {
+        this.name = webhookPostParameters.getName();
+        this.url = webhookPostParameters.getUrl();
+        if(webhookPostParameters.isUseSecret()) {
+            this.secret = webhookPostParameters.getSecret();
+        } else {
+            this.secret = null;
+        }
+        this.secret = webhookPostParameters.getSecret();
+        this.newSeries = webhookPostParameters.isNewSeries();
+        this.newUser = webhookPostParameters.isNewUser();
+        this.album = album;
+        this.user = user;
+        this.enabled = webhookPostParameters.isEnabled();
         creationTime = LocalDateTime.now();
 
         album.addWebhook(this);
