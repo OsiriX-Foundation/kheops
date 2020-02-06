@@ -299,7 +299,7 @@ import moment from 'moment';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
-import SortList from '@/components/inbox/SortList.vue';
+import SortList from '@/components/globals/SortList.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {

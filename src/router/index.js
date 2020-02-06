@@ -3,7 +3,7 @@ import Router from 'vue-router';
 import ListAlbums from '@/components/albums/ListAlbums';
 import NewAlbum from '@/components/albums/NewAlbum';
 // import Album from '@/components/albums/Album';
-import Album from '@/components/albums/Album';
+import Album from '@/components/album/Album';
 import User from '@/components/user/user';
 import store from '@/store';
 import Inbox from '@/components/inbox/Inbox';
@@ -195,15 +195,6 @@ const router = new Router({
     path: '*',
     redirect: '/inbox',
   },
-  /*
-  {
-  path: '/favorites',
-  name: 'favorites',
-  component: Favorites,
-  beforeEnter: requireAuth,
-  meta: { permissions: 'active', condition: 'any' }
-  }
-  */
   ],
 });
 

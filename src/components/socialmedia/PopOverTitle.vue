@@ -25,7 +25,7 @@
 import CloseIcon from '@/components/kheopsSVG/CloseIcon';
 
 export default {
-  name: 'TwitterLink',
+  name: 'PopOverTitle',
   components: { CloseIcon },
   props: {
     title: {
