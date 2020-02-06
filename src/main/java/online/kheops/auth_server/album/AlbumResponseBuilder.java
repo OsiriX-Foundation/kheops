@@ -81,6 +81,11 @@ public class AlbumResponseBuilder {
         this.description = r.getValue("album_description").toString();
         this.numberOfStudies = (Integer) r.getValue("number_of_studies");
         this.numberOfSeries = (Integer) r.getValue("number_of_series");
+        try {
+            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
+        } catch(NullPointerException e) {
+            this.numberOfInstances = 0;
+        }
         if(r.getValue("modalities") != null) {
             this.modalities = r.getValue("modalities").toString().split(",");
         } else {
