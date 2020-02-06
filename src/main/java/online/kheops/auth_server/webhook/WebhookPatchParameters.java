@@ -12,25 +12,30 @@ import static online.kheops.auth_server.webhook.Webhooks.*;
 public class WebhookPatchParameters {
 
     public static class WebhookPatchParametersBuilder {
+
+        private String albumId;
+        private String webhookId;
+
         private Optional<String> url;
         private Optional<String> name;
         private Optional<String> secret;
-
         private Optional<Boolean> enabled;
-        private String albumId;
-        private String webhookId;
+        private Optional<Boolean> newSeries;
+        private Optional<Boolean> newUser;
+
         private boolean removeSecret;
+
         private List<String> events;
         private List<String> addEvents;
         private List<String> removeEvents;
-        private Optional<Boolean> newSeries;
-        private Optional<Boolean> newUser;
 
         public WebhookPatchParametersBuilder() {
             url = Optional.empty();
             name = Optional.empty();
             secret = Optional.empty();
             enabled = Optional.empty();
+            newSeries = Optional.empty();
+            newUser = Optional.empty();
             removeSecret = false;
         }
 
@@ -67,7 +72,7 @@ public class WebhookPatchParameters {
         }
 
         public WebhookPatchParametersBuilder setEnabled(Boolean enabled) {
-            this.enabled = Optional.of(enabled);
+            this.enabled = Optional.ofNullable(enabled);
             return this;
         }
 
