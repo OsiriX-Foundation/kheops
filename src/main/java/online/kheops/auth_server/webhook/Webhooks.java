@@ -226,10 +226,11 @@ public class Webhooks {
             final List<Webhook> webhookList;
             if (url != null) {
                 webhookList = WebhookQueries.getWebhooks(album, limit, url, offset, em);
+                numberOfWebhook = WebhookQueries.getNumberOfWebhooks(album, url, em);
             } else {
                 webhookList = WebhookQueries.getWebhooks(album, limit, offset, em);
+                numberOfWebhook = WebhookQueries.getNumberOfWebhooks(album, em);
             }
-            numberOfWebhook = WebhookQueries.getNumberOfWebhooks(album, em);
 
             for(Webhook webhook:webhookList) {
                 final WebhookResponse webhookResponse = new WebhookResponse(webhook);

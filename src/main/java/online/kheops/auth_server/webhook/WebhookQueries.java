@@ -54,10 +54,16 @@ public class WebhookQueries {
                     .getResultList();
     }
 
-
     public static Long getNumberOfWebhooks( Album album, EntityManager em) {
         return em.createQuery("SELECT count(w) from Webhook w join w.album a where a = :album", Long.class)
                 .setParameter("album", album)
+                .getSingleResult();
+    }
+    public static Long getNumberOfWebhooks( Album album, String url, EntityManager em) {
+        return em.createQuery("SELECT count(w) from Webhook w join w.album a where a = :album and w.url = :url", Long.class)
+                .setParameter("album", album)
+                .setParameter("url", url)
+
                 .getSingleResult();
     }
 
