@@ -211,7 +211,7 @@ public class Webhooks {
         }
         return webhookResponse;
     }
-    public static PairListXTotalCount<WebhookResponse> getWebhooks(String albumId, Integer limit, Integer offset)
+    public static PairListXTotalCount<WebhookResponse> getWebhooks(String albumId, String url, Integer limit, Integer offset)
             throws AlbumNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -223,7 +223,12 @@ public class Webhooks {
             tx.begin();
 
             final Album album = getAlbum(albumId, em);
-            final List<Webhook> webhookList = WebhookQueries.getWebhooks(album, limit, offset, em);
+            final List<Webhook> webhookList;
+            if (url != null) {
+                webhookList = WebhookQueries.getWebhooks(album, limit, url, offset, em);
+            } else {
+                webhookList = WebhookQueries.getWebhooks(album, limit, offset, em);
+            }
             numberOfWebhook = WebhookQueries.getNumberOfWebhooks(album, em);
 
             for(Webhook webhook:webhookList) {

@@ -140,14 +140,15 @@ public class WebhookResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getWebhooks(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                               @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
+                               @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset,
+                               @QueryParam("url") String url )
             throws AlbumNotFoundException {
 
 
         final PairListXTotalCount<WebhookResponse> pairWebhooksTotalWebhook;
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-        pairWebhooksTotalWebhook = Webhooks.getWebhooks(albumId, limit, offset);
+        pairWebhooksTotalWebhook = Webhooks.getWebhooks(albumId, url, limit, offset);
 
         kheopsPrincipal.getKheopsLogBuilder()
                 .action(KheopsLogBuilder.ActionType.LIST_WEBHOOK)
