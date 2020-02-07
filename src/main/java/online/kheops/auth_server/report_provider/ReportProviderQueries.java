@@ -21,7 +21,7 @@ public class ReportProviderQueries {
 
     public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, Integer limit, Integer offset, EntityManager em) {
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false", ReportProvider.class)
+        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false order by dsr.creationTime desc", ReportProvider.class)
                 .setParameter("albumId", albumId)
                 .setMaxResults(limit)
                 .setFirstResult(offset)

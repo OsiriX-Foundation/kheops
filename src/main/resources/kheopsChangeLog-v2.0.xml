@@ -81,27 +81,6 @@
     <changeSet author="kheops" id="v2.0-2.4">
         <preConditions onFail="MARK_RAN">
             <not>
-                <indexExists indexName="webhooks_pk_index" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="webhooks_pk_index" tableName="webhooks">
-            <column name="pk"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet author="kheops" id="v2.0-2.5">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists indexName="webhooks_id_index" schemaName="public"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="webhooks_id_index" tableName="webhooks">
-            <column name="id"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="kheops" id="v2.0-2.6">
-        <preConditions onFail="MARK_RAN">
-            <not>
                 <indexExists indexName="webhooks_url_index" schemaName="public"/>
             </not>
         </preConditions>
@@ -110,7 +89,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet author="kheops" id="v2.0-2.7">
+    <changeSet author="kheops" id="v2.0-2.5">
         <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="webhooks_enabled_index" schemaName="public"/>
@@ -121,7 +100,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet author="kheops" id="v2.0-2.8">
+    <changeSet author="kheops" id="v2.0-2.6">
         <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="webhooks_album_fk_index" schemaName="public"/>

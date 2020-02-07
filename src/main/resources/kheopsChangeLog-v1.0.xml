@@ -449,7 +449,6 @@
     </changeSet>
 
 
-
     <changeSet author="kheops" id="v1.0-30">
          <preConditions onFail="MARK_RAN">
             <not>
@@ -587,6 +586,8 @@
         <addForeignKeyConstraint baseColumnNames="inbox_fk" baseTableName="users" constraintName="users_inbox_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
     </changeSet>
 
+
+
     <changeSet author="kheops" id="v1.0-47">
         <sql>CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA public</sql>
     </changeSet>
@@ -596,5 +597,138 @@
     </changeSet>
 
 
+    <changeSet author="kheops" id="v1.1-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_series_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_series_album_fk_index" tableName="album_series">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_series_series_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_series_series_fk_index" tableName="album_series">
+            <column name="series_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_user_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_user_album_fk_index" tableName="album_user">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_user_user_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_user_user_fk_index" tableName="album_user">
+            <column name="user_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="albums_last_event_time_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="albums_last_event_time_index" tableName="albums">
+            <column name="last_event_time"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="capabilities_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="capabilities_album_fk_index" tableName="capabilities">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="events_series_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="events_series_fk_index" tableName="events">
+            <column name="series_fk"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="events_user_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="events_user_fk_index" tableName="events">
+            <column name="user_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="report_providers_client_id_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="report_providers_client_id_index" tableName="report_providers">
+            <column name="client_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="report_providers_creation_time_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="report_providers_creation_time_album_fk_index" tableName="report_providers">
+            <column name="creation_time"/>
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="users_inbox_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="users_inbox_fk_index" tableName="users">
+            <column name="inbox_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="series_modality_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="series_modality_index" tableName="series">
+            <column name="modality"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v1.1-25">
+        <tagDatabase tag="v1.1"/>
+    </changeSet>
 
 </databaseChangeLog>
