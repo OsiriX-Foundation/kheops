@@ -9,8 +9,6 @@ import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 
@@ -31,10 +29,6 @@ public class NewSeriesWebhook implements WebhookResult{
 
     @XmlElement(name = "updated_study")
     private StudyResponse updatedStudy;
-    @XmlElement(name = "report_provider")
-    private ReportProviderResponse reportProvider;
-    @XmlElement(name = "capability_token")
-    private CapabilitiesResponse capability;
 
 
     private NewSeriesWebhook() { /*empty*/ }
@@ -62,12 +56,11 @@ public class NewSeriesWebhook implements WebhookResult{
     }
 
     public void setReportProvider(ReportProvider reportProvider) {
-        this.reportProvider = new ReportProviderResponse(reportProvider);
-        this.reportProvider.webhookResponse();
+        sourceUser.setReportProvider(reportProvider);
     }
 
     public void setCapabilityToken(Capability capability) {
-        this.capability = new CapabilitiesResponse(capability);
+        sourceUser.setCapabilityToken(capability);
     }
 
     public boolean containSeries() {
