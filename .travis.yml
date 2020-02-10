@@ -20,7 +20,7 @@ cache:
 
 after_success:
   - git fetch --unshallow
-#  - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
+  - ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
 
 deploy:
   skip_cleanup: true
