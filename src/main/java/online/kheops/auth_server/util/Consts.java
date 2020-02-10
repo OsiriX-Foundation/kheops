@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableList;
 
 import javax.ws.rs.Priorities;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Consts {
 

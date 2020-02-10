@@ -4,12 +4,8 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.series.SeriesResponse;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
-
-import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 
 public class StudyResponse {
 

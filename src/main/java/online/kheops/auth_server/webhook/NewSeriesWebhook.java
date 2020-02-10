@@ -1,11 +1,9 @@
 package online.kheops.auth_server.webhook;
 
-import online.kheops.auth_server.capability.CapabilitiesResponse;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.Series;
-import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
 

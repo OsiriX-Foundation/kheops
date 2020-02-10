@@ -1,14 +1,11 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.Webhook;
-import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class WebhookResponse {
 
