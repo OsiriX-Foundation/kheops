@@ -1,6 +1,6 @@
 package online.kheops.auth_server.user;
 
-import online.kheops.auth_server.capability.CapabilitiesResponse2;
+import online.kheops.auth_server.capability.CapabilitiesResponse;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
@@ -35,10 +35,10 @@ public class UserResponse  implements Comparable<UserResponse> {
     private Boolean albumAccess;
 
     //For webhook new series
-    @XmlElement(name = "report_provider")
-    private ReportProviderResponse reportProvider;
-    @XmlElement(name = "capability_token")
-    private CapabilitiesResponse2 capability;
+    //@XmlElement(name = "report_provider")
+    //private ReportProviderResponse reportProvider;
+    //@XmlElement(name = "capability_token")
+    //private CapabilitiesResponse capability;
 
     private UserResponse() { /*empty*/ }
 
@@ -61,14 +61,14 @@ public class UserResponse  implements Comparable<UserResponse> {
         userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
     }
 
-    public void setReportProvider(ReportProvider reportProvider) {
+    /*public void setReportProvider(ReportProvider reportProvider) {
         this.reportProvider = new ReportProviderResponse(reportProvider);
         this.reportProvider.webhookResponse();
     }
 
     public void setCapabilityToken(Capability capability) {
-        this.capability = new CapabilitiesResponse2(capability);
-    }
+        this.capability = new CapabilitiesResponse(capability);
+    }*/
 
     public String getSub() { return sub; }
 

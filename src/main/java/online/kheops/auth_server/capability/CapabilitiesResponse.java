@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-public class CapabilitiesResponse2 {
+public class CapabilitiesResponse {
 
     @XmlElement(name = "id")
     private String id;
@@ -57,9 +57,9 @@ public class CapabilitiesResponse2 {
     @XmlElement(name = "created_by")
     private UserResponse createdBy;
 
-    private CapabilitiesResponse2() { /*empty*/ }
+    private CapabilitiesResponse() { /*empty*/ }
 
-    public CapabilitiesResponse2(Capability capability, boolean showSecret, boolean isIntrospect) {
+    public CapabilitiesResponse(Capability capability, boolean showSecret, boolean isIntrospect) {
 
         if (!isIntrospect) {
             id = capability.getId();
@@ -88,7 +88,7 @@ public class CapabilitiesResponse2 {
         ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(this, capability);
     }
 
-    public CapabilitiesResponse2(Capability capability) {
+    public CapabilitiesResponse(Capability capability) {
         id = capability.getId();
         tokenType = null;
         title = capability.getTitle();

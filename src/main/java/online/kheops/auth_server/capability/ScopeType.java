@@ -21,7 +21,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PAR
 public enum ScopeType {
     USER {
         @Override
-        public CapabilitiesResponse2 generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
+        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
                 throws BadQueryParametersException {
             return createUserCapability(capabilityParameters, kheopsLogBuilder);
         }
@@ -32,7 +32,7 @@ public enum ScopeType {
         }
 
         @Override
-        public void setCapabilityResponse(CapabilitiesResponse2 capabilityResponse, Capability capability) {
+        public void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability) {
             capabilityResponse.setScopeType(this.name().toLowerCase());
             capabilityResponse.setOriginNull();
         }
@@ -45,7 +45,7 @@ public enum ScopeType {
     },
     ALBUM {
         @Override
-        public CapabilitiesResponse2 generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
+        public CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
                 throws AlbumNotFoundException, NewCapabilityForbidden, BadQueryParametersException, UserNotMemberException {
             return createAlbumCapability(capabilityParameters, kheopsLogBuilder);
         }
@@ -64,7 +64,7 @@ public enum ScopeType {
         }
 
         @Override
-        public void setCapabilityResponse(CapabilitiesResponse2 capabilityResponse, Capability capability) {
+        public void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability) {
             final AlbumResponse albumResponse = new AlbumResponse(capability);
             capabilityResponse.setAlbumResponse(albumResponse);
             capabilityResponse.setScopeType(this.name().toLowerCase());
@@ -89,7 +89,7 @@ public enum ScopeType {
         }
     };
 
-    public abstract CapabilitiesResponse2 generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
+    public abstract CapabilitiesResponse generateCapability(CapabilityParameters capabilityParameters, KheopsLogBuilder kheopsLogBuilder)
             throws UserNotFoundException, AlbumNotFoundException, NewCapabilityForbidden, BadQueryParametersException, UserNotMemberException;
 
     /**
@@ -98,7 +98,7 @@ public enum ScopeType {
     public abstract CapabilityParametersBuilder initScope(CapabilityParametersBuilder capabilityParametersBuilder, String albumId)
             throws BadQueryParametersException;
 
-    public abstract void setCapabilityResponse(CapabilitiesResponse2 capabilityResponse, Capability capability);
+    public abstract void setCapabilityResponse(CapabilitiesResponse capabilityResponse, Capability capability);
 
     public abstract void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) throws BadQueryParametersException;
 

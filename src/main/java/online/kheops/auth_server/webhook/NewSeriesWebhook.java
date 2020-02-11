@@ -54,11 +54,11 @@ public class NewSeriesWebhook implements WebhookResult{
     }
 
     public void setReportProvider(ReportProvider reportProvider) {
-        sourceUser.setReportProvider(reportProvider);
+        /*sourceUser.setReportProvider(reportProvider);*/
     }
 
     public void setCapabilityToken(Capability capability) {
-        sourceUser.setCapabilityToken(capability);
+        /*sourceUser.setCapabilityToken(capability);*/
     }
 
     public boolean containSeries() {
