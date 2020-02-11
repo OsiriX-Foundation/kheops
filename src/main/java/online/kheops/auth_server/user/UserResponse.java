@@ -35,7 +35,7 @@ public class UserResponse  implements Comparable<UserResponse> {
     private Boolean albumAccess;
 
     //For webhook new series
-    //@XmlElement(name = "report_provider")
+    @XmlElement(name = "report_provider")
     private ReportProviderResponse reportProvider;
     //@XmlElement(name = "capability_token")
     private CapabilitiesResponse capability;
