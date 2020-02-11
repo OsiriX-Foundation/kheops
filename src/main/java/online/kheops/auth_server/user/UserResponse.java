@@ -37,7 +37,7 @@ public class UserResponse  implements Comparable<UserResponse> {
     //For webhook new series
     @XmlElement(name = "report_provider")
     private ReportProviderResponse reportProvider;
-    //@XmlElement(name = "capability_token")
+    @XmlElement(name = "capability_token")
     private CapabilitiesResponse capability;
 
     private UserResponse() { /*empty*/ }
