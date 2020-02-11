@@ -69,7 +69,7 @@ public class CapabilitiesResource {
         }
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
-        final CapabilitiesResponse capabilityResponse;
+        final CapabilitiesResponse2 capabilityResponse;
 
         final CapabilityParametersBuilder capabilityParametersBuilder = new CapabilityParametersBuilder()
                 .callingUser(kheopsPrincipal.getUser())
@@ -155,7 +155,7 @@ public class CapabilitiesResource {
             throws CapabilityNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
-        final CapabilitiesResponse capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId, kheopsPrincipal.getKheopsLogBuilder());
+        final CapabilitiesResponse2 capabilityResponse = Capabilities.revokeCapability(kheopsPrincipal.getUser(), capabilityId, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(capabilityResponse).build();
     }
@@ -173,7 +173,7 @@ public class CapabilitiesResource {
                                     @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                     @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
-        final PairListXTotalCount<CapabilitiesResponse> pair;
+        final PairListXTotalCount<CapabilitiesResponse2> pair;
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
         final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
@@ -188,7 +188,7 @@ public class CapabilitiesResource {
 
         kheopsLogBuilder.action(ActionType.GET_CAPABILITIES)
                 .log();
-        GenericEntity<List<CapabilitiesResponse>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse>>(pair.getAttributesList()) {};
+        GenericEntity<List<CapabilitiesResponse2>> genericCapabilityResponsesList = new GenericEntity<List<CapabilitiesResponse2>>(pair.getAttributesList()) {};
         return Response.status(OK).entity(genericCapabilityResponsesList).header(X_TOTAL_COUNT, pair.getXTotalCount()).build();
     }
 
@@ -202,7 +202,7 @@ public class CapabilitiesResource {
             throws CapabilityNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
-        final CapabilitiesResponse capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getUser());
+        final CapabilitiesResponse2 capabilityResponses = Capabilities.getCapability(capabilityTokenID, kheopsPrincipal.getUser());
 
         kheopsPrincipal.getKheopsLogBuilder().action(ActionType.GET_CAPABILITY)
                 .capabilityID(capabilityTokenID)

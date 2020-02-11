@@ -1,6 +1,6 @@
 package online.kheops.auth_server.user;
 
-import online.kheops.auth_server.capability.CapabilitiesResponse;
+import online.kheops.auth_server.capability.CapabilitiesResponse2;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
@@ -38,7 +38,7 @@ public class UserResponse  implements Comparable<UserResponse> {
     @XmlElement(name = "report_provider")
     private ReportProviderResponse reportProvider;
     @XmlElement(name = "capability_token")
-    private CapabilitiesResponse capability;
+    private CapabilitiesResponse2 capability;
 
     private UserResponse() { /*empty*/ }
 
@@ -67,7 +67,7 @@ public class UserResponse  implements Comparable<UserResponse> {
     }
 
     public void setCapabilityToken(Capability capability) {
-        this.capability = new CapabilitiesResponse(capability);
+        this.capability = new CapabilitiesResponse2(capability);
     }
 
     public String getSub() { return sub; }
