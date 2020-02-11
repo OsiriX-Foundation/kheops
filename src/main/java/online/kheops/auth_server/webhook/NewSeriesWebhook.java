@@ -53,13 +53,9 @@ public class NewSeriesWebhook implements WebhookResult{
         updatedStudy.addSeries(series);
     }
 
-    public void setReportProvider(ReportProvider reportProvider) {
-        /*sourceUser.setReportProvider(reportProvider);*/
-    }
+    public void setReportProvider(ReportProvider reportProvider) { sourceUser.setReportProvider(reportProvider); }
 
-    public void setCapabilityToken(Capability capability) {
-        /*sourceUser.setCapabilityToken(capability);*/
-    }
+    public void setCapabilityToken(Capability capability) { sourceUser.setCapabilityToken(capability); }
 
     public boolean containSeries() {
         return updatedStudy.containSeries();
