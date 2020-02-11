@@ -25,14 +25,14 @@ public class EventResponse {
         private String studyDescription;
     }
 
-    private static class CapabilityResponse {
+    private static class CCapabilityResponse {
         @XmlElement(name = "title")
         private String title;
         @XmlElement(name = "id")
         private String id;
     }
 
-    private static class ReportProviderResponse {
+    private static class CReportProviderResponse {
         @XmlElement(name = "name")
         private String name;
         @XmlElement(name = "id")
@@ -66,9 +66,9 @@ public class EventResponse {
     @XmlElement(name = "study")
     private StudyResponse study;
     @XmlElement(name = "capability")
-    private CapabilityResponse capability;
+    private CCapabilityResponse capability;
     @XmlElement(name = "report_provider")
-    private ReportProviderResponse reportProvider;
+    private CReportProviderResponse reportProvider;
 
     private EventResponse() { /*empty*/ }
 
@@ -141,7 +141,7 @@ public class EventResponse {
             study.studyDescription = mutation.getStudy().getStudyDescription();
         }
         mutation.getReportProvider().ifPresent(mutationReportProvider -> {
-            reportProvider = new ReportProviderResponse();
+            reportProvider = new CReportProviderResponse();
             if(mutationReportProvider.isRemoved()) {
                 reportProvider.removed = true;
             } else {
@@ -152,7 +152,7 @@ public class EventResponse {
             reportProvider.name = mutationReportProvider.getName();
         });
         mutation.getCapability().ifPresent(mutationCapability -> {
-            capability = new CapabilityResponse();
+            capability = new CCapabilityResponse();
             capability.id = mutationCapability.getId();
             capability.title = mutationCapability.getTitle();
         });

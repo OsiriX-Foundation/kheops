@@ -35,8 +35,8 @@ public class UserResponse  implements Comparable<UserResponse> {
     private Boolean albumAccess;
 
     //For webhook new series
-    @XmlElement(name = "report_providerxx")
-    private ReportProviderResponse reportProviderxx;
+    @XmlElement(name = "report_provider")
+    private ReportProviderResponse reportProvider;
     //@XmlElement(name = "capability_token")
     private CapabilitiesResponse capability;
 
@@ -62,8 +62,8 @@ public class UserResponse  implements Comparable<UserResponse> {
     }
 
     public void setReportProvider(ReportProvider reportProvider) {
-        this.reportProviderxx = new ReportProviderResponse(reportProvider);
-        this.reportProviderxx.webhookResponse();
+        this.reportProvider = new ReportProviderResponse(reportProvider);
+        this.reportProvider.webhookResponse();
     }
 
     public void setCapabilityToken(Capability capability) {
