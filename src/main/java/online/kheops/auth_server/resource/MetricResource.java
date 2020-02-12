@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.annotation.MetricSecured;
 import online.kheops.auth_server.metric.MetricResponse;
 
 import javax.ws.rs.*;
@@ -14,7 +13,6 @@ import static javax.ws.rs.core.Response.Status.*;
 public class MetricResource {
 
     @GET
-    @MetricSecured
     @Path("metrics")
     public Response test() {
 
