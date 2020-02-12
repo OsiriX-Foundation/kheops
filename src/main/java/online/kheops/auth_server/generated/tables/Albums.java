@@ -17,7 +17,6 @@ import online.kheops.auth_server.generated.tables.records.AlbumsRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -42,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Albums extends TableImpl<AlbumsRecord> {
 
-    private static final long serialVersionUID = 313199869;
+    private static final long serialVersionUID = -206812218;
 
     /**
      * The reference instance of <code>public.albums</code>
@@ -60,7 +59,7 @@ public class Albums extends TableImpl<AlbumsRecord> {
     /**
      * The column <code>public.albums.pk</code>.
      */
-    public final TableField<AlbumsRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('album_pk_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<AlbumsRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.albums.id</code>.
@@ -164,14 +163,6 @@ public class Albums extends TableImpl<AlbumsRecord> {
     @Override
     public List<Index> getIndexes() {
         return Arrays.<Index>asList(Indexes.ALBUM_PK, Indexes.ALBUMS_ID_UNIQUE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<AlbumsRecord, Long> getIdentity() {
-        return Keys.IDENTITY_ALBUMS;
     }
 
     /**

@@ -20,11 +20,15 @@ public class ReportProviderResponse {
 
     private ReportProviderResponse() { /*empty*/ }
 
-    protected ReportProviderResponse(ReportProvider reportProvider) {
+    public ReportProviderResponse(ReportProvider reportProvider) {
         name = reportProvider.getName();
         url = reportProvider.getUrl();
         clientId = reportProvider.getClientId();
-
         createdTime = reportProvider.getCreationTime();
+    }
+
+    public void webhookResponse() {
+        url = null;
+        createdTime = null;
     }
 }

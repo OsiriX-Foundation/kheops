@@ -21,7 +21,8 @@ public class KheopsLogBuilder {
         NEW_TOKEN, INTROSPECT_TOKEN,
         REFRESH_TOKEN_GRANT, AUTHORIZATION_CODE_GRANT, PASSWORD_GRANT, CLIENT_CREDENTIALS_GRANT, JWT_ASSERTION_GRANT, SAML_ASSERTION_GRANT, TOKEN_EXCHANGE_GRANT,
         NEW_USER,
-        INBOX_INFO}
+        INBOX_INFO,
+        NEW_WEBHOOK, REMOVE_WEBHOOK, GET_WEBHOOK, EDIT_WEBHOOK, LIST_WEBHOOK, TRIGGER_WEBHOOK}
 
     private ArrayList<LogEntry> logEntry;
     private static final Logger LOG = Logger.getLogger(KheopsLogBuilder.class.getName());
@@ -47,6 +48,11 @@ public class KheopsLogBuilder {
 
     public KheopsLogBuilder clientID(String clientID) {
         logEntry.add(new LogEntry("clientID", clientID));
+        return this;
+    }
+
+    public KheopsLogBuilder webhookID(String webhookID) {
+        logEntry.add(new LogEntry("webhookID", webhookID));
         return this;
     }
 

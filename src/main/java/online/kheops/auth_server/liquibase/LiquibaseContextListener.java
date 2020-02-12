@@ -20,12 +20,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.lang.System.exit;
+
 public class LiquibaseContextListener implements ServletContextListener {
 
     private static ServletContext servletContext;
     private static final String CHANGE_LOG_FILE = "kheopsChangeLog-master.xml";
     private static final java.util.logging.Logger LOG = Logger.getLogger(LiquibaseContextListener.class.getName());
-    private static final String DB_VERSION = "v1";
+    private static final String DB_VERSION = "v2";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -70,9 +72,10 @@ public class LiquibaseContextListener implements ServletContextListener {
                 jdbcCon.close();
                 con.close();
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Unable to use liquibase", e);
+                LOG.log(Level.SEVERE, "Unable to use liquibase", e);
+                exit(1);
             }
-        LOG.log(Level.INFO, "Liquibase : database version : " + DB_VERSION + "SUCCESSFUL");
+        LOG.log(Level.INFO, "Liquibase : database version : " + DB_VERSION + " SUCCESSFUL");
     }
 
     @Override

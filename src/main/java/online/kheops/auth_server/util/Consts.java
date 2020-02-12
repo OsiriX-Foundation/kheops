@@ -1,5 +1,7 @@
 package online.kheops.auth_server.util;
 
+import com.google.common.collect.ImmutableList;
+
 import javax.ws.rs.Priorities;
 import java.time.Duration;
 
@@ -29,6 +31,12 @@ public class Consts {
         public static final String RP_TOKEN = "reportProviderToken";
     }
 
+    public static final int NUMBER_OF_RETRY_WEBHOOK = 5;
+    public static final int SECONDE_BEFORE_RETRY_WEBHOOK = 5;
+    public static final ImmutableList<String> VALID_SCHEMES_WEBHOOK_URL = ImmutableList.of("http", "https");
+
+    public static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
+
     //AlbumQueryParams.java
     public static final String FAVORITE = "favorite";
     public static final int CUSTOM_DICOM_TAG_FAVORITE = 0x00012345;
@@ -55,6 +63,9 @@ public class Consts {
     //size column in db
     public static class DB_COLUMN_SIZE {
         public static final int ALBUM_NAME = 255;
+        public static final int WEBHOOK_NAME = 255;
+        public static final int WEBHOOK_URL = 1024;
+        public static final int WEBHOOK_SECRET = 1024;
         public static final int ALBUM_DESCRIPTION = 2048;
         public static final int COMMENT = 1024;
         public static final int CAPABILITY_DESCRIPTION = 255;

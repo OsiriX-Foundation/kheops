@@ -35,7 +35,7 @@ public class CapabilitiesResponse {
     private String revokeTime;
 
     @XmlElement(name = "revoked")
-    private boolean revoked;
+    private Boolean revoked;
 
     @XmlElement(name = "read_permission")
     private Boolean readPermission;
@@ -86,6 +86,12 @@ public class CapabilitiesResponse {
         }
 
         ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(this, capability);
+    }
+
+    public CapabilitiesResponse(Capability capability) {
+        id = capability.getId();
+        tokenType = null;
+        title = capability.getTitle();
     }
 
     public void setScopeType(String scopeType) { this.scopeType = scopeType; }

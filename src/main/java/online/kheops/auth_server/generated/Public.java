@@ -19,10 +19,11 @@ import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
-import online.kheops.auth_server.generated.tables.Version;
+import online.kheops.auth_server.generated.tables.WebhookAttempts;
+import online.kheops.auth_server.generated.tables.WebhookTriggers;
+import online.kheops.auth_server.generated.tables.Webhooks;
 
 import org.jooq.Catalog;
-import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
 
@@ -40,7 +41,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = -670485852;
+    private static final long serialVersionUID = -699272521;
 
     /**
      * The reference instance of <code>public</code>
@@ -93,9 +94,19 @@ public class Public extends SchemaImpl {
     public final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
 
     /**
-     * The table <code>public.version</code>.
+     * The table <code>public.webhook_attempts</code>.
      */
-    public final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
+    public final WebhookAttempts WEBHOOK_ATTEMPTS = online.kheops.auth_server.generated.tables.WebhookAttempts.WEBHOOK_ATTEMPTS;
+
+    /**
+     * The table <code>public.webhook_triggers</code>.
+     */
+    public final WebhookTriggers WEBHOOK_TRIGGERS = online.kheops.auth_server.generated.tables.WebhookTriggers.WEBHOOK_TRIGGERS;
+
+    /**
+     * The table <code>public.webhooks</code>.
+     */
+    public final Webhooks WEBHOOKS = online.kheops.auth_server.generated.tables.Webhooks.WEBHOOKS;
 
     /**
      * No further instances allowed
@@ -111,26 +122,6 @@ public class Public extends SchemaImpl {
     @Override
     public Catalog getCatalog() {
         return DefaultCatalog.DEFAULT_CATALOG;
-    }
-
-    @Override
-    public final List<Sequence<?>> getSequences() {
-        List result = new ArrayList();
-        result.addAll(getSequences0());
-        return result;
-    }
-
-    private final List<Sequence<?>> getSequences0() {
-        return Arrays.<Sequence<?>>asList(
-            Sequences.ALBUM_PK_SEQ,
-            Sequences.ALBUM_SERIES_PK_SEQ,
-            Sequences.ALBUM_USER_PK_SEQ,
-            Sequences.CAPABILITIES_PK_SEQ,
-            Sequences.EVENT_PK_SEQ,
-            Sequences.REPORT_PROVIDERS_PK_SEQ,
-            Sequences.SERIES_PK_SEQ,
-            Sequences.STUDIES_PK_SEQ,
-            Sequences.USERS_PK_SEQ);
     }
 
     @Override
@@ -151,6 +142,8 @@ public class Public extends SchemaImpl {
             Series.SERIES,
             Studies.STUDIES,
             Users.USERS,
-            Version.VERSION);
+            WebhookAttempts.WEBHOOK_ATTEMPTS,
+            WebhookTriggers.WEBHOOK_TRIGGERS,
+            Webhooks.WEBHOOKS);
     }
 }

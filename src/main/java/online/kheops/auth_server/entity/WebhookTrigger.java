@@ -1,0 +1,84 @@
+package online.kheops.auth_server.entity;
+
+import online.kheops.auth_server.webhook.WebhookRequestId;
+import online.kheops.auth_server.webhook.WebhookType;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@SuppressWarnings({"WeakerAccess", "unused"})
+@Entity
+@Table(name = "webhook_triggers")
+public class WebhookTrigger {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "pk")
+    private long pk;
+
+    @Basic(optional = false)
+    @Column(name = "id")
+    private String id;
+
+    @Basic(optional = false)
+    @Column(name = "is_manual_trigger", updatable = false)
+    private Boolean isManualTrigger;
+
+    @Basic(optional = false)
+    @Column(name = "new_series")
+    private Boolean newSeries;
+
+    @Basic(optional = false)
+    @Column(name = "new_user")
+    private Boolean newUser;
+
+    @OneToMany
+    @JoinColumn (name = "webhook_trigger_fk", nullable = false)
+    @OrderBy("attempt desc")
+    private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
+    private Webhook webhook;
+
+    public WebhookTrigger() {}
+
+    public WebhookTrigger(String id, boolean isManualTrigger, WebhookType type, Webhook webhook) {
+
+        this.id = id;
+        this.isManualTrigger = isManualTrigger;
+        this.webhook = webhook;
+        webhook.addWebhookTrigger(this);
+        if(type.equals(WebhookType.NEW_USER)) {
+            this.newUser = true;
+            this.newSeries = false;
+        } else if (type.equals(WebhookType.NEW_SERIES)) {
+            this.newUser = false;
+            this.newSeries = true;
+        }
+    }
+
+    public WebhookTrigger(boolean isManualTrigger, WebhookType type, Webhook webhook) {
+        this(new WebhookRequestId().getRequestId(), isManualTrigger, type, webhook);
+    }
+
+
+    public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
+
+    public Boolean isManualTrigger() { return isManualTrigger; }
+    public Boolean getNewSeries() { return newSeries; }
+    public Boolean getNewUser() { return newUser; }
+    public String getId() { return id; }
+    public long getPk() { return pk; }
+
+    public Set<WebhookAttempt> getWebhookAttempts() { return webhookAttempts; }
+
+    public boolean isSuccess() {
+        for (WebhookAttempt webhookAttempt: webhookAttempts) {
+            if (webhookAttempt.getStatus() >= 200 && webhookAttempt.getStatus() <= 299) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

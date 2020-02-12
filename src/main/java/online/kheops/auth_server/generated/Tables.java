@@ -15,7 +15,9 @@ import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
-import online.kheops.auth_server.generated.tables.Version;
+import online.kheops.auth_server.generated.tables.WebhookAttempts;
+import online.kheops.auth_server.generated.tables.WebhookTriggers;
+import online.kheops.auth_server.generated.tables.Webhooks;
 
 
 /**
@@ -77,7 +79,17 @@ public class Tables {
     public static final Users USERS = online.kheops.auth_server.generated.tables.Users.USERS;
 
     /**
-     * The table <code>public.version</code>.
+     * The table <code>public.webhook_attempts</code>.
      */
-    public static final Version VERSION = online.kheops.auth_server.generated.tables.Version.VERSION;
+    public static final WebhookAttempts WEBHOOK_ATTEMPTS = online.kheops.auth_server.generated.tables.WebhookAttempts.WEBHOOK_ATTEMPTS;
+
+    /**
+     * The table <code>public.webhook_triggers</code>.
+     */
+    public static final WebhookTriggers WEBHOOK_TRIGGERS = online.kheops.auth_server.generated.tables.WebhookTriggers.WEBHOOK_TRIGGERS;
+
+    /**
+     * The table <code>public.webhooks</code>.
+     */
+    public static final Webhooks WEBHOOKS = online.kheops.auth_server.generated.tables.Webhooks.WEBHOOKS;
 }

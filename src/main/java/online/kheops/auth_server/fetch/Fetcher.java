@@ -52,7 +52,7 @@ public abstract class Fetcher {
         seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
-    public static void  fetchStudy(String studyInstanceUID) {
+    public static void fetchStudy(String studyInstanceUID) {
         final URI studyUri = studyUriBuilder.build(studyInstanceUID);
 
         final Attributes attributes;

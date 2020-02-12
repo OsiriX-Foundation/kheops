@@ -13,6 +13,8 @@ import javax.servlet.ServletContext;
 import java.time.Instant;
 import java.util.*;
 
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+
 public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
     private final List<String> studyUIDs;
@@ -29,7 +31,6 @@ public class ReportProviderAccessToken implements AccessToken {
     private final String token;
 
     static class Builder implements AccessTokenBuilder{
-        private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 
         private final ServletContext servletContext;
 

@@ -11,9 +11,9 @@ import javax.servlet.ServletContext;
 import java.util.*;
 
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 
 class AuthorizationCodeValidator {
-    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
     private final ServletContext servletContext;

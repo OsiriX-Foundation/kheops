@@ -1,0 +1,217 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet author="kheops" id="v2.0-1.0">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="version" schemaName="public"/>
+        </preConditions>
+        <dropTable tableName="version"/>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v2.0-2.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhooks" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhooks">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhooks_pk"/>
+            </column>
+            <column name="id" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creation_time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret" type="VARCHAR(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="new_series" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="new_user" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="album_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-2.1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_user_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="user_fk" baseTableName="webhooks" constraintName="webhook_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-2.2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_album_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="album_fk" baseTableName="webhooks" constraintName="webhook_album_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-2.3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='webhooks_id_unique'</sqlCheck>
+        </preConditions>
+        <addUniqueConstraint columnNames="id" constraintName="webhooks_id_unique" tableName="webhooks"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-2.4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="webhooks_url_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="webhooks_url_index" tableName="webhooks">
+            <column name="url"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-2.5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="webhooks_enabled_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="webhooks_enabled_index" tableName="webhooks">
+            <column name="enabled"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-2.6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="webhooks_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="webhooks_album_fk_index" tableName="webhooks">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v2.0-3.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhook_triggers" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhook_triggers">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhook_triggers_pk"/>
+            </column>
+            <column name="id" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="webhook_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_manual_trigger" type="BOOLEAN"/>
+            <column name="new_series" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="new_user" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-3.1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_triggers_webhook_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="webhook_fk" baseTableName="webhook_triggers" constraintName="webhook_triggers_webhook_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="webhooks" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-3.2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='webhook_triggers_id_unique'</sqlCheck>
+        </preConditions>
+        <addUniqueConstraint columnNames="id" constraintName="webhook_triggers_id_unique" tableName="webhook_triggers"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-3.3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="webhook_triggers_webhook_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="webhook_triggers_webhook_fk_index" tableName="webhook_triggers">
+            <column name="webhook_fk"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v2.0-4.0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhook_attempts" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhook_attempts">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhook_attempt_pk"/>
+            </column>
+            <column name="status" type="BIGINT"/>
+            <column name="time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="webhook_trigger_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempt" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-4.1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_attempts_webhook_triggers_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="webhook_trigger_fk" baseTableName="webhook_attempts" constraintName="webhook_attempts_webhook_triggers_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="webhook_triggers" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.0-4.2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="webhook_attempts_webhook_trigger_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="webhook_attempts_webhook_trigger_fk_index" tableName="webhook_attempts">
+            <column name="webhook_trigger_fk"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v2.0-5.0">
+       <tagDatabase tag="v2"/>
+    </changeSet>
+
+</databaseChangeLog>

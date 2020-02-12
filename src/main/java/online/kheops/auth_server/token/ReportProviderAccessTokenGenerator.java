@@ -10,8 +10,9 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.InternalServerErrorException;
 import java.util.*;
 
+import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
+
 public class ReportProviderAccessTokenGenerator {
-    private static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
     private final ServletContext context;

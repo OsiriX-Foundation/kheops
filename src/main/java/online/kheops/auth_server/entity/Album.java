@@ -70,6 +70,10 @@ public class Album {
     private Set<AlbumUser> albumUser = new HashSet<>();
 
     @OneToMany
+    @JoinColumn (name = "album_fk", nullable = false)
+    private Set<Webhook> webhooks = new HashSet<>();
+
+    @OneToMany
     @JoinColumn (name = "album_fk", nullable = true)
     private Set<Event> events = new HashSet<>();
 
@@ -200,6 +204,10 @@ public class Album {
     public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
     public Set<ReportProvider> getReportProviders() {return reportProviders; }
+
+    public void addWebhook(Webhook webhook) { this.webhooks.add(webhook); }
+
+    public Set<Webhook> getWebhooks() { return webhooks; }
 
     @Override
     public String toString() {

@@ -1,0 +1,214 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="kheops" id="v1.1-0">
+        <sql>CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA public</sql>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_series_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_series_album_fk_index" tableName="album_series">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_series_series_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_series_series_fk_index" tableName="album_series">
+            <column name="series_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_user_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_user_album_fk_index" tableName="album_user">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="album_user_user_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="album_user_user_fk_index" tableName="album_user">
+            <column name="user_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="albums_last_event_time_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="albums_last_event_time_index" tableName="albums">
+            <column name="last_event_time"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="capabilities_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="capabilities_album_fk_index" tableName="capabilities">
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="events_series_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="events_series_fk_index" tableName="events">
+            <column name="series_fk"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="events_user_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="events_user_fk_index" tableName="events">
+            <column name="user_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="report_providers_client_id_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="report_providers_client_id_index" tableName="report_providers">
+            <column name="client_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="kheops" id="v1.1-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="report_providers_creation_time_album_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="report_providers_creation_time_album_fk_index" tableName="report_providers">
+            <column name="creation_time"/>
+            <column name="album_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="users_inbox_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="users_inbox_fk_index" tableName="users">
+            <column name="inbox_fk"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="series_modality_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="series_modality_index" tableName="series">
+            <column name="modality"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-13">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'album_pk_seq'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="album_pk_seq" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-14">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'series_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="series_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="series_pk_seq" oldSequenceName="series_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-15">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'users_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="users_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="users_pk_seq" oldSequenceName="users_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-16">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'album_series_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="album_series_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="album_series_pk_seq" oldSequenceName="album_series_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-17">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'album_user_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="album_user_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="album_user_pk_seq" oldSequenceName="album_user_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-18">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'capabilities_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="capabilities_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="capabilities_pk_seq" oldSequenceName="capabilities_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-19">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'event_pk_seq'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="event_pk_seq" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-20">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'report_providers_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="report_providers_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="report_providers_pk_seq" oldSequenceName="report_providers_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v1.1-21">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'studies_pk_seq1'</sqlCheck>
+        </preConditions>
+        <dropSequence sequenceName="studies_pk_seq" schemaName="public"/>
+        <renameSequence newSequenceName="studies_pk_seq" oldSequenceName="studies_pk_seq1" schemaName="public"/>
+    </changeSet>
+
+
+
+    <changeSet author="kheops" id="v1.1-22">
+        <tagDatabase tag="v1.1"/>
+    </changeSet>
+
+
+</databaseChangeLog>

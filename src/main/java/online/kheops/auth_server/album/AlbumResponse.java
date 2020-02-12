@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static online.kheops.auth_server.album.Albums.getUsers;
-
 public class AlbumResponse {
 
     @XmlElement(name = "album_id")

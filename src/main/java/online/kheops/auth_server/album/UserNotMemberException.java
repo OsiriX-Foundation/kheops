@@ -17,6 +17,11 @@ public class UserNotMemberException extends Exception implements KheopsException
                 .build();
     }
 
+    public UserNotMemberException(ErrorResponse errorResponse) {
+        super();
+        this.errorResponse = errorResponse;
+    }
+
     public ErrorResponse getErrorResponse() { return errorResponse; }
 
 }

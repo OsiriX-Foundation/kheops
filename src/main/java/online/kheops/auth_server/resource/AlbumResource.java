@@ -17,6 +17,7 @@ import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 
+import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.*;
@@ -43,6 +44,9 @@ public class AlbumResource {
 
     @Context
     private SecurityContext securityContext;
+
+    @Context
+    private ServletContext context;
 
     @POST
     @Secured
@@ -303,12 +307,12 @@ public class AlbumResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addUser(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                             @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user)
-            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException {
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotFoundException, UserNotMemberException{
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User targetUser;
 
-        targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false);
+        targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, false, context);
 
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
@@ -327,13 +331,13 @@ public class AlbumResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addAdmin(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                              @SuppressWarnings("RSReferenceInspection") @PathParam("user") String user)
-            throws AlbumNotFoundException, AlbumForbiddenException {
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final User targetUser;
 
         try {
-            targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, true);
+            targetUser = Albums.addUser(kheopsPrincipal.getUser(), user, albumId, true, context);
         } catch (UserNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
