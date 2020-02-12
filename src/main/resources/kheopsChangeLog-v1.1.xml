@@ -136,14 +136,14 @@
 
     <changeSet author="kheops" id="v1.1-13">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from album_pk_seq</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'album_pk_seq'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="album_pk_seq" schemaName="public"/>
     </changeSet>
 
     <changeSet author="kheops" id="v1.1-14">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from series_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'series_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="series_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="series_pk_seq" oldSequenceName="series_pk_seq1" schemaName="public"/>
@@ -151,7 +151,7 @@
 
     <changeSet author="kheops" id="v1.1-15">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from users_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'users_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="users_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="users_pk_seq" oldSequenceName="users_pk_seq1" schemaName="public"/>
@@ -159,7 +159,7 @@
 
     <changeSet author="kheops" id="v1.1-16">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from album_series_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'album_series_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="album_series_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="album_series_pk_seq" oldSequenceName="album_series_pk_seq1" schemaName="public"/>
@@ -167,7 +167,7 @@
 
     <changeSet author="kheops" id="v1.1-17">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from album_user_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'album_user_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="album_user_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="album_user_pk_seq" oldSequenceName="album_user_pk_seq1" schemaName="public"/>
@@ -175,7 +175,7 @@
 
     <changeSet author="kheops" id="v1.1-18">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from capabilities_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'capabilities_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="capabilities_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="capabilities_pk_seq" oldSequenceName="capabilities_pk_seq1" schemaName="public"/>
@@ -183,14 +183,14 @@
 
     <changeSet author="kheops" id="v1.1-19">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from event_pk_seq</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'event_pk_seq'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="event_pk_seq" schemaName="public"/>
     </changeSet>
 
     <changeSet author="kheops" id="v1.1-20">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from report_providers_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'report_providers_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="report_providers_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="report_providers_pk_seq" oldSequenceName="report_providers_pk_seq1" schemaName="public"/>
@@ -198,7 +198,7 @@
 
     <changeSet author="kheops" id="v1.1-21">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">select count(*) from studies_pk_seq1</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from pg_statio_all_sequences where relname = 'studies_pk_seq1'</sqlCheck>
         </preConditions>
         <dropSequence sequenceName="studies_pk_seq" schemaName="public"/>
         <renameSequence newSequenceName="studies_pk_seq" oldSequenceName="studies_pk_seq1" schemaName="public"/>
