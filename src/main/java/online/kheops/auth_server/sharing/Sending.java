@@ -38,6 +38,8 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FO
 
 public class Sending {
 
+    private static final Object lock = new Object();
+
     private Sending() {
         throw new IllegalStateException("Utility class");
     }
@@ -201,85 +203,88 @@ public class Sending {
     public static void putSeriesInAlbum(ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, ClientIdNotFoundException, UserNotMemberException {
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
+        synchronized (lock) {
 
-        try {
-            tx.begin();
+            final EntityManager em = EntityManagerListener.createEntityManager();
+            final EntityTransaction tx = em.getTransaction();
 
-            final User callingUser = em.merge(kheopsPrincipal.getUser());
-            final Album targetAlbum = getAlbum(albumId, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-
-            Series availableSeries;
             try {
-                availableSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
+                tx.begin();
 
-                //Todo series already exist ?? if upload with capability token => verify if orphelin => if not => return forbidden
-            } catch (SeriesNotFoundException e2) {
-                // from here the series does not exists
-                // find if the study already exists
-                final Study study = getOrCreateStudy(studyInstanceUID, em);
+                final User callingUser = em.merge(kheopsPrincipal.getUser());
+                final Album targetAlbum = getAlbum(albumId, em);
+                final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
 
-                availableSeries = new Series(seriesInstanceUID);
-                study.getSeries().add(availableSeries);
-                availableSeries.setStudy(study);
-                em.persist(availableSeries);
-            }
+                Series availableSeries;
+                try {
+                    availableSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-            if (targetAlbum.containsSeries(availableSeries, em)) {
+                    //Todo series already exist ?? if upload with capability token => verify if orphelin => if not => return forbidden
+                } catch (SeriesNotFoundException e2) {
+                    // from here the series does not exists
+                    // find if the study already exists
+                    final Study study = getOrCreateStudy(studyInstanceUID, em);
+
+                    availableSeries = new Series(seriesInstanceUID);
+                    study.getSeries().add(availableSeries);
+                    availableSeries.setStudy(study);
+                    em.persist(availableSeries);
+                }
+
+                if (targetAlbum.containsSeries(availableSeries, em)) {
+                    kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
+                            .album(albumId)
+                            .study(studyInstanceUID)
+                            .series(seriesInstanceUID)
+                            .log();
+                    return;
+                }
+
+                final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries);
+                availableSeries.addAlbumSeries(albumSeries);
+                targetAlbum.addSeries(albumSeries);
+                em.persist(albumSeries);
+
+                final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+
+                final Mutation mutation;
+                if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                    final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
+                    mutation = Events.albumPostSeriesMutation(capability, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
+                    newSeriesWebhook.setCapabilityToken(capability);
+                } else if (kheopsPrincipal.getClientId().isPresent()) {
+                    ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
+                    reportProvider = em.merge(reportProvider);
+                    newSeriesWebhook.setReportProvider(reportProvider);
+                    mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
+                } else {
+                    mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
+                }
+                em.persist(mutation);
+                targetAlbum.updateLastEventTime();
+
                 kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
                         .album(albumId)
                         .study(studyInstanceUID)
                         .series(seriesInstanceUID)
                         .log();
-                return;
-            }
 
-            final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries);
-            availableSeries.addAlbumSeries(albumSeries);
-            targetAlbum.addSeries(albumSeries);
-            em.persist(albumSeries);
-
-            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER),false);
-
-            final Mutation mutation;
-            if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                mutation = Events.albumPostSeriesMutation(capability, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
-                newSeriesWebhook.setCapabilityToken(capability);
-            } else if(kheopsPrincipal.getClientId().isPresent()) {
-                ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
-                reportProvider = em.merge(reportProvider);
-                newSeriesWebhook.setReportProvider(reportProvider);
-                mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
-            } else {
-                mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
-            }
-            em.persist(mutation);
-            targetAlbum.updateLastEventTime();
-
-            kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
-                    .album(albumId)
-                    .study(studyInstanceUID)
-                    .series(seriesInstanceUID)
-                    .log();
-
-            if(availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
-                for (Webhook webhook : targetAlbum.getWebhooks()) {
-                    if (webhook.getNewSeries() && webhook.isEnabled()) {
-                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
-                        em.persist(webhookTrigger);
-                        new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                if (availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
+                    for (Webhook webhook : targetAlbum.getWebhooks()) {
+                        if (webhook.getNewSeries() && webhook.isEnabled()) {
+                            WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                            em.persist(webhookTrigger);
+                            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                        }
                     }
                 }
+                tx.commit();
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                em.close();
             }
-            tx.commit();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
         }
     }
 

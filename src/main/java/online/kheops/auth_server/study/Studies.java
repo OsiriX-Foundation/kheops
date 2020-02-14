@@ -414,17 +414,21 @@ public class Studies {
             return findStudyByStudyUID(studyInstanceUID, em);
     }
 
+    private static final Object lock = new Object();
+
     public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
-        Study study;
-        try {
-            study = getStudy(studyInstanceUID, em);
-        } catch (StudyNotFoundException ignored) {
-            // the study doesn't exist, we need to create it
-            study = new Study();
-            study.setStudyInstanceUID(studyInstanceUID);
-            em.persist(study);
+        synchronized (lock) {
+            Study study;
+            try {
+                study = getStudy(studyInstanceUID, em);
+            } catch (StudyNotFoundException ignored) {
+                // the study doesn't exist, we need to create it
+                study = new Study();
+                study.setStudyInstanceUID(studyInstanceUID);
+                em.persist(study);
+            }
+            return study;
         }
-        return study;
     }
 
     public static boolean canAccessStudy(User user, Study study, EntityManager em) {
