@@ -9,6 +9,7 @@ import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.token.*;
+import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
@@ -166,7 +167,15 @@ public class TokenResource
             if (accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN) {
                 final Capability capability;
                 try {
-                    capability = getCapabilityWithID(accessToken.getCapabilityTokenId().get());
+                    if(accessToken.getCapabilityTokenId().isPresent()) {
+                        capability = getCapabilityWithID(accessToken.getCapabilityTokenId().get());
+                    } else {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message("Not Found")
+                                .detail("Capability token not found")
+                                .build();
+                        throw new CapabilityNotFoundException(errorResponse);
+                    }
                 } catch (CapabilityNotFoundException e) {
                     return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
                 }

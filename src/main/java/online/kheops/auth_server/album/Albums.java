@@ -318,14 +318,6 @@ public class Albums {
                 final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
                 final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
-                if (removedAlbumUser.isAdmin()) {
-                    for (Capability capability: album.getCapabilities()) {
-                        if (capability.getUser() == removedUser) {
-                            capability.setRevoked(true);
-                        }
-                    }
-                }
-
                 final Events.MutationType mutationType;
 
                 if (callingUser.getPk() == removedUser.getPk()) {
@@ -338,6 +330,14 @@ public class Albums {
                             .detail("You must be an admin for removing another user")
                             .build();
                     throw new AlbumForbiddenException(errorResponse);
+                }
+
+                if (removedAlbumUser.isAdmin()) {
+                    for (Capability capability: album.getCapabilities()) {
+                        if (capability.getUser() == removedUser) {
+                            capability.setRevoked(true);
+                        }
+                    }
                 }
 
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
