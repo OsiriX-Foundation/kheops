@@ -36,11 +36,16 @@ public final class ZipStudyResource {
     private static final String INBOX = "inbox";
     private static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
 
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
     private static final Client CLIENT = ClientBuilder.newClient();
     private static final String DICOM_ZIP_FILENAME = "DICOM.ZIP";
 
     @Context
     ServletContext context;
+
+    @HeaderParam(HEADER_X_FORWARDED_FOR)
+    String headerXForwardedFor;
 
     @GET
     @Path("/{" + STUDY_INSTANCE_UID +"}")
@@ -67,6 +72,7 @@ public final class ZipStudyResource {
             upstreamResponse = upstreamTarget.resolveTemplate("StudyInstanceUID", studyInstanceUID)
                     .request("multipart/related;type=\"application/dicom\"")
                     .header(AUTHORIZATION, authorizationHeader)
+                    .header(HEADER_X_FORWARDED_FOR, headerXForwardedFor)
                     .get();
         } catch (ProcessingException e) {
             LOG.log(WARNING, "Unable to get the upstream", e);
