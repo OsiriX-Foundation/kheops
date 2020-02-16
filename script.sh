@@ -102,6 +102,12 @@ else
    echo -e "environment variable KHEOPS_UI_PORT \e[92mOK\e[0m"
 fi
 
+if [[ -z $KHEOPS_KEYCLOAK_URI ]]; then
+  echo "Missing KHEOPS_KEYCLOAK_URI environment variable"
+  missing_env_var_secret=true
+else
+   echo -e "environment variable KHEOPS_KEYCLOAK_URI \e[92mOK\e[0m"
+fi
 
 #if missing env var or secret => exit
 if [[ $missing_env_var_secret = true ]]; then
@@ -121,6 +127,7 @@ sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|" 
 sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" /etc/nginx/conf.d/kheops.conf
 
 sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${keycloak_url}|$KHEOPS_KEYCLOAK_URI|" /etc/nginx/conf.d/kheops.conf
 
 echo "Ending setup NGINX secrets and env var"
 
