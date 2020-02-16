@@ -63,7 +63,7 @@ sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /opt/openresty/nginx/con
 #set secrets
 export JWT_SECRET=$kheops_auth_hmasecret
 export JWT_POST_SECRET=$kheops_auth_hmasecret_post
-export KHEOPS_SERVICE_ACCOUNT_USER
+export KHEOPS_SERVICE_ACCOUNT_USER=$KHEOPS_SERVICE_ACCOUNT_USER
 
 echo "Ending setup PEP secrets and env var"
 
