@@ -44,10 +44,6 @@ if [ -z "$KHEOPS_PROXY_PACS_WADO_RS" ]; then
     echo "Missing KHEOPS_PROXY_PACS_WADO_RS environment variable"
     missing_env_var_secret=true
 fi
-if [ -z "$KHEOPS_SERVICE_ACCOUNT_USER" ]; then
-    echo "Missing KHEOPS_SERVICE_ACCOUNT_USER environment variable"
-    missing_env_var_secret=true
-fi
 
 
 #if missing env var or secret => exit
@@ -63,7 +59,7 @@ sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /opt/openresty/nginx/con
 #set secrets
 export JWT_SECRET=$kheops_auth_hmasecret
 export JWT_POST_SECRET=$kheops_auth_hmasecret_post
-export KHEOPS_SERVICE_ACCOUNT_USER=$KHEOPS_SERVICE_ACCOUNT_USER
+
 
 echo "Ending setup PEP secrets and env var"
 
