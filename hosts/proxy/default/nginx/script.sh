@@ -44,6 +44,10 @@ if [ -z "$KHEOPS_PROXY_PACS_WADO_RS" ]; then
     echo "Missing KHEOPS_PROXY_PACS_WADO_RS environment variable"
     missing_env_var_secret=true
 fi
+if [ -z "$KHEOPS_SERVICE_ACCOUNT_USER" ]; then
+    echo "Missing KHEOPS_SERVICE_ACCOUNT_USER environment variable"
+    missing_env_var_secret=true
+fi
 
 
 #if missing env var or secret => exit
