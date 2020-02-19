@@ -4,12 +4,12 @@ const state = {
 };
 
 const getters = {
-  source: (state) => state.webhooks,
+  webhooks: (state) => state.webhooks,
 };
 
 const actions = {
-  setWebhooks({ commit }, source) {
-    commit('SET_WEBHOOKS', source);
+  setWebhooks({ commit }, webhooks) {
+    commit('SET_WEBHOOKS', webhooks);
   },
   initWebhooks({ commit }) {
     commit('INIT_WEBHOOKS');
