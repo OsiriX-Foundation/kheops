@@ -63,6 +63,11 @@ const actions = {
     }
     return HTTP.post(request, queries, { headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then((res) => res).catch((err) => Promise.reject(err));
   },
+  deleteStoreComment({ commit }, params) {
+    if (state.comments[params.StudyInstanceUID] !== undefined) {
+      commit('DELETE_COMMENTS', { StudyInstanceUID: params.StudyInstanceUID });
+    }
+  },
 };
 
 // mutations
@@ -72,6 +77,9 @@ const mutations = {
   },
   SET_COMMENTS(state, params) {
     Vue.set(state.comments, params.StudyInstanceUID, params.comments);
+  },
+  DELETE_COMMENTS(state, params) {
+    Vue.delete(state.comments, params.StudyInstanceUID);
   },
 };
 
