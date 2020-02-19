@@ -20,13 +20,13 @@ export const CurrentUser = {
       return Vue.prototype.$keycloak.token;
     },
     currentuserSub() {
-      return Vue.prototype.$keycloak.idTokenParsed.sub;
+      return Vue.prototype.$keycloak.idTokenParsed !== null ? Vue.prototype.$keycloak.idTokenParsed.sub : null;
     },
     currentuserEmail() {
-      return Vue.prototype.$keycloak.idTokenParsed.email;
+      return Vue.prototype.$keycloak.idTokenParsed !== null ? Vue.prototype.$keycloak.idTokenParsed.email : null;
     },
     currentuserFullname() {
-      return Vue.prototype.$keycloak.idTokenParsed.name;
+      return Vue.prototype.$keycloak.idTokenParsed !== null ? Vue.prototype.$keycloak.idTokenParsed.name : null;
     },
   },
   methods: {
