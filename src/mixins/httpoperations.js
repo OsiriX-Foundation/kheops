@@ -2,7 +2,7 @@ export default {
   getObjectParameters(queries) {
     const tabQueries = [];
     Object.keys(queries).forEach((key) => {
-      if (typeof queries[key] !== 'function' && typeof queries[key] !== 'object') {
+      if (typeof queries[key] !== 'function' && typeof queries[key] !== 'object' && queries[key] !== '') {
         tabQueries.push(`${encodeURIComponent(key)}=${encodeURIComponent(queries[key])}`);
       } else if (typeof queries[key] !== 'function' && queries[key].constructor === Array) {
         queries[key].forEach((value) => {

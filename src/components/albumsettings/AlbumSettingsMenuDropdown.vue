@@ -5,14 +5,16 @@
     "user": "Users",
     "tokens": "Tokens",
     "providerSR": "Report Providers",
-    "socialmedia": "Social Media"
+    "socialmedia": "Social Media",
+    "webhook": "Webhook"
   },
   "fr": {
     "general": "Général",
     "user": "Utilisateurs",
     "tokens": "Tokens",
     "providerSR": "Report Providers",
-    "socialmedia": "Réseaux sociaux"
+    "socialmedia": "Réseaux sociaux",
+    "webhook": "Webhook"
   }
 }
 </i18n>

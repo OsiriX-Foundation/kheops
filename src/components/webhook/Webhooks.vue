@@ -1,0 +1,80 @@
+<i18n>
+  {
+    "en": {
+      "newwebhook": "New Webhook"
+
+    },
+    "fr": {
+      "newwebhook": "Nouveau Webhook"
+    }
+  }
+</i18n>
+
+<template>
+  <div>
+    <div
+      v-if="(currentView === 'listwebhook')"
+      class="my-3 selection-button-container provider-position"
+    >
+      <router-link
+        :to="{
+          name: 'albumsettingsaction',
+          params: { action: 'newwebhook' }
+        }"
+        class="btn btn-secondary"
+      >
+        <v-icon
+          name="plus"
+          class="mr-2"
+        />
+        {{ $t('newwebhook') }}
+      </router-link>
+    </div>
+    <list-webhook
+      v-if="currentView === 'listwebhook'"
+      :album-id="albumId"
+    />
+    <new-webhook
+      v-if="currentView === 'newwebhook'"
+      :album-id="albumId"
+      @done="loadAction('listwebhook')"
+    />
+  </div>
+</template>
+
+<script>
+import ListWebhook from '@/components/webhook/ListWebhook';
+import NewWebhook from '@/components/webhook/NewWebhook';
+
+export default {
+  name: 'Providers',
+  components: {
+    ListWebhook, NewWebhook,
+  },
+  props: {
+    albumId: {
+      type: String,
+      required: true,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      view: 'list',
+      clientIdSelected: '',
+    };
+  },
+  computed: {
+    currentView() {
+      return this.$route.params.action !== undefined ? this.$route.params.action : 'listwebhook';
+    },
+  },
+  created() {
+  },
+  methods: {
+    loadAction(action) {
+      this.$router.push({ name: 'albumsettingsaction', params: { action } });
+    },
+  },
+};
+</script>
