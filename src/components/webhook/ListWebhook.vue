@@ -62,7 +62,7 @@ export default {
   created() {
   },
   beforeDestroy() {
-    // init webhook list
+    this.$store.commit('initWebhooks')
   },
   methods: {
   },
