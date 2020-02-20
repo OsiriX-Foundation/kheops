@@ -56,7 +56,6 @@ public class Users {
     public static User getOrCreateUser(String userReference)
             throws UserNotFoundException {
 
-
         final EntityManager getUserEntityManager = EntityManagerListener.createEntityManager();
         //try to find the user in kheops db
         try {
