@@ -6,7 +6,7 @@
     "tokens": "Tokens",
     "providerSR": "Report Providers",
     "socialmedia": "Social Media",
-    "webhook": "Webhook"
+    "webhooks": "Webhooks"
   },
   "fr": {
     "general": "Général",
@@ -14,7 +14,7 @@
     "tokens": "Tokens",
     "providerSR": "Report Providers",
     "socialmedia": "Réseaux sociaux",
-    "webhook": "Webhook"
+    "webhooks": "Webhooks"
   }
 }
 </i18n>

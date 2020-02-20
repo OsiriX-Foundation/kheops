@@ -33,9 +33,21 @@
     <list-webhook
       v-if="currentView === 'listwebhook'"
       :album-id="albumId"
+      @webhookselectedshow="showWebhook"
     />
     <new-webhook
       v-if="currentView === 'newwebhook'"
+      :album-id="albumId"
+      @done="loadAction('listwebhook')"
+    />
+    <webhook
+      v-if="currentView === 'webhook'"
+      :album-id="albumId"
+      @done="loadAction('listwebhook')"
+      @edit="editWebhook"
+    />
+    <edit-webhook
+      v-if="currentView === 'editwebhook'"
       :album-id="albumId"
       @done="loadAction('listwebhook')"
     />
@@ -45,11 +57,13 @@
 <script>
 import ListWebhook from '@/components/webhook/ListWebhook';
 import NewWebhook from '@/components/webhook/NewWebhook';
+import Webhook from '@/components/webhook/Webhook';
+import EditWebhook from '@/components/webhook/EditWebhook';
 
 export default {
-  name: 'Providers',
+  name: 'Webhooks',
   components: {
-    ListWebhook, NewWebhook,
+    ListWebhook, NewWebhook, Webhook, EditWebhook,
   },
   props: {
     albumId: {
@@ -72,8 +86,17 @@ export default {
   created() {
   },
   methods: {
+    showWebhook(id) {
+      this.loadActionId('webhook', id);
+    },
+    editWebhook(id) {
+      this.loadActionId('editwebhook', id);
+    },
     loadAction(action) {
       this.$router.push({ name: 'albumsettingsaction', params: { action } });
+    },
+    loadActionId(action, id) {
+      this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
     },
   },
 };

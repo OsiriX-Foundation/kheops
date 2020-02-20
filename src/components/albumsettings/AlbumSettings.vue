@@ -32,7 +32,7 @@
           :album="album"
         />
         <album-settings-webhook
-          v-if="currentCategory === 'webhook'"
+          v-if="currentCategory === 'webhooks'"
           :album="album"
         />
       </div>
@@ -70,7 +70,7 @@ export default {
   data() {
     return {
       basicCategories: ['general', 'user', 'providerSR'],
-      adminCategories: ['tokens', 'webhook'],
+      adminCategories: ['tokens', 'webhooks'],
     };
   },
   computed: {

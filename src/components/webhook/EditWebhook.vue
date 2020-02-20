@@ -1,7 +1,9 @@
 <i18n>
 {
   "en": {
-    "newwebhook": "New webhook",
+    "confirm": "Confirm",
+    "warningremove": "Are you sure to remove this webhook ?",
+    "editwebhook": "Edit webhook",
     "namewebhook": "Name of the webhook",
     "urlwebhook": "Configuration URL of the webhook",
     "secret": "Secret",
@@ -14,7 +16,9 @@
     "urlnotvalid": "This url is not valid"
   },
   "fr": {
-    "newwebhook": "Nouveau webhook",
+    "confirm": "Confirmer",
+    "warningremove": "Etes-vous sûre de vouloir supprimer ce webhook ?",
+    "editwebhook": "Edition d'un webhook",
     "namewebhook": "Nom du webhook",
     "urlwebhook": "URL de webhook",
     "secret": "Secret",
@@ -30,7 +34,9 @@
 </i18n>
 
 <template>
-  <div>
+  <div
+    v-if="Object.entries(webhook).length > 0"
+  >
     <div
       class="my-3 selection-button-container provider-position"
     >
@@ -47,17 +53,17 @@
             />
           </span>
         </button>
-        {{ $t('newwebhook') }}
+        {{ $t('editwebhook') }}
       </h4>
     </div>
-    <form @submit.prevent="createWebhook">
+    <form @submit.prevent="editWebhook">
       <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-3">
           <b>{{ $t('namewebhook') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <input
-            v-model="webhook.name"
+            v-model="modelWebhook.name"
             v-focus
             type="text"
             :placeholder="$t('namewebhook')"
@@ -66,7 +72,7 @@
             maxlength="255"
           >
 
-          <b-form-invalid-feedback :state="webhook.name !== ''">
+          <b-form-invalid-feedback :state="modelWebhook.name !== ''">
             {{ $t('fieldobligatory') }}
           </b-form-invalid-feedback>
         </div>
@@ -77,7 +83,7 @@
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <input
-            v-model="webhook.url"
+            v-model="modelWebhook.url"
             type="text"
             :placeholder="$t('urlwebhook')"
             class="form-control"
@@ -85,24 +91,27 @@
             maxlength="1024"
           >
 
-          <b-form-invalid-feedback :state="webhook.url !== ''">
+          <b-form-invalid-feedback :state="modelWebhook.url !== ''">
             {{ $t('fieldobligatory') }}
           </b-form-invalid-feedback>
           <b-form-invalid-feedback
-            v-if="webhook.url !== ''"
-            :state="checkUrl(webhook.url)"
+            v-if="modelWebhook.url !== ''"
+            :state="checkUrl(modelWebhook.url)"
           >
             {{ $t('urlnotvalid') }}
           </b-form-invalid-feedback>
         </div>
       </div>
-      <div class="row mb-3">
+      <div
+        v-if="webhook.use_secret === false"
+        class="row mb-3"
+      >
         <div class="col-xs-12 col-sm-12 col-md-3">
           <b>{{ $t('secret') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <input
-            v-model="webhook.secret"
+            v-model="modelWebhook.secret"
             type="text"
             :placeholder="$t('secret')"
             class="form-control"
@@ -117,7 +126,7 @@
         <div class="col-xs-12 col-sm-12 col-md-9">
           <b-form-checkbox-group
             id="events"
-            v-model="webhook.event"
+            v-model="modelWebhook.event"
             :options="eventsDefined"
             :state="state"
             stacked
@@ -129,31 +138,31 @@
         </div>
       </div>
       <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-3" />
-        <div class="col-xs-12 col-sm-12 col-md-9">
+        <div class="offset-xs-12 offset-sm-12 offset-md-3 col-xs-12 col-sm-12 col-md-9">
           <b-form-checkbox
-            v-model="webhook.enabled"
+            v-model="modelWebhook.enabled"
           >
             <b>{{ $t('enabled') }}</b>
           </b-form-checkbox>
         </div>
       </div>
-      <create-cancel-button
-        :disabled="disabledCreate"
-        @cancel="done"
+      <done-delete-button
+        class-row="mb-2"
+        class-col="offset-md-4 offset-lg-3 col-xs-12 col-sm-12 col-md-4 col-lg-3"
+        :text-warning-remove="$t('warningremove')"
+        :text-button-done="$t('confirm')"
       />
     </form>
   </div>
 </template>
 
 <script>
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
-import { HTTP } from '@/router/http';
-import httpoperations from '@/mixins/httpoperations';
+import { mapGetters } from 'vuex';
+import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
 
 export default {
-  name: 'NewWebhook',
-  components: { CreateCancelButton },
+  name: 'Webhook',
+  components: { DoneDeleteButton },
   props: {
     albumId: {
       type: String,
@@ -167,38 +176,51 @@ export default {
         { value: 'new_series', text: this.$t('new_series') },
         { value: 'new_user', text: this.$t('new_user') },
       ],
-      webhook: {
-        url: '',
+      modelWebhook: {
         name: '',
-        secret: '',
+        url: '',
         event: [],
         enabled: false,
       },
     };
   },
   computed: {
+    ...mapGetters({
+      webhook: 'webhook',
+    }),
     state() {
-      return this.webhook.event.length >= 1;
+      if (this.modelWebhook.event !== undefined && this.modelWebhook.event !== null) {
+        return this.modelWebhook.event.length >= 1;
+      }
+      return false;
     },
-    disabledCreate() {
-      return (this.webhook.name === ''
-      || this.webhook.url === ''
-      || !this.checkUrl(this.webhook.url)
-      || this.webhook.event.length === 0);
+    webhookId() {
+      return this.$route.params.id;
     },
   },
+  created() {
+    const params = {
+      albumId: this.albumId,
+      webhookId: this.webhookId,
+    };
+    this.$store.dispatch('getWebhook', params).then(() => {
+      this.setModelWebhook(this.webhook);
+    });
+  },
+  beforeDestroy() {
+  },
   methods: {
-    createWebhook() {
-      const queries = httpoperations.getFormData(this.webhook);
-      const url = `albums/${this.albumId}/webhooks`;
-      HTTP.post(url, queries).then(() => {
-        this.done();
-      }).catch((err) => {
-        console.log(err);
-      });
+    setModelWebhook(webhook) {
+      this.modelWebhook.name = webhook.name;
+      this.modelWebhook.url = webhook.url;
+      this.modelWebhook.event = webhook.events;
+      this.modelWebhook.enabled = webhook.enabled;
+      if (webhook.use_secret === false) {
+        this.modelWebhook.secret = '';
+      }
     },
-    done() {
-      this.$emit('done');
+    editWebhook() {
+      console.log('edit');
     },
     // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
     checkUrl(str) {
