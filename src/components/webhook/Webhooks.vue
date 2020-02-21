@@ -34,6 +34,7 @@
       v-if="currentView === 'listwebhook'"
       :album-id="albumId"
       @webhookselectedshow="showWebhook"
+      @webhookselectededit="editWebhook"
     />
     <new-webhook
       v-if="currentView === 'newwebhook'"

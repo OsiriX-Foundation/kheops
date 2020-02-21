@@ -7,7 +7,8 @@
     "events": "Events",
     "enabled": "Enabled",
     "new_series": "New series",
-    "new_user": "New user"
+    "new_user": "New user",
+    "edit": "Edit"
   },
   "fr": {
     "nowebhooks": "Aucun webhook créé",
@@ -16,7 +17,8 @@
     "events": "Evènements",
     "enabled": "Activé",
     "new_series": "Nouvelles séries",
-    "new_user": "Nouvel utilisateur"
+    "new_user": "Nouvel utilisateur",
+    "edit": "Editer"
   }
 }
 </i18n>
@@ -31,7 +33,7 @@
       :items="webhooks"
       :fields="fields"
       tbody-tr-class="link"
-      @row-clicked="selectWebhook"
+      @row-clicked="rowSelectedWebhook"
     >
       <template v-slot:empty>
         <div
@@ -54,6 +56,16 @@
           :color="{checked: '#5fc04c', unchecked: 'grey'}"
           @change="setEnbaled(row.item.id, row.item.enabled)"
         />
+      </template>
+      <template
+        v-slot:cell(btn_edit)="data"
+      >
+        <button
+          class="btn btn-sm btn-primary"
+          @click.stop="editWebhook(data.item.id)"
+        >
+          {{ $t('edit') }}
+        </button>
       </template>
     </b-table>
   </div>
@@ -109,6 +121,11 @@ export default {
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
         },
+        {
+          key: 'btn_edit',
+          label: '',
+          sortable: false,
+        },
       ],
     };
   },
@@ -128,8 +145,14 @@ export default {
     this.$store.dispatch('initWebhooks');
   },
   methods: {
-    selectWebhook(rowSelected) {
-      this.$emit('webhookselectedshow', rowSelected.id);
+    rowSelectedWebhook(rowSelected) {
+      this.selectWebhook(rowSelected.id);
+    },
+    selectWebhook(webhookId) {
+      this.$emit('webhookselectedshow', webhookId);
+    },
+    editWebhook(webhookId) {
+      this.$emit('webhookselectededit', webhookId);
     },
     setEnbaled(webhooksId, value) {
       const params = {
