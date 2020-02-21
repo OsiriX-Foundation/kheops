@@ -223,10 +223,10 @@ public class Sending {
                 } catch (SeriesNotFoundException e2) {
                     // from here the series does not exists
                     // find if the study already exists
-                    final Study study = getOrCreateStudy(studyInstanceUID, em);
+                    final Study study = em.merge(getOrCreateStudy(studyInstanceUID));
 
                     availableSeries = new Series(seriesInstanceUID);
-                    study.getSeries().add(availableSeries);
+                    study.addSeries(availableSeries);
                     availableSeries.setStudy(study);
                     em.persist(availableSeries);
                 }
@@ -515,10 +515,10 @@ public class Sending {
 
             // from here the series does not exists
             // find if the study already exists
-            final Study study = getOrCreateStudy(studyInstanceUID, em);
+            final Study study = em.merge(getOrCreateStudy(studyInstanceUID));
 
             final Series series = new Series(seriesInstanceUID);
-            study.getSeries().add(series);
+            study.addSeries(series);
             final Album inbox = callingUser.getInbox();
             final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
             series.addAlbumSeries(inboxSeries);
@@ -615,7 +615,7 @@ public class Sending {
     }
 
     public static Set<String> availableSeriesUIDs(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
-            throws AlbumNotFoundException , StudyNotFoundException {
+            throws AlbumNotFoundException, StudyNotFoundException {
         Set<String> availableSeriesUIDs;
 
         EntityManager em = EntityManagerListener.createEntityManager();

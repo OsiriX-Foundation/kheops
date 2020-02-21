@@ -233,8 +233,8 @@ public class Study {
         this.populated = populated;
     }
 
-    public Set<Series> getSeries() {
-        return series;
+    public void addSeries (Series series) {
+        this.series.add(series);
     }
 
     public LocalDateTime getCreatedTime() {

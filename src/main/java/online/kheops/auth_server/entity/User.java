@@ -52,7 +52,7 @@ public class User {
     @JoinColumn (name = "to_user_fk", nullable=true)
     private Set<Mutation> mutations = new HashSet<>();
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "inbox_fk", unique = true, nullable = false, updatable = false)
     private Album inbox;
 
@@ -135,6 +135,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "[User keycloak_id:" + getKeycloakId() + " email:" + getEmail() + "]";
+        return "[User keycloak_id:" + getKeycloakId() +/* " email:" + getEmail() +*/ "]";
     }
 }

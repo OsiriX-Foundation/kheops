@@ -20,6 +20,7 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -414,21 +415,38 @@ public class Studies {
             return findStudyByStudyUID(studyInstanceUID, em);
     }
 
-    private static final Object lock = new Object();
+    public static Study getOrCreateStudy(String studyInstanceUID) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
-    public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
-        synchronized (lock) {
-            Study study;
+        Study study;
+        try {
+            study = getStudy(studyInstanceUID, em);
+        } catch (StudyNotFoundException ignored) {
+            // the study doesn't exist, we need to create it
             try {
-                study = getStudy(studyInstanceUID, em);
-            } catch (StudyNotFoundException ignored) {
-                // the study doesn't exist, we need to create it
+                tx.begin();
                 study = new Study();
                 study.setStudyInstanceUID(studyInstanceUID);
                 em.persist(study);
+                tx.commit();
+            } catch (PersistenceException e) {
+                final EntityManager em2 = EntityManagerListener.createEntityManager();
+                try {
+                    study = getStudy(studyInstanceUID, em2);
+                } catch (StudyNotFoundException e2) {
+                    throw new RuntimeException(e2);
+                } finally {
+                    em2.close();
+                }
             }
-            return study;
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
+        return study;
     }
 
     public static boolean canAccessStudy(User user, Study study, EntityManager em) {
