@@ -22,7 +22,6 @@
 </i18n>
 <template>
   <div>
-    {{ webhooks }}
     <b-table
       v-if="loadingData === false"
       stacked="sm"

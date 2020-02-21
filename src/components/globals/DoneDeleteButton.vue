@@ -19,6 +19,7 @@
       <div :class="classCol">
         <button
           class="btn btn-primary btn-block"
+          :disabled="disabledDone"
           @click="done"
         >
           {{ textButtonDone }}
@@ -38,7 +39,7 @@
       class="row"
       :class="classRow"
     >
-      <div :class="classCol">
+      <div :class="classColWarningRemove !== '' ? classColWarningRemove : classCol">
         <p
           class="mt-2"
         >
@@ -83,12 +84,22 @@ export default {
       required: false,
       default: true,
     },
+    disabledDone: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     classRow: {
       type: String,
       required: false,
       default: '',
     },
     classCol: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    classColWarningRemove: {
       type: String,
       required: false,
       default: '',

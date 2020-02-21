@@ -142,15 +142,18 @@
           <b-form-checkbox
             v-model="modelWebhook.enabled"
           >
-            <b>{{ $t('enabled') }}</b>
+            <b class="pointer">{{ $t('enabled') }}</b>
           </b-form-checkbox>
         </div>
       </div>
       <done-delete-button
         class-row="mb-2"
         class-col="offset-md-4 offset-lg-3 col-xs-12 col-sm-12 col-md-4 col-lg-3"
+        class-col-warning-remove="offset-md-4 offset-lg-3 col-sm-12 col-md-8 col-lg-9"
         :text-warning-remove="$t('warningremove')"
         :text-button-done="$t('confirm')"
+        :disabled-done="disabledCreate"
+        @remove="removeWebhook"
       />
     </form>
   </div>
@@ -159,6 +162,8 @@
 <script>
 import { mapGetters } from 'vuex';
 import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import { HTTP } from '@/router/http';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'Webhook',
@@ -197,6 +202,12 @@ export default {
     webhookId() {
       return this.$route.params.id;
     },
+    disabledCreate() {
+      return (this.modelWebhook.name === ''
+      || this.modelWebhook.url === ''
+      || !this.checkUrl(this.modelWebhook.url)
+      || this.modelWebhook.event.length === 0);
+    },
   },
   created() {
     const params = {
@@ -208,6 +219,7 @@ export default {
     });
   },
   beforeDestroy() {
+    this.$store.dispatch('initWebhook');
   },
   methods: {
     setModelWebhook(webhook) {
@@ -219,8 +231,26 @@ export default {
         this.modelWebhook.secret = '';
       }
     },
+    done() {
+      this.$emit('done');
+    },
     editWebhook() {
-      console.log('edit');
+      const queries = httpoperations.getFormData(this.modelWebhook);
+      const url = `albums/${this.albumId}/webhooks/${this.webhookId}`;
+      HTTP.patch(url, queries).then((res) => {
+        if (res.status === 200) {
+          this.done();
+        }
+      }).catch((err) => console.log(err));
+    },
+    removeWebhook() {
+      const params = {
+        albumId: this.albumId,
+        webhookId: this.webhookId,
+      };
+      this.$store.dispatch('removeWebhook', params).then(() => {
+        this.done();
+      });
     },
     // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
     checkUrl(str) {

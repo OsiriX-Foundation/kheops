@@ -122,6 +122,7 @@
     <done-delete-button
       class-row="mb-2"
       class-col="offset-md-4 offset-lg-3 col-xs-12 col-sm-12 col-md-4 col-lg-3"
+      class-col-warning-remove="offset-md-4 offset-lg-3 col-sm-12 col-md-8 col-lg-9"
       :text-warning-remove="$t('warningremove')"
       :text-button-done="$t('edit')"
       @done="edit"
