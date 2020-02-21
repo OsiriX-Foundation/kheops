@@ -20,7 +20,7 @@
     "warningremove": "Etes-vous sûre de vouloir supprimer ce webhook ?",
     "editwebhook": "Edition d'un webhook",
     "namewebhook": "Nom du webhook",
-    "urlwebhook": "URL de webhook",
+    "urlwebhook": "URL du webhook",
     "secret": "Secret",
     "event": "Evènement",
     "enabled": "Activer le webhook",

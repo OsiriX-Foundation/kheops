@@ -16,7 +16,7 @@
   "fr": {
     "newwebhook": "Nouveau webhook",
     "namewebhook": "Nom du webhook",
-    "urlwebhook": "URL de webhook",
+    "urlwebhook": "URL du webhook",
     "secret": "Secret",
     "event": "Evènement",
     "enabled": "Activer le webhook",
