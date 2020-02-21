@@ -58,6 +58,14 @@
         />
       </template>
       <template
+        v-slot:cell(status)="data"
+      >
+        <triggers
+          v-if="data.item.number_of_triggers > 0"
+          :triggers="data.item.last_triggers"
+        />
+      </template>
+      <template
         v-slot:cell(btn_edit)="data"
       >
         <button
@@ -73,10 +81,11 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import Triggers from '@/components/webhook/Triggers';
 
 export default {
   name: 'ListTokens',
-  components: { },
+  components: { Triggers },
   props: {
     albumId: {
       type: String,
@@ -106,7 +115,7 @@ export default {
           label: this.$t('events'),
           sortable: true,
           tdClass: 'word-break',
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
           formatter: (values) => {
             if (Array.isArray(values)) {
               return values.map((value) => this.$t(value)).join(', ');
@@ -119,6 +128,12 @@ export default {
           label: this.$t('enabled'),
           sortable: true,
           tdClass: 'word-break',
+          class: 'd-none d-md-table-cell',
+        },
+        {
+          key: 'status',
+          label: 'Response status',
+          sortable: false,
           class: 'd-none d-md-table-cell',
         },
         {
