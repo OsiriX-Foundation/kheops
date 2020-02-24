@@ -15,6 +15,13 @@ Vue.filter('formatDateTime', (value) => {
   return value;
 });
 
+Vue.filter('formatDateTimeDetails', (value) => {
+  if (value) {
+    return moment(String(value)).isValid() ? moment(String(value)).format('YYYY-MM-DD HH:mm:ss') : 'Invalid Date';
+  }
+  return value;
+});
+
 Vue.filter('formatTime', (value) => {
   if (value) {
     return moment(String(value)).isValid() ? moment(String(value)).format('HH:mm') : 'Invalid Date';

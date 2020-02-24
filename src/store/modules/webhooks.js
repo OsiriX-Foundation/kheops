@@ -30,7 +30,10 @@ const actions = {
     return HTTP.patch(url, queries).then((res) => {
       const webhook = res.data;
       commit('UPDATE_WEBHOOK', webhook);
-    }).catch((err) => err);
+      return res;
+    }).catch((err) => {
+      throw err;
+    });
   },
   setWebhooks({ commit }, webhooks) {
     commit('SET_WEBHOOKS', { webhooks });
@@ -47,16 +50,30 @@ const actions = {
     return HTTP.get(url + queries).then((res) => {
       const webhook = res.data;
       commit('SET_WEBHOOK', webhook);
-    }).catch((err) => err);
+      return res;
+    }).catch((err) => {
+      throw err;
+    });
+  },
+  editWebhook(ctx, params) {
+    const queries = httpoperations.getFormData(params.queries);
+    const url = `albums/${params.albumId}/webhooks/${params.webhookId}`;
+    return HTTP.patch(url, queries).then((res) => res)
+      .catch((err) => {
+        throw err;
+      });
   },
   initWebhook({ commit }) {
     commit('INIT_WEBHOOK');
   },
   removeWebhook({ commit }, params) {
     const url = `albums/${params.albumId}/webhooks/${params.webhookId}`;
-    return HTTP.delete(url).then(() => {
+    return HTTP.delete(url).then((res) => {
       commit('INIT_WEBHOOK');
-    }).catch((err) => err);
+      return res;
+    }).catch((err) => {
+      throw err;
+    });
   },
 };
 
