@@ -42,15 +42,10 @@
       @done="loadAction('listwebhook')"
     />
     <webhook
-      v-if="currentView === 'webhook'"
+      v-if="currentView === 'webhook' || currentView === 'editwebhook'"
       :album-id="albumId"
       @done="loadAction('listwebhook')"
       @edit="editWebhook"
-    />
-    <edit-webhook
-      v-if="currentView === 'editwebhook'"
-      :album-id="albumId"
-      @done="loadAction('listwebhook')"
     />
   </div>
 </template>
@@ -59,12 +54,11 @@
 import ListWebhook from '@/components/webhook/ListWebhook';
 import NewWebhook from '@/components/webhook/NewWebhook';
 import Webhook from '@/components/webhook/Webhook';
-import EditWebhook from '@/components/webhook/EditWebhook';
 
 export default {
   name: 'Webhooks',
   components: {
-    ListWebhook, NewWebhook, Webhook, EditWebhook,
+    ListWebhook, NewWebhook, Webhook,
   },
   props: {
     albumId: {

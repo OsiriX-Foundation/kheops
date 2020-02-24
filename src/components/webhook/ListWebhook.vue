@@ -8,7 +8,9 @@
     "enabled": "Enabled",
     "new_series": "New series",
     "new_user": "New user",
-    "edit": "Edit"
+    "edit": "Edit",
+    "refresh": "Refresh",
+    "webhook": "Webhook"
   },
   "fr": {
     "nowebhooks": "Aucun webhook créé",
@@ -18,12 +20,29 @@
     "enabled": "Activé",
     "new_series": "Nouvelles séries",
     "new_user": "Nouvel utilisateur",
-    "edit": "Editer"
+    "edit": "Editer",
+    "refresh": "Rafraîchir",
+    "webhook": "Webhook"
   }
 }
 </i18n>
 <template>
   <div>
+    <div class="d-flex">
+      <div>
+        <h4>
+          {{ $t('webhook') }}
+        </h4>
+      </div>
+      <div class="ml-auto">
+        <button
+          class="btn btn-sm btn-primary"
+          @click.stop="getWebhooks()"
+        >
+          {{ $t('refresh') }}
+        </button>
+      </div>
+    </div>
     <b-table
       v-if="loadingData === false"
       stacked="sm"
@@ -130,12 +149,12 @@ export default {
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
         },
-        {
-          key: 'status',
-          label: 'Response status',
-          sortable: false,
-          class: 'd-none d-md-table-cell',
-        },
+        // {
+        //   key: 'status',
+        //   label: 'Response status',
+        //   sortable: false,
+        //   class: 'd-none d-md-table-cell',
+        // },
         {
           key: 'btn_edit',
           label: '',
@@ -150,16 +169,19 @@ export default {
     }),
   },
   created() {
-    const params = {
-      albumId: this.albumId,
-    };
     this.$store.dispatch('initWebhooks');
-    this.$store.dispatch('getWebhooks', params);
+    this.getWebhooks();
   },
   beforeDestroy() {
     this.$store.dispatch('initWebhooks');
   },
   methods: {
+    getWebhooks() {
+      const params = {
+        albumId: this.albumId,
+      };
+      this.$store.dispatch('getWebhooks', params);
+    },
     rowSelectedWebhook(rowSelected) {
       this.selectWebhook(rowSelected.id);
     },

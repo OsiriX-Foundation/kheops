@@ -58,10 +58,10 @@
     </div>
     <form @submit.prevent="editWebhook">
       <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-3">
+        <div :class="classColRight">
           <b>{{ $t('namewebhook') }}</b>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-9">
+        <div :class="classColLeft">
           <input
             v-model="modelWebhook.name"
             v-focus
@@ -78,10 +78,10 @@
         </div>
       </div>
       <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-3">
+        <div :class="classColRight">
           <b>{{ $t('urlwebhook') }}</b>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-9">
+        <div :class="classColLeft">
           <input
             v-model="modelWebhook.url"
             type="text"
@@ -106,10 +106,10 @@
         v-if="webhook.use_secret === false"
         class="row mb-3"
       >
-        <div class="col-xs-12 col-sm-12 col-md-3">
+        <div :class="classColRight">
           <b>{{ $t('secret') }}</b>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-9">
+        <div :class="classColLeft">
           <input
             v-model="modelWebhook.secret"
             type="text"
@@ -120,10 +120,10 @@
         </div>
       </div>
       <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-3">
+        <div :class="classColRight">
           <b>{{ $t('event') }}</b>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-9">
+        <div :class="classColLeft">
           <b-form-checkbox-group
             id="events"
             v-model="modelWebhook.event"
@@ -138,7 +138,8 @@
         </div>
       </div>
       <div class="row mb-3">
-        <div class="offset-xs-12 offset-sm-12 offset-md-3 col-xs-12 col-sm-12 col-md-9">
+        <div :class="classColRight" />
+        <div :class="classColLeft">
           <b-form-checkbox
             v-model="modelWebhook.enabled"
           >
@@ -148,22 +149,19 @@
       </div>
       <done-delete-button
         class-row="mb-2"
-        class-col="offset-md-4 offset-lg-3 col-xs-12 col-sm-12 col-md-4 col-lg-3"
-        class-col-warning-remove="offset-md-4 offset-lg-3 col-sm-12 col-md-8 col-lg-9"
+        class-col="offset-md-5 offset-lg-4 col-xs-12 col-sm-12 col-md-5 col-lg-4"
+        class-col-warning-remove="offset-md-5 offset-lg-4 col-sm-12 col-md-6 col-lg-7"
         :text-warning-remove="$t('warningremove')"
         :text-button-done="$t('confirm')"
         :disabled-done="disabledCreate"
-        @remove="removeWebhook"
+        @remove="remove"
       />
     </form>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
-import { HTTP } from '@/router/http';
-import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'Webhook',
@@ -172,6 +170,21 @@ export default {
     albumId: {
       type: String,
       required: true,
+      default: '',
+    },
+    webhook: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
+    classColRight: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    classColLeft: {
+      type: String,
+      required: false,
       default: '',
     },
   },
@@ -190,9 +203,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      webhook: 'webhook',
-    }),
     state() {
       if (this.modelWebhook.event !== undefined && this.modelWebhook.event !== null) {
         return this.modelWebhook.event.length >= 1;
@@ -209,17 +219,13 @@ export default {
       || this.modelWebhook.event.length === 0);
     },
   },
-  created() {
-    const params = {
-      albumId: this.albumId,
-      webhookId: this.webhookId,
-    };
-    this.$store.dispatch('getWebhook', params).then(() => {
+  watch: {
+    webhook() {
       this.setModelWebhook(this.webhook);
-    });
+    },
   },
-  beforeDestroy() {
-    this.$store.dispatch('initWebhook');
+  created() {
+    this.setModelWebhook(this.webhook);
   },
   methods: {
     setModelWebhook(webhook) {
@@ -234,22 +240,17 @@ export default {
     done() {
       this.$emit('done');
     },
-    editWebhook() {
-      const queries = httpoperations.getFormData(this.modelWebhook);
-      const url = `albums/${this.albumId}/webhooks/${this.webhookId}`;
-      HTTP.patch(url, queries).then((res) => {
-        if (res.status === 200) {
-          this.done();
-        }
-      }).catch((err) => console.log(err));
+    remove() {
+      this.$emit('remove', this.webhookId);
     },
-    removeWebhook() {
+    editWebhook() {
       const params = {
+        queries: this.modelWebhook,
         albumId: this.albumId,
         webhookId: this.webhookId,
       };
-      this.$store.dispatch('removeWebhook', params).then(() => {
-        this.done();
+      this.$store.dispatch('editWebhook', params).then(() => {
+        this.$emit('webhook', this.webhookId);
       });
     },
     // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
