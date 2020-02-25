@@ -170,7 +170,7 @@ public class Series {
         this.seriesDescription = seriesDescription;
     }
 
-    public int getSeriesNumber() {
+    public Integer getSeriesNumber() {
         return seriesNumber;
     }
 
@@ -178,7 +178,7 @@ public class Series {
         this.seriesNumber = seriesNumber;
     }
 
-    public int getNumberOfSeriesRelatedInstances() {
+    public Integer getNumberOfSeriesRelatedInstances() {
         return numberOfSeriesRelatedInstances;
     }
 

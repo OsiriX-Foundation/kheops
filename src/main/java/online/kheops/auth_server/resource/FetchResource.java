@@ -77,11 +77,6 @@ public class FetchResource {
                     .log();
         }
 
-
-
-
-
-
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
@@ -89,10 +84,6 @@ public class FetchResource {
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
-
-
-
-
 
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
@@ -133,7 +124,7 @@ public class FetchResource {
                 final Album targetAlbum = getAlbum(albumId, em);
                 final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
                 final List<Series> seriesList = new ArrayList<>();
-                for (String seriesInstanceUID: seriesInstanceUIDList) {
+                for (String seriesInstanceUID : seriesInstanceUIDList) {
                     seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
                 }
                 final Study study = seriesList.get(0).getStudy();
@@ -141,7 +132,7 @@ public class FetchResource {
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
                 newSeriesWebhook.setFetch();
 
-                for (Series series: seriesList){
+                for (Series series : seriesList) {
                     if (series.isPopulated()) {
                         newSeriesWebhook.addSeries(series);
                     }
@@ -172,12 +163,7 @@ public class FetchResource {
                 }
                 em.close();
             }
-
         }
-
-
-
-
 
         return Response.ok().build();
     }
