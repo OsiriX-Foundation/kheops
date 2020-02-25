@@ -430,8 +430,7 @@ public class Studies {
 
             try {
                 tx.begin();
-                study = new Study();
-                study.setStudyInstanceUID(studyInstanceUID);
+                study = new Study(studyInstanceUID);
                 localEm.persist(study);
                 tx.commit();
                 study = em.merge(study);

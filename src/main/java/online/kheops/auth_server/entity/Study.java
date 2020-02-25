@@ -91,6 +91,12 @@ public class Study {
         updatedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
+    public Study() { }
+
+    public Study(String studyInstanceUID) {
+        this.studyInstanceUID = studyInstanceUID;
+    }
+
     // This method does not set Tag.NumberOfStudyRelatedSeries, Tag.NumberOfStudyRelatedInstances, Tag.ModalitiesInStudy
     public Attributes getAttributes() {
         if (!isPopulated()) {

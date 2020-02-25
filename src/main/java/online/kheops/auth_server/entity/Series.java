@@ -46,10 +46,10 @@ public class Series {
     private String bodyPartExamined;
 
     @Column(name = "series_number")
-    private int seriesNumber;
+    private Integer seriesNumber;
 
     @Column(name = "number_of_series_related_instances")
-    private int numberOfSeriesRelatedInstances;
+    private Integer numberOfSeriesRelatedInstances;
 
     @Basic(optional = false)
     @Column(name = "populated")

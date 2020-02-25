@@ -2,10 +2,7 @@ package online.kheops.auth_server.series;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumSeries;
-import online.kheops.auth_server.entity.Mutation;
-import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
@@ -14,11 +11,13 @@ import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;
+import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 
 public class Series {
 
@@ -37,6 +36,44 @@ public class Series {
         return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
     }
 
+    public static online.kheops.auth_server.entity.Series getOrCreateSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
+            throws SeriesNotFoundException {
+
+        online.kheops.auth_server.entity.Series series;
+        try {
+            series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+        } catch (SeriesNotFoundException ignored) {
+            // from here the series does not exists
+            // find if the study already exists
+            final EntityManager localEm = EntityManagerListener.createEntityManager();
+            final EntityTransaction tx = localEm.getTransaction();
+            final Study study = getOrCreateStudy(studyInstanceUID, localEm);
+            try {
+                tx.begin();
+                series = new online.kheops.auth_server.entity.Series(seriesInstanceUID);
+                study.addSeries(series);
+                series.setStudy(study);
+                localEm.persist(series);
+                tx.commit();
+                series = em.merge(series);
+            } catch (PersistenceException ignored2) {
+                ignored2.printStackTrace();
+                try {
+                    tx.rollback();
+                    series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+                } catch (SeriesNotFoundException e) {
+                    throw e;
+                }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                localEm.close();
+            }
+        }
+        return series;
+    }
+
     public static boolean seriesExist(String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
         try {
             getSeries(studyInstanceUID,  seriesInstanceUID, em);
@@ -45,8 +82,6 @@ public class Series {
         }
         return true;
     }
-
-
 
     public static boolean canAccessSeries(User user, String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
         try {
