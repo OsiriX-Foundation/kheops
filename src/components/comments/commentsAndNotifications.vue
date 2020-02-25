@@ -481,7 +481,7 @@ export default {
     this.getComments();
   },
   destroyed() {
-    this.$store.commit('INIT_COMMENTS');
+    this.$store.dispatch('deleteStoreComment', { StudyInstanceUID: this.id });
   },
   methods: {
     getName(user) {
