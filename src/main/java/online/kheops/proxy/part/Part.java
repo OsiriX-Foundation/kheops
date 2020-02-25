@@ -5,12 +5,14 @@ import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.stream.TeeInputStream;
 import org.dcm4che3.mime.MultipartInputStream;
 import org.dcm4che3.ws.rs.MediaTypes;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -45,8 +47,9 @@ public abstract class Part implements AutoCloseable {
         final MediaType mediaType;
         if (contentType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
             try {
-                fileID.accept(getContentDispositionName(getHeaderParamValue(headerParams, CONTENT_DISPOSITION)));
-            } catch (IllegalArgumentException e) {
+                final Map<String, String> contentDispositionParameters= new ContentDisposition(getHeaderParamValue(headerParams, CONTENT_DISPOSITION)).getParameters();
+                fileID.accept(contentDispositionParameters.get("name"));
+            } catch (IllegalArgumentException | ParseException e) {
                 LOG.log(WARNING, "Unable to parse content-disposition: " + getHeaderParamValue(headerParams, CONTENT_DISPOSITION), e);
             }
             mediaType = APPLICATION_DICOM_TYPE;
@@ -111,28 +114,6 @@ public abstract class Part implements AutoCloseable {
         } else {
             throw new IllegalArgumentException("Requested instanceIDs don't match this Part's instanceIDs");
         }
-    }
-
-    private static String getContentDispositionName(final String contentDisposition) {
-        // Horrible hack because DCM4CHE removes quotes from the headers for some really stupid reason
-        // If this was not the case we could have used Jersey's ContentDisposition
-
-        if (contentDisposition == null) {
-            throw new IllegalArgumentException();
-        }
-
-        final int frontIndex = contentDisposition.indexOf("; name=");
-        if (frontIndex == -1) {
-            throw new IllegalArgumentException();
-        }
-
-        final String frontTrimmed = contentDisposition.substring(frontIndex + 7);
-        final int backIndex = frontTrimmed.indexOf(';');
-        if (backIndex == -1) {
-            throw new IllegalArgumentException();
-        }
-
-        return frontTrimmed.substring(0, backIndex);
     }
 
     @Override
