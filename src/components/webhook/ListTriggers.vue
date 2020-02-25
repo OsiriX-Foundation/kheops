@@ -116,6 +116,7 @@
         :limit="limit"
         aria-controls="table-triggers"
         size="sm"
+        @change="changePage"
       />
     </div>
   </span>
@@ -132,10 +133,19 @@ export default {
       required: true,
       default: () => [],
     },
+    perPage: {
+      type: Number,
+      required: true,
+      default: 10,
+    },
+    rows: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
   },
   data() {
     return {
-      perPage: 10,
       currentPage: 1,
       limit: 6,
       fields: [
@@ -178,9 +188,6 @@ export default {
     };
   },
   computed: {
-    rows() {
-      return this.triggers.length;
-    }
   },
   created() {
   },
@@ -196,6 +203,9 @@ export default {
     showRowDetails(item) {
       // eslint-disable-next-line
       this.$set(item, '_showDetails', !item._showDetails);
+    },
+    changePage(page) {
+      this.$emit('change', page);
     },
   },
 };

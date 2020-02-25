@@ -79,6 +79,8 @@
       >
         <list-triggers
           :triggers="webhook.triggers"
+          :per-page="limit"
+          :rows="webhook.number_of_triggers"
         />
       </div>
     </div>
@@ -107,6 +109,8 @@ export default {
       classColRight: 'col-xs-12 col-sm-12 col-md-5 col-lg-4',
       classColLeft: 'col-xs-12 col-sm-12 col-md-7 col-lg-8',
       loading: true,
+      limit: 10,
+      offset: 0,
     };
   },
   computed: {
