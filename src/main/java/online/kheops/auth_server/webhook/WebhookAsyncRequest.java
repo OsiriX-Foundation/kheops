@@ -64,4 +64,5 @@ public class WebhookAsyncRequest {
         return webhookTrigger.getId();
     }
 
+    public Webhook getWebhook() { return webhook; }
 }

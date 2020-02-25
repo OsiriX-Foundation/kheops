@@ -42,7 +42,7 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
     @Override
     public void failed(Throwable throwable) {
         cnt--;
-
+        LOG.log(Level.WARNING, "FAIL WEBHOOK url :"+ this.asyncRequest.getWebhook().getUrl(), throwable);
         addWebhookAttemptToDb(cnt, -1);
 
         if (cnt > 0) {
