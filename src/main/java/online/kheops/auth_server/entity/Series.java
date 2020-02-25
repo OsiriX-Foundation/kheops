@@ -46,10 +46,10 @@ public class Series {
     private String bodyPartExamined;
 
     @Column(name = "series_number")
-    private Integer seriesNumber;
+    private int seriesNumber;
 
     @Column(name = "number_of_series_related_instances")
-    private Integer numberOfSeriesRelatedInstances;
+    private int numberOfSeriesRelatedInstances;
 
     @Basic(optional = false)
     @Column(name = "populated")
@@ -170,7 +170,7 @@ public class Series {
         this.seriesDescription = seriesDescription;
     }
 
-    public Integer getSeriesNumber() {
+    public int getSeriesNumber() {
         return seriesNumber;
     }
 
@@ -178,7 +178,7 @@ public class Series {
         this.seriesNumber = seriesNumber;
     }
 
-    public Integer getNumberOfSeriesRelatedInstances() {
+    public int getNumberOfSeriesRelatedInstances() {
         return numberOfSeriesRelatedInstances;
     }
 
