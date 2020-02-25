@@ -10,7 +10,8 @@
     "date": "Date",
     "event": "Event",
     "-1": "An error occur",
-    "deliveries": "Recent attempts"
+    "deliveries": "Recent attempts",
+    "noattempts": "There are no attempts to show"
   },
   "fr": {
     "new_series": "nouvelles série",
@@ -22,7 +23,8 @@
     "date": "Date",
     "event": "Evènement",
     "-1": "Une erreur est survenue",
-    "deliveries": "Tentatives récentes"
+    "deliveries": "Tentatives récentes",
+    "noattempts": "Il n'y aucune tentative faîte"
   }
 }
 </i18n>
@@ -103,6 +105,12 @@
           name="ban"
           :color="'red'"
         />
+      </template><template v-slot:empty>
+        <div
+          class="text-warning text-center"
+        >
+          {{ $t('noattempts') }}
+        </div>
       </template>
     </b-table>
     <div
