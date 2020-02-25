@@ -32,7 +32,10 @@
     "noaccessstudy": "{user} has no access to this study",
     "noaccess": "no more access",
     "nocommentaccessalbum": "is no longer a member of this album.",
-    "nocommentaccessstudy": "no access to this study."
+    "nocommentaccessstudy": "no access to this study.",
+    "createwebhook": "{user} created a webhook",
+    "editwebhook": "{user} edited a webhook",
+    "deletewebhook": "{user} deleted a webhook"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -65,7 +68,10 @@
     "noaccessalbum": "{user} n'a pas d'accès à cet album",
     "noaccessstudy": "{user} n'a pas d'accès à cette étude",
     "nocommentaccessalbum": "n'est plus membre de cet album.",
-    "nocommentaccessstudy": "n'a plus accès à cette étude."
+    "nocommentaccessstudy": "n'a plus accès à cette étude.",
+    "createwebhook": "{user} a créé un webhook",
+    "editwebhook": "{user} a édité un webhook",
+    "deletewebhook": "{user} a supprimé un webhook"
   }
 }
 </i18n>
@@ -317,6 +323,27 @@
               >
                 {{ $t('newreport', {user: comment.origin|getUsername, reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
               </div>
+
+              <div
+                v-if="comment.mutation_type === 'CREATE_WEBHOOK'"
+                class=" flex-grow-1 bd-highlight"
+              >
+                {{ $t('createwebhook', {user: getName(comment.origin)}) }}
+              </div>
+
+              <div
+                v-if="comment.mutation_type === 'DELETE_WEBHOOK'"
+                class=" flex-grow-1 bd-highlight"
+              >
+                {{ $t('deletewebhook', {user: getName(comment.origin)}) }}
+              </div>
+
+              <div
+                v-if="comment.mutation_type === 'EDIT_WEBHOOK'"
+                class=" flex-grow-1 bd-highlight"
+              >
+                {{ $t('editwebhook', {user: getName(comment.origin)}) }}
+              </div>
             </div>
           </div>
         </div>
@@ -457,6 +484,9 @@ export default {
     this.$store.commit('INIT_COMMENTS');
   },
   methods: {
+    getName(user) {
+      return this.$options.filters.getUsername(user);
+    },
     checkUserFromTextarea() {
       if (this.disabledText) {
         this.$refs.privateuser.checkUser();
