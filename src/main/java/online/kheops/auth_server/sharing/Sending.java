@@ -223,7 +223,7 @@ public class Sending {
                 } catch (SeriesNotFoundException e2) {
                     // from here the series does not exists
                     // find if the study already exists
-                    final Study study = em.merge(getOrCreateStudy(studyInstanceUID));
+                    final Study study = getOrCreateStudy(studyInstanceUID, em);
 
                     availableSeries = new Series(seriesInstanceUID);
                     study.addSeries(availableSeries);
@@ -515,7 +515,7 @@ public class Sending {
 
             // from here the series does not exists
             // find if the study already exists
-            final Study study = em.merge(getOrCreateStudy(studyInstanceUID));
+            final Study study = getOrCreateStudy(studyInstanceUID, em);
 
             final Series series = new Series(seriesInstanceUID);
             study.addSeries(series);

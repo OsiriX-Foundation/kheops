@@ -21,6 +21,8 @@ import org.jooq.impl.DSL;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.EntityType;
+import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
@@ -415,36 +418,36 @@ public class Studies {
             return findStudyByStudyUID(studyInstanceUID, em);
     }
 
-    public static Study getOrCreateStudy(String studyInstanceUID) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
+    public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
 
         Study study;
         try {
             study = getStudy(studyInstanceUID, em);
         } catch (StudyNotFoundException ignored) {
             // the study doesn't exist, we need to create it
+            final EntityManager localEm = EntityManagerListener.createEntityManager();
+            final EntityTransaction tx = localEm.getTransaction();
+
             try {
                 tx.begin();
                 study = new Study();
                 study.setStudyInstanceUID(studyInstanceUID);
-                em.persist(study);
+                localEm.persist(study);
                 tx.commit();
-            } catch (PersistenceException e) {
-                final EntityManager em2 = EntityManagerListener.createEntityManager();
+                study = em.merge(study);
+            } catch (PersistenceException ignored2) {
                 try {
-                    study = getStudy(studyInstanceUID, em2);
-                } catch (StudyNotFoundException e2) {
-                    throw new RuntimeException(e2);
-                } finally {
-                    em2.close();
+                    tx.rollback();
+                    study = getStudy(studyInstanceUID, em);
+                } catch (StudyNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                localEm.close();
             }
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
         }
         return study;
     }
