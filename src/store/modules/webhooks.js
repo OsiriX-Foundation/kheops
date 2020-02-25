@@ -22,7 +22,9 @@ const actions = {
         commit('SET_WEBHOOKS', res.data);
       }
       return res;
-    }).catch((err) => err);
+    }).catch((err) => {
+      throw err;
+    });
   },
   updateWebhook({ commit }, params) {
     const url = `albums/${params.albumId}/webhooks/${params.webhookId}`;

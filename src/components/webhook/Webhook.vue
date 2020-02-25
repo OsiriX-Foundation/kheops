@@ -17,7 +17,8 @@
     "webhookdisabled": "This webhook is disabled",
     "webhookenabled": "This webhook is enabled",
     "state": "State",
-    "deliveries": "Recent attempts"
+    "deliveries": "Recent attempts",
+    "unauthorized": "You don't have the permissions"
   },
   "fr": {
     "webhook": "Webhook",
@@ -36,7 +37,8 @@
     "webhookdisabled": "Ce webhook est désactivé",
     "webhookenabled": "Ce webhook est activé",
     "state": "Etat",
-    "deliveries": "Tentatives récentes"
+    "deliveries": "Tentatives récentes",
+    "unauthorized": "Vous n'avez pas les permissions"
   }
 }
 </i18n>
@@ -94,6 +96,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import httpoperations from '@/mixins/httpoperations';
 import TriggersList from '@/components/webhook/TriggersList';
 import WebhookDetails from '@/components/webhook/WebhookDetails';
 import EditWebhook from '@/components/webhook/EditWebhook';
@@ -152,7 +155,8 @@ export default {
         albumId: this.albumId,
         webhookId: this.webhookId,
       };
-      return this.$store.dispatch('getWebhook', params).catch(() => {
+      return this.$store.dispatch('getWebhook', params).catch((err) => {
+        this.manageError(err);
         this.done();
       });
     },
@@ -163,7 +167,17 @@ export default {
       };
       this.$store.dispatch('removeWebhook', params).then(() => {
         this.done();
+      }).catch((err) => {
+        this.manageError(err);
       });
+    },
+    manageError(err) {
+      const status = httpoperations.getStatusError(err);
+      if (status === 401 || status === 403) {
+        this.$snotify.error(this.$t('unauthorized'));
+      } else {
+        this.$snotify.error(this.$t('sorryerror'));
+      }
     },
   },
 };

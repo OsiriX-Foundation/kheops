@@ -10,7 +10,8 @@
     "new_user": "New user",
     "edit": "Edit",
     "refresh": "Refresh",
-    "webhook": "Webhook"
+    "webhook": "Webhook",
+    "reload": "Reload"
   },
   "fr": {
     "nowebhooks": "Aucun webhook créé",
@@ -22,7 +23,8 @@
     "new_user": "Nouvel utilisateur",
     "edit": "Editer",
     "refresh": "Rafraîchir",
-    "webhook": "Webhook"
+    "webhook": "Webhook",
+    "reload": "Recharger"
   }
 }
 </i18n>
@@ -44,21 +46,51 @@
       </div>
     </div>
     <b-table
-      v-if="loadingData === false"
       stacked="sm"
       striped
       hover
       show-empty
       :items="webhooks"
       :fields="fields"
+      :busy="loadingData"
       tbody-tr-class="link"
       @row-clicked="rowSelectedWebhook"
     >
+      <template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <pulse-loader
+            color="white"
+          />
+        </div>
+      </template>
       <template v-slot:empty>
         <div
           class="text-warning text-center"
         >
-          {{ $t('nowebhooks') }}
+          <span
+            v-if="status === -1"
+          >
+            {{ $t('nowebhooks') }}
+          </span>
+          <span
+            v-if="status !== -1"
+          >
+            <text-error
+              :status="status"
+            />
+            <span
+              v-if="status !== 401 && status !== 403"
+            >
+              <br><br>
+              <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                @click="getWebhooks()"
+              >
+                {{ $t('reload') }}
+              </button>
+            </span>
+          </span>
         </div>
       </template>
       <template v-slot:emptyfiltered>
@@ -100,11 +132,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import httpoperations from '@/mixins/httpoperations';
 import Triggers from '@/components/webhook/Triggers';
+import TextError from '@/components/globals/TextError';
 
 export default {
   name: 'ListTokens',
-  components: { Triggers },
+  components: { Triggers, TextError, PulseLoader },
   props: {
     albumId: {
       type: String,
@@ -114,6 +149,7 @@ export default {
   },
   data() {
     return {
+      status: 0,
       loadingData: false,
       fields: [
         {
@@ -149,12 +185,6 @@ export default {
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
         },
-        // {
-        //   key: 'status',
-        //   label: 'Response status',
-        //   sortable: false,
-        //   class: 'd-none d-md-table-cell',
-        // },
         {
           key: 'btn_edit',
           label: '',
@@ -180,7 +210,13 @@ export default {
       const params = {
         albumId: this.albumId,
       };
-      this.$store.dispatch('getWebhooks', params);
+      this.loadingData = true;
+      this.$store.dispatch('getWebhooks', params).then(() => {
+        this.loadingData = false;
+      }).catch((err) => {
+        this.loadingData = false;
+        this.status = httpoperations.getStatusError(err);
+      });
     },
     rowSelectedWebhook(rowSelected) {
       this.selectWebhook(rowSelected.id);

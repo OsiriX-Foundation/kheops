@@ -22,4 +22,10 @@ export default {
     const stringQueries = tabQueries.length > 0 ? `${tabQueries.join('&')}` : '';
     return stringQueries;
   },
+  getStatusError(error) {
+    if (error.request !== undefined && error.request.status !== undefined) {
+      return error.request.status;
+    }
+    return -1;
+  },
 };

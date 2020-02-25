@@ -11,7 +11,8 @@
     "new_user": "New user",
     "invalidevent": "Please select minimum one event",
     "fieldobligatory": "Field obligatory",
-    "urlnotvalid": "This url is not valid"
+    "urlnotvalid": "This url is not valid",
+    "unauthorized": "You don't have the permission to create a webhook"
   },
   "fr": {
     "newwebhook": "Nouveau webhook",
@@ -24,7 +25,8 @@
     "new_user": "Nouvel utilisateur",
     "invalidevent": "SVP choississez minimum une évènement",
     "fieldobligatory": "Champs obligatoire",
-    "urlnotvalid": "Cette url n'est pas valide"
+    "urlnotvalid": "Cette url n'est pas valide",
+    "unauthorized": "Vous n'avez pas les permissions de créer un webhook"
   }
 }
 </i18n>
@@ -194,7 +196,12 @@ export default {
       HTTP.post(url, queries).then(() => {
         this.done();
       }).catch((err) => {
-        console.log(err);
+        const status = httpoperations.getStatusError(err);
+        if (status === 401 || status === 403) {
+          this.$snotify.error(this.$t('unauthorized'));
+        } else {
+          this.$snotify.error(this.$t('sorryerror'));
+        }
       });
     },
     done() {

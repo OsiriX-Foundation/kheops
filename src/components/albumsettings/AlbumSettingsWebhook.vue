@@ -1,9 +1,11 @@
 <template>
-  <div class="container">
+  <div
+    v-if="album.is_admin"
+    class="container"
+  >
     <webhooks
       scope="album"
       :album-id="album.album_id"
-      :write-permission="album.is_admin"
     />
   </div>
 </template>

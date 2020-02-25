@@ -58,7 +58,7 @@
           <p
             v-if="row.item.is_manual_trigger === true"
           >
-            {{ $t('manualtrigger') }}     
+            {{ $t('manualtrigger') }}
           </p>
           <span
             class="d-flex flex-wrap flex-row bd-highlight mb-3"
@@ -123,9 +123,7 @@ export default {
           label: this.$t('event'),
           tdClass: 'word-break',
           class: 'd-none d-lg-table-cell',
-          formatter: (values) => {
-            return this.$t(values);
-          },
+          formatter: (values) => this.$t(values),
         },
         {
           key: 'attempts',

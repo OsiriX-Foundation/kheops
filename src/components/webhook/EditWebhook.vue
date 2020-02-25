@@ -13,7 +13,8 @@
     "new_user": "New user",
     "invalidevent": "Please select minimum one event",
     "fieldobligatory": "Field obligatory",
-    "urlnotvalid": "This url is not valid"
+    "urlnotvalid": "This url is not valid",
+    "unauthorized": "You don't have the permissions"
   },
   "fr": {
     "confirm": "Confirmer",
@@ -28,7 +29,8 @@
     "new_user": "Nouvel utilisateur",
     "invalidevent": "SVP choississez minimum une évènement",
     "fieldobligatory": "Champs obligatoire",
-    "urlnotvalid": "Cette url n'est pas valide"
+    "urlnotvalid": "Cette url n'est pas valide",
+    "unauthorized": "Vous n'avez pas les permissions"
   }
 }
 </i18n>
@@ -162,6 +164,7 @@
 
 <script>
 import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'Webhook',
@@ -251,6 +254,13 @@ export default {
       };
       this.$store.dispatch('editWebhook', params).then(() => {
         this.$emit('webhook', this.webhookId);
+      }).catch((err) => {
+        const status = httpoperations.getStatusError(err);
+        if (status === 401 || status === 403) {
+          this.$snotify.error(this.$t('unauthorized'));
+        } else {
+          this.$snotify.error(this.$t('sorryerror'));
+        }
       });
     },
     // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url

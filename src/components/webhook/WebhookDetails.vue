@@ -58,25 +58,8 @@
             />
           </span>
         </button>
-        {{ $t('webhook') }} - {{ webhook.name }}
+        {{ webhook.name }}
       </h4>
-    </div>
-    <div class="row mb-3">
-      <div :class="classColRight">
-        <b>{{ $t('state') }}</b>
-      </div>
-      <div :class="classColLeft">
-        <b
-          v-if="webhook.enabled === true"
-        >
-          {{ $t('webhookenabled') }}
-        </b>
-        <b
-          v-else-if="webhook.enabled === false"
-        >
-          {{ $t('webhookdisabled') }}
-        </b>
-      </div>
     </div>
     <div class="row mb-3">
       <div :class="classColRight">
@@ -123,6 +106,23 @@
         >
           {{ $t('noevent') }}
         </span>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div :class="classColRight">
+        <b>{{ $t('state') }}</b>
+      </div>
+      <div :class="classColLeft">
+        <b
+          v-if="webhook.enabled === true"
+        >
+          {{ $t('webhookenabled') }}
+        </b>
+        <b
+          v-else-if="webhook.enabled === false"
+        >
+          {{ $t('webhookdisabled') }}
+        </b>
       </div>
     </div>
     <done-delete-button
