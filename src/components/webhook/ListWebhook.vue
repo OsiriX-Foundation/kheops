@@ -151,7 +151,7 @@ export default {
   },
   data() {
     return {
-      status: 0,
+      status: -1,
       loadingData: false,
       fields: [
         {
