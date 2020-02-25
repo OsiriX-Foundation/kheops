@@ -1,7 +1,6 @@
 <i18n>
 {
   "en": {
-    "newtoken": "New token",
     "showrevokedtoken": "Show revoked tokens",
     "showinvalidtoken": "Show invalid tokens",
     "revoke": "revoke",
@@ -19,7 +18,6 @@
     "notokens": "There are no tokens to show"
   },
   "fr": {
-    "newtoken": "Nouveau token",
     "showrevokedtoken": "Afficher les tokens révoqués",
     "showinvalidtoken": "Afficher les tokens invalides",
     "revoke": "révoquer",
@@ -40,18 +38,8 @@
 </i18n>
 <template>
   <div>
-    <button
-      class="btn btn-secondary my-3"
-      @click="clickNew()"
-    >
-      <v-icon
-        name="plus"
-        class="mr-2"
-      />
-      {{ $t('newtoken') }}
-    </button>
     <div class="d-flex align-content-around flex-wrap">
-      <div class="mt-2">
+      <div>
         <h4>
           Tokens
         </h4>

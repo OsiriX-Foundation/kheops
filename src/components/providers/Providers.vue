@@ -16,16 +16,19 @@
       v-if="(currentView === 'listproviders') && writePermission"
       class="my-3 selection-button-container provider-position"
     >
-      <button
+      <router-link
+        :to="{
+          name: 'albumsettingsaction',
+          params: { action: 'newprovider' }
+        }"
         class="btn btn-secondary"
-        @click="loadAction('newprovider')"
       >
         <v-icon
           name="plus"
           class="mr-2"
         />
         {{ $t('newprovider') }}
-      </button>
+      </router-link>
     </div>
 
     <new-provider
