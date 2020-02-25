@@ -31,6 +31,10 @@
           v-if="currentCategory === 'providerSR'"
           :album="album"
         />
+        <album-settings-webhook
+          v-if="currentCategory === 'webhooks'"
+          :album="album"
+        />
       </div>
     </div>
   </div>
@@ -41,6 +45,7 @@ import AlbumSettingsGeneral from '@/components/albumsettings/AlbumSettingsGenera
 import AlbumSettingsUser from '@/components/albumsettings/AlbumSettingsUser';
 import AlbumSettingsToken from '@/components/albumsettings/AlbumSettingsToken';
 import AlbumSettingsReportProvider from '@/components/albumsettings/AlbumSettingsReportProvider';
+import AlbumSettingsWebhook from '@/components/albumsettings/AlbumSettingsWebhook';
 import AlbumSettingsMenuNav from '@/components/albumsettings/AlbumSettingsMenuNav';
 import AlbumSettingsMenuDropdown from '@/components/albumsettings/AlbumSettingsMenuDropdown';
 
@@ -51,6 +56,7 @@ export default {
     AlbumSettingsUser,
     AlbumSettingsToken,
     AlbumSettingsReportProvider,
+    AlbumSettingsWebhook,
     AlbumSettingsMenuNav,
     AlbumSettingsMenuDropdown,
   },
@@ -64,7 +70,7 @@ export default {
   data() {
     return {
       basicCategories: ['general', 'user', 'providerSR'],
-      adminCategories: ['tokens'],
+      adminCategories: ['tokens', 'webhooks'],
     };
   },
   computed: {

@@ -1,0 +1,179 @@
+<i18n>
+{
+  "en": {
+    "webhook": "Webhook",
+    "urlwebhook": "URL of the webhook",
+    "secret": "Secret",
+    "event": "Event",
+    "nosecret": "No secret defined",
+    "secretdefined": "A secret has been defined",
+    "enabled": "Enabled",
+    "new_series": "New series",
+    "new_user": "New user",
+    "noevent": "No event defined",
+    "numbertriggers": "Number of triggers",
+    "warningremove": "Are you sure to remove this webhook ?",
+    "edit": "Edit",
+    "webhookdisabled": "This webhook is disabled",
+    "webhookenabled": "This webhook is enabled",
+    "state": "State",
+    "unauthorized": "You don't have the permissions"
+  },
+  "fr": {
+    "webhook": "Webhook",
+    "urlwebhook": "URL du webhook",
+    "secret": "Secret",
+    "event": "Evènement",
+    "nosecret": "Pas de secret défini",
+    "secretdefined": "Un secret a été défini",
+    "enabled": "Activé",
+    "new_series": "Nouvelles séries",
+    "new_user": "Nouvel utilisateur",
+    "noevent": "Pas d'évèment défini",
+    "numbertriggers": "Nombre déclenchements",
+    "warningremove": "Etes-vous sûre de vouloir supprimer ce webhook ?",
+    "edit": "Editer",
+    "webhookdisabled": "Ce webhook est désactivé",
+    "webhookenabled": "Ce webhook est activé",
+    "state": "Etat",
+    "unauthorized": "Vous n'avez pas les permissions"
+  }
+}
+</i18n>
+
+<template>
+  <div>
+    <div
+      class="row"
+    >
+      <div
+        v-if="currentView === 'webhook'"
+        class="col-12"
+      >
+        <webhook-details
+          :album-id="albumId"
+          :webhook="webhook"
+          class-col-right="col-xs-12 col-sm-12 col-md-5 col-lg-4"
+          class-col-left="col-xs-12 col-sm-12 col-md-7 col-lg-8"
+          @done="done"
+          @edit="editWebhook"
+          @remove="removeWebhook"
+        />
+      </div>
+      <div
+        v-if="currentView === 'editwebhook'"
+        class="col-12"
+      >
+        <edit-webhook
+          :album-id="albumId"
+          :webhook="webhook"
+          class-col-right="col-xs-12 col-sm-12 col-md-5 col-lg-4"
+          class-col-left="col-xs-12 col-sm-12 col-md-7 col-lg-8"
+          @done="done"
+          @webhook="showWebhook"
+          @remove="removeWebhook"
+        />
+      </div>
+      <div
+        class="col-12"
+      >
+        <list-triggers
+          :triggers="webhook.triggers"
+          :per-page="limit"
+          :rows="webhook.number_of_triggers"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex';
+import httpoperations from '@/mixins/httpoperations';
+import ListTriggers from '@/components/webhook/ListTriggers';
+import WebhookDetails from '@/components/webhook/WebhookDetails';
+import EditWebhook from '@/components/webhook/EditWebhook';
+
+export default {
+  name: 'Webhook',
+  components: { ListTriggers, WebhookDetails, EditWebhook },
+  props: {
+    albumId: {
+      type: String,
+      required: true,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      classColRight: 'col-xs-12 col-sm-12 col-md-5 col-lg-4',
+      classColLeft: 'col-xs-12 col-sm-12 col-md-7 col-lg-8',
+      loading: true,
+      limit: 10,
+      offset: 0,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      webhook: 'webhook',
+    }),
+    webhookId() {
+      return this.$route.params.id;
+    },
+    currentView() {
+      return this.$route.params.action !== undefined ? this.$route.params.action : 'listwebhook';
+    },
+  },
+  created() {
+    this.getWebhook();
+  },
+  beforeDestroy() {
+    this.$store.dispatch('initWebhook');
+  },
+  methods: {
+    done() {
+      this.$emit('done');
+    },
+    showWebhook(id) {
+      this.getWebhook().then(() => {
+        this.loadActionId('webhook', id);
+      });
+    },
+    editWebhook(id) {
+      this.loadActionId('editwebhook', id);
+    },
+    loadActionId(action, id) {
+      this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
+    },
+    getWebhook() {
+      const params = {
+        albumId: this.albumId,
+        webhookId: this.webhookId,
+      };
+      return this.$store.dispatch('getWebhook', params).catch((err) => {
+        this.manageError(err);
+        this.done();
+      });
+    },
+    removeWebhook(webhookId) {
+      const params = {
+        albumId: this.albumId,
+        webhookId,
+      };
+      this.$store.dispatch('removeWebhook', params).then(() => {
+        this.done();
+      }).catch((err) => {
+        this.manageError(err);
+      });
+    },
+    manageError(err) {
+      const status = httpoperations.getStatusError(err);
+      if (status === 401 || status === 403) {
+        this.$snotify.error(this.$t('unauthorized'));
+      } else {
+        this.$snotify.error(this.$t('sorryerror'));
+      }
+    },
+  },
+};
+</script>

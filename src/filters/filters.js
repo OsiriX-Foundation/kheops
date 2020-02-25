@@ -15,6 +15,13 @@ Vue.filter('formatDateTime', (value) => {
   return value;
 });
 
+Vue.filter('formatDateTimeDetails', (value) => {
+  if (value) {
+    return moment(String(value)).isValid() ? moment(String(value)).format('YYYY-MM-DD HH:mm:ss') : 'Invalid Date';
+  }
+  return value;
+});
+
 Vue.filter('formatTime', (value) => {
   if (value) {
     return moment(String(value)).isValid() ? moment(String(value)).format('HH:mm') : 'Invalid Date';
@@ -44,16 +51,12 @@ Vue.filter('maxTextLength', (value, maxlength) => {
 });
 
 Vue.filter('getUsername', (value) => {
-  if (value === undefined
-    || value.last_name === undefined
-    || value.first_name === undefined
-    || value.last_name === undefined
-    || value.email === undefined) {
-    return 'bad value';
-  } if (value.first_name === '' || value.last_name === '') {
-    return value.email;
+  if (value.first_name !== undefined && value.last_name !== undefined) {
+    return `${value.first_name} ${value.last_name}`;
+  } if (value.email !== undefined) {
+    return `${value.email}`;
   }
-  return `${value.first_name} ${value.last_name}`;
+  return 'bad value';
 });
 
 // http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#TM

@@ -388,7 +388,6 @@ export default {
             'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary',
           },
         },
-        headers: {},
       },
       errorValues: {
         0xC122: 'transfersyntaxnotsupported',
@@ -524,7 +523,6 @@ export default {
     },
     sendDicomizeFiles(files, dicomValue) {
       let promiseSequential = Promise.resolve();
-      this.config.dicomizeData.headers = { ...this.config.dicomizeData.headers, ...this.config.headers };
       this.getStudy(this.studyUIDToSend).then((res) => {
         const study = res.data[0];
         files.forEach((file) => {
@@ -560,6 +558,8 @@ export default {
         const formData = new FormData();
         formData.append(idFile, data);
         const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
+        const headers = this.setAuthorizationHeader();
+        this.config.dicomizeData.headers = { ...this.config.dicomizeData.headers, ...headers };
         HTTP.post(request, data, this.config.dicomizeData).then((res) => {
           resolve(res);
         }).catch((err) => {
@@ -568,12 +568,18 @@ export default {
       });
     },
     sendFormData(files) {
-      this.config.formData.headers = { ...this.config.formData.headers, ...this.config.headers };
       if (this.maxsize > this.totalSizeFiles && files.length <= this.maxsend && files.length > 0) {
         this.sendFormDataPromise(files);
       } else if (files.length > 0) {
         this.sendBySize(files);
       }
+    },
+    setAuthorizationHeader() {
+      const headers = {};
+      if (this.currentuserAccessToken() !== '') {
+        headers.Authorization = `Bearer ${this.currentuserAccessToken()}`;
+      }
+      return headers;
     },
     initVariablesForSending() {
       this.UI.show = true;
@@ -583,10 +589,6 @@ export default {
       this.progress = 0;
       this.listErrorUnknownFiles = {};
       this.totalUnknownFilesError = 0;
-      if (this.currentuserAccessToken() !== '') {
-        this.config.headers.Authorization = `Bearer ${this.currentuserAccessToken()}`;
-      }
-
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('initErrorFiles');
     },
@@ -626,6 +628,8 @@ export default {
         if (!this.UI.cancel && this.files.length > 0) {
           const formData = this.createFormData(files);
           this.currentFilesLength = files.length;
+          const headers = this.setAuthorizationHeader();
+          this.config.formData.headers = { ...this.config.formData.headers, ...headers };
           const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
           HTTP.post(request, formData, this.config.formData).then((res) => {
             this.manageResult(files, res.data, res.status);
