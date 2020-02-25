@@ -109,11 +109,13 @@
         />
       </template>
       <template
-        v-slot:cell(status)="data"
+        v-slot:cell(statuswebhook)="data"
       >
-        <triggers
-          v-if="data.item.number_of_triggers > 0"
-          :triggers="data.item.last_triggers"
+        <state-icons
+          v-if="data.item.number_of_triggers !== undefined && data.item.number_of_triggers > 0"
+          :done="checkPass(data.item.last_triggers)"
+          :error="checkFail(data.item.last_triggers)"
+          :warning="checkBoth(data.item.last_triggers)"
         />
       </template>
       <template
@@ -134,12 +136,12 @@
 import { mapGetters } from 'vuex';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import httpoperations from '@/mixins/httpoperations';
-import Triggers from '@/components/webhook/Triggers';
+import StateIcons from '@/components/globals/StateIcons';
 import TextError from '@/components/globals/TextError';
 
 export default {
   name: 'ListTokens',
-  components: { Triggers, TextError, PulseLoader },
+  components: { TextError, PulseLoader, StateIcons },
   props: {
     albumId: {
       type: String,
@@ -152,6 +154,12 @@ export default {
       status: 0,
       loadingData: false,
       fields: [
+        {
+          key: 'statuswebhook',
+          label: '',
+          sortable: true,
+          tdClass: 'word-break',
+        },
         {
           key: 'name',
           label: this.$t('name'),
@@ -236,6 +244,21 @@ export default {
         },
       };
       this.$store.dispatch('updateWebhook', params)
+    },
+    checkPass(lastTriggers) {
+      return lastTriggers.every((trigger) => trigger.status === 'pass');
+    },
+    checkFail(lastTriggers) {
+      return lastTriggers.every((trigger) => trigger.status === 'fail');
+    },
+    checkBoth(lastTriggers) {
+      const tmpTrigger = {};
+      lastTriggers.forEach((trigger) => {
+        if (tmpTrigger[trigger.status] === undefined) {
+          tmpTrigger[trigger.status] = '1';
+        }
+      });
+      return Object.entries(tmpTrigger).length > 1;
     },
   },
 };

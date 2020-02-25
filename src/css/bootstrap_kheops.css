@@ -199,3 +199,42 @@ a.text-success:hover, a.text-success:focus {
 .bs-popover-top .arrow::after, .bs-popover-auto[x-placement^="top"] .arrow::after {
 	border-top-color: #1d2434;
 }
+
+.pagination > li > a
+{
+    background-color: #003866;
+    color: white;
+}
+
+.pagination > li > a.disabled
+{
+    background-color: #003866 !Important;
+    color: white;
+}
+
+.pagination > li > a:focus,
+.pagination > li > a:hover,
+.pagination > li > span:focus,
+.pagination > li > span:hover
+{
+    color: #5a5a5a;
+    background-color: #eee;
+    border-color: #ddd;
+}
+
+.pagination > .active > a
+{
+    color: white;
+    background-color: #5A4181 !Important;
+    border: solid 1px #5A4181 !Important;
+}
+
+.page-item.disabled .page-link {  
+    background-color: #444444 !important;
+}
+
+.pagination > .active > a:hover
+{
+    background-color: #5A4181 !Important;
+    border: solid 1px #5A4181;
+}

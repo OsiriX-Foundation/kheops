@@ -9,7 +9,8 @@
     "status": "Status",
     "date": "Date",
     "event": "Event",
-    "-1": "An error occur"
+    "-1": "An error occur",
+    "deliveries": "Recent attempts"
   },
   "fr": {
     "new_series": "nouvelles série",
@@ -20,13 +21,24 @@
     "status": "Status",
     "date": "Date",
     "event": "Evènement",
-    "-1": "Une erreur est survenue"
+    "-1": "Une erreur est survenue",
+    "deliveries": "Tentatives récentes"
   }
 }
 </i18n>
 <template>
   <span>
+    <div
+      class="my-3"
+    >
+      <div>
+        <h4>
+          {{ $t('deliveries') }}
+        </h4>
+      </div>
+    </div>
     <b-table
+      id="table-triggers"
       stacked="sm"
       striped
       hover
@@ -34,6 +46,8 @@
       :items="triggers"
       :fields="fields"
       :sort-desc="true"
+      :per-page="perPage"
+      :current-page="currentPage"
       tbody-tr-class="link"
       @row-clicked="showRowDetails"
     >
@@ -91,13 +105,26 @@
         />
       </template>
     </b-table>
+    <div
+      class="my-3 d-flex flex-wrap"
+    >
+      <b-pagination
+        v-model="currentPage"
+        class="ml-auto"
+        :total-rows="rows"
+        :per-page="perPage"
+        :limit="limit"
+        aria-controls="table-triggers"
+        size="sm"
+      />
+    </div>
   </span>
 </template>
 
 <script>
 
 export default {
-  name: 'TriggersList',
+  name: 'ListTriggers',
   components: { },
   props: {
     triggers: {
@@ -108,6 +135,9 @@ export default {
   },
   data() {
     return {
+      perPage: 10,
+      currentPage: 1,
+      limit: 6,
       fields: [
         {
           key: 'status',
@@ -131,8 +161,8 @@ export default {
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
           formatter: (values) => {
-            if (Array.isArray(values)) {
-              return values[0].time;
+            if (Array.isArray(values) && values[0].time !== undefined) {
+              return this.$options.filters.formatDateTimeDetails(values[0].time);
             }
             return '';
           },
@@ -148,6 +178,9 @@ export default {
     };
   },
   computed: {
+    rows() {
+      return this.triggers.length;
+    }
   },
   created() {
   },

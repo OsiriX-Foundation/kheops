@@ -17,7 +17,6 @@
     "webhookdisabled": "This webhook is disabled",
     "webhookenabled": "This webhook is enabled",
     "state": "State",
-    "deliveries": "Recent attempts",
     "unauthorized": "You don't have the permissions"
   },
   "fr": {
@@ -37,7 +36,6 @@
     "webhookdisabled": "Ce webhook est désactivé",
     "webhookenabled": "Ce webhook est activé",
     "state": "Etat",
-    "deliveries": "Tentatives récentes",
     "unauthorized": "Vous n'avez pas les permissions"
   }
 }
@@ -79,14 +77,7 @@
       <div
         class="col-12"
       >
-        <div
-          class="my-3"
-        >
-          <h4>
-            {{ $t('deliveries') }}
-          </h4>
-        </div>
-        <triggers-list
+        <list-triggers
           :triggers="webhook.triggers"
         />
       </div>
@@ -97,13 +88,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import httpoperations from '@/mixins/httpoperations';
-import TriggersList from '@/components/webhook/TriggersList';
+import ListTriggers from '@/components/webhook/ListTriggers';
 import WebhookDetails from '@/components/webhook/WebhookDetails';
 import EditWebhook from '@/components/webhook/EditWebhook';
 
 export default {
   name: 'Webhook',
-  components: { TriggersList, WebhookDetails, EditWebhook },
+  components: { ListTriggers, WebhookDetails, EditWebhook },
   props: {
     albumId: {
       type: String,
