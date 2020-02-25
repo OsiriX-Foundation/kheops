@@ -1,8 +1,36 @@
+<i18n>
+{
+  "en": {
+    "newtoken": "New token"
+  },
+  "fr": {
+    "newtoken": "Nouveau token"
+  }
+}
+</i18n>
 <template>
   <div
     v-if="writePermission"
     class="tokens"
   >
+    <div
+      v-if="(currentView === 'listtokens')"
+      class="my-3 selection-button-container provider-position"
+    >
+      <router-link
+        :to="{
+          name: 'albumsettingsaction',
+          params: { action: 'newtoken' }
+        }"
+        class="btn btn-secondary"
+      >
+        <v-icon
+          name="plus"
+          class="mr-2"
+        />
+        {{ $t('newtoken') }}
+      </router-link>
+    </div>
     <div
       v-if="currentView === 'listtokens'"
     >
