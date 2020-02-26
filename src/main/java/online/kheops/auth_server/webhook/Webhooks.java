@@ -146,15 +146,7 @@ public class Webhooks {
             final Album album = getAlbum(albumId, em);
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
 
-            for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                for(WebhookAttempt webhookAttempt:webhookTrigger.getWebhookAttempts()) {
-                    em.remove(webhookAttempt);
-                }
-                for(WebhookTriggerSeries webhookTriggerSeries:webhookTrigger.getWebhookTriggersSeries()) {
-                    em.remove(webhookTriggerSeries);
-                }
-                em.remove(webhookTrigger);
-            }
+            deleteWebhook(webhook, em);
 
             em.remove(webhook);
 
@@ -173,6 +165,18 @@ public class Webhooks {
                 tx.rollback();
             }
             em.close();
+        }
+    }
+
+    public static void deleteWebhook(Webhook webhook, EntityManager em) {
+        for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+            for(WebhookAttempt webhookAttempt:webhookTrigger.getWebhookAttempts()) {
+                em.remove(webhookAttempt);
+            }
+            for(WebhookTriggerSeries webhookTriggerSeries:webhookTrigger.getWebhookTriggersSeries()) {
+                em.remove(webhookTriggerSeries);
+            }
+            em.remove(webhookTrigger);
         }
     }
 

@@ -10,6 +10,7 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.webhook.NewUserWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
+import online.kheops.auth_server.webhook.WebhookQueries;
 import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
@@ -24,6 +25,7 @@ import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
+import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
 
 public class Albums {
 
@@ -168,13 +170,9 @@ public class Albums {
             }
 
             for (Webhook webhook:album.getWebhooks()) {
-                for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                    em.remove(webhookTrigger);
-                }
-                em.remove(webhook);
+                deleteWebhook(webhook, em);
             }
-
-
+            
             em.remove(album);
 
             tx.commit();
