@@ -80,7 +80,7 @@ export default {
       },
       showRevokeTwitter: false,
       urlSharing: '',
-    }
+    };
   },
   computed: {
     twitterToken() {

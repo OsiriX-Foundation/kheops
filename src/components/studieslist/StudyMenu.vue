@@ -41,7 +41,7 @@
 export default {
   name: 'StudyMenu',
   components: { },
-  props: { 
+  props: {
     study: {
       type: Object,
       required: true,

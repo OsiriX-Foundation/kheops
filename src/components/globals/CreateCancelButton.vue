@@ -45,7 +45,7 @@ export default {
       type: String,
       required: false,
       default: '',
-    }
+    },
   },
   methods: {
     create() {
