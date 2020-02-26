@@ -15,6 +15,7 @@
     "eslint-plugin-import": "^2.19.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "oidc-client": "^1.10.1",
     "v-calendar": "^0.9.7",
     "vee-validate": "^2.2.15",
     "vue": "^2.6.11",
@@ -30,6 +31,7 @@
     "vue-uuid": "^1.1.1",
     "vuejs-datepicker": "^1.6.2",
     "vuex": "^3.1.2",
+    "vuex-oidc": "^3.4.1",
     "webpack-merge": "^4.2.2"
   },
   "devDependencies": {
