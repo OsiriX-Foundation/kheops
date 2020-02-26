@@ -1,5 +1,10 @@
 <template>
   <div>
+    {{ oidcIsAuthenticated }} <br>
+    {{ oidcAccessToken }} <br>
+    {{ oidcIdToken }} <br>
+    {{ oidcIdTokenExp }} <br>
+    {{ oidcUser }}
     <component-import-study
       :permissions="permissions"
     />
@@ -7,6 +12,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
 
 export default {
@@ -31,6 +37,14 @@ export default {
     };
   },
   computed: {
+    ...mapGetters([
+      'oidcIsAuthenticated',
+      'oidcAuthenticationIsChecked',
+      'oidcUser',
+      'oidcIdToken',
+      'oidcIdTokenExp',
+      'oidcAccessToken',
+    ]),
   },
   watch: {
   },
