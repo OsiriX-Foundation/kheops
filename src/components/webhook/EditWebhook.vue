@@ -158,10 +158,12 @@
 import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
 import httpoperations from '@/mixins/httpoperations';
 import FieldObligatory from '@/components/globals/FieldObligatory';
+import { validator } from '@/mixins/validator.js';
 
 export default {
   name: 'Webhook',
   components: { DoneDeleteButton, FieldObligatory },
+  mixins: [validator],
   props: {
     albumId: {
       type: String,
@@ -255,16 +257,6 @@ export default {
           this.$snotify.error(this.$t('sorryerror'));
         }
       });
-    },
-    // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
-    checkUrl(str) {
-      const pattern = new RegExp('^https?:\\/\\/'+ // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-      return !!pattern.test(str);
     },
   },
 };
