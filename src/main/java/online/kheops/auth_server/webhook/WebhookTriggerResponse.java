@@ -2,6 +2,8 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
+import online.kheops.auth_server.user.UserResponse;
+import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ public class WebhookTriggerResponse {
     private String event;
     @XmlElement(name = "attempts")
     private List<WebhookAttemptResponse> webhookAttemptResponseList;
+    @XmlElement(name = "user")
+    private UserResponse user;
 
 
 
@@ -31,6 +35,12 @@ public class WebhookTriggerResponse {
             event = WebhookType.NEW_SERIES.name().toLowerCase();
         } else if(webhookTrigger.getNewUser()) {
             event = WebhookType.NEW_USER.name().toLowerCase();
+            final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
+            user = userResponseBuilder.setEmail(webhookTrigger.getUser().getEmail())
+                    .setLastName(webhookTrigger.getUser().getLastName())
+                    .setFirstName(webhookTrigger.getUser().getFirstName())
+                    .setSub(webhookTrigger.getUser().getKeycloakId())
+                    .build();
         }
 
         if(!webhookTrigger.getWebhookAttempts().isEmpty()) {
