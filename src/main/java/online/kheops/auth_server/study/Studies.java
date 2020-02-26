@@ -20,6 +20,9 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.EntityType;
+import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -28,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
@@ -414,21 +418,37 @@ public class Studies {
             return findStudyByStudyUID(studyInstanceUID, em);
     }
 
-    private static final Object lock = new Object();
-
     public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
-        synchronized (lock) {
-            Study study;
+
+        Study study;
+        try {
+            study = getStudy(studyInstanceUID, em);
+        } catch (StudyNotFoundException ignored) {
+            // the study doesn't exist, we need to create it
+            final EntityManager localEm = EntityManagerListener.createEntityManager();
+            final EntityTransaction tx = localEm.getTransaction();
+
             try {
-                study = getStudy(studyInstanceUID, em);
-            } catch (StudyNotFoundException ignored) {
-                // the study doesn't exist, we need to create it
-                study = new Study();
-                study.setStudyInstanceUID(studyInstanceUID);
-                em.persist(study);
+                tx.begin();
+                study = new Study(studyInstanceUID);
+                localEm.persist(study);
+                tx.commit();
+                study = em.merge(study);
+            } catch (PersistenceException ignored2) {
+                try {
+                    tx.rollback();
+                    study = getStudy(studyInstanceUID, em);
+                } catch (StudyNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                localEm.close();
             }
-            return study;
         }
+        return study;
     }
 
     public static boolean canAccessStudy(User user, Study study, EntityManager em) {
