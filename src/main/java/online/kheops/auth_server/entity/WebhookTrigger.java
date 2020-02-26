@@ -46,7 +46,7 @@ public class WebhookTrigger {
     private User user;
 
     @OneToMany
-    @JoinColumn(name = "series_fk", nullable = false)
+    @JoinColumn(name = "webhook_trigger_fk", nullable = false)
     private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
 
