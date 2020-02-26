@@ -148,8 +148,6 @@ public class Webhooks {
 
             deleteWebhook(webhook, em);
 
-            em.remove(webhook);
-
             final Mutation mutation = Events.albumPostMutation(callingUser, album, DELETE_WEBHOOK);
             em.persist(mutation);
 
@@ -178,6 +176,7 @@ public class Webhooks {
             }
             em.remove(webhookTrigger);
         }
+        em.remove(webhook);
     }
 
 
