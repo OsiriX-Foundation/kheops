@@ -21,7 +21,8 @@
     "write_permission": "Add new studies or series in existant study",
     "appropriate_permission": "Share studies (Send to another user, to the inbox, to another album)",
     "download_permission": "Show download button",
-    "delete_permission": "Delete studies (Is enable only if read and write permission enable)"
+    "delete_permission": "Delete studies (Is enable only if read and write permission enable)",
+    "warningpermissions": "Please select minimum one permission"
   },
   "fr": {
     "newtoken": "Nouveau token",
@@ -38,7 +39,8 @@
     "sorryerror": "Désolé, une erreur est survenue",
     "tokenvalue": "Valeur du token",
     "urlvalue": "Url d'accès aux données",
-    "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !"
+    "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !",
+    "warningpermissions": "SVP choississez minimum une permission"
   }
 }
 </i18n>
@@ -165,6 +167,7 @@
             <field-obligatory
               class="mb-3"
               :state="warningPermissions"
+              :text="$t('warningpermissions')"
             />
             <span
               v-if="permissions.read_permission"
