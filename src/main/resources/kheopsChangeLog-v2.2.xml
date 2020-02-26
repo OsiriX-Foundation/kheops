@@ -56,7 +56,7 @@
                 <foreignKeyConstraintExists foreignKeyName="webhook_trigger_series_webhook_trigger_fk_fkey" schemaName="public"/>
             </not>
         </preConditions>
-        <addForeignKeyConstraint baseColumnNames="webhook_trigger_fk" baseTableName="webhook_trigger_series" constraintName="webhook_trigger_series_webhook_trigger_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="albums" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="webhook_trigger_fk" baseTableName="webhook_trigger_series" constraintName="webhook_trigger_series_webhook_trigger_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="webhook_triggers" validate="true"/>
     </changeSet>
 
     <changeSet author="kheops" id="v2.2-6">
