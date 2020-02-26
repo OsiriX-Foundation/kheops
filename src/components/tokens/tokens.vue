@@ -19,7 +19,7 @@
     >
       <router-link
         :to="{
-          name: 'albumsettingsaction',
+          name: routename,
           params: { action: 'newtoken' }
         }"
         class="btn btn-secondary"
@@ -93,6 +93,9 @@ export default {
     currentView() {
       return this.$route.params.action !== undefined ? this.$route.params.action : 'listtokens';
     },
+    routename() {
+      return this.scope === 'album' ? 'albumsettingsaction' : 'useraction';
+    },
   },
   watch: {
   },
@@ -100,11 +103,7 @@ export default {
   },
   methods: {
     loadView(action) {
-      if (this.scope === 'album') {
-        this.$router.push({ name: 'albumsettingsaction', params: { action } });
-      } else if (this.scope === 'user') {
-        this.$router.push({ name: 'useraction', params: { action } });
-      }
+      this.$router.push({ name: this.routename, params: { action } });
     },
   },
 };
