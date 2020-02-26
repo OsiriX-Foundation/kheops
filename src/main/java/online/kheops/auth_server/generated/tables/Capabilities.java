@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
-    private static final long serialVersionUID = -1552206437;
+    private static final long serialVersionUID = 1916043996;
 
     /**
      * The reference instance of <code>public.capabilities</code>
@@ -187,7 +187,7 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.CAPABILITIES_ID_UNIQUE, Indexes.CAPABILITIES_PK, Indexes.CAPABILITIES_SECRET_UNIQUE, Indexes.CAPABILITIES_USER_FK_INDEX);
+        return Arrays.<Index>asList(Indexes.CAPABILITIES_ALBUM_FK_INDEX, Indexes.CAPABILITIES_ID_UNIQUE, Indexes.CAPABILITIES_PK, Indexes.CAPABILITIES_SECRET_UNIQUE, Indexes.CAPABILITIES_USER_FK_INDEX);
     }
 
     /**

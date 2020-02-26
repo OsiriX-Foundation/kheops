@@ -14,12 +14,15 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.Databasechangelog;
+import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
 import online.kheops.auth_server.generated.tables.Studies;
 import online.kheops.auth_server.generated.tables.Users;
 import online.kheops.auth_server.generated.tables.WebhookAttempts;
+import online.kheops.auth_server.generated.tables.WebhookTriggerSeries;
 import online.kheops.auth_server.generated.tables.WebhookTriggers;
 import online.kheops.auth_server.generated.tables.Webhooks;
 
@@ -41,7 +44,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = -699272521;
+    private static final long serialVersionUID = 778878743;
 
     /**
      * The reference instance of <code>public</code>
@@ -67,6 +70,16 @@ public class Public extends SchemaImpl {
      * The table <code>public.capabilities</code>.
      */
     public final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+
+    /**
+     * The table <code>public.databasechangelog</code>.
+     */
+    public final Databasechangelog DATABASECHANGELOG = online.kheops.auth_server.generated.tables.Databasechangelog.DATABASECHANGELOG;
+
+    /**
+     * The table <code>public.databasechangeloglock</code>.
+     */
+    public final Databasechangeloglock DATABASECHANGELOGLOCK = online.kheops.auth_server.generated.tables.Databasechangeloglock.DATABASECHANGELOGLOCK;
 
     /**
      * The table <code>public.events</code>.
@@ -97,6 +110,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.webhook_attempts</code>.
      */
     public final WebhookAttempts WEBHOOK_ATTEMPTS = online.kheops.auth_server.generated.tables.WebhookAttempts.WEBHOOK_ATTEMPTS;
+
+    /**
+     * The table <code>public.webhook_trigger_series</code>.
+     */
+    public final WebhookTriggerSeries WEBHOOK_TRIGGER_SERIES = online.kheops.auth_server.generated.tables.WebhookTriggerSeries.WEBHOOK_TRIGGER_SERIES;
 
     /**
      * The table <code>public.webhook_triggers</code>.
@@ -137,12 +155,15 @@ public class Public extends SchemaImpl {
             AlbumUser.ALBUM_USER,
             Albums.ALBUMS,
             Capabilities.CAPABILITIES,
+            Databasechangelog.DATABASECHANGELOG,
+            Databasechangeloglock.DATABASECHANGELOGLOCK,
             Events.EVENTS,
             ReportProviders.REPORT_PROVIDERS,
             Series.SERIES,
             Studies.STUDIES,
             Users.USERS,
             WebhookAttempts.WEBHOOK_ATTEMPTS,
+            WebhookTriggerSeries.WEBHOOK_TRIGGER_SERIES,
             WebhookTriggers.WEBHOOK_TRIGGERS,
             Webhooks.WEBHOOKS);
     }
