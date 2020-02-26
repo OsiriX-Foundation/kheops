@@ -3,13 +3,15 @@
   "en": {
     "newprovider": "New provider",
     "nameProvider": "Name of the provider",
-    "urlProvider": "Configuration URL of the provider"
+    "urlProvider": "Configuration URL of the provider",
+    "urlnotvalid": "This url is not valid"
 
   },
   "fr": {
     "newprovider": "Nouveau provider",
     "nameProvider": "Nom du provider",
-    "urlProvider": "URL de configuration"
+    "urlProvider": "URL de configuration",
+    "urlnotvalid": "Cette url n'est pas valide"
   }
 }
 </i18n>
@@ -50,6 +52,9 @@
             required
             maxlength="1024"
           >
+          <field-obligatory
+            :state="provider.name !== ''"
+          />
         </div>
       </div>
       <div class="row">
@@ -72,50 +77,40 @@
             >
               <state-provider
                 :loading="loading"
-                :check-u-r-l="checkURL"
+                :check-u-r-l="checkedURL"
                 :class-icon="'ml-2 mt-2'"
               />
             </div>
+            <field-obligatory
+              :state="provider.url !== ''"
+            />
+            <field-obligatory
+              v-if="provider.url !== ''"
+              :state="checkUrl(provider.url)"
+              :text="$t('urlnotvalid')"
+            />
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="offset-md-3 col-md-9 d-none d-sm-none d-md-block">
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :disabled="loading"
-          >
-            {{ $t('create') }}
-          </button>
-          <button
-            type="reset"
-            class="btn btn-secondary ml-3"
-            @click="cancel"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-        <div class="col-12 d-md-none">
-          <button
-            type="submit"
-            class="btn btn-primary btn-block"
-            :disabled="loading"
-          >
-            {{ $t('create') }}
-          </button>
-        </div>
-      </div>
+      <create-cancel-button
+        :disabled="disabledCreate"
+        class-col="offset-md-3 col-md-9"
+        @cancel="cancel"
+      />
     </form>
   </div>
 </template>
 
 <script>
 import StateProvider from '@/components/providers/StateProvider';
+import FieldObligatory from '@/components/globals/FieldObligatory';
+import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import { validator } from '@/mixins/validator.js';
 
 export default {
   name: 'NewProvider',
-  components: { StateProvider },
+  components: { StateProvider, FieldObligatory, CreateCancelButton },
+  mixins: [validator],
   props: {
     albumID: {
       type: String,
@@ -131,8 +126,16 @@ export default {
       },
       show: false,
       loading: false,
-      checkURL: false,
+      checkedURL: false,
     };
+  },
+  computed: {
+    disabledCreate() {
+      return (this.provider.name === ''
+        || this.provider.url === ''
+        || !this.checkUrl(this.provider.url))
+        || this.loading;
+    },
   },
   methods: {
     createProvider() {
@@ -149,7 +152,7 @@ export default {
       });
     },
     setStateProvider(checkURL, loading, show) {
-      this.checkURL = checkURL;
+      this.checkedURL = checkURL;
       this.loading = loading;
       this.show = show;
     },

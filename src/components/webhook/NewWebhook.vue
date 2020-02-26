@@ -10,7 +10,6 @@
     "new_series": "New serie/s",
     "new_user": "New user",
     "invalidevent": "Please select minimum one event",
-    "fieldobligatory": "Field obligatory",
     "urlnotvalid": "This url is not valid",
     "unauthorized": "You don't have the permission to create a webhook"
   },
@@ -24,7 +23,6 @@
     "new_series": "Nouvelle/s serie/s",
     "new_user": "Nouvel utilisateur",
     "invalidevent": "SVP choississez minimum une évènement",
-    "fieldobligatory": "Champs obligatoire",
     "urlnotvalid": "Cette url n'est pas valide",
     "unauthorized": "Vous n'avez pas les permissions de créer un webhook"
   }
@@ -67,10 +65,7 @@
             required
             maxlength="255"
           >
-
-          <b-form-invalid-feedback :state="webhook.name !== ''">
-            {{ $t('fieldobligatory') }}
-          </b-form-invalid-feedback>
+          <field-obligatory :state="webhook.name !== ''" />
         </div>
       </div>
       <div class="row mb-3">
@@ -86,16 +81,12 @@
             required
             maxlength="1024"
           >
-
-          <b-form-invalid-feedback :state="webhook.url !== ''">
-            {{ $t('fieldobligatory') }}
-          </b-form-invalid-feedback>
-          <b-form-invalid-feedback
+          <field-obligatory :state="webhook.url !== ''" />
+          <field-obligatory
             v-if="webhook.url !== ''"
             :state="checkUrl(webhook.url)"
-          >
-            {{ $t('urlnotvalid') }}
-          </b-form-invalid-feedback>
+            :text="$t('urlnotvalid')"
+          />
         </div>
       </div>
       <div class="row mb-3">
@@ -124,9 +115,10 @@
             :state="state"
             stacked
           >
-            <b-form-invalid-feedback :state="state">
-              {{ $t('invalidevent') }}
-            </b-form-invalid-feedback>
+            <field-obligatory
+              :state="state"
+              :text="$t('invalidevent')"
+            />
           </b-form-checkbox-group>
         </div>
       </div>
@@ -142,6 +134,7 @@
       </div>
       <create-cancel-button
         :disabled="disabledCreate"
+        class-col="offset-md-3 col-md-9"
         @cancel="done"
       />
     </form>
@@ -152,10 +145,11 @@
 import CreateCancelButton from '@/components/globals/CreateCancelButton';
 import { HTTP } from '@/router/http';
 import httpoperations from '@/mixins/httpoperations';
+import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
   name: 'NewWebhook',
-  components: { CreateCancelButton },
+  components: { CreateCancelButton, FieldObligatory },
   props: {
     albumId: {
       type: String,

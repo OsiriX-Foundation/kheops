@@ -12,7 +12,6 @@
     "new_series": "New serie/s",
     "new_user": "New user",
     "invalidevent": "Please select minimum one event",
-    "fieldobligatory": "Field obligatory",
     "urlnotvalid": "This url is not valid",
     "unauthorized": "You don't have the permissions"
   },
@@ -28,7 +27,6 @@
     "new_series": "Nouvelle/s serie/s",
     "new_user": "Nouvel utilisateur",
     "invalidevent": "SVP choississez minimum une évènement",
-    "fieldobligatory": "Champs obligatoire",
     "urlnotvalid": "Cette url n'est pas valide",
     "unauthorized": "Vous n'avez pas les permissions"
   }
@@ -73,10 +71,7 @@
             required
             maxlength="255"
           >
-
-          <b-form-invalid-feedback :state="modelWebhook.name !== ''">
-            {{ $t('fieldobligatory') }}
-          </b-form-invalid-feedback>
+          <field-obligatory :state="modelWebhook.name !== ''" />
         </div>
       </div>
       <div class="row mb-3">
@@ -92,16 +87,12 @@
             required
             maxlength="1024"
           >
-
-          <b-form-invalid-feedback :state="modelWebhook.url !== ''">
-            {{ $t('fieldobligatory') }}
-          </b-form-invalid-feedback>
-          <b-form-invalid-feedback
+          <field-obligatory :state="modelWebhook.url !== ''" />
+          <field-obligatory
             v-if="modelWebhook.url !== ''"
             :state="checkUrl(modelWebhook.url)"
-          >
-            {{ $t('urlnotvalid') }}
-          </b-form-invalid-feedback>
+            :text="$t('urlnotvalid')"
+          />
         </div>
       </div>
       <div
@@ -133,9 +124,10 @@
             :state="state"
             stacked
           >
-            <b-form-invalid-feedback :state="state">
-              {{ $t('invalidevent') }}
-            </b-form-invalid-feedback>
+            <field-obligatory
+              :state="state"
+              :text="$t('invalidevent')"
+            />
           </b-form-checkbox-group>
         </div>
       </div>
@@ -165,10 +157,11 @@
 <script>
 import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
 import httpoperations from '@/mixins/httpoperations';
+import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
   name: 'Webhook',
-  components: { DoneDeleteButton },
+  components: { DoneDeleteButton, FieldObligatory },
   props: {
     albumId: {
       type: String,
