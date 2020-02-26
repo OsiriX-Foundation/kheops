@@ -238,70 +238,27 @@
         </div>
       </span>
     </div>
-    <div class="row mb-2">
-      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
-        <button
-          v-if="writePermission"
-          class="btn btn-primary btn-block"
-          @click.stop="edit()"
-        >
-          {{ $t('edit') }}
-        </button>
-        <button
-          v-if="writePermission && !confirmDelete"
-          type="button"
-          class="btn btn-danger btn-block"
-          @click="deleteProvider"
-        >
-          {{ $t('remove') }}
-        </button>
-      </div>
-    </div>
-    <div
-      v-if="writePermission && confirmDelete"
-      class="row mb-2"
-    >
-      <div class="offset-md-3 col-12 col-md-9">
-        <p
-          class="mt-2"
-        >
-          {{ $t('warningremove') }}
-        </p>
-      </div>
-    </div>
-    <div
-      v-if="writePermission && confirmDelete"
-      class="row mb-2"
-    >
-      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
-        <button
-          v-if="writePermission && confirmDelete"
-          type="button"
-          class="btn btn-danger btn-block"
-          @click="deleteProvider"
-        >
-          {{ $t('confirm') }}
-        </button>
-        <button
-          v-if="writePermission && confirmDelete"
-          type="button"
-          class="btn btn-secondary btn-block"
-          @click="confirmDelete=false"
-        >
-          {{ $t('cancel') }}
-        </button>
-      </div>
-    </div>
+    <done-delete-button
+      v-if="writePermission"
+      class-row="mb-2"
+      class-col="offset-md-3 col-12 col-sm-12 col-md-3"
+      class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
+      :text-warning-remove="$t('warningremove')"
+      :text-button-done="$t('edit')"
+      @done="edit"
+      @remove="deleteProvider"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
+import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
 
 export default {
   name: 'Provider',
-  components: { StateProvider },
+  components: { StateProvider, DoneDeleteButton },
   props: {
     albumID: {
       type: String,
@@ -350,19 +307,15 @@ export default {
       this.$emit('providerselectededit', this.clientID);
     },
     deleteProvider() {
-      if (this.confirmDelete === false) {
-        this.confirmDelete = true;
-      } else {
-        this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
-          if (res.status !== 204) {
-            this.$snotify.error('Sorry, an error occured');
-          } else {
-            this.$emit('done');
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
-      }
+      this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+        if (res.status !== 204) {
+          this.$snotify.error('Sorry, an error occured');
+        } else {
+          this.$emit('done');
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
     },
   },
 };

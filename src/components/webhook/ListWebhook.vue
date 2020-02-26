@@ -243,7 +243,7 @@ export default {
           enabled: !value,
         },
       };
-      this.$store.dispatch('updateWebhook', params)
+      this.$store.dispatch('updateWebhook', params);
     },
     checkPass(lastTriggers) {
       return lastTriggers.every((trigger) => trigger.status === 'pass');

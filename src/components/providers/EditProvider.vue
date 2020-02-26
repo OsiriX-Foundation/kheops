@@ -8,7 +8,8 @@
     "remove": "Remove",
     "warningremove": "Are you sure to remove this report provider ?",
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "urlnotvalid": "This url is not valid"
   },
   "fr": {
     "editprovider": "Edition d'un provider",
@@ -18,7 +19,8 @@
     "remove": "Supprimer",
     "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
     "confirm": "Confirmer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "urlnotvalid": "Cette url n'est pas valide"
   }
 }
 </i18n>
@@ -57,6 +59,9 @@
             required
             maxlength="1024"
           >
+          <field-obligatory
+            :state="provider.name !== ''"
+          />
         </div>
       </div>
       <div class="row">
@@ -79,77 +84,44 @@
             >
               <state-provider
                 :loading="loading"
-                :check-u-r-l="checkURL"
+                :check-u-r-l="checkedURL"
                 :class-icon="'ml-2 mt-2'"
               />
             </div>
+            <field-obligatory
+              :state="provider.url !== ''"
+            />
+            <field-obligatory
+              v-if="provider.url !== ''"
+              :state="checkUrl(provider.url)"
+              :text="$t('urlnotvalid')"
+            />
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="offset-md-3 col-12 col-sm-12 col-md-3">
-          <button
-            type="submit"
-            class="btn btn-primary btn-block"
-            :disabled="loading"
-          >
-            {{ $t('edit') }}
-          </button>
-          <button
-            v-if="!confirmDelete"
-            type="button"
-            class="btn btn-danger btn-block"
-            @click="deleteProvider"
-          >
-            {{ $t('remove') }}
-          </button>
-        </div>
-      </div>
-      <div
-        v-if="confirmDelete"
-        class="row mb-2"
-      >
-        <div class="offset-md-3 col-12 col-md-9">
-          <p
-            class="mt-2"
-          >
-            {{ $t('warningremove') }}
-          </p>
-        </div>
-      </div>
-      <div
-        v-if="confirmDelete"
-        class="row mb-2"
-      >
-        <div class="offset-md-3 col-12 col-sm-12 col-md-3">
-          <button
-            v-if="confirmDelete"
-            type="button"
-            class="btn btn-danger btn-block"
-            @click="deleteProvider"
-          >
-            {{ $t('confirm') }}
-          </button>
-          <button
-            v-if="confirmDelete"
-            type="button"
-            class="btn btn-secondary btn-block"
-            @click="confirmDelete=false"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-      </div>
+      <done-delete-button
+        class-row="mb-2"
+        class-col="offset-md-3 col-12 col-sm-12 col-md-3"
+        class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
+        :text-warning-remove="$t('warningremove')"
+        :text-button-done="$t('edit')"
+        :disabled-done="disabledCreate"
+        @remove="deleteProvider"
+      />
     </form>
   </div>
 </template>
 <script>
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
+import FieldObligatory from '@/components/globals/FieldObligatory';
+import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import { validator } from '@/mixins/validator.js';
 
 export default {
   name: 'EditProvider',
-  components: { StateProvider },
+  components: { StateProvider, FieldObligatory, DoneDeleteButton },
+  mixins: [validator],
   props: {
     albumID: {
       type: String,
@@ -160,7 +132,7 @@ export default {
   data() {
     return {
       show: false,
-      checkURL: false,
+      checkedURL: false,
       loading: false,
       confirmDelete: false,
     };
@@ -171,6 +143,12 @@ export default {
     }),
     clientID() {
       return this.$route.params.id;
+    },
+    disabledCreate() {
+      return (this.provider.name === ''
+        || this.provider.url === ''
+        || !this.checkUrl(this.provider.url))
+        || this.loading;
     },
   },
   created() {
@@ -212,7 +190,7 @@ export default {
       });
     },
     setStateProvider(checkURL, loading, show) {
-      this.checkURL = checkURL;
+      this.checkedURL = checkURL;
       this.loading = loading;
       this.show = show;
     },
@@ -220,19 +198,15 @@ export default {
       this.$emit('done');
     },
     deleteProvider() {
-      if (!this.confirmDelete) {
-        this.confirmDelete = true;
-      } else {
-        this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
-          if (res.status !== 204) {
-            this.$snotify.error('Sorry, an error occured');
-          } else {
-            this.$emit('done');
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
-      }
+      this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+        if (res.status !== 204) {
+          this.$snotify.error('Sorry, an error occured');
+        } else {
+          this.$emit('done');
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
     },
   },
 };

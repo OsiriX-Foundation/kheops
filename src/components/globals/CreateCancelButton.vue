@@ -1,6 +1,9 @@
 <template>
   <div class="row">
-    <div class="offset-md-3 col-md-9 d-none d-sm-none d-md-block">
+    <div
+      class="d-none d-sm-none d-md-block"
+      :class="classCol"
+    >
       <button
         type="submit"
         class="btn btn-primary"
@@ -37,6 +40,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    classCol: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   methods: {

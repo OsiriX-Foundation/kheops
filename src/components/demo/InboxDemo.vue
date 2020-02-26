@@ -90,7 +90,7 @@ export default {
     setResponse() {
       this.$refs.demoModal.hide();
       this.setDemoInbox(true);
-    }
+    },
   },
 };
 

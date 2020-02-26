@@ -21,7 +21,8 @@
     "write_permission": "Add new studies or series in existant study",
     "appropriate_permission": "Share studies (Send to another user, to the inbox, to another album)",
     "download_permission": "Show download button",
-    "delete_permission": "Delete studies (Is enable only if read and write permission enable)"
+    "delete_permission": "Delete studies (Is enable only if read and write permission enable)",
+    "warningpermissions": "Please select minimum one permission"
   },
   "fr": {
     "newtoken": "Nouveau token",
@@ -38,7 +39,8 @@
     "sorryerror": "Désolé, une erreur est survenue",
     "tokenvalue": "Valeur du token",
     "urlvalue": "Url d'accès aux données",
-    "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !"
+    "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !",
+    "warningpermissions": "SVP choississez minimum une permission"
   }
 }
 </i18n>
@@ -80,6 +82,9 @@
               required
               maxlength="255"
             >
+            <field-obligatory
+              :state="token.title !== ''"
+            />
           </div>
         </div>
         <div
@@ -102,6 +107,9 @@
                 {{ $t(option_scope) }}
               </option>
             </select>
+            <field-obligatory
+              :state="token.scope_type !== ''"
+            />
           </div>
         </div>
         <div
@@ -124,6 +132,9 @@
                 {{ album.name }}
               </option>
             </select>
+            <field-obligatory
+              :state="token.album !== ''"
+            />
           </div>
         </div>
         <div
@@ -152,31 +163,41 @@
               class="token-props"
             >
               {{ $t('read') }}
-            </label><br>
-            <toggle-button
-              v-if="permissions.read_permission"
-              v-model="permissions.download_permission"
-              :color="{checked: '#5fc04c', unchecked: 'grey'}"
-              class="ml-3"
-            />
-            <label
-              v-if="permissions.read_permission"
-              class="token-props"
-            >
-              {{ $t('download') }}
-            </label><br>
-            <toggle-button
-              v-if="permissions.read_permission"
-              v-model="permissions.appropriate_permission"
-              :color="{checked: '#5fc04c', unchecked: 'grey'}"
-              class="ml-3"
-            />
-            <label
-              v-if="permissions.read_permission"
-              class="token-props"
-            >
-              {{ $t('appropriate') }}
             </label>
+            <field-obligatory
+              class="mb-3"
+              :state="warningPermissions"
+              :text="$t('warningpermissions')"
+            />
+            <span
+              v-if="permissions.read_permission"
+            >
+              <br>
+              <toggle-button
+                v-if="permissions.read_permission"
+                v-model="permissions.download_permission"
+                :color="{checked: '#5fc04c', unchecked: 'grey'}"
+                class="ml-3"
+              />
+              <label
+                v-if="permissions.read_permission"
+                class="token-props"
+              >
+                {{ $t('download') }}
+              </label> <br>
+              <toggle-button
+                v-if="permissions.read_permission"
+                v-model="permissions.appropriate_permission"
+                :color="{checked: '#5fc04c', unchecked: 'grey'}"
+                class="ml-3"
+              />
+              <label
+                v-if="permissions.read_permission"
+                class="token-props"
+              >
+                {{ $t('appropriate') }}
+              </label>
+            </span>
           </div>
         </div>
         <div class="row">
@@ -194,6 +215,9 @@
               :placeholder="$t('expirationdate')"
               :clear-button="true"
               clear-button-icon="fa fa-times"
+            />
+            <field-obligatory
+              :state="token.expiration_time !== ''"
             />
           </div>
         </div>
@@ -218,33 +242,11 @@
           </div>
         </div>
         -->
-        <div class="row">
-          <div class="offset-md-2 col-md-10 mb-1 d-none d-sm-none d-md-block">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="disabledCreateToken"
-            >
-              {{ $t('create') }}
-            </button>
-            <button
-              type="reset"
-              class="btn btn-secondary ml-3"
-              @click="cancel"
-            >
-              {{ $t('cancel') }}
-            </button>
-          </div>
-          <div class="col-12 d-md-none">
-            <button
-              type="submit"
-              class="btn btn-primary btn-block"
-              :disabled="disabledCreateToken"
-            >
-              {{ $t('create') }}
-            </button>
-          </div>
-        </div>
+        <create-cancel-button
+          :disabled="disabledCreateToken"
+          class-col="offset-md-2 col-md-10"
+          @cancel="cancel"
+        />
       </fieldset>
     </form>
 
@@ -333,10 +335,12 @@
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
 import { mapGetters } from 'vuex';
+import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
   name: 'NewToken',
-  components: { Datepicker },
+  components: { Datepicker, CreateCancelButton, FieldObligatory },
   props: {
     scope: {
       type: String,
@@ -374,6 +378,9 @@ export default {
     }),
     disabledCreateToken() {
       return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (this.token.scope_type === 'album' && !this.permissions.read_permission && !this.permissions.write_permission);
+    },
+    warningPermissions() {
+      return (this.token.scope_type === 'album' && (this.permissions.read_permission || this.permissions.write_permission));
     },
     permissionsSummary() {
       const summary = [];
