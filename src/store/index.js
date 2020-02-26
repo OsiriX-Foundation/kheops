@@ -30,6 +30,9 @@ export default new Vuex.Store({
     webhooks,
     oidcStore: vuexOidcCreateStoreModule(
       oidcSettings,
+      {
+        namespaced: true,
+      },
       // Optional OIDC event listeners
       {
         userLoaded: (user) => console.log('OIDC user is loaded:', user),

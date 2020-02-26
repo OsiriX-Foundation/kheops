@@ -37,7 +37,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters([
+    ...mapGetters('oidcStore', [
       'oidcIsAuthenticated',
       'oidcAuthenticationIsChecked',
       'oidcUser',

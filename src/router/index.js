@@ -230,5 +230,5 @@ router.beforeEach((to, from, next) => {
   }
 });
 */
-router.beforeEach(vuexOidcCreateRouterMiddleware(store));
+router.beforeEach(vuexOidcCreateRouterMiddleware(store, 'oidcStore'));
 export default router;

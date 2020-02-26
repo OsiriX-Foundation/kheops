@@ -22,7 +22,7 @@ export default {
       });
   },
   methods: {
-    ...mapActions([
+    ...mapActions('oidcStore', [
       'oidcSignInCallback',
     ]),
   },
