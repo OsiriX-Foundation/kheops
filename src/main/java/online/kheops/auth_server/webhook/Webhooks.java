@@ -147,8 +147,15 @@ public class Webhooks {
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
 
             for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+                for(WebhookAttempt webhookAttempt:webhookTrigger.getWebhookAttempts()) {
+                    em.remove(webhookAttempt);
+                }
+                for(WebhookTriggerSeries webhookTriggerSeries:webhookTrigger.getWebhookTriggersSeries()) {
+                    em.remove(webhookTriggerSeries);
+                }
                 em.remove(webhookTrigger);
             }
+
             em.remove(webhook);
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, DELETE_WEBHOOK);
@@ -272,6 +279,8 @@ public class Webhooks {
             if(album.containsSeries(series, em)) {
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),true);
                 final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
+                final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
+                em.persist(webhookTriggerSeries);
                 em.persist(webhookTrigger);
                 new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
             } else {
@@ -314,6 +323,7 @@ public class Webhooks {
             if (isMemberOfAlbum(targetUser, album, em)) {
                 final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
                 final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_USER, webhook);
+                webhookTrigger.setUser(targetUser);
                 em.persist(webhookTrigger);
                 new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
             } else {

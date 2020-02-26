@@ -132,9 +132,11 @@ public class FetchResource {
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
                 newSeriesWebhook.setFetch();
 
+                final List<Series> seriesListWebhook = new ArrayList<>();
                 for (Series series : seriesList) {
                     if (series.isPopulated()) {
                         newSeriesWebhook.addSeries(series);
+                        seriesListWebhook.add(series);
                     }
                 }
 
@@ -149,7 +151,11 @@ public class FetchResource {
                 if (study.isPopulated() && newSeriesWebhook.containSeries()) {
                     for (Webhook webhook : targetAlbum.getWebhooks()) {
                         if (webhook.getNewSeries() && webhook.isEnabled()) {
-                            WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                            final WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                            for (Series series : seriesListWebhook) {
+                                final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
+                                em.persist(webhookTriggerSeries);
+                            }
                             em.persist(webhookTrigger);
                             new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                         }

@@ -281,6 +281,7 @@ public class Albums {
                 for (Webhook webhook : album.getWebhooks()) {
                     if (webhook.getNewUser() && webhook.isEnabled()) {
                         WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_USER, webhook);
+                        webhookTrigger.setUser(callingUser);
                         em.persist(webhookTrigger);
                         new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
                     }

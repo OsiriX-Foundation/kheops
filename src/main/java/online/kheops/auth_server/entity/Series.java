@@ -67,6 +67,10 @@ public class Series {
     @JoinColumn (name = "series_fk", nullable=true)
     private Set<Mutation> mutations = new HashSet<>();
 
+    @OneToMany
+    @JoinColumn(name = "series_fk", nullable = false)
+    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
+
     public Series() {}
 
     public Series(String newSeriesInstanceUID) {
@@ -195,6 +199,8 @@ public class Series {
     public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
 
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
+
+    public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
 
     public String getBodyPartExamined() { return bodyPartExamined; }
 

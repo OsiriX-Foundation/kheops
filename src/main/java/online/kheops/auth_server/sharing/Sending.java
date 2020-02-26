@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.BadRequestException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -222,8 +223,6 @@ public class Sending {
             }
 
             final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries);
-            availableSeries.addAlbumSeries(albumSeries);
-            targetAlbum.addSeries(albumSeries);
             em.persist(albumSeries);
 
             final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER), false);
@@ -253,7 +252,9 @@ public class Sending {
             if (availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
                 for (Webhook webhook : targetAlbum.getWebhooks()) {
                     if (webhook.getNewSeries() && webhook.isEnabled()) {
-                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                        final WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                        final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, availableSeries);
+                        em.persist(webhookTriggerSeries);
                         em.persist(webhookTrigger);
                         new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                     }
@@ -282,17 +283,17 @@ public class Sending {
             final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
+            final List<Series> seriesListWebhook = new ArrayList<>();
 
             boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
                 if (!targetAlbum.containsSeries(series, em)) {
                     final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, series);
-                    series.addAlbumSeries(albumSeries);
-                    targetAlbum.addSeries(albumSeries);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
                     if(series.isPopulated() && series.getStudy().isPopulated()) {
                         newSeriesWebhook.addSeries(series);
+                        seriesListWebhook.add(series);
                     }
                 }
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
@@ -335,7 +336,11 @@ public class Sending {
             if(newSeriesWebhook.containSeries()) {
                 for (Webhook webhook : targetAlbum.getWebhooks()) {
                     if (webhook.getNewSeries() && webhook.isEnabled()) {
-                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                        final WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                        for (Series series : seriesListWebhook) {
+                            final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
+                            em.persist(webhookTriggerSeries);
+                        }
                         em.persist(webhookTrigger);
                         new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                     }
@@ -375,8 +380,6 @@ public class Sending {
             for (Series series : availableSeries) {
                 if (!inbox.containsSeries(series, em)) {
                     final AlbumSeries albumSeries = new AlbumSeries(inbox, series);
-                    series.addAlbumSeries(albumSeries);
-                    inbox.addSeries(albumSeries);
                     em.persist(albumSeries);
                 }
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
@@ -432,8 +435,6 @@ public class Sending {
             }
 
             final AlbumSeries albumSeries = new AlbumSeries(inbox, series);
-            series.addAlbumSeries(albumSeries);
-            inbox.addSeries(albumSeries);
             em.persist(albumSeries);
 
             tx.commit();
@@ -467,8 +468,6 @@ public class Sending {
                     //here the series exists but she is orphan
                     final Album inbox = callingUser.getInbox();
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
-                    storedSeries.addAlbumSeries(inboxSeries);
-                    inbox.addSeries(inboxSeries);
                     em.persist(inboxSeries);
                     tx.commit();
 
@@ -481,9 +480,6 @@ public class Sending {
                     final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
                     final Album inbox = callingUser.getInbox();
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-                    series.addAlbumSeries(inboxSeries);
-                    inbox.addSeries(inboxSeries);
-
                     em.persist(inboxSeries);
                     tx.commit();
                     kheopsLogBuilder.log();
@@ -500,9 +496,6 @@ public class Sending {
             study.addSeries(series);
             final Album inbox = callingUser.getInbox();
             final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-            series.addAlbumSeries(inboxSeries);
-            inbox.addSeries(inboxSeries);
-
             em.persist(series);
             em.persist(inboxSeries);
 
@@ -540,8 +533,6 @@ public class Sending {
 
             final Album inbox = callingUser.getInbox();
             final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
-            storedSeries.addAlbumSeries(inboxSeries);
-            inbox.addSeries(inboxSeries);
             em.persist(inboxSeries);
             tx.commit();
 
@@ -573,8 +564,6 @@ public class Sending {
             for (Series series : seriesLst) {
                 if(!inbox.containsSeries(series, em)) {
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-                    series.addAlbumSeries(inboxSeries);
-                    inbox.addSeries(inboxSeries);
                     em.persist(inboxSeries);
                 }
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());

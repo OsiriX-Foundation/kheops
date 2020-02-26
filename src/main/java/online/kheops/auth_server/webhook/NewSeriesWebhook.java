@@ -65,6 +65,8 @@ public class NewSeriesWebhook implements WebhookResult{
         importSource = "upload";
     }
 
+
+
     @Override
     public WebhookType getType() {
         return WebhookType.NEW_SERIES;

@@ -27,7 +27,7 @@ public class LiquibaseContextListener implements ServletContextListener {
     private static ServletContext servletContext;
     private static final String CHANGE_LOG_FILE = "kheopsChangeLog-master.xml";
     private static final java.util.logging.Logger LOG = Logger.getLogger(LiquibaseContextListener.class.getName());
-    private static final String DB_VERSION = "v2.1";
+    private static final String DB_VERSION = "v2.2";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
