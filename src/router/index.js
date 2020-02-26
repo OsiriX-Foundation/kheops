@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import { vuexOidcCreateRouterMiddleware } from 'vuex-oidc';
 import ListAlbums from '@/components/albums/ListAlbums';
 import NewAlbum from '@/components/albums/NewAlbum';
 // import Album from '@/components/albums/Album';
@@ -8,6 +9,8 @@ import User from '@/components/user/user';
 import store from '@/store';
 import Inbox from '@/components/inbox/Inbox';
 import ViewWithoutLogin from '@/components/withoutlogin/ViewWithoutLogin';
+import OidcCallback from '@/components/oidc/OidcCallback';
+import OidcCallbackError from '@/components/oidc/OidcCallbackError';
 // import PermissionDenied from '@/components/user/permissionDenied'
 
 // import {ServerTable, ClientTable, Event} from 'vue-tables-2';
@@ -42,6 +45,19 @@ const router = new Router({
   routes: [{
     path: '/',
     redirect: '/inbox',
+  },
+  {
+    path: '/oidc-callback',
+    name: 'oidcCallback',
+    component: OidcCallback,
+  },
+  {
+    path: '/oidc-callback-error',
+    name: 'oidcCallbackError',
+    component: OidcCallbackError,
+    meta: {
+      isPublic: true,
+    }
   },
   {
     path: '/inbox',
@@ -190,6 +206,9 @@ const router = new Router({
     path: '/view/:token',
     name: 'viewnologin',
     component: ViewWithoutLogin,
+    meta: {
+      isPublic: true,
+    },
   },
   {
     path: '*',
@@ -197,7 +216,7 @@ const router = new Router({
   },
   ],
 });
-
+/*
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (router.app.$keycloak.authenticated) {
@@ -210,5 +229,6 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
+*/
+router.beforeEach(vuexOidcCreateRouterMiddleware(store));
 export default router;
