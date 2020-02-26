@@ -152,11 +152,11 @@ public class FetchResource {
                     for (Webhook webhook : targetAlbum.getWebhooks()) {
                         if (webhook.getNewSeries() && webhook.isEnabled()) {
                             final WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                            em.persist(webhookTrigger);
                             for (Series series : seriesListWebhook) {
                                 final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
                                 em.persist(webhookTriggerSeries);
                             }
-                            em.persist(webhookTrigger);
                             new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                         }
                     }

@@ -254,8 +254,8 @@ public class Sending {
                     if (webhook.getNewSeries() && webhook.isEnabled()) {
                         final WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
                         final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, availableSeries);
-                        em.persist(webhookTriggerSeries);
                         em.persist(webhookTrigger);
+                        em.persist(webhookTriggerSeries);
                         new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                     }
                 }

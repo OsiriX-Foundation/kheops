@@ -280,8 +280,8 @@ public class Webhooks {
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),true);
                 final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
                 final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
-                em.persist(webhookTriggerSeries);
                 em.persist(webhookTrigger);
+                em.persist(webhookTriggerSeries);
                 new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
             } else {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
