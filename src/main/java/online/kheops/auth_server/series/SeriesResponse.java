@@ -13,11 +13,11 @@ public class SeriesResponse {
     @XmlElement(name = "series_uid")
     private String seriesUid;
     @XmlElement(name = "number_of_series_related_instance")
-    private long numberOfSeriesRelatedInstance;
+    private Long numberOfSeriesRelatedInstance;
     @XmlElement(name = "time_zone_offset_from_utc")
     private String timeZoneOffsetFromUTC;
     @XmlElement(name = "series_number")
-    private long seriesNumber;
+    private Long seriesNumber;
     @XmlElement(name = "body_part_examined")
     private String bodyPartExamined;
 
@@ -28,11 +28,11 @@ public class SeriesResponse {
 
     public SeriesResponse(Series series, String instance) {
         modality = series.getModality();
-        numberOfSeriesRelatedInstance = series.getNumberOfSeriesRelatedInstances();
+        numberOfSeriesRelatedInstance = Long.valueOf(series.getNumberOfSeriesRelatedInstances());
         seriesDescription = series.getSeriesDescription();
         seriesUid = series.getSeriesInstanceUID();
         timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
-        seriesNumber = series.getSeriesNumber();
+        seriesNumber = Long.valueOf(series.getSeriesNumber());
         bodyPartExamined = series.getBodyPartExamined();
         retrieveUrl = instance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
     }
