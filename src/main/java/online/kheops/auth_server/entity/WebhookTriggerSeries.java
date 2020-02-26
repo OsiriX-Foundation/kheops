@@ -28,4 +28,8 @@ public class WebhookTriggerSeries {
         series.addWebHookTriggerSeries(this);
         webhookTrigger.addWebHookTriggerSeries(this);
     }
+
+    public Series getSeries() {
+        return series;
+    }
 }

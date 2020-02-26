@@ -2,6 +2,8 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
+import online.kheops.auth_server.entity.WebhookTriggerSeries;
+import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
@@ -22,6 +24,8 @@ public class WebhookTriggerResponse {
     private List<WebhookAttemptResponse> webhookAttemptResponseList;
     @XmlElement(name = "user")
     private UserResponse user;
+    @XmlElement(name = "study")
+    private StudyResponse studyResponse;
 
 
 
@@ -33,6 +37,12 @@ public class WebhookTriggerResponse {
         isManualTrigger = webhookTrigger.isManualTrigger();
         if(webhookTrigger.getNewSeries()) {
             event = WebhookType.NEW_SERIES.name().toLowerCase();
+            for (WebhookTriggerSeries webhookTriggerSeries: webhookTrigger.getWebhookTriggersSeries()) {
+                if (studyResponse == null) {
+                    studyResponse = new StudyResponse(webhookTriggerSeries.getSeries().getStudy());
+                }
+                studyResponse.addSeries(webhookTriggerSeries.getSeries());
+            }
         } else if(webhookTrigger.getNewUser()) {
             event = WebhookType.NEW_USER.name().toLowerCase();
             final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();

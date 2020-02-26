@@ -36,4 +36,8 @@ public class SeriesResponse {
         bodyPartExamined = series.getBodyPartExamined();
         retrieveUrl = instance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
     }
+
+    public SeriesResponse(Series series) {
+        seriesUid = series.getSeriesInstanceUID();
+    }
 }
