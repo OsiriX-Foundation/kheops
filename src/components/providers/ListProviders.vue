@@ -6,7 +6,7 @@
     "urlNotWorking": "This provider is off",
     "refresh": "Refresh",
     "created_time": "Created time",
-    "name_provider": "Name of provider",
+    "name_provider": "Name",
     "url": "Configuration URL",
     "noreports": "There are no report providers to show"
   },
@@ -16,7 +16,7 @@
     "urlNotWorking": "Ce provider n'est pas accessible",
     "refresh": "Rafraîchir",
     "created_time": "Date de création",
-    "name_provider": "Nom du provider",
+    "name_provider": "Nom",
     "url": "URL de configuration",
     "noreports": "Aucun report provider créé"
   }
@@ -111,6 +111,11 @@ export default {
     return {
       fields: [
         {
+          key: 'url_check',
+          label: '',
+          sortable: false,
+        },
+        {
           key: 'name',
           label: this.$t('name_provider'),
           sortable: true,
@@ -128,7 +133,7 @@ export default {
           label: this.$t('created_time'),
           sortable: true,
           tdClass: 'word-break',
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
           formatter: (createdTime) => {
             if (createdTime !== undefined) {
               return this.$options.filters.formatDateTimeDetails(createdTime);
@@ -138,11 +143,6 @@ export default {
         },
         {
           key: 'btn_edit',
-          label: '',
-          sortable: false,
-        },
-        {
-          key: 'url_check',
           label: '',
           sortable: false,
         },
