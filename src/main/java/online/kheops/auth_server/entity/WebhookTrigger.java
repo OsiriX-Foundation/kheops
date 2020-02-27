@@ -37,7 +37,7 @@ public class WebhookTrigger {
     @OrderBy("attempt desc")
     private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
     private Webhook webhook;
 
