@@ -43,7 +43,7 @@
     v-if="Object.entries(webhook).length > 0"
   >
     <div
-      class="my-3 selection-button-container provider-position"
+      class="row word-break my-3 provider-position"
     >
       <h4>
         <button
