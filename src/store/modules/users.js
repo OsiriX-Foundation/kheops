@@ -71,7 +71,7 @@ const actions = {
         commit('SET_TOKENS', res.data);
       }
       return res.data;
-    }).catch(() => false);
+    }).catch((err) => Promise.reject(err));
   },
   createToken({ commit }, params) {
     let query = '';

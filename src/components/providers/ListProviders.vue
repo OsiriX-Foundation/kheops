@@ -47,6 +47,7 @@
       :items="providers"
       :fields="fields"
       :sort-desc="true"
+      :busy="loadingData"
       tbody-tr-class="link"
       @row-clicked="selectProvider"
     >
@@ -70,14 +71,25 @@
           {{ $t('edit') }}
         </button>
       </template>
-      <template v-slot:empty="scope">
+      <template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <pulse-loader
+            color="white"
+          />
+        </div>
+      </template>
+      <template v-slot:empty>
         <div
           class="text-warning text-center"
         >
-          {{ $t('noreports') }}
+          <list-empty
+            :status="status"
+            :text-empty="$t('noreports')"
+            @reload="getProviders()"
+          />
         </div>
       </template>
-      <template v-slot:emptyfiltered="scope">
+      <template v-slot:emptyfiltered>
         <div
           class="text-warning text-center"
         >
@@ -90,11 +102,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import StateProvider from '@/components/providers/StateProvider';
+import ListEmpty from '@/components/globals/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListProviders',
-  components: { StateProvider },
+  components: { StateProvider, PulseLoader, ListEmpty },
   props: {
     albumID: {
       type: String,
@@ -109,6 +124,8 @@ export default {
   },
   data() {
     return {
+      status: -1,
+      loadingData: false,
       fields: [
         {
           key: 'url_check',
@@ -155,15 +172,19 @@ export default {
     }),
   },
   created() {
-    this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
-      if (res.status !== 200) {
-        this.$snotify.error('Sorry, an error occured');
-      }
-    }).catch((err) => {
-      console.log(err);
-    });
+    this.getProviders();
   },
   methods: {
+    getProviders() {
+      this.loadingData = true;
+      return this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
+        this.loadingData = false;
+        this.status = -1;
+      }).catch((err) => {
+        this.loadingData = false;
+        this.status = httpoperations.getStatusError(err);
+      });
+    },
     selectProvider(rowSelected) {
       this.$emit('providerselectedshow', rowSelected.client_id);
     },
@@ -171,13 +192,7 @@ export default {
       this.$emit('providerselectededit', clientId);
     },
     refresh() {
-      this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
-        if (res.status !== 200) {
-          this.$snotify.error('Sorry, an error occured');
-        }
-      }).catch((err) => {
-        console.log(err);
-      });
+      this.getProviders();
     },
   },
 };

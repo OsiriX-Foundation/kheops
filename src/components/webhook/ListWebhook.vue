@@ -67,30 +67,11 @@
         <div
           class="text-warning text-center"
         >
-          <span
-            v-if="status === -1"
-          >
-            {{ $t('nowebhooks') }}
-          </span>
-          <span
-            v-if="status !== -1"
-          >
-            <text-error
-              :status="status"
-            />
-            <span
-              v-if="status !== 401 && status !== 403"
-            >
-              <br><br>
-              <button
-                type="button"
-                class="btn btn-sm btn-primary"
-                @click="getWebhooks()"
-              >
-                {{ $t('reload') }}
-              </button>
-            </span>
-          </span>
+          <list-empty
+            :status="status"
+            :text-empty="$t('nowebhooks')"
+            @reload="getWebhooks()"
+          />
         </div>
       </template>
       <template v-slot:emptyfiltered>
@@ -137,11 +118,11 @@ import { mapGetters } from 'vuex';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import httpoperations from '@/mixins/httpoperations';
 import StateIcons from '@/components/globals/StateIcons';
-import TextError from '@/components/globals/TextError';
+import ListEmpty from '@/components/globals/ListEmpty';
 
 export default {
   name: 'ListTokens',
-  components: { TextError, PulseLoader, StateIcons },
+  components: { ListEmpty, PulseLoader, StateIcons },
   props: {
     albumId: {
       type: String,
@@ -221,6 +202,7 @@ export default {
       this.loadingData = true;
       this.$store.dispatch('getWebhooks', params).then(() => {
         this.loadingData = false;
+        this.status = -1;
       }).catch((err) => {
         this.loadingData = false;
         this.status = httpoperations.getStatusError(err);
