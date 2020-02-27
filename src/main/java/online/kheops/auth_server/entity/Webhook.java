@@ -155,4 +155,6 @@ public class Webhook {
     }
 
     public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+
+    public long getPk() { return pk; }
 }

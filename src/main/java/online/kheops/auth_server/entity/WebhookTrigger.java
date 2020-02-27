@@ -103,4 +103,8 @@ public class WebhookTrigger {
     public Set<WebhookTriggerSeries> getWebhookTriggersSeries() {
         return webhookTriggersSeries;
     }
+
+    public Webhook getWebhook() {
+        return webhook;
+    }
 }
