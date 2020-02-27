@@ -129,6 +129,12 @@ export default {
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
+          formatter: (createdTime) => {
+            if (createdTime !== undefined) {
+              return this.$options.filters.formatDateTimeDetails(createdTime);
+            }
+            return '';
+          },
         },
         {
           key: 'btn_edit',

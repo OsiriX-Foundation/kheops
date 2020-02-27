@@ -107,7 +107,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            {{ provider.created_time }}
+            {{ provider.created_time|formatDateTimeDetails }}
           </dd>
         </div>
       </div>
