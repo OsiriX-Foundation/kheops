@@ -254,6 +254,7 @@
       id="tokenModal"
       ref="tokenModal"
       header-class="bg-primary"
+      title-class="word-break"
       body-class="bg-secondary"
       centered
       no-fade
