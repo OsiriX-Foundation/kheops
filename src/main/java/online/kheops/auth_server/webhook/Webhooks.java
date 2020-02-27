@@ -264,7 +264,7 @@ public class Webhooks {
         return new PairListXTotalCount<>(numberOfWebhook, webhookResponseList);
     }
 
-    public static void triggerNewSeriesWebhook(ServletContext context, String webhookID, String albumId, String studyInstanceUID, String seriesInstanceUID, User callingUser)
+    public static void triggerNewSeriesWebhook(ServletContext context, String webhookID, String albumId, String studyInstanceUID, List<String> seriesInstanceUID, User callingUser)
             throws WebhookNotFoundException, AlbumNotFoundException, UserNotMemberException, SeriesNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -278,20 +278,24 @@ public class Webhooks {
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
             final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
 
-            Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-            if(album.containsSeries(series, em)) {
-                final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, series, context.getInitParameter(HOST_ROOT_PARAMETER),true);
-                final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
-                final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
-                em.persist(webhookTrigger);
-                em.persist(webhookTriggerSeries);
-                new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
-            } else {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(SERIES_NOT_FOUND)
-                        .detail("The series does not exist or she is not in the album")
-                        .build();
-                throw new SeriesNotFoundException(errorResponse);
+            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
+
+            for (String seriesUID: seriesInstanceUID) {
+                final Series series = getSeries(studyInstanceUID, seriesUID, em);
+                if (album.containsSeries(series, em)) {
+                    newSeriesWebhook.addSeries(series);
+                    final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
+                    final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
+                    em.persist(webhookTrigger);
+                    em.persist(webhookTriggerSeries);
+                    new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                } else {
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message(SERIES_NOT_FOUND)
+                            .detail("The series does not exist or she is not in the album")
+                            .build();
+                    throw new SeriesNotFoundException(errorResponse);
+                }
             }
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);
