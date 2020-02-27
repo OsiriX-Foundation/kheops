@@ -3,26 +3,18 @@
   "en": {
     "new_series": "new serie",
     "new_user": "new user",
-    "activate": "Trigger by adding {event}",
     "manualtrigger": "Manual trigger",
-    "attempt":"Attempt",
-    "status": "Status",
     "date": "Date",
     "event": "Event",
-    "-1": "An error occur",
     "deliveries": "Recent attempts",
     "noattempts": "There are no attempts to show"
   },
   "fr": {
     "new_series": "nouvelles série",
     "new_user": "nouvel utilisateur",
-    "activate": "Déclenché par l'ajout de {event}",
     "manualtrigger": "Déclenchement manuel",
-    "attempt":"Tentative",
-    "status": "Status",
     "date": "Date",
     "event": "Evènement",
-    "-1": "Une erreur est survenue",
     "deliveries": "Tentatives récentes",
     "noattempts": "Il n'y aucune tentative faîte"
   }
@@ -70,26 +62,9 @@
         <b-card
           class="pointer-default"
         >
-          <p>{{ $t('activate', {event: $t(row.item.event)}) }}</p>
-          <p
-            v-if="row.item.is_manual_trigger === true"
-          >
-            {{ $t('manualtrigger') }}
-          </p>
-          <span
-            class="d-flex flex-wrap flex-row bd-highlight mb-3"
-          >
-            <span
-              v-for="attempt in row.item.attempts"
-              :key="attempt.id"
-              class="p-2 bd-highlight"
-            >
-              <b>{{ $t('attempt') }} {{ attempt.attempt }}</b> <br>
-              {{ $t('status') }}: {{ $t(attempt.status) }}<br>
-              {{ $t('date') }}: {{ attempt.time | formatDateTimeDetails }}<br>
-              <br>
-            </span>
-          </span>
+          <detail-attempts
+            :trigger="row.item"
+          />
         </b-card>
       </template>
       <template
@@ -131,10 +106,11 @@
 </template>
 
 <script>
+import DetailAttempts from '@/components/webhook/DetailAttempts';
 
 export default {
   name: 'ListTriggers',
-  components: { },
+  components: { DetailAttempts },
   props: {
     triggers: {
       type: Array,
