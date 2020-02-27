@@ -10,8 +10,8 @@ export const oidcSettings = {
 */
 // eslint-disable-next-line import/prefer-default-export
 export const oidcSettings = {
-  authority: 'http://localhost:8080/auth/realms/kheops',
-  clientId: 'kheopsLogin',
+  authority: 'https://keycloak.kheops.online/auth/realms/travis',
+  clientId: 'loginConnect',
   redirectUri: 'http://localhost:8081/oidc-callback',
   responseType: 'code',
   automaticSilentRenew: true,
