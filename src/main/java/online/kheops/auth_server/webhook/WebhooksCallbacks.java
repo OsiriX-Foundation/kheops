@@ -57,8 +57,8 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
         try {
             tx.begin();
             webhookTrigger = em.merge(webhookTrigger);
-            final WebhookAttempt webhookAttempt = new WebhookAttempt(status, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
             LOG.log(Level.WARNING,"webhook pk "+webhookTrigger.getWebhook().getPk());
+            final WebhookAttempt webhookAttempt = new WebhookAttempt(status, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
             em.persist(webhookAttempt);
             tx.commit();
         } catch (Exception e) {
