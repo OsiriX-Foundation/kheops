@@ -235,13 +235,13 @@ export default {
           key: 'expiration_time',
           label: this.$t('expiration date'),
           sortable: true,
-          class: 'd-none d-sm-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'issued_at_time',
           label: this.$t('create date'),
           sortable: true,
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'last_used',
