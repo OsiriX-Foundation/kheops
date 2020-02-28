@@ -477,3 +477,8 @@ label.token-props{
 	text-transform: capitalize;
 	margin-left: 1em;
 }
+
+.serie-section {
+	max-height: 300px;
+	overflow-y: scroll;
+}
