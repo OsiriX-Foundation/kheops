@@ -72,11 +72,7 @@
         </button>
       </template>
       <template v-slot:table-busy>
-        <div class="text-center text-danger my-2">
-          <pulse-loader
-            color="white"
-          />
-        </div>
+        <loading />
       </template>
       <template v-slot:empty>
         <div
@@ -102,14 +98,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import Loading from '@/components/globals/Loading';
 import StateProvider from '@/components/providers/StateProvider';
 import ListEmpty from '@/components/globals/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListProviders',
-  components: { StateProvider, PulseLoader, ListEmpty },
+  components: { StateProvider, Loading, ListEmpty },
   props: {
     albumID: {
       type: String,

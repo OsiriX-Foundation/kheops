@@ -171,11 +171,7 @@
         </span>
       </template>
       <template v-slot:table-busy>
-        <div class="text-center text-danger my-2">
-          <pulse-loader
-            color="white"
-          />
-        </div>
+        <loading />
       </template>
       <template v-slot:empty>
         <div
@@ -202,13 +198,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import moment from 'moment';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import Loading from '@/components/globals/Loading';
 import ListEmpty from '@/components/globals/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListTokens',
-  components: { PulseLoader, ListEmpty },
+  components: { Loading, ListEmpty },
   props: {
     scope: {
       type: String,

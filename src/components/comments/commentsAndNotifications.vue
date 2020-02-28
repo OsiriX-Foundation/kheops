@@ -35,7 +35,8 @@
     "nocommentaccessstudy": "no access to this study.",
     "createwebhook": "{user} created a webhook",
     "editwebhook": "{user} edited a webhook",
-    "deletewebhook": "{user} deleted a webhook"
+    "deletewebhook": "{user} deleted a webhook",
+    "triggerwebhook": "{user} has made a manual trigger on a webhook"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -71,7 +72,8 @@
     "nocommentaccessstudy": "n'a plus accès à cette étude.",
     "createwebhook": "{user} a créé un webhook",
     "editwebhook": "{user} a édité un webhook",
-    "deletewebhook": "{user} a supprimé un webhook"
+    "deletewebhook": "{user} a supprimé un webhook",
+    "triggerwebhook": "{user} a déclenché manuellement un webhook"
   }
 }
 </i18n>
@@ -103,9 +105,7 @@
         <div
           v-if="loading === true"
         >
-          <pulse-loader
-            color="white"
-          />
+          <loading />
         </div>
         <div
           v-for="comment in comments"
@@ -344,6 +344,13 @@
               >
                 {{ $t('editwebhook', {user: getName(comment.origin)}) }}
               </div>
+
+              <div
+                v-if="comment.mutation_type === 'TRIGGER_WEBHOOK'"
+                class=" flex-grow-1 bd-highlight"
+              >
+                {{ $t('triggerwebhook', {user: getName(comment.origin)}) }}
+              </div>
             </div>
           </div>
         </div>
@@ -415,13 +422,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
+import Loading from '@/components/globals/Loading';
 
 export default {
   name: 'CommentsAndNotifications',
-  components: { AddUser, PulseLoader },
+  components: { AddUser, Loading },
   mixins: [CurrentUser],
   props: {
     scope: {
