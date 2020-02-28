@@ -277,18 +277,16 @@ public class Webhooks {
             final Album album = getAlbum(albumId, em);
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
             final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
+            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, context.getInitParameter(HOST_ROOT_PARAMETER), true);
+            final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
+            em.persist(webhookTrigger);
 
-            final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
-
-            for (String seriesUID: seriesInstanceUID) {
+            for (String seriesUID : seriesInstanceUID) {
                 final Series series = getSeries(studyInstanceUID, seriesUID, em);
                 if (album.containsSeries(series, em)) {
                     newSeriesWebhook.addSeries(series);
-                    final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
                     final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
-                    em.persist(webhookTrigger);
                     em.persist(webhookTriggerSeries);
-                    new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(SERIES_NOT_FOUND)
@@ -297,12 +295,10 @@ public class Webhooks {
                     throw new SeriesNotFoundException(errorResponse);
                 }
             }
-
+            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
             final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);
             em.persist(mutation);
-
             tx.commit();
-
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
