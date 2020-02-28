@@ -41,7 +41,10 @@
 <template>
   <span>
     <div class="d-flex mb-2">
-      <div class="">{{ $t('activate', {event: $t(trigger.event)}) }}
+      <div
+        class="word-break"
+      >
+        {{ $t('activate', {event: $t(trigger.event)}) }}
         <span
           v-if="trigger.event === 'new_series'"
         >
@@ -105,7 +108,9 @@
       <span
         v-if="trigger.event === 'new_series'"
       >
-        <p>
+        <p
+          class="word-break"
+        >
           {{ $t('informationtrigger', { url: webhook.url }) }}
         </p>
         <details-series
@@ -122,7 +127,9 @@
       <span
         v-if="trigger.event === 'new_user'"
       >
-        <p>
+        <p
+          class="word-break"
+        >
           {{ $t('informationtriggeruser', { url: webhook.url }) }}
         </p>
         <ul
