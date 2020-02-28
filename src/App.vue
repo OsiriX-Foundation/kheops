@@ -1,16 +1,16 @@
 <i18n>
 {
   "en": {
-    "albums": "Kheops - Albums",
-    "album": "Kheops - Album",
-    "newalbum": "Kheops - New album",
-    "user": "Kheops - User"
+    "albums": "{appTitle} - Albums",
+    "album": "{appTitle} - Album",
+    "newalbum": "{appTitle} - New album",
+    "user": "{appTitle} - User"
   },
   "fr": {
-    "albums": "Kheops - Albums",
-    "album": "Kheops - Album",
-    "newalbum": "Kheops - Nouvel album",
-    "user": "Kheops - Utilisateur"
+    "albums": "{appTitle} - Albums",
+    "album": "{appTitle} - Album",
+    "newalbum": "{appTitle} - Nouvel album",
+    "user": "{appTitle} - Utilisateur"
   }
 }
 </i18n>
@@ -46,7 +46,7 @@ export default {
   components: { navHeader, navBar, SendStudies },
   data() {
     return {
-      appTitle: 'Kheops',
+      appTitle: 'KHEOPS',
     };
   },
   computed: {
@@ -59,11 +59,11 @@ export default {
   },
   watch: {
     $route(to) {
-      document.title = this.$t(to.meta.title) || this.appTitle;
+      document.title = this.$t(to.meta.title, { appTitle: this.appTitle }) || this.appTitle;
     },
   },
   created() {
-    document.title = 'Kheops';
+    document.title = this.$t(this.$route.meta.title, { appTitle: this.appTitle }) || this.appTitle;
   },
 };
 </script>

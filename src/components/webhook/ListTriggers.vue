@@ -3,28 +3,22 @@
   "en": {
     "new_series": "new serie",
     "new_user": "new user",
-    "activate": "Trigger by adding {event}",
     "manualtrigger": "Manual trigger",
-    "attempt":"Attempt",
-    "status": "Status",
     "date": "Date",
     "event": "Event",
-    "-1": "An error occur",
     "deliveries": "Recent attempts",
-    "noattempts": "There are no attempts to show"
+    "noattempts": "There are no attempts to show",
+    "refresh": "Refresh"
   },
   "fr": {
     "new_series": "nouvelles série",
     "new_user": "nouvel utilisateur",
-    "activate": "Déclenché par l'ajout de {event}",
     "manualtrigger": "Déclenchement manuel",
-    "attempt":"Tentative",
-    "status": "Status",
     "date": "Date",
     "event": "Evènement",
-    "-1": "Une erreur est survenue",
     "deliveries": "Tentatives récentes",
-    "noattempts": "Il n'y aucune tentative faîte"
+    "noattempts": "Il n'y aucune tentative faîte",
+    "refresh": "Rafraîchir"
   }
 }
 </i18n>
@@ -33,10 +27,16 @@
     <div
       class="my-3"
     >
-      <div>
+      <div class="d-flex mb-2">
         <h4>
           {{ $t('deliveries') }}
         </h4>
+        <button
+          class="ml-auto btn btn-sm btn-primary"
+          @click="refresh()"
+        >
+          {{ $t('refresh') }}
+        </button>
       </div>
     </div>
     <b-table
@@ -50,6 +50,7 @@
       :sort-desc="true"
       :per-page="perPage"
       :current-page="currentPage"
+      :busy="loading"
       tbody-tr-class="link"
       @row-clicked="showRowDetails"
     >
@@ -70,26 +71,10 @@
         <b-card
           class="pointer-default"
         >
-          <p>{{ $t('activate', {event: $t(row.item.event)}) }}</p>
-          <p
-            v-if="row.item.is_manual_trigger === true"
-          >
-            {{ $t('manualtrigger') }}
-          </p>
-          <span
-            class="d-flex flex-wrap flex-row bd-highlight mb-3"
-          >
-            <span
-              v-for="attempt in row.item.attempts"
-              :key="attempt.id"
-              class="p-2 bd-highlight"
-            >
-              <b>{{ $t('attempt') }} {{ attempt.attempt }}</b> <br>
-              {{ $t('status') }}: {{ $t(attempt.status) }}<br>
-              {{ $t('date') }}: {{ attempt.time | formatDateTimeDetails }}<br>
-              <br>
-            </span>
-          </span>
+          <detail-attempts
+            :trigger="row.item"
+            @manualtrigger="manualtrigger"
+          />
         </b-card>
       </template>
       <template
@@ -112,6 +97,9 @@
           {{ $t('noattempts') }}
         </div>
       </template>
+      <template v-slot:table-busy>
+        <loading />
+      </template>
     </b-table>
     <div
       class="my-3 d-flex flex-wrap"
@@ -131,10 +119,12 @@
 </template>
 
 <script>
+import DetailAttempts from '@/components/webhook/DetailAttempts';
+import Loading from '@/components/globals/Loading';
 
 export default {
   name: 'ListTriggers',
-  components: { },
+  components: { DetailAttempts, Loading },
   props: {
     triggers: {
       type: Array,
@@ -150,6 +140,11 @@ export default {
       type: Number,
       required: true,
       default: 1,
+    },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -214,6 +209,12 @@ export default {
     },
     changePage(page) {
       this.$emit('change', page);
+    },
+    manualtrigger() {
+      this.$emit('manualtrigger');
+    },
+    refresh() {
+      this.$emit('refresh');
     },
   },
 };

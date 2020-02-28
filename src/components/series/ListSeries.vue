@@ -28,9 +28,8 @@
         />
       </div>
     </div>
-    <pulse-loader
-      :loading="loadingSerie"
-      color="white"
+    <loading
+      v-if="loadingSerie"
     />
     <div
       v-if="loadingSerie === false && errorSeries === true"
@@ -56,13 +55,13 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import SeriesSummary from '@/components/series/SeriesSummary';
+import Loading from '@/components/globals/Loading';
 
 export default {
   name: 'ListSeries',
   components: {
-    PulseLoader, SeriesSummary,
+    SeriesSummary, Loading,
   },
   props: {
     study: {

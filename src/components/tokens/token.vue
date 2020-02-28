@@ -52,9 +52,11 @@
 <template>
   <div class="token">
     <div
-      class="my-3 selection-button-container token-position"
+      class="my-3 token-position"
     >
-      <h4>
+      <h4
+        class="row word-break mb-3"
+      >
         <button
           type="button"
           class="btn btn-link btn-sm d-md-none"

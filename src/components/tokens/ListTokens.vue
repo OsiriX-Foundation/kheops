@@ -56,7 +56,6 @@
       </div>
     </div>
     <b-table
-      v-if="loadingData === false"
       stacked="sm"
       striped
       hover
@@ -65,6 +64,7 @@
       :fields="fields"
       :sort-desc="true"
       :sort-by.sync="sortBy"
+      :busy="loadingData"
       tbody-tr-class="link"
       @row-clicked="loadToken"
     >
@@ -170,14 +170,21 @@
           {{ $t('revoked') }}
         </span>
       </template>
-      <template v-slot:empty="scope">
+      <template v-slot:table-busy>
+        <loading />
+      </template>
+      <template v-slot:empty>
         <div
           class="text-warning text-center"
         >
-          {{ $t('notokens') }}
+          <list-empty
+            :status="status"
+            :text-empty="$t('notokens')"
+            @reload="getTokens()"
+          />
         </div>
       </template>
-      <template v-slot:emptyfiltered="scope">
+      <template v-slot:emptyfiltered>
         <div
           class="text-warning text-center"
         >
@@ -191,10 +198,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import moment from 'moment';
+import Loading from '@/components/globals/Loading';
+import ListEmpty from '@/components/globals/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListTokens',
-  components: { },
+  components: { Loading, ListEmpty },
   props: {
     scope: {
       type: String,
@@ -235,13 +245,13 @@ export default {
           key: 'expiration_time',
           label: this.$t('expiration date'),
           sortable: true,
-          class: 'd-none d-sm-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'issued_at_time',
           label: this.$t('create date'),
           sortable: true,
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'last_used',
@@ -265,6 +275,7 @@ export default {
         actionid: '',
         action: '',
       },
+      status: -1,
     };
   },
   computed: {
@@ -285,9 +296,7 @@ export default {
   created() {
     this.loadingData = true;
     this.initRouterName();
-    this.getTokens().then(() => {
-      this.loadingData = false;
-    });
+    this.getTokens();
   },
   beforeDestroy() {
     this.$store.dispatch('initValidParamToken');
@@ -302,14 +311,29 @@ export default {
       this.$store.dispatch('setValidParamToken', !this.showInvalid);
     },
     getTokens() {
+      this.loadingData = true;
       if (this.scope === 'album' && this.albumid) {
         const queries = {
           valid: !this.showInvalid,
           album: this.albumid,
         };
-        return this.$store.dispatch('getAlbumTokens', { queries });
+        return this.$store.dispatch('getAlbumTokens', { queries }).then(() => {
+          this.loadingData = false;
+          this.status = -1;
+        }).catch((err) => {
+          this.loadingData = false;
+          this.status = httpoperations.getStatusError(err);
+          return err;
+        });
       }
-      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid });
+      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid }).then(() => {
+        this.loadingData = false;
+        this.status = -1;
+      }).catch((err) => {
+        this.loadingData = false;
+        this.status = httpoperations.getStatusError(err);
+        return err;
+      });
     },
     loadToken(item) {
       const action = 'token';

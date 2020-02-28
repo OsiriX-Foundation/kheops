@@ -49,7 +49,9 @@
     <div
       class="my-3 provider-position"
     >
-      <h4>
+      <h4
+        class="row word-break mb-3"
+      >
         <button
           type="button"
           class="btn btn-link btn-sm d-md-none"
@@ -62,9 +64,7 @@
             />
           </span>
         </button>
-        <span
-          class="breakwork"
-        >
+        <span>
           {{ provider.name }}
         </span>
       </h4>
@@ -107,7 +107,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            {{ provider.created_time }}
+            {{ provider.created_time|formatDateTimeDetails }}
           </dd>
         </div>
       </div>
