@@ -196,7 +196,6 @@ export default {
       const url = `albums/${this.albumId}/webhooks`;
       HTTP.post(url, queries).then(() => {
         this.done();
-        this.oncreate = false;
       }).catch((err) => {
         const status = httpoperations.getStatusError(err);
         if (status === 401 || status === 403) {

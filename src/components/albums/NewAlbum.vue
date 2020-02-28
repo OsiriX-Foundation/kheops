@@ -192,38 +192,12 @@
       </div>
 
       <fieldset>
-        <div class="row">
-          <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="disabledCreate"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-          <div class="col-12 mt-1 d-md-none">
-            <button
-              type="submit"
-              class="btn btn-primary btn-block"
-              :disabled="disabledCreate"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary btn-block"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-        </div>
+        <create-cancel-button
+          :disabled="disabledCreate"
+          :loading="oncreate"
+          class-col="mt-3 col-12"
+          @cancel="cancel"
+        />
       </fieldset>
     </form>
   </div>
@@ -231,9 +205,11 @@
 
 <script>
 import { HTTP } from '@/router/http';
+import CreateCancelButton from '@/components/globals/CreateCancelButton';
 
 export default {
   name: 'NewAlbum',
+  components: { CreateCancelButton },
   data() {
     return {
       album: {
@@ -327,7 +303,6 @@ export default {
             this.$router.push(`/albums/${albumCreated.album_id}`);
           }
         }
-        this.oncreate = false;
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
         this.oncreate = false;
@@ -393,6 +368,9 @@ export default {
         });
       }
       return data;
+    },
+    cancel() {
+      this.$router.push({ name: 'albums' });
     },
   },
 };

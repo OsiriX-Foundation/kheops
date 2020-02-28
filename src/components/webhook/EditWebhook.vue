@@ -253,7 +253,6 @@ export default {
       };
       this.$store.dispatch('editWebhook', params).then(() => {
         this.$emit('webhook', this.webhookId);
-        this.onedit = false;
       }).catch((err) => {
         const status = httpoperations.getStatusError(err);
         if (status === 401 || status === 403) {

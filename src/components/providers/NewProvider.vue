@@ -147,10 +147,10 @@ export default {
       this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then((res) => {
         if (res.status !== 201) {
           this.setStateProvider(false, false, true);
+          this.oncreate = false;
         } else {
           this.$emit('done');
         }
-        this.oncreate = false;
       }).catch((err) => {
         this.setStateProvider(false, false, true);
         this.oncreate = false;

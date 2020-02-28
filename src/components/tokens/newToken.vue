@@ -441,7 +441,6 @@ export default {
         this.token.access_token = res.data.access_token;
         this.sharingurl = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
         this.$refs.tokenModal.show();
-        this.oncreate = false;
       }).catch(() => {
         this.oncreate = false;
         this.$snotify.error(this.$t('sorryerror'));

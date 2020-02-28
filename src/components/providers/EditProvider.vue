@@ -185,10 +185,10 @@ export default {
       this.$store.dispatch('updateProvider', { paramsURL, query }).then((res) => {
         if (res.status !== 200) {
           this.setStateProvider(false, false, true);
+          this.onedit = false;
         } else {
           this.$emit('done');
         }
-        this.onedit = false;
       }).catch((err) => {
         this.setStateProvider(false, false, true);
         console.log(err);
