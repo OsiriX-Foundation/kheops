@@ -189,13 +189,21 @@ public class WebhookResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response triggerWebhook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                    @SuppressWarnings("RSReferenceInspection") @PathParam("webhook") String webhookId,
-                                   @FormParam("event") @NotNull String event,
+                                   @FormParam("event") String event,
                                    @FormParam(SeriesInstanceUID) List<String> seriesUID,
                                    @FormParam(StudyInstanceUID) @UIDValidator String studyUID,
                                    @FormParam("user") String user)
             throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
+
+        if (event == null) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("'event' must be set")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
 
         if ((user == null && studyUID == null) ||
                 (user != null && studyUID != null)) {
