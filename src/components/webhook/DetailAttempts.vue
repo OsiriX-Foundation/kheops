@@ -96,9 +96,7 @@
       title-class="word-break"
       body-class="bg-secondary"
       centered
-      no-fade
       hide-footer
-      no-close-on-backdrop
       size="lg"
     >
       <template v-slot:modal-title>
