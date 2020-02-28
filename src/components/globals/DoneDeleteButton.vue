@@ -9,8 +9,24 @@
 }
 </i18n>
 <template>
+  <div
+    v-if="loading"
+    class="text-center"
+  >
+    <div
+      class="row"
+      :class="classRow"
+    >
+      <div :class="classCol">
+        <clip-loader
+          :size="'40px'"
+          color="white"
+        />
+      </div>
+    </div>
+  </div>
   <span
-    v-if="show"
+    v-else-if="show"
   >
     <div
       class="row"
@@ -18,6 +34,7 @@
     >
       <div :class="classCol">
         <button
+          v-if="!loading"
           class="btn btn-primary btn-block"
           :disabled="disabledDone"
           @click="done"
@@ -75,9 +92,11 @@
 </template>
 
 <script>
+import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
 
 export default {
   name: 'DoneDeleteButton',
+  components: { ClipLoader },
   props: {
     show: {
       type: Boolean,
@@ -85,6 +104,11 @@ export default {
       default: true,
     },
     disabledDone: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    loading: {
       type: Boolean,
       required: false,
       default: false,

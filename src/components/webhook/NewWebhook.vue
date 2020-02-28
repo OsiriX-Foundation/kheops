@@ -134,6 +134,7 @@
       </div>
       <create-cancel-button
         :disabled="disabledCreate"
+        :loading="oncreate"
         class-col="offset-md-3 col-md-9"
         @cancel="done"
       />

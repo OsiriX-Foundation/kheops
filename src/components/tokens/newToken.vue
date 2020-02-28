@@ -244,6 +244,7 @@
         -->
         <create-cancel-button
           :disabled="disabledCreateToken"
+          :loading="oncreate"
           class-col="offset-md-2 col-md-10"
           @cancel="cancel"
         />

@@ -148,6 +148,7 @@
         :text-warning-remove="$t('warningremove')"
         :text-button-done="$t('confirm')"
         :disabled-done="disabledCreate"
+        :loading="onedit"
         @remove="remove"
       />
     </form>

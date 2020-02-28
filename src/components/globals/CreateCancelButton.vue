@@ -1,5 +1,22 @@
 <template>
-  <div class="row">
+  <div
+    v-if="loading"
+    class="row"
+  >
+    <div
+      :class="classCol"
+    >
+      <clip-loader
+        :size="'30px'"
+        color="white"
+        class="text-left"
+      />
+    </div>
+  </div>
+  <div
+    v-else
+    class="row"
+  >
     <div
       class="d-none d-sm-none d-md-block"
       :class="classCol"
@@ -32,11 +49,18 @@
   </div>
 </template>
 <script>
+import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
 
 export default {
   name: 'ConfirmButton',
+  components: { ClipLoader },
   props: {
     disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    loading: {
       type: Boolean,
       required: false,
       default: false,

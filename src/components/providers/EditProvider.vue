@@ -106,6 +106,7 @@
         :text-warning-remove="$t('warningremove')"
         :text-button-done="$t('edit')"
         :disabled-done="disabledCreate"
+        :loading="onedit"
         @remove="deleteProvider"
       />
     </form>
