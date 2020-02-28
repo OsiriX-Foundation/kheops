@@ -198,6 +198,7 @@ export default {
         event: [],
         enabled: false,
       },
+      onedit: false,
     };
   },
   computed: {
@@ -214,7 +215,8 @@ export default {
       return (this.modelWebhook.name === ''
       || this.modelWebhook.url === ''
       || !this.checkUrl(this.modelWebhook.url)
-      || this.modelWebhook.event.length === 0);
+      || this.modelWebhook.event.length === 0
+      || this.onedit);
     },
   },
   watch: {
@@ -242,6 +244,7 @@ export default {
       this.$emit('remove', this.webhookId);
     },
     editWebhook() {
+      this.onedit = true;
       const params = {
         queries: this.modelWebhook,
         albumId: this.albumId,
@@ -249,6 +252,7 @@ export default {
       };
       this.$store.dispatch('editWebhook', params).then(() => {
         this.$emit('webhook', this.webhookId);
+        this.onedit = false;
       }).catch((err) => {
         const status = httpoperations.getStatusError(err);
         if (status === 401 || status === 403) {
@@ -256,6 +260,7 @@ export default {
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }
+        this.onedit = false;
       });
     },
   },

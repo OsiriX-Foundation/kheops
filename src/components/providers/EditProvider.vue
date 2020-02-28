@@ -135,6 +135,7 @@ export default {
       checkedURL: false,
       loading: false,
       confirmDelete: false,
+      onedit: false,
     };
   },
   computed: {
@@ -148,7 +149,8 @@ export default {
       return (this.provider.name === ''
         || this.provider.url === ''
         || !this.checkUrl(this.provider.url))
-        || this.loading;
+        || this.loading
+        || this.onedit;
     },
   },
   created() {
@@ -169,6 +171,7 @@ export default {
   methods: {
     updateProvider() {
       this.setStateProvider(false, true, true);
+      this.onedit = true;
       const paramsURL = {
         albumID: this.albumID,
         clientID: this.clientID,
@@ -184,9 +187,11 @@ export default {
         } else {
           this.$emit('done');
         }
+        this.onedit = false;
       }).catch((err) => {
         this.setStateProvider(false, false, true);
         console.log(err);
+        this.onedit = false;
       });
     },
     setStateProvider(checkURL, loading, show) {

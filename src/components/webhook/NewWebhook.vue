@@ -172,6 +172,7 @@ export default {
         event: [],
         enabled: false,
       },
+      oncreate: false,
     };
   },
   computed: {
@@ -182,15 +183,19 @@ export default {
       return (this.webhook.name === ''
       || this.webhook.url === ''
       || !this.checkUrl(this.webhook.url)
-      || this.webhook.event.length === 0);
+      || this.webhook.event.length === 0
+      || this.oncreate
+      );
     },
   },
   methods: {
     createWebhook() {
+      this.oncreate = true;
       const queries = httpoperations.getFormData(this.webhook);
       const url = `albums/${this.albumId}/webhooks`;
       HTTP.post(url, queries).then(() => {
         this.done();
+        this.oncreate = false;
       }).catch((err) => {
         const status = httpoperations.getStatusError(err);
         if (status === 401 || status === 403) {
@@ -198,6 +203,7 @@ export default {
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }
+        this.oncreate = false;
       });
     },
     done() {

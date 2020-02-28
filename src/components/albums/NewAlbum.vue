@@ -197,7 +197,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              :disabled="!album.name"
+              :disabled="disabledCreate"
             >
               {{ $t('create') }}
             </button>
@@ -212,7 +212,7 @@
             <button
               type="submit"
               class="btn btn-primary btn-block"
-              :disabled="!album.name"
+              :disabled="disabledCreate"
             >
               {{ $t('create') }}
             </button>
@@ -258,6 +258,7 @@ export default {
       },
       newUserName: '',
       numberCol: 2,
+      oncreate: false,
     };
   },
   computed: {
@@ -269,6 +270,9 @@ export default {
     },
     downloadSeries() {
       return this.album.userSettings.downloadSeries;
+    },
+    disabledCreate() {
+      return this.album.name === '' || this.oncreate;
     },
   },
   watch: {
@@ -299,6 +303,7 @@ export default {
       }
     },
     createAlbum() {
+      this.oncreate = true;
       const formData = {
         name: this.album.name,
         description: this.album.description,
@@ -322,8 +327,10 @@ export default {
             this.$router.push(`/albums/${albumCreated.album_id}`);
           }
         }
+        this.oncreate = false;
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
+        this.oncreate = false;
       });
     },
     addAlbumUser(albumCreated) {

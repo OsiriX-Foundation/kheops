@@ -127,6 +127,7 @@ export default {
       show: false,
       loading: false,
       checkedURL: false,
+      oncreate: false,
     };
   },
   computed: {
@@ -134,20 +135,24 @@ export default {
       return (this.provider.name === ''
         || this.provider.url === ''
         || !this.checkUrl(this.provider.url))
-        || this.loading;
+        || this.loading
+        || this.oncreate;
     },
   },
   methods: {
     createProvider() {
       this.setStateProvider(false, true, true);
+      this.oncreate = true;
       this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then((res) => {
         if (res.status !== 201) {
           this.setStateProvider(false, false, true);
         } else {
           this.$emit('done');
         }
+        this.oncreate = false;
       }).catch((err) => {
         this.setStateProvider(false, false, true);
+        this.oncreate = false;
         console.log(err);
       });
     },
