@@ -110,7 +110,7 @@
         </p>
         <details-series
           v-if="trigger.event === 'new_series'"
-          class-col="col-2 col-sm-3 col-md-4 col-lg-3 col-xl-2 mb-5"
+          class-col="col-4 col-sm-3 col-md-4 col-lg-3 col-xl-2 mb-5"
           class-row="serie-section card-main mb-3"
           height="75"
           width="75"
