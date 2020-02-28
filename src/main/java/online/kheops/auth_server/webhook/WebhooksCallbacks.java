@@ -1,6 +1,7 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.entity.Webhook;
 import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
 
@@ -57,12 +58,9 @@ public class WebhooksCallbacks implements InvocationCallback<Response> {
         try {
             tx.begin();
             webhookTrigger = em.merge(webhookTrigger);
-            //LOG.log(Level.WARNING,"webhook pk "+webhookTrigger.getWebhook().getPk());
             final WebhookAttempt webhookAttempt = new WebhookAttempt(status, NUMBER_OF_RETRY_WEBHOOK - cnt, webhookTrigger);
             em.persist(webhookAttempt);
             tx.commit();
-        } catch (Exception e) {
-            LOG.log(Level.WARNING,"Error adding a webhook attempt to the DB",e);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

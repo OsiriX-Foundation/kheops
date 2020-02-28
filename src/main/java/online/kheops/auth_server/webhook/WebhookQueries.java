@@ -63,8 +63,6 @@ public class WebhookQueries {
         return em.createQuery("SELECT count(w) from Webhook w join w.album a where a = :album and w.url = :url", Long.class)
                 .setParameter("album", album)
                 .setParameter("url", url)
-
                 .getSingleResult();
     }
-
 }

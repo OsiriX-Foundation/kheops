@@ -148,6 +148,7 @@ public class FetchResource {
                     newSeriesWebhook.setReportProvider(reportProvider);
                 }
 
+                final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
                 if (study.isPopulated() && newSeriesWebhook.containSeries()) {
                     for (Webhook webhook : targetAlbum.getWebhooks()) {
                         if (webhook.getNewSeries() && webhook.isEnabled()) {
@@ -157,12 +158,15 @@ public class FetchResource {
                                 final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
                                 em.persist(webhookTriggerSeries);
                             }
-                            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                            webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
                         }
                     }
                 }
 
                 tx.commit();
+                for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                    webhookAsyncRequest.firstRequest();
+                }
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();

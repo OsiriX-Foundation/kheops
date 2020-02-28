@@ -247,6 +247,7 @@ public class Albums {
 
             final Album album = getAlbum(albumId, em);
 
+            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
             if (isMemberOfAlbum(targetUser, album, em)) {
                 try {
                     final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
@@ -281,12 +282,16 @@ public class Albums {
                         WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_USER, webhook);
                         webhookTrigger.setUser(callingUser);
                         em.persist(webhookTrigger);
-                        new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger));
+
                     }
                 }
             }
             album.updateLastEventTime();
             tx.commit();
+            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                webhookAsyncRequest.firstRequest();
+            }
             return targetUser;
         } finally {
             if (tx.isActive()) {

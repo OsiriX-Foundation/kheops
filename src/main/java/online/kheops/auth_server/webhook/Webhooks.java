@@ -295,10 +295,10 @@ public class Webhooks {
                     throw new SeriesNotFoundException(errorResponse);
                 }
             }
-            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
             final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);
             em.persist(mutation);
             tx.commit();
+            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger).firstRequest();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -322,13 +322,14 @@ public class Webhooks {
 
             final User targetUser = getOrCreateUser(user);
             final AlbumUser albumTargetUser = getAlbumUser(album, targetUser, em);
+            final NewUserWebhook newUserWebhook;
+            final WebhookTrigger webhookTrigger;
 
             if (isMemberOfAlbum(targetUser, album, em)) {
-                final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
-                final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_USER, webhook);
+                newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
+                webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_USER, webhook);
                 webhookTrigger.setUser(targetUser);
                 em.persist(webhookTrigger);
-                new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
             } else {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message("User not a member")
@@ -339,9 +340,8 @@ public class Webhooks {
 
             final Mutation mutation = Events.albumPostMutation(callingUser, album, TRIGGER_WEBHOOK);
             em.persist(mutation);
-
             tx.commit();
-
+            new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger).firstRequest();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

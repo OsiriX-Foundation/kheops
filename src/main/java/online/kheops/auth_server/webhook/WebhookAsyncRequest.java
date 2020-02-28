@@ -10,12 +10,15 @@ import javax.ws.rs.core.MediaType;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
 import static online.kheops.auth_server.util.Consts.SECONDE_BEFORE_RETRY_WEBHOOK;
 import static online.kheops.auth_server.util.HttpHeaders.*;
 
 public class WebhookAsyncRequest {
+
+    private static final Logger LOG = Logger.getLogger(WebhookAsyncRequest.class.getName());
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -30,7 +33,9 @@ public class WebhookAsyncRequest {
         this.webhookTrigger = webhookTrigger;
         this.webhook = webhook;
         this.data = data;
+    }
 
+    public void firstRequest() {
         request(NUMBER_OF_RETRY_WEBHOOK);
     }
 

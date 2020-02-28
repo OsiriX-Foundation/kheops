@@ -249,6 +249,8 @@ public class Sending {
                     .series(seriesInstanceUID)
                     .log();
 
+            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
+
             if (availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
                 for (Webhook webhook : targetAlbum.getWebhooks()) {
                     if (webhook.getNewSeries() && webhook.isEnabled()) {
@@ -256,11 +258,14 @@ public class Sending {
                         final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, availableSeries);
                         em.persist(webhookTrigger);
                         em.persist(webhookTriggerSeries);
-                        new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
                     }
                 }
             }
             tx.commit();
+            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                webhookAsyncRequest.firstRequest();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -333,6 +338,8 @@ public class Sending {
                     .study(studyInstanceUID)
                     .log();
 
+            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
+
             if(newSeriesWebhook.containSeries()) {
                 for (Webhook webhook : targetAlbum.getWebhooks()) {
                     if (webhook.getNewSeries() && webhook.isEnabled()) {
@@ -342,11 +349,14 @@ public class Sending {
                             final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
                             em.persist(webhookTriggerSeries);
                         }
-                        new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
                     }
                 }
             }
             tx.commit();
+            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                webhookAsyncRequest.firstRequest();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
