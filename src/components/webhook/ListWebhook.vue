@@ -57,11 +57,7 @@
       @row-clicked="rowSelectedWebhook"
     >
       <template v-slot:table-busy>
-        <div class="text-center text-danger my-2">
-          <pulse-loader
-            color="white"
-          />
-        </div>
+        <loading />
       </template>
       <template v-slot:empty>
         <div
@@ -115,14 +111,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import httpoperations from '@/mixins/httpoperations';
 import StateIcons from '@/components/globals/StateIcons';
 import ListEmpty from '@/components/globals/ListEmpty';
+import Loading from '@/components/globals/Loading';
 
 export default {
   name: 'ListTokens',
-  components: { ListEmpty, PulseLoader, StateIcons },
+  components: { ListEmpty, StateIcons, Loading },
   props: {
     albumId: {
       type: String,

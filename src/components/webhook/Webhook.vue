@@ -81,6 +81,9 @@
           :triggers="webhook.triggers"
           :per-page="limit"
           :rows="webhook.number_of_triggers"
+          :loading="loading"
+          @manualtrigger="getWebhook()"
+          @refresh="getWebhook()"
         />
       </div>
     </div>
@@ -146,11 +149,15 @@ export default {
       this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
     },
     getWebhook() {
+      this.loading = true;
       const params = {
         albumId: this.albumId,
         webhookId: this.webhookId,
       };
-      return this.$store.dispatch('getWebhook', params).catch((err) => {
+      return this.$store.dispatch('getWebhook', params).then(() => {
+        this.loading = false;
+      }).catch((err) => {
+        this.loading = false;
         this.manageError(err);
         this.done();
       });

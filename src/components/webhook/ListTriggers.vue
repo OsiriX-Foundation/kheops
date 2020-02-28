@@ -7,7 +7,8 @@
     "date": "Date",
     "event": "Event",
     "deliveries": "Recent attempts",
-    "noattempts": "There are no attempts to show"
+    "noattempts": "There are no attempts to show",
+    "refresh": "Refresh"
   },
   "fr": {
     "new_series": "nouvelles série",
@@ -16,7 +17,8 @@
     "date": "Date",
     "event": "Evènement",
     "deliveries": "Tentatives récentes",
-    "noattempts": "Il n'y aucune tentative faîte"
+    "noattempts": "Il n'y aucune tentative faîte",
+    "refresh": "Rafraîchir"
   }
 }
 </i18n>
@@ -25,10 +27,16 @@
     <div
       class="my-3"
     >
-      <div>
+      <div class="d-flex mb-2">
         <h4>
           {{ $t('deliveries') }}
         </h4>
+        <button
+          class="ml-auto btn btn-sm btn-primary"
+          @click="refresh()"
+        >
+          {{ $t('refresh') }}
+        </button>
       </div>
     </div>
     <b-table
@@ -42,6 +50,7 @@
       :sort-desc="true"
       :per-page="perPage"
       :current-page="currentPage"
+      :busy="loading"
       tbody-tr-class="link"
       @row-clicked="showRowDetails"
     >
@@ -64,6 +73,7 @@
         >
           <detail-attempts
             :trigger="row.item"
+            @manualtrigger="manualtrigger"
           />
         </b-card>
       </template>
@@ -87,6 +97,9 @@
           {{ $t('noattempts') }}
         </div>
       </template>
+      <template v-slot:table-busy>
+        <loading />
+      </template>
     </b-table>
     <div
       class="my-3 d-flex flex-wrap"
@@ -107,10 +120,11 @@
 
 <script>
 import DetailAttempts from '@/components/webhook/DetailAttempts';
+import Loading from '@/components/globals/Loading';
 
 export default {
   name: 'ListTriggers',
-  components: { DetailAttempts },
+  components: { DetailAttempts, Loading },
   props: {
     triggers: {
       type: Array,
@@ -126,6 +140,11 @@ export default {
       type: Number,
       required: true,
       default: 1,
+    },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -190,6 +209,12 @@ export default {
     },
     changePage(page) {
       this.$emit('change', page);
+    },
+    manualtrigger() {
+      this.$emit('manualtrigger');
+    },
+    refresh() {
+      this.$emit('refresh');
     },
   },
 };
