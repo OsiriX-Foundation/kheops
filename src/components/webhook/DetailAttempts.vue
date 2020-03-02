@@ -10,15 +10,7 @@
     "date": "Date",
     "-1": "An error occur",
     "redeliver": "Redeliver",
-    "studies": "Study",
-    "informationtrigger": "The below series will be delivered to {url} using the current webhook configuraton.",
-    "informationtriggeruser": "The below user will be delivered to {url} using the current webhook configuraton.",
-    "mail": "Mail",
-    "lastname": "Last name",
-    "firstname": "First name",
-    "sub": "Sub",
-    "errortrigger": "You can't redeliver this trigger.",
-    "errorseries": "Please verifiy if you have always access at the studies or the series. The following series occures an error :"
+    "studies": "Study"
   },
   "fr": {
     "new_series": "nouvelles série",
@@ -30,13 +22,7 @@
     "date": "Date",
     "-1": "Une erreur est survenue",
     "redeliver": "Redéclencher",
-    "studies": "Etude",
-    "informationtrigger": "Les séries ci-dessous seront livrées à {url} en utilisant la configuration actuelle.",
-    "informationtriggeruser": "L'utilisateur ci-dessous sera livré à {url} en utilisant la configuration actuelle.",
-    "mail": "Email",
-    "lastname": "Nom de famille",
-    "firstname": "Prénom",
-    "sub": "Sub"
+    "studies": "Etude"
   }
 }
 </i18n>
