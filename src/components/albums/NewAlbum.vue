@@ -63,6 +63,7 @@
                 class="form-control"
                 maxlength="255"
               >
+              <field-obligatory :state="album.name !== ''" />
             </dd>
           </div>
         </div>
@@ -206,10 +207,11 @@
 <script>
 import { HTTP } from '@/router/http';
 import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
+import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
   name: 'NewAlbum',
-  components: { CreateCancelButton },
+  components: { CreateCancelButton, FieldObligatory },
   data() {
     return {
       album: {
