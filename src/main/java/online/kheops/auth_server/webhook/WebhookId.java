@@ -1,9 +1,9 @@
 package online.kheops.auth_server.webhook;
 
+import javax.persistence.EntityManager;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import static online.kheops.auth_server.album.Albums.albumExist;
 import static online.kheops.auth_server.webhook.Webhooks.webhookExist;
 
 public class WebhookId {
@@ -15,7 +15,7 @@ public class WebhookId {
     public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
     private static final Random rdm = new SecureRandom();
 
-    public WebhookId() {
+    public WebhookId(EntityManager em) {
         StringBuilder idBuilder = new StringBuilder();
 
         do {
@@ -24,7 +24,7 @@ public class WebhookId {
                 int index = rdm.nextInt(DICT.length());
                 idBuilder.append(DICT.charAt(index));
             }
-        } while (webhookExist(idBuilder.toString()));
+        } while (webhookExist(idBuilder.toString(), em));
         id = idBuilder.toString();
     }
 

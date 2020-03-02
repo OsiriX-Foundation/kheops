@@ -2,6 +2,7 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Webhook;
+import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -19,6 +20,18 @@ public class WebhookQueries {
         try {
             return em.createQuery("SELECT w from Webhook w where :webhookId = w.id", Webhook.class)
                     .setParameter("webhookId", webhookID)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new WebhookNotFoundException();
+        }
+    }
+
+    public static WebhookTrigger findWebhookTriggerById(String webhookTriggerID, EntityManager em)
+            throws WebhookNotFoundException {
+
+        try {
+            return em.createQuery("SELECT w from WebhookTrigger w where :webhookTriggerId = w.id", WebhookTrigger.class)
+                    .setParameter("webhookTriggerId", webhookTriggerID)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new WebhookNotFoundException();

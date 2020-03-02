@@ -8,10 +8,7 @@ import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import online.kheops.auth_server.webhook.NewUserWebhook;
-import online.kheops.auth_server.webhook.WebhookAsyncRequest;
-import online.kheops.auth_server.webhook.WebhookQueries;
-import online.kheops.auth_server.webhook.WebhookType;
+import online.kheops.auth_server.webhook.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -279,7 +276,7 @@ public class Albums {
                 final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                 for (Webhook webhook : album.getWebhooks()) {
                     if (webhook.getNewUser() && webhook.isEnabled()) {
-                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_USER, webhook);
+                        WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_USER, webhook);
                         webhookTrigger.setUser(targetUser);
                         em.persist(webhookTrigger);
                         webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger));

@@ -34,6 +34,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARA
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.KheopsLogBuilder.ActionType.*;
 import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookById;
+import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookTriggerById;
 
 public class Webhooks {
 
@@ -54,7 +55,7 @@ public class Webhooks {
             callingUser = em.merge(callingUser);
 
             final Album album = getAlbum(webhookPostParameters.getAlbumId(), em);
-            final Webhook newWebhook = new Webhook(webhookPostParameters, album, callingUser);
+            final Webhook newWebhook = new Webhook(webhookPostParameters, new WebhookId(em).getId(), album, callingUser);
 
             em.persist(newWebhook);
 
@@ -278,7 +279,7 @@ public class Webhooks {
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
             final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
             final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, albumCallingUser, context.getInitParameter(HOST_ROOT_PARAMETER), true);
-            final WebhookTrigger webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_SERIES, webhook);
+            final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), true, WebhookType.NEW_SERIES, webhook);
             em.persist(webhookTrigger);
 
             for (String seriesUID : seriesInstanceUID) {
@@ -327,7 +328,7 @@ public class Webhooks {
 
             if (isMemberOfAlbum(targetUser, album, em)) {
                 newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, albumTargetUser, context.getInitParameter(HOST_ROOT_PARAMETER),true);
-                webhookTrigger = new WebhookTrigger(true, WebhookType.NEW_USER, webhook);
+                webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), true, WebhookType.NEW_USER, webhook);
                 webhookTrigger.setUser(targetUser);
                 em.persist(webhookTrigger);
             } else {
@@ -351,10 +352,20 @@ public class Webhooks {
     }
 
 
-    public static boolean webhookExist(String webhookId) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
+    public static boolean webhookExist(String webhookId, EntityManager em) {
         try {
             findWebhookById(webhookId, em);
+        } catch (WebhookNotFoundException e) {
+            return false;
+        } finally {
+            em.close();
+        }
+        return true;
+    }
+
+    public static boolean webhookTriggerExist(String webhookTriggerId, EntityManager em) {
+        try {
+            findWebhookTriggerById(webhookTriggerId, em);
         } catch (WebhookNotFoundException e) {
             return false;
         } finally {

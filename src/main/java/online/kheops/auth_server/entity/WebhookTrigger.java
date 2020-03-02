@@ -74,11 +74,6 @@ public class WebhookTrigger {
 
     public User getUser() {return user; }
 
-    public WebhookTrigger(boolean isManualTrigger, WebhookType type, Webhook webhook) {
-        this(new WebhookRequestId().getRequestId(), isManualTrigger, type, webhook);
-    }
-
-
     public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
 
     public Boolean isManualTrigger() { return isManualTrigger; }
