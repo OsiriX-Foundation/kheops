@@ -3,7 +3,7 @@
   "en": {
     "newwebhook": "New webhook",
     "namewebhook": "Name of the webhook",
-    "urlwebhook": "Configuration URL of the webhook",
+    "urlwebhook": "Payload URL",
     "secret": "Secret",
     "event": "Event",
     "enabled": "Enabled the webhook",
@@ -112,7 +112,6 @@
             id="events"
             v-model="webhook.event"
             :options="eventsDefined"
-            :state="state"
             stacked
           >
             <field-obligatory
@@ -171,7 +170,7 @@ export default {
         name: '',
         secret: '',
         event: [],
-        enabled: false,
+        enabled: true,
       },
       oncreate: false,
     };
