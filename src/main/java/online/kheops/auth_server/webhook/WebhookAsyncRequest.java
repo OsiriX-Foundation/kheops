@@ -36,7 +36,7 @@ public class WebhookAsyncRequest {
     }
 
     public void firstRequest() {
-        request(NUMBER_OF_RETRY_WEBHOOK);
+        SCHEDULER.schedule(()->request(NUMBER_OF_RETRY_WEBHOOK),5, TimeUnit.SECONDS);
     }
 
     public void retry(int cnt) {
