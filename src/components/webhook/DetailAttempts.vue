@@ -16,7 +16,9 @@
     "mail": "Mail",
     "lastname": "Last name",
     "firstname": "First name",
-    "sub": "Sub"
+    "sub": "Sub",
+    "errortrigger": "You can't redeliver this trigger.",
+    "errorseries": "Please verifiy if you have always access at the studies or the series. The following series occures an error :"
   },
   "fr": {
     "new_series": "nouvelles série",
@@ -40,6 +42,11 @@
 </i18n>
 <template>
   <span>
+    <p
+      v-if="trigger.is_manual_trigger === true"
+    >
+      {{ $t('manualtrigger') }}
+    </p>
     <div class="d-flex mb-2">
       <div
         class="word-break"
@@ -73,11 +80,6 @@
         </button>
       </div>
     </div>
-    <p
-      v-if="trigger.is_manual_trigger === true"
-    >
-      {{ $t('manualtrigger') }}
-    </p>
     <span
       class="d-flex flex-wrap flex-row bd-highlight mb-3"
     >
@@ -103,50 +105,36 @@
       size="lg"
     >
       <template v-slot:modal-title>
+        <span
+          v-if="errorTrigger === true"
+          class="mr-2"
+        >
+          <state-icons
+            :done="false"
+            :error="false"
+            :warning="errorTrigger === true"
+          />
+        </span>
         {{ $t('manualtrigger') }}
       </template>
-      <span
+      <trigger-serie
         v-if="trigger.event === 'new_series'"
-      >
-        <p
-          class="word-break"
-        >
-          {{ $t('informationtrigger', { url: webhook.url }) }}
-        </p>
-        <details-series
-          v-if="trigger.event === 'new_series'"
-          class-col="col-4 col-sm-3 col-md-4 col-lg-3 col-xl-2 mb-5"
-          class-row="serie-section card-main mb-3"
-          height="75"
-          width="75"
-          :serie-uids="seriesUIDS"
-          :study-uid="trigger.study.study_uid"
-          :source="source"
-        />
-      </span>
-      <span
+        :trigger="trigger"
+        :url="webhook.url"
+        @missingseries="missingSeries"
+      />
+      <trigger-user
         v-if="trigger.event === 'new_user'"
-      >
-        <p
-          class="word-break"
-        >
-          {{ $t('informationtriggeruser', { url: webhook.url }) }}
-        </p>
-        <ul
-          v-if="trigger.user !== undefined"
-        >
-          <li v-if="trigger.user.email !== undefined">{{ $t('mail') }} : {{ trigger.user.email }}</li>
-          <li v-if="trigger.user.last_name !== undefined">{{ $t('lastname') }} : {{ trigger.user.last_name }}</li>
-          <li v-if="trigger.user.first_name !== undefined">{{ $t('firstname') }} : {{ trigger.user.first_name }}</li>
-          <li v-if="trigger.user.sub !== undefined">{{ $t('sub') }} : {{ trigger.user.sub }}</li>
-        </ul>
-      </span>
+        :trigger="trigger"
+        :url="webhook.url"
+        @missinguser="errorTrigger = true"
+      />
       <div
         class="text-center"
       >
         <button
           class="btn btn-primary "
-          :disabled="disabledTrigger"
+          :disabled="disabledTrigger || errorTrigger"
           @click="triggerWebhook"
         >
           {{ $t('redeliver') }}
@@ -159,12 +147,14 @@
 <script>
 import { mapGetters } from 'vuex';
 import httpoperations from '@/mixins/httpoperations';
-import DetailsSeries from '@/components/series/DetailsSeries';
+import TriggerSerie from '@/components/webhook/TriggerSerie';
+import TriggerUser from '@/components/webhook/TriggerUser';
+import StateIcons from '@/components/globals/StateIcons';
 import { HTTP } from '@/router/http';
 
 export default {
   name: 'DetailAttempts',
-  components: { DetailsSeries },
+  components: { TriggerSerie, TriggerUser, StateIcons },
   props: {
     trigger: {
       type: Object,
@@ -175,6 +165,7 @@ export default {
   data() {
     return {
       disabledTrigger: false,
+      errorTrigger: false,
     };
   },
   computed: {
@@ -186,18 +177,6 @@ export default {
     },
     webhookId() {
       return this.$route.params.id;
-    },
-    source() {
-      return {
-        key: 'album',
-        value: this.$route.params.album_id,
-      };
-    },
-    seriesUIDS() {
-      if (this.trigger.event === 'new_series' && this.trigger.study !== undefined && this.trigger.study.series !== undefined) {
-        return this.trigger.study.series.map((serie) => serie.series_uid);
-      }
-      return [];
     },
   },
   created() {
@@ -245,6 +224,9 @@ export default {
         user: user.email !== undefined && user.email !== '' ? user.email : user.sub,
       };
       return formData;
+    },
+    missingSeries() {
+      this.errorTrigger = true;
     },
   },
 };
