@@ -457,9 +457,9 @@ import ListHeaders from '@/components/studieslist/ListHeaders';
 import ListIcons from '@/components/studieslist/ListIcons';
 import ListItemDetails from '@/components/studieslist/ListItemDetails.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
-import SortList from '@/components/globals/SortList.vue';
+import SortList from '@/components/globallist/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {

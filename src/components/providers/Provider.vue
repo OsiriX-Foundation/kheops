@@ -255,7 +255,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 
 export default {
   name: 'Provider',

@@ -98,9 +98,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 import StateProvider from '@/components/providers/StateProvider';
-import ListEmpty from '@/components/globals/ListEmpty';
+import ListEmpty from '@/components/globallist/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {

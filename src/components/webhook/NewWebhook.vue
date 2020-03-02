@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import { HTTP } from '@/router/http';
 import httpoperations from '@/mixins/httpoperations';
 import FieldObligatory from '@/components/globals/FieldObligatory';

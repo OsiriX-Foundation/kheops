@@ -337,7 +337,7 @@
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
 import { mapGetters } from 'vuex';
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {

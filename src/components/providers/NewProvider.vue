@@ -105,7 +105,7 @@
 <script>
 import StateProvider from '@/components/providers/StateProvider';
 import FieldObligatory from '@/components/globals/FieldObligatory';
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import { validator } from '@/mixins/validator.js';
 
 export default {

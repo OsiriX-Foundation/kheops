@@ -205,7 +205,7 @@
 
 <script>
 import { HTTP } from '@/router/http';
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 
 export default {
   name: 'NewAlbum',

@@ -207,9 +207,9 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import moment from 'moment';
-import Loading from '@/components/globals/Loading';
-import ClipLoader from '@/components/globalsloading/ClipLoader';
-import ListEmpty from '@/components/globals/ListEmpty';
+import Loading from '@/components/globalloading/Loading';
+import ClipLoader from '@/components/globalloading/ClipLoader';
+import ListEmpty from '@/components/globallist/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {

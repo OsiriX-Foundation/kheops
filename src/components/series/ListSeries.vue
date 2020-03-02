@@ -56,7 +56,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import SeriesSummary from '@/components/series/SeriesSummary';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'ListSeries',

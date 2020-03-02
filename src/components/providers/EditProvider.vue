@@ -113,7 +113,7 @@
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
 import FieldObligatory from '@/components/globals/FieldObligatory';
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 import { validator } from '@/mixins/validator.js';
 
 export default {

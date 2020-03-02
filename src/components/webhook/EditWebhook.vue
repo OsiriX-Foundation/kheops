@@ -153,7 +153,7 @@
 </template>
 
 <script>
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 import httpoperations from '@/mixins/httpoperations';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 import { validator } from '@/mixins/validator.js';

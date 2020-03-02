@@ -31,7 +31,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import DetailSerie from '@/components/series/DetailsSerie';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'DetailSeries',

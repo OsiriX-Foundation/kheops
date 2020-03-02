@@ -120,7 +120,7 @@
 
 <script>
 import DetailAttempts from '@/components/webhook/DetailAttempts';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'ListTriggers',

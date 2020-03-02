@@ -296,9 +296,9 @@ import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
 import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
-import SortList from '@/components/globals/SortList.vue';
+import SortList from '@/components/globallist/SortList.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'Albums',

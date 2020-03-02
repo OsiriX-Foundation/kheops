@@ -424,7 +424,7 @@
 import { mapGetters } from 'vuex';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'CommentsAndNotifications',
