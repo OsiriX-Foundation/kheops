@@ -357,8 +357,6 @@ public class Webhooks {
             findWebhookById(webhookId, em);
         } catch (WebhookNotFoundException e) {
             return false;
-        } finally {
-            em.close();
         }
         return true;
     }
@@ -368,8 +366,6 @@ public class Webhooks {
             findWebhookTriggerById(webhookTriggerId, em);
         } catch (WebhookNotFoundException e) {
             return false;
-        } finally {
-            em.close();
         }
         return true;
     }
