@@ -1,16 +1,18 @@
 <i18n>
 {
   "en": {
-    "remove": "Remove"
+    "remove": "Remove",
+    "confirm": "Confirm"
   },
   "fr": {
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "confirm": "Confirmer"
   }
 }
 </i18n>
 <template>
   <div
-    v-if="loading"
+    v-if="loading === true"
     class="text-center"
   >
     <div
@@ -26,7 +28,7 @@
     </div>
   </div>
   <span
-    v-else-if="show"
+    v-else-if="show && loading === false"
   >
     <div
       class="row"
@@ -34,60 +36,62 @@
     >
       <div :class="classCol">
         <button
-          v-if="!loading"
+          v-if="!loading && showDone === true"
           class="btn btn-primary btn-block"
           :disabled="disabledDone"
           @click="done"
         >
-          {{ textButtonDone }}
+          {{ textButtonDone === '' ? $t('confirm') : textButtonDone }}
         </button>
         <button
-          v-if="!confirmDelete"
+          v-if="!confirmDelete && showDelete === true"
           type="button"
           class="btn btn-danger btn-block"
           @click="confirmDelete = true"
         >
-          {{ $t('remove') }}
+          {{ textButtonRemove === '' ? $t('remove') : textButtonRemove }}
         </button>
       </div>
     </div>
-    <div
-      v-if="confirmDelete"
-      class="row"
-      :class="classRow"
+    <span
+      v-if="confirmDelete === true && showDelete === true"
     >
-      <div :class="classColWarningRemove !== '' ? classColWarningRemove : classCol">
-        <p
-          class="mt-2"
-        >
-          {{ textWarningRemove }}
-        </p>
+      <div
+        class="row"
+        :class="classRow"
+      >
+        <div :class="classColWarningRemove !== '' ? classColWarningRemove : classCol">
+          <p
+            class="mt-2"
+          >
+            {{ textWarningRemove }}
+          </p>
+        </div>
       </div>
-    </div>
-    <div
-      v-if="confirmDelete"
-      class="row"
-      :class="classRow"
-    >
-      <div :class="classCol">
-        <button
-          v-if="confirmDelete"
-          type="button"
-          class="btn btn-danger btn-block"
-          @click="remove"
-        >
-          {{ $t('confirm') }}
-        </button>
-        <button
-          v-if="confirmDelete"
-          type="button"
-          class="btn btn-secondary btn-block"
-          @click="confirmDelete = false"
-        >
-          {{ $t('cancel') }}
-        </button>
+      <div
+        class="row"
+        :class="classRow"
+      >
+        <div :class="classCol">
+          <button
+            v-if="confirmDelete"
+            type="button"
+            class="btn btn-danger btn-block"
+            @click="remove"
+          >
+            {{ $t('confirm') }}
+          </button>
+          <button
+            v-if="confirmDelete"
+            type="button"
+            class="btn btn-secondary btn-block"
+            @click="confirmDelete = false"
+          >
+            {{ $t('cancel') }}
+          </button>
+        </div>
       </div>
-    </div>
+    </span>
   </span>
 </template>
 
@@ -99,6 +103,16 @@ export default {
   components: { ClipLoader },
   props: {
     show: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showDelete: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showDone: {
       type: Boolean,
       required: false,
       default: true,
@@ -135,7 +149,12 @@ export default {
     },
     textButtonDone: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
+    },
+    textButtonRemove: {
+      type: String,
+      required: false,
       default: '',
     },
   },

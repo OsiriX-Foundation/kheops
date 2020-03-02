@@ -53,6 +53,7 @@
         <webhook-details
           :album-id="albumId"
           :webhook="webhook"
+          :on-loading="onLoading"
           class-col-right="col-xs-12 col-sm-12 col-md-5 col-lg-4"
           class-col-left="col-xs-12 col-sm-12 col-md-7 col-lg-8"
           @done="done"
@@ -67,6 +68,7 @@
         <edit-webhook
           :album-id="albumId"
           :webhook="webhook"
+          :on-loading="onLoading"
           class-col-right="col-xs-12 col-sm-12 col-md-5 col-lg-4"
           class-col-left="col-xs-12 col-sm-12 col-md-7 col-lg-8"
           @done="done"
@@ -114,6 +116,7 @@ export default {
       loading: true,
       limit: 10,
       offset: 0,
+      onLoading: false,
     };
   },
   computed: {
@@ -163,6 +166,7 @@ export default {
       });
     },
     removeWebhook(webhookId) {
+      this.onLoading = true;
       const params = {
         albumId: this.albumId,
         webhookId,
@@ -170,6 +174,7 @@ export default {
       this.$store.dispatch('removeWebhook', params).then(() => {
         this.done();
       }).catch((err) => {
+        this.onLoading = false;
         this.manageError(err);
       });
     },

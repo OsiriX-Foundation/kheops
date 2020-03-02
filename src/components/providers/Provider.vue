@@ -245,6 +245,7 @@
       class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
       :text-warning-remove="$t('warningremove')"
       :text-button-done="$t('edit')"
+      :loading="onloading"
       @done="edit"
       @remove="deleteProvider"
     />
@@ -274,6 +275,7 @@ export default {
   data() {
     return {
       confirmDelete: false,
+      onloading: false,
     };
   },
   computed: {
@@ -307,13 +309,16 @@ export default {
       this.$emit('providerselectededit', this.clientID);
     },
     deleteProvider() {
+      this.onloading = true;
       this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
         if (res.status !== 204) {
+          this.onloading = false;
           this.$snotify.error('Sorry, an error occured');
         } else {
           this.$emit('done');
         }
       }).catch((err) => {
+        this.onloading = false;
         console.log(err);
       });
     },
