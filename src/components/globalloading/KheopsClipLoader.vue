@@ -22,7 +22,7 @@
 import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
 
 export default {
-  name: 'DoneDeleteButton',
+  name: 'KheopsClipLoader',
   components: { ClipLoader },
   props: {
     loading: {

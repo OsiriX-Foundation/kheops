@@ -166,7 +166,7 @@
           >
             {{ $t('revoke') }}
           </button>
-          <clip-loader
+          <kheops-clip-loader
             v-else
             :loading="onloading[data.item.id]"
           />
@@ -208,13 +208,13 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import moment from 'moment';
 import Loading from '@/components/globalloading/Loading';
-import ClipLoader from '@/components/globalloading/ClipLoader';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import ListEmpty from '@/components/globallist/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListTokens',
-  components: { Loading, ListEmpty, ClipLoader },
+  components: { Loading, ListEmpty, KheopsClipLoader },
   props: {
     scope: {
       type: String,
