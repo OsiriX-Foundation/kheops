@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesBySeriesUID;
 import static online.kheops.auth_server.util.Consts.INCLUDE_FIELD;
 
 public abstract class Fetcher {
@@ -72,7 +73,8 @@ public abstract class Fetcher {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
             return;
         }
-
+        
+        final List<String> seriesUIDList;
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         try {
@@ -80,13 +82,13 @@ public abstract class Fetcher {
 
             final TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID", String.class);
             query.setParameter("studyInstanceUID", studyInstanceUID);
-            query.getResultList().forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID));
+            seriesUIDList = query.getResultList();
 
             TypedQuery<Study> queryStudy = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
             queryStudy.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+            final Study study = queryStudy.getSingleResult();
 
-            Study study = queryStudy.getSingleResult();
             study.mergeAttributes(attributes);
             study.setPopulated(true);
 
@@ -97,6 +99,8 @@ public abstract class Fetcher {
             }
             em.close();
         }
+
+        seriesUIDList.forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID));
     }
 
     private static void fetchSeries(String studyUID, String seriesUID) {
@@ -128,11 +132,7 @@ public abstract class Fetcher {
         try {
             tx.begin();
 
-            TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :seriesInstanceUID", Series.class);
-            query.setParameter("seriesInstanceUID", seriesUID);
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-
-            Series series = query.getSingleResult();
+            final Series series = findSeriesBySeriesUID(seriesUID, em);
             series.mergeAttributes(attributes);
             series.setPopulated(true);
 
