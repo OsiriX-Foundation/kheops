@@ -57,8 +57,8 @@
         />{{ $t('add_user') }}
       </button>
       <form
-        v-if="form_add_user"
-        @submit.prevent="addUser"
+        v-if="form_add_user && onloading === false"
+        @submit.prevent="addUser() && onloading !== true"
       >
         <div class="input-group">
           <div>
@@ -90,6 +90,13 @@
           </div>
         </div>
       </form>
+      <div
+        v-if="onloading === true"
+      >
+        <kheops-clip-loader
+          size="30px"
+        />
+      </div>
     </h3>
 
     <album-users
@@ -163,10 +170,11 @@
 <script>
 import { mapGetters } from 'vuex';
 import AlbumUsers from '@/components/albumsettings/AlbumUsers';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'AlbumSettingsUser',
-  components: { AlbumUsers },
+  components: { AlbumUsers, KheopsClipLoader },
   props: {
     album: {
       type: Object,
@@ -195,6 +203,7 @@ export default {
         write_comments: 'writeComments',
       },
       numberCol: 2,
+      onloading: false,
     };
   },
   computed: {
@@ -211,6 +220,7 @@ export default {
       if (sameUserName.length > 0) {
         this.$snotify.error(this.$t('allreadypresent'));
       } else if (this.validEmail(this.new_user_name)) {
+        this.onloading = true;
         const params = {
           album_id: this.album.album_id,
           user: this.new_user_name,
@@ -223,8 +233,10 @@ export default {
           } else {
             this.$snotify.error(this.$t('sorryerror'));
           }
+          this.onloading = false;
         }).catch((err) => {
           this.$snotify.error(this.$t('sorryerror'));
+          this.onloading = false;
           return err;
         });
       }
