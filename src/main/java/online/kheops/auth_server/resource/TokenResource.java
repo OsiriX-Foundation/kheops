@@ -190,7 +190,7 @@ public class TokenResource
             return Response.status(OK).entity(introspectResponse.toJson()).build();
         } else {
             LOG.log(WARNING, "Public or Report Provider attempting to introspect a valid non-report provider token");
-            return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
+            return Response.status(UNAUTHORIZED).build();
         }
     }
 }
