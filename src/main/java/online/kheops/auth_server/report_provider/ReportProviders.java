@@ -47,7 +47,7 @@ public class ReportProviders {
             tx.begin();
 
             final Album album = getAlbum(albumId, em);
-            reportProvider = new ReportProvider(url, name, album);
+            reportProvider = new ReportProvider(url, name, album, new ClientId(em).getClientId());
 
             callingUser = em.merge(callingUser);
             final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.CREATE_REPORT_PROVIDER);

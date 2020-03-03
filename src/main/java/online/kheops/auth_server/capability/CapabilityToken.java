@@ -1,5 +1,6 @@
 package online.kheops.auth_server.capability;
 
+import javax.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,14 +22,14 @@ public class CapabilityToken {
 
     private static final Random rdm = new SecureRandom();
 
-    public CapabilityToken() {
+    public CapabilityToken(EntityManager em) {
         final StringBuilder secretBuilder = new StringBuilder();
         do {
             while (secretBuilder.length() < TOKEN_LENGTH) {
                 int index = rdm.nextInt(TOKEN_DICT.length());
                 secretBuilder.append(TOKEN_DICT.charAt(index));
             }
-        } while (capabilitySecretExist(secretBuilder.toString()));
+        } while (capabilitySecretExist(hashCapability(secretBuilder.toString()), em));
         token = secretBuilder.toString();
     }
 

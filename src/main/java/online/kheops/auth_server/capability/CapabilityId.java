@@ -1,5 +1,6 @@
 package online.kheops.auth_server.capability;
 
+import javax.persistence.EntityManager;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -15,7 +16,7 @@ public class CapabilityId {
 
     private static final Random rdm = new SecureRandom();
 
-    public CapabilityId() {
+    public CapabilityId(EntityManager em) {
         final StringBuilder idBuilder = new StringBuilder();
 
         do {
@@ -24,7 +25,7 @@ public class CapabilityId {
                 int index = rdm.nextInt(ID_DICT.length());
                 idBuilder.append(ID_DICT.charAt(index));
             }
-        } while (capabilityIDExist(idBuilder.toString()));
+        } while (capabilityIDExist(idBuilder.toString(), em));
         id = idBuilder.toString();
     }
 

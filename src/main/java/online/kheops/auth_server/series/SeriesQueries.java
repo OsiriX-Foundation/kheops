@@ -133,6 +133,22 @@ public class SeriesQueries {
         }
     }
 
+    public static Series findSeriesBySeriesUID(String seriesInstanceUID, EntityManager em)
+            throws SeriesNotFoundException {
+
+        try {
+            TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(SERIES_NOT_FOUND)
+                    .detail("The series does not exist or you don't have access")
+                    .build();
+            throw new SeriesNotFoundException(errorResponse);
+        }
+    }
+
     public static Series findSeriesBySeriesAndAlbumWithSendPermission(User callingUser, Series series, EntityManager em)
             throws SeriesNotFoundException {
 

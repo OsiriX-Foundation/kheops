@@ -1,6 +1,7 @@
 package online.kheops.auth_server.user;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
@@ -101,6 +102,7 @@ public class Users {
             newUser = new User(userReference);
             final Album inbox = new Album();
             inbox.setName("inbox");
+            inbox.setId(new AlbumId(em).getId());
             newUser.setInbox(inbox);
             final UsersPermission usersPermission = new UsersPermission();
             usersPermission.setInboxPermission();

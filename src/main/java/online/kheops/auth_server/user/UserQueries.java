@@ -14,7 +14,6 @@ public class UserQueries {
 
     public static User findUserByUserId(String userId, EntityManager em) throws UserNotFoundException{
         try {
-
             TypedQuery<User> query = em.createQuery("SELECT u from User u where u.keycloakId = :userId", User.class);
             query.setParameter("userId", userId);
             return query.getSingleResult();

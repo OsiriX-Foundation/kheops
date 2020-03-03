@@ -277,8 +277,8 @@ public class Sending {
 
     public static void putStudyInAlbum(ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
-        EntityManager em = EntityManagerListener.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
             tx.begin();
@@ -597,7 +597,7 @@ public class Sending {
             throws AlbumNotFoundException, StudyNotFoundException {
         Set<String> availableSeriesUIDs;
 
-        EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
             callingUser = em.merge(callingUser);

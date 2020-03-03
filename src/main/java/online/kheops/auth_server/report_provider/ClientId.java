@@ -1,7 +1,5 @@
 package online.kheops.auth_server.report_provider;
 
-import online.kheops.auth_server.EntityManagerListener;
-
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
@@ -20,29 +18,24 @@ public class ClientId {
 
     private static final Random rdm = new SecureRandom();
 
-    public ClientId() {
+    public ClientId(EntityManager em) {
         final StringBuilder secretBuilder = new StringBuilder();
         do {
             while (secretBuilder.length() < CLIENT_ID_LENGTH) {
                 int index = rdm.nextInt(CLIENT_ID_DICT.length());
                 secretBuilder.append(CLIENT_ID_DICT.charAt(index));
             }
-        } while (clientIdExist(secretBuilder.toString()));
+        } while (clientIdExist(secretBuilder.toString(), em));
         id = secretBuilder.toString();
     }
 
-
-    private static boolean clientIdExist(String clientId) {
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
+    private static boolean clientIdExist(String clientId, EntityManager em) {
 
         try {
             getReportProviderWithClientId(clientId, em);
             return true;
         } catch (NoResultException e) {
             return false;
-        } finally {
-            em.close();
         }
     }
 
