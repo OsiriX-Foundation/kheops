@@ -61,7 +61,7 @@
           v-if="sending === true && UI.getInfo === false"
           class="p-2"
         >
-          <clip-loader
+          <kheops-clip-loader
             :loading="sending"
             :size="'20px'"
             :color="'white'"
@@ -221,7 +221,7 @@
           <div
             v-else
           >
-            <clip-loader
+            <kheops-clip-loader
               :loading="UI.cancel"
               :size="UI.SpinnerCancelSize"
               :color="'red'"
@@ -339,7 +339,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import { HTTP } from '@/router/http';
 import ListErrorFiles from '@/components/study/ListErrorFiles';
 import InputDicomize from '@/components/study/InputDicomize';
@@ -353,7 +353,7 @@ import { CurrentUser } from '@/mixins/currentuser.js';
 export default {
   name: 'SendStudies',
   components: {
-    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, DoneIcon, InputDicomize,
+    ListErrorFiles, ErrorIcon, KheopsClipLoader, BlockIcon, CloseIcon, DoneIcon, InputDicomize,
   },
   mixins: [DicomOperations, CurrentUser],
   props: {

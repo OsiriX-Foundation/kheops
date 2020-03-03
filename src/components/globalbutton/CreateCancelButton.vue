@@ -6,7 +6,7 @@
     <div
       :class="classCol"
     >
-      <clip-loader
+      <kheops-clip-loader
         :size="'30px'"
         color="white"
         class="text-left"
@@ -49,11 +49,11 @@
   </div>
 </template>
 <script>
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'ConfirmButton',
-  components: { ClipLoader },
+  components: { KheopsClipLoader },
   props: {
     disabled: {
       type: Boolean,

@@ -20,7 +20,7 @@
       :class="classRow"
     >
       <div :class="classCol">
-        <clip-loader
+        <kheops-clip-loader
           :size="'40px'"
           color="white"
         />
@@ -96,11 +96,11 @@
 </template>
 
 <script>
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'DoneDeleteButton',
-  components: { ClipLoader },
+  components: { KheopsClipLoader },
   props: {
     show: {
       type: Boolean,
