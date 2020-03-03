@@ -472,14 +472,14 @@ public class Studies {
         }
     }
 
-    public static boolean canAccessStudyInbox(User user, Study study, EntityManager em) {
+    /*public static boolean canAccessStudyInbox(User user, Study study, EntityManager em) {
         try {
             StudyQueries.findStudyByStudyandUserInbox(study, user, em);
             return true;
         } catch (StudyNotFoundException e) {
             return false;
         }
-    }
+    }*/
 
     public static boolean canAccessStudy(Album album, Study study, EntityManager em) {
         try {
@@ -490,7 +490,7 @@ public class Studies {
         }
     }
 
-    public static boolean canAccessStudy(Album album, Study study) {
+    /*public static boolean canAccessStudy(Album album, Study study) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
@@ -503,7 +503,7 @@ public class Studies {
         } finally {
             em.close();
         }
-    }
+    }*/
 
     public static boolean canAccessStudy(Album album, String studyUID) {
 
