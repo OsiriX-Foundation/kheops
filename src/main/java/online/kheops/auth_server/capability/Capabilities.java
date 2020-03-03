@@ -47,6 +47,7 @@ public class Capabilities {
             tx.begin();
             final User user = em.merge(capabilityParameters.getCallingUser());
             final Capability capability = new Capability.CapabilityBuilder()
+                    .secretBeforeHash(new CapabilityToken(em).getToken())
                     .id(new CapabilityId(em).getId())
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
@@ -92,6 +93,7 @@ public class Capabilities {
                 throw new NewCapabilityForbidden();
             }
             final Capability capability = new Capability.CapabilityBuilder()
+                    .secretBeforeHash(new CapabilityToken(em).getToken())
                     .id(new CapabilityId(em).getId())
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
@@ -264,17 +266,12 @@ public class Capabilities {
         }
     }
 
-    public static boolean capabilitySecretExist(String capabilitySecret) {
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
+    public static boolean capabilitySecretExist(String capabilitySecret, EntityManager em) {
         try {
             getCapability(capabilitySecret, em);
             return true;
         } catch (CapabilityNotFoundException e) {
             return false;
-        } finally {
-            em.close();
         }
     }
 
@@ -289,17 +286,5 @@ public class Capabilities {
 
         final String hashSecret = hashCapability(secret);
         return findCapabilityByCapabilityToken(hashSecret, em);
-    }
-
-    public static Capability getCapability(String secret)
-            throws CapabilityNotFoundException {
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        try {
-            return  getCapability(secret, em);
-        } finally {
-            em.close();
-        }
     }
 }

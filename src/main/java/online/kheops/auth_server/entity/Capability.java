@@ -109,7 +109,7 @@ public class Capability {
     private Capability() {}
 
     private Capability(CapabilityBuilder builder) throws BadQueryParametersException {
-        secretBeforeHash = new CapabilityToken().getToken();
+        this.secretBeforeHash = builder.secretBeforeHash;
         this.secret = hashCapability(secretBeforeHash);
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
@@ -205,9 +205,11 @@ public class Capability {
 
     public void addMutation(Mutation mutation) { mutations.add(mutation); }
 
+
+
     public static class CapabilityBuilder {
 
-
+        private String secretBeforeHash;
         private LocalDateTime expirationTime;
         private LocalDateTime notBeforeTime;
         private String title;
@@ -238,6 +240,10 @@ public class Capability {
         }
         public CapabilityBuilder id (String id) {
             this.id = id;
+            return this;
+        }
+        public CapabilityBuilder secretBeforeHash (String secretBeforeHash) {
+            this.secretBeforeHash = secretBeforeHash;
             return this;
         }
         public CapabilityBuilder readPermission (boolean readPermission) {
@@ -289,6 +295,9 @@ public class Capability {
             }
             if (title == null) {
                 throw new IllegalStateException("Missing title");
+            }
+            if (secretBeforeHash == null) {
+                throw new IllegalStateException("Missing secretBeforeHash");
             }
             return new Capability(this);
         }
