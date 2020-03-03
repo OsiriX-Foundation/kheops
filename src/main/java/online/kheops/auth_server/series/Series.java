@@ -159,11 +159,22 @@ public class Series {
 
         try {
             callingUser = em.merge(callingUser);
-            isFavorite = isFavorite(seriesUID, callingUser.getInbox().getId());
+            isFavorite = isFavorite(seriesUID, callingUser.getInbox().getId(), em);
         } finally {
             em.close();
         }
         return isFavorite;
+    }
+
+    private static boolean isFavorite(String seriesUID, String albumID, EntityManager em) {
+
+        final AlbumSeries albumSeries;
+        try {
+            albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
+        } catch (SeriesNotFoundException e) {
+            throw new IllegalStateException("SeriesUID: "+seriesUID+" Not found inside the albumID: "+albumID);
+        }
+        return albumSeries.isFavorite();
     }
 
     public static boolean isFavorite(String seriesUID, String albumID) {
@@ -173,7 +184,7 @@ public class Series {
         try {
             albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
         } catch (SeriesNotFoundException e) {
-            throw new IllegalStateException("SeriesUID: "+seriesUID+"Not found inside the albumID: "+albumID);
+            throw new IllegalStateException("SeriesUID: "+seriesUID+" Not found inside the albumID: "+albumID);
         } finally {
             em.close();
         }
