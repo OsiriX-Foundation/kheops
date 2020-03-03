@@ -131,6 +131,7 @@
       class-col-warning-remove="offset-md-5 offset-lg-4 col-sm-12 col-md-6 col-lg-7"
       :text-warning-remove="$t('warningremove')"
       :text-button-done="$t('edit')"
+      :loading="onLoading"
       @done="edit"
       @remove="remove"
     />
@@ -138,7 +139,7 @@
 </template>
 
 <script>
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 
 export default {
   name: 'WebhookDetails',
@@ -163,6 +164,11 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    onLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

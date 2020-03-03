@@ -59,7 +59,7 @@
           v-if="loading"
           class="outPopUp"
         >
-          <clip-loader
+          <kheops-clip-loader
             :loading="loading"
             :size="'60px'"
             :color="'white'"
@@ -85,13 +85,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import List from '@/components/studieslist/List';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
   name: 'ComponentDragAndDrop',
-  components: { ClipLoader, List },
+  components: { KheopsClipLoader, List },
   props: {
     permissions: {
       type: Object,

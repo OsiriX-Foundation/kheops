@@ -1,7 +1,6 @@
 <i18n>
 {
   "en": {
-    "confirm": "Confirm",
     "warningremove": "Are you sure to remove this webhook ?",
     "editwebhook": "Edit webhook",
     "namewebhook": "Name of the webhook",
@@ -16,7 +15,6 @@
     "unauthorized": "You don't have the permissions"
   },
   "fr": {
-    "confirm": "Confirmer",
     "warningremove": "Etes-vous sûre de vouloir supprimer ce webhook ?",
     "editwebhook": "Edition d'un webhook",
     "namewebhook": "Nom du webhook",
@@ -146,8 +144,8 @@
         class-col="offset-md-5 offset-lg-4 col-xs-12 col-sm-12 col-md-5 col-lg-4"
         class-col-warning-remove="offset-md-5 offset-lg-4 col-sm-12 col-md-6 col-lg-7"
         :text-warning-remove="$t('warningremove')"
-        :text-button-done="$t('confirm')"
         :disabled-done="disabledCreate"
+        :loading="onedit || onLoading"
         @remove="remove"
       />
     </form>
@@ -155,7 +153,7 @@
 </template>
 
 <script>
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 import httpoperations from '@/mixins/httpoperations';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 import { validator } from '@/mixins/validator.js';
@@ -185,6 +183,11 @@ export default {
       required: false,
       default: '',
     },
+    onLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -198,6 +201,7 @@ export default {
         event: [],
         enabled: false,
       },
+      onedit: false,
     };
   },
   computed: {
@@ -214,7 +218,8 @@ export default {
       return (this.modelWebhook.name === ''
       || this.modelWebhook.url === ''
       || !this.checkUrl(this.modelWebhook.url)
-      || this.modelWebhook.event.length === 0);
+      || this.modelWebhook.event.length === 0
+      || this.onedit);
     },
   },
   watch: {
@@ -242,6 +247,7 @@ export default {
       this.$emit('remove', this.webhookId);
     },
     editWebhook() {
+      this.onedit = true;
       const params = {
         queries: this.modelWebhook,
         albumId: this.albumId,
@@ -256,6 +262,7 @@ export default {
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }
+        this.onedit = false;
       });
     },
   },

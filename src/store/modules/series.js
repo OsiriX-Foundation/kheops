@@ -38,16 +38,18 @@ const actions = {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
     return HTTP.get(request + queries, { headers: { Accept: 'application/dicom+json' } }).then((res) => {
-      const newSeries = dicomoperations.translateObjectDICOM(res.data, '0020000E');
-      Object.keys(newSeries).forEach((serieUID) => {
-        newSeries[serieUID].imgSrc = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].imgSrc : '';
-        newSeries[serieUID].flag = JSON.parse(JSON.stringify(state.defaultFlagSerie));
-        newSeries[serieUID].SOPClassUID = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].SOPClassUID : undefined;
-        const seriesAlreadyExist = (state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined);
-        newSeries[serieUID].flag.is_selected = seriesAlreadyExist ? state.series[params.StudyInstanceUID][serieUID].flag.is_selected : params.studySelected;
-      });
-      commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: newSeries });
-      dispatch('setSeriesImage', { StudyInstanceUID: params.StudyInstanceUID });
+      if (res.status !== 204) {
+        const newSeries = dicomoperations.translateObjectDICOM(res.data, '0020000E');
+        Object.keys(newSeries).forEach((serieUID) => {
+          newSeries[serieUID].imgSrc = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].imgSrc : '';
+          newSeries[serieUID].flag = JSON.parse(JSON.stringify(state.defaultFlagSerie));
+          newSeries[serieUID].SOPClassUID = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].SOPClassUID : undefined;
+          const seriesAlreadyExist = (state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined);
+          newSeries[serieUID].flag.is_selected = seriesAlreadyExist ? state.series[params.StudyInstanceUID][serieUID].flag.is_selected : params.studySelected;
+        });
+        commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: newSeries });
+        dispatch('setSeriesImage', { StudyInstanceUID: params.StudyInstanceUID });
+      }
       return res;
     }).catch((err) => Promise.reject(err));
   },

@@ -56,7 +56,6 @@
       </div>
     </div>
     <b-table
-      stacked="sm"
       striped
       hover
       show-empty
@@ -155,14 +154,22 @@
       <template
         v-slot:cell(actions)="data"
       >
-        <button
+        <span
           v-if="!data.item.revoked"
-          type="button"
-          class="btn btn-danger btn-xs"
-          @click.stop="revoke(data.item.id)"
         >
-          {{ $t('revoke') }}
-        </button>
+          <button
+            v-if="onloading[data.item.id] === undefined || onloading[data.item.id] === false"
+            type="button"
+            class="btn btn-danger btn-xs"
+            @click.stop="revoke(data.item.id)"
+          >
+            {{ $t('revoke') }}
+          </button>
+          <kheops-clip-loader
+            v-else
+            :loading="onloading[data.item.id]"
+          />
+        </span>
         <span
           v-if="data.item.revoked"
           class="text-danger"
@@ -196,15 +203,17 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import moment from 'moment';
-import Loading from '@/components/globals/Loading';
-import ListEmpty from '@/components/globals/ListEmpty';
+import Loading from '@/components/globalloading/Loading';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import ListEmpty from '@/components/globallist/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListTokens',
-  components: { Loading, ListEmpty },
+  components: { Loading, ListEmpty, KheopsClipLoader },
   props: {
     scope: {
       type: String,
@@ -221,6 +230,7 @@ export default {
     return {
       showInvalid: false,
       loadingData: false,
+      onloading: {},
       sortBy: 'expiration_date',
       fields: [
         {
@@ -317,22 +327,31 @@ export default {
           valid: !this.showInvalid,
           album: this.albumid,
         };
-        return this.$store.dispatch('getAlbumTokens', { queries }).then(() => {
+        return this.$store.dispatch('getAlbumTokens', { queries }).then((res) => {
+          const tokens = res.data;
+          this.setOnLoading(tokens);
           this.loadingData = false;
           this.status = -1;
         }).catch((err) => {
           this.loadingData = false;
           this.status = httpoperations.getStatusError(err);
-          return err;
+          Promise.reject(err);
         });
       }
-      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid }).then(() => {
+      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid }).then((res) => {
+        const tokens = res;
+        this.setOnLoading(tokens);
         this.loadingData = false;
         this.status = -1;
       }).catch((err) => {
         this.loadingData = false;
         this.status = httpoperations.getStatusError(err);
-        return err;
+        Promise.reject(err);
+      });
+    },
+    setOnLoading(tokens) {
+      tokens.forEach((token) => {
+        Vue.set(this.onloading, token.id, false);
       });
     },
     loadToken(item) {
@@ -355,9 +374,15 @@ export default {
       return 'active';
     },
     revoke(tokenId) {
+      Vue.set(this.onloading, tokenId, true);
       this.$store.dispatch('revokeToken', { token_id: tokenId }).then(() => {
-        this.getTokens();
+        this.getTokens().then(() => {
+          Vue.set(this.onloading, tokenId, false);
+        }).catch(() => {
+          Vue.set(this.onloading, tokenId, false);
+        });
       }).catch(() => {
+        Vue.set(this.onloading, tokenId, false);
         this.$snotify.error(this.$t('sorryerror'));
       });
     },

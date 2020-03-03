@@ -3,7 +3,7 @@
   "en": {
     "newwebhook": "New webhook",
     "namewebhook": "Name of the webhook",
-    "urlwebhook": "Configuration URL of the webhook",
+    "urlwebhook": "Payload URL",
     "secret": "Secret",
     "event": "Event",
     "enabled": "Enabled the webhook",
@@ -112,7 +112,6 @@
             id="events"
             v-model="webhook.event"
             :options="eventsDefined"
-            :state="state"
             stacked
           >
             <field-obligatory
@@ -134,6 +133,7 @@
       </div>
       <create-cancel-button
         :disabled="disabledCreate"
+        :loading="oncreate"
         class-col="offset-md-3 col-md-9"
         @cancel="done"
       />
@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import { HTTP } from '@/router/http';
 import httpoperations from '@/mixins/httpoperations';
 import FieldObligatory from '@/components/globals/FieldObligatory';
@@ -170,8 +170,9 @@ export default {
         name: '',
         secret: '',
         event: [],
-        enabled: false,
+        enabled: true,
       },
+      oncreate: false,
     };
   },
   computed: {
@@ -182,11 +183,14 @@ export default {
       return (this.webhook.name === ''
       || this.webhook.url === ''
       || !this.checkUrl(this.webhook.url)
-      || this.webhook.event.length === 0);
+      || this.webhook.event.length === 0
+      || this.oncreate
+      );
     },
   },
   methods: {
     createWebhook() {
+      this.oncreate = true;
       const queries = httpoperations.getFormData(this.webhook);
       const url = `albums/${this.albumId}/webhooks`;
       HTTP.post(url, queries).then(() => {
@@ -198,6 +202,7 @@ export default {
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }
+        this.oncreate = false;
       });
     },
     done() {

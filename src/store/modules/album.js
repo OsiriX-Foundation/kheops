@@ -66,6 +66,7 @@ const actions = {
       if (res.status === 200) {
         commit('SET_ALBUM_USERS', res.data);
       }
+      return res;
     }).catch((err) => Promise.reject(err));
   },
   editAlbum({ commit }, params) {

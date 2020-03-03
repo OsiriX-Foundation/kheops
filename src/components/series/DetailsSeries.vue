@@ -1,22 +1,27 @@
 <template>
-  <div
+  <span
     v-if="loadingSerie === false"
-    class="row"
-    :class="classRow"
   >
     <div
-      v-for="serieUid in serieUids"
-      :key="serieUid.key"
-      class="word-break"
-      :class="classCol"
+      v-if="series[studyUid] !== undefined"
+      class="row"
+      :class="classRow"
     >
-      <detail-serie
-        :serie="series[studyUid][serieUid]"
-        :height="height"
-        :width="width"
-      />
+      <div
+        v-for="serie in series[studyUid]"
+        :key="serie.key"
+        class="word-break"
+        :class="classCol"
+      >
+        <detail-serie
+          v-if="serie.SeriesInstanceUID.Value[0] !== undefined"
+          :serie="series[studyUid][serie.SeriesInstanceUID.Value[0]]"
+          :height="height"
+          :width="width"
+        />
+      </div>
     </div>
-  </div>
+  </span>
   <span
     v-else
   >
@@ -26,7 +31,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import DetailSerie from '@/components/series/DetailsSerie';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'DetailSeries',
@@ -95,14 +100,28 @@ export default {
       params.queries.includefield = this.includefield;
       this.loadingSerie = true;
       this.$store.dispatch('getSeries', params).then((res) => {
-        if (res.status === 200) {
-          this.loadingSerie = false;
-          this.errorSeries = false;
-        }
+        this.errorSeries = false;
+        this.loadingSerie = false;
+        this.missingSeries();
       }).catch(() => {
         this.loadingSerie = false;
         this.errorSeries = true;
       });
+    },
+    missingSeries() {
+      let missingSeries = [];
+      if (this.series[this.studyUid] !== undefined) {
+        this.serieUids.forEach((serieUID) => {
+          if (this.series[this.studyUid][serieUID] === undefined) {
+            missingSeries.push(serieUID);
+          }
+        });
+      } else {
+        missingSeries = this.serieUids;
+      }
+      if (missingSeries.length > 0) {
+        this.$emit('missingseries', missingSeries);
+      }
     },
   },
 };

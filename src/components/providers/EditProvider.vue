@@ -4,7 +4,6 @@
     "editprovider": "Edit provider",
     "nameProvider": "Name of the provider",
     "urlProvider": "Configuration URL of the provider",
-    "edit": "Confirm",
     "remove": "Remove",
     "warningremove": "Are you sure to remove this report provider ?",
     "confirm": "Confirm",
@@ -15,7 +14,6 @@
     "editprovider": "Edition d'un provider",
     "nameProvider": "Nom du provider",
     "urlProvider": "URL de configuration",
-    "edit": "Confirmer",
     "remove": "Supprimer",
     "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
     "confirm": "Confirmer",
@@ -104,8 +102,8 @@
         class-col="offset-md-3 col-12 col-sm-12 col-md-3"
         class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
         :text-warning-remove="$t('warningremove')"
-        :text-button-done="$t('edit')"
         :disabled-done="disabledCreate"
+        :loading="onloading"
         @remove="deleteProvider"
       />
     </form>
@@ -115,7 +113,7 @@
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
 import FieldObligatory from '@/components/globals/FieldObligatory';
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 import { validator } from '@/mixins/validator.js';
 
 export default {
@@ -135,6 +133,7 @@ export default {
       checkedURL: false,
       loading: false,
       confirmDelete: false,
+      onloading: false,
     };
   },
   computed: {
@@ -148,7 +147,8 @@ export default {
       return (this.provider.name === ''
         || this.provider.url === ''
         || !this.checkUrl(this.provider.url))
-        || this.loading;
+        || this.loading
+        || this.onloading;
     },
   },
   created() {
@@ -169,6 +169,7 @@ export default {
   methods: {
     updateProvider() {
       this.setStateProvider(false, true, true);
+      this.onloading = true;
       const paramsURL = {
         albumID: this.albumID,
         clientID: this.clientID,
@@ -181,12 +182,14 @@ export default {
       this.$store.dispatch('updateProvider', { paramsURL, query }).then((res) => {
         if (res.status !== 200) {
           this.setStateProvider(false, false, true);
+          this.onloading = false;
         } else {
           this.$emit('done');
         }
       }).catch((err) => {
         this.setStateProvider(false, false, true);
         console.log(err);
+        this.onloading = false;
       });
     },
     setStateProvider(checkURL, loading, show) {
@@ -198,14 +201,17 @@ export default {
       this.$emit('done');
     },
     deleteProvider() {
+      this.onloading = true;
       this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
         if (res.status !== 204) {
+          this.onloading = false;
           this.$snotify.error('Sorry, an error occured');
         } else {
           this.$emit('done');
         }
       }).catch((err) => {
         console.log(err);
+        this.onloading = false;
       });
     },
   },

@@ -4,6 +4,7 @@
 
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 import '@/css/bootstrap_dark.css';
 import '@/css/bootstrap_kheops.css';
 import '@/css/main.css';

@@ -46,7 +46,6 @@
       </div>
     </div>
     <b-table
-      stacked="sm"
       striped
       hover
       show-empty
@@ -113,8 +112,8 @@
 import { mapGetters } from 'vuex';
 import httpoperations from '@/mixins/httpoperations';
 import StateIcons from '@/components/globals/StateIcons';
-import ListEmpty from '@/components/globals/ListEmpty';
-import Loading from '@/components/globals/Loading';
+import ListEmpty from '@/components/globallist/ListEmpty';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'ListTokens',

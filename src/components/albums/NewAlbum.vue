@@ -63,6 +63,7 @@
                 class="form-control"
                 maxlength="255"
               >
+              <field-obligatory :state="album.name !== ''" />
             </dd>
           </div>
         </div>
@@ -192,38 +193,12 @@
       </div>
 
       <fieldset>
-        <div class="row">
-          <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="!album.name"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-          <div class="col-12 mt-1 d-md-none">
-            <button
-              type="submit"
-              class="btn btn-primary btn-block"
-              :disabled="!album.name"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary btn-block"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-        </div>
+        <create-cancel-button
+          :disabled="disabledCreate"
+          :loading="oncreate"
+          class-col="mt-3 col-12"
+          @cancel="cancel"
+        />
       </fieldset>
     </form>
   </div>
@@ -231,9 +206,12 @@
 
 <script>
 import { HTTP } from '@/router/http';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
+import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
   name: 'NewAlbum',
+  components: { CreateCancelButton, FieldObligatory },
   data() {
     return {
       album: {
@@ -258,6 +236,7 @@ export default {
       },
       newUserName: '',
       numberCol: 2,
+      oncreate: false,
     };
   },
   computed: {
@@ -269,6 +248,9 @@ export default {
     },
     downloadSeries() {
       return this.album.userSettings.downloadSeries;
+    },
+    disabledCreate() {
+      return this.album.name === '' || this.oncreate;
     },
   },
   watch: {
@@ -299,6 +281,7 @@ export default {
       }
     },
     createAlbum() {
+      this.oncreate = true;
       const formData = {
         name: this.album.name,
         description: this.album.description,
@@ -324,6 +307,7 @@ export default {
         }
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
+        this.oncreate = false;
       });
     },
     addAlbumUser(albumCreated) {
@@ -386,6 +370,9 @@ export default {
         });
       }
       return data;
+    },
+    cancel() {
+      this.$router.push({ name: 'albums' });
     },
   },
 };

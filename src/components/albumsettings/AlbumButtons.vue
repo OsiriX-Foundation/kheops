@@ -37,26 +37,24 @@ Props :
 
 <template>
   <div
+    v-if="onloading === true"
+    class="btnalbum offset-md-8 offset-lg-9 col-md-4 col-lg-3"
+  >
+    <kheops-clip-loader
+      :size="'40px'"
+      color="white"
+    />
+  </div>
+  <div
+    v-else
     class="container"
   >
     <div
       v-if="showQuit && confirmQuit"
       class="row"
     >
-      <div class="col-lg-4 d-none d-sm-none d-md-block" />
       <div
-        class="btnalbum col-lg-8 d-none d-sm-none d-md-block"
-        align="right"
-      >
-        <p v-if="confirmQuit && !lastAdmin && !lastUser">
-          {{ $t("quitalbum") }}
-        </p>
-        <p v-else-if="confirmQuit && lastUser">
-          {{ $t('lastuser') }}
-        </p>
-      </div>
-      <div
-        class="btnalbum d-md-none"
+        class="btnalbum offset-lg-4 col-lg-8 d-md-block text-md-right"
       >
         <p v-if="confirmQuit && !lastAdmin && !lastUser">
           {{ $t("quitalbum") }}
@@ -87,9 +85,8 @@ Props :
         />
       </div>
 
-      <div class="col-md-8 col-lg-9" />
       <div
-        class="btnalbum col-md-4 col-lg-3"
+        class="btnalbum offset-md-8 offset-lg-9 col-md-4 col-lg-3"
       >
         <button
           type="button"
@@ -112,21 +109,13 @@ Props :
       v-if="showDelete && confirmDeletion"
       class="row"
     >
-      <div class="col-md-4 col-lg-6 d-none d-sm-none d-md-block" />
       <div
-        class="btnalbum col-md-8 col-lg-6 d-none d-sm-none d-md-block"
+        class="btnalbum offset-md-4 offset-lg-6 col-12 col-md-8 col-lg-6"
       >
         <p
           v-if="confirmDeletion"
-          align="right"
+          class="text-md-right"
         >
-          {{ $t("delalbum") }}
-        </p>
-      </div>
-      <div
-        class="btnalbum d-md-none"
-      >
-        <p v-if="confirmDeletion">
           {{ $t("delalbum") }}
         </p>
       </div>
@@ -135,9 +124,8 @@ Props :
       v-if="showDelete"
       class="row"
     >
-      <div class="col-md-8 col-lg-9" />
       <div
-        class="btnalbum col-md-4 col-lg-3"
+        class="btnalbum offset-md-8 offset-lg-9 col-md-4 col-lg-3"
       >
         <button
           type="button"
@@ -161,11 +149,12 @@ Props :
 
 <script>
 import AlbumUsers from '@/components/albumsettings/AlbumUsers';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'AlbumButtons',
-  components: { AlbumUsers },
+  components: { AlbumUsers, KheopsClipLoader },
   mixins: [CurrentUser],
   props: {
     album: {
@@ -193,6 +182,7 @@ export default {
     return {
       confirmDeletion: false,
       confirmQuit: false,
+      onloading: false,
     };
   },
   computed: {
@@ -213,9 +203,11 @@ export default {
       if (!this.confirmDeletion) {
         this.confirmDeletion = true;
       } else {
+        this.onloading = true;
         this.$store.dispatch('deleteAlbum', { album_id: this.album.album_id }).then(() => {
           this.$router.push('/albums');
         }).catch(() => {
+          this.onloading = false;
           this.$snotify.error(this.$t('sorryerror'));
         });
       }
@@ -224,9 +216,11 @@ export default {
       if (!this.confirmQuit) {
         this.confirmQuit = true;
       } else {
+        this.onloading = true;
         this.$store.dispatch('removeAlbumUser', { album_id: this.album.album_id, user: this.currentuserSub }).then(() => {
           this.$router.push('/albums');
         }).catch(() => {
+          this.onloading = false;
           this.$snotify.error(this.$t('sorryerror'));
         });
       }

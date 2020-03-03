@@ -404,6 +404,7 @@
               />
               <div class="input-group-append">
                 <button
+                  v-if="onloading === false"
                   title="send comment"
                   type="submit"
                   class="btn btn-primary button-cursor"
@@ -411,6 +412,9 @@
                 >
                   <v-icon name="paper-plane" />
                 </button>
+                <kheops-clip-loader
+                  v-if="onloading === true"
+                />
               </div>
             </div>
           </form>
@@ -424,11 +428,12 @@
 import { mapGetters } from 'vuex';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
-import Loading from '@/components/globals/Loading';
+import Loading from '@/components/globalloading/Loading';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'CommentsAndNotifications',
-  components: { AddUser, Loading },
+  components: { AddUser, Loading, KheopsClipLoader },
   mixins: [CurrentUser],
   props: {
     scope: {
@@ -458,6 +463,7 @@ export default {
       disabledText: false,
       statusMsgPrivate: false,
       loading: true,
+      onloading: false,
     };
   },
   computed: {
@@ -525,7 +531,7 @@ export default {
       }
     },
     addComment() {
-      if (this.newComment.comment.length >= 1) {
+      if (this.newComment.comment.length >= 1 && this.onloading === false) {
         const queries = {
           comment: this.newComment.comment,
         };
@@ -541,6 +547,7 @@ export default {
       }
     },
     addStudyComment(queries) {
+      this.onloading = true;
       const params = {
         StudyInstanceUID: this.id,
         queries,
@@ -552,13 +559,16 @@ export default {
           this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
             this.scrollBottom();
           });
+          this.onloading = false;
         }
       }).catch((res) => {
         this.$snotify.error(`${this.$t('sorryerror')}: ${res}`);
         this.newComment.comment = '';
+        this.onloading = false;
       });
     },
     addAlbumComment(queries) {
+      this.onloading = true;
       const params = {
         album_id: this.id,
         queries,
@@ -569,9 +579,11 @@ export default {
           this.newComment.comment = '';
           this.getComments();
         }
+        this.onloading = false;
       }).catch((res) => {
         this.$snotify.error(`${this.$t('sorryerror')}: ${res}`);
         this.newComment.comment = '';
+        this.onloading = false;
       });
     },
     getComments() {
