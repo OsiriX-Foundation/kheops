@@ -46,7 +46,6 @@
       </div>
     </div>
     <b-table
-      stacked="sm"
       striped
       hover
       show-empty
