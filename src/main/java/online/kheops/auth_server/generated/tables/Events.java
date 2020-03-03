@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Events extends TableImpl<EventsRecord> {
 
-    private static final long serialVersionUID = -462120320;
+    private static final long serialVersionUID = 881652132;
 
     /**
      * The reference instance of <code>public.events</code>
@@ -167,7 +167,7 @@ public class Events extends TableImpl<EventsRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EVENT_PK);
+        return Arrays.<Index>asList(Indexes.EVENT_PK, Indexes.EVENTS_SERIES_FK_INDEX, Indexes.EVENTS_USER_FK_INDEX);
     }
 
     /**

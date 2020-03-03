@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = 755002167;
+    private static final long serialVersionUID = -774889861;
 
     /**
      * The reference instance of <code>public.users</code>
@@ -116,7 +116,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.KEYCLOAK_ID_UNIQUE, Indexes.USERS_PK);
+        return Arrays.<Index>asList(Indexes.INBOX_FK_UNIQUE, Indexes.KEYCLOAK_ID_UNIQUE, Indexes.USERS_INBOX_FK_INDEX, Indexes.USERS_PK);
     }
 
     /**
@@ -132,7 +132,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<UniqueKey<UsersRecord>> getKeys() {
-        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.KEYCLOAK_ID_UNIQUE);
+        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.KEYCLOAK_ID_UNIQUE, Keys.INBOX_FK_UNIQUE);
     }
 
     /**

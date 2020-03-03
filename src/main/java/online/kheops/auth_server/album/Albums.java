@@ -8,9 +8,7 @@ import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import online.kheops.auth_server.webhook.NewUserWebhook;
-import online.kheops.auth_server.webhook.WebhookAsyncRequest;
-import online.kheops.auth_server.webhook.WebhookType;
+import online.kheops.auth_server.webhook.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -24,6 +22,7 @@ import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getOrCreateUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
+import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
 
 public class Albums {
 
@@ -43,7 +42,7 @@ public class Albums {
 
             callingUser = em.merge(callingUser);
 
-            final Album newAlbum = new Album(name, description, usersPermission);
+            final Album newAlbum = new Album(name, description, usersPermission, new AlbumId(em).getId());
             final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
             final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
 
@@ -168,13 +167,9 @@ public class Albums {
             }
 
             for (Webhook webhook:album.getWebhooks()) {
-                for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                    em.remove(webhookTrigger);
-                }
-                em.remove(webhook);
+                deleteWebhook(webhook, em);
             }
-
-
+            
             em.remove(album);
 
             tx.commit();
@@ -249,6 +244,7 @@ public class Albums {
 
             final Album album = getAlbum(albumId, em);
 
+            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
             if (isMemberOfAlbum(targetUser, album, em)) {
                 try {
                     final AlbumUser targetAlbumUser = getAlbumUser(album, targetUser, em);
@@ -280,14 +276,19 @@ public class Albums {
                 final NewUserWebhook newUserWebhook = new NewUserWebhook(albumId, albumCallingUser, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER),false);
                 for (Webhook webhook : album.getWebhooks()) {
                     if (webhook.getNewUser() && webhook.isEnabled()) {
-                        WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_USER, webhook);
+                        WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_USER, webhook);
+                        webhookTrigger.setUser(targetUser);
                         em.persist(webhookTrigger);
-                        new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger);
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newUserWebhook, webhookTrigger));
+
                     }
                 }
             }
             album.updateLastEventTime();
             tx.commit();
+            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                webhookAsyncRequest.firstRequest();
+            }
             return targetUser;
         } finally {
             if (tx.isActive()) {
@@ -318,14 +319,6 @@ public class Albums {
                 final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
                 final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
-                if (removedAlbumUser.isAdmin()) {
-                    for (Capability capability: album.getCapabilities()) {
-                        if (capability.getUser() == removedUser) {
-                            capability.setRevoked(true);
-                        }
-                    }
-                }
-
                 final Events.MutationType mutationType;
 
                 if (callingUser.getPk() == removedUser.getPk()) {
@@ -338,6 +331,14 @@ public class Albums {
                             .detail("You must be an admin for removing another user")
                             .build();
                     throw new AlbumForbiddenException(errorResponse);
+                }
+
+                if (removedAlbumUser.isAdmin()) {
+                    for (Capability capability: album.getCapabilities()) {
+                        if (capability.getUser() == removedUser) {
+                            capability.setRevoked(true);
+                        }
+                    }
                 }
 
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
@@ -421,17 +422,6 @@ public class Albums {
         return findAlbumById(albumId, em);
     }
 
-    public static Album getAlbum(String albumId)
-            throws AlbumNotFoundException {
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        try {
-            return getAlbum(albumId, em);
-        } finally {
-            em.close();
-        }
-    }
-
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)
             throws UserNotMemberException {
 
@@ -443,18 +433,6 @@ public class Albums {
             findAlbumById(albumId, em);
         } catch (AlbumNotFoundException e) {
             return false;
-        }
-        return true;
-    }
-
-    public static boolean albumExist(String albumId) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        try {
-            findAlbumById(albumId, em);
-        } catch (AlbumNotFoundException e) {
-            return false;
-        } finally {
-            em.close();
         }
         return true;
     }

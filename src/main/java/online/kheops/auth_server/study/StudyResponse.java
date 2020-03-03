@@ -61,11 +61,19 @@ public class StudyResponse {
         this.instance = instance;
     }
 
+    public StudyResponse(Study study) {
+        studyInstanceUID = study.getStudyInstanceUID();
+    }
+
     public void addSeries(Series series) {
         if(this.series == null) {
             this.series = new ArrayList<>();
         }
-        this.series.add(new SeriesResponse(series, instance));
+        if (instance != null) {
+            this.series.add(new SeriesResponse(series, instance));
+        } else {
+            this.series.add(new SeriesResponse(series));
+        }
     }
 
     public boolean containSeries() {

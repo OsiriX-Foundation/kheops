@@ -41,6 +41,16 @@ public class WebhookTrigger {
     @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
     private Webhook webhook;
 
+    @OneToOne
+    @JoinColumn(name = "user_fk", unique = false, nullable = true, updatable = false)
+    private User user;
+
+    @OneToMany
+    @JoinColumn(name = "webhook_trigger_fk", nullable = false)
+    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
+
+
+
     public WebhookTrigger() {}
 
     public WebhookTrigger(String id, boolean isManualTrigger, WebhookType type, Webhook webhook) {
@@ -58,10 +68,11 @@ public class WebhookTrigger {
         }
     }
 
-    public WebhookTrigger(boolean isManualTrigger, WebhookType type, Webhook webhook) {
-        this(new WebhookRequestId().getRequestId(), isManualTrigger, type, webhook);
+    public void setUser(User user) {
+        this.user = user;
     }
 
+    public User getUser() {return user; }
 
     public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
 
@@ -80,5 +91,15 @@ public class WebhookTrigger {
             }
         }
         return false;
+    }
+
+    public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
+
+    public Set<WebhookTriggerSeries> getWebhookTriggersSeries() {
+        return webhookTriggersSeries;
+    }
+
+    public Webhook getWebhook() {
+        return webhook;
     }
 }

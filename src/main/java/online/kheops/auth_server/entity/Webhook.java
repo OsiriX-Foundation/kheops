@@ -61,14 +61,9 @@ public class Webhook {
     @OrderBy("pk DESC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
-    @PrePersist
-    public void onPrePersist() {
-        id = new WebhookId().getId();
-    }
-
     private Webhook() {}
 
-    public Webhook(WebhookPostParameters webhookPostParameters, Album album, User user) {
+    public Webhook(WebhookPostParameters webhookPostParameters, String id, Album album, User user) {
         this.name = webhookPostParameters.getName();
         this.url = webhookPostParameters.getUrl();
         if(webhookPostParameters.isUseSecret()) {
@@ -76,6 +71,7 @@ public class Webhook {
         } else {
             this.secret = null;
         }
+        this.id = id;
         this.secret = webhookPostParameters.getSecret();
         this.newSeries = webhookPostParameters.isNewSeries();
         this.newUser = webhookPostParameters.isNewUser();
@@ -155,4 +151,6 @@ public class Webhook {
     }
 
     public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+
+    public long getPk() { return pk; }
 }

@@ -1,10 +1,17 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-   <include file="kheopsChangeLog-v1.0.xml"/>
-   <include file="kheopsChangeLog-v1.1.xml"/>
-   <include file="kheopsChangeLog-v2.0.xml"/>
-   <include file="kheopsChangeLog-v2.1.xml"/>
-   <include file="kheopsChangeLog-v2.2.xml"/>
+
+    <changeSet author="kheops" id="v2.1-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">Select count(*) from pg_constraint where conname = 'inbox_fk_unique'</sqlCheck>
+        </preConditions>
+        <addUniqueConstraint tableName="users" columnNames="inbox_fk" constraintName="inbox_fk_unique"/>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v2.1-2">
+       <tagDatabase tag="v2.1"/>
+    </changeSet>
 
 </databaseChangeLog>

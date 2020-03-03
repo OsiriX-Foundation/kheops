@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
 
-    private static final long serialVersionUID = -1288534211;
+    private static final long serialVersionUID = -1817486332;
 
     /**
      * The reference instance of <code>public.webhook_triggers</code>
@@ -84,6 +84,11 @@ public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
      * The column <code>public.webhook_triggers.new_user</code>.
      */
     public final TableField<WebhookTriggersRecord, Boolean> NEW_USER = createField("new_user", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
+     * The column <code>public.webhook_triggers.user_fk</code>.
+     */
+    public final TableField<WebhookTriggersRecord, Long> USER_FK = createField("user_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * Create a <code>public.webhook_triggers</code> table reference
@@ -131,7 +136,7 @@ public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.WEBHOOK_TRIGGERS_PK);
+        return Arrays.<Index>asList(Indexes.WEBHOOK_TRIGGERS_ID_UNIQUE, Indexes.WEBHOOK_TRIGGERS_PK, Indexes.WEBHOOK_TRIGGERS_WEBHOOK_FK_INDEX);
     }
 
     /**
@@ -147,7 +152,23 @@ public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
      */
     @Override
     public List<UniqueKey<WebhookTriggersRecord>> getKeys() {
-        return Arrays.<UniqueKey<WebhookTriggersRecord>>asList(Keys.WEBHOOK_TRIGGERS_PK);
+        return Arrays.<UniqueKey<WebhookTriggersRecord>>asList(Keys.WEBHOOK_TRIGGERS_PK, Keys.WEBHOOK_TRIGGERS_ID_UNIQUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<WebhookTriggersRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<WebhookTriggersRecord, ?>>asList(Keys.WEBHOOK_TRIGGERS__WEBHOOK_TRIGGERS_WEBHOOK_FK_FKEY, Keys.WEBHOOK_TRIGGERS__WEBHOOK_TRIGGERS_USER_FK_FKEY);
+    }
+
+    public Webhooks webhooks() {
+        return new Webhooks(this, Keys.WEBHOOK_TRIGGERS__WEBHOOK_TRIGGERS_WEBHOOK_FK_FKEY);
+    }
+
+    public Users users() {
+        return new Users(this, Keys.WEBHOOK_TRIGGERS__WEBHOOK_TRIGGERS_USER_FK_FKEY);
     }
 
     /**

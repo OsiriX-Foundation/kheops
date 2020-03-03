@@ -3,7 +3,9 @@ package online.kheops.auth_server.event;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.study.Studies;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -216,7 +218,7 @@ public class Events {
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
 
-    public static PairListXTotalCount<EventResponse> getCommentsByStudyUID(User callingUser, String studyInstanceUID, Integer offset, Integer limit) {
+    public static PairListXTotalCount<EventResponse> getCommentsByStudyUID(KheopsPrincipal principal, String studyInstanceUID, Integer offset, Integer limit) {
 
         final List<EventResponse> eventResponses = new ArrayList<>();
         final long XTotalCount;
@@ -225,18 +227,29 @@ public class Events {
         final HashMap<String, Boolean> userMember = new HashMap<>();
 
         try {
-            callingUser = em.merge(callingUser);
+            User callingUser = em.merge(principal.getUser());
 
-            for (Comment c : EventQueries.getCommentsByStudy(callingUser, studyInstanceUID, offset, limit, em)) {
+            final List<Comment> comments;
+            final boolean isAlbumCapabilityToken = principal.getScope().compareTo(ScopeType.ALBUM) == 0;
+            if (isAlbumCapabilityToken) {
+                XTotalCount = EventQueries.getTotalPublicCommentsByStudy(studyInstanceUID, em);
+                comments = EventQueries.getPublicCommentsByStudy(studyInstanceUID, offset, limit, em);
+            } else {
+                XTotalCount = EventQueries.getTotalCommentsByStudy(callingUser, studyInstanceUID, em);
+                comments = EventQueries.getCommentsByStudy(callingUser, studyInstanceUID, offset, limit, em);
+
+            }
+
+            for (Comment c : comments) {
                 if (!userMember.containsKey(c.getUser().getKeycloakId())) {
                     userMember.put(c.getUser().getKeycloakId(), canAccessStudy(c.getUser(), c.getStudy(), em));
                 }
-                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
+                if (c.getPrivateTargetUser() != null && isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
                     userMember.put(c.getPrivateTargetUser().getKeycloakId(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
                 }
                 eventResponses.add(new EventResponse(c, userMember));
             }
-            XTotalCount = EventQueries.getTotalCommentsByStudy(callingUser, studyInstanceUID, em);
+
         } finally {
             em.close();
         }

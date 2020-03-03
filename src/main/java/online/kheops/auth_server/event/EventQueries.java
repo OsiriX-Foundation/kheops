@@ -67,4 +67,17 @@ public class EventQueries {
         query.setParameter("studyUID", studyUID);
         return query.getSingleResult();
     }
+
+    public static List<Comment> getPublicCommentsByStudy(String studyUID, Integer offset, Integer limit, EntityManager em) {
+        TypedQuery<Comment> query = em.createQuery("SELECT c from Comment c where c.study.studyInstanceUID =  :studyUID and c.privateTargetUser = null order by c.eventTime desc", Comment.class);
+        query.setParameter("studyUID", studyUID);
+        query.setFirstResult(offset).setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    public static long getTotalPublicCommentsByStudy(String studyUID, EntityManager em) {
+        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Comment c where c.study.studyInstanceUID = :studyUID and c.privateTargetUser = null", Long.class);
+        query.setParameter("studyUID", studyUID);
+        return query.getSingleResult();
+    }
 }

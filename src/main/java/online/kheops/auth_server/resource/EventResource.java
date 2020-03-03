@@ -142,7 +142,7 @@ public class EventResource {
         }
 
         final PairListXTotalCount<EventResponse> pair;
-        pair = Events.getCommentsByStudyUID(kheopsPrincipal.getUser(), studyInstanceUID, offset, limit);
+        pair = Events.getCommentsByStudyUID(kheopsPrincipal, studyInstanceUID, offset, limit);
 
         final GenericEntity<List<EventResponse>> genericEventsResponsesList = new GenericEntity<List<EventResponse>>(pair.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder().study(studyInstanceUID)

@@ -16,6 +16,7 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.NewSeriesWebhook;
 import online.kheops.auth_server.webhook.WebhookAsyncRequest;
+import online.kheops.auth_server.webhook.WebhookRequestId;
 import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
@@ -77,11 +78,6 @@ public class FetchResource {
                     .log();
         }
 
-
-
-
-
-
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
@@ -89,10 +85,6 @@ public class FetchResource {
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
-
-
-
-
 
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
@@ -133,7 +125,7 @@ public class FetchResource {
                 final Album targetAlbum = getAlbum(albumId, em);
                 final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
                 final List<Series> seriesList = new ArrayList<>();
-                for (String seriesInstanceUID: seriesInstanceUIDList) {
+                for (String seriesInstanceUID : seriesInstanceUIDList) {
                     seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
                 }
                 final Study study = seriesList.get(0).getStudy();
@@ -141,9 +133,11 @@ public class FetchResource {
                 final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
                 newSeriesWebhook.setFetch();
 
-                for (Series series: seriesList){
+                final List<Series> seriesListWebhook = new ArrayList<>();
+                for (Series series : seriesList) {
                     if (series.isPopulated()) {
                         newSeriesWebhook.addSeries(series);
+                        seriesListWebhook.add(series);
                     }
                 }
 
@@ -155,29 +149,32 @@ public class FetchResource {
                     newSeriesWebhook.setReportProvider(reportProvider);
                 }
 
+                final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
                 if (study.isPopulated() && newSeriesWebhook.containSeries()) {
                     for (Webhook webhook : targetAlbum.getWebhooks()) {
                         if (webhook.getNewSeries() && webhook.isEnabled()) {
-                            WebhookTrigger webhookTrigger = new WebhookTrigger(false, WebhookType.NEW_SERIES, webhook);
+                            final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
                             em.persist(webhookTrigger);
-                            new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger);
+                            for (Series series : seriesListWebhook) {
+                                final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
+                                em.persist(webhookTriggerSeries);
+                            }
+                            webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
                         }
                     }
                 }
 
                 tx.commit();
+                for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                    webhookAsyncRequest.firstRequest();
+                }
             } finally {
                 if (tx.isActive()) {
                     tx.rollback();
                 }
                 em.close();
             }
-
         }
-
-
-
-
 
         return Response.ok().build();
     }

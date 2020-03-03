@@ -189,32 +189,33 @@ public class WebhookResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response triggerWebhook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                    @SuppressWarnings("RSReferenceInspection") @PathParam("webhook") String webhookId,
-                                   @FormParam("event") @NotNull String event,
-                                   @FormParam(SeriesInstanceUID) @UIDValidator String seriesUID,
+                                   @FormParam("event") String event,
+                                   @FormParam(SeriesInstanceUID) List<String> seriesUID,
                                    @FormParam(StudyInstanceUID) @UIDValidator String studyUID,
                                    @FormParam("user") String user)
             throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if ((user == null && seriesUID == null) ||
-                (user != null && seriesUID != null)) {
+        if (event == null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Use only '"+SeriesInstanceUID+"' xor 'user' not both")
+                    .detail("'event' must be set")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
-        if ((studyUID != null && seriesUID == null) || (seriesUID != null && studyUID == null)) {
+
+        if ((user == null && studyUID == null) ||
+                (user != null && studyUID != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("'"+StudyInstanceUID+"' and '"+StudyInstanceUID+"' must be set")
+                    .detail("Use only '"+StudyInstanceUID+"' xor 'user' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
         if(event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
-            if (studyUID == null || seriesUID == null) {
+            if (studyUID == null || seriesUID.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
                         .detail("'" + StudyInstanceUID + "' and '" + StudyInstanceUID + "' must be set")

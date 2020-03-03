@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Webhooks extends TableImpl<WebhooksRecord> {
 
-    private static final long serialVersionUID = -794002470;
+    private static final long serialVersionUID = -433040436;
 
     /**
      * The reference instance of <code>public.webhooks</code>
@@ -157,7 +157,7 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.WEBHOOKS_PK);
+        return Arrays.<Index>asList(Indexes.WEBHOOKS_ALBUM_FK_INDEX, Indexes.WEBHOOKS_ENABLED_INDEX, Indexes.WEBHOOKS_ID_UNIQUE, Indexes.WEBHOOKS_PK, Indexes.WEBHOOKS_URL_INDEX);
     }
 
     /**
@@ -173,7 +173,23 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
      */
     @Override
     public List<UniqueKey<WebhooksRecord>> getKeys() {
-        return Arrays.<UniqueKey<WebhooksRecord>>asList(Keys.WEBHOOKS_PK);
+        return Arrays.<UniqueKey<WebhooksRecord>>asList(Keys.WEBHOOKS_PK, Keys.WEBHOOKS_ID_UNIQUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<WebhooksRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<WebhooksRecord, ?>>asList(Keys.WEBHOOKS__WEBHOOK_USER_FK_FKEY, Keys.WEBHOOKS__WEBHOOK_ALBUM_FK_FKEY);
+    }
+
+    public Users users() {
+        return new Users(this, Keys.WEBHOOKS__WEBHOOK_USER_FK_FKEY);
+    }
+
+    public Albums albums() {
+        return new Albums(this, Keys.WEBHOOKS__WEBHOOK_ALBUM_FK_FKEY);
     }
 
     /**

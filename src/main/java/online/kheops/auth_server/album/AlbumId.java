@@ -1,5 +1,6 @@
 package online.kheops.auth_server.album;
 
+import javax.persistence.EntityManager;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ public class AlbumId {
     public static final String ID_PATTERN = "[A-Za-z0-9]{" + ID_LENGTH + "}";
     private static final Random rdm = new SecureRandom();
 
-    public AlbumId() {
+    public AlbumId(EntityManager em) {
         StringBuilder idBuilder = new StringBuilder();
 
         do {
@@ -23,7 +24,7 @@ public class AlbumId {
                 int index = rdm.nextInt(DICT.length());
                 idBuilder.append(DICT.charAt(index));
             }
-        } while (albumExist(idBuilder.toString()));
+        } while (albumExist(idBuilder.toString(), em));
         id = idBuilder.toString();
     }
 

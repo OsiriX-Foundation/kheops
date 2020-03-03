@@ -20,6 +20,9 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.EntityType;
+import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -28,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
@@ -415,14 +419,34 @@ public class Studies {
     }
 
     public static Study getOrCreateStudy(String studyInstanceUID, EntityManager em) {
+
         Study study;
         try {
             study = getStudy(studyInstanceUID, em);
         } catch (StudyNotFoundException ignored) {
             // the study doesn't exist, we need to create it
-            study = new Study();
-            study.setStudyInstanceUID(studyInstanceUID);
-            em.persist(study);
+            final EntityManager localEm = EntityManagerListener.createEntityManager();
+            final EntityTransaction tx = localEm.getTransaction();
+
+            try {
+                tx.begin();
+                study = new Study(studyInstanceUID);
+                localEm.persist(study);
+                tx.commit();
+                study = em.merge(study);
+            } catch (PersistenceException ignored2) {
+                try {
+                    tx.rollback();
+                    study = getStudy(studyInstanceUID, em);
+                } catch (StudyNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            } finally {
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
+                localEm.close();
+            }
         }
         return study;
     }
@@ -448,14 +472,14 @@ public class Studies {
         }
     }
 
-    public static boolean canAccessStudyInbox(User user, Study study, EntityManager em) {
+    /*public static boolean canAccessStudyInbox(User user, Study study, EntityManager em) {
         try {
             StudyQueries.findStudyByStudyandUserInbox(study, user, em);
             return true;
         } catch (StudyNotFoundException e) {
             return false;
         }
-    }
+    }*/
 
     public static boolean canAccessStudy(Album album, Study study, EntityManager em) {
         try {
@@ -466,7 +490,7 @@ public class Studies {
         }
     }
 
-    public static boolean canAccessStudy(Album album, Study study) {
+    /*public static boolean canAccessStudy(Album album, Study study) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 
@@ -479,7 +503,7 @@ public class Studies {
         } finally {
             em.close();
         }
-    }
+    }*/
 
     public static boolean canAccessStudy(Album album, String studyUID) {
 

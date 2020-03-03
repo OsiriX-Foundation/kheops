@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Level.INFO;
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
@@ -157,11 +156,12 @@ public class ReportProviderResource {
         final EntityTransaction tx = em.getTransaction();
 
         final ReportProvider reportProvider;
-        final String albumId;
+        final Album album;
+
         try {
             tx.begin();
             reportProvider = getReportProviderWithClientId(clientId, em);
-            albumId = reportProvider.getAlbum().getId();
+            album = reportProvider.getAlbum();
         } catch (NoResultException e) {
             LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -176,13 +176,10 @@ public class ReportProviderResource {
             em.close();
         }
 
-        final Album album;
-
-        if (!(principal.hasUserAccess() && principal.hasAlbumAccess(albumId))) {
+        if (!(principal.hasUserAccess() && principal.hasAlbumAccess(album.getId()))) {
             return Response.status(FORBIDDEN).build();
         }
 
-        album = getAlbum(albumId);
         for (String uid : studyInstanceUIDs) {
             if (!canAccessStudy(album, uid)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -221,7 +218,7 @@ public class ReportProviderResource {
                         .queryParam("code", token)
                         .queryParam("conf_uri", confUri)
                         .queryParam("client_id", reportProvider.getClientId())
-                        .queryParam("return_uri", getHostRoot() + "/albums/" + albumId);
+                        .queryParam("return_uri", getHostRoot() + "/albums/" + album.getId());
 
                 for (String uid : studyInstanceUIDs) {
                     reportProviderUrlBuilder.queryParam("studyUID", URLEncoder.encode(uid, UTF_8.toString()));
@@ -230,7 +227,7 @@ public class ReportProviderResource {
                 reportProviderUrl = reportProviderUrlBuilder.toString();
 
             } else if (responseType.equals("token")) {
-                final boolean userHasWriteAccess = principal.hasAlbumPermission(ADD_SERIES, albumId);
+                final boolean userHasWriteAccess = principal.hasAlbumPermission(ADD_SERIES, album.getId());
 
                 ReportProviderAccessTokenGenerator generator = ReportProviderAccessTokenGenerator.createGenerator(context)
                         .withClientId(clientId)
@@ -244,7 +241,7 @@ public class ReportProviderResource {
                 final String token = generator.generate(3600);
 
                 final String confUri = URLEncoder.encode(kheopsConfigUrl, UTF_8.toString());
-                final String returnUri = URLEncoder.encode(getHostRoot() + "/albums/" + albumId, UTF_8.toString());
+                final String returnUri = URLEncoder.encode(getHostRoot() + "/albums/" + album.getId(), UTF_8.toString());
 
                 reportProviderUrl = UriBuilder.fromUri(getRedirectUri(reportProvider))
                         .fragment("access_token=" + token +
@@ -268,7 +265,7 @@ public class ReportProviderResource {
             }
             KheopsLogBuilder kheopsLogBuilder = principal.getKheopsLogBuilder()
                     .action(ActionType.NEW_REPORT)
-                    .album(albumId)
+                    .album(album.getId())
                     .clientID(clientId);
             studyInstanceUIDs.forEach(kheopsLogBuilder::study);
             kheopsLogBuilder.log();

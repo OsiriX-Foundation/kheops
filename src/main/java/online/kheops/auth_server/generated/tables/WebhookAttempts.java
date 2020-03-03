@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
 
-    private static final long serialVersionUID = -262046100;
+    private static final long serialVersionUID = 80997957;
 
     /**
      * The reference instance of <code>public.webhook_attempts</code>
@@ -127,7 +127,7 @@ public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.WEBHOOK_ATTEMPT_PK);
+        return Arrays.<Index>asList(Indexes.WEBHOOK_ATTEMPT_PK, Indexes.WEBHOOK_ATTEMPTS_WEBHOOK_TRIGGER_FK_INDEX);
     }
 
     /**
@@ -144,6 +144,18 @@ public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
     @Override
     public List<UniqueKey<WebhookAttemptsRecord>> getKeys() {
         return Arrays.<UniqueKey<WebhookAttemptsRecord>>asList(Keys.WEBHOOK_ATTEMPT_PK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<WebhookAttemptsRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<WebhookAttemptsRecord, ?>>asList(Keys.WEBHOOK_ATTEMPTS__WEBHOOK_ATTEMPTS_WEBHOOK_TRIGGERS_FK_FKEY);
+    }
+
+    public WebhookTriggers webhookTriggers() {
+        return new WebhookTriggers(this, Keys.WEBHOOK_ATTEMPTS__WEBHOOK_ATTEMPTS_WEBHOOK_TRIGGERS_FK_FKEY);
     }
 
     /**

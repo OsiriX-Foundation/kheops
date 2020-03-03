@@ -93,14 +93,14 @@ public class Album {
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdTime = now;
         lastEventTime = now;
-        id = new AlbumId().getId();
     }
 
     public Album() {}
 
-    public Album(String name, String description, UsersPermission usersPermission) {
+    public Album(String name, String description, UsersPermission usersPermission, String id) {
         this.name = name;
         this.description = description;
+        this.id = id;
         this.setPermission(usersPermission);
     }
 

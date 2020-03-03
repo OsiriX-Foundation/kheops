@@ -23,7 +23,7 @@ public class WebhookResponse {
     @XmlElement(name = "enabled")
     private boolean enabled;
     @XmlElement(name = "last_triggers")
-    private List<String> lastTriggers;
+    private List<WebhookLastTriggerResponse> lastTriggers;
     @XmlElement(name = "number_of_triggers")
     private Integer numberOfTriggers;
     @XmlElement(name = "triggers")
@@ -53,11 +53,8 @@ public class WebhookResponse {
         if (lastTriggers == null) {
             lastTriggers = new ArrayList<>();
         }
-        if(webhookTrigger.isSuccess()) {
-            this.lastTriggers.add("pass");
-        } else {
-            this.lastTriggers.add("fail");
-        }
+        this.lastTriggers.add(new WebhookLastTriggerResponse(webhookTrigger));
+
     }
 
     public void addFullTriggers(WebhookTrigger webhookTrigger) {
