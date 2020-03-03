@@ -73,7 +73,7 @@ public abstract class Fetcher {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
             return;
         }
-        
+
         final List<String> seriesUIDList;
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

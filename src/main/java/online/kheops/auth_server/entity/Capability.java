@@ -96,7 +96,6 @@ public class Capability {
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         issuedAtTime = now;
         updatedTime = now;
-        id = new CapabilityId().getId();
         if(notBeforeTime == null) {
             notBeforeTime = now;
         }
@@ -115,6 +114,7 @@ public class Capability {
         this.expirationTime = builder.expirationTime;
         this.notBeforeTime = builder.notBeforeTime;
         this.title  = builder.title;
+        this.id = builder.id;
         this.user = builder.user;
         builder.scopeType.setCapabilityEntityScope(this, builder.album, builder.study, builder.series);
         this.readPermission = builder.readPermission;
@@ -211,6 +211,7 @@ public class Capability {
         private LocalDateTime expirationTime;
         private LocalDateTime notBeforeTime;
         private String title;
+        private String id;
         private boolean readPermission;
         private boolean writePermission;
         private boolean appropriatePermission;
@@ -233,6 +234,10 @@ public class Capability {
         }
         public CapabilityBuilder title (String title) {
             this.title = title;
+            return this;
+        }
+        public CapabilityBuilder id (String id) {
+            this.id = id;
             return this;
         }
         public CapabilityBuilder readPermission (boolean readPermission) {

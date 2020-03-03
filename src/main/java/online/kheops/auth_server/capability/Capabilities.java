@@ -47,6 +47,7 @@ public class Capabilities {
             tx.begin();
             final User user = em.merge(capabilityParameters.getCallingUser());
             final Capability capability = new Capability.CapabilityBuilder()
+                    .id(new CapabilityId(em).getId())
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
                     .notBeforeTime(capabilityParameters.getNotBeforeTime())
@@ -91,6 +92,7 @@ public class Capabilities {
                 throw new NewCapabilityForbidden();
             }
             final Capability capability = new Capability.CapabilityBuilder()
+                    .id(new CapabilityId(em).getId())
                     .user(user)
                     .expirationTime(capabilityParameters.getExpirationTime())
                     .notBeforeTime(capabilityParameters.getNotBeforeTime())
@@ -241,17 +243,12 @@ public class Capabilities {
         return capabilityResponse;
     }
 
-    public static boolean capabilityIDExist(String capabilityId) {
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
+    public static boolean capabilityIDExist(String capabilityId, EntityManager em) {
         try {
             findCapabilityByCapabilityID(capabilityId, em);
             return true;
         } catch (CapabilityNotFoundException e) {
             return false;
-        } finally {
-            em.close();
         }
     }
 
