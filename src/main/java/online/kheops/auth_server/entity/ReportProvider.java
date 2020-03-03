@@ -56,8 +56,8 @@ public class ReportProvider {
 
     public ReportProvider() {}
 
-    public ReportProvider(String url, String name, Album album) {
-        this.clientId = new ClientId().getClientId();
+    public ReportProvider(String url, String name, Album album, String clientId) {
+        this.clientId = clientId;
         this.url = url;
         this.name = name;
         this.album = album;
