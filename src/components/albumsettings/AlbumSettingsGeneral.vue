@@ -34,7 +34,9 @@
           </span>
         </div>
         <div v-if="edit.name !== '-1'">
-          <form @submit.prevent="updateAlbum">
+          <form
+            @submit.prevent="updateAlbum"
+          >
             <div class="input-group mb-2">
               <div>
                 <input
@@ -45,7 +47,10 @@
                   maxlength="255"
                 >
               </div>
-              <div class="input-group-append">
+              <div
+                v-if="onloading === false"
+                class="input-group-append"
+              >
                 <button
                   class="btn btn-primary"
                   type="submit"
@@ -61,6 +66,14 @@
                 >
                   {{ $t('cancel') }}
                 </button>
+              </div>
+              <div
+                v-if="onloading === true"
+                class="ml-2 mt-1"
+              >
+                <kheops-clip-loader
+                  size="25px"
+                />
               </div>
             </div>
           </form>
@@ -100,7 +113,9 @@
                   maxlength="2048"
                 />
               </div>
-              <div>
+              <div
+                v-if="onloading === false"
+              >
                 <button
                   class="btn btn-primary"
                   type="submit"
@@ -116,6 +131,15 @@
                 >
                   {{ $t('cancel') }}
                 </button>
+              </div>
+              <div
+                v-if="onloading === true"
+                class="mt-2"
+              >
+                <kheops-clip-loader
+                  size="25px"
+                  class-loader="text-left"
+                />
               </div>
             </div>
           </form>
@@ -134,10 +158,11 @@
 <script>
 import { mapGetters } from 'vuex';
 import AlbumButtons from '@/components/albumsettings/AlbumButtons';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'AlbumSettingsGeneral',
-  components: { AlbumButtons },
+  components: { AlbumButtons, KheopsClipLoader },
   props: {
     album: {
       type: Object,
@@ -151,6 +176,7 @@ export default {
         name: '-1',
         description: '-1',
       },
+      onloading: false,
     };
   },
   computed: {
@@ -169,6 +195,7 @@ export default {
   },
   methods: {
     updateAlbum() {
+      this.onloading = true;
       if (!this.album.is_admin) {
         this.$snotify.error(this.$t('permissiondenied'));
         return;
@@ -185,6 +212,9 @@ export default {
           this.edit.description = '-1';
           this.edit.name = '-1';
         }
+        this.onloading = false;
+      }).catch(() => {
+        this.onloading = false;
       });
     },
   },

@@ -15,6 +15,7 @@
     v-if="loading === true"
     :size="size"
     :color="color"
+    :class="classLoader"
   />
 </template>
 
@@ -39,6 +40,11 @@ export default {
       type: String,
       required: false,
       default: 'white',
+    },
+    classLoader: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
 };
