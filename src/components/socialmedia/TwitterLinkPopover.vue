@@ -29,12 +29,16 @@
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-12 col-md-12">
           <button
+            v-if="loading === false"
             type="submit"
             class="btn btn-danger btn-block"
             @click="revoke"
           >
             {{ $t('disable') }}
           </button>
+          <kheops-clip-loader
+            v-if="loading === true"
+          />
         </div>
       </div>
       <div class="row mb-2">
@@ -52,13 +56,21 @@
   </span>
 </template>
 <script>
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+
 export default {
   name: 'TwitterLinkPopover',
+  components: { KheopsClipLoader },
   props: {
     tokens: {
       type: Array,
       required: true,
       default: () => [],
+    },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

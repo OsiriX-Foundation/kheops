@@ -3,12 +3,14 @@
     <twitter-link
       :albumid="albumid"
       :tokens="albumTokens"
+      :loading="waitRevoke"
       @revoketokens="revokeTokens"
       @gettokens="getTokens"
     />
     <sharing-link
       :albumid="albumid"
       :tokens="albumTokens"
+      :loading="waitRevoke"
       @revoketokens="revokeTokens"
       @gettokens="getTokens"
     />
@@ -30,6 +32,11 @@ export default {
       default: null,
     },
   },
+  data() {
+    return {
+      waitRevoke: false,
+    };
+  },
   computed: {
     ...mapGetters({
       albumTokens: 'albumTokens',
@@ -45,13 +52,16 @@ export default {
       return this.$store.dispatch('getAlbumTokens', { queries });
     },
     revokeTokens(tokens) {
+      this.waitRevoke = true;
       tokens.forEach((token) => {
         this.$store.dispatch('revokeToken', { token_id: token.id }).then((res) => {
           if (res.status === 200) {
             this.getTokens();
           }
+          this.waitRevoke = false;
         }).catch(() => {
           this.$snotify.error(this.$t('sorryerror'));
+          this.waitRevoke = false;
         });
       });
     },
