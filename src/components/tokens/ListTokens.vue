@@ -56,8 +56,6 @@
       </div>
     </div>
     <b-table
-      v-if="loadingData === false"
-      stacked="sm"
       striped
       hover
       show-empty
@@ -65,6 +63,7 @@
       :fields="fields"
       :sort-desc="true"
       :sort-by.sync="sortBy"
+      :busy="loadingData"
       tbody-tr-class="link"
       @row-clicked="loadToken"
     >
@@ -155,14 +154,22 @@
       <template
         v-slot:cell(actions)="data"
       >
-        <button
+        <span
           v-if="!data.item.revoked"
-          type="button"
-          class="btn btn-danger btn-xs"
-          @click.stop="revoke(data.item.id)"
         >
-          {{ $t('revoke') }}
-        </button>
+          <button
+            v-if="onloading[data.item.id] === undefined || onloading[data.item.id] === false"
+            type="button"
+            class="btn btn-danger btn-xs"
+            @click.stop="revoke(data.item.id)"
+          >
+            {{ $t('revoke') }}
+          </button>
+          <kheops-clip-loader
+            v-else
+            :loading="onloading[data.item.id]"
+          />
+        </span>
         <span
           v-if="data.item.revoked"
           class="text-danger"
@@ -170,14 +177,21 @@
           {{ $t('revoked') }}
         </span>
       </template>
-      <template v-slot:empty="scope">
+      <template v-slot:table-busy>
+        <loading />
+      </template>
+      <template v-slot:empty>
         <div
           class="text-warning text-center"
         >
-          {{ $t('notokens') }}
+          <list-empty
+            :status="status"
+            :text-empty="$t('notokens')"
+            @reload="getTokens()"
+          />
         </div>
       </template>
-      <template v-slot:emptyfiltered="scope">
+      <template v-slot:emptyfiltered>
         <div
           class="text-warning text-center"
         >
@@ -189,12 +203,17 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import moment from 'moment';
+import Loading from '@/components/globalloading/Loading';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import ListEmpty from '@/components/globallist/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListTokens',
-  components: { },
+  components: { Loading, ListEmpty, KheopsClipLoader },
   props: {
     scope: {
       type: String,
@@ -211,6 +230,7 @@ export default {
     return {
       showInvalid: false,
       loadingData: false,
+      onloading: {},
       sortBy: 'expiration_date',
       fields: [
         {
@@ -235,13 +255,13 @@ export default {
           key: 'expiration_time',
           label: this.$t('expiration date'),
           sortable: true,
-          class: 'd-none d-sm-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'issued_at_time',
           label: this.$t('create date'),
           sortable: true,
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'last_used',
@@ -265,6 +285,7 @@ export default {
         actionid: '',
         action: '',
       },
+      status: -1,
     };
   },
   computed: {
@@ -285,9 +306,7 @@ export default {
   created() {
     this.loadingData = true;
     this.initRouterName();
-    this.getTokens().then(() => {
-      this.loadingData = false;
-    });
+    this.getTokens();
   },
   beforeDestroy() {
     this.$store.dispatch('initValidParamToken');
@@ -302,14 +321,38 @@ export default {
       this.$store.dispatch('setValidParamToken', !this.showInvalid);
     },
     getTokens() {
+      this.loadingData = true;
       if (this.scope === 'album' && this.albumid) {
         const queries = {
           valid: !this.showInvalid,
           album: this.albumid,
         };
-        return this.$store.dispatch('getAlbumTokens', { queries });
+        return this.$store.dispatch('getAlbumTokens', { queries }).then((res) => {
+          const tokens = res.data;
+          this.setOnLoading(tokens);
+          this.loadingData = false;
+          this.status = -1;
+        }).catch((err) => {
+          this.loadingData = false;
+          this.status = httpoperations.getStatusError(err);
+          Promise.reject(err);
+        });
       }
-      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid });
+      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid }).then((res) => {
+        const tokens = res;
+        this.setOnLoading(tokens);
+        this.loadingData = false;
+        this.status = -1;
+      }).catch((err) => {
+        this.loadingData = false;
+        this.status = httpoperations.getStatusError(err);
+        Promise.reject(err);
+      });
+    },
+    setOnLoading(tokens) {
+      tokens.forEach((token) => {
+        Vue.set(this.onloading, token.id, false);
+      });
     },
     loadToken(item) {
       const action = 'token';
@@ -331,9 +374,15 @@ export default {
       return 'active';
     },
     revoke(tokenId) {
+      Vue.set(this.onloading, tokenId, true);
       this.$store.dispatch('revokeToken', { token_id: tokenId }).then(() => {
-        this.getTokens();
+        this.getTokens().then(() => {
+          Vue.set(this.onloading, tokenId, false);
+        }).catch(() => {
+          Vue.set(this.onloading, tokenId, false);
+        });
       }).catch(() => {
+        Vue.set(this.onloading, tokenId, false);
         this.$snotify.error(this.$t('sorryerror'));
       });
     },

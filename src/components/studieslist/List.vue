@@ -416,9 +416,7 @@
       @infinite="infiniteHandler"
     >
       <div slot="spinner">
-        <pulse-loader
-          color="white"
-        />
+        <loading />
       </div>
       <div slot="no-more">
         {{ $t('nomorestudies') }}
@@ -455,19 +453,19 @@ import { mapGetters } from 'vuex';
 import InfiniteLoading from 'vue-infinite-loading';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import ListHeaders from '@/components/studieslist/ListHeaders';
 import ListIcons from '@/components/studieslist/ListIcons';
 import ListItemDetails from '@/components/studieslist/ListItemDetails.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
-import SortList from '@/components/globals/SortList.vue';
+import SortList from '@/components/globallist/SortList.vue';
 import IconListProviders from '@/components/providers/IconListProviders.vue';
+import Loading from '@/components/globalloading/Loading';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'Studies',
   components: {
-    ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders, PulseLoader,
+    ListHeaders, ListIcons, ListItemDetails, InfiniteLoading, Datepicker, SortList, IconListProviders, Loading,
   },
   mixins: [CurrentUser],
   props: {

@@ -53,6 +53,7 @@
         <webhook-details
           :album-id="albumId"
           :webhook="webhook"
+          :on-loading="onLoading"
           class-col-right="col-xs-12 col-sm-12 col-md-5 col-lg-4"
           class-col-left="col-xs-12 col-sm-12 col-md-7 col-lg-8"
           @done="done"
@@ -67,6 +68,7 @@
         <edit-webhook
           :album-id="albumId"
           :webhook="webhook"
+          :on-loading="onLoading"
           class-col-right="col-xs-12 col-sm-12 col-md-5 col-lg-4"
           class-col-left="col-xs-12 col-sm-12 col-md-7 col-lg-8"
           @done="done"
@@ -81,6 +83,9 @@
           :triggers="webhook.triggers"
           :per-page="limit"
           :rows="webhook.number_of_triggers"
+          :loading="loading"
+          @manualtrigger="getWebhook()"
+          @refresh="getWebhook()"
         />
       </div>
     </div>
@@ -111,6 +116,7 @@ export default {
       loading: true,
       limit: 10,
       offset: 0,
+      onLoading: false,
     };
   },
   computed: {
@@ -146,16 +152,21 @@ export default {
       this.$router.push({ name: 'albumsettingsactionid', params: { action, id } });
     },
     getWebhook() {
+      this.loading = true;
       const params = {
         albumId: this.albumId,
         webhookId: this.webhookId,
       };
-      return this.$store.dispatch('getWebhook', params).catch((err) => {
+      return this.$store.dispatch('getWebhook', params).then(() => {
+        this.loading = false;
+      }).catch((err) => {
+        this.loading = false;
         this.manageError(err);
         this.done();
       });
     },
     removeWebhook(webhookId) {
+      this.onLoading = true;
       const params = {
         albumId: this.albumId,
         webhookId,
@@ -163,6 +174,7 @@ export default {
       this.$store.dispatch('removeWebhook', params).then(() => {
         this.done();
       }).catch((err) => {
+        this.onLoading = false;
         this.manageError(err);
       });
     },

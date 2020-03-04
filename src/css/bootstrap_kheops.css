@@ -238,3 +238,12 @@ a.text-success:hover, a.text-success:focus {
     background-color: #5A4181 !Important;
     border: solid 1px #5A4181;
 }
+
+.table.b-table > thead > tr > [aria-sort="none"],
+.table.b-table > tfoot > tr > [aria-sort="none"],
+.table.b-table > thead > tr > [aria-sort="ascending"],
+.table.b-table > tfoot > tr > [aria-sort="ascending"],
+.table.b-table > thead > tr > [aria-sort="descending"],
+.table.b-table > tfoot > tr > [aria-sort="descending"] {
+  background-image: none;
+}

@@ -35,7 +35,8 @@
     "nocommentaccessstudy": "no access to this study.",
     "createwebhook": "{user} created a webhook",
     "editwebhook": "{user} edited a webhook",
-    "deletewebhook": "{user} deleted a webhook"
+    "deletewebhook": "{user} deleted a webhook",
+    "triggerwebhook": "{user} has made a manual trigger on a webhook"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -71,7 +72,8 @@
     "nocommentaccessstudy": "n'a plus accès à cette étude.",
     "createwebhook": "{user} a créé un webhook",
     "editwebhook": "{user} a édité un webhook",
-    "deletewebhook": "{user} a supprimé un webhook"
+    "deletewebhook": "{user} a supprimé un webhook",
+    "triggerwebhook": "{user} a déclenché manuellement un webhook"
   }
 }
 </i18n>
@@ -103,9 +105,7 @@
         <div
           v-if="loading === true"
         >
-          <pulse-loader
-            color="white"
-          />
+          <loading />
         </div>
         <div
           v-for="comment in comments"
@@ -344,6 +344,13 @@
               >
                 {{ $t('editwebhook', {user: getName(comment.origin)}) }}
               </div>
+
+              <div
+                v-if="comment.mutation_type === 'TRIGGER_WEBHOOK'"
+                class=" flex-grow-1 bd-highlight"
+              >
+                {{ $t('triggerwebhook', {user: getName(comment.origin)}) }}
+              </div>
             </div>
           </div>
         </div>
@@ -397,6 +404,7 @@
               />
               <div class="input-group-append">
                 <button
+                  v-if="onloading === false"
                   title="send comment"
                   type="submit"
                   class="btn btn-primary button-cursor"
@@ -404,6 +412,9 @@
                 >
                   <v-icon name="paper-plane" />
                 </button>
+                <kheops-clip-loader
+                  v-if="onloading === true"
+                />
               </div>
             </div>
           </form>
@@ -415,13 +426,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import AddUser from '@/components/user/AddUser';
+import Loading from '@/components/globalloading/Loading';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'CommentsAndNotifications',
-  components: { AddUser, PulseLoader },
+  components: { AddUser, Loading, KheopsClipLoader },
   mixins: [CurrentUser],
   props: {
     scope: {
@@ -451,6 +463,7 @@ export default {
       disabledText: false,
       statusMsgPrivate: false,
       loading: true,
+      onloading: false,
     };
   },
   computed: {
@@ -518,7 +531,7 @@ export default {
       }
     },
     addComment() {
-      if (this.newComment.comment.length >= 1) {
+      if (this.newComment.comment.length >= 1 && this.onloading === false) {
         const queries = {
           comment: this.newComment.comment,
         };
@@ -534,6 +547,7 @@ export default {
       }
     },
     addStudyComment(queries) {
+      this.onloading = true;
       const params = {
         StudyInstanceUID: this.id,
         queries,
@@ -545,13 +559,16 @@ export default {
           this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
             this.scrollBottom();
           });
+          this.onloading = false;
         }
       }).catch((res) => {
         this.$snotify.error(`${this.$t('sorryerror')}: ${res}`);
         this.newComment.comment = '';
+        this.onloading = false;
       });
     },
     addAlbumComment(queries) {
+      this.onloading = true;
       const params = {
         album_id: this.id,
         queries,
@@ -562,9 +579,11 @@ export default {
           this.newComment.comment = '';
           this.getComments();
         }
+        this.onloading = false;
       }).catch((res) => {
         this.$snotify.error(`${this.$t('sorryerror')}: ${res}`);
         this.newComment.comment = '';
+        this.onloading = false;
       });
     },
     getComments() {

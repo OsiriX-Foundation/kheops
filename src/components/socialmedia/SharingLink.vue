@@ -42,6 +42,7 @@
         :album-id="albumid"
         :url="urlSharing"
         :tokens="sharingToken"
+        :loading="waitCreate || loading"
         @cancel="cancelSharingToken"
         @revoke="revokeSharingTokens"
         @create="createSharingToken"
@@ -68,6 +69,11 @@ export default {
       required: true,
       default: () => [],
     },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -75,6 +81,7 @@ export default {
         show: false,
       },
       urlSharing: '',
+      waitCreate: false,
     };
   },
   computed: {
@@ -95,12 +102,15 @@ export default {
       this.$emit('revoketokens', tokens);
     },
     createSharingToken(token) {
+      this.waitCreate = true;
       this.createToken(token).then((res) => {
         const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
         this.urlSharing = urlSharing;
         this.$emit('gettokens');
+        this.waitCreate = false;
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
+        this.waitCreate = false;
       });
     },
   },

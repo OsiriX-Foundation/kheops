@@ -244,6 +244,7 @@
         -->
         <create-cancel-button
           :disabled="disabledCreateToken"
+          :loading="oncreate"
           class-col="offset-md-2 col-md-10"
           @cancel="cancel"
         />
@@ -254,6 +255,7 @@
       id="tokenModal"
       ref="tokenModal"
       header-class="bg-primary"
+      title-class="word-break"
       body-class="bg-secondary"
       centered
       no-fade
@@ -335,7 +337,7 @@
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
 import { mapGetters } from 'vuex';
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
@@ -370,6 +372,7 @@ export default {
         appropriate_permission: false,
       },
       scopes: ['user', 'album'],
+      oncreate: false,
     };
   },
   computed: {
@@ -377,7 +380,12 @@ export default {
       albums: 'albums',
     }),
     disabledCreateToken() {
-      return !this.token.title || (this.token.scope_type === 'album' && !this.token.album) || (this.token.scope_type === 'album' && !this.permissions.read_permission && !this.permissions.write_permission);
+      return (
+        !this.token.title
+        || (this.token.scope_type === 'album' && !this.token.album)
+        || (this.token.scope_type === 'album' && !this.permissions.read_permission && !this.permissions.write_permission)
+        || this.oncreate
+      );
     },
     warningPermissions() {
       return (this.token.scope_type === 'album' && (this.permissions.read_permission || this.permissions.write_permission));
@@ -416,6 +424,7 @@ export default {
   },
   methods: {
     createToken() {
+      this.oncreate = true;
       if (this.token.scope_type !== 'album') {
         this.permissions.read_permission = false;
         this.permissions.write_permission = false;
@@ -433,6 +442,7 @@ export default {
         this.sharingurl = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
         this.$refs.tokenModal.show();
       }).catch(() => {
+        this.oncreate = false;
         this.$snotify.error(this.$t('sorryerror'));
       });
     },

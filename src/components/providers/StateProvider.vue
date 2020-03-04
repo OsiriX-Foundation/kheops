@@ -17,7 +17,7 @@
     class="nowrap"
     :title="$t('urlWorking')"
   >
-    <clip-loader
+    <kheops-clip-loader
       :loading="loading"
       :size="'20px'"
       :color="'white'"
@@ -49,11 +49,11 @@
 </template>
 
 <script>
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'StateProvider',
-  components: { ClipLoader },
+  components: { KheopsClipLoader },
   props: {
     loading: {
       type: Boolean,

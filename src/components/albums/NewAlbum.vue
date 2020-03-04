@@ -63,6 +63,7 @@
                 class="form-control"
                 maxlength="255"
               >
+              <field-obligatory :state="album.name !== ''" />
             </dd>
           </div>
         </div>
@@ -95,24 +96,6 @@
           <div class="col-xs-12 col-sm-9">
             <dd>
               <h5
-                v-if="album.users.length > 0"
-                class="newalbum-user"
-              >
-                <span
-                  v-for="user in album.users"
-                  :key="user.email"
-                  class="badge badge-secondary"
-                >
-                  {{ user.email }}
-                  <span
-                    class="pointer"
-                    @click="deleteUser(user)"
-                  >
-                    <v-icon name="times" />
-                  </span>
-                </span>
-              </h5>
-              <h5
                 class="newalbum-user"
               >
                 <div class="input-group mb-3">
@@ -126,6 +109,7 @@
                   >
                   <div class="input-group-append">
                     <button
+                      v-if="loadingCheckUser === false"
                       id="button-addon2"
                       class="btn btn-outline-secondary btn-sm"
                       type="button"
@@ -134,10 +118,23 @@
                     >
                       <v-icon name="plus" />
                     </button>
+                    <kheops-clip-loader
+                      v-if="loadingCheckUser === true"
+                      size="25px"
+                      class="ml-1"
+                    />
                   </div>
                 </div>
               </h5>
             </dd>
+          </div>
+          <div class="offset-md-3 col-md-9">
+            <new-album-user
+              v-if="album.users.length > 0"
+              :users="album.users"
+              @toggle-admin="toggleAdmin"
+              @delete-user="deleteUser"
+            />
           </div>
         </div>
       </fieldset>
@@ -192,38 +189,12 @@
       </div>
 
       <fieldset>
-        <div class="row">
-          <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="!album.name"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-          <div class="col-12 mt-1 d-md-none">
-            <button
-              type="submit"
-              class="btn btn-primary btn-block"
-              :disabled="!album.name"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary btn-block"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-        </div>
+        <create-cancel-button
+          :disabled="disabledCreate"
+          :loading="oncreate"
+          class-col="mt-3 col-12"
+          @cancel="cancel"
+        />
       </fieldset>
     </form>
   </div>
@@ -231,9 +202,14 @@
 
 <script>
 import { HTTP } from '@/router/http';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
+import FieldObligatory from '@/components/globals/FieldObligatory';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import NewAlbumUser from '@/components/albums/NewAlbumUser';
 
 export default {
   name: 'NewAlbum',
+  components: { CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser },
   data() {
     return {
       album: {
@@ -258,6 +234,8 @@ export default {
       },
       newUserName: '',
       numberCol: 2,
+      oncreate: false,
+      loadingCheckUser: false,
     };
   },
   computed: {
@@ -269,6 +247,9 @@ export default {
     },
     downloadSeries() {
       return this.album.userSettings.downloadSeries;
+    },
+    disabledCreate() {
+      return this.album.name === '' || this.oncreate;
     },
   },
   watch: {
@@ -283,22 +264,35 @@ export default {
       const index = this.album.users.findIndex((i) => i.email === user.email);
       if (index > -1) this.album.users.splice(index, 1);
     },
+    toggleAdmin(user) {
+      const index = this.album.users.findIndex((i) => i.email === user.email);
+      if (index > -1) this.album.users[index].is_admin = !this.album.users[index].is_admin;
+    },
     checkUser() {
+      this.loadingCheckUser = true;
       const vm = this;
       const idx = _.findIndex(vm.album.users, (u) => u.email === vm.newUserName);
       if (vm.newUserName && idx === -1) {
         HTTP.get(`users?reference=${vm.newUserName}`, { headers: { Accept: 'application/json' } }).then((res) => {
           if (res.status === 204) this.$snotify.error('User unknown');
           else if (res.status === 200) {
-            this.album.users.push({ email: res.data.email });
+            const user = res.data;
+            user.is_admin = false;
+            this.album.users.unshift(user);
             vm.newUserName = '';
           }
+          this.loadingCheckUser = false;
         }).catch(() => {
+          this.loadingCheckUser = false;
           console.log('Sorry, an error occured');
         });
+      } else {
+        vm.newUserName = '';
+        this.loadingCheckUser = false;
       }
     },
     createAlbum() {
+      this.oncreate = true;
       const formData = {
         name: this.album.name,
         description: this.album.description,
@@ -312,7 +306,7 @@ export default {
       this.$store.dispatch('createAlbum', { formData }).then((res) => {
         if (res.status === 201) {
           const albumCreated = res.data;
-          this.addAlbumUser(albumCreated);
+          this.addAlbumNewUser(albumCreated);
           const data = this.dataToUpload(albumCreated.album_id);
           if (data.length > 0) {
             this.putStudiesInAlbum(albumCreated, data).then(() => {
@@ -324,22 +318,40 @@ export default {
         }
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
+        this.oncreate = false;
       });
     },
-    addAlbumUser(albumCreated) {
+    addAlbumNewUser(albumCreated) {
       this.album.users.forEach((user) => {
         const paramsUser = {
           album_id: albumCreated.album_id,
           user: user.email,
         };
-        this.$store.dispatch('addAlbumUser', paramsUser).then((res) => {
-          if (res.status !== 201) {
-            this.$snotify.error(this.$t('sorryerror'));
-          }
-        }).catch((err) => {
+        if (user.is_admin === true) {
+          this.addAlbumUserAdmin(paramsUser);
+        } else {
+          this.addAlbumUser(paramsUser);
+        }
+      });
+    },
+    addAlbumUserAdmin(paramsUser) {
+      this.$store.dispatch('addAlbumUserAdmin', paramsUser).then((res) => {
+        if (res.status !== 204) {
           this.$snotify.error(this.$t('sorryerror'));
-          return err;
-        });
+        }
+      }).catch((err) => {
+        this.$snotify.error(this.$t('sorryerror'));
+        return err;
+      });
+    },
+    addAlbumUser(paramsUser) {
+      this.$store.dispatch('addAlbumUser', paramsUser).then((res) => {
+        if (res.status !== 201) {
+          this.$snotify.error(this.$t('sorryerror'));
+        }
+      }).catch((err) => {
+        this.$snotify.error(this.$t('sorryerror'));
+        return err;
       });
     },
     putStudiesInAlbum(albumCreated, data) {
@@ -386,6 +398,9 @@ export default {
         });
       }
       return data;
+    },
+    cancel() {
+      this.$router.push({ name: 'albums' });
     },
   },
 };

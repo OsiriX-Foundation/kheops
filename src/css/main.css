@@ -477,3 +477,21 @@ label.token-props{
 	text-transform: capitalize;
 	margin-left: 1em;
 }
+
+.serie-section {
+	max-height: 300px;
+	overflow-y: scroll;
+}
+
+table.tableAddUserNewAlbum tbody {
+	display: block;
+	max-height: 175px;
+	overflow-y: scroll;
+  }
+  
+table.tableAddUserNewAlbum thead ,
+table.tableAddUserNewAlbum tr {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}

@@ -52,9 +52,11 @@
 <template>
   <div class="token">
     <div
-      class="my-3 selection-button-container token-position"
+      class="my-3 token-position"
     >
-      <h4>
+      <h4
+        class="row word-break mb-3"
+      >
         <button
           type="button"
           class="btn btn-link btn-sm d-md-none"
@@ -201,85 +203,31 @@
           </dd>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="offset-sm-3 col-sm-9 d-none d-sm-none d-md-block">
-          <button
-            v-if="!token.revoked && !confirmRevoke"
-            type="button"
-            class="btn btn-danger"
-            @click="revoke"
-          >
-            {{ $t('revoke') }}
-          </button>
-          <p
-            v-if="!token.revoked && confirmRevoke"
-          >
-            {{ $t('warningrevoke') }}
-          </p>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-danger"
-            @click="revoke"
-          >
-            {{ $t('confirm') }}
-          </button>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-secondary"
-            @click="confirmRevoke=false"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-
-        <div class="col-12 d-md-none">
-          <button
-            v-if="!token.revoked && !confirmRevoke"
-            type="button"
-            class="btn btn-danger btn-block"
-            @click="revoke"
-          >
-            {{ $t('revoke') }}
-          </button>
-          <p
-            v-if="!token.revoked && confirmRevoke"
-          >
-            {{ $t('warningrevoke') }}
-          </p>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-danger btn-block"
-            @click="revoke"
-          >
-            {{ $t('confirm') }}
-          </button>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-secondary btn-block"
-            @click="confirmRevoke=false"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-      </div>
+      <done-delete-button
+        class-row="mt-2"
+        class-col="offset-md-3 col-sm-12 col-md-4 col-lg-2 d-block"
+        class-col-warning-remove="offset-md-3 col-12 col-md-9"
+        :text-warning-remove="$t('warningrevoke')"
+        :text-button-remove="$t('revoke')"
+        :show-done="false"
+        :loading="onloading"
+        @remove="revoke"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 
 export default {
   name: 'Token',
-  props: {
-  },
+  components: { DoneDeleteButton },
   data() {
     return {
       confirmRevoke: false,
+      onloading: false,
     };
   },
   computed: {
@@ -321,15 +269,13 @@ export default {
       return tokenId;
     },
     revoke() {
-      if (this.confirmRevoke === false) {
-        this.confirmRevoke = true;
-      } else {
-        this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then(() => {
-          this.cancel();
-        }).catch(() => {
-          this.$snotify.error(this.$t('sorryerror'));
-        });
-      }
+      this.onloading = true;
+      this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then(() => {
+        this.cancel();
+      }).catch(() => {
+        this.onloading = false;
+        this.$snotify.error(this.$t('sorryerror'));
+      });
     },
     cancel() {
       this.$emit('done');

@@ -94,6 +94,7 @@
       </div>
       <create-cancel-button
         :disabled="disabledCreate"
+        :loading="oncreate"
         class-col="offset-md-3 col-md-9"
         @cancel="cancel"
       />
@@ -104,7 +105,7 @@
 <script>
 import StateProvider from '@/components/providers/StateProvider';
 import FieldObligatory from '@/components/globals/FieldObligatory';
-import CreateCancelButton from '@/components/globals/CreateCancelButton';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import { validator } from '@/mixins/validator.js';
 
 export default {
@@ -127,6 +128,7 @@ export default {
       show: false,
       loading: false,
       checkedURL: false,
+      oncreate: false,
     };
   },
   computed: {
@@ -134,20 +136,24 @@ export default {
       return (this.provider.name === ''
         || this.provider.url === ''
         || !this.checkUrl(this.provider.url))
-        || this.loading;
+        || this.loading
+        || this.oncreate;
     },
   },
   methods: {
     createProvider() {
       this.setStateProvider(false, true, true);
+      this.oncreate = true;
       this.$store.dispatch('postProvider', { query: this.provider, albumID: this.albumID }).then((res) => {
         if (res.status !== 201) {
           this.setStateProvider(false, false, true);
+          this.oncreate = false;
         } else {
           this.$emit('done');
         }
       }).catch((err) => {
         this.setStateProvider(false, false, true);
+        this.oncreate = false;
         console.log(err);
       });
     },

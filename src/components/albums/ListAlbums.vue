@@ -258,9 +258,7 @@
       @infinite="infiniteHandler"
     >
       <div slot="spinner">
-        <pulse-loader
-          color="white"
-        />
+        <loading />
       </div>
       <div slot="no-more">
         {{ $t('nomorealbums') }}
@@ -296,16 +294,16 @@ import { mapGetters } from 'vuex';
 import Datepicker from 'vuejs-datepicker';
 import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
-import SortList from '@/components/globals/SortList.vue';
+import SortList from '@/components/globallist/SortList.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'Albums',
   components: {
-    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, PulseLoader,
+    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, Loading,
   },
   data() {
     return {

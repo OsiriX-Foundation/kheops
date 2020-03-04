@@ -40,6 +40,7 @@
       </template>
       <twitter-link-popover
         :tokens="twitterToken"
+        :loading="loading"
         @revoke="revokeTwitterTokens"
         @cancel="showRevokeTwitter = false"
       />
@@ -64,6 +65,11 @@ export default {
       type: Array,
       required: true,
       default: () => [],
+    },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

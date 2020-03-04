@@ -49,7 +49,9 @@
     <div
       class="my-3 provider-position"
     >
-      <h4>
+      <h4
+        class="row word-break mb-3"
+      >
         <button
           type="button"
           class="btn btn-link btn-sm d-md-none"
@@ -62,9 +64,7 @@
             />
           </span>
         </button>
-        <span
-          class="breakwork"
-        >
+        <span>
           {{ provider.name }}
         </span>
       </h4>
@@ -107,7 +107,7 @@
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            {{ provider.created_time }}
+            {{ provider.created_time|formatDateTimeDetails }}
           </dd>
         </div>
       </div>
@@ -245,6 +245,7 @@
       class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
       :text-warning-remove="$t('warningremove')"
       :text-button-done="$t('edit')"
+      :loading="onloading"
       @done="edit"
       @remove="deleteProvider"
     />
@@ -254,7 +255,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
-import DoneDeleteButton from '@/components/globals/DoneDeleteButton';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 
 export default {
   name: 'Provider',
@@ -274,6 +275,7 @@ export default {
   data() {
     return {
       confirmDelete: false,
+      onloading: false,
     };
   },
   computed: {
@@ -307,13 +309,16 @@ export default {
       this.$emit('providerselectededit', this.clientID);
     },
     deleteProvider() {
+      this.onloading = true;
       this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
         if (res.status !== 204) {
+          this.onloading = false;
           this.$snotify.error('Sorry, an error occured');
         } else {
           this.$emit('done');
         }
       }).catch((err) => {
+        this.onloading = false;
         console.log(err);
       });
     },
