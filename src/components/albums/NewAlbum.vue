@@ -127,6 +127,7 @@
                   >
                   <div class="input-group-append">
                     <button
+                      v-if="loadingCheckUser === false"
                       id="button-addon2"
                       class="btn btn-outline-secondary btn-sm"
                       type="button"
@@ -135,6 +136,11 @@
                     >
                       <v-icon name="plus" />
                     </button>
+                    <kheops-clip-loader
+                      v-if="loadingCheckUser === true"
+                      size="25px"
+                      class="ml-1"
+                    />
                   </div>
                 </div>
               </h5>
@@ -208,10 +214,11 @@
 import { HTTP } from '@/router/http';
 import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import FieldObligatory from '@/components/globals/FieldObligatory';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'NewAlbum',
-  components: { CreateCancelButton, FieldObligatory },
+  components: { CreateCancelButton, FieldObligatory, KheopsClipLoader },
   data() {
     return {
       album: {
@@ -237,6 +244,7 @@ export default {
       newUserName: '',
       numberCol: 2,
       oncreate: false,
+      loadingCheckUser: false,
     };
   },
   computed: {
@@ -266,6 +274,7 @@ export default {
       if (index > -1) this.album.users.splice(index, 1);
     },
     checkUser() {
+      this.loadingCheckUser = true;
       const vm = this;
       const idx = _.findIndex(vm.album.users, (u) => u.email === vm.newUserName);
       if (vm.newUserName && idx === -1) {
@@ -275,7 +284,9 @@ export default {
             this.album.users.push({ email: res.data.email });
             vm.newUserName = '';
           }
+          this.loadingCheckUser = false;
         }).catch(() => {
+          this.loadingCheckUser = false;
           console.log('Sorry, an error occured');
         });
       }
