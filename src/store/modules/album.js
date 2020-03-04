@@ -100,6 +100,15 @@ const actions = {
       return res;
     }).catch((err) => Promise.reject(err));
   },
+  addAlbumUserAdmin({ dispatch }, params) {
+    const request = `albums/${params.album_id}/users/${params.user}/admin`;
+    return HTTP.put(request).then((res) => {
+      if (res.status === 204) {
+        dispatch('getUsersAlbum', { album_id: params.album_id });
+      }
+      return res;
+    }).catch((err) => Promise.reject(err));
+  },
   removeAlbumUser({ dispatch }, params) {
     const request = `albums/${params.album_id}/users/${params.user}`;
     return HTTP.delete(request).then((res) => {

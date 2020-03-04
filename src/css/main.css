@@ -482,3 +482,16 @@ label.token-props{
 	max-height: 300px;
 	overflow-y: scroll;
 }
+
+table.tableAddUserNewAlbum tbody {
+	display: block;
+	max-height: 175px;
+	overflow-y: scroll;
+  }
+  
+table.tableAddUserNewAlbum thead ,
+table.tableAddUserNewAlbum tr {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
