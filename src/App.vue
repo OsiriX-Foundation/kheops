@@ -18,17 +18,16 @@
   <div id="app">
     <vue-snotify />
     <nav-header
-      :logged="logged"
+      :logged="oidcIsAuthenticated"
     />
     <nav-bar
-      v-if="logged"
+      v-if="oidcIsAuthenticated"
     />
 
     <!-- content -->
     <router-view
-      :style="logged ? 'margin: 25px auto' : 'margin: 75px auto'"
+      :style="oidcIsAuthenticated ? 'margin: 25px auto' : 'margin: 75px auto'"
     />
-
     <send-studies />
     <!-- footer -->
     <footer />
@@ -37,6 +36,7 @@
 
 <script>
 
+import { mapGetters } from 'vuex';
 import navHeader from '@/components/navheader';
 import navBar from '@/components/navbar';
 import SendStudies from '@/components/study/SendStudies';
@@ -50,11 +50,11 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     year() {
       return new Date().getFullYear();
-    },
-    logged() {
-      return this.$keycloak.authenticated;
     },
   },
   watch: {

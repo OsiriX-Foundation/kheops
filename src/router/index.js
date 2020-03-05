@@ -216,19 +216,6 @@ const router = new Router({
   },
   ],
 });
-/*
-router.beforeEach((to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (router.app.$keycloak.authenticated) {
-      next();
-    } else {
-      const loginUrl = router.app.$keycloak.createLoginUrl();
-      window.location.replace(loginUrl);
-    }
-  } else {
-    next();
-  }
-});
-*/
+
 router.beforeEach(vuexOidcCreateRouterMiddleware(store, 'oidcStore'));
 export default router;

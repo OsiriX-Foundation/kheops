@@ -134,6 +134,7 @@
   </span>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 import Vue from 'vue';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
 import SlicerIcon from '@/components/kheopsSVG/SlicerIcon.vue';
@@ -216,12 +217,16 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+      'oidcAccessToken',
+    ]),
     OS() {
       return navigator.platform;
     },
     access_token() {
-      if (this.$keycloak.authenticated) {
-        return Vue.prototype.$keycloak.token;
+      if (this.oidcIsAuthenticated) {
+        return this.oidcAccessToken;
       }
       if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
@@ -276,7 +281,7 @@ export default {
     getURLDownload() {
       const sourceQuery = this.getSourceQueries();
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      const token = this.currentuserAccessToken();
+      const token = this.getCurrentuserAccessToken(this.oidcIsAuthenticated);
       this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
@@ -289,7 +294,7 @@ export default {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       const sourceQuery = this.getSourceQueries();
       const openWindow = this.setWindowsProps(viewer, StudyInstanceUID);
-      const token = this.currentuserAccessToken();
+      const token = this.getCurrentuserAccessToken(this.oidcIsAuthenticated);
 
       this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const viewerToken = res.data.access_token;

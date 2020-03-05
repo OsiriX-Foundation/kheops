@@ -54,6 +54,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
@@ -63,6 +64,11 @@ export default {
     return {
       new_user_name: '',
     };
+  },
+  computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
   },
   methods: {
     validEmail(email) {
@@ -80,9 +86,9 @@ export default {
       });
     },
     getHeaders() {
-      if (this.authenticated) {
+      if (this.oidcIsAuthenticated) {
         return {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+          Authorization: `Bearer ${this.currentuserAccessToken}`,
           Accept: 'application/json',
         };
       }

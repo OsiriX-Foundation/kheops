@@ -436,6 +436,9 @@ export default {
       sourceSending: 'sourceSending',
       studyUIDToSend: 'studyUIDToSend',
     }),
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     totalSizeFiles() {
       return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
     },
@@ -576,8 +579,8 @@ export default {
     },
     setAuthorizationHeader() {
       const headers = {};
-      if (this.currentuserAccessToken() !== '') {
-        headers.Authorization = `Bearer ${this.currentuserAccessToken()}`;
+      if (this.getCurrentuserAccessToken(this.oidcIsAuthenticated) !== '') {
+        headers.Authorization = `Bearer ${this.getCurrentuserAccessToken(this.oidcIsAuthenticated)}`;
       }
       return headers;
     },

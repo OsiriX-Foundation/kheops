@@ -64,7 +64,16 @@ const i18n = new VueI18n({
   locale: 'en',
   messages,
 });
+
+// eslint-disable-next-line no-new
+new Vue({
+  router,
+  store,
+  i18n,
+  render: (h) => h(App),
+}).$mount('#app');
 /* eslint-disable no-new */
+/*
 Vue.use(VueKeyCloak, {
   config: keycloakconfig,
   init: {
@@ -73,7 +82,6 @@ Vue.use(VueKeyCloak, {
   },
   onReady: () => {
     tokenInterceptor();
-    /* eslint-disable no-new */
     new Vue({
       el: '#app',
       router,
@@ -84,6 +92,7 @@ Vue.use(VueKeyCloak, {
     });
   },
 });
+*/
 
 // https://fr.vuejs.org/v2/guide/custom-directive.html
 Vue.directive('focus', {
@@ -91,16 +100,6 @@ Vue.directive('focus', {
     el.focus();
   },
 });
-
-// if we don't need authentication...
-
-// new Vue({
-//   el: '#app',
-//   router,
-//   store,
-//   components: { App },
-//   template: '<App/>'
-// })
 
 Icon.register({
   refresh: {

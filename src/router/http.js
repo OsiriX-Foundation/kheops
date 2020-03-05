@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Vue from 'vue';
+import store from '@/store';
 import { serverURL } from '@/app_config';
 
 // eslint-disable-next-line
@@ -9,7 +10,8 @@ HTTP.interceptors.request.use((config) => {
   const tmpconfig = config;
   if (tmpconfig.headers.Authorization === undefined) {
     if (window.location.pathname.includes('/view/') === false) {
-      tmpconfig.headers.Authorization = `Bearer ${Vue.prototype.$keycloak.token}`;
+      const accessToken = store.state.oidcStore.access_token;
+      tmpconfig.headers.Authorization = `Bearer ${accessToken}`;
       return tmpconfig;
     }
     if (window.location.pathname.includes('/view/') === true) {

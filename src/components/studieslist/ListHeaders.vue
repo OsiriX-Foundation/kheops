@@ -459,9 +459,9 @@ export default {
       return {};
     },
     getHeaders() {
-      if (this.currentuserCapabilitiesToken !== undefined && this.currentuserKeycloakToken !== undefined) {
+      if (this.currentuserCapabilitiesToken !== undefined && this.currentuserAccessToken !== undefined) {
         return {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+          Authorization: `Bearer ${this.currentuserAccessToken}`,
           'X-Authorization-Source': `Bearer ${this.currentuserCapabilitiesToken}`,
         };
       }

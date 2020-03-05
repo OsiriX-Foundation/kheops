@@ -53,14 +53,14 @@
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav right>
           <b-nav-item
-            v-if="logged"
+            v-if="logged === true"
             v-access="'active'"
             class="font-kheops active"
           >
             <router-link
               to="/user"
             >
-              {{ currentuserFullname !== undefined ? currentuserFullname : currentuserEmail }}
+              {{ oidcUser.name }}
             </router-link>
           </b-nav-item>
           <b-nav-item
@@ -92,7 +92,7 @@
             v-if="logged"
             :title="$t('tooltipLogout')"
             class="active pointer"
-            @click="logout()"
+            @click="signOutOidc()"
           >
             <span
               class="font-white"
@@ -128,7 +128,7 @@
 
 <script>
 import Vue from 'vue';
-import store from '@/store';
+import { mapActions, mapGetters } from 'vuex';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
 import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
@@ -153,14 +153,25 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcUser',
+    ]),
     lang() {
       return this.$i18n.locale;
     },
+    user() {
+      if (this.oidcUser !== null) {
+        return this.oidcUser;
+      }
+      return {};
+    }
   },
   created() {
+    console.log(this.logged);
     this.setFromLocalStorage();
   },
   methods: {
+    ...mapActions('oidcStore', ['authenticateOidcSilent', 'signOutOidc']),
     setFromLocalStorage() {
       const storageLanguage = localStorage.getItem('language');
       const navigatorLanguage = (navigator.language || navigator.userLanguage).split('-')[0];
@@ -169,14 +180,6 @@ export default {
       } else {
         this.changeLang(navigatorLanguage);
       }
-    },
-    logout() {
-      store.dispatch('logout').then(() => {
-        Vue.prototype.$keycloak.logoutFn();
-      });
-    },
-    login() {
-      Vue.prototype.$keycloak.loginFn();
     },
     changeLang(value) {
       if (this.availableLanguage.includes(value)) {

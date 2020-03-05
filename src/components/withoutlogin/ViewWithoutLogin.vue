@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
 import { HTTP } from '@/router/http';
 import httpoperations from '@/mixins/httpoperations';
@@ -46,17 +47,17 @@ export default {
     };
   },
   computed: {
-    logged() {
-      return this.$keycloak.authenticated;
-    },
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     permissions() {
       return {
         add_series: this.scope.includes('write'),
         delete_series: this.scope.includes('write'),
         download_series: this.scope.includes('downloadbutton'),
-        send_series: this.scope.includes('send') && this.logged,
+        send_series: this.scope.includes('send') && this.oidcIsAuthenticated,
         write_comments: false,
-        add_inbox: this.scope.includes('send') && this.logged,
+        add_inbox: this.scope.includes('send') && this.oidcIsAuthenticated,
       };
     },
   },

@@ -28,7 +28,7 @@
           type="text"
           hidden
           name="access_token"
-          :value="accessToken"
+          :value="oidcAccessToken"
         />
         <b-form-input
           v-if="checkProviderModalities(study, provider)"
@@ -63,8 +63,7 @@
   </span>
 </template>
 <script>
-
-import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import { serverURL } from '@/app_config';
 
 export default {
@@ -95,9 +94,9 @@ export default {
     };
   },
   computed: {
-    accessToken() {
-      return Vue.prototype.$keycloak.token;
-    },
+    ...mapGetters('oidcStore', [
+      'oidcAccessToken',
+    ]),
     returnuri() {
       return `${process.env.VUE_APP_URL_ROOT}/albums/${this.albumId}?StudyInstanceUID=${encodeURIComponent(this.study.StudyInstanceUID.Value[0])}`;
     },

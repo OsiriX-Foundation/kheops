@@ -94,6 +94,9 @@ export default {
       studies: 'studies',
       series: 'series',
     }),
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     checkSR() {
       if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
         return !this.serie.Modality.Value[0].includes('SR');
@@ -228,7 +231,7 @@ export default {
     },
     openTab(series) {
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
-      const token = this.currentuserAccessToken();
+      const token = this.getCurrentuserAccessToken(this.oidcIsAuthenticated);
       const windowProps = this.setWindowsProps(series);
       const openWindow = window.open('', windowProps.name);
 

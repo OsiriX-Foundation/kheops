@@ -811,12 +811,12 @@ export default {
       });
     },
     setAlbumsList() {
-      if (this.currentuserKeycloakToken !== null) {
+      if (this.currentuserAccessToken !== null) {
         const queriesAlbums = {
           canAddSeries: true,
         };
         const headers = {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+          Authorization: `Bearer ${this.currentuserAccessToken}`,
         };
         this.$store.dispatch('getAlbums', { queries: queriesAlbums, headers });
       }
