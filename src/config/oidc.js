@@ -10,11 +10,11 @@ export const oidcSettings = {
 */
 // eslint-disable-next-line import/prefer-default-export
 export const oidcSettings = {
-  authority: 'https://keycloak.kheops.online/auth/realms/travis',
+  authority: 'https://keycloak.kheops.online/auth/realms/Test',
   clientId: 'loginConnect',
-  redirectUri: 'http://localhost:8081/oidc-callback',
+  redirectUri: 'http://localhost:8080/oidc-callback',
   responseType: 'code',
   automaticSilentRenew: true,
-  silentRedirectUri: 'http://localhost:8081/silent-renew-oidc.html',
+  silentRedirectUri: 'http://localhost:8080/silent-renew-oidc.html',
   scope: 'openid',
 };
