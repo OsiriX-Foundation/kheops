@@ -32,6 +32,10 @@ User management URL.
 
 ### API
 
+You have two ways to define the API URL. You must use one.
+
+**The first is to use the defined environment variable of the KHEOPS API.**
+
 `KHEOPS_ROOT_SCHEME`
 
 The API scheme
@@ -47,6 +51,12 @@ The API port
 `KHEOPS_API_PATH`
 
 The API pathname. Start with `/` to avoid any problems.
+
+**The second is following below.**
+
+`KHEOPS_API_URL`
+
+The URL API. Use the following example to avoid any problem. `https://demo.kheops.online/api`
 
 ## Project setup
 ```
