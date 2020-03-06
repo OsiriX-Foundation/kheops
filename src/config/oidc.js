@@ -16,5 +16,6 @@ export const oidcSettings = {
   responseType: 'code',
   automaticSilentRenew: true,
   silentRedirectUri: 'http://localhost:8080/silent-renew-oidc.html',
+  post_logout_redirect_uri: 'http://localhost:8080',
   scope: 'openid',
 };
