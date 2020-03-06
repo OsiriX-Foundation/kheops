@@ -72,8 +72,7 @@ export default {
       },
     },
     disabledUserManagement() {
-      console.log(process.env.VUE_APP_USER_MANAGEMENT)
-      return process.env.VUE_APP_USER_MANAGEMENT !== undefined;
+      return process.env.VUE_APP_USER_MANAGEMENT !== undefined && !process.env.VUE_APP_USER_MANAGEMENT.includes('false');
     },
   },
   methods: {
