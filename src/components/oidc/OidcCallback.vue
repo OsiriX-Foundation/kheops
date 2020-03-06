@@ -1,16 +1,18 @@
 <template>
   <div>
-    <pulse-loader />
+    <loading
+      class="mt-5"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'OidcCallback',
-  components: { PulseLoader },
+  components: { Loading },
   mounted() {
     this.oidcSignInCallback()
       .then((redirectPath) => {
