@@ -17,10 +17,10 @@
   <div id="userSettingsGeneral">
     <form>
       <div class="row">
-        <div class="col-xs-3 col-sm-3 col-md-3 text-left text-sm-right">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3 text-left text-sm-right">
           {{ $t('language') }}
         </div>
-        <div class="col-xs-9 col-sm-9 col-md-9 text-left mb-2">
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 text-left mb-2">
           <select
             v-model="lang"
             class="form-control"
@@ -33,10 +33,15 @@
             </option>
           </select>
         </div>
-        <div class="col-xs-3 col-sm-3 col-md-3 col-xs-12 text-left text-sm-right">
+      </div>
+      <div
+        v-if="disabledUserManagement"
+        class="row mt-2"
+      >
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3 text-left text-sm-right">
           {{ $t('accountmanagement') }}
         </div>
-        <div class="col-xs-9 col-sm-9 col-md-9 col-xs-12 text-left mb-2">
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 text-left mb-2">
           <button
             type="button"
             class="btn btn-primary"
@@ -66,10 +71,14 @@ export default {
         this.$root.$i18n.locale = value;
       },
     },
+    disabledUserManagement() {
+      console.log(process.env.VUE_APP_USER_MANAGEMENT)
+      return process.env.VUE_APP_USER_MANAGEMENT !== undefined;
+    },
   },
   methods: {
     gomanagement() {
-      window.open(`${process.env.VUE_APP_URL_KEYCLOAK}/auth/realms/${process.env.VUE_APP_REALM_KEYCLOAK}/account`);
+      window.open(process.env.VUE_APP_USER_MANAGEMENT);
     },
   },
 };
