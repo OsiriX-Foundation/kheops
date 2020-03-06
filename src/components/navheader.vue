@@ -54,7 +54,6 @@
         <b-navbar-nav right>
           <b-nav-item
             v-if="logged === true"
-            v-access="'active'"
             class="font-kheops active"
           >
             <router-link
@@ -127,7 +126,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
@@ -164,10 +162,9 @@ export default {
         return this.oidcUser;
       }
       return {};
-    }
+    },
   },
   created() {
-    console.log(this.logged);
     this.setFromLocalStorage();
   },
   methods: {

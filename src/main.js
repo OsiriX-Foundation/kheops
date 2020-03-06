@@ -15,7 +15,6 @@ import lodash from 'lodash';
 import Icon from 'vue-awesome/components/Icon';
 import ToggleButton from 'vue-js-toggle-button';
 import VeeValidate from 'vee-validate';
-import VueKeyCloak from '@dsb-norge/vue-keycloak-js';
 import '@/filters/filters.js';
 import VueI18n from 'vue-i18n';
 import VueScrollTo from 'vue-scrollto';
@@ -45,54 +44,12 @@ Vue.use(VueScrollTo);
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon);
 Vue.directive('access', Access);
-const keycloakconfig = {
-  realm: process.env.VUE_APP_REALM_KEYCLOAK,
-  url: `${process.env.VUE_APP_URL_KEYCLOAK}/auth`,
-  clientId: process.env.VUE_APP_CLIENTID,
-  // logoutRedirectUri: 'http://logout'
-};
-
-function tokenInterceptor() {
-  const user = {
-    permissions: ['active'],
-  };
-  store.dispatch('login', user);
-}
 
 // Create VueI18n instance with options
 const i18n = new VueI18n({
   locale: 'en',
   messages,
 });
-
-// eslint-disable-next-line no-new
-new Vue({
-  router,
-  store,
-  i18n,
-  render: (h) => h(App),
-}).$mount('#app');
-/* eslint-disable no-new */
-/*
-Vue.use(VueKeyCloak, {
-  config: keycloakconfig,
-  init: {
-    onLoad: 'check-sso',
-    checkLoginIframe: true,
-  },
-  onReady: () => {
-    tokenInterceptor();
-    new Vue({
-      el: '#app',
-      router,
-      store,
-      i18n,
-      components: { App },
-      template: '<App/>',
-    });
-  },
-});
-*/
 
 // https://fr.vuejs.org/v2/guide/custom-directive.html
 Vue.directive('focus', {
@@ -165,3 +122,11 @@ Icon.register({
     ],
   },
 });
+
+// eslint-disable-next-line no-new
+new Vue({
+  router,
+  store,
+  i18n,
+  render: (h) => h(App),
+}).$mount('#app');
