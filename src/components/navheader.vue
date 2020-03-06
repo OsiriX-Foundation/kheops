@@ -91,14 +91,14 @@
             v-if="logged"
             :title="$t('tooltipLogout')"
             class="active pointer"
-            @click="signOutOidc()"
           >
-            <span
+            <router-link
+              to="/oidc-logout"
               class="font-white"
             >
               {{ $t('tooltipLogout') }}
               <v-icon name="sign-out-alt" />
-            </span>
+            </router-link>
           </b-nav-item>
           <b-nav-item-dropdown
             :text="`${$t('lang')}: ${lang}`"

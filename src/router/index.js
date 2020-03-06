@@ -11,6 +11,7 @@ import Inbox from '@/components/inbox/Inbox';
 import ViewWithoutLogin from '@/components/withoutlogin/ViewWithoutLogin';
 import OidcCallback from '@/components/oidc/OidcCallback';
 import OidcCallbackError from '@/components/oidc/OidcCallbackError';
+import OidcLogout from '@/components/oidc/OidcLogout';
 // import PermissionDenied from '@/components/user/permissionDenied'
 
 // import {ServerTable, ClientTable, Event} from 'vue-tables-2';
@@ -47,6 +48,11 @@ const router = new Router({
     redirect: '/inbox',
   },
   {
+    path: '/oidc-logout',
+    name: 'oidcLogout',
+    component: OidcLogout,
+  },
+  {
     path: '/oidc-callback',
     name: 'oidcCallback',
     component: OidcCallback,
@@ -57,7 +63,7 @@ const router = new Router({
     component: OidcCallbackError,
     meta: {
       isPublic: true,
-    }
+    },
   },
   {
     path: '/inbox',
