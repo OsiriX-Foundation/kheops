@@ -15,15 +15,8 @@ export default {
   components: { Loading },
   mounted() {
     this.signOutOidc({
-      post_logout_redirect_uri: 'http://localhost:8080',
-    })
-      .then((redirectPath) => {
-        this.$router.push(redirectPath);
-      })
-      .catch((err) => {
-        console.error(err);
-        this.$router.push('/oidc-callback-error'); // Handle errors any way you want
-      });
+      post_logout_redirect_uri: process.env.VUE_APP_URL_ROOT,
+    });
   },
   methods: {
     ...mapActions('oidcStore', [

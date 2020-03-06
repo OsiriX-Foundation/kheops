@@ -18,6 +18,7 @@
   <div id="app">
     <vue-snotify />
     <nav-header
+      v-if="showNavHeader"
       :logged="oidcIsAuthenticated"
     />
     <nav-bar
@@ -55,6 +56,9 @@ export default {
     ]),
     year() {
       return new Date().getFullYear();
+    },
+    showNavHeader() {
+      return this.$route.meta.header === undefined ? true : this.$route.meta.header;
     },
   },
   watch: {
