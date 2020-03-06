@@ -26,7 +26,7 @@ public class Users {
         throw new IllegalStateException("Utility class");
     }
 
-    private static User getUser(String userReference, EntityManager em)
+    public static User getUser(String userReference, EntityManager em)
             throws UserNotFoundException {
 
         if (userReference.contains("@")) {
@@ -51,11 +51,7 @@ public class Users {
         }
     }
 
-    public static User updateOrCreateUser(IdToken idToken) {
-        return updateOrCreateUser(idToken.getSub(), idToken.getName(), idToken.getEmail());
-    }
-
-    public static User updateOrCreateUser(String sub, String name, String email) {
+    public static User upsertUser(String sub, String name, String email) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

@@ -181,7 +181,7 @@ public class UserResource {
             return Response.status(BAD_REQUEST).build();
         }
 
-        final User user = updateOrCreateUser(idToken);
+        final User user = upsertUser(idToken.getSub(), idToken.getName(), idToken.getEmail());
         final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
         return Response.ok().entity(userResponse).build();
     }
@@ -234,7 +234,7 @@ public class UserResource {
             userinfoEndpointURI = new URI(res.userinfoEndpoint);
             UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer "+token).get(UserInfoEntity.class);
 
-            final User user = updateOrCreateUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
+            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
             return Response.ok().entity(userResponse).build();
         } catch (URISyntaxException e) {
@@ -242,7 +242,6 @@ public class UserResource {
         }
 
         return Response.status(BAD_REQUEST).build();
-
     }
 
 

@@ -375,7 +375,7 @@ public class Sending {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = em.merge(getUser(targetUsername));
+            final User targetUser = getUser(targetUsername, em);
 
             if (callingUser == targetUser) {
                 if(fromAlbumId != null) {
@@ -424,7 +424,7 @@ public class Sending {
         try {
             tx.begin();
 
-            final User targetUser = em.merge(getUser(targetUsername));
+            final User targetUser = getUser(targetUsername, em);
             callingUser = em.merge(callingUser);
 
             kheopsLogBuilder.targetUser(targetUser.getKeycloakId())

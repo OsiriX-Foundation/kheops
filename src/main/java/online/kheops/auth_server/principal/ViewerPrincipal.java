@@ -27,7 +27,6 @@ import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
-import static online.kheops.auth_server.user.Users.getUser;
 
 public class ViewerPrincipal implements KheopsPrincipal {
 

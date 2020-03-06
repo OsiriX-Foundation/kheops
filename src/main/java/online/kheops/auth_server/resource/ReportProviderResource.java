@@ -142,24 +142,16 @@ public class ReportProviderResource {
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        final User callingUser;
-        try {
-            callingUser = getUser(accessToken.getSubject());
-        } catch (UserNotFoundException e) {
-            LOG.log(Level.WARNING, "User not found", e);
-            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        }
-
-        final KheopsPrincipal principal = accessToken.newPrincipal(context, callingUser);
-
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
 
+        final User callingUser;
+        final KheopsPrincipal principal;
         final ReportProvider reportProvider;
         final Album album;
 
         try {
-            tx.begin();
+            callingUser = getUser(accessToken.getSubject(), em);
+            principal = accessToken.newPrincipal(context, callingUser);
             reportProvider = getReportProviderWithClientId(clientId, em);
             album = reportProvider.getAlbum();
         } catch (NoResultException e) {
@@ -169,10 +161,10 @@ public class ReportProviderResource {
                     .detail("Client ID not found")
                     .build();
             return Response.status(NOT_FOUND).entity(errorResponse).build();
+        } catch (UserNotFoundException e) {
+            LOG.log(Level.WARNING, "User not found", e);
+            return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
             em.close();
         }
 

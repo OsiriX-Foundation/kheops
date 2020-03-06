@@ -232,7 +232,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = em.merge(getUser(userName));
+            final User targetUser = getUser(userName, em);
 
             if (targetUser.getPk() == callingUser.getPk()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -308,7 +308,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = em.merge(getUser(userName));
+            final User removedUser = getUser(userName, em);
             final Album album = getAlbum(albumId, em);
 
             //Delete the album if it is the last User
@@ -367,7 +367,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = em.merge(getUser(userName));
+            final User removedUser = getUser(userName, em);
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 

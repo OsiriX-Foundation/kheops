@@ -321,7 +321,7 @@ public class Webhooks {
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
             final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
 
-            final User targetUser = getUser(user);
+            final User targetUser = getUser(user, em);
             final AlbumUser albumTargetUser = getAlbumUser(album, targetUser, em);
             final NewUserWebhook newUserWebhook;
             final WebhookTrigger webhookTrigger;

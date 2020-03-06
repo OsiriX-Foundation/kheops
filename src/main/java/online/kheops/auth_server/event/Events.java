@@ -55,7 +55,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, album);
 
             if(isPrivateComment) {
-                final User targetUser = em.merge(getUser(user));
+                final User targetUser = getUser(user, em);
 
                 if (targetUser != callingUser && !isMemberOfAlbum(targetUser, album, em)) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -282,7 +282,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, study);
 
             if(isPrivateComment) {
-                User targetUser = em.merge(getUser(targetUserPk));
+                User targetUser = getUser(targetUserPk, em);
 
                 if (targetUser != callingUser && !Studies.canAccessStudy(targetUser, study, em)) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
