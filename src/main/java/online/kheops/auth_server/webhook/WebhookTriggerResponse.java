@@ -47,8 +47,7 @@ public class WebhookTriggerResponse {
             event = WebhookType.NEW_USER.name().toLowerCase();
             final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
             user = userResponseBuilder.setEmail(webhookTrigger.getUser().getEmail())
-                    .setLastName(webhookTrigger.getUser().getLastName())
-                    .setFirstName(webhookTrigger.getUser().getFirstName())
+                    .setName(webhookTrigger.getUser().getName())
                     .setSub(webhookTrigger.getUser().getKeycloakId())
                     .build();
         }

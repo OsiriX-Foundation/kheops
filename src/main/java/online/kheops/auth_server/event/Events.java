@@ -22,7 +22,7 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
 public class Events {
@@ -55,7 +55,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, album);
 
             if(isPrivateComment) {
-                final User targetUser = em.merge(getOrCreateUser(user));
+                final User targetUser = em.merge(getUser(user));
 
                 if (targetUser != callingUser && !isMemberOfAlbum(targetUser, album, em)) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -282,7 +282,7 @@ public class Events {
             final Comment comment = new Comment(commentContent, callingUser, study);
 
             if(isPrivateComment) {
-                User targetUser = em.merge(getOrCreateUser(targetUserPk));
+                User targetUser = em.merge(getUser(targetUserPk));
 
                 if (targetUser != callingUser && !Studies.canAccessStudy(targetUser, study, em)) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()

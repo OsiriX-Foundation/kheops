@@ -19,7 +19,7 @@ import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
@@ -232,7 +232,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = em.merge(getOrCreateUser(userName));
+            final User targetUser = em.merge(getUser(userName));
 
             if (targetUser.getPk() == callingUser.getPk()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -308,7 +308,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = em.merge(getOrCreateUser(userName));
+            final User removedUser = em.merge(getUser(userName));
             final Album album = getAlbum(albumId, em);
 
             //Delete the album if it is the last User
@@ -367,7 +367,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = em.merge(getOrCreateUser(userName));
+            final User removedUser = em.merge(getUser(userName));
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 

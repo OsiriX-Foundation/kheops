@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 
 class PepAccessTokenGenerator {
@@ -67,7 +67,7 @@ class PepAccessTokenGenerator {
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(accessToken.getSubject());
+            callingUser = getUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "User not found", e);
         }

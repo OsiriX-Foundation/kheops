@@ -36,7 +36,7 @@ final class PepAccessToken implements AccessToken {
             }
 
             try {
-                Users.getOrCreateUser(jwt.getSubject());
+                Users.getUser(jwt.getSubject());
             } catch (UserNotFoundException e) {
                 throw new AccessTokenVerificationException("Can't find user");
             }

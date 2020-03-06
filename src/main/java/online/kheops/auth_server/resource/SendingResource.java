@@ -35,7 +35,7 @@ import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PAT
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.filter.SecuredFilter.getToken;
 import static online.kheops.auth_server.user.AlbumUserPermissions.*;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_AUTHORIZATION_SOURCE;
@@ -631,7 +631,7 @@ public class SendingResource
             throws AccessTokenVerificationException, UserNotFoundException {
 
         final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, getToken(token));
-        final User user = getOrCreateUser(accessToken.getSubject());
+        final User user = getUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);
     }

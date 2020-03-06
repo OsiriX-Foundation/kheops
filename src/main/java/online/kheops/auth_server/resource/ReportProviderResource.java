@@ -42,7 +42,7 @@ import static online.kheops.auth_server.report_provider.ReportProviderQueries.ge
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.AlbumUserPermissions.*;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.QUERY_PARAMETER_OFFSET;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
@@ -131,7 +131,7 @@ public class ReportProviderResource {
             return Response.status(BAD_GATEWAY).entity(errorResponse).build();
         }
 
-        getOrCreateUser(accessToken.getSubject());
+        getUser(accessToken.getSubject());
 
         if (! (accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) ) {
@@ -144,7 +144,7 @@ public class ReportProviderResource {
 
         final User callingUser;
         try {
-            callingUser = getOrCreateUser(accessToken.getSubject());
+            callingUser = getUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found", e);
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
