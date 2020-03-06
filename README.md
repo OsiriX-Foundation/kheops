@@ -1,4 +1,4 @@
-# kheops-vue
+# KHEOPS user interface
 
 ## Docker environment variables
 
