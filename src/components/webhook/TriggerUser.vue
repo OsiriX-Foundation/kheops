@@ -38,8 +38,7 @@
       v-if="trigger.user !== undefined"
     >
       <li v-if="trigger.user.email !== undefined">{{ $t('mail') }} : {{ trigger.user.email }}</li>
-      <li v-if="trigger.user.last_name !== undefined">{{ $t('lastname') }} : {{ trigger.user.last_name }}</li>
-      <li v-if="trigger.user.first_name !== undefined">{{ $t('firstname') }} : {{ trigger.user.first_name }}</li>
+      <li v-if="trigger.user.name !== undefined">{{ $t('name') }} : {{ trigger.user.name }}</li>
       <li v-if="trigger.user.sub !== undefined">{{ $t('sub') }} : {{ trigger.user.sub }}</li>
     </ul>
   </span>
