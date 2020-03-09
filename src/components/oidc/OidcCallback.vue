@@ -7,12 +7,17 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'OidcCallback',
   components: { Loading },
+  computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
+  },
   mounted() {
     this.oidcSignInCallback()
       .then((redirectPath) => {
@@ -20,7 +25,11 @@ export default {
       })
       .catch((err) => {
         console.error(err);
-        this.$router.push('/oidc-callback-error'); // Handle errors any way you want
+        if (!this.oidcIsAuthenticated) {
+          this.$router.push('/oidc-callback-error'); // Handle errors any way you want
+        } else {
+          this.$router.push('/');
+        }
       });
   },
   methods: {
