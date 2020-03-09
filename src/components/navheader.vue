@@ -78,7 +78,7 @@
             class="active pointer"
             :title="$t('tooltipHelp')"
             target="_blank"
-            @click="redirect('https://docs.kheops.online')"
+            @click="redirectOn('https://docs.kheops.online')"
           >
             <span
               class="font-white"
@@ -176,7 +176,7 @@ export default {
     this.setFromLocalStorage();
   },
   methods: {
-    ...mapActions('oidcStore', ['authenticateOidcSilent', 'signOutOidc']),
+    ...mapActions('oidcStore', ['authenticateOidcSilent', 'signOutOidc', 'authenticateOidc']),
     setFromLocalStorage() {
       const storageLanguage = localStorage.getItem('language');
       const navigatorLanguage = (navigator.language || navigator.userLanguage).split('-')[0];
@@ -192,8 +192,14 @@ export default {
         this.$root.$i18n.locale = value;
       }
     },
-    redirect(href) {
+    redirectOn(href) {
       window.open(href, '_blank');
+    },
+    login() {
+      const payload = {
+        redirectPath: this.$route.path,
+      };
+      this.authenticateOidc(payload);
     },
   },
 };
