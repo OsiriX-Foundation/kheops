@@ -127,14 +127,12 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import { CurrentUser } from '@/mixins/currentuser.js';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
 import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
 
 export default {
   name: 'NavHeader',
   components: { KheopsPyramid, KheopsFont },
-  mixins: [CurrentUser],
   props: {
     logged: {
       type: Boolean,
@@ -156,12 +154,6 @@ export default {
     ]),
     lang() {
       return this.$i18n.locale;
-    },
-    user() {
-      if (this.oidcUser !== null) {
-        return this.oidcUser;
-      }
-      return {};
     },
     redirect: {
       get() {
