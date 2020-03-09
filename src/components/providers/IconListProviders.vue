@@ -64,7 +64,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import { serverURL } from '@/app_config';
 
 export default {
   name: 'IconListProviders',
@@ -89,7 +88,6 @@ export default {
   },
   data() {
     return {
-      serverURL,
       show: false,
     };
   },
@@ -97,6 +95,9 @@ export default {
     ...mapGetters('oidcStore', [
       'oidcAccessToken',
     ]),
+    serverURL() {
+      return process.env.VUE_APP_URL_API;
+    },
     returnuri() {
       return `${process.env.VUE_APP_URL_ROOT}/albums/${this.albumId}?StudyInstanceUID=${encodeURIComponent(this.study.StudyInstanceUID.Value[0])}`;
     },

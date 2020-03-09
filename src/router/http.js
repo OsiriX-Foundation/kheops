@@ -1,10 +1,7 @@
 import axios from 'axios';
-import Vue from 'vue';
 import store from '@/store';
-import { serverURL } from '@/app_config';
-
 // eslint-disable-next-line
-export const HTTP = axios.create({ baseURL: serverURL });
+export const HTTP = axios.create({ baseURL: process.env.VUE_APP_URL_API });
 
 HTTP.interceptors.request.use((config) => {
   const tmpconfig = config;
