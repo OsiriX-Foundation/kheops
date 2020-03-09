@@ -66,8 +66,21 @@ export default {
       document.title = this.$t(to.meta.title, { appTitle: this.appTitle }) || this.appTitle;
     },
   },
+  mounted() {
+    window.addEventListener('vuexoidc:userSignedOut', this.userSignOut);
+  },
   created() {
     document.title = this.$t(this.$route.meta.title, { appTitle: this.appTitle }) || this.appTitle;
+  },
+  destroyed() {
+    window.removeEventListener('vuexoidc:userSignedOut', this.userSignOut);
+  },
+  methods: {
+    userSignOut() {
+      const redirect = `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      const signOut = { path: '/oidc-logout', name: 'oidcLogout', params: { redirect } };
+      this.$router.push(signOut);
+    },
   },
 };
 </script>

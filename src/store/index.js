@@ -31,14 +31,17 @@ export default new Vuex.Store({
     oidcStore: vuexOidcCreateStoreModule(
       oidcSettings,
       {
+        dispatchEventsOnWindow: true,
         namespaced: true,
       },
       // Optional OIDC event listeners
+      /*
       {
         userLoaded: (user) => console.log('OIDC user is loaded:', user),
         userSignedOut: () => console.log('OIDC user is signed out'),
         oidcError: (payload) => console.log('OIDC error', payload),
       },
+      */
     ),
   },
 });
