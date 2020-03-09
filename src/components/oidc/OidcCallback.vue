@@ -25,14 +25,11 @@ export default {
       })
       .catch((err) => {
         console.error(err);
-        this.$router.push('/oidc-callback-error');
-        /*
         if (!this.oidcIsAuthenticated) {
           this.$router.push('/oidc-callback-error'); // Handle errors any way you want
         } else {
           this.$router.push('/');
         }
-        */
       });
   },
   methods: {
