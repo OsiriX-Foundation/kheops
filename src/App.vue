@@ -69,17 +69,18 @@ export default {
     $route(to) {
       document.title = this.$t(to.meta.title, { appTitle: this.appTitle }) || this.appTitle;
     },
+    oidcAccessToken() {
+      this.accessTokenLoaded(this.oidcAccessToken);
+    },
   },
   mounted() {
     window.addEventListener('vuexoidc:userSignedOut', this.userSignOut);
-    window.addEventListener('vuexoidc:userLoaded', this.userLoaded);
   },
   created() {
     document.title = this.$t(this.$route.meta.title, { appTitle: this.appTitle }) || this.appTitle;
   },
   destroyed() {
     window.removeEventListener('vuexoidc:userSignedOut', this.userSignOut);
-    window.addEventListener('vuexoidc:userLoaded', this.userLoaded);
   },
   methods: {
     userSignOut() {
@@ -87,12 +88,17 @@ export default {
       const signOut = { path: '/oidc-logout', name: 'oidcLogout', params: { redirect } };
       this.$router.push(signOut);
     },
-    userLoaded() {
+    accessTokenLoaded(accessToken) {
       if (this.userSend === false) {
-        this.postAccessToken(this.oidcAccessToken).catch((err) => {
-          console.log(err);
-        });
-        this.userSend = true;
+        if (accessToken !== null) {
+          this.postAccessToken(accessToken).then((res) => {
+            if (res.status === 200) {
+              this.userSend = true;
+            }
+          }).catch((err) => {
+            console.log(err);
+          });
+        }
       }
     },
   },
