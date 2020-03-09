@@ -14,7 +14,9 @@ export default {
   name: 'OidcLogout',
   components: { Loading },
   mounted() {
-    this.signOutOidc();
+    // eslint-disable-next-line camelcase
+    const post_logout_redirect_uri = this.$route.params.redirect !== undefined ? this.$route.params.redirect : process.env.VUE_APP_URL_ROOT;
+    this.signOutOidc({ post_logout_redirect_uri });
   },
   methods: {
     ...mapActions('oidcStore', [

@@ -93,7 +93,7 @@
             class="active pointer"
           >
             <router-link
-              to="/oidc-logout"
+              :to="{ path: '/oidc-logout', name: 'oidcLogout', params: {redirect: redirect} }"
               class="font-white"
             >
               {{ $t('tooltipLogout') }}
@@ -162,6 +162,14 @@ export default {
         return this.oidcUser;
       }
       return {};
+    },
+    redirect: {
+      get() {
+        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      },
+      set() {
+        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      }
     },
   },
   created() {
