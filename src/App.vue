@@ -37,7 +37,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import navHeader from '@/components/navheader';
 import navBar from '@/components/navbar';
 import SendStudies from '@/components/study/SendStudies';
@@ -83,10 +83,13 @@ export default {
     window.removeEventListener('vuexoidc:userSignedOut', this.userSignOut);
   },
   methods: {
+    ...mapActions('oidcStore', [
+      'authenticateOidc',
+    ]),
     userSignOut() {
-      const redirect = `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
-      const signOut = { path: '/oidc-logout', name: 'oidcLogout', params: { redirect } };
-      this.$router.push(signOut);
+      if (!this.oidcIsAuthenticated) {
+        this.authenticateOidc();
+      }
     },
     accessTokenLoaded(accessToken) {
       if (this.userSend === false) {
