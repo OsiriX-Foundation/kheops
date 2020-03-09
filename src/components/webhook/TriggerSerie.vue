@@ -117,5 +117,5 @@ export default {
       this.$emit('missingseries');
     },
   },
-}
+};
 </script>

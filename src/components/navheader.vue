@@ -169,7 +169,7 @@ export default {
       },
       set() {
         return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
-      }
+      },
     },
   },
   created() {

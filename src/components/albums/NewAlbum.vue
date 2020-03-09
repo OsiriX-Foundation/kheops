@@ -209,7 +209,9 @@ import NewAlbumUser from '@/components/albums/NewAlbumUser';
 
 export default {
   name: 'NewAlbum',
-  components: { CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser },
+  components: {
+    CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser,
+  },
   data() {
     return {
       album: {
