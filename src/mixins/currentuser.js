@@ -1,6 +1,8 @@
 /* eslint-disable */
 import Vue from 'vue';
 import store from '@/store';
+import { HTTP } from '@/router/http';
+import httpoperations from '@/mixins/httpoperations';
 
 export const CurrentUser = {
   computed: {
@@ -37,6 +39,11 @@ export const CurrentUser = {
         return this.currentuserAccessToken;
       }
       return '';
+    },
+    postAccessToken(access_token) {
+      const url = '/register';
+      const formData = httpoperations.getFormData({ access_token });
+      return HTTP.post(url, formData);
     },
   },
 };
