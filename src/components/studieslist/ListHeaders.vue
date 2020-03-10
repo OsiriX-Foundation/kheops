@@ -75,7 +75,6 @@
           :disabled="selectedStudiesNb === 0"
           variant="link"
           size="sm"
-          no-caret
         >
           <template slot="button-content">
             <span>

@@ -4,8 +4,6 @@
       v-if="providers.length > 0"
       size="sm"
       variant="link"
-      no-caret
-      right
       toggle-class="kheopsicon"
       @shown="setShow(true)"
       @hidden="setShow(false)"
