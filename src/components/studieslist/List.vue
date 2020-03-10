@@ -110,29 +110,10 @@
       :show-import-button="permissions.add_series && canUploadFiles"
       :show-inbox-button="permissions.add_inbox"
       :album-id="albumID"
+      class="list-header"
       @setFilters="changeFilterValue"
       @reloadStudies="reloadStudies"
     />
-    <div
-      id="stickyHeader"
-      ref="stickyHeader"
-      :class="isActive ? 'pt-2 sticky' : ''"
-    >
-      <list-headers
-        v-if="isActive"
-        :studies="studies"
-        :albums="albums"
-        :show-send-button="permissions.send_series"
-        :show-album-button="permissions.send_series"
-        :show-favorite-button="permissions.add_series && $route.name !== 'viewnologin'"
-        :show-delete-button="permissions.delete_series"
-        :show-import-button="permissions.add_series && canUploadFiles"
-        :show-inbox-button="permissions.add_inbox"
-        :album-id="source.key === 'album' ? source.value : ''"
-        @setFilters="changeFilterValue"
-        @reloadStudies="reloadStudies"
-      />
-    </div>
     <div
       ref="studiesList"
     >
@@ -146,6 +127,7 @@
         :no-local-sorting="true"
         :no-sort-reset="true"
         :tbody-class="'link'"
+        fixed
         @sort-changed="sortingChanged"
         @row-hovered="setItemHover"
         @row-unhovered="setItemUnhover"
@@ -485,7 +467,6 @@ export default {
       selectedDate: null,
       infiniteId: 0,
       showFilters: false,
-      isActive: false,
       showIcons: false,
       statusList: 200,
       headerID: 'listheaders',
@@ -506,6 +487,7 @@ export default {
           key: 'is_selected',
           label: '',
           sortable: false,
+          thClass: 'pointer table-header',
           class: ['td_checkbox_inbox', 'word-break'],
           thStyle: {
             width: '100px',
@@ -515,7 +497,7 @@ export default {
           key: 'PatientName',
           label: this.$t('PatientName'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-header',
           tdClass: 'word-break',
           formatter: (value) => {
             if (value !== null && value.Value !== undefined) {
@@ -531,7 +513,7 @@ export default {
           key: 'PatientID',
           label: this.$t('PatientID'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-header',
           tdClass: 'word-break',
           class: 'word-break d-none d-md-table-cell d-lg-table-cell',
           formatter: (value) => {
@@ -548,6 +530,7 @@ export default {
           key: 'StudyDescription',
           label: this.$t('StudyDescription'),
           sortable: false,
+          thClass: 'pointer table-header',
           tdClass: 'word-break',
           class: 'word-break d-none d-lg-table-cell',
           formatter: (value) => {
@@ -564,7 +547,7 @@ export default {
           key: 'StudyDate',
           label: this.$t('StudyDate'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-header',
           tdClass: 'word-break',
           class: 'word-break d-none d-sm-table-cell d-md-table-cell d-lg-table-cell',
           formatter: (value) => {
@@ -581,6 +564,7 @@ export default {
           key: 'ModalitiesInStudy',
           label: this.$t('Modality'),
           sortable: false,
+          thClass: 'pointer table-header',
           tdClass: 'word-break',
           class: 'word-break d-none d-sm-table-cell',
           formatter: (value) => {
@@ -684,7 +668,6 @@ export default {
     this.$store.dispatch('initAlbums', {});
   },
   mounted() {
-    this.scroll();
   },
   methods: {
     setQueryParams() {
@@ -724,20 +707,6 @@ export default {
       if (filterValue === true) {
         this.changeFilterValue();
       }
-    },
-    scroll() {
-      window.onscroll = () => {
-        if (this.$refs.stickyHeader !== undefined && this.$refs.studiesList !== undefined) {
-          const sticky = this.$refs.stickyHeader.offsetTop;
-          const heightSticky = this.$refs.stickyHeader.clientHeight;
-          const studiesList = this.$refs.studiesList.offsetTop;
-          if ((window.pageYOffset) > sticky - heightSticky && !this.isActive) {
-            this.isActive = true;
-          } else if ((window.pageYOffset < studiesList - heightSticky) && this.isActive) {
-            this.isActive = false;
-          }
-        }
-      };
     },
     getStudyByUID(StudyUID) {
       return this.studies.filter((study) => {
@@ -976,7 +945,7 @@ export default {
     },
     changeFilterValue() {
       this.showFilters = !this.showFilters;
-      if (this.showFilters === true && this.isActive === true) {
+      if (this.showFilters === true) {
         const el = this.$el.querySelector(`[id='${this.headerID}']`);
         if (el !== null) {
           const offset = -el.offsetHeight;
