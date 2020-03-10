@@ -14,49 +14,53 @@
           name="build"
         />
       </template>
-      <form
-        v-for="provider in providers"
-        :id="study.StudyInstanceUID.Value[0]"
-        :key="provider.id"
-        :action="serverURL + '/report'"
-        method="post"
+      <div
+        class="maxheight-scroll"
       >
-        <b-form-input
-          v-if="checkProviderModalities(study, provider)"
-          type="text"
-          hidden
-          name="access_token"
-          :value="accessToken"
-        />
-        <b-form-input
-          v-if="checkProviderModalities(study, provider)"
-          type="text"
-          hidden
-          name="client_id"
-          :value="provider.client_id"
-        />
-        <b-form-input
-          v-if="checkProviderModalities(study, provider)"
-          type="text"
-          hidden
-          name="studyUID"
-          :value="study.StudyInstanceUID.Value[0]"
-        />
-        <b-form-input
-          v-if="checkProviderModalities(study, provider)"
-          type="text"
-          hidden
-          name="return_uri"
-          :value="returnuri"
-        />
-        <button
-          v-if="checkProviderModalities(study, provider)"
-          type="submit"
-          class="dropdown-item pointer"
+        <form
+          v-for="provider in providers"
+          :id="study.StudyInstanceUID.Value[0]"
+          :key="provider.id"
+          :action="serverURL + '/report'"
+          method="post"
         >
-          {{ provider.name }}
-        </button>
-      </form>
+          <b-form-input
+            v-if="checkProviderModalities(study, provider)"
+            type="text"
+            hidden
+            name="access_token"
+            :value="accessToken"
+          />
+          <b-form-input
+            v-if="checkProviderModalities(study, provider)"
+            type="text"
+            hidden
+            name="client_id"
+            :value="provider.client_id"
+          />
+          <b-form-input
+            v-if="checkProviderModalities(study, provider)"
+            type="text"
+            hidden
+            name="studyUID"
+            :value="study.StudyInstanceUID.Value[0]"
+          />
+          <b-form-input
+            v-if="checkProviderModalities(study, provider)"
+            type="text"
+            hidden
+            name="return_uri"
+            :value="returnuri"
+          />
+          <button
+            v-if="checkProviderModalities(study, provider)"
+            type="submit"
+            class="dropdown-item pointer"
+          >
+            {{ provider.name }}
+          </button>
+        </form>
+      </div>
     </b-dropdown>
   </span>
 </template>

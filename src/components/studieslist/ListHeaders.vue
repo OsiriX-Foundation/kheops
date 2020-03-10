@@ -15,7 +15,9 @@
     "draganddrop": "Or drag and drop",
     "studiessharedsuccess": "studies sent successfully",
     "studiessharederror": "studies could not be sent",
-    "addInbox": "Add to inbox"
+    "addInbox": "Add to inbox",
+    "addinnewalbum": "Add to a new album",
+    "headerlistalbums": "Albums list"
   },
   "fr": {
     "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
@@ -32,7 +34,9 @@
     "draganddrop": "Ou Drag and Drop",
     "studiessharedsuccess": "études ont été envoyées avec succès",
     "addInbox": "Ajouter à la boite de réception",
-    "studiessharederror": "études n'ont pas pu être envoyée"
+    "studiessharederror": "études n'ont pas pu être envoyée",
+    "addinnewalbum": "Ajouter à un nouvel album",
+    "headerlistalbums": "Liste d'albums"
   }
 }
 </i18n>
@@ -85,21 +89,31 @@
             </span><br>
             <span>{{ $t("addalbum") }}</span>
           </template>
-          <b-dropdown-item
-            v-for="allowedAlbum in allowedAlbums"
-            :key="allowedAlbum.id"
-            @click.stop="addToAlbum(allowedAlbum.album_id)"
+          <div
+            class="maxheight-scroll"
           >
-            {{ allowedAlbum.name|maxTextLength(albumNameMaxLength) }}
-          </b-dropdown-item>
-          <b-dropdown-divider />
-          <b-dropdown-item
-            @click.stop="goToCreateAlbum()"
-          >
-            Create an album
-          </b-dropdown-item>
+            <b-dropdown-item
+              @click.stop="goToCreateAlbum()"
+            >
+              <span
+                class="font-kheops"
+              >
+                {{ $t('addinnewalbum') }}
+              </span>
+            </b-dropdown-item>
+            <b-dropdown-divider />
+            <b-dropdown-header>
+              {{ $t('headerlistalbums') }}
+            </b-dropdown-header>
+            <b-dropdown-item
+              v-for="allowedAlbum in allowedAlbums"
+              :key="allowedAlbum.id"
+              @click.stop="addToAlbum(allowedAlbum.album_id)"
+            >
+              {{ allowedAlbum.name|maxTextLength(albumNameMaxLength) }}
+            </b-dropdown-item>
+          </div>
         </b-dropdown>
-
         <div
           v-if="showInboxButton === true"
           class="align-self-center"

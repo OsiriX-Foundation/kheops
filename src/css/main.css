@@ -495,3 +495,8 @@ table.tableAddUserNewAlbum tr {
 	width: 100%;
 	table-layout: fixed;
 }
+
+.maxheight-scroll {
+	max-height: 250px;
+	overflow: auto;
+}
