@@ -14,7 +14,7 @@
           name="build"
         />
       </template>
-      <b-dropdown-form
+      <form
         v-for="provider in providers"
         :id="study.StudyInstanceUID.Value[0]"
         :key="provider.id"
@@ -56,7 +56,7 @@
         >
           {{ provider.name }}
         </button>
-      </b-dropdown-form>
+      </form>
     </b-dropdown>
   </span>
 </template>
