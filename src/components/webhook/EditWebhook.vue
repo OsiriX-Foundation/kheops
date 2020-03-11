@@ -119,7 +119,6 @@
             id="events"
             v-model="modelWebhook.event"
             :options="eventsDefined"
-            :state="state"
             stacked
           >
             <field-obligatory

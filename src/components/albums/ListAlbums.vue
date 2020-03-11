@@ -51,16 +51,11 @@
 <template>
   <div>
     <list-albums-headers
+      class="list-header"
       :disabled-btn-share="albumsSelected.length === 0"
-      @inviteClick="form_send_album = true"
+      :albums-selected="albumsSelected"
       @searchClick="showFilters = !showFilters"
       @reloadAlbums="searchAlbums"
-    />
-
-    <form-get-user
-      v-if="form_send_album && albumsSelected.length > 0"
-      @get-user="sendToUser"
-      @cancel-user="form_send_album=false"
     />
     <b-table
       striped
@@ -229,17 +224,9 @@
           <div class="">
             {{ row.value }}
           </div>
-          <span
-            class="ml-auto"
-            :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
-            @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
-          >
-            <v-icon
-              name="star"
-              class="kheopsicon"
-              :class="(!row.item.is_favorite) ? '' : 'bg-neutral fill-neutral'"
-            />
-          </span>
+          <list-albums-icons
+            :album="row.item"
+          />
         </div>
       </template>
       <template
@@ -294,8 +281,8 @@ import { mapGetters } from 'vuex';
 import Datepicker from 'vuejs-datepicker';
 import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
-import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
+import ListAlbumsIcons from '@/components/albums/ListAlbumsIcons';
 import SortList from '@/components/globallist/SortList.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import Loading from '@/components/globalloading/Loading';
@@ -303,12 +290,11 @@ import Loading from '@/components/globalloading/Loading';
 export default {
   name: 'Albums',
   components: {
-    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, Loading,
+    InfiniteLoading, ListAlbumsHeaders, Datepicker, SortList, Loading, ListAlbumsIcons,
   },
   data() {
     return {
       statusList: 200,
-      form_send_album: false,
       showFilters: false,
       infiniteId: 0,
       albumsParams: {
@@ -321,6 +307,7 @@ export default {
         {
           key: 'is_selected',
           label: '',
+          thClass: 'table-albums-header',
           sortable: false,
           class: 'td_checkbox_albums word-break',
           thStyle: {
@@ -330,7 +317,7 @@ export default {
         {
           key: 'name',
           label: this.$t('name'),
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           tdClass: 'name',
           sortable: true,
           class: 'word-break',
@@ -342,7 +329,7 @@ export default {
           key: 'number_of_studies',
           label: this.$t('Study #'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -352,7 +339,7 @@ export default {
           key: 'number_of_users',
           label: this.$t('User #'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-md-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -362,7 +349,7 @@ export default {
           key: 'number_of_comments',
           label: this.$t('Message #'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -372,7 +359,7 @@ export default {
           key: 'created_time',
           label: this.$t('Date'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -382,7 +369,7 @@ export default {
           key: 'last_event_time',
           label: this.$t('LastEvent'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -399,6 +386,7 @@ export default {
             return this.$t('nomodality');
           },
           class: 'word-break',
+          thClass: 'table-albums-header',
           thStyle: {
             width: '200px',
           },
@@ -556,13 +544,6 @@ export default {
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
     },
-    sendToUser(userId) {
-      this.albumsSelected.forEach((album) => {
-        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
-          this.$snotify.success(this.$t('albumshared'));
-        });
-      });
-    },
     sortingChanged(ctx) {
       this.albumsParams.sortDesc = ctx.sortDesc;
       this.albumsParams.sortBy = ctx.sortBy;
@@ -572,12 +553,6 @@ export default {
       this.albumsParams.offset = 0;
       this.$store.dispatch('initAlbums', { });
       this.infiniteId += 1;
-    },
-    toggleFavorite(albumID, isFavorite) {
-      const value = !isFavorite;
-      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
-        this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value });
-      });
     },
     setItemHover(item, index) {
       this.albums[index].flag.is_hover = true;

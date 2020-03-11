@@ -245,16 +245,43 @@ div.seriesSummaryContainer{
 	line-height: 1.5em;
 }
 
-.sticky {
-    position: fixed;
-    top: 70px;
-    width: 100%;
+.list-header {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 70px;
     background: #06162c;
-    z-index: 5;
-    opacity: 0.95;
+    opacity: 1;
+    z-index: 15;
 }
-.sticky + .content {
-	padding-top: 70px;
+
+.table-header {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 170px;
+    background: #06162c;
+    opacity: 1;
+    z-index: 14;
+}
+
+@media (min-width: 576px) {
+	.table-header {
+		top: 125px;
+	}
+}
+
+.table-albums-header {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 170px;
+    background: #06162c;
+    opacity: 1;
+    z-index: 14;
+}
+
+@media (min-width: 450px) {
+	.table-albums-header {
+		top: 125px;
+	}
 }
 
 .display-inline{
@@ -494,4 +521,9 @@ table.tableAddUserNewAlbum tr {
 	display: table;
 	width: 100%;
 	table-layout: fixed;
+}
+
+.maxheight-scroll {
+	max-height: 250px;
+	overflow: auto;
 }
