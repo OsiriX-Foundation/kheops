@@ -127,7 +127,6 @@
         :no-local-sorting="true"
         :no-sort-reset="true"
         :tbody-class="'link'"
-        fixed
         @sort-changed="sortingChanged"
         @row-hovered="setItemHover"
         @row-unhovered="setItemUnhover"
@@ -945,13 +944,6 @@ export default {
     },
     changeFilterValue() {
       this.showFilters = !this.showFilters;
-      if (this.showFilters === true) {
-        const el = this.$el.querySelector(`[id='${this.headerID}']`);
-        if (el !== null) {
-          const offset = -el.offsetHeight;
-          this.scrollTo(el, offset);
-        }
-      }
     },
     setShowIcons(value, studyUID, index = -1) {
       let studyIndex = index;
