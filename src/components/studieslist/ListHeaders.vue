@@ -2,7 +2,6 @@
 {
   "en": {
     "selectednbstudies": "{count} study is selected | {count} studies are selected",
-    "addalbum": "Add to an album",
     "infoFavorites": "Favorites",
     "send": "Send",
     "delete": "Delete",
@@ -10,18 +9,12 @@
     "addfavorites": "Add too favorites",
     "addfavorites": "Remove too favorites",
     "confirmDelete": "Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
-    "importdir": "Import directory",
-    "importfiles": "Import files",
-    "draganddrop": "Or drag and drop",
     "studiessharedsuccess": "studies sent successfully",
     "studiessharederror": "studies could not be sent",
-    "addInbox": "Add to inbox",
-    "addinnewalbum": "Add to a new album",
-    "headerlistalbums": "Albums list"
+    "addInbox": "Add to inbox"
   },
   "fr": {
     "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
-    "addalbum": "Ajouter à un album",
     "infoFavorites": "Favoris",
     "send": "Envoyer",
     "delete": "Supprimer",
@@ -29,14 +22,9 @@
     "addfavorites": "Ajouter aux favoris",
     "addfavorites": "Supprimer des favoris",
     "confirmDelete": "Etes vous de sûr de vouloir supprimer {countStudies} étude contenant {countSeries} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série.| Etes vous de sûr de vouloir supprimer {countStudies} études contenant {countSeries} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
-    "importdir": "Importer un dossier",
-    "importfiles": "Importer des fichiers",
-    "draganddrop": "Ou Drag and Drop",
     "studiessharedsuccess": "études ont été envoyées avec succès",
     "addInbox": "Ajouter à la boite de réception",
-    "studiessharederror": "études n'ont pas pu être envoyée",
-    "addinnewalbum": "Ajouter à un nouvel album",
-    "headerlistalbums": "Liste d'albums"
+    "studiessharederror": "études n'ont pas pu être envoyée"
   }
 }
 </i18n>
@@ -74,46 +62,14 @@
         <!--
           v-if="!albumId || (album.send_series || album.is_admin)"
         -->
-        <b-dropdown
+
+        <dropdown-albums
           v-if="showAlbumButton === true"
           :disabled="selectedStudiesNb === 0"
-          variant="link"
-          size="sm"
-        >
-          <template slot="button-content">
-            <span>
-              <v-icon
-                class="align-middle"
-                name="book"
-              />
-            </span><br>
-            <span>{{ $t("addalbum") }}</span>
-          </template>
-          <div
-            class="maxheight-scroll"
-          >
-            <b-dropdown-item
-              @click.stop="goToCreateAlbum()"
-            >
-              <span
-                class="font-kheops"
-              >
-                {{ $t('addinnewalbum') }}
-              </span>
-            </b-dropdown-item>
-            <b-dropdown-divider />
-            <b-dropdown-header>
-              {{ $t('headerlistalbums') }}
-            </b-dropdown-header>
-            <b-dropdown-item
-              v-for="allowedAlbum in allowedAlbums"
-              :key="allowedAlbum.id"
-              @click.stop="addToAlbum(allowedAlbum.album_id)"
-            >
-              {{ allowedAlbum.name|maxTextLength(albumNameMaxLength) }}
-            </b-dropdown-item>
-          </div>
-        </b-dropdown>
+          :albums="albums"
+          @create-album="goToCreateAlbum"
+          @add-to-album="addToAlbum"
+        />
         <div
           v-if="showInboxButton === true"
           class="align-self-center"
@@ -174,43 +130,9 @@
         <div
           class="align-self-center ml-auto text-right col-12 col-sm-auto"
         >
-          <b-dropdown
+          <dropdown-import-study
             v-if="showImportButton === true"
-            id="dropdown-divider"
-            toggle-class="kheopsicon"
-            variant="link"
-            right
-          >
-            <template slot="button-content">
-              <v-icon
-                name="add"
-                width="34px"
-                height="34px"
-              />
-            </template>
-            <b-dropdown-item-button
-              :disabled="sendingFiles"
-            >
-              <label for="file">
-                {{ $t("importfiles") }}
-              </label>
-            </b-dropdown-item-button>
-            <b-dropdown-item-button
-              v-if="determineWebkitDirectory()"
-              :disabled="sendingFiles"
-            >
-              <label for="directory">
-                {{ $t("importdir") }}
-              </label>
-            </b-dropdown-item-button>
-            <b-dropdown-divider />
-            <b-dropdown-item-button
-              v-if="determineWebkitDirectory()"
-              @click="showDragAndDrop"
-            >
-              {{ $t("draganddrop") }}
-            </b-dropdown-item-button>
-          </b-dropdown>
+          />
           <button
             type="button"
             class=" btn btn-link "
@@ -256,11 +178,15 @@
 import { mapGetters } from 'vuex';
 import formGetUser from '@/components/user/getUser';
 import ConfirmButton from '@/components/globalbutton/ConfirmButton.vue';
+import DropdownAlbums from '@/components/albums/DropdownAlbums';
+import DropdownImportStudy from '@/components/study/DropdownImportStudy';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'ListHeaders',
-  components: { formGetUser, ConfirmButton },
+  components: {
+    formGetUser, ConfirmButton, DropdownImportStudy, DropdownAlbums,
+  },
   mixins: [CurrentUser],
   props: {
     studies: {
@@ -319,7 +245,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      sendingFiles: 'sending',
       series: 'series',
       source: 'source',
     }),
@@ -360,12 +285,6 @@ export default {
     },
     allSelectedStudies() {
       return _.filter(this.studies, (s) => (s.flag.is_selected === true || s.flag.is_indeterminate === true));
-    },
-    allowedAlbums() {
-      if (this.albumId === '') {
-        return this.albums;
-      }
-      return this.albums.filter((album) => album.album_id !== this.albumId);
     },
   },
 
@@ -609,18 +528,9 @@ export default {
         this.deselectStudySeries();
       });
     },
-    determineWebkitDirectory() {
-      // https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
-      const tmpInput = document.createElement('input');
-      if ('webkitdirectory' in tmpInput && typeof window.orientation === 'undefined') return true;
-      return false;
-    },
     setFilters() {
       this.showFilters = !this.showFilters;
       this.$emit('setFilters', this.showFilters);
-    },
-    showDragAndDrop() {
-      this.$store.dispatch('setDemoDragAndDrop', true);
     },
     reloadStudies() {
       this.$emit('reloadStudies');
