@@ -469,6 +469,7 @@ export default {
       showIcons: false,
       statusList: 200,
       headerID: 'listheaders',
+      defaultSortAlbums: '-last_event_time',
       firstScrollTo: '',
       sortable: [
         'StudyDate',
@@ -737,7 +738,7 @@ export default {
             const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
             let offset = 0;
             if (el !== null) {
-              offset = el.offsetHeight + 75;
+              offset = el.offsetHeight + 125;
             }
             if (elStickyHeader !== null) {
               offset += elStickyHeader.offsetHeight;
@@ -782,6 +783,7 @@ export default {
       if (this.currentuserAccessToken !== null) {
         const queriesAlbums = {
           canAddSeries: true,
+          sort: this.defaultSortAlbums,
         };
         const headers = {
           Authorization: `Bearer ${this.currentuserAccessToken}`,
