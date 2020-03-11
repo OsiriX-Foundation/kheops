@@ -51,6 +51,7 @@
 <template>
   <div>
     <list-albums-headers
+      class="list-header"
       :disabled-btn-share="albumsSelected.length === 0"
       @inviteClick="form_send_album = true"
       @searchClick="showFilters = !showFilters"
@@ -314,6 +315,7 @@ export default {
         {
           key: 'is_selected',
           label: '',
+          thClass: 'table-albums-header',
           sortable: false,
           class: 'td_checkbox_albums word-break',
           thStyle: {
@@ -323,7 +325,7 @@ export default {
         {
           key: 'name',
           label: this.$t('name'),
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           tdClass: 'name',
           sortable: true,
           class: 'word-break',
@@ -335,7 +337,7 @@ export default {
           key: 'number_of_studies',
           label: this.$t('Study #'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -345,7 +347,7 @@ export default {
           key: 'number_of_users',
           label: this.$t('User #'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-md-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -355,7 +357,7 @@ export default {
           key: 'number_of_comments',
           label: this.$t('Message #'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -365,7 +367,7 @@ export default {
           key: 'created_time',
           label: this.$t('Date'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -375,7 +377,7 @@ export default {
           key: 'last_event_time',
           label: this.$t('LastEvent'),
           sortable: true,
-          thClass: 'pointer',
+          thClass: 'pointer table-albums-header',
           class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
@@ -392,6 +394,7 @@ export default {
             return this.$t('nomodality');
           },
           class: 'word-break',
+          thClass: 'table-albums-header',
           thStyle: {
             width: '200px',
           },

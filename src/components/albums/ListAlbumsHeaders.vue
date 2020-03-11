@@ -49,7 +49,7 @@
           </button>
         </div>
         <div
-          class="ml-auto align-self-center"
+          class="ml-auto align-self-center text-right col-xxs-12 col-xs-auto"
         >
           <button
             type="button"

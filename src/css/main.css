@@ -269,6 +269,21 @@ div.seriesSummaryContainer{
 	}
 }
 
+.table-albums-header {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 170px;
+    background: #06162c;
+    opacity: 1;
+    z-index: 14;
+}
+
+@media (min-width: 450px) {
+	.table-albums-header {
+		top: 125px;
+	}
+}
+
 .display-inline{
 	display: inline;
 }

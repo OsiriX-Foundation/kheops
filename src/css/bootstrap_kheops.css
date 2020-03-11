@@ -247,3 +247,9 @@ a.text-success:hover, a.text-success:focus {
 .table.b-table > tfoot > tr > [aria-sort="descending"] {
   background-image: none;
 }
+
+@media (max-width: 449px) {
+	.col-xxs-12 {
+		width: 100%;
+	}
+}
