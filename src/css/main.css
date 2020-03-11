@@ -257,10 +257,16 @@ div.seriesSummaryContainer{
 .table-header {
 	position: -webkit-sticky;
 	position: sticky;
-	top: 125px;
+	top: 170px;
     background: #06162c;
     opacity: 1;
-    z-index: 15;
+    z-index: 14;
+}
+
+@media (min-width: 576px) {
+	.table-header {
+		top: 125px;
+	}
 }
 
 .display-inline{

@@ -49,7 +49,7 @@
       <div
         class="d-flex flex-wrap"
       >
-        <div class="p-2 align-self-center d-none d-sm-block">
+        <div class="p-2 align-self-center d-none d-md-block">
           <span>{{ $tc("selectednbstudies", selectedStudiesNb, { count: selectedStudiesNb }) }}</span>
         </div>
         <div
@@ -172,7 +172,7 @@
           </button>
         </div>
         <div
-          class="align-self-center ml-auto"
+          class="align-self-center ml-auto text-right col-12 col-sm-auto"
         >
           <b-dropdown
             v-if="showImportButton === true"
