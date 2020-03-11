@@ -229,17 +229,9 @@
           <div class="">
             {{ row.value }}
           </div>
-          <span
-            class="ml-auto"
-            :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
-            @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
-          >
-            <v-icon
-              name="star"
-              class="kheopsicon"
-              :class="(!row.item.is_favorite) ? '' : 'bg-neutral fill-neutral'"
-            />
-          </span>
+          <list-albums-icons
+            :album="row.item"
+          />
         </div>
       </template>
       <template
@@ -296,6 +288,7 @@ import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
 import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
+import ListAlbumsIcons from '@/components/albums/ListAlbumsIcons';
 import SortList from '@/components/globallist/SortList.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import Loading from '@/components/globalloading/Loading';
@@ -303,7 +296,7 @@ import Loading from '@/components/globalloading/Loading';
 export default {
   name: 'Albums',
   components: {
-    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, Loading,
+    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, Loading, ListAlbumsIcons,
   },
   data() {
     return {
@@ -572,12 +565,6 @@ export default {
       this.albumsParams.offset = 0;
       this.$store.dispatch('initAlbums', { });
       this.infiniteId += 1;
-    },
-    toggleFavorite(albumID, isFavorite) {
-      const value = !isFavorite;
-      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
-        this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value });
-      });
     },
     setItemHover(item, index) {
       this.albums[index].flag.is_hover = true;
