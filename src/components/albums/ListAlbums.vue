@@ -53,15 +53,9 @@
     <list-albums-headers
       class="list-header"
       :disabled-btn-share="albumsSelected.length === 0"
-      @inviteClick="form_send_album = true"
+      :albums-selected="albumsSelected"
       @searchClick="showFilters = !showFilters"
       @reloadAlbums="searchAlbums"
-    />
-
-    <form-get-user
-      v-if="form_send_album && albumsSelected.length > 0"
-      @get-user="sendToUser"
-      @cancel-user="form_send_album=false"
     />
     <b-table
       striped
@@ -287,7 +281,6 @@ import { mapGetters } from 'vuex';
 import Datepicker from 'vuejs-datepicker';
 import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
-import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
 import ListAlbumsIcons from '@/components/albums/ListAlbumsIcons';
 import SortList from '@/components/globallist/SortList.vue';
@@ -297,12 +290,11 @@ import Loading from '@/components/globalloading/Loading';
 export default {
   name: 'Albums',
   components: {
-    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, Loading, ListAlbumsIcons,
+    InfiniteLoading, ListAlbumsHeaders, Datepicker, SortList, Loading, ListAlbumsIcons,
   },
   data() {
     return {
       statusList: 200,
-      form_send_album: false,
       showFilters: false,
       infiniteId: 0,
       albumsParams: {
@@ -551,13 +543,6 @@ export default {
     },
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
-    },
-    sendToUser(userId) {
-      this.albumsSelected.forEach((album) => {
-        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
-          this.$snotify.success(this.$t('albumshared'));
-        });
-      });
     },
     sortingChanged(ctx) {
       this.albumsParams.sortDesc = ctx.sortDesc;
