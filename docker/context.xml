@@ -17,6 +17,8 @@
                override="false"/>
     <Parameter name="online.kheops.keycloak.realms" value="${kheops_keycloak_realms}"
                override="false"/>
+    <Parameter name="online.kheops.oidc.provider" value="${kheops_oidc_provider}"
+               override="false"/>
     <Parameter name="online.kheops.root.uri" value="${kheops_root_url}"
                override="false"/>
     <Parameter name="online.kheops.client.dicomwebproxyclientid" value="${kheops_client_dicomwebproxyclientid}"

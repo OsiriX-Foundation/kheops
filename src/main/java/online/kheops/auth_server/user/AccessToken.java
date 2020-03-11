@@ -4,11 +4,10 @@ import com.auth0.jwk.JwkException;
 import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
-import online.kheops.auth_server.keycloak.KeycloakContextListener;
+import online.kheops.auth_server.OIDCProviderContextListener;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -33,15 +32,15 @@ public final class AccessToken {
 
     private final String issuer;
 
-    private static final String JWKS_CACHE_ALIAS = "jwksCache";
+    private static final String CONFIGURATION_URLS_CACHE_ALIAS = "configurationURLsCache";
     private static final String PUBLIC_KEY_CACHE_ALIAS = "publicKeyCache";
     private static CacheManager jwksCacheManager = getJwksCacheManager();
-    private static Cache<String, URL> jwksURLCache = jwksCacheManager.getCache(JWKS_CACHE_ALIAS, String.class, URL.class);
+    private static Cache<String, ConfigurationURLs> configurationURLsCache = jwksCacheManager.getCache(CONFIGURATION_URLS_CACHE_ALIAS, String.class, ConfigurationURLs.class);
     private static Cache<String, RSAPublicKey> publicKeyCache = jwksCacheManager.getCache(PUBLIC_KEY_CACHE_ALIAS, String.class, RSAPublicKey.class);
 
     private static CacheManager getJwksCacheManager() {
         CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(JWKS_CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, URL.class, ResourcePoolsBuilder.heap(10))
+                .withCache(CONFIGURATION_URLS_CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, ConfigurationURLs.class, ResourcePoolsBuilder.heap(10))
                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(10))))
                 .withCache(PUBLIC_KEY_CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, RSAPublicKey.class, ResourcePoolsBuilder.heap(10))
                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(10))))
@@ -53,10 +52,23 @@ public final class AccessToken {
     private static class ConfigurationEntity {
         @XmlElement(name="jwks_uri")
         String jwksURI;
+        @XmlElement(name="issuer")
+        String issuer;
+    }
+
+    private static class ConfigurationURLs {
+        private URL jwksURI;
+
+        private String issuerS;
+
+        public ConfigurationURLs(ConfigurationEntity configurationEntity) throws MalformedURLException {
+            this.jwksURI = new URL(configurationEntity.jwksURI);
+            this.issuerS = configurationEntity.issuer;
+        }
     }
 
     public static final class Builder {
-        private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
+        private final String configurationUrl = OIDCProviderContextListener.getOIDCConfigurationString();
 
         private final ServletContext servletContext;
 
@@ -65,12 +77,12 @@ public final class AccessToken {
         }
 
         public AccessToken build(String assertionToken) throws IdTokenVerificationException {
-            URL jwksURL = getJwksURL(configurationUrl);
+            ConfigurationURLs configurationURLs = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
                 @Override
                 public RSAPublicKey getPublicKeyById(String kid) {
-                    return getRSAPublicKey(jwksURL, kid);
+                    return getRSAPublicKey(configurationURLs.jwksURI, kid);
                 }
                 // implemented to get rid of warnings
                 @Override public RSAPrivateKey getPrivateKey() {return null;}
@@ -80,9 +92,9 @@ public final class AccessToken {
             final DecodedJWT jwt;
             try {
                 jwt = JWT.require(Algorithm.RSA256(keyProvider))
-                        .acceptLeeway(99999)
-                        .withIssuer(getIssuer())
-                        .acceptLeeway(99999)
+                        .acceptLeeway(60)
+                        .withIssuer(configurationURLs.issuerS)
+                        .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
@@ -99,10 +111,10 @@ public final class AccessToken {
             return new AccessToken(jwt.getIssuer());
         }
 
-        private static synchronized URL getJwksURL(String configurationUrl) {
-            URL jwksURL = jwksURLCache.get(configurationUrl);
+        private static synchronized ConfigurationURLs getJwksURL(String configurationUrl) {
+            ConfigurationURLs configurationURLs = configurationURLsCache.get(configurationUrl);
 
-            if (jwksURL == null) {
+            if (configurationURLs == null) {
                 final ConfigurationEntity configurationEntity;
                 try {
                     configurationEntity = CLIENT.target(configurationUrl).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
@@ -111,13 +123,13 @@ public final class AccessToken {
                 }
 
                 try {
-                    jwksURL = new URL(configurationEntity.jwksURI);
+                    configurationURLs = new ConfigurationURLs(configurationEntity);
                 } catch (MalformedURLException e) {
                     throw new DownloadKeyException("jwks_uri is not a valid URI, configuration URL:\" + configurationUrl", e);
                 }
-                jwksURLCache.put(configurationUrl, jwksURL);
+                configurationURLsCache.put(configurationUrl, configurationURLs);
             }
-            return jwksURL;
+            return configurationURLs;
         }
 
         private static synchronized RSAPublicKey getRSAPublicKey(URL jwksURL, String keyId) {
@@ -133,11 +145,6 @@ public final class AccessToken {
             }
 
             return publicKey;
-        }
-
-        private String getIssuer() {
-            return servletContext.getInitParameter("online.kheops.keycloak.uri") + "/auth/realms/" +
-                    servletContext.getInitParameter("online.kheops.keycloak.realms");
         }
     }
 

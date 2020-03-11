@@ -20,6 +20,9 @@
         <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
     </listener>
     <listener>
+        <listener-class>online.kheops.auth_server.OIDCProviderContextListener</listener-class>
+    </listener>
+    <listener>
         <listener-class>online.kheops.auth_server.liquibase.LiquibaseContextListener</listener-class>
     </listener>
     <listener>
@@ -74,6 +77,11 @@
         <description>Uri for the keycloak API</description>
         <param-name>online.kheops.keycloak.uri</param-name>
         <param-value>https://keycloak.kheops.online</param-value>
+    </context-param>
+    <context-param>
+        <description>Uri for the keycloak API</description>
+        <param-name>online.kheops.oidc.provider</param-name>
+        <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
     </context-param>
     <context-param>
         <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>

@@ -63,6 +63,10 @@ if [ -z "$KHEOPS_KEYCLOAK_URI" ]; then
     echo "Missing KHEOPS_KEYCLOAK_URI environment variable"
     missing_env_var_secret=true
 fi
+if [ -z "$KHEOPS_OIDC_PROVIDER" ]; then
+    echo "Missing KHEOPS_OIDC_PROVIDER environment variable"
+    missing_env_var_secret=true
+fi
 if [ -z "$KHEOPS_KEYCLOAK_CLIENTID" ]; then
     echo "Missing KHEOPS_KEYCLOAK_CLIENTID environment variable"
     missing_env_var_secret=true
@@ -122,6 +126,7 @@ sed -i "s|\${kheops_keycloak_clientid}|$KHEOPS_KEYCLOAK_CLIENTID|" ${REPLACE_FIL
 sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
 
 
 
