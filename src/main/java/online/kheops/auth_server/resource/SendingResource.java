@@ -196,12 +196,26 @@ public class SendingResource
                     return Response.status(FORBIDDEN).entity(errorResponse).build();
                 }
             }
-
-
-            Sending.appropriateSeriesFromToken(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-            return Response.status(CREATED).build();
-
-
+            try {
+                if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                    final String albumID = kheopsPrincipal.getAlbumID();
+                    if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
+                        Sending.putSeriesInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                        return Response.status(CREATED).build();
+                    } else {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message(AUTHORIZATION_ERROR)
+                                .detail("No write access with this credential")
+                                .build();
+                        return Response.status(FORBIDDEN).entity(errorResponse).build();
+                    }
+                } else {
+                    Sending.appropriateSeriesFromToken(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                    return Response.status(CREATED).build();
+                }
+            } catch (NotAlbumScopeTypeException | ClientIdNotFoundException e) {
+                return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
+            }
         } else {
             if (!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
