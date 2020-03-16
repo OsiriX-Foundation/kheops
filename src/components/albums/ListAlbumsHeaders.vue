@@ -49,7 +49,7 @@
           </button>
         </div>
         <div
-          class="ml-auto align-self-center"
+          class="ml-auto align-self-center text-right col-xxs-12 col-xs-auto"
         >
           <button
             type="button"
@@ -74,36 +74,56 @@
         </div>
       </div>
     </div>
+    <form-get-user
+      v-if="form_send_album && disabledBtnShare === false"
+      @get-user="sendToUser"
+      @cancel-user="form_send_album=false"
+    />
   </div>
 </template>
 
 <script>
+import formGetUser from '@/components/user/getUser';
 
 export default {
   name: 'ListAlbumsHeaders',
-  components: { },
+  components: { formGetUser },
   props: {
     disabledBtnShare: {
       type: Boolean,
       required: false,
       default: true,
     },
+    albumsSelected: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
   },
   data() {
-    return {};
+    return {
+      form_send_album: false,
+    };
   },
   methods: {
     searchClick() {
       this.$emit('searchClick');
     },
     inviteClick() {
-      this.$emit('inviteClick');
+      this.form_send_album = true;
     },
     reloadAlbums() {
       this.$emit('reloadAlbums');
     },
     goNewAlbum() {
       this.$router.push('/albums/new');
+    },
+    sendToUser(userId) {
+      this.albumsSelected.forEach((album) => {
+        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
+          this.$snotify.success(this.$t('albumshared'));
+        });
+      });
     },
   },
 };

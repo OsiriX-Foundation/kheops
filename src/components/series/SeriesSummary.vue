@@ -29,11 +29,11 @@
         >
           <img
             v-if="!loadingImage"
-            :class="checkSR ? 'pointer' : ''"
+            class="pointer"
             :src="serie.imgSrc"
             width="150"
             height="150"
-            @click="checkSR ? openTab(serie) : ''"
+            @click="openTab(serie)"
           >
           <bounce-loader
             :loading="loadingImage"
@@ -94,12 +94,6 @@ export default {
       studies: 'studies',
       series: 'series',
     }),
-    checkSR() {
-      if (this.serie.Modality !== undefined && this.serie.Modality.Value !== undefined) {
-        return !this.serie.Modality.Value[0].includes('SR');
-      }
-      return true;
-    },
     imageTitle() {
       let modality = '';
       let description = '';
@@ -264,7 +258,7 @@ export default {
       } else if (this.mustOpenWSI(series)) {
         windowProps.name = `WSI-${this.studyInstanceUID}`;
         windowProps.id = 'WSI';
-      } else if (this.checkSR) {
+      } else {
         windowProps.name = `OHIF-${this.studyInstanceUID}`;
         windowProps.id = 'OHIF';
       }
