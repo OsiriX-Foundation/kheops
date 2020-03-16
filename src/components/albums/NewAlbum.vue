@@ -400,7 +400,7 @@ export default {
       return data;
     },
     cancel() {
-      this.$router.push({ name: 'albums' });
+      this.$router.go(-1);
     },
   },
 };
