@@ -36,7 +36,9 @@
     "createwebhook": "{user} created a webhook",
     "editwebhook": "{user} edited a webhook",
     "deletewebhook": "{user} deleted a webhook",
-    "triggerwebhook": "{user} has made a manual trigger on a webhook"
+    "triggerwebhook": "{user} has made a manual trigger on a webhook",
+    "theuser": "the user",
+    "theadmin": "the admin"
   },
   "fr" : {
     "commentpostsuccess": "le commentaire a été posté avec succès",
@@ -73,7 +75,9 @@
     "createwebhook": "{user} a créé un webhook",
     "editwebhook": "{user} a édité un webhook",
     "deletewebhook": "{user} a supprimé un webhook",
-    "triggerwebhook": "{user} a déclenché manuellement un webhook"
+    "triggerwebhook": "{user} a déclenché manuellement un webhook",
+    "theuser": "l'utilisateur",
+    "theadmin": "l'admin"
   }
 }
 </i18n>

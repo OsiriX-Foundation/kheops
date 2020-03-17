@@ -15,7 +15,8 @@
     "create date": "create date",
     "last used": "last used",
     "permission": "permission",
-    "notokens": "There are no tokens to show"
+    "notokens": "There are no tokens to show",
+    "user": "user"
   },
   "fr": {
     "showrevokedtoken": "Afficher les tokens révoqués",
@@ -32,7 +33,8 @@
     "create date": "créé le",
     "last used": "dern. utilisation",
     "permission": "permission",
-    "notokens": "Aucun token créé"
+    "notokens": "Aucun token créé",
+    "user": "utilisateur"
   }
 }
 </i18n>

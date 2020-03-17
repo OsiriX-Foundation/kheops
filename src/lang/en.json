@@ -1,28 +1,13 @@
 {
-	"salut": "Hello",
-	"update": "Update",
 	"cancel": "Cancel",
 	"create": "Create",
 	"permissiondenied": "Permission denied",
 	"sorryerror": "Sorry, an error occured",
 	"confirm": "Confirm",
 	"add": "Add",
-	"usersettings": "Album user settings",
-	"albumupdatesuccess": "Album updated successfully",
-	"Yes": "Yes",
-	"No": "No",
-	"yes": "yes",
-	"no": "no",
-	"name": "name",
-	"delete": "Delete",
-	"confirmdeletion": "Confirm deletion",
-	"send": "Send",
-	"in": "in",
-	"theuser": "the user",
-	"theadmin": "the admin",
-	"to": "to",
-	"thealbum": "the album",
-	"back": "back",
-	"none": "none",
-	"user": "user"
+	"album" : {
+    "studies": "Studies",
+    "comments": "Comments",
+    "settings": "Settings"
+	}
 }
