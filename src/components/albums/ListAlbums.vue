@@ -277,7 +277,6 @@
 </template>
 <script>
 
-import { mapGetters } from 'vuex';
 import Datepicker from 'vuejs-datepicker';
 import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
