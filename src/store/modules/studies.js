@@ -8,7 +8,7 @@ import httpoperations from '@/mixins/httpoperations';
 const state = {
   studies: [],
   defaultFlagStudy: {
-    is_selected: false,
+    is_selected: true,
     is_hover: false,
     is_favorite: false,
     is_commented: false,
@@ -246,9 +246,11 @@ const mutations = {
     }
   },
   SET_STUDY_FLAG(state, params) {
-    const study = state.studies[params.index];
-    study.flag[params.flag] = params.value;
-    Vue.set(state.studies, params.index, study);
+    if (params.index !== -1 && state.studies[params.index] !== undefined) {
+      const study = state.studies[params.index];
+      study.flag[params.flag] = params.value;
+      Vue.set(state.studies, params.index, study);
+    }
   },
   DELETE_STUDY(state, params) {
     const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
