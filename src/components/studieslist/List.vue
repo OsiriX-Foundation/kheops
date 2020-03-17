@@ -102,7 +102,6 @@
     <list-headers
       :id="headerID"
       :studies="studies"
-      :albums="albums"
       :show-send-button="permissions.send_series"
       :show-album-button="permissions.send_series"
       :show-favorite-button="permissions.add_series && $route.name !== 'viewnologin'"
@@ -591,7 +590,6 @@ export default {
     ...mapGetters({
       studies: 'studies',
       series: 'series',
-      albums: 'albums',
       sendingFiles: 'sending',
       providers: 'providers',
       modalities: 'modalities',
@@ -656,7 +654,6 @@ export default {
   },
   created() {
     this.initData();
-    this.setAlbumsList();
     this.setAlbumInbox();
     this.setFilters();
     this.setQueryParams();
@@ -777,17 +774,6 @@ export default {
         this.$router.push('/albums');
         return err;
       });
-    },
-    setAlbumsList() {
-      if (this.currentuserKeycloakToken !== null) {
-        const queriesAlbums = {
-          canAddSeries: true,
-        };
-        const headers = {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
-        };
-        this.$store.dispatch('getAlbums', { queries: queriesAlbums, headers });
-      }
     },
     setAlbumInbox() {
       if (this.albumID !== undefined) {

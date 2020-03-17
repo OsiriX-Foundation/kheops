@@ -66,7 +66,6 @@
         <dropdown-albums
           v-if="showAlbumButton === true"
           :disabled="selectedStudiesNb === 0"
-          :albums="albums"
           @create-album="goToCreateAlbum"
           @add-to-album="addToAlbum"
         />
@@ -190,11 +189,6 @@ export default {
   mixins: [CurrentUser],
   props: {
     studies: {
-      type: Array,
-      required: true,
-      default: () => ([]),
-    },
-    albums: {
       type: Array,
       required: true,
       default: () => ([]),
