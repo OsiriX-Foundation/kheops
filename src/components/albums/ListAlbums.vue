@@ -297,6 +297,7 @@ export default {
       statusList: 200,
       showFilters: false,
       infiniteId: 0,
+      albumsKey: 'all',
       albumsParams: {
         offset: 0,
         limit: 50,
@@ -406,9 +407,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      albums: 'albums',
-    }),
+    albums() {
+      return this.$store.getters.getAlbumsByKey(this.albumsKey);
+    },
     albumsSelected() {
       return this.albums.filter((album) => album.is_selected === true);
     },
@@ -466,10 +467,10 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('initAlbums', {});
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   destroyed() {
-    this.$store.dispatch('initAlbums', {});
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   methods: {
     clickAlbum(item) {
@@ -506,7 +507,7 @@ export default {
         sort: (this.albumsParams.sortDesc ? '-' : '') + this.albumsParams.sortBy,
       };
       const queries = Object.assign(params, this.prepareFilters());
-      return this.$store.dispatch('getAlbums', { queries });
+      return this.$store.dispatch('getAlbums', { queries, key: this.albumsKey });
     },
     prepareFilters() {
       const filtersToSend = {};
@@ -551,7 +552,7 @@ export default {
     },
     searchAlbums() {
       this.albumsParams.offset = 0;
-      this.$store.dispatch('initAlbums', { });
+      this.$store.dispatch('initAlbums', { key: this.albumsKey });
       this.infiniteId += 1;
     },
     setItemHover(item, index) {

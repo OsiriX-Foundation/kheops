@@ -336,7 +336,6 @@
 <script>
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
-import { mapGetters } from 'vuex';
 import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 
@@ -356,6 +355,7 @@ export default {
   },
   data() {
     return {
+      albumsKey: 'canCreateCapabilityToken',
       token: {
         title: '',
         scope_type: this.scope,
@@ -376,9 +376,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      albums: 'albums',
-    }),
+    albums() {
+      return this.$store.getters.getAlbumsByKey(this.albumsKey);
+    },
     disabledCreateToken() {
       return (
         !this.token.title
@@ -415,11 +415,12 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('getAlbums', { queries: { canCreateCapabilityToken: 'true' } });
+    const queries = { canCreateCapabilityToken: true };
+    this.$store.dispatch('getAlbums', { queries, key: this.albumsKey });
   },
   destroyed() {
     if (this.albums.length > 0) {
-      this.$store.dispatch('initAlbums', {});
+      this.$store.dispatch('initAlbums', { key: this.albumsKey });
     }
   },
   methods: {

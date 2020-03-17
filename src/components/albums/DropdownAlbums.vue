@@ -54,8 +54,6 @@
   </b-dropdown>
 </template>
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
   name: 'DropdownImportStudy',
   props: {
@@ -69,29 +67,38 @@ export default {
       required: false,
       default: 25,
     },
-    queriesAlbums: {
+    albumsQueries: {
       type: Object,
       required: false,
       default: () => ({
         canAddSeries: true,
       }),
     },
+    albumsKey: {
+      type: String,
+      required: false,
+      default: 'canAddSeries',
+    },
   },
   computed: {
-    ...mapGetters({
-      albums: 'albums',
-    }),
+    albums() {
+      return this.$store.getters.getAlbumsByKey(this.albumsKey);
+    },
     listAlbums() {
       const albumID = this.$route.params.album_id;
       return this.albums.filter((album) => album.album_id !== albumID);
     },
   },
   created() {
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
     this.setAlbumsList();
+  },
+  destroyed() {
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   methods: {
     setAlbumsList() {
-      this.$store.dispatch('getAlbums', { queries: this.queriesAlbums });
+      this.$store.dispatch('getAlbums', { queries: this.albumsQueries, key: this.albumsKey });
     },
     createAlbum() {
       this.$emit('create-album');

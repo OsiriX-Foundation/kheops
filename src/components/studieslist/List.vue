@@ -661,7 +661,6 @@ export default {
   destroyed() {
     this.$store.dispatch('initStudies', {});
     this.$store.dispatch('initSeries');
-    this.$store.dispatch('initAlbums', {});
   },
   mounted() {
   },
@@ -757,7 +756,6 @@ export default {
       this.$store.dispatch('initStudies', {});
       this.$store.dispatch('initSeries');
       this.$store.dispatch('initModalities');
-      this.$store.dispatch('initAlbums', {});
     },
     reloadStudies() {
       this.searchStudies();

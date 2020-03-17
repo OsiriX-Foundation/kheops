@@ -22,6 +22,11 @@ export default {
       required: true,
       default: () => ({}),
     },
+    albumsKey: {
+      type: String,
+      required: false,
+      default: 'all',
+    },
   },
   computed: {
     visibility() {
@@ -35,7 +40,12 @@ export default {
     toggleFavorite(albumID, isFavorite) {
       const value = !isFavorite;
       this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
-        this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value });
+        this.$store.dispatch('setValueAlbum', {
+          album_id: albumID,
+          flag: 'is_favorite',
+          value,
+          key: this.albumsKey,
+        });
       });
     },
   },
