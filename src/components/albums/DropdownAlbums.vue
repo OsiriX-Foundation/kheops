@@ -44,7 +44,7 @@
         {{ $t('headerlistalbums') }}
       </b-dropdown-header>
       <b-dropdown-item
-        v-for="album in albums"
+        v-for="album in listAlbums"
         :key="album.id"
         @click.stop="addToAlbum(album.album_id)"
       >
@@ -75,6 +75,10 @@ export default {
     },
   },
   computed: {
+    listAlbums() {
+      const albumID = this.$route.params.album_id;
+      return this.albums.filter((album) => album.album_id !== albumID);
+    },
   },
   methods: {
     createAlbum() {
