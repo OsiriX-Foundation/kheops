@@ -15,6 +15,7 @@ const state = {
     is_indeterminate: false,
     view: '',
   },
+  source: '',
   modalities: [],
 };
 
@@ -40,7 +41,12 @@ const getters = {
 
 // actions
 const actions = {
-  initStudies({ commit }) {
+  initStudies({ commit }, source) {
+    if (source !== undefined && typeof source === 'string') {
+      state.source = source;
+    } else {
+      state.source = '';
+    }
     commit('INIT_STUDIES');
   },
   getStudies({ commit }, params) {
@@ -253,9 +259,11 @@ const mutations = {
     }
   },
   DELETE_STUDY(state, params) {
-    const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
-    if (studyIdx > -1) {
-      Vue.delete(state.studies, studyIdx);
+    if (state.source === '' || state.source === params.source) {
+      const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
+      if (studyIdx > -1) {
+        Vue.delete(state.studies, studyIdx);
+      }
     }
   },
   SET_STUDY_SHOW_DETAILS(state, params) {

@@ -401,8 +401,10 @@ export default {
     },
     deleteSelectedStudies() {
       this.selectedStudies.forEach((study) => {
+        const source = this.albumId === undefined ? 'inbox' : this.albumId;
         const params = {
           StudyInstanceUID: study.StudyInstanceUID.Value[0],
+          source,
         };
         if (this.albumId === '') {
           this.$store.dispatch('deleteStudy', params);

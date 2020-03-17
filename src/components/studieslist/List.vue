@@ -658,7 +658,7 @@ export default {
     this.setFilters();
     this.setQueryParams();
   },
-  destroyed() {
+  beforeDestroyed() {
     this.$store.dispatch('initStudies', {});
     this.$store.dispatch('initSeries');
   },
@@ -753,7 +753,8 @@ export default {
       });
     },
     initData() {
-      this.$store.dispatch('initStudies', {});
+      const source = this.albumID === undefined ? 'inbox' : this.albumID;
+      this.$store.dispatch('initStudies', source);
       this.$store.dispatch('initSeries');
       this.$store.dispatch('initModalities');
     },
