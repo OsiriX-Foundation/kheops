@@ -8,7 +8,7 @@ import httpoperations from '@/mixins/httpoperations';
 const state = {
   studies: [],
   defaultFlagStudy: {
-    is_selected: true,
+    is_selected: false,
     is_hover: false,
     is_favorite: false,
     is_commented: false,
