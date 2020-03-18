@@ -8,7 +8,53 @@
 	"album" : {
 		"studies": "Studies",
 		"comments": "Comments",
-		"settings": "Settings"
+		"settings": "Settings",
+		"addalbum": "Add to an album",
+		"addinnewalbum": "Add to a new album",
+		"headerlistalbums": "Albums list"
+	},
+	"newalbum": {
+		"albumName": "Album Name",
+		"albumDescription": "Album Description",
+		"users": "Users",
+		"newalbum": "New album",
+		"authorizationerror": "You don't have the permissions to add the study {study}",
+		"studynotfound": "The study {study} is not found",
+		"username": "User name",
+		"changeroleadmin": "change role to data steward",
+		"changeroleuser": "change role to user",
+		"remove": "Remove user",
+		"Admin": "Data steward"
+	},
+	"albumusersettings": {
+		"usersettings": "Album user settings",
+		"addUser": "Invite a user",
+		"addSeries": "Add studies / series",
+		"downloadSeries": "Show download button",
+		"sendSeries": "Sharing",
+		"deleteSeries": "Remove studies / series",
+		"writeComments": "Write comments"
+	},
+	"listalbums": {
+		"Study #": "Study #",
+		"Modalities": "Modalities",
+		"User #": "User #",
+		"Message #": "Message #",
+		"Date": "Created date",
+		"LastEvent": "Last event",
+		"nomodality": "No modality",
+		"name": "Name",
+		"nomorealbums": "No more albums",
+		"noresults": "No album found",
+		"error": "An error occur please reload the albums.",
+		"reload": "Reload",
+		"filter": "Filter",
+		"fromDate": "From",
+		"toDate": "To",
+		"nopermissions": "You don't have the permissions to show the albums list.",
+		"newalbum": "New album",
+		"share": "Invite user",
+		"albumshared": "Album shared"
 	},
 	"comment": {
 		"includenotifications": "include notifications",

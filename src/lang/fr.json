@@ -8,7 +8,53 @@
 	"album" : {
 		"studies": "Etudes",
 		"comments": "Commentaires",
-		"settings": "Réglages"
+		"settings": "Réglages",
+		"addalbum": "Ajouter à un album",
+		"addinnewalbum": "Ajouter à un nouvel album",
+		"headerlistalbums": "Liste d'albums"
+	},
+	"listalbums": {
+		"Study #": "# Etudes",
+		"Modalities": "Modalités",
+		"User #": "# Utilisateurs",
+		"Message #": "# Messages",
+		"Date": "Date de création",
+		"LastEvent": "Dernier événement",
+		"nomodality": "Aucune modalité",
+		"name": "Nom",
+		"nomorealbums": "Pas d'albums en plus",
+		"noresults": "Aucun album trouvé",
+		"error": "Une erreur s'est produite, veuillez recharger les albums.",
+		"reload": "Recharger",
+		"filter": "Filtrer",
+		"fromDate": "De",
+		"toDate": "A",
+		"nopermissions": "Vous n'avez pas les autorisations pour afficher la liste des albums.",
+		"newalbum": "Nouvel album",
+		"share": "Inviter un utilisateur",
+		"albumshared": "Album partagé"
+	},
+	"newalbum": {
+		"albumName": "Nom de l'album",
+		"albumDescription": "Description de l'album",
+		"users": "Utilisateurs",
+		"newalbum": "Nouvel album",
+		"authorizationerror": "Vous n'avez pas les droits d'ajouter l'étude {study}",
+		"studynotfound": "l'étude {study} n'a pas été trouvée",
+		"username": "Utilisateur",
+		"changeroleadmin": "changer le rôle pour gardien des données",
+		"changeroleuser": "changer le rôle pour utilisateur",
+		"remove": "Retirer l'utilisateur",
+		"Admin": "Gardien des données"
+	},
+	"albumusersettings": {
+		"usersettings": "Réglages des utilisateurs de l'album",
+		"addUser": "Inviter un utilisateur",
+		"addSeries": "Ajouter une étude / série",
+		"downloadSeries": "Montrer le bouton de téléchargement",
+		"sendSeries": "Partager",
+		"deleteSeries": "Supprimer une étude / série",
+		"writeComments": "Commenter"
 	},
 	"comment": {
 		"includenotifications": "inclure les notifications",

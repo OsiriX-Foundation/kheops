@@ -1,29 +1,8 @@
-
-<i18n>
-{
-  "en": {
-    "username": "User name",
-    "user": "user",
-    "changeroleadmin": "change role to data steward",
-    "changeroleuser": "change role to user",
-    "remove": "Remove user",
-    "Admin": "Data steward"
-  },
-  "fr": {
-    "username": "Utilisateur",
-    "user": "utilisateur",
-    "changeroleadmin": "changer le rôle pour gardien des données",
-    "changeroleuser": "changer le rôle pour utilisateur",
-    "remove": "Retirer l'utilisateur",
-    "Admin": "Gardien des données"
-  }
-}
-</i18n>
 <template>
   <table class="table tableAddUserNewAlbum">
     <thead>
       <tr>
-        <th>{{ $t('username') }}</th>
+        <th>{{ $t('newalbum.username') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -40,7 +19,7 @@
             <span
               class="font-neutral"
             >
-              {{ $t("Admin") }}
+              {{ $t("newalbum.Admin") }}
             </span>
           </span>
           <div
@@ -50,7 +29,7 @@
               class="font-white"
               @click.stop="toggleAdmin(user)"
             >
-              {{ (user.is_admin)?$t('changeroleuser'):$t('changeroleadmin') }}
+              {{ (user.is_admin)?$t('newalbum.changeroleuser'):$t('newalbum.changeroleadmin') }}
               <v-icon
                 name="user"
               />
@@ -60,7 +39,7 @@
               class="text-danger"
               @click="deleteUser(user)"
             >
-              {{ $t('remove') }}
+              {{ $t('newalbum.remove') }}
               <v-icon name="trash" />
             </a>
           </div>
@@ -75,7 +54,7 @@
               class="font-white"
               @click.stop="toggleAdmin(user)"
             >
-              {{ (user.is_admin)?$t('changeroleuser'):$t('changeroleadmin') }}
+              {{ (user.is_admin)?$t('newalbum.changeroleuser'):$t('newalbum.changeroleadmin') }}
               <v-icon
                 name="user"
               />
@@ -85,7 +64,7 @@
               class="text-danger"
               @click="deleteUser(user)"
             >
-              {{ $t('remove') }}
+              {{ $t('newalbum.remove') }}
               <v-icon name="trash" />
             </a>
           </div>

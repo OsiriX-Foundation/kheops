@@ -1,15 +1,3 @@
-<i18n>
-{
-  "en": {
-    "newalbum": "New album",
-    "share": "Invite user"
-  },
-  "fr": {
-    "newalbum": "Nouvel album",
-    "share": "Inviter un utilisateur"
-  }
-}
-</i18n>
 <template>
   <div>
     <div
@@ -27,7 +15,7 @@
               name="plus"
               class="mr-2"
             />
-            {{ $t('newalbum') }}
+            {{ $t('listalbums.newalbum') }}
           </button>
         </div>
         <div
@@ -45,7 +33,7 @@
                 scale="1.5"
               />
             </span><br>
-            {{ $t("share") }}
+            {{ $t("listalbums.share") }}
           </button>
         </div>
         <div
@@ -121,7 +109,7 @@ export default {
     sendToUser(userId) {
       this.albumsSelected.forEach((album) => {
         this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
-          this.$snotify.success(this.$t('albumshared'));
+          this.$snotify.success(this.$t('listalbums.albumshared'));
         });
       });
     },

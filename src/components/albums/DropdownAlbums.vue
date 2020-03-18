@@ -1,17 +1,3 @@
-<i18n>
-{
-  "en": {
-    "addalbum": "Add to an album",
-    "addinnewalbum": "Add to a new album",
-    "headerlistalbums": "Albums list"
-  },
-  "fr": {
-    "addalbum": "Ajouter à un album",
-    "addinnewalbum": "Ajouter à un nouvel album",
-    "headerlistalbums": "Liste d'albums"
-  }
-}
-</i18n>
 <template>
   <b-dropdown
     :disabled="disabled"
@@ -25,7 +11,7 @@
           name="book"
         />
       </span><br>
-      <span>{{ $t("addalbum") }}</span>
+      <span>{{ $t("album.addalbum") }}</span>
     </template>
     <div
       class="maxheight-scroll"
@@ -36,12 +22,12 @@
         <span
           class="font-kheops"
         >
-          {{ $t('addinnewalbum') }}
+          {{ $t('album.addinnewalbum') }}
         </span>
       </b-dropdown-item>
       <b-dropdown-divider />
       <b-dropdown-header>
-        {{ $t('headerlistalbums') }}
+        {{ $t('album.headerlistalbums') }}
       </b-dropdown-header>
       <b-dropdown-item
         v-for="album in listAlbums"
