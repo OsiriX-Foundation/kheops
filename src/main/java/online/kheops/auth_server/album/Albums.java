@@ -35,14 +35,14 @@ public class Albums {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
-        final AlbumResponse albumResponse;
+        final Album newAlbum;
 
         try {
             tx.begin();
 
             callingUser = em.merge(callingUser);
 
-            final Album newAlbum = new Album(name, description, usersPermission, new AlbumId(em).getId());
+            newAlbum = new Album(name, description, usersPermission, new AlbumId(em).getId());
             final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
             final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
 
@@ -52,14 +52,13 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return albumResponse;
+        return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
     }
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
@@ -68,13 +67,13 @@ public class Albums {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
-        final AlbumResponse albumResponse;
+        final Album editAlbum;
 
         try {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final Album editAlbum = getAlbum(albumId, em);
+            editAlbum = getAlbum(albumId, em);
             final AlbumUser callingAlbumUser = getAlbumUser(editAlbum, callingUser, em);
 
             if (notificationNewComment != null) {
@@ -113,14 +112,13 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return albumResponse;
+        return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
     }
 
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
