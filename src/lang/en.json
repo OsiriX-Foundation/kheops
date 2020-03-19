@@ -263,5 +263,11 @@
 		"unauthorized": "You don't have the permissions",
 		"unknownerror": "An unknown error occur",
 		"notfound": "Not found"
+	},
+	"doctitle": {
+		"albums": "{appTitle} - Albums",
+		"album": "{appTitle} - Album",
+		"newalbum": "{appTitle} - New album",
+		"user": "{appTitle} - User"
 	}
 }
