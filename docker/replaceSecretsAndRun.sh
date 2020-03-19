@@ -83,9 +83,11 @@ if [ -z "$KHEOPS_CLIENT_ZIPPERCLIENTID" ]; then
     echo "Missing KHEOPS_CLIENT_ZIPPERCLIENTID environment variable"
     missing_env_var=true
 fi
+
+use_scope=true
 if [ -z "$KHEOPS_USE_KHEOPS_SCOPE" ]; then
     echo "KHEOPS_USE_KHEOPS_SCOPE not set default value is 'true'"
-    use_scope=true
+
 else
     use_scope=false
 fi
@@ -133,7 +135,7 @@ sed -i "s|\${kheops_keycloak_realms}|$KHEOPS_KEYCLOAK_REALMS|" ${REPLACE_FILE_PA
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_use_kheops_scope}|use_scope|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_use_kheops_scope}|$use_scope|" ${REPLACE_FILE_PATH}
 
 
 
