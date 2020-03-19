@@ -1,13 +1,3 @@
-<i18n>
-{
-  "en": {
-    "invalidtoken": "This link is no longer active"
-  },
-  "fr": {
-    "invalidtoken": "Ce lien n'est plus actif"
-  }
-}
-</i18n>
 <template>
   <div>
     <component-import-study
@@ -20,7 +10,7 @@
     >
       <b-card class="text-center">
         <div class="bg-secondary font-large">
-          {{ $t('invalidtoken') }}
+          {{ $t('sharinglink.invalidtoken') }}
         </div>
       </b-card>
     </div>

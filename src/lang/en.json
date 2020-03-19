@@ -17,6 +17,14 @@
     "refresh": "Refresh",
     "fieldobligatory": "Field obligatory",
 	"urlnotvalid": "This url is not valid",
+	"navbar": {
+		"lang": "lang",
+		"tooltipHelp": "Help",
+		"tooltipLogout": "Logout",
+		"tooltipLogin": "Login",
+		"inbox": "Inbox",
+		"albums": "Albums"
+	},
 	"user": {
 		"mail": "Email",
 		"lastname": "Last name",
@@ -206,7 +214,8 @@
 		"addalbum": "Sharing",
 		"twitterEnable": "Twitter link enabled",
 		"twitterDisable": "No twitter link",
-		"twitterText": "My KHEOPS shared album. {link} #KHEOPS"
+		"twitterText": "My KHEOPS shared album. {link} #KHEOPS",
+		"invalidtoken": "This link is no longer active"
 	},
 	"webhook": {
 		"webhook": "Webhook",

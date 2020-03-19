@@ -1,22 +1,3 @@
-<i18n>
-{
-  "en": {
-    "welcome": "Welcome",
-    "lang": "lang",
-    "tooltipHelp": "Help",
-    "tooltipLogout": "Logout",
-    "tooltipLogin": "Login"
-  },
-  "fr": {
-    "welcome": "Bienvenue",
-    "lang": "lang",
-    "tooltipHelp": "Aide",
-    "tooltipLogout": "Déconnexion",
-    "tooltipLogin": "Se connecter"
-  }
-}
-</i18n>
-
 <template>
   <!--
     Navbar
@@ -66,43 +47,43 @@
           <b-nav-item
             v-else-if="logged === false"
             class="active pointer"
-            :title="$t('tooltipLogin')"
+            :title="$t('navbar.tooltipLogin')"
             @click="login()"
           >
             <span
               class="font-white"
             >
-              {{ $t('tooltipLogin') }}
+              {{ $t('navbar.tooltipLogin') }}
             </span>
           </b-nav-item>
           <b-nav-item
             class="active pointer"
-            :title="$t('tooltipHelp')"
+            :title="$t('navbar.tooltipHelp')"
             target="_blank"
             @click="redirect('https://docs.kheops.online')"
           >
             <span
               class="font-white"
             >
-              {{ $t('tooltipHelp') }}
+              {{ $t('navbar.tooltipHelp') }}
               <v-icon name="help" />
             </span>
           </b-nav-item>
           <b-nav-item
             v-if="logged"
-            :title="$t('tooltipLogout')"
+            :title="$t('navbar.tooltipLogout')"
             class="active pointer"
             @click="logout()"
           >
             <span
               class="font-white"
             >
-              {{ $t('tooltipLogout') }}
+              {{ $t('navbar.tooltipLogout') }}
               <v-icon name="sign-out-alt" />
             </span>
           </b-nav-item>
           <b-nav-item-dropdown
-            :text="`${$t('lang')}: ${lang}`"
+            :text="`${$t('navbar.lang')}: ${lang}`"
             toggle-class="font-white"
             right
             class="active"
