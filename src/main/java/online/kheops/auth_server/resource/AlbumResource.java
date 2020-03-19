@@ -347,7 +347,7 @@ public class AlbumResource {
                 .action(ActionType.ADD_ADMIN)
                 .targetUser(targetUser.getKeycloakId())
                 .log();
-        return Response.status(NO_CONTENT).build();
+        return Response.status(NO_CONTENT).build();//todo NO_CONTENT => CREATED ????
     }
 
     @DELETE

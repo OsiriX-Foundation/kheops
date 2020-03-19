@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
 
@@ -94,7 +94,7 @@ class ViewerAccessTokenGenerator {
         }
 
         try {
-            getOrCreateUser(accessToken.getSubject());
+            getUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, "User not found", e);
         }

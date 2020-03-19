@@ -19,7 +19,7 @@ import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
 import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
@@ -35,14 +35,14 @@ public class Albums {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
-        final AlbumResponse albumResponse;
+        final Album newAlbum;
 
         try {
             tx.begin();
 
             callingUser = em.merge(callingUser);
 
-            final Album newAlbum = new Album(name, description, usersPermission, new AlbumId(em).getId());
+            newAlbum = new Album(name, description, usersPermission, new AlbumId(em).getId());
             final AlbumUser newAlbumUser = new AlbumUser(newAlbum, callingUser, true);
             final Mutation newAlbumMutation = Events.albumPostNewAlbumMutation(callingUser, newAlbum);
 
@@ -52,14 +52,13 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return albumResponse;
+        return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
     }
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
@@ -68,13 +67,13 @@ public class Albums {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
-        final AlbumResponse albumResponse;
+        final Album editAlbum;
 
         try {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final Album editAlbum = getAlbum(albumId, em);
+            editAlbum = getAlbum(albumId, em);
             final AlbumUser callingAlbumUser = getAlbumUser(editAlbum, callingUser, em);
 
             if (notificationNewComment != null) {
@@ -113,14 +112,13 @@ public class Albums {
 
             tx.commit();
 
-            albumResponse = findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return albumResponse;
+        return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
     }
 
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
@@ -232,7 +230,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User targetUser = em.merge(getOrCreateUser(userName));
+            final User targetUser = getUser(userName, em);
 
             if (targetUser.getPk() == callingUser.getPk()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -308,7 +306,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = em.merge(getOrCreateUser(userName));
+            final User removedUser = getUser(userName, em);
             final Album album = getAlbum(albumId, em);
 
             //Delete the album if it is the last User
@@ -367,7 +365,7 @@ public class Albums {
             tx.begin();
 
             callingUser = em.merge(callingUser);
-            final User removedUser = em.merge(getOrCreateUser(userName));
+            final User removedUser = getUser(userName, em);
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 

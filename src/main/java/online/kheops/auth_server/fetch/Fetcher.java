@@ -80,10 +80,6 @@ public abstract class Fetcher {
         try {
             tx.begin();
 
-            final TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID", String.class);
-            query.setParameter("studyInstanceUID", studyInstanceUID);
-            seriesUIDList = query.getResultList();
-
             TypedQuery<Study> queryStudy = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
             queryStudy.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
@@ -92,18 +88,22 @@ public abstract class Fetcher {
             study.mergeAttributes(attributes);
             study.setPopulated(true);
 
+            final TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID", String.class);
+            query.setParameter("studyInstanceUID", studyInstanceUID);
+            seriesUIDList = query.getResultList();
+
             tx.commit();
+
+            seriesUIDList.forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID, em));
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-
-        seriesUIDList.forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID));
     }
 
-    private static void fetchSeries(String studyUID, String seriesUID) {
+    private static void fetchSeries(String studyUID, String seriesUID, EntityManager em) {
         final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
@@ -127,7 +127,6 @@ public abstract class Fetcher {
             return;
         }
 
-        final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
@@ -143,7 +142,6 @@ public abstract class Fetcher {
             if (tx.isActive()) {
                 tx.rollback();
             }
-            em.close();
         }
     }
 

@@ -4,6 +4,7 @@ import online.kheops.auth_server.capability.CapabilitiesResponse;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
+import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.report_provider.ReportProviderResponse;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -13,10 +14,8 @@ public class UserResponse  implements Comparable<UserResponse> {
     //Mandatory
     @XmlElement(name = "email")
     private String email;
-    @XmlElement(name = "last_name")
-    private String lastName;
-    @XmlElement(name = "first_name")
-    private String firstName;
+    @XmlElement(name = "name")
+    private String name;
     @XmlElement(name = "sub")
     private String sub;
 
@@ -44,17 +43,21 @@ public class UserResponse  implements Comparable<UserResponse> {
 
     public UserResponse(AlbumUser albumUser) {
         email = albumUser.getUser().getEmail();
-        firstName = albumUser.getUser().getFirstName();
-        lastName = albumUser.getUser().getLastName();
         isAdmin = albumUser.isAdmin();
         sub = albumUser.getUser().getKeycloakId();
+        name = albumUser.getUser().getName();
+    }
+
+    public UserResponse(User user) {
+        email = user.getEmail();
+        sub = user.getKeycloakId();
+        name = user.getName();
     }
 
     protected UserResponse(UserResponseBuilder userResponseBuilder) {
         email = userResponseBuilder.getEmail();
         sub = userResponseBuilder.getSub();
-        firstName = userResponseBuilder.getFirstName();
-        lastName = userResponseBuilder.getLastName();
+        name = userResponseBuilder.getName();
 
         albumAccess = userResponseBuilder.getAlbumAccess();
         studyAccess = userResponseBuilder.getStudyAccess();
@@ -99,8 +102,6 @@ public class UserResponse  implements Comparable<UserResponse> {
             result = sub.hashCode();
             result = 31 * result + isAdmin.hashCode();
             result = 31 * result + email.hashCode();
-            result = 31 * result + lastName.hashCode();
-            result = 31 * result + firstName.hashCode();
             hashCode = result;
         }
         return result;
