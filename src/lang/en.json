@@ -1,9 +1,10 @@
 {
 	"cancel": "Cancel",
 	"create": "Create",
+	"update": "Update",
+	"confirm": "Confirm",
 	"permissiondenied": "Permission denied",
 	"sorryerror": "Sorry, an error occured",
-	"confirm": "Confirm",
 	"add": "Add",
 	"album" : {
 		"studies": "Studies",
@@ -19,14 +20,38 @@
 		"users": "Users",
 		"newalbum": "New album",
 		"authorizationerror": "You don't have the permissions to add the study {study}",
-		"studynotfound": "The study {study} is not found",
+		"studynotfound": "The study {study} is not found"
+	},
+	"albumsettings": {
+		"albumname": "Album name",
+		"albumdescription": "Album description",
+		"delete": "Delete album",
+		"quit": "Leave album",
+		"lastuser": "You are the last user in the album, if you quit, the album is delete.",
+		"delalbum": "Are you sure you want to delete the album?",
+		"quitalbum": "Are you sure you want to leave the album?",
+		"lastadmin": "You are the last admin, you can choose to define a new admin or let the album without admin."
+	},
+	"albumsettingsmenu": {
+		"general": "General",
+		"user": "Users",
+		"tokens": "Tokens",
+		"providerSR": "Report Providers",
+		"webhooks": "Webhooks"
+	},
+	"albumuser": {
 		"username": "User name",
 		"changeroleadmin": "change role to data steward",
 		"changeroleuser": "change role to user",
 		"remove": "Remove user",
-		"Admin": "Data steward"
+		"Admin": "Data steward",
+		"warningtoggleadmin": "Warning! Do you really want to revoke your admin role? ",
+		"warningtoggledelete": "Do you realy want to delete this user ?"
 	},
 	"albumusersettings": {
+		"userlist": "List of users",
+		"allreadypresent": "This user is already present in the album",
+		"emailuser": "user email",
 		"usersettings": "Album user settings",
 		"addUser": "Invite a user",
 		"addSeries": "Add studies / series",

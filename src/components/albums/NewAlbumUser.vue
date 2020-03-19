@@ -2,7 +2,7 @@
   <table class="table tableAddUserNewAlbum">
     <thead>
       <tr>
-        <th>{{ $t('newalbum.username') }}</th>
+        <th>{{ $t('albumuser.username') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -19,7 +19,7 @@
             <span
               class="font-neutral"
             >
-              {{ $t("newalbum.Admin") }}
+              {{ $t("albumuser.Admin") }}
             </span>
           </span>
           <div
@@ -29,7 +29,7 @@
               class="font-white"
               @click.stop="toggleAdmin(user)"
             >
-              {{ (user.is_admin)?$t('newalbum.changeroleuser'):$t('newalbum.changeroleadmin') }}
+              {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t('albumuser.changeroleadmin') }}
               <v-icon
                 name="user"
               />
@@ -39,7 +39,7 @@
               class="text-danger"
               @click="deleteUser(user)"
             >
-              {{ $t('newalbum.remove') }}
+              {{ $t('albumuser.remove') }}
               <v-icon name="trash" />
             </a>
           </div>
@@ -54,7 +54,7 @@
               class="font-white"
               @click.stop="toggleAdmin(user)"
             >
-              {{ (user.is_admin)?$t('newalbum.changeroleuser'):$t('newalbum.changeroleadmin') }}
+              {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t('albumuser.changeroleadmin') }}
               <v-icon
                 name="user"
               />
@@ -64,7 +64,7 @@
               class="text-danger"
               @click="deleteUser(user)"
             >
-              {{ $t('newalbum.remove') }}
+              {{ $t('albumuser.remove') }}
               <v-icon name="trash" />
             </a>
           </div>

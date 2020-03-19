@@ -1,7 +1,8 @@
 {
 	"cancel": "Annuler",
-	"confirm": "Confirmer",
 	"create": "Créer",
+    "update": "Mettre à jour",
+	"confirm": "Confirmer",
 	"permissiondenied": "Permission refusée",
 	"sorryerror": "Désolé, une erreur est survenue",
 	"add": "Ajouter",
@@ -40,21 +41,51 @@
 		"users": "Utilisateurs",
 		"newalbum": "Nouvel album",
 		"authorizationerror": "Vous n'avez pas les droits d'ajouter l'étude {study}",
-		"studynotfound": "l'étude {study} n'a pas été trouvée",
+		"studynotfound": "l'étude {study} n'a pas été trouvée"
+	},
+	"albumsettings": {
+		"albumname": "Nom de l'album",
+		"albumdescription": "Description de l'album",
+		"delete": "Effacer l'album",
+		"quit": "Quitter l'album",
+		"lastuser": "Vous êtes le dernier utilisateur, si vous quittez l'album, il sera supprimé.",
+		"delalbum": "Etes-vous sûr de vouloir supprimer l'album ?",
+		"quitalbum": "Etes-vous sûr de vouloir quitter l'album ?",
+		"lastadmin": "Vous êtes le dernier administrateur, vous pouvez définir un nouveau administrateur ou laisser l'album sans."
+	},
+	"albumsettingsmenu": {
+		"general": "Général",
+		"user": "Utilisateurs",
+		"tokens": "Tokens",
+		"providerSR": "Report Providers",
+		"webhooks": "Webhooks"
+	},
+	"albumuser": {
 		"username": "Utilisateur",
 		"changeroleadmin": "changer le rôle pour gardien des données",
 		"changeroleuser": "changer le rôle pour utilisateur",
 		"remove": "Retirer l'utilisateur",
-		"Admin": "Gardien des données"
+		"Admin": "Gardien des données",
+		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
+		"warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?"
 	},
 	"albumusersettings": {
+		"userlist": "Liste d'utilisateurs",
+		"allreadypresent": "Cet utilisateur est déjà présent dans l'album",
+		"emailuser": "mail utilisateur",
 		"usersettings": "Réglages des utilisateurs de l'album",
 		"addUser": "Inviter un utilisateur",
 		"addSeries": "Ajouter une étude / série",
 		"downloadSeries": "Montrer le bouton de téléchargement",
 		"sendSeries": "Partager",
 		"deleteSeries": "Supprimer une étude / série",
-		"writeComments": "Commenter"
+		"writeComments": "Commenter",
+		"add_user": "Inviter un utilisateur",
+		"add_series": "Ajouter une étude / série",
+		"download_series": "Montrer le bouton de téléchargement",
+		"send_series": "Partager",
+		"delete_series": "Supprimer une étude / série",
+		"write_comments": "Commenter"
 	},
 	"comment": {
 		"includenotifications": "inclure les notifications",

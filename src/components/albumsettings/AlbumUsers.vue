@@ -6,42 +6,12 @@ Props :
   showDeleteUser  Boolean
   showChangeRole  Boolean
 -->
-<i18n>
-{
-  "en": {
-    "username": "User name",
-    "user": "user",
-    "changerole": "change role to",
-    "albumuserdeletesuccess": "Access to the album has been successfully removed",
-    "usernotsettoadmin": "User no longer has admin rights",
-    "usersettoadmin": "User has admin rights",
-    "warningtoggleadmin": "Warning! Do you really want to revoke your admin role? ",
-    "remove": "Remove user",
-    "warningtoggledelete": "Do you realy want to delete this user ?",
-    "Admin": "Data steward",
-    "admin": "data steward"
-  },
-  "fr": {
-    "username": "Utilisateur",
-    "user": "utilisateur",
-    "changerole": "changer le rôle pour",
-    "albumuserdeletesuccess": "L'accès à l'album a été supprimé avec succès",
-    "usernotsettoadmin": "L'utilisateur n'a plus de droits admin",
-    "usersettoadmin": "L'utilisateur a des droits admin",
-    "warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
-    "remove": "Retirer l'utilisateur",
-    "warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?",
-    "Admin": "Gardien des données",
-    "admin": "gardien des données"
-  }
-}
-</i18n>
 <template>
   <div class="user-table-container">
     <table class="table">
       <thead>
         <tr>
-          <th>{{ $t('username') }}</th>
+          <th>{{ $t('albumuser.username') }}</th>
           <th v-if="album.is_admin" />
         </tr>
       </thead>
@@ -59,7 +29,7 @@ Props :
               <span
                 class="font-neutral"
               >
-                {{ $t("Admin") }}
+                {{ $t("albumuser.Admin") }}
               </span>
             </span>
             <!-- on mobile -->
@@ -75,7 +45,7 @@ Props :
                   v-if="showChangeRole"
                   @click.stop="toggleAdmin(user)"
                 >
-                  {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
+                  {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
                   <v-icon
                     name="user"
                   />
@@ -86,13 +56,13 @@ Props :
                   class="text-danger"
                   @click.stop="deleteUser(user)"
                 >
-                  {{ $t('remove') }}
+                  {{ $t('albumuser.remove') }}
                   <v-icon name="trash" />
                 </a>
               </div>
               <div v-if="confirmDelete === user.email">
                 <span class="text-danger mr-2">
-                  {{ $t("warningtoggledelete") }}
+                  {{ $t("albumuser.warningtoggledelete") }}
                 </span>
                 <br>
                 <div class="btn-group">
@@ -113,7 +83,7 @@ Props :
               </div>
               <div v-if="confirmResetAdmin === user.email">
                 <span class="text-danger mr-2">
-                  {{ $t("warningtoggleadmin") }}
+                  {{ $t("albumuser.warningtoggleadmin") }}
                 </span>
                 <br>
                 <div class="btn-group">
@@ -158,7 +128,7 @@ Props :
                 class="font-white"
                 @click.stop="toggleAdmin(user)"
               >
-                {{ $t('changerole') }} {{ (user.is_admin)?$t('user'):$t("admin") }}
+                {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
                 <v-icon
                   name="user"
                 />
@@ -169,13 +139,13 @@ Props :
                 class="text-danger"
                 @click.stop="deleteUser(user)"
               >
-                {{ $t('remove') }}
+                {{ $t('albumuser.remove') }}
                 <v-icon name="trash" />
               </a>
             </div>
             <div v-if="confirmDelete === user.email">
               <span class="text-danger mr-2">
-                {{ $t("warningtoggledelete") }}
+                {{ $t("albumuser.warningtoggledelete") }}
               </span>
               <br>
               <div class="btn-group">
@@ -196,7 +166,7 @@ Props :
             </div>
             <div v-if="confirmResetAdmin === user.email">
               <span class="text-danger mr-2">
-                {{ $t("warningtoggleadmin") }}
+                {{ $t("albumuser.warningtoggleadmin") }}
               </span>
               <br>
               <div class="btn-group">

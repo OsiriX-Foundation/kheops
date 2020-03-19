@@ -1,40 +1,3 @@
-<i18n>
-{
-  "en": {
-    "userlist": "List of users",
-    "add_user": "Invite a user",
-    "add_series": "Add Studies / Series",
-    "download_series": "Show Download Button",
-    "send_series": "Sharing",
-    "delete_series": "Remove Studies / Series",
-    "write_comments": "Write Comments",
-    "albumuseraddsuccess": "User successfully added to the album",
-    "Unknown user": "Unknown user",
-    "usersettings": "Album user settings",
-    "allreadypresent": "This user is already present in the album",
-    "add": "Add",
-    "cancel": "Cancel",
-    "user": "user"
-  },
-  "fr": {
-    "userlist": "Liste d'utilisateurs",
-    "add_user": "Inviter un utilisateur",
-    "add_series": "Ajouter une étude / série",
-    "download_series": "Montrer le bouton de téléchargement",
-    "send_series": "Partager",
-    "delete_series": "Supprimer une étude / série",
-    "write_comments": "Commenter",
-    "albumuseraddsuccess": "L'utilisateur a été ajouté avec succès à l'album",
-    "Unknown user": "Utilisateur inconnu",
-    "usersettings": "Réglages des utilisateurs de l'album",
-    "allreadypresent": "Cet utilisateur est déjà présent dans l'album",
-    "add": "Ajouter",
-    "cancel": "Annuler",
-    "user": "utilisateur"
-  }
-}
-</i18n>
-
 <template>
   <div class="container">
     <h3
@@ -43,7 +6,7 @@
       <div
         class="mr-auto"
       >
-        {{ $t('userlist') }}
+        {{ $t('albumusersettings.userlist') }}
       </div>
       <button
         v-if="(album.add_user||album.is_admin) && form_add_user === false"
@@ -54,7 +17,7 @@
           name="user-plus"
           scale="1"
           class="mr-2"
-        />{{ $t('add_user') }}
+        />{{ $t('albumusersettings.add_user') }}
       </button>
       <form
         v-if="form_add_user && onloading === false"
@@ -67,7 +30,7 @@
               v-focus
               type="email"
               class="form-control"
-              :placeholder="'email '+$t('user')"
+              :placeholder="$t('albumusersettings.emailuser')"
             >
           </div>
           <div class="input-group-append">
@@ -116,7 +79,7 @@
             <h4
               class="mt-3 mb-3 ml-2"
             >
-              {{ $t('usersettings') }}
+              {{ $t('albumusersettings.usersettings') }}
             </h4>
           </div>
         </div>
@@ -156,7 +119,7 @@
                   class="text-success"
                 />
                 <label class="ml-2 mt-2 word-break">
-                  {{ $t(label) }}
+                  {{ $t(`albumusersettings.${dictSettings[label]}`) }}
                 </label>
               </div>
             </span>
@@ -218,7 +181,7 @@ export default {
     addUser() {
       const sameUserName = this.users.filter((user) => user.email === this.new_user_name);
       if (sameUserName.length > 0) {
-        this.$snotify.error(this.$t('allreadypresent'));
+        this.$snotify.error(this.$t('albumusersettings.allreadypresent'));
       } else if (this.validEmail(this.new_user_name)) {
         this.onloading = true;
         const params = {

@@ -1,23 +1,3 @@
-<i18n>
-{
-  "en": {
-    "general": "General",
-    "user": "Users",
-    "tokens": "Tokens",
-    "providerSR": "Report Providers",
-    "socialmedia": "Social Media",
-    "webhooks": "Webhooks"
-  },
-  "fr": {
-    "general": "Général",
-    "user": "Utilisateurs",
-    "tokens": "Tokens",
-    "providerSR": "Report Providers",
-    "socialmedia": "Réseaux sociaux",
-    "webhooks": "Webhooks"
-  }
-}
-</i18n>
 <template>
   <nav class="nav nav-pills nav-justified flex-column">
     <router-link
@@ -28,7 +8,7 @@
       :class="(currentCategory === cat || (cat === 'general' && currentCategory === undefined)) ? 'active' : ''"
       active-class="active"
     >
-      {{ $t(cat) }}
+      {{ $t(`albumsettingsmenu.${cat}`) }}
     </router-link>
   </nav>
 </template>
