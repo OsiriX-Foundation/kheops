@@ -1,24 +1,9 @@
-<i18n>
-{
-  "en": {
-    "language": "Language",
-    "accountmanagement": "Account management",
-    "manage": "Manage"
-  },
-  "fr": {
-    "language": "Langue",
-    "accountmanagement": "Gérer son profil utilisateur",
-    "manage": "Gérer"
-  }
-}
-</i18n>
-
 <template>
   <div id="userSettingsGeneral">
     <form>
       <div class="row">
         <div class="col-xs-3 col-sm-3 col-md-3 text-left text-sm-right">
-          {{ $t('language') }}
+          {{ $t('user.language') }}
         </div>
         <div class="col-xs-9 col-sm-9 col-md-9 text-left mb-2">
           <select
@@ -34,7 +19,7 @@
           </select>
         </div>
         <div class="col-xs-3 col-sm-3 col-md-3 col-xs-12 text-left text-sm-right">
-          {{ $t('accountmanagement') }}
+          {{ $t('user.accountmanagement') }}
         </div>
         <div class="col-xs-9 col-sm-9 col-md-9 col-xs-12 text-left mb-2">
           <button
@@ -42,7 +27,7 @@
             class="btn btn-primary"
             @click="gomanagement()"
           >
-            {{ $t('manage') }}
+            {{ $t('user.manage') }}
           </button>
         </div>
       </div>

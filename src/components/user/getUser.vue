@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en": {
-    "username": "User name",
-    "user": "user",
-    "send": "Send",
-    "cancel": "Cancel"
-  },
-  "fr": {
-    "username": "Utilisateur",
-    "user": "Utilisateur",
-    "send": "Envoyer",
-    "cancel": "Annuler"
-  }
-}
-</i18n>
-
 <template>
   <div class="card">
     <div class="card-body">
@@ -26,7 +9,7 @@
               v-focus
               type="email"
               class="form-control"
-              :placeholder="'email '+$t('user')"
+              :placeholder="$t('user.emailuser')"
             >
           </div>
           <div class="input-group-append">

@@ -21,7 +21,7 @@
     class="container"
   >
     <h3 class="pb-3">
-      {{ $t('usersettings') }}
+      {{ $t('user.usersettings') }}
     </h3>
     <div class="row">
       <div class="col-lg-2 col-sm-12 col-xs-12 mb-2">
@@ -33,7 +33,7 @@
             :class="(currentCategory === cat) ? 'active':''"
             @click="loadview(cat)"
           >
-            {{ $t(cat) }}
+            {{ $t(`albumsettingsmenu.${cat}`) }}
           </a>
         </nav>
       </div>

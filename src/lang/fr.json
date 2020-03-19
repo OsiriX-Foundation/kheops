@@ -4,6 +4,7 @@
     "update": "Mettre à jour",
 	"confirm": "Confirmer",
     "edit": "Editer",
+    "send": "Envoyer",
     "valid": "Valider",
     "enabled": "Activé",
     "disable": "Désactiver",
@@ -28,7 +29,16 @@
 		"mail": "Mail",
 		"lastname": "Nom",
 		"firstname": "Prénom",
-		"sub": "Sub"
+		"sub": "Sub",
+		"emailuser": "mail utilisateur",
+		"userunknown": "Utilisateur {user} inconnu",
+		"nouser": "Aucun utilisateur spécifié",
+		"noaccessalbum": "{user} n'a pas d'accès à cet album",
+		"noaccessstudy": "{user} n'a pas d'accès à cette étude",
+		"usersettings": "Préférences utilisateur",
+		"language": "Langue",
+		"accountmanagement": "Gérer son profil utilisateur",
+		"manage": "Gérer"
 	},
 	"serie": {
 		"errorSeries": "Une erreur s'est produite, rechargez les séries SVP."
@@ -99,7 +109,6 @@
 	"albumusersettings": {
 		"userlist": "Liste d'utilisateurs",
 		"allreadypresent": "Cet utilisateur est déjà présent dans l'album",
-		"emailuser": "mail utilisateur",
 		"usersettings": "Réglages des utilisateurs de l'album",
 		"addUser": "Inviter un utilisateur",
 		"addSeries": "Ajouter une étude / série",

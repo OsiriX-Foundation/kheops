@@ -4,6 +4,7 @@
 	"update": "Update",
 	"confirm": "Confirm",
     "edit": "Edit",
+    "send": "Send",
     "valid": "Valid",
     "enabled": "Enabled",
     "disable": "Revoke",
@@ -29,7 +30,16 @@
 		"mail": "Email",
 		"lastname": "Last name",
 		"firstname": "First name",
-		"sub": "Sub"
+		"sub": "Sub",
+		"emailuser": "user email",
+		"userunknown": "User {user} unknown",
+		"nouser": "No user specified",
+		"noaccessalbum": "{user} has no access to this album",
+		"noaccessstudy": "{user} has no access to this study",
+		"usersettings": "User settings",
+		"language": "Language",
+		"accountmanagement": "Account management",
+		"manage": "Manage"
 	},
 	"serie": {
 		"errorSeries": "An error occured, please reload the series list"
@@ -79,7 +89,6 @@
 	"albumusersettings": {
 		"userlist": "List of users",
 		"allreadypresent": "This user is already present in the album",
-		"emailuser": "user email",
 		"usersettings": "Album user settings",
 		"addUser": "Invite a user",
 		"addSeries": "Add studies / series",

@@ -30,7 +30,7 @@
               v-focus
               type="email"
               class="form-control"
-              :placeholder="$t('albumusersettings.emailuser')"
+              :placeholder="$t('user.emailuser')"
             >
           </div>
           <div class="input-group-append">
