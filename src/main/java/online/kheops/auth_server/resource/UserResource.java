@@ -24,6 +24,7 @@ import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -223,8 +224,9 @@ public class UserResource {
                 ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
                 userInfoUrl = res.userinfoEndpoint;
                 userInfoURLsCache.put(accessToken.getIssuer(), userInfoUrl);
+            } catch (ProcessingException | WebApplicationException e) {
+                return Response.status(BAD_GATEWAY).build();
             } catch (URISyntaxException e) {
-                e.printStackTrace();
                 return Response.status(BAD_REQUEST).build();
             }
         }
@@ -236,8 +238,9 @@ public class UserResource {
             final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
             return Response.ok().entity(userResponse).build();
+        } catch (ProcessingException | WebApplicationException e) {
+            return Response.status(BAD_GATEWAY).build();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             return Response.status(BAD_REQUEST).build();
         }
     }
