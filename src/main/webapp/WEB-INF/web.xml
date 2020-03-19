@@ -108,5 +108,10 @@
         <param-name>online.kheops.keycloak.realms</param-name>
         <param-value>travis</param-value>
     </context-param>
+    <context-param>
+        <description>Define if the scope 'kheosp' must be present in the access_token</description>
+        <param-name>online.kheops.use.scope</param-name>
+        <param-value>true</param-value>
+    </context-param>
 
 </web-app>

@@ -6,12 +6,18 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
-import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.*;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
@@ -23,6 +29,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -156,37 +163,6 @@ public class UserResource {
         }
     }
 
-    //https://connect2id.com/products/server/docs/api/userinfo
-    //https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
-    //https://auth0.com/docs/tokens/references/id-token-structure
-
-    @POST
-    @Path("register2")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response register(@FormParam("id_token") String token) {
-
-        if (token == null || token.isEmpty()) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'id_token' must be set")
-                    .build();
-            return Response.status(BAD_REQUEST).entity(errorResponse).build();
-        }
-
-        final IdToken idToken;
-        try {
-            idToken = new IdToken.Builder(servletContext).build(token);
-        } catch (IdTokenVerificationException e) {
-            return Response.status(BAD_REQUEST).build();
-        }
-
-        final User user = upsertUser(idToken.getSub(), idToken.getName(), idToken.getEmail());
-        final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
-        return Response.ok().entity(userResponse).build();
-    }
-
-
     private static class ConfigurationEntity {
         @XmlElement(name="userinfo_endpoint")
         String userinfoEndpoint;
@@ -200,6 +176,19 @@ public class UserResource {
         String email;
     }
     private static final Client CLIENT = ClientBuilder.newClient();
+
+    private static final String USER_INFO_URLS_CACHE_ALIAS = "userInfoURLsCache";
+    private static CacheManager userInfoCacheManager = getUserInfoCacheManager();
+    private static Cache<String, String> userInfoURLsCache = userInfoCacheManager.getCache(USER_INFO_URLS_CACHE_ALIAS, String.class, String.class);
+
+    private static CacheManager getUserInfoCacheManager() {
+        CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                .withCache(USER_INFO_URLS_CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10))
+                        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(10))))
+                .build();
+        cacheManager.init();
+        return cacheManager;
+    }
 
     @POST
     @Path("register")
@@ -224,24 +213,33 @@ public class UserResource {
         }
 
 
-        //utiliser un cache pour les userinfo uri
-        final String openidConfiguration = accessToken.getIssuer() + "/.well-known/openid-configuration";
-        final URI openidConfigurationURI;
-        final URI userinfoEndpointURI;
+        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer());
+        if (userInfoUrl == null) {
+            final String openidConfiguration = accessToken.getIssuer() + "/.well-known/openid-configuration";
+            final URI openidConfigurationURI;
+
+            try {
+                openidConfigurationURI = new URI(openidConfiguration);
+                ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
+                userInfoUrl = res.userinfoEndpoint;
+                userInfoURLsCache.put(accessToken.getIssuer(), userInfoUrl);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                return Response.status(BAD_REQUEST).build();
+            }
+        }
         try {
-            openidConfigurationURI = new URI(openidConfiguration);
-            ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
-            userinfoEndpointURI = new URI(res.userinfoEndpoint);
-            UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer "+token).get(UserInfoEntity.class);
+            final URI userinfoEndpointURI;
+            userinfoEndpointURI = new URI(userInfoUrl);
+            UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token).get(UserInfoEntity.class);
 
             final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
             return Response.ok().entity(userResponse).build();
         } catch (URISyntaxException e) {
             e.printStackTrace();
+            return Response.status(BAD_REQUEST).build();
         }
-
-        return Response.status(BAD_REQUEST).build();
     }
 
 

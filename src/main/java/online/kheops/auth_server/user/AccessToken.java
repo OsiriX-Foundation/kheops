@@ -5,6 +5,7 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.OIDCProviderContextListener;
@@ -59,11 +60,11 @@ public final class AccessToken {
     private static class ConfigurationURLs {
         private URL jwksURI;
 
-        private String issuerS;
+        private String issuer;
 
         public ConfigurationURLs(ConfigurationEntity configurationEntity) throws MalformedURLException {
             this.jwksURI = new URL(configurationEntity.jwksURI);
-            this.issuerS = configurationEntity.issuer;
+            this.issuer = configurationEntity.issuer;
         }
     }
 
@@ -93,12 +94,24 @@ public final class AccessToken {
             try {
                 jwt = JWT.require(Algorithm.RSA256(keyProvider))
                         .acceptLeeway(60)
-                        .withIssuer(configurationURLs.issuerS)
+                        .withIssuer(configurationURLs.issuer)
                         .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
                 throw new IdTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
+            }
+
+            final boolean verifyScope = Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.use.scope"));
+            if (verifyScope) {
+                final Claim scopeClaim = jwt.getClaim("scope");
+                if (scopeClaim.isNull() || scopeClaim.asString() == null) {
+                    throw new IdTokenVerificationException("Missing scope claim in token");
+                } else {
+                    if (!scopeClaim.asString().contains("kheops")) {
+                        throw new IdTokenVerificationException("Missing scope 'kheops' in token");
+                    }
+                }
             }
 
             if (jwt.getSubject() == null) {
