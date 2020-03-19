@@ -3,8 +3,6 @@ package online.kheops.auth_server;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
 
 public class OIDCProviderContextListener implements ServletContextListener {
 
@@ -29,10 +27,6 @@ public class OIDCProviderContextListener implements ServletContextListener {
     private static String getOIDCProvider() {
         verifyState();
         return servletContext.getInitParameter("online.kheops.oidc.provider");
-    }
-
-    public static URI getOIDCConfigurationURI() {
-        return UriBuilder.fromUri(getOIDCProvider() + "/.well-known/openid-configuration").build();
     }
 
     public static String getOIDCConfigurationString() {
