@@ -4,6 +4,8 @@
     "update": "Mettre à jour",
 	"confirm": "Confirmer",
     "edit": "Editer",
+    "valid": "Valider",
+    "disable": "Désactiver",
     "remove": "Supprimer",
 	"permissiondenied": "Permission refusée",
 	"sorryerror": "Désolé, une erreur est survenue",
@@ -12,6 +14,9 @@
     "refresh": "Rafraîchir",
 	"fieldobligatory": "Champs obligatoire",
 	"urlnotvalid": "Cette url n'est pas valide",
+	"serie": {
+		"errorSeries": "Une erreur s'est produite, rechargez les séries SVP."
+	},
 	"album" : {
 		"studies": "Etudes",
 		"comments": "Commentaires",
@@ -155,6 +160,20 @@
 		"supported_modalities": "Modalités supportées",
 		"urlWorking": "Ce provider est bon.",
 		"urlNotWorking": "Ce provider ne répond pas."
+	},
+	"sharinglink": {
+		"sharingEnable": "Lien de partage actif",
+		"sharingDisable": "Pas de lien de partage",
+		"sharingTitle": "URL à partager",
+		"write": "Ajouter et supprimer des séries dans l'album",
+		"download": "Montrer le bouton de téléchargement",
+		"expirationdate": "Date d'expiration",
+		"revoke": "Voulez-vous désactiver le dernier lien de partage créé ?",
+		"urlsharing": "Votre url de partage :",
+		"addalbum": "Partager",
+		"twitterEnable": "Lien twitter actif",
+		"twitterDisable": "Pas de lien twitter",
+		"twitterText": "Mon album KHEOPS partagé. {link} #KHEOPS"
 	},
 	"texterror": {
 		"unauthorized": "Vous n'avez pas les permissions",

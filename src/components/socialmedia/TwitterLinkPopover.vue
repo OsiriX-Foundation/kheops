@@ -1,28 +1,10 @@
-<i18n scoped>
-{
-  "en": {
-    "cancel": "Cancel",
-    "revoke": "Do you want disable the latest sharing link created ?",
-    "valid": "Valid",
-    "title": "Twitter link",
-    "disable": "Revoke"
-  },
-  "fr": {
-    "cancel": "Annuler",
-    "revoke": "Voulez-vous désactiver le dernier lien de partage créé ?",
-    "valid": "Valider",
-    "title": "Lien twitter",
-    "disable": "Désactiver"
-  }
-}
-</i18n>
 <template>
   <span>
     <div>
       <div class="row mt-2">
         <div class="col-xs-12 col-sm-12 col-md-12">
           <label>
-            {{ $t('revoke') }}
+            {{ $t('sharinglink.revoke') }}
           </label>
         </div>
       </div>

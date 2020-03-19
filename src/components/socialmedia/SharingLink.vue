@@ -1,22 +1,8 @@
-<i18n scoped>
-{
-  "en": {
-    "sharingEnable": "Sharing link enabled",
-    "sharingDisable": "No sharing link",
-    "sharingTitle": "Sharing URL"
-  },
-  "fr": {
-    "sharingEnable": "Lien de partage actif",
-    "sharingDisable": "Pas de lien de partage",
-    "sharingTitle": "URL à partager"
-  }
-}
-</i18n>
 <template>
   <span>
     <span
       id="sharing-link"
-      :text="sharingToken.length > 0 ? $t('sharingEnable') : $t('sharingDisable')"
+      :text="sharingToken.length > 0 ? $t('sharinglink.sharingEnable') : $t('sharinglink.sharingDisable')"
       class="btn btn-link p-0"
       @click.stop="sharingTokenParams.show = !sharingTokenParams.show"
     >
@@ -34,7 +20,7 @@
     >
       <template v-slot:title>
         <pop-over-title
-          :title="$t('sharingTitle')"
+          :title="$t('sharinglink.sharingTitle')"
           @cancel="cancelSharingToken"
         />
       </template>

@@ -1,22 +1,8 @@
-<i18n scoped>
-{
-  "en": {
-    "twitterEnable": "Twitter link enabled",
-    "twitterDisable": "No twitter link",
-    "twitterText": "My KHEOPS shared album. {link} #KHEOPS"
-  },
-  "fr": {
-    "twitterEnable": "Lien twitter actif",
-    "twitterDisable": "Pas de lien twitter",
-    "twitterText": "Mon album KHEOPS partagé. {link} #KHEOPS"
-  }
-}
-</i18n>
 <template>
   <span>
     <span
       id="twitter-link"
-      :text="twitterToken.length > 0 ? $t('twitterEnable') : $t('twitterDisable')"
+      :text="twitterToken.length > 0 ? $t('sharinglink.twitterEnable') : $t('sharinglink.twitterDisable')"
       class="pointer"
       @click.stop="toggleTwitter(albumid)"
     >
@@ -104,7 +90,7 @@ export default {
       this.createToken(this.twitterTokenParams).then((res) => {
         const urlTwitter = 'https://twitter.com/intent/tweet';
         const link = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
-        const urlSharing = this.$t('twitterText', { link });
+        const urlSharing = this.$t('sharinglink.twitterText', { link });
         const queries = `?text=${encodeURIComponent(urlSharing)}`;
         twitterWindow.location.href = urlTwitter + queries;
         this.$emit('gettokens');

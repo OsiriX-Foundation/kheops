@@ -1,25 +1,3 @@
-<i18n>{
-  "en": {
-    "modality": "Modality",
-    "numberimages": "Number of images",
-    "description": "Description",
-    "seriesdate": "Series date",
-    "seriestime": "Series time",
-    "openviewer": "Open OHIF viewer",
-    "applicationentity": "Application entity"
-  },
-  "fr": {
-    "modality": "Modalité",
-    "numberimages": "Nombre d'images",
-    "description": "Description",
-    "seriesdate": "Date de la série",
-    "seriestime": "Heure de la série",
-    "openviewer": "Ouvrir la visionneuse OHIF",
-    "applicationentity": "Application entity"
-  }
-}
-</i18n>
-
 <template>
   <div class="seriesSummaryContainer">
     <div class="row justify-content-center">
