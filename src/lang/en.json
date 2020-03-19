@@ -3,9 +3,12 @@
 	"create": "Create",
 	"update": "Update",
 	"confirm": "Confirm",
+    "remove": "Remove",
 	"permissiondenied": "Permission denied",
 	"sorryerror": "Sorry, an error occured",
 	"add": "Add",
+    "reload": "Reload",
+    "fieldobligatory": "Field obligatory",
 	"album" : {
 		"studies": "Studies",
 		"comments": "Comments",
@@ -120,5 +123,10 @@
 		"editwebhook": "{user} edited a webhook",
 		"deletewebhook": "{user} deleted a webhook",
 		"triggerwebhook": "{user} has made a manual trigger on a webhook"
+	},
+	"texterror": {
+		"unauthorized": "You don't have the permissions",
+		"unknownerror": "An unknown error occur",
+		"notfound": "Not found"
 	}
 }

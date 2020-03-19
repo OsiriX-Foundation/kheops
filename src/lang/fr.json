@@ -3,9 +3,12 @@
 	"create": "Créer",
     "update": "Mettre à jour",
 	"confirm": "Confirmer",
+    "remove": "Supprimer",
 	"permissiondenied": "Permission refusée",
 	"sorryerror": "Désolé, une erreur est survenue",
 	"add": "Ajouter",
+    "reload": "Recharger",
+	"fieldobligatory": "Champs obligatoire",
 	"album" : {
 		"studies": "Etudes",
 		"comments": "Commentaires",
@@ -126,5 +129,10 @@
 		"editwebhook": "{user} a édité un webhook",
 		"deletewebhook": "{user} a supprimé un webhook",
 		"triggerwebhook": "{user} a déclenché manuellement un webhook"
+	},
+	"texterror": {
+		"unauthorized": "Vous n'avez pas les permissions",
+		"unknownerror": "Une erreur inconnue est survenue",
+		"notfound": "Pas trouvé"
 	}
 }
