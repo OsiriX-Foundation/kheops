@@ -1,28 +1,3 @@
-<i18n>
-{
-  "en": {
-    "editprovider": "Edit provider",
-    "nameProvider": "Name of the provider",
-    "urlProvider": "Configuration URL of the provider",
-    "remove": "Remove",
-    "warningremove": "Are you sure to remove this report provider ?",
-    "confirm": "Confirm",
-    "cancel": "Cancel",
-    "urlnotvalid": "This url is not valid"
-  },
-  "fr": {
-    "editprovider": "Edition d'un provider",
-    "nameProvider": "Nom du provider",
-    "urlProvider": "URL de configuration",
-    "remove": "Supprimer",
-    "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
-    "confirm": "Confirmer",
-    "cancel": "Annuler",
-    "urlnotvalid": "Cette url n'est pas valide"
-  }
-}
-</i18n>
-
 <template>
   <div>
     <div
@@ -41,13 +16,13 @@
             />
           </span>
         </button>
-        {{ $t('editprovider') }}
+        {{ $t('provider.editprovider') }}
       </h4>
     </div>
     <form @submit.prevent="updateProvider">
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('nameProvider') }}</b>
+          <b>{{ $t('provider.nameProvider') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9 mb-3">
           <input
@@ -64,7 +39,7 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('urlProvider') }}</b>
+          <b>{{ $t('provider.urlProvider') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9 mb-3">
           <div class="input-group mb-3">
@@ -101,7 +76,7 @@
         class-row="mb-2"
         class-col="offset-md-3 col-12 col-sm-12 col-md-3"
         class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
-        :text-warning-remove="$t('warningremove')"
+        :text-warning-remove="$t('provider.warningremove')"
         :disabled-done="disabledCreate"
         :loading="onloading"
         @remove="deleteProvider"

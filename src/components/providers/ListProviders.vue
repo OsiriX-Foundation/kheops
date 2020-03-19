@@ -1,27 +1,3 @@
-<i18n>
-{
-  "en": {
-    "edit": "Edit",
-    "urlWorking": "This provider is on",
-    "urlNotWorking": "This provider is off",
-    "refresh": "Refresh",
-    "created_time": "Created time",
-    "name_provider": "Name",
-    "url": "Configuration URL",
-    "noreports": "There are no report providers to show"
-  },
-  "fr": {
-    "edit": "Editer",
-    "urlWorking": "Ce provider est accessible",
-    "urlNotWorking": "Ce provider n'est pas accessible",
-    "refresh": "Rafraîchir",
-    "created_time": "Date de création",
-    "name_provider": "Nom",
-    "url": "URL de configuration",
-    "noreports": "Aucun report provider créé"
-  }
-}
-</i18n>
 <template>
   <div>
     <div class="d-flex">
@@ -79,7 +55,7 @@
         >
           <list-empty
             :status="status"
-            :text-empty="$t('noreports')"
+            :text-empty="$t('provider.noreports')"
             @reload="getProviders()"
           />
         </div>
@@ -88,7 +64,7 @@
         <div
           class="text-warning text-center"
         >
-          {{ $t('noreports') }}
+          {{ $t('provider.noreports') }}
         </div>
       </template>
     </b-table>
@@ -129,20 +105,20 @@ export default {
         },
         {
           key: 'name',
-          label: this.$t('name_provider'),
+          label: this.$t('provider.name_provider'),
           sortable: true,
           tdClass: 'word-break',
         },
         {
           key: 'url',
-          label: this.$t('url'),
+          label: this.$t('provider.url'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-sm-table-cell',
         },
         {
           key: 'created_time',
-          label: this.$t('created_time'),
+          label: this.$t('provider.created_time'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-lg-table-cell',
