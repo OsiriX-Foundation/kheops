@@ -1,27 +1,3 @@
-<i18n>
-{
-  "en": {
-    "new_series": "new serie",
-    "new_user": "new user",
-    "manualtrigger": "Manual trigger",
-    "date": "Date",
-    "event": "Event",
-    "deliveries": "Recent attempts",
-    "noattempts": "There are no attempts to show",
-    "refresh": "Refresh"
-  },
-  "fr": {
-    "new_series": "nouvelles série",
-    "new_user": "nouvel utilisateur",
-    "manualtrigger": "Déclenchement manuel",
-    "date": "Date",
-    "event": "Evènement",
-    "deliveries": "Tentatives récentes",
-    "noattempts": "Il n'y aucune tentative faîte",
-    "refresh": "Rafraîchir"
-  }
-}
-</i18n>
 <template>
   <span>
     <div
@@ -29,7 +5,7 @@
     >
       <div class="d-flex mb-2">
         <h4>
-          {{ $t('deliveries') }}
+          {{ $t('webhook.deliveries') }}
         </h4>
         <button
           class="ml-auto btn btn-sm btn-primary"
@@ -93,7 +69,7 @@
         <div
           class="text-warning text-center"
         >
-          {{ $t('noattempts') }}
+          {{ $t('webhook.noattempts') }}
         </div>
       </template>
       <template v-slot:table-busy>
@@ -162,14 +138,14 @@ export default {
         },
         {
           key: 'event',
-          label: this.$t('event'),
+          label: this.$t('webhook.event'),
           tdClass: 'word-break',
           class: 'd-none d-lg-table-cell',
-          formatter: (values) => this.$t(values),
+          formatter: (values) => this.$t(`webhook.${values}`),
         },
         {
           key: 'attempts',
-          label: this.$t('date'),
+          label: this.$t('webhook.date'),
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
           formatter: (values) => {

@@ -1,15 +1,3 @@
-<i18n>
-  {
-    "en": {
-      "newwebhook": "New Webhook"
-
-    },
-    "fr": {
-      "newwebhook": "Nouveau Webhook"
-    }
-  }
-</i18n>
-
 <template>
   <div>
     <div
@@ -27,7 +15,7 @@
           name="plus"
           class="mr-2"
         />
-        {{ $t('newwebhook') }}
+        {{ $t('webhook.newwebhook') }}
       </router-link>
     </div>
     <list-webhook
