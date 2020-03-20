@@ -31,6 +31,7 @@
 	},
 	"user": {
 		"mail": "Email",
+		"name": "Name",
 		"lastname": "Last name",
 		"firstname": "First name",
 		"sub": "Sub",
