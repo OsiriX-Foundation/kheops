@@ -369,7 +369,7 @@ public class AlbumQueries {
             }
 
             if (fuzzyMatching) {
-                Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getName()+")");
+                Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getTable()+"."+column.getName()+")");
                 return condition.or(fuzzyCondition);
             }
             return condition;
