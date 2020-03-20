@@ -111,6 +111,7 @@
 import Vue from 'vue';
 import store from '@/store';
 import { CurrentUser } from '@/mixins/currentuser.js';
+import { loadLanguageAsync } from '@/setup/i18n-setup';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
 import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
 
@@ -162,7 +163,7 @@ export default {
     changeLang(value) {
       if (this.availableLanguage.includes(value)) {
         localStorage.setItem('language', value);
-        this.$root.$i18n.locale = value;
+        loadLanguageAsync(value);
       }
     },
     redirect(href) {

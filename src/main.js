@@ -23,7 +23,7 @@ import store from './store';
 import Access from '@/directives/access';
 import router from './router';
 import App from './App';
-import messages from '@/lang/messages';
+import { i18n } from '@/setup/i18n-setup';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;
@@ -59,11 +59,6 @@ function tokenInterceptor() {
   store.dispatch('login', user);
 }
 
-// Create VueI18n instance with options
-const i18n = new VueI18n({
-  locale: 'en',
-  messages,
-});
 /* eslint-disable no-new */
 Vue.use(VueKeyCloak, {
   config: keycloakconfig,
