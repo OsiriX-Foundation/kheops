@@ -1,27 +1,10 @@
-<i18n>
-{
-  "en": {
-    "usersettings": "User settings",
-    "general": "General",
-    "tokens": "Tokens",
-    "provider": "Provider"
-  },
-  "fr": {
-    "usersettings": "Préférences utilisateur",
-    "general": "Général",
-    "tokens": "Tokens",
-    "provider": "Fournisseur"
-  }
-}
-</i18n>
-
 <template>
   <div
     id="user"
     class="container"
   >
     <h3 class="pb-3">
-      {{ $t('usersettings') }}
+      {{ $t('user.usersettings') }}
     </h3>
     <div class="row">
       <div class="col-lg-2 col-sm-12 col-xs-12 mb-2">
@@ -33,7 +16,7 @@
             :class="(currentCategory === cat) ? 'active':''"
             @click="loadview(cat)"
           >
-            {{ $t(cat) }}
+            {{ $t(`albumsettingsmenu.${cat}`) }}
           </a>
         </nav>
       </div>

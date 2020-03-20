@@ -1,15 +1,3 @@
-<i18n>
-{
-  "en": {
-    "errorSeries": "An error occured, please reload the series list",
-    "reload": "Reload"
-  },
-  "fr": {
-    "errorSeries": "Une erreur est survenue, veuillez recharger les séries.",
-    "reload": "Recharger"
-  }
-}
-</i18n>
 <template>
   <span>
     <div
@@ -38,7 +26,7 @@
         class="d-flex flex-column justify-content-center align-items-center full-height"
       >
         <div class="mb-3">
-          {{ $t('errorSeries') }}
+          {{ $t('serie.errorSeries') }}
         </div>
         <div class="">
           <button

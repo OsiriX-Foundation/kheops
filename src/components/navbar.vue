@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en" : {
-    "inbox": "Inbox",
-    "albums": "Albums",
-    "favorites": "Favorites",
-    "recents": "Recents"
-  },
-  "fr": {
-    "inbox": "Boîte de réception",
-    "albums": "Albums",
-    "favorites": "Favoris",
-    "recents": "Récents"
-  }
-}
-</i18n>
-
 <template>
   <div
     id="navbar_container"
@@ -31,7 +14,7 @@
             <v-icon
               name="bars"
               class="navbar-icon-margin"
-            />{{ $t("inbox") }}
+            />{{ $t("navbar.inbox") }}
           </router-link>
         </li>
         <li class="nav-item">
@@ -43,7 +26,7 @@
             <v-icon
               name="book"
               class="navbar-icon-margin"
-            />{{ $t("albums") }}
+            />{{ $t("navbar.albums") }}
           </router-link>
         </li>
         <!--

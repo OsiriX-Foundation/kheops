@@ -1,41 +1,3 @@
-<i18n>
-{
-  "en": {
-    "showrevokedtoken": "Show revoked tokens",
-    "showinvalidtoken": "Show invalid tokens",
-    "revoke": "revoke",
-    "revoked": "revoked",
-    "active": "active",
-    "expired": "expired",
-    "revokedsuccess": "revoked successfully",
-    "expiration date": "expiration date",
-    "status": "status",
-    "description": "description",
-    "scope": "scope",
-    "create date": "create date",
-    "last used": "last used",
-    "permission": "permission",
-    "notokens": "There are no tokens to show"
-  },
-  "fr": {
-    "showrevokedtoken": "Afficher les tokens révoqués",
-    "showinvalidtoken": "Afficher les tokens invalides",
-    "revoke": "révoquer",
-    "revoked": "révoqué",
-    "active": "actif",
-    "expired": "expiré",
-    "revokedsuccess": "révoqué avec succès",
-    "expiration date": "date d'expiration",
-    "status": "statut",
-    "description": "description",
-    "scope": "application",
-    "create date": "créé le",
-    "last used": "dern. utilisation",
-    "permission": "permission",
-    "notokens": "Aucun token créé"
-  }
-}
-</i18n>
 <template>
   <div>
     <div class="d-flex align-content-around flex-wrap">
@@ -51,7 +13,7 @@
           @change="toggleValid"
         />
         <span class="ml-2 toggle-label">
-          {{ $t('showinvalidtoken') }}
+          {{ $t('token.showinvalidtoken') }}
         </span>
       </div>
     </div>
@@ -87,7 +49,7 @@
             name="user"
             class="mr-2"
           />
-          {{ $t('user') }}
+          {{ $t('token.user') }}
         </div>
       </template>
       <template
@@ -163,7 +125,7 @@
             class="btn btn-danger btn-xs"
             @click.stop="revoke(data.item.id)"
           >
-            {{ $t('revoke') }}
+            {{ $t('disable') }}
           </button>
           <kheops-clip-loader
             v-else
@@ -174,7 +136,7 @@
           v-if="data.item.revoked"
           class="text-danger"
         >
-          {{ $t('revoked') }}
+          {{ $t('token.revoked') }}
         </span>
       </template>
       <template v-slot:table-busy>
@@ -186,7 +148,7 @@
         >
           <list-empty
             :status="status"
-            :text-empty="$t('notokens')"
+            :text-empty="$t('token.notokens')"
             @reload="getTokens()"
           />
         </div>
@@ -195,7 +157,7 @@
         <div
           class="text-warning text-center"
         >
-          {{ $t('notokens') }}
+          {{ $t('token.notokens') }}
         </div>
       </template>
     </b-table>
@@ -235,43 +197,43 @@ export default {
       fields: [
         {
           key: 'status',
-          label: this.$t('status'),
+          label: this.$t('token.status'),
           sortable: true,
         },
         {
           key: 'title',
-          label: this.$t('description'),
+          label: this.$t('token.description'),
           sortable: true,
           tdClass: 'word-break',
         },
         {
           key: 'scope_type',
-          label: this.$t('scope'),
+          label: this.$t('token.scope'),
           sortable: true,
           class: this.scope === 'album' ? 'd-none' : 'd-none d-sm-table-cell',
           tdClass: 'word-break',
         },
         {
           key: 'expiration_time',
-          label: this.$t('expiration date'),
+          label: this.$t('token.expirationdate'),
           sortable: true,
           class: 'd-none d-lg-table-cell',
         },
         {
           key: 'issued_at_time',
-          label: this.$t('create date'),
+          label: this.$t('token.creationdate'),
           sortable: true,
           class: 'd-none d-lg-table-cell',
         },
         {
           key: 'last_used',
-          label: this.$t('last used'),
+          label: this.$t('token.lastuse'),
           sortable: true,
           class: 'd-none d-lg-table-cell',
         },
         {
           key: 'permission',
-          label: this.$t('permission'),
+          label: this.$t('token.permission'),
           sortable: true,
           class: 'd-none d-sm-table-cell',
         },

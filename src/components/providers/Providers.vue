@@ -1,15 +1,3 @@
-<i18n>
-  {
-    "en": {
-      "newprovider": "New report provider"
-
-    },
-    "fr": {
-      "newprovider": "Nouveau report provider"
-    }
-  }
-</i18n>
-
 <template>
   <div>
     <div
@@ -27,7 +15,7 @@
           name="plus"
           class="mr-2"
         />
-        {{ $t('newprovider') }}
+        {{ $t('provider.newprovider') }}
       </router-link>
     </div>
 

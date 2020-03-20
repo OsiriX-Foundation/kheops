@@ -1,24 +1,10 @@
-<i18n>
-{
-  "en": {
-    "informationtriggeruser": "The below user will be delivered to {url} using the current webhook configuraton.",
-    "errortrigger": "You can't redeliver this trigger.",
-    "erroruser": "The following user is no longer present in the album :"
-  },
-  "fr": {
-    "informationtriggeruser": "L'utilisateur ci-dessous sera livré à {url} en utilisant la configuration actuelle.",
-    "errortrigger": "Vous ne pouvez pas rédéclencher cet évènement.",
-    "erroruser": "L'utilisateur suivant n'est plus présent dans l'album :"
-  }
-}
-</i18n>
 <template>
   <span>
     <p
       v-if="userNotPresent === false"
       class="word-break"
     >
-      {{ $t('informationtriggeruser', { url: url }) }}
+      {{ $t('webhook.informationtriggeruser', { url: url }) }}
     </p>
     <span
       v-if="userNotPresent === true"
@@ -26,20 +12,20 @@
       <div
         class="text-warning mb-2"
       >
-        {{ $t('errortrigger') }}
+        {{ $t('webhook.errortrigger') }}
       </div>
       <div
         class="text-warning mb-2"
       >
-        {{ $t('erroruser') }}
+        {{ $t('webhook.erroruser') }}
       </div>
     </span>
     <ul
       v-if="trigger.user !== undefined"
     >
-      <li v-if="trigger.user.email !== undefined">{{ $t('mail') }} : {{ trigger.user.email }}</li>
-      <li v-if="trigger.user.name !== undefined">{{ $t('name') }} : {{ trigger.user.name }}</li>
-      <li v-if="trigger.user.sub !== undefined">{{ $t('sub') }} : {{ trigger.user.sub }}</li>
+      <li v-if="trigger.user.email !== undefined">{{ $t('user.mail') }} : {{ trigger.user.email }}</li>
+      <li v-if="trigger.user.name !== undefined">{{ $t('user.name') }} : {{ trigger.user.name }}</li>
+      <li v-if="trigger.user.sub !== undefined">{{ $t('user.sub') }} : {{ trigger.user.sub }}</li>
     </ul>
   </span>
 </template>

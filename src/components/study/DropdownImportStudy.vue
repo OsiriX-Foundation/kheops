@@ -1,17 +1,3 @@
-<i18n>
-{
-  "en": {
-    "importdir": "Import directory",
-    "importfiles": "Import files",
-    "draganddrop": "Or drag and drop"
-  },
-  "fr": {
-    "importdir": "Importer un dossier",
-    "importfiles": "Importer des fichiers",
-    "draganddrop": "Ou Drag and Drop"
-  }
-}
-</i18n>
 <template>
   <b-dropdown
     id="dropdown-divider"
@@ -30,7 +16,7 @@
       :disabled="sendingFiles"
     >
       <label for="file">
-        {{ $t("importfiles") }}
+        {{ $t("upload.importfiles") }}
       </label>
     </b-dropdown-item-button>
     <b-dropdown-item-button
@@ -38,7 +24,7 @@
       :disabled="sendingFiles"
     >
       <label for="directory">
-        {{ $t("importdir") }}
+        {{ $t("upload.importdir") }}
       </label>
     </b-dropdown-item-button>
     <b-dropdown-divider />
@@ -46,7 +32,7 @@
       v-if="determineWebkitDirectory()"
       @click="showDragAndDrop"
     >
-      {{ $t("draganddrop") }}
+      {{ $t("upload.draganddrop") }}
     </b-dropdown-item-button>
   </b-dropdown>
 </template>

@@ -1,21 +1,8 @@
-<i18n>
-{
-  "en": {
-    "urlWorking": "This provider is on",
-    "urlNotWorking": "This provider is off"
-  },
-  "fr": {
-    "urlWorking": "This provider is on",
-    "urlNotWorking": "This provider is off"
-  }
-}
-</i18n>
-
 <template>
   <span
     v-if="loading"
     class="nowrap"
-    :title="$t('urlWorking')"
+    :title="$t('provider.urlWorking')"
   >
     <kheops-clip-loader
       :loading="loading"
@@ -27,7 +14,7 @@
   <span
     v-else-if="checkURL"
     class="nowrap"
-    :title="$t('urlWorking')"
+    :title="$t('provider.urlWorking')"
   >
     <v-icon
       name="check-circle"
@@ -38,7 +25,7 @@
   <span
     v-else
     class="nowrap"
-    :title="$t('urlNotWorking')"
+    :title="$t('provider.urlNotWorking')"
   >
     <v-icon
       name="ban"

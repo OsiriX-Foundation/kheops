@@ -1,14 +1,3 @@
-<i18n>
-{
-  "en": {
-    "fieldobligatory": "Field obligatory"
-  },
-  "fr": {
-    "fieldobligatory": "Champs obligatoire"
-  }
-}
-</i18n>
-
 <template>
   <b-form-invalid-feedback :state="state">
     <span

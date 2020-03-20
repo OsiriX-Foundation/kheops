@@ -1,4 +1,3 @@
-
 <template v-slot:table-busy>
   <div class="text-center text-danger my-2">
     <pulse-loader

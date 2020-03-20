@@ -1,53 +1,3 @@
-<i18n>
-{
-  "en": {
-    "newalbum": "New album",
-    "Study #": "Study #",
-    "Modalities": "Modalities",
-    "User #": "User #",
-    "Message #": "Message #",
-    "Date": "Created date",
-    "LastEvent": "Last event",
-    "selectednbalbums": "{count} album is selected | {count} albums are selected",
-    "permissionsfailed": "You can't send this albums : ",
-    "send": "The album {albumName} has been shared.",
-    "nomodality": "No modality",
-    "name": "Name",
-    "nomorealbums": "No more albums",
-    "noresults": "No album found",
-    "albumshared": "Album shared",
-    "error": "An error occur please reload the albums.",
-    "reload": "Reload",
-    "filter": "Filter",
-    "fromDate": "From",
-    "toDate": "To",
-    "nopermissions": "You don't have the permissions to show the albums list."
-  },
-  "fr": {
-    "newalbum": "Nouvel album",
-    "Study #": "# Etudes",
-    "Modalities": "Modalités",
-    "User #": "# Utilisateurs",
-    "Message #": "# Messages",
-    "Date": "Date de création",
-    "LastEvent": "Dernier événement",
-    "selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-    "permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
-    "send": "L'album {albumName} a été partagé.",
-    "nomodality": "Aucune modalité",
-    "name": "Nom",
-    "nomorealbums": "Pas d'albums en plus",
-    "noresults": "Aucun album trouvé",
-    "albumshared": "Album partagé",
-    "error": "Une erreur s'est produite, veuillez recharger les albums.",
-    "reload": "Recharger",
-    "filter": "Filtrer",
-    "fromDate": "De",
-    "toDate": "A",
-    "nopermissions": "Vous n'avez pas les autorisations pour afficher la liste des albums."
-  }
-}
-</i18n>
 <template>
   <div>
     <list-albums-headers
@@ -84,7 +34,7 @@
             v-focus
             type="search"
             class="form-control form-control-sm"
-            :placeholder="$t('filter')"
+            :placeholder="$t('listalbums.filter')"
           > <br>
         </div>
         <sort-list
@@ -139,7 +89,7 @@
                 :disabled-dates="disabledFromCreateDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('fromDate')"
+                :placeholder="$t('listalbums.fromDate')"
               />
             </div>
           </div>
@@ -150,7 +100,7 @@
                 :disabled-dates="disabledToCreateDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('toDate')"
+                :placeholder="$t('listalbums.toDate')"
               />
             </div>
           </div>
@@ -178,7 +128,7 @@
                 :disabled-dates="disabledFromEventDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('fromDate')"
+                :placeholder="$t('listalbums.fromDate')"
               />
             </div>
           </div>
@@ -190,7 +140,7 @@
                 :disabled-dates="disabledToEventDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('toDate')"
+                :placeholder="$t('listalbums.toDate')"
               />
             </div>
           </div>
@@ -248,27 +198,27 @@
         <loading />
       </div>
       <div slot="no-more">
-        {{ $t('nomorealbums') }}
+        {{ $t('listalbums.nomorealbums') }}
       </div>
       <div slot="no-results">
-        {{ $t('noresults') }}
+        {{ $t('listalbums.noresults') }}
       </div>
       <div slot="error">
         <span
           v-if="statusList === 401 || statusList === 403"
         >
-          {{ $t('nopermissions') }}
+          {{ $t('listalbums.nopermissions') }}
         </span>
         <span
           v-else
         >
-          {{ $t('error') }}<br><br>
+          {{ $t('listalbums.error') }}<br><br>
           <button
             type="button"
             class=" btn btn-md"
             @click="searchAlbums()"
           >
-            {{ $t('reload') }}
+            {{ $t('listalbums.reload') }}
           </button>
         </span>
       </div>
@@ -277,7 +227,6 @@
 </template>
 <script>
 
-import { mapGetters } from 'vuex';
 import Datepicker from 'vuejs-datepicker';
 import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
@@ -297,6 +246,7 @@ export default {
       statusList: 200,
       showFilters: false,
       infiniteId: 0,
+      albumsKey: 'all',
       albumsParams: {
         offset: 0,
         limit: 50,
@@ -316,7 +266,7 @@ export default {
         },
         {
           key: 'name',
-          label: this.$t('name'),
+          label: this.$t('listalbums.name'),
           thClass: 'pointer table-albums-header',
           tdClass: 'name',
           sortable: true,
@@ -327,7 +277,7 @@ export default {
         },
         {
           key: 'number_of_studies',
-          label: this.$t('Study #'),
+          label: this.$t('listalbums.Study #'),
           sortable: true,
           thClass: 'pointer table-albums-header',
           class: 'd-none d-sm-table-cell word-break',
@@ -337,7 +287,7 @@ export default {
         },
         {
           key: 'number_of_users',
-          label: this.$t('User #'),
+          label: this.$t('listalbums.User #'),
           sortable: true,
           thClass: 'pointer table-albums-header',
           class: 'd-none d-md-table-cell word-break',
@@ -347,7 +297,7 @@ export default {
         },
         {
           key: 'number_of_comments',
-          label: this.$t('Message #'),
+          label: this.$t('listalbums.Message #'),
           sortable: true,
           thClass: 'pointer table-albums-header',
           class: 'd-none d-lg-table-cell word-break',
@@ -357,7 +307,7 @@ export default {
         },
         {
           key: 'created_time',
-          label: this.$t('Date'),
+          label: this.$t('listalbums.Date'),
           sortable: true,
           thClass: 'pointer table-albums-header',
           class: 'd-none d-sm-table-cell word-break',
@@ -367,7 +317,7 @@ export default {
         },
         {
           key: 'last_event_time',
-          label: this.$t('LastEvent'),
+          label: this.$t('listalbums.LastEvent'),
           sortable: true,
           thClass: 'pointer table-albums-header',
           class: 'd-none d-lg-table-cell word-break',
@@ -377,13 +327,13 @@ export default {
         },
         {
           key: 'modalities',
-          label: this.$t('Modalities'),
+          label: this.$t('listalbums.Modalities'),
           sortable: false,
           formatter: (value) => {
             if (value.length > 0) {
               return value.join(', ');
             }
-            return this.$t('nomodality');
+            return this.$t('listalbums.nomodality');
           },
           class: 'word-break',
           thClass: 'table-albums-header',
@@ -406,9 +356,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      albums: 'albums',
-    }),
+    albums() {
+      return this.$store.getters.getAlbumsByKey(this.albumsKey);
+    },
     albumsSelected() {
       return this.albums.filter((album) => album.is_selected === true);
     },
@@ -466,10 +416,10 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('initAlbums', {});
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   destroyed() {
-    this.$store.dispatch('initAlbums', {});
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   methods: {
     clickAlbum(item) {
@@ -506,7 +456,7 @@ export default {
         sort: (this.albumsParams.sortDesc ? '-' : '') + this.albumsParams.sortBy,
       };
       const queries = Object.assign(params, this.prepareFilters());
-      return this.$store.dispatch('getAlbums', { queries });
+      return this.$store.dispatch('getAlbums', { queries, key: this.albumsKey });
     },
     prepareFilters() {
       const filtersToSend = {};
@@ -551,7 +501,7 @@ export default {
     },
     searchAlbums() {
       this.albumsParams.offset = 0;
-      this.$store.dispatch('initAlbums', { });
+      this.$store.dispatch('initAlbums', { key: this.albumsKey });
       this.infiniteId += 1;
     },
     setItemHover(item, index) {

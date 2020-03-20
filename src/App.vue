@@ -1,19 +1,3 @@
-<i18n>
-{
-  "en": {
-    "albums": "{appTitle} - Albums",
-    "album": "{appTitle} - Album",
-    "newalbum": "{appTitle} - New album",
-    "user": "{appTitle} - User"
-  },
-  "fr": {
-    "albums": "{appTitle} - Albums",
-    "album": "{appTitle} - Album",
-    "newalbum": "{appTitle} - Nouvel album",
-    "user": "{appTitle} - Utilisateur"
-  }
-}
-</i18n>
 <template>
   <div id="app">
     <vue-snotify />
@@ -67,7 +51,7 @@ export default {
   },
   watch: {
     $route(to) {
-      document.title = this.$t(to.meta.title, { appTitle: this.appTitle }) || this.appTitle;
+      document.title = to.meta.title === undefined ? this.appTitle : this.$t(`doctitle.${to.meta.title}`, { appTitle: this.appTitle });
     },
     oidcAccessToken() {
       this.accessTokenLoaded(this.oidcAccessToken);
@@ -77,7 +61,7 @@ export default {
     window.addEventListener('vuexoidc:userSignedOut', this.userSignOut);
   },
   created() {
-    document.title = this.$t(this.$route.meta.title, { appTitle: this.appTitle }) || this.appTitle;
+    document.title = this.$route.meta.title === undefined ? this.appTitle : this.$t(`doctitle.${this.$route.meta.title}`, { appTitle: this.appTitle });
   },
   destroyed() {
     window.removeEventListener('vuexoidc:userSignedOut', this.userSignOut);
