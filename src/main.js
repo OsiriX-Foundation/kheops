@@ -22,7 +22,7 @@ import store from './store';
 import Access from '@/directives/access';
 import router from './router';
 import App from './App';
-import messages from '@/lang/messages';
+import { i18n } from '@/setup/i18n-setup';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;
@@ -44,12 +44,6 @@ Vue.use(VueScrollTo);
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon);
 Vue.directive('access', Access);
-
-// Create VueI18n instance with options
-const i18n = new VueI18n({
-  locale: 'en',
-  messages,
-});
 
 // https://fr.vuejs.org/v2/guide/custom-directive.html
 Vue.directive('focus', {
