@@ -1,16 +1,3 @@
-<i18n>
-{
-  "en": {
-    "description": "Description",
-    "upload": "Send"
-  },
-  "fr": {
-    "description": "Description",
-    "upload": "Envoyer"
-  }
-}
-</i18n>
-
 <template>
   <div>
     <!--
@@ -64,7 +51,7 @@
       <input
         v-model="manageFiles[file.name].description.value"
         type="text"
-        :placeholder="$t('description')"
+        :placeholder="$t('upload.description')"
         class="form-control"
         @keydown.enter.prevent="validDicomValue"
       >
@@ -76,7 +63,7 @@
         class="btn btn-primary"
         @click="validDicomValue()"
       >
-        {{ $t('upload') }}
+        {{ $t('send') }}
       </button>
     </div>
   </div>
