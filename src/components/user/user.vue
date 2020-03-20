@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en": {
-    "usersettings": "User settings",
-    "general": "General",
-    "tokens": "Tokens",
-    "provider": "Provider"
-  },
-  "fr": {
-    "usersettings": "Préférences utilisateur",
-    "general": "Général",
-    "tokens": "Tokens",
-    "provider": "Fournisseur"
-  }
-}
-</i18n>
-
 <template>
   <div
     id="user"

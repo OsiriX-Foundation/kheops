@@ -1,34 +1,3 @@
-<i18n>
-{
-  "en": {
-    "selectednbstudies": "{count} study is selected | {count} studies are selected",
-    "infoFavorites": "Favorites",
-    "send": "Send",
-    "delete": "Delete",
-    "cancel": "Cancel",
-    "addfavorites": "Add too favorites",
-    "addfavorites": "Remove too favorites",
-    "confirmDelete": "Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
-    "studiessharedsuccess": "studies sent successfully",
-    "studiessharederror": "studies could not be sent",
-    "addInbox": "Add to inbox"
-  },
-  "fr": {
-    "selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
-    "infoFavorites": "Favoris",
-    "send": "Envoyer",
-    "delete": "Supprimer",
-    "cancel": "Annuler",
-    "addfavorites": "Ajouter aux favoris",
-    "addfavorites": "Supprimer des favoris",
-    "confirmDelete": "Etes vous de sûr de vouloir supprimer {countStudies} étude contenant {countSeries} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série.| Etes vous de sûr de vouloir supprimer {countStudies} études contenant {countSeries} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
-    "studiessharedsuccess": "études ont été envoyées avec succès",
-    "addInbox": "Ajouter à la boite de réception",
-    "studiessharederror": "études n'ont pas pu être envoyée"
-  }
-}
-</i18n>
-
 <template>
   <div>
     <div
@@ -38,7 +7,7 @@
         class="d-flex flex-wrap"
       >
         <div class="p-2 align-self-center d-none d-md-block">
-          <span>{{ $tc("selectednbstudies", selectedStudiesNb, { count: selectedStudiesNb }) }}</span>
+          <span>{{ $tc("study.selectednbstudies", selectedStudiesNb, { count: selectedStudiesNb }) }}</span>
         </div>
         <div
           v-if="showSendButton === true"
@@ -85,7 +54,7 @@
                 name="bars"
               />
             </span><br>
-            <span>{{ $t("addInbox") }}</span>
+            <span>{{ $t("study.addInbox") }}</span>
           </button>
         </div>
         <div
@@ -104,7 +73,7 @@
                 name="star"
               />
             </span><br>
-            <span>{{ $t("infoFavorites") }}</span>
+            <span>{{ $t("study.infoFavorites") }}</span>
           </button>
         </div>
         <div
@@ -161,7 +130,7 @@
       v-if="confirmDelete && selectedStudiesNb"
       :btn-danger-text="$t('delete')"
       :btn-primary-text="$t('cancel')"
-      :text="$tc('confirmDelete', selectedStudiesNb, {countStudies: selectedStudiesNb, countSeries: selectedSeriesNb})"
+      :text="$tc('study.confirmDelete', selectedStudiesNb, {countStudies: selectedStudiesNb, countSeries: selectedSeriesNb})"
       :method-confirm="() => confirmDelete=false"
       :method-cancel="deleteStudies"
     />
@@ -321,7 +290,7 @@ export default {
         });
 
         Promise.all(promises).then(() => {
-          this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('studiessharedsuccess')}`);
+          this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('study.studiessharedsuccess')}`);
           this.formSendStudy = false;
           this.deselectStudySeries();
         }).catch((err) => {

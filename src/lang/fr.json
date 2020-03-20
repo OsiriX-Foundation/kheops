@@ -5,6 +5,9 @@
 	"confirm": "Confirmer",
     "edit": "Editer",
     "send": "Envoyer",
+    "delete": "Supprimer",
+    "download": "Télécharger",
+    "favorite": "Favori",
     "valid": "Valider",
     "enabled": "Activé",
     "disable": "Désactiver",
@@ -42,6 +45,36 @@
 	},
 	"serie": {
 		"errorSeries": "Une erreur s'est produite, rechargez les séries SVP."
+	},
+	"study": {
+		"PatientName": "Nom du patient",
+		"Modality": "Modalité",
+		"StudyDate": "Date de l'étude",
+		"StudyDescription": "Description de l'étude",
+		"PatientID": "Patient ID",
+		"filter": "Filtrer",
+		"fromDate": "De",
+		"toDate": "A",
+		"nomorestudies": "Plus d'études",
+		"noresults": "Aucune étude trouvée.",
+		"error": "Une erreur s'est produite, veuillez recharger les études.",
+		"nopermissions": "Vous n'avez pas les autorisations pour afficher la liste des études.",
+		"selectednbstudies": "{count} étude est sélectionnée | {count} études sont sélectionnées",
+		"infoFavorites": "Favoris",
+		"confirmDelete": "Etes vous de sûr de vouloir supprimer {countStudies} étude contenant {countSeries} série? Une fois supprimée, vous ne pouvais plus charger cette série tant qu'un autre utilisateur a accès à cette série.| Etes vous de sûr de vouloir supprimer {countStudies} études contenant {countSeries} séries? Une fois supprimées, vous ne pouvais plus charger ces séries tant qu'un autre utilisateur a accès à ces séries.",
+		"studiessharedsuccess": "études ont été envoyées avec succès",
+		"addInbox": "Ajouter à la boite de réception",
+		"import": "Importer des données",
+		"opencomments": "Ouvrir les commentaires",
+		"series": "Séries",
+		"comments": "Commentaires",
+		"metadata": "Métadonnées"
+	},
+	"viewer": {
+		"osirix": "Ouvrir OsiriX",
+		"ohif": "Ouvrir OHIF",
+		"weasis": "Ouvrir Weasis",
+		"slicer": "Ouvrir 3D Slicer"
 	},
 	"album" : {
 		"studies": "Etudes",

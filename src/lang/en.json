@@ -5,6 +5,9 @@
 	"confirm": "Confirm",
     "edit": "Edit",
     "send": "Send",
+    "delete": "Delete",
+    "download": "Download",
+    "favorite": "Favorite",
     "valid": "Valid",
     "enabled": "Enabled",
     "disable": "Revoke",
@@ -43,6 +46,36 @@
 	},
 	"serie": {
 		"errorSeries": "An error occured, please reload the series list"
+	},
+	"study": {
+		"PatientName": "Patient Name",
+		"Modality": "Modality",
+		"StudyDate": "Study Date",
+		"StudyDescription": "Study Description",
+		"PatientID": "Patient ID",
+		"filter": "Filter",
+		"fromDate": "From",
+		"toDate": "To",
+		"nomorestudies": "No more studies",
+		"noresults": "No study found",
+		"error": "An error occur please reload the studies.",
+		"nopermissions": "You don't have the permissions to show the studies list.",
+		"selectednbstudies": "{count} study is selected | {count} studies are selected",
+		"infoFavorites": "Favorites",
+		"confirmDelete": "Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
+		"studiessharedsuccess": "studies sent successfully",
+		"addInbox": "Add to inbox",
+		"import": "Import data",
+		"opencomments": "Open comments",
+		"series": "Series",
+		"comments": "Comments",
+		"metadata": "Metadata"
+	},
+	"viewer": {
+		"osirix": "Open OsiriX",
+		"ohif": "Open OHIF",
+		"weasis": "Open Weasis",
+		"slicer": "Open 3D Slicer"
 	},
 	"album" : {
 		"studies": "Studies",
