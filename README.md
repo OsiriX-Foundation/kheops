@@ -48,12 +48,10 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 If you want to add a new language in the KHEOPS UI, please follow the explanations below.
 
-KHEOPS use by default the english. If a translate is not present, KHEOPS will use the english translate.
-The translate file for KHEOPS is in the directory below: **KheopsUI/src/lang**
+KHEOPS use by default the english. If no translation is present, KHEOPS will use the English translation.
+The translation file for KHEOPS can be found in the directory below: **[KheopsUI/src/lang](src/lang/)**
 
-KHEOPS UI use the internationalization plugin [Vue I18n](https://kazupon.github.io/vue-i18n/).
-
-Some features used of **Vue I18n** will be explain bellow, but if you want more details you can read the [documentation of Vue I18n](https://kazupon.github.io/vue-i18n/introduction.html).
+KHEOPS UI use the internationalization plugin [Vue I18n](https://kazupon.github.io/vue-i18n/). Some features used of **Vue I18n** will be explain bellow, but if you want more details you can read the [documentation of Vue I18n](https://kazupon.github.io/vue-i18n/introduction.html).
 
 #### Named formatting
 
@@ -62,7 +60,6 @@ In a translation, the format *{named}* used a named given by the UI. [Named form
 #### Pluralization
 
 In a translation, the pipe | defines a separator and is used to define plurals. [Pluralization](https://kazupon.github.io/vue-i18n/guide/pluralization.html)
-
 
 For example: `study: no studies | one study | many studies`
 
