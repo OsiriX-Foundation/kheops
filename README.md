@@ -72,9 +72,9 @@ For example: `study: no studies | one study | many studies`
 
 #### Files needed to add a new language
 
-* Create a JSON file for you language in the directory **KheopsUI/src/lang**. For example `es.json`
+* Create a JSON file for you language in the directory **[KheopsUI/src/lang](src/lang/)**. For example `es.json`
 
-* Create a JS file in the directory **KheopsUI/src/lang**. For example `es.js`
+* Create a JS file in the directory **[KheopsUI/src/lang](src/lang/)**. For example `es.js`
 
 Copy and past the following code into your created JS file and replace the `es` by your language created.
 
@@ -86,11 +86,11 @@ const messages = es;
 export default messages;
 ```
 
-Now you can begin your translation for KHEOPS. To see all translations used in the UI, you can copy and past the contents of the `KheopsUI/src/lang/example.json` in your JSON file to be sure to don't forget any translation.
+Now you can begin your translation for KHEOPS. To see all translations used in the UI, you can copy and past the contents of the [KheopsUI/src/lang/example.json](src/lang/example.json) in your JSON file to be sure to don't forget any translation.
 
 #### Display your language in the UI
 
-In the file **KheopsUI/src/components/navheader.vue** add the new language in the `availableLanguage` data. The new language will be loaded when it is selected. For example on adding `es` in `availableLanguage`, the file `es.js` will be loaded when the language spanish selected.
+In the file [KheopsUI/src/components/navheader.vue](src/components/navheader.vue) add the new language in the `availableLanguage` data. The new language will be loaded when it is selected. For example on adding `es` in `availableLanguage`, the file `es.js` will be loaded when the language spanish selected.
 
 ```
 availableLanguage: [
