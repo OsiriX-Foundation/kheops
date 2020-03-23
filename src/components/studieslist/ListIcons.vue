@@ -109,6 +109,7 @@
 </template>
 <script>
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
 import SlicerIcon from '@/components/kheopsSVG/SlicerIcon.vue';
 import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
@@ -190,6 +191,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({
+      album: 'album',
+    }),
     OS() {
       return navigator.platform;
     },
@@ -264,8 +268,8 @@ export default {
       const sourceQuery = this.getSourceQueries();
       const openWindow = this.setWindowsProps(viewer, StudyInstanceUID);
       const token = this.currentuserAccessToken();
-
-      this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
+      const scope = this.setScope(this.source.key, this.album);
+      this.getViewerToken(token, StudyInstanceUID, this.source, scope).then((res) => {
         const viewerToken = res.data.access_token;
         let url = '';
         if (viewer === 'Osirix') {

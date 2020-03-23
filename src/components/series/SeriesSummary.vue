@@ -71,6 +71,7 @@ export default {
     ...mapGetters({
       studies: 'studies',
       series: 'series',
+      album: 'album',
     }),
     imageTitle() {
       let modality = '';
@@ -203,8 +204,9 @@ export default {
       const token = this.currentuserAccessToken();
       const windowProps = this.setWindowsProps(series);
       const openWindow = window.open('', windowProps.name);
+      const scope = this.setScope(this.source.key, this.album);
 
-      this.getViewerToken(token, this.studyInstanceUID, this.source).then((res) => {
+      this.getViewerToken(token, this.studyInstanceUID, this.source, scope).then((res) => {
         const viewerToken = res.data.access_token;
         let url = '';
         if (windowProps.id === 'WADO') {
