@@ -155,6 +155,7 @@ export default {
           class: ['td_checkbox_inbox', 'word-break'],
           thStyle: {
             width: '100px',
+            top: this.topstyle,
           },
         },
         {
@@ -171,6 +172,7 @@ export default {
           },
           thStyle: {
             width: '250px',
+            top: this.topstyle,
           },
         },
         {
@@ -188,6 +190,7 @@ export default {
           },
           thStyle: {
             width: '250px',
+            top: this.topstyle,
           },
         },
         {
@@ -205,6 +208,7 @@ export default {
           },
           thStyle: {
             width: '400px',
+            top: this.topstyle,
           },
         },
         {
@@ -222,6 +226,7 @@ export default {
           },
           thStyle: {
             width: '150px',
+            top: this.topstyle,
           },
         },
         {
@@ -239,6 +244,7 @@ export default {
           },
           thStyle: {
             width: '150px',
+            top: this.topstyle,
           },
         },
       ],

@@ -34,7 +34,9 @@
       @reloadStudies="reloadStudies"
     />
     <studies-list
+      v-if="topstyle !== null"
       :permissions="permissions"
+      :topstyle="topstyle"
     />
     <infinite-loading
       ref="infiniteLoading"
@@ -116,6 +118,8 @@ export default {
         ModalitiesInStudy: '',
       },
       headerID: 'listheaders',
+      topstyle: null,
+      defaulttop: 69,
     };
   },
   computed: {
@@ -125,7 +129,14 @@ export default {
       sendingFiles: 'sending',
     }),
   },
+  mounted() {
+    this.setTopstyle();
+  },
   methods: {
+    setTopstyle() {
+      const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
+      this.topstyle = `${elStickyHeader.offsetHeight + this.defaulttop}px`;
+    },
     getStudies(offset = 0, limit = 0) {
       const queries = this.setStudiesQueries(offset, limit);
       return this.$store.dispatch('getStudies', { queries });
