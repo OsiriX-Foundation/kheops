@@ -8,7 +8,7 @@ public enum AlbumUserPermissions {
     ADD_USER {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isAddUser();
+            return album.getUserPermission().isAddUser();
         }
     },
     REMOVE_USER {
@@ -22,7 +22,7 @@ public enum AlbumUserPermissions {
     DOWNLOAD_SERIES {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isDownloadSeries();
+            return album.getUserPermission().isDownloadSeries();
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
@@ -32,7 +32,7 @@ public enum AlbumUserPermissions {
     SEND_SERIES {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isSendSeries();
+            return album.getUserPermission().isSendSeries();
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
@@ -42,7 +42,7 @@ public enum AlbumUserPermissions {
     DELETE_SERIES {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isDeleteSeries();
+            return album.getUserPermission().isDeleteSeries();
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
@@ -52,7 +52,7 @@ public enum AlbumUserPermissions {
     ADD_SERIES {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isAddSeries();
+            return album.getUserPermission().isAddSeries();
         }
         @Override
         public boolean hasCapabilityPermission(Capability capability) {
@@ -76,7 +76,7 @@ public enum AlbumUserPermissions {
     WRITE_COMMENT {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isWriteComments();
+            return album.getUserPermission().isWriteComments();
         }
     },
     READ_COMMENT {
@@ -100,7 +100,7 @@ public enum AlbumUserPermissions {
     EDIT_FAVORITES {
         @Override
         public boolean hasUserPermission(Album album) {
-            return album.isAddSeries();
+            return album.getUserPermission().isAddSeries();
         }
     },
     MANAGE_DICOM_SR,

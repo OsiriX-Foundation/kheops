@@ -7,6 +7,7 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.entity.UserPermission;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -76,7 +77,8 @@ public class Users {
             user.setInbox(inbox);
             final UsersPermission usersPermission = new UsersPermission();
             usersPermission.setInboxPermission();
-            inbox.setPermission(usersPermission);
+            UserPermission userPermission = new UserPermission(usersPermission);
+            inbox.setUserPermission(userPermission);
 
             final AlbumUser albumUser = new AlbumUser(inbox, user, false);
             albumUser.setNewCommentNotifications(false);

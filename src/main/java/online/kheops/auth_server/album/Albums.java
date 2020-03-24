@@ -91,12 +91,12 @@ public class Albums {
                 if (description != null) {
                     editAlbum.setDescription(description);
                 }
-                usersPermission.getAddUser().ifPresent(editAlbum::setAddUser);
-                usersPermission.getDownloadSeries().ifPresent(editAlbum::setDownloadSeries);
-                usersPermission.getSendSeries().ifPresent(editAlbum::setSendSeries);
-                usersPermission.getDeleteSeries().ifPresent(editAlbum::setDeleteSeries);
-                usersPermission.getAddSeries().ifPresent(editAlbum::setAddSeries);
-                usersPermission.getWriteComments().ifPresent(editAlbum::setWriteComments);
+                usersPermission.getAddUser().ifPresent(editAlbum.getUserPermission()::setAddUser);
+                usersPermission.getDownloadSeries().ifPresent(editAlbum.getUserPermission()::setDownloadSeries);
+                usersPermission.getSendSeries().ifPresent(editAlbum.getUserPermission()::setSendSeries);
+                usersPermission.getDeleteSeries().ifPresent(editAlbum.getUserPermission()::setDeleteSeries);
+                usersPermission.getAddSeries().ifPresent(editAlbum.getUserPermission()::setAddSeries);
+                usersPermission.getWriteComments().ifPresent(editAlbum.getUserPermission()::setWriteComments);
 
                 Mutation mutation = Events.albumPostEditMutation(callingUser, editAlbum);
                 editAlbum.updateLastEventTime();
