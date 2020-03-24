@@ -291,8 +291,6 @@ export default {
       }
     },
     getStudyByUID(StudyUID) {
-      console.log(this.studies);
-      console.log(StudyUID)
       return this.studies.filter((study) => {
         if (study.StudyInstanceUID !== undefined && study.StudyInstanceUID.Value !== undefined) {
           return study.StudyInstanceUID.Value[0] === StudyUID;
@@ -301,12 +299,7 @@ export default {
       });
     },
     sortingChanged(ctx) {
-      console.log(ctx);
-      /*
-      this.studiesParams.sortDesc = ctx.sortDesc;
-      this.studiesParams.sortBy = ctx.sortBy;
-      this.searchStudies();
-      */
+      this.$emit('sorting-changed', ctx);
     },
     setItemHover(item, index) {
       this.studies[index].flag.is_hover = true;

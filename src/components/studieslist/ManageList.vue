@@ -1,25 +1,11 @@
 <template>
   <div>
-    <input
-      id="file"
-      ref="inputfiles"
-      type="file"
-      name="file"
-      class="inputfile"
-      multiple
-      :disabled="sendingFiles"
-      @change="inputLoadFiles"
-    >
-    <input
-      id="directory"
-      ref="inputdir"
-      type="file"
-      name="file"
-      class="inputfile"
-      webkitdirectory
-      :disabled="sendingFiles"
-      @change="inputLoadDirectories"
-    >
+    <study-input-file
+      @loadfiles="inputLoadFiles"
+    />
+    <study-input-directory
+      @loaddirectories="inputLoadFiles"
+    />
     <list-headers
       :id="headerID"
       :studies="studies"
@@ -37,6 +23,7 @@
       v-if="topstyle !== null"
       :permissions="permissions"
       :topstyle="topstyle"
+      @sorting-changed="sortingChanged"
     />
     <infinite-loading
       ref="infiniteLoading"
@@ -81,11 +68,13 @@ import InfiniteLoading from 'vue-infinite-loading';
 import Loading from '@/components/globalloading/Loading';
 import StudiesList from '@/components/studieslist/StudiesList';
 import ListHeaders from '@/components/studieslist/ListHeaders';
+import StudyInputFile from '@/components/study/StudyInputFile';
+import StudyInputDirectory from '@/components/study/StudyInputDirectory';
 
 export default {
   name: 'ManageList',
   components: {
-    ListHeaders, InfiniteLoading, Loading, StudiesList,
+    ListHeaders, InfiniteLoading, Loading, StudiesList, StudyInputFile, StudyInputDirectory,
   },
   props: {
     permissions: {
@@ -132,7 +121,22 @@ export default {
   mounted() {
     this.setTopstyle();
   },
+  created() {
+    this.initData();
+    this.setAlbumInbox();
+    // this.setFilters();
+    // this.setQueryParams();
+  },
+  onDestroyed() {
+    this.initData();
+  },
   methods: {
+    initData() {
+      const source = this.albumID === undefined ? 'inbox' : this.albumID;
+      this.$store.dispatch('initStudies', source);
+      this.$store.dispatch('initSeries');
+      this.$store.dispatch('initModalities');
+    },
     setTopstyle() {
       const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
       this.topstyle = `${elStickyHeader.offsetHeight + this.defaulttop}px`;
@@ -155,6 +159,16 @@ export default {
         });
       } else {
         this.setAlbumInbox();
+      }
+    },
+    setAlbumInbox() {
+      if (this.albumID !== undefined) {
+        if (!this.currentuserOnView) {
+          this.$store.dispatch('getProviders', { albumID: this.albumID });
+        }
+        this.$store.dispatch('setModalitiesAlbum');
+      } else {
+        this.$store.dispatch('getInboxInfo');
       }
     },
     // https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
@@ -221,17 +235,16 @@ export default {
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
     },
-    inputLoadFiles() {
-      if (this.$refs.inputfiles.files.length > 0) {
-        const filesFromInput = this.$refs.inputfiles.files;
-        this.$emit('loadfiles', filesFromInput);
-      }
+    inputLoadFiles(filesFromInput) {
+      this.$emit('loadfiles', filesFromInput);
     },
-    inputLoadDirectories() {
-      if (this.$refs.inputdir.files.length > 0) {
-        const filesFromInput = this.$refs.inputdir.files;
-        this.$emit('loaddirectories', filesFromInput);
-      }
+    inputLoadDirectories(filesFromInput) {
+      this.$emit('loaddirectories', filesFromInput);
+    },
+    sortingChanged(ctx) {
+      this.studiesParams.sortDesc = ctx.sortDesc;
+      this.studiesParams.sortBy = ctx.sortBy;
+      this.searchStudies();
     },
   },
 };
