@@ -71,12 +71,10 @@ public class Study {
     @Column(name = "populated")
     private boolean populated = false;
 
-    @OneToMany
-    @JoinColumn(name = "study_fk", nullable = false)
+    @OneToMany(mappedBy = "study")
     private Set<Series> series = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "study_fk", nullable=true)
+    @OneToMany(mappedBy = "study")
     private Set<Event> events = new HashSet<>();
 
     @PrePersist

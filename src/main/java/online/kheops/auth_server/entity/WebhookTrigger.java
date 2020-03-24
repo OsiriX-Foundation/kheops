@@ -32,10 +32,12 @@ public class WebhookTrigger {
     @Column(name = "new_user")
     private Boolean newUser;
 
-    @OneToMany
-    @JoinColumn (name = "webhook_trigger_fk", nullable = false)
+    @OneToMany(mappedBy = "webhookTrigger")
     @OrderBy("attempt desc")
     private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
+
+    @OneToMany(mappedBy = "webhookTrigger")
+    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
     @ManyToOne
     @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
@@ -44,11 +46,6 @@ public class WebhookTrigger {
     @OneToOne
     @JoinColumn(name = "user_fk", unique = false, nullable = true, updatable = false)
     private User user;
-
-    @OneToMany
-    @JoinColumn(name = "webhook_trigger_fk", nullable = false)
-    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
-
 
 
     public WebhookTrigger() {}

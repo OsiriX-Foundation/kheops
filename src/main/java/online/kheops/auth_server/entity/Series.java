@@ -59,16 +59,13 @@ public class Series {
     @JoinColumn(name = "study_fk", insertable=false, updatable=false)
     private Study study;
 
-    @OneToMany
-    @JoinColumn (name = "series_fk", nullable = false)
+    @OneToMany(mappedBy = "series")
     private Set<AlbumSeries> albumsSeries = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "series_fk", nullable=true)
+    @OneToMany(mappedBy = "series")
     private Set<Mutation> mutations = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn(name = "series_fk", nullable = false)
+    @OneToMany(mappedBy = "series")
     private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
     public Series() {}

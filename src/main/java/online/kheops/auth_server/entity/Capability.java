@@ -87,8 +87,7 @@ public class Capability {
     @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
     private Album album;
 
-    @OneToMany
-    @JoinColumn (name = "capability_fk")
+    @OneToMany(mappedBy = "capability")
     private Set<Mutation> mutations = new HashSet<>();
 
     @PrePersist

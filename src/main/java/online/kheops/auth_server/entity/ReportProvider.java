@@ -43,8 +43,7 @@ public class ReportProvider {
     @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
     private Album album;
 
-    @OneToMany
-    @JoinColumn (name = "report_provider_fk", nullable=true)
+    @OneToMany(mappedBy = "reportProvider")
     private Set<Mutation> mutations = new HashSet<>();
 
     @PrePersist

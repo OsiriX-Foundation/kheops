@@ -37,28 +37,23 @@ public class User {
     @Column(name = "name")
     private String name;
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OrderColumn(name = "pk")
+    @OneToMany(mappedBy = "user")
     private Set<AlbumUser> albumUser = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<Webhook> webhooks = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<Event> events = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "private_target_user_fk", nullable=true)
+    @OneToMany(mappedBy = "privateTargetUser")
     private Set<Event> privateEvent = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "to_user_fk", nullable=true)
+    @OneToMany(mappedBy = "toUser")
     private Set<Mutation> mutations = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.MERGE)

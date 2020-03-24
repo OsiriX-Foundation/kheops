@@ -56,8 +56,7 @@ public class Webhook {
     @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
     private User user;
 
-    @OneToMany
-    @JoinColumn (name = "webhook_fk", nullable = false)
+    @OneToMany(mappedBy = "webhook")
     @OrderBy("pk DESC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 

@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Table(name = "album_user")
 
 public class AlbumUser {
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")

@@ -61,31 +61,25 @@ public class Album {
     @Column(name = "write_comments_permission")
     private boolean writeComments;
 
-    @OneToMany
-    @JoinColumn (name = "album_fk",nullable = false)
+    @OneToMany(mappedBy = "album")
     private Set<AlbumSeries> albumSeries = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "album_fk", nullable = false)
+    @OneToMany(mappedBy = "album")
     private Set<AlbumUser> albumUser = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "album_fk", nullable = false)
+    @OneToMany(mappedBy = "album")
     private Set<Webhook> webhooks = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "album_fk", nullable = true)
+    @OneToMany(mappedBy = "album")
     private Set<Event> events = new HashSet<>();
 
     @OneToOne(mappedBy = "inbox")
     private User inboxUser;
 
-    @OneToMany
-    @JoinColumn (name = "album_fk")
+    @OneToMany(mappedBy = "album")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "album_fk", nullable = false)
+    @OneToMany(mappedBy = "album")
     private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist
