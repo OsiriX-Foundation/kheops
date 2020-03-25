@@ -77,14 +77,10 @@
                 <template
                   slot="reportprovider"
                 >
-                  <!--
-                  <icon-list-providers
+                  <manage-providers
                     :study="row.item"
-                    :providers="providersEnable"
-                    :album-id="source.key === 'album' ? source.value : ''"
-                    @dropdownState="setShowIcons"
+                    :source="source"
                   />
-                  -->
                 </template>
               </list-icons>
             </div>
@@ -117,14 +113,14 @@
 import { mapGetters } from 'vuex';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import ListIcons from '@/components/studieslist/ListIcons';
-import IconListProviders from '@/components/providers/IconListProviders.vue';
+import ManageProviders from '@/components/studieslist/ManageProviders.vue';
 import ListItemDetails from '@/components/studieslist/ListItemDetails.vue';
 import StudyCheckbox from '@/components/studieslist/StudyCheckbox.vue';
 
 export default {
   name: 'StudiesList',
   components: {
-    ListIcons, IconListProviders, ListItemDetails, StudyCheckbox,
+    ListIcons, ManageProviders, ListItemDetails, StudyCheckbox,
   },
   props: {
     permissions: {
