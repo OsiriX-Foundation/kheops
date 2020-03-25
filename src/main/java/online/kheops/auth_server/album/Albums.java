@@ -143,16 +143,16 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
+            for (Event event:album.getEvents()) {
+                em.remove(event);
+            }
+
             for (ReportProvider reportProvider:album.getReportProviders()) {
                 em.remove(reportProvider);
             }
 
             for (AlbumUser albumUser:album.getAlbumUser()) {
                 em.remove(albumUser);
-            }
-
-            for (Event event:album.getEvents()) {
-                em.remove(event);
             }
 
             for (Capability capability:album.getCapabilities()) {
