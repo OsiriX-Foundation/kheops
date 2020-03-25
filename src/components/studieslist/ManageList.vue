@@ -98,25 +98,27 @@ export default {
         sortDesc: true,
         sortBy: 'StudyDate',
       },
-      filters: {
-        PatientName: '',
-        PatientID: '',
-        StudyDescription: '',
-        StudyDateFrom: '',
-        StudyDateTo: '',
-        ModalitiesInStudy: '',
-      },
       headerID: 'listheaders',
       topstyle: null,
       defaulttop: 69,
+      tmpFilters: {},
     };
   },
   computed: {
     ...mapGetters({
       source: 'source',
       studies: 'studies',
-      sendingFiles: 'sending',
+      filters: 'filters',
     }),
+  },
+  watch: {
+    filters: {
+      handler() {
+        // const noFiltersSet = Object.values(this.filters).every((filterValue) => filterValue === '');
+        this.searchStudies();
+      },
+      deep: true,
+    },
   },
   mounted() {
     this.setTopstyle();
@@ -124,13 +126,53 @@ export default {
   created() {
     this.initData();
     this.setAlbumInbox();
-    // this.setFilters();
+    this.setFilters();
     // this.setQueryParams();
   },
   onDestroyed() {
     this.initData();
   },
   methods: {
+    setQueryParams() {
+      if (this.$route.query.StudyInstanceUID !== undefined) {
+        this.firstScrollTo = decodeURIComponent(Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID[0] : this.$route.query.StudyInstanceUID);
+      }
+      if (this.$route.query.sort !== undefined) {
+        const sort = decodeURIComponent(Array.isArray(this.$route.query.sort) ? this.$route.query.sort[0] : this.$route.query.sort);
+        if (this.sortable.includes(sort.replace('-', ''))) {
+          this.studiesParams.sortDesc = sort.includes('-');
+          this.studiesParams.sortBy = sort.replace('-', '');
+        }
+      }
+    },
+    setFilters() {
+      let showFilters = false;
+      const filters = {};
+      Object.keys(this.$route.query).forEach((key) => {
+        const value = decodeURIComponent(Array.isArray(this.$route.query[key]) ? this.$route.query[key][0] : this.$route.query[key]);
+        if (this.filters[key] !== undefined && key !== 'StudyDateFrom' && key !== 'StudyDateTo') {
+          filters[key] = value;
+          showFilters = true;
+        }
+        if (key === 'StudyDate') {
+          let date = [];
+          if (value.includes('-')) {
+            date = value.split('-');
+          } else {
+            date.push(value);
+            date.push(value);
+          }
+          filters.StudyDateFrom = this.dateFormatter(date[0]);
+          filters.StudyDateTo = this.dateFormatter(date[1]);
+          showFilters = true;
+        }
+      });
+      if (showFilters === true) {
+        // this.changeFilterValue();
+        this.$store.dispatch('setShowFilters', showFilters);
+        this.$store.dispatch('setFilters', filters);
+      }
+    },
     initData() {
       const source = this.albumID === undefined ? 'inbox' : this.albumID;
       this.$store.dispatch('initStudies', source);
@@ -143,6 +185,7 @@ export default {
     },
     getStudies(offset = 0, limit = 0) {
       const queries = this.setStudiesQueries(offset, limit);
+      this.tmpFilters = { ...this.filters };
       return this.$store.dispatch('getStudies', { queries });
     },
     searchStudies() {
@@ -186,6 +229,9 @@ export default {
         } else if (res.status === 204 && res.data.length === 0) {
           $state.complete();
         }
+        if (this.checkFilters() === false) {
+          this.searchStudies();
+        }
       }).catch((err) => {
         console.log(err);
         if (err.response !== undefined && err.response.status !== undefined) {
@@ -194,6 +240,18 @@ export default {
         $state.error();
         return err;
       });
+    },
+    checkFilters() {
+      if (Object.keys(this.tmpFilters).length > 0) {
+        if (Object.keys(this.tmpFilters).length !== Object.keys(this.filters).length) {
+          return false;
+        }
+        const difference = Object.keys(this.filters).every((key) => {
+          return (this.tmpFilters[key] === this.filters[key]);
+        });
+        return difference;
+      }
+      return true;
     },
     setStudiesQueries(offset = 0, limit = 0) {
       const params = {

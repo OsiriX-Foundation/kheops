@@ -19,6 +19,149 @@
         @row-clicked="showRowDetails"
       >
         <!--
+          HEADER TABLE
+        -->
+        <template
+          v-slot:head(PatientName)="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <div class="d-flex">
+              <div class="flex-fill">
+                <input
+                  v-model="filters.PatientName"
+                  v-focus
+                  type="search"
+                  class="form-control form-control-sm"
+                  :placeholder="$t('study.filter')"
+                >
+              </div>
+              <span>
+                <select
+                  v-model="filters.ModalitiesInStudy"
+                  class="form-control form-control-sm d-block d-sm-none"
+                  :placeholder="$t('study.filter')"
+                >
+                  <option value="" />
+                  <option
+                    v-for="modality in modalities"
+                    :key="modality.id"
+                    :value="modality"
+                  >
+                    {{ modality }}
+                  </option>
+                </select>
+              </span>
+            </div>
+            <br>
+          </div>
+          {{ data.label }}
+        </template>
+
+        <template
+          v-slot:head(PatientID)="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <input
+              v-model="filters.PatientID"
+              type="search"
+              class="form-control form-control-sm"
+              :placeholder="$t('study.filter')"
+            > <br>
+          </div>
+          {{ data.label }}
+        </template>
+
+        <template
+          v-slot:head(StudyDescription)="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <input
+              v-model="filters.StudyDescription"
+              type="search"
+              class="form-control form-control-sm"
+              :placeholder="$t('study.filter')"
+            > <br>
+          </div>
+          {{ data.label }}
+        </template>
+
+        <template
+          v-slot:head(StudyDate)="data"
+        >
+          <div
+            v-if="showFilters"
+            class="form-row"
+            @click.stop=""
+          >
+            <div class="col form-inline">
+              <div class="form-group">
+                <datepicker
+                  v-model="filters.StudyDateFrom"
+                  :disabled-dates="disabledFromDates"
+                  input-class="form-control form-control-sm  search-calendar"
+                  wrapper-class="wrapper-class"
+                  calendar-class="calendar-class"
+                  :placeholder="$t('study.fromDate')"
+                  :clear-button="true"
+                  :typeable="true"
+                />
+              </div>
+            </div>
+
+            <div class="col form-inline">
+              <div class="form-group">
+                <datepicker
+                  v-model="filters.StudyDateTo"
+                  :disabled-dates="disabledToDates"
+                  input-class="form-control form-control-sm search-calendar"
+                  wrapper-class="wrapper-class"
+                  calendar-class="calendar-class"
+                  :placeholder="$t('study.toDate')"
+                  :clear-button="true"
+                  :typeable="true"
+                />
+              </div>
+            </div>
+          </div>
+          <br v-if="showFilters">
+          {{ data.label }}
+        </template>
+
+        <template
+          v-slot:head(ModalitiesInStudy)="data"
+        >
+          <div
+            v-if="showFilters"
+            @click.stop=""
+          >
+            <select
+              v-model="filters.ModalitiesInStudy"
+              class="form-control form-control-sm display-inline"
+            >
+              <option value="" />
+              <option
+                v-for="modality in modalities"
+                :key="modality.id"
+                :value="modality"
+              >
+                {{ modality }}
+              </option>
+            </select>
+            <br>
+            <br>
+          </div>
+          {{ data.label }}
+        </template>
+        <!--
           CONTENT TABLE
         -->
         <template
@@ -111,6 +254,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
+import Datepicker from 'vuejs-datepicker';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import ListIcons from '@/components/studieslist/ListIcons';
 import ManageProviders from '@/components/studieslist/ManageProviders.vue';
@@ -120,7 +264,7 @@ import StudyCheckbox from '@/components/studieslist/StudyCheckbox.vue';
 export default {
   name: 'StudiesList',
   components: {
-    ListIcons, ManageProviders, ListItemDetails, StudyCheckbox,
+    ListIcons, ManageProviders, ListItemDetails, StudyCheckbox, Datepicker,
   },
   props: {
     permissions: {
@@ -249,10 +393,24 @@ export default {
   computed: {
     ...mapGetters({
       studies: 'studies',
+      modalities: 'modalities',
       source: 'source',
+      showFilters: 'showFilters',
+      filters: 'filters',
     }),
     mobiledetect() {
       return mobiledetect.mobileAndTabletcheck();
+    },
+    disabledToDates() {
+      return {
+        to: this.filters.StudyDateFrom,
+        from: new Date(),
+      };
+    },
+    disabledFromDates() {
+      return {
+        from: new Date(),
+      };
     },
   },
   created() {

@@ -202,7 +202,6 @@ export default {
     return {
       formSendStudy: false,
       confirmDelete: false,
-      showFilters: false,
       albumNameMaxLength: 25,
     };
   },
@@ -210,6 +209,7 @@ export default {
     ...mapGetters({
       series: 'series',
       source: 'source',
+      showFilters: 'showFilters',
     }),
     selectedStudiesNb() {
       return _.filter(this.studies, (s) => (s.flag.is_selected === true || s.flag.is_indeterminate === true)).length;
@@ -494,8 +494,10 @@ export default {
       });
     },
     setFilters() {
-      this.showFilters = !this.showFilters;
-      this.$emit('setFilters', this.showFilters);
+      this.$store.dispatch('setShowFilters', !this.showFilters);
+      if (this.showFilters === false) {
+        this.$store.dispatch('initFilters');
+      }
     },
     reloadStudies() {
       this.$emit('reloadStudies');
