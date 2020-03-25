@@ -56,7 +56,7 @@ public class Series {
     private boolean populated = false;
 
     @ManyToOne
-    @JoinColumn(name = "study_fk", insertable=false, updatable=false)
+    @JoinColumn(name = "study_fk", insertable = true, updatable=false)
     private Study study;
 
     @OneToMany(mappedBy = "series")

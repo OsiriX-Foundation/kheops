@@ -76,7 +76,7 @@ public class Capability {
     private boolean writePermission ;
 
     @ManyToOne
-    @JoinColumn(name = "user_fk", insertable=false, updatable=false)
+    @JoinColumn(name = "user_fk", insertable = true, updatable=false)
     private User user;
 
     @Basic(optional = false)
@@ -84,7 +84,7 @@ public class Capability {
     private String scopeType ;
 
     @ManyToOne
-    @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
+    @JoinColumn(name = "album_fk ", insertable = true, updatable=false)
     private Album album;
 
     @OneToMany(mappedBy = "capability")

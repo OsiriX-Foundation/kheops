@@ -40,7 +40,7 @@ public class WebhookTrigger {
     private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "webhook_fk", nullable=false, insertable = true, updatable = false)
     private Webhook webhook;
 
     @OneToOne

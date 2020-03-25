@@ -19,19 +19,19 @@ public abstract class Event {
     private LocalDateTime eventTime;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=true, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "study_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn (name = "study_fk", nullable=true, insertable = true, updatable = false)
     private Study study;
 
     @ManyToOne
-    @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = true, updatable = false)
     private User privateTargetUser;
 
     @PrePersist

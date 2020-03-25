@@ -10,19 +10,19 @@ import java.util.Optional;
 public class Mutation extends Event{
 
     @ManyToOne
-    @JoinColumn(name = "to_user_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn(name = "to_user_fk", nullable=true, insertable = true, updatable = false)
     private User toUser;
 
     @ManyToOne
-    @JoinColumn(name = "series_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn(name = "series_fk", nullable=true, insertable = true, updatable = false)
     private Series series;
 
     @ManyToOne
-    @JoinColumn(name = "capability_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn(name = "capability_fk", nullable=true, insertable = true, updatable = false)
     private Capability capability;
 
     @ManyToOne
-    @JoinColumn(name = "report_provider_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn(name = "report_provider_fk", nullable=true, insertable = true, updatable = false)
     private ReportProvider reportProvider;
 
     @Basic(optional = false)

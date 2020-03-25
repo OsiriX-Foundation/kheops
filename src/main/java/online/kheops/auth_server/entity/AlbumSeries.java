@@ -17,11 +17,11 @@ public class AlbumSeries {
     private boolean favorite   = true;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+     @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "series_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "series_fk", nullable=false, insertable = true, updatable = false)
     private Series series;
 
     public AlbumSeries() {}

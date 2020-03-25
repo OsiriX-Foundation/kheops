@@ -40,7 +40,7 @@ public class ReportProvider {
     private boolean removed;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @OneToMany(mappedBy = "reportProvider")

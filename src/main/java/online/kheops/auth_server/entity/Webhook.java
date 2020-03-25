@@ -49,11 +49,11 @@ public class Webhook {
     private Boolean enabled;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
     @OneToMany(mappedBy = "webhook")

@@ -13,11 +13,11 @@ public class WebhookTriggerSeries {
     private long pk;
 
     @ManyToOne
-    @JoinColumn (name = "webhook_trigger_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "webhook_trigger_fk", nullable=false, insertable = true, updatable = false)
     private WebhookTrigger webhookTrigger;
 
     @ManyToOne
-    @JoinColumn (name = "series_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "series_fk", nullable=false, insertable = true, updatable = false)
     private Series series;
 
     public WebhookTriggerSeries() {}

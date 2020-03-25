@@ -24,7 +24,7 @@ public class WebhookAttempt {
     private LocalDateTime time;
 
     @ManyToOne
-    @JoinColumn (name = "webhook_trigger_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "webhook_trigger_fk", nullable=false, insertable = true, updatable = false)
     private WebhookTrigger webhookTrigger;
 
     private WebhookAttempt() {}
