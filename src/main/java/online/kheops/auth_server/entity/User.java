@@ -7,7 +7,9 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +42,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OrderColumn(name = "pk")
     @OneToMany(mappedBy = "user")
     private Set<AlbumUser> albumUser = new HashSet<>();
 
@@ -91,9 +92,7 @@ public class User {
         return capabilities;
     }
 
-    public Set<AlbumUser> getAlbumUser() {
-        return albumUser;
-    }
+    public Set<AlbumUser> getAlbumUser() { return albumUser; }
 
     public void addAlbumUser(AlbumUser albumUser) { this.albumUser.add(albumUser); }
 
