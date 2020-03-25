@@ -17,7 +17,7 @@ public class AlbumSeries {
     private boolean favorite   = true;
 
     @ManyToOne
-     @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne

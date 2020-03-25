@@ -102,7 +102,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> seriesQuery = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where (a = u.inbox or au.admin = true or a.sendSeries = true)and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            TypedQuery<Series> seriesQuery = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where (a = u.inbox or au.admin = true or a.userPermission.sendSeries = true)and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
             seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
             seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             seriesQuery.setParameter("callingUser", callingUser);
@@ -153,7 +153,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and (au.admin = true or a.sendSeries = true)", Series.class);
+            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and (au.admin = true or a.userPermission.sendSeries = true)", Series.class);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
