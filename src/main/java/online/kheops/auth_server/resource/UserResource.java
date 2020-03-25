@@ -238,6 +238,9 @@ public class UserResource {
             final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
             return Response.ok().entity(userResponse).build();
+
+        } catch (NotAuthorizedException e) {
+            return Response.status(UNAUTHORIZED).build();
         } catch (ProcessingException | WebApplicationException e) {
             return Response.status(BAD_GATEWAY).build();
         } catch (URISyntaxException e) {

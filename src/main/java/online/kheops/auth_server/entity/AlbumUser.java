@@ -30,11 +30,11 @@ public class AlbumUser {
     private boolean admin = false;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, updatable = false)
     private User user;
 
     public AlbumUser () {}
