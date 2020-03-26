@@ -52,7 +52,16 @@
           :class="['dropzone-area', classDragIn]"
         >
           <slot name="dropzone-content">
+            <!--
             <list
+              ref="list"
+              :permissions="permissions"
+              :album-i-d="albumID"
+              @loadfiles="inputLoadFiles"
+              @loaddirectories="inputLoadFiles"
+            />
+            -->
+            <manage-list
               ref="list"
               :permissions="permissions"
               :album-i-d="albumID"
@@ -70,11 +79,12 @@
 import { mapGetters } from 'vuex';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import List from '@/components/studieslist/List';
+import ManageList from '@/components/studieslist/ManageList';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
   name: 'ComponentDragAndDrop',
-  components: { KheopsClipLoader, List },
+  components: { KheopsClipLoader, List, ManageList },
   props: {
     permissions: {
       type: Object,
@@ -188,6 +198,7 @@ export default {
       }
     },
     inputLoadFiles(filesFromInput) {
+      console.log(filesFromInput);
       const arrayFiles = [];
       for (let i = 0; i < filesFromInput.length; i += 1) {
         const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name;

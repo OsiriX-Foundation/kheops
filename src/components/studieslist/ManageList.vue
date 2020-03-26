@@ -325,10 +325,14 @@ export default {
       return moment(date).format('YYYYMMDD');
     },
     inputLoadFiles(filesFromInput) {
-      this.$emit('loadfiles', filesFromInput);
+      if (filesFromInput.length > 0) {
+        this.$emit('loadfiles', filesFromInput);
+      }
     },
     inputLoadDirectories(filesFromInput) {
-      this.$emit('loaddirectories', filesFromInput);
+      if (filesFromInput.length > 0) {
+        this.$emit('loaddirectories', filesFromInput);
+      }
     },
     sortingChanged(ctx) {
       this.studiesParams.sortDesc = ctx.sortDesc;

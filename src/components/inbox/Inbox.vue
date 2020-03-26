@@ -2,7 +2,8 @@
   <div>
     <component-import-study
       :permissions="permissions"
-    >
+    />
+    <!--
       <template
         slot="dropzone-content"
       >
@@ -11,6 +12,7 @@
         />
       </template>
     </component-import-study>
+    -->
   </div>
 </template>
 

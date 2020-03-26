@@ -158,7 +158,7 @@ const actions = {
   deleteStudy({ commit }, params) {
     const request = `/studies/${params.StudyInstanceUID}`;
     return HTTP.delete(request).then(() => {
-      commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
+      commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID, source: params.source });
       commit('DELETE_SERIE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
       return true;
     }).catch((err) => {

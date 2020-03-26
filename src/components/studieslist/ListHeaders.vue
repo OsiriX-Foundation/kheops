@@ -370,7 +370,7 @@ export default {
     },
     deleteSelectedStudies() {
       this.selectedStudies.forEach((study) => {
-        const source = this.albumId === undefined ? 'inbox' : this.albumId;
+        const source = this.albumId === undefined || this.albumId === '' ? 'inbox' : this.albumId;
         const params = {
           StudyInstanceUID: study.StudyInstanceUID.Value[0],
           source,
