@@ -475,7 +475,7 @@ public class Sending {
             try {
                 final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-                if(isOrphan(storedSeries, em)) {
+                if (isOrphan(storedSeries, em)) {
                     //here the series exists but she is orphan
                     final Album inbox = callingUser.getInbox();
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
@@ -484,7 +484,7 @@ public class Sending {
 
                     kheopsLogBuilder.log();
                     return; //appropriate OK
-                } else if(isSeriesInInbox(callingUser, storedSeries, em)) {
+                } else if (isSeriesInInbox(callingUser, storedSeries, em)) {
                     kheopsLogBuilder.log();
                     return;
                 } else {
@@ -512,6 +512,8 @@ public class Sending {
 
             tx.commit();
             kheopsLogBuilder.log();
+        }catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

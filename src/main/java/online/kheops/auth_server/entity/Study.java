@@ -239,6 +239,7 @@ public class Study {
 
     public void addSeries (Series series) {
         this.series.add(series);
+        series.setStudy(this);
     }
 
     public LocalDateTime getCreatedTime() {
