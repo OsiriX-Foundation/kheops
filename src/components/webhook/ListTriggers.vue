@@ -139,6 +139,7 @@ export default {
         {
           key: 'event',
           label: this.$t('webhook.event'),
+          sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-lg-table-cell',
           formatter: (values) => this.$t(`webhook.${values}`),
@@ -146,6 +147,7 @@ export default {
         {
           key: 'attempts',
           label: this.$t('webhook.date'),
+          sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-md-table-cell',
           formatter: (values) => {
