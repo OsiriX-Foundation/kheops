@@ -212,7 +212,7 @@
                 :show-favorite-icon="permissions.add_series && $route.name !== 'viewnologin'"
                 :show-comment-icon="true"
                 :show-download-icon="permissions.download_series"
-                :show-import-icon="permissions.add_series && permissions.can_upload"
+                :show-import-icon="permissions.add_series && canUpload"
                 :show-report-provider-icon="source.key === 'album' ? true : false"
                 :show-weasis-icon="!mobiledetect"
                 :album-id="source.key === 'album' ? source.value : ''"
@@ -272,6 +272,11 @@ export default {
       type: Object,
       required: true,
       default: () => ({}),
+    },
+    canUpload: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     sortBy: {
       type: String,

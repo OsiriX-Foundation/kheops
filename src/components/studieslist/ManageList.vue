@@ -1,9 +1,11 @@
 <template>
   <div>
     <study-input-file
+      :disabled="sendingFiles"
       @loadfiles="inputLoadFiles"
     />
     <study-input-directory
+      :disabled="sendingFiles"
       @loaddirectories="inputLoadFiles"
     />
     <list-headers
@@ -13,7 +15,7 @@
       :show-album-button="permissions.send_series"
       :show-favorite-button="permissions.add_series && $route.name !== 'viewnologin'"
       :show-delete-button="permissions.delete_series"
-      :show-import-button="permissions.add_series && permissions.can_upload"
+      :show-import-button="permissions.add_series && canUpload"
       :show-inbox-button="permissions.add_inbox"
       :album-id="albumID"
       class="list-header"
@@ -22,6 +24,7 @@
     <studies-list
       v-if="topstyle !== null"
       :permissions="permissions"
+      :can-upload="canUpload"
       :topstyle="topstyle"
       :sort-by="studiesParams.sortBy"
       :sort-desc="studiesParams.sortDesc"
@@ -116,9 +119,23 @@ export default {
       source: 'source',
       studies: 'studies',
       filters: 'filters',
+      sendingFiles: 'sending',
     }),
+    canUpload() {
+      let canUpload = true;
+      if (process.env.VUE_APP_DISABLE_UPLOAD !== undefined) {
+        canUpload = !process.env.VUE_APP_DISABLE_UPLOAD.includes('true');
+      }
+      return canUpload;
+    },
   },
   watch: {
+    sendingFiles() {
+      if (!this.sendingFiles) {
+        this.updateStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit);
+        this.$refs.infiniteLoading.stateChanger.reset();
+      }
+    },
     filters: {
       handler() {
         // const noFiltersSet = Object.values(this.filters).every((filterValue) => filterValue === '');
@@ -192,6 +209,10 @@ export default {
       this.tmpFilters = { ...this.filters };
       return this.$store.dispatch('getStudies', { queries });
     },
+    updateStudies(offset = 0, limit = 0) {
+      const queries = this.setStudiesQueries(offset, limit);
+      return this.$store.dispatch('updateStudies', { queries });
+    },
     searchStudies() {
       this.studiesParams.offset = 0;
       this.$store.dispatch('initStudies', { });
@@ -207,6 +228,12 @@ export default {
       } else {
         this.setAlbumInbox();
       }
+    },
+    getAlbum() {
+      return this.$store.dispatch('getAlbum', { album_id: this.albumID }).catch((err) => {
+        this.$router.push('/albums');
+        return err;
+      });
     },
     setAlbumInbox() {
       if (this.albumID !== undefined) {

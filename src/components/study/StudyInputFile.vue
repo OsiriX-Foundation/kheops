@@ -6,19 +6,19 @@
     name="file"
     class="inputfile"
     multiple
-    :disabled="sendingFiles"
+    :disabled="disabled"
     @change="inputLoadFiles"
   >
 </template>
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
   name: 'StudyInputFile',
-  computed: {
-    ...mapGetters({
-      sendingFiles: 'sending',
-    }),
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   methods: {
     inputLoadFiles() {

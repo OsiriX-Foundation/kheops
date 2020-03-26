@@ -6,19 +6,19 @@
     name="file"
     class="inputfile"
     webkitdirectory
-    :disabled="sendingFiles"
+    :disabled="disabled"
     @change="inputLoadDirectories"
   >
 </template>
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
   name: 'StudyInputDirectory',
-  computed: {
-    ...mapGetters({
-      sendingFiles: 'sending',
-    }),
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   methods: {
     inputLoadDirectories() {

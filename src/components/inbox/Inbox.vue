@@ -20,7 +20,7 @@ import ManageList from '@/components/studieslist/ManageList';
 
 export default {
   name: 'Inbox',
-  components: { ComponentImportStudy, ManageList, },
+  components: { ComponentImportStudy, ManageList },
   props: {
   },
   data() {
@@ -29,24 +29,15 @@ export default {
         key: 'inbox',
         value: true,
       },
-    };
-  },
-  computed: {
-    permissions() {
-      let canUpload = true;
-      if (process.env.VUE_APP_DISABLE_UPLOAD !== undefined) {
-        canUpload = !process.env.VUE_APP_DISABLE_UPLOAD.includes('true');
-      }
-      return {
+      permissions: {
         add_series: true,
         delete_series: true,
         download_series: true,
         send_series: true,
         write_comments: true,
         add_inbox: false,
-        can_upload: canUpload,
-      }
-    }
+      },
+    };
   },
   watch: {
   },
