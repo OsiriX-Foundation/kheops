@@ -9,10 +9,11 @@
         :hover="mobiledetect ? false : true"
         :items="studies"
         :fields="fields"
-        :sort-desc="true"
         :no-local-sorting="true"
         :no-sort-reset="true"
         :tbody-class="'link'"
+        :sort-desc="sortDesc"
+        :sort-by="sortBy"
         @sort-changed="sortingChanged"
         @row-hovered="setItemHover"
         @row-unhovered="setItemUnhover"
@@ -271,6 +272,16 @@ export default {
       type: Object,
       required: true,
       default: () => ({}),
+    },
+    sortBy: {
+      type: String,
+      required: false,
+      default: 'StudyDate',
+    },
+    sortDesc: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     albumID: {
       type: String,

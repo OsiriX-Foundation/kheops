@@ -23,6 +23,8 @@
       v-if="topstyle !== null"
       :permissions="permissions"
       :topstyle="topstyle"
+      :sort-by="studiesParams.sortBy"
+      :sort-desc="studiesParams.sortDesc"
       @sorting-changed="sortingChanged"
     />
     <infinite-loading
@@ -102,6 +104,11 @@ export default {
       topstyle: null,
       defaulttop: 69,
       tmpFilters: {},
+      sortable: [
+        'StudyDate',
+        'PatientID',
+        'PatientName',
+      ],
     };
   },
   computed: {
@@ -127,16 +134,13 @@ export default {
     this.initData();
     this.setAlbumInbox();
     this.setFilters();
-    // this.setQueryParams();
+    this.setQueryParams();
   },
   onDestroyed() {
     this.initData();
   },
   methods: {
     setQueryParams() {
-      if (this.$route.query.StudyInstanceUID !== undefined) {
-        this.firstScrollTo = decodeURIComponent(Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID[0] : this.$route.query.StudyInstanceUID);
-      }
       if (this.$route.query.sort !== undefined) {
         const sort = decodeURIComponent(Array.isArray(this.$route.query.sort) ? this.$route.query.sort[0] : this.$route.query.sort);
         if (this.sortable.includes(sort.replace('-', ''))) {
