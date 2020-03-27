@@ -5,7 +5,9 @@ import online.kheops.auth_server.user.UsersPermission;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -39,9 +41,6 @@ public class Album {
     @Embedded private UserPermission userPermission;
 
     @OneToMany(mappedBy = "album")
-    private Set<AlbumSeries> albumSeries = new HashSet<>();
-
-    @OneToMany(mappedBy = "album")
     private Set<AlbumUser> albumUser = new HashSet<>();
 
     @OneToMany(mappedBy = "album")
@@ -58,6 +57,12 @@ public class Album {
 
     @OneToMany(mappedBy = "album")
     private Set<ReportProvider> reportProviders = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "album_series", joinColumns = @JoinColumn(name = "album_fk"))
+    @MapKeyJoinColumn(name = "series_fk")
+    @Column(name = "favorite")
+    private Map<Series, Boolean> seriesMap = new HashMap<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -111,21 +116,15 @@ public class Album {
         return true;
     }
 
-    public void addSeries(AlbumSeries albumSeries) {
-        this.albumSeries.add(albumSeries);
+    public void addSeries(Series series, Boolean fav) {
+        this.seriesMap.put(series, fav);
     }
 
     public void removeSeries(Series series, EntityManager em) {
-        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
-                .setParameter("series", series)
-                .setParameter("album", this)
-                .getSingleResult();
-        series.removeAlbumSeries(localAlbumSeries);
-        this.albumSeries.remove(localAlbumSeries);
-        em.remove(localAlbumSeries);
+        this.seriesMap.remove(series);
     }
 
-    public Set<AlbumSeries> getAlbumSeries() { return albumSeries; }
+    public Map<Series, Boolean> getSeriesMap() { return seriesMap; }
 
     public Set<AlbumUser> getAlbumUser() { return albumUser; }
 
