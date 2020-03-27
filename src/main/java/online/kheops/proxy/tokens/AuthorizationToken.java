@@ -30,7 +30,7 @@ public class AuthorizationToken {
                 final String decoded = new String(Base64.getDecoder().decode(encodedAuthorization), StandardCharsets.UTF_8);
                 String[] split = decoded.split(":");
                 if (split.length != 2) {
-                    LOG.log(Level.WARNING, "Basic authentication doesn't have a username and password");
+                    LOG.log(Level.WARNING, "Basic authentication does not contain a username and password");
                     throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
                 }
 
