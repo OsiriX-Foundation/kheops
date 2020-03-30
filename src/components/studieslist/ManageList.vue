@@ -199,6 +199,8 @@ export default {
       this.$store.dispatch('initStudies', source);
       this.$store.dispatch('initSeries');
       this.$store.dispatch('initModalities');
+      this.$store.dispatch('initFilters');
+      this.$store.dispatch('initShowFilters');
     },
     setTopstyle() {
       const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
