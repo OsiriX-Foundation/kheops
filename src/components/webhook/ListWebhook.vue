@@ -103,7 +103,7 @@ export default {
         {
           key: 'statuswebhook',
           label: '',
-          sortable: true,
+          sortable: false,
           tdClass: 'word-break',
         },
         {

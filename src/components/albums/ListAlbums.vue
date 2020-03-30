@@ -12,7 +12,8 @@
       :hover="mobiledetect ? false : true"
       :items="albums"
       :fields="fields"
-      :sort-desc="true"
+      :sort-desc="albumsParams.sortDesc"
+      :sort-by="albumsParams.sortBy"
       :no-local-sorting="true"
       :dark="false"
       :no-sort-reset="true"
@@ -37,41 +38,21 @@
             :placeholder="$t('listalbums.filter')"
           > <br>
         </div>
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
         v-slot:head(number_of_studies)="data"
       >
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
         v-slot:head(number_of_users)="data"
       >
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
         v-slot:head(number_of_comments)="data"
       >
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
@@ -106,11 +87,6 @@
           </div>
         </div>
         <br v-if="showFilters">
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
@@ -146,11 +122,6 @@
           </div>
         </div>
         <br v-if="showFilters">
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
@@ -232,14 +203,13 @@ import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
 import ListAlbumsIcons from '@/components/albums/ListAlbumsIcons';
-import SortList from '@/components/globallist/SortList.vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'Albums',
   components: {
-    InfiniteLoading, ListAlbumsHeaders, Datepicker, SortList, Loading, ListAlbumsIcons,
+    InfiniteLoading, ListAlbumsHeaders, Datepicker, Loading, ListAlbumsIcons,
   },
   data() {
     return {

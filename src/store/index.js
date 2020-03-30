@@ -13,6 +13,7 @@ import album from './modules/album';
 import tokens from './modules/tokens';
 import source from './modules/source';
 import webhooks from './modules/webhooks';
+import studiesfilters from './modules/studiesfilters';
 
 Vue.use(Vuex);
 export default new Vuex.Store({
@@ -43,5 +44,6 @@ export default new Vuex.Store({
       },
       */
     ),
+    studiesfilters,
   },
 });

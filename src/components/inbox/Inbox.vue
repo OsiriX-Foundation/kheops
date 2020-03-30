@@ -3,15 +3,26 @@
     <component-import-study
       :permissions="permissions"
     />
+    <!--
+      <template
+        slot="dropzone-content"
+      >
+        <manage-list
+          :permissions="permissions"
+        />
+      </template>
+    </component-import-study>
+    -->
   </div>
 </template>
 
 <script>
 import ComponentImportStudy from '@/components/study/ComponentImportStudy';
+import ManageList from '@/components/studieslist/ManageList';
 
 export default {
   name: 'Inbox',
-  components: { ComponentImportStudy },
+  components: { ComponentImportStudy, ManageList },
   props: {
   },
   data() {
