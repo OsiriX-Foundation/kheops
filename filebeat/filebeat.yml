@@ -29,6 +29,8 @@ filebeat.inputs:
     paths:
       - /usr/local/tomcat/logs/localhost_access_log.*.txt
 
+    exclude_lines: ['.*/authorization/metrics.*']
+
     fields:
       docker_type: tomcat
       log_type: localhost_access_log
