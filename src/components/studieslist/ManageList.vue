@@ -22,7 +22,7 @@
       @reloadStudies="reloadStudies"
     />
     <studies-list
-      v-if="topstyle !== null"
+      v-if="topstyle !== null && firstLoading === false"
       :permissions="permissions"
       :can-upload="canUpload"
       :topstyle="topstyle"
@@ -97,6 +97,7 @@ export default {
     return {
       infiniteId: 0,
       statusList: 200,
+      firstLoading: true,
       studiesParams: {
         offset: 0,
         limit: 50,
@@ -249,6 +250,7 @@ export default {
     },
     // https://peachscript.github.io/vue-infinite-loading/old/#!/getting-started/trigger-manually
     infiniteHandler($state) {
+      this.firstLoading = this.studies.length === 0 && this.firstLoading;
       this.getStudies(this.studiesParams.offset, this.studiesParams.limit).then((res) => {
         if (res.status !== undefined) {
           this.statusList = res.status;
@@ -265,12 +267,14 @@ export default {
         if (this.checkFilters() === false) {
           this.searchStudies();
         }
+        this.firstLoading = false;
       }).catch((err) => {
         console.log(err);
         if (err.response !== undefined && err.response.status !== undefined) {
           this.statusList = err.response.status;
         }
         $state.error();
+        this.firstLoading = false;
         return err;
       });
     },
