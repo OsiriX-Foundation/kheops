@@ -1,11 +1,11 @@
 <template>
   <div>
     <study-input-file
-      :disabled="sendingFiles"
+      :disabled="sendingFiles && canUpload"
       @loadfiles="inputLoadFiles"
     />
     <study-input-directory
-      :disabled="sendingFiles"
+      :disabled="sendingFiles && canUpload"
       @loaddirectories="inputLoadFiles"
     />
     <list-headers
