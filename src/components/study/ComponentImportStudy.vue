@@ -198,7 +198,6 @@ export default {
       }
     },
     inputLoadFiles(filesFromInput) {
-      console.log(filesFromInput);
       const arrayFiles = [];
       for (let i = 0; i < filesFromInput.length; i += 1) {
         const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name;
