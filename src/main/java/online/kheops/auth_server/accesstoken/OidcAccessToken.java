@@ -9,8 +9,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import online.kheops.auth_server.OIDCProviderContextListener;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.keycloak.KeycloakContextListener;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.UserPrincipal;
 import org.ehcache.Cache;
@@ -77,7 +77,7 @@ public final class OidcAccessToken implements AccessToken {
     }
 
     public static final class Builder implements AccessTokenBuilder {
-        private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
+        private final String configurationUrl = OIDCProviderContextListener.getOIDCConfigurationString();
 
         private final ServletContext servletContext;
 
