@@ -24,6 +24,7 @@
       <template
         v-slot:head(PatientName)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           @click.stop=""
@@ -55,14 +56,13 @@
               </select>
             </span>
           </div>
-          <br>
         </div>
-        {{ data.label }}
       </template>
 
       <template
         v-slot:head(PatientID)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           @click.stop=""
@@ -72,14 +72,14 @@
             type="search"
             class="form-control form-control-sm"
             :placeholder="$t('study.filter')"
-          > <br>
+          >
         </div>
-        {{ data.label }}
       </template>
 
       <template
         v-slot:head(StudyDescription)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           @click.stop=""
@@ -89,14 +89,14 @@
             type="search"
             class="form-control form-control-sm"
             :placeholder="$t('study.filter')"
-          > <br>
+          >
         </div>
-        {{ data.label }}
       </template>
 
       <template
         v-slot:head(StudyDate)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           class="form-row"
@@ -132,13 +132,12 @@
             </div>
           </div>
         </div>
-        <br v-if="showFilters">
-        {{ data.label }}
       </template>
 
       <template
         v-slot:head(ModalitiesInStudy)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           @click.stop=""
@@ -156,10 +155,7 @@
               {{ modality }}
             </option>
           </select>
-          <br>
-          <br>
         </div>
-        {{ data.label }}
       </template>
       <!--
         CONTENT TABLE

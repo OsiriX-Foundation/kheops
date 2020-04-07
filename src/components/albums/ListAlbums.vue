@@ -26,6 +26,7 @@
       <template
         v-slot:head(name)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           @click.stop=""
@@ -36,9 +37,8 @@
             type="search"
             class="form-control form-control-sm"
             :placeholder="$t('listalbums.filter')"
-          > <br>
+          >
         </div>
-        {{ data.label }}
       </template>
       <template
         v-slot:head(number_of_studies)="data"
@@ -58,6 +58,7 @@
       <template
         v-slot:head(created_time)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           class="form-row"
@@ -86,12 +87,11 @@
             </div>
           </div>
         </div>
-        <br v-if="showFilters">
-        {{ data.label }}
       </template>
       <template
         v-slot:head(last_event_time)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           class="form-row"
@@ -121,8 +121,6 @@
             </div>
           </div>
         </div>
-        <br v-if="showFilters">
-        {{ data.label }}
       </template>
       <template
         v-slot:cell(is_selected)="row"
