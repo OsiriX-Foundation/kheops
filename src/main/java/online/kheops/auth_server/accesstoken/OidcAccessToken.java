@@ -162,7 +162,7 @@ public final class OidcAccessToken implements AccessToken {
                 try {
                     configurationURLs = new ConfigurationURLs(configurationEntity);
                 } catch (MalformedURLException e) {
-                    throw new DownloadKeyException("jwks_uri is not a valid URI, configuration URL:\" + configurationUrl", e);
+                    throw new DownloadKeyException("jwks_uri is not a valid URI, configuration URL:" + configurationUrl, e);
                 }
                 configurationURLsCache.put(configurationUrl, configurationURLs);
             }

@@ -216,7 +216,7 @@ public class UserResource {
 
         String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer().get());
         if (userInfoUrl == null) {
-            final String openidConfiguration = accessToken.getIssuer() + "/.well-known/openid-configuration";
+            final String openidConfiguration = accessToken.getIssuer().get() + "/.well-known/openid-configuration";
             final URI openidConfigurationURI;
 
             try {
