@@ -40,6 +40,8 @@
   </b-dropdown>
 </template>
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'DropdownImportStudy',
   props: {
@@ -67,6 +69,10 @@ export default {
     },
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+      'oidcAccessToken',
+    ]),
     albums() {
       return this.$store.getters.getAlbumsByKey(this.albumsKey);
     },
@@ -84,7 +90,12 @@ export default {
   },
   methods: {
     setAlbumsList() {
-      this.$store.dispatch('getAlbums', { queries: this.albumsQueries, key: this.albumsKey });
+      if (this.oidcIsAuthenticated) {
+        const headers = {
+          Authorization: `Bearer ${this.oidcAccessToken}`,
+        };
+        this.$store.dispatch('getAlbums', { queries: this.albumsQueries, key: this.albumsKey, headers });
+      }
     },
     createAlbum() {
       this.$emit('create-album');
