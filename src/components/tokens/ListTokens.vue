@@ -21,6 +21,7 @@
       striped
       hover
       show-empty
+      sort-icon-left
       :items="tokens"
       :fields="fields"
       :sort-desc="true"

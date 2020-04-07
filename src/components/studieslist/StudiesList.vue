@@ -5,6 +5,7 @@
     <b-table
       class="container-fluid"
       striped
+      sort-icon-left
       :hover="mobiledetect ? false : true"
       :items="studies"
       :fields="fields"

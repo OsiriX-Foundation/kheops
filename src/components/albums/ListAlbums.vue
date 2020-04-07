@@ -9,6 +9,7 @@
     />
     <b-table
       striped
+      sort-icon-left
       :hover="mobiledetect ? false : true"
       :items="albums"
       :fields="fields"

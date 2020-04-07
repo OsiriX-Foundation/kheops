@@ -19,6 +19,7 @@
       striped
       hover
       show-empty
+      sort-icon-left
       :items="webhooks"
       :fields="fields"
       :busy="loadingData"
