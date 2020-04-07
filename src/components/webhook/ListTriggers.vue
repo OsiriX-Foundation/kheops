@@ -20,6 +20,7 @@
       striped
       hover
       show-empty
+      sort-icon-left
       :items="triggers"
       :fields="fields"
       :sort-desc="true"
