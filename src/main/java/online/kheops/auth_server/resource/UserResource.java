@@ -1,11 +1,12 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
+import online.kheops.auth_server.accesstoken.OidcAccessToken;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.*;
@@ -24,7 +25,6 @@ import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -206,15 +206,15 @@ public class UserResource {
         }
 
 
-        final online.kheops.auth_server.user.AccessToken accessToken;
+        final OidcAccessToken accessToken;
         try {
-            accessToken = new online.kheops.auth_server.user.AccessToken.Builder(servletContext).build(token);
-        } catch (IdTokenVerificationException e) {
+            accessToken = new OidcAccessToken.Builder(servletContext).build(token);
+        } catch (AccessTokenVerificationException e) {
             return Response.status(BAD_REQUEST).build();
         }
 
 
-        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer());
+        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer().get());
         if (userInfoUrl == null) {
             final String openidConfiguration = accessToken.getIssuer() + "/.well-known/openid-configuration";
             final URI openidConfigurationURI;
@@ -223,7 +223,7 @@ public class UserResource {
                 openidConfigurationURI = new URI(openidConfiguration);
                 ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
                 userInfoUrl = res.userinfoEndpoint;
-                userInfoURLsCache.put(accessToken.getIssuer(), userInfoUrl);
+                userInfoURLsCache.put(accessToken.getIssuer().get(), userInfoUrl);
             } catch (ProcessingException | WebApplicationException e) {
                 return Response.status(BAD_GATEWAY).build();
             } catch (URISyntaxException e) {
@@ -262,7 +262,7 @@ public class UserResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
-        } catch (AccessTokenVerificationException e) {
+        } catch (online.kheops.auth_server.accesstoken.AccessTokenVerificationException e) {
             LOG.log(Level.INFO, "bad accesstoken", e);
             throw new ForbiddenException("Bad AccessToken");
         }

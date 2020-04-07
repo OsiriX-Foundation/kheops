@@ -1,14 +1,18 @@
-package online.kheops.auth_server.user;
+package online.kheops.auth_server.accesstoken;
 
 import com.auth0.jwk.JwkException;
 import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
-import online.kheops.auth_server.OIDCProviderContextListener;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.keycloak.KeycloakContextListener;
+import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.principal.UserPrincipal;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -26,10 +30,15 @@ import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Optional;
 
-public final class AccessToken {
+public final class OidcAccessToken implements AccessToken {
 
     private static final Client CLIENT = ClientBuilder.newClient();
+
+    private final String subject;
+    private final String actingParty;
+    private final String token;
 
     private final String issuer;
 
@@ -59,7 +68,6 @@ public final class AccessToken {
 
     private static class ConfigurationURLs {
         private URL jwksURI;
-
         private String issuer;
 
         public ConfigurationURLs(ConfigurationEntity configurationEntity) throws MalformedURLException {
@@ -68,8 +76,8 @@ public final class AccessToken {
         }
     }
 
-    public static final class Builder {
-        private final String configurationUrl = OIDCProviderContextListener.getOIDCConfigurationString();
+    public static final class Builder implements AccessTokenBuilder {
+        private final String configurationUrl = KeycloakContextListener.getKeycloakOIDCConfigurationString();
 
         private final ServletContext servletContext;
 
@@ -77,13 +85,13 @@ public final class AccessToken {
             this.servletContext = servletContext;
         }
 
-        public AccessToken build(String assertionToken) throws IdTokenVerificationException {
-            ConfigurationURLs configurationURLs = getJwksURL(configurationUrl);
+        public OidcAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+            ConfigurationURLs configurationURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
                 @Override
                 public RSAPublicKey getPublicKeyById(String kid) {
-                    return getRSAPublicKey(configurationURLs.jwksURI, kid);
+                    return getRSAPublicKey(configurationURL.jwksURI, kid);
                 }
                 // implemented to get rid of warnings
                 @Override public RSAPrivateKey getPrivateKey() {return null;}
@@ -93,35 +101,51 @@ public final class AccessToken {
             final DecodedJWT jwt;
             try {
                 jwt = JWT.require(Algorithm.RSA256(keyProvider))
-                        .acceptLeeway(60)
-                        .withIssuer(configurationURLs.issuer)
+                        .acceptLeeway(120)
+                        .withIssuer(configurationURL.issuer)
                         .acceptLeeway(60)
                         .build()
                         .verify(assertionToken);
             } catch (JWTVerificationException e) {
-                throw new IdTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
+                throw new AccessTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
+            }
+
+            if (jwt.getSubject() == null) {
+                throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
             final boolean verifyScope = Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.use.scope"));
             if (verifyScope) {
                 final Claim scopeClaim = jwt.getClaim("scope");
                 if (scopeClaim.isNull() || scopeClaim.asString() == null) {
-                    throw new IdTokenVerificationException("Missing scope claim in token");
+                    throw new AccessTokenVerificationException("Missing scope claim in token");
                 } else {
                     if (!scopeClaim.asString().contains("kheops")) {
-                        throw new IdTokenVerificationException("Missing scope 'kheops' in token");
+                        throw new AccessTokenVerificationException("Missing scope 'kheops' in token");
                     }
                 }
             }
 
-            if (jwt.getSubject() == null) {
-                throw new IdTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
-            }
-            if (jwt.getIssuer() == null) {
-                throw new IdTokenVerificationException("No Issuer present in the token, configuration URL:" + configurationUrl);
+            final String actingParty;
+            Claim actClaim = jwt.getClaim("act");
+            if (!actClaim.isNull()) {
+                try {
+                    actingParty = (String) actClaim.asMap().get("sub");
+                } catch (ClassCastException | JWTDecodeException e) {
+                    throw new AccessTokenVerificationException("Unable to read the acting party", e);
+                }
+                if (actingParty == null) {
+                    throw new AccessTokenVerificationException("Has acting party, but without a subject");
+                }
+            } else {
+                actingParty = null;
             }
 
-            return new AccessToken(jwt.getIssuer());
+            if (jwt.getIssuer() == null) {
+                throw new AccessTokenVerificationException("No Issuer present in the token, configuration URL:" + configurationUrl);
+            }
+
+            return new OidcAccessToken(jwt.getSubject(), actingParty, jwt.getIssuer(), assertionToken);
         }
 
         private static synchronized ConfigurationURLs getJwksURL(String configurationUrl) {
@@ -161,9 +185,39 @@ public final class AccessToken {
         }
     }
 
-    private AccessToken(String issuer) {
+    public OidcAccessToken(String subject, String actingParty, String issuer, String token) {
+        this.subject = subject;
+        this.actingParty = actingParty;
         this.issuer = issuer;
+        this.token = token;
     }
 
-    public String getIssuer() { return issuer; }
+    @Override
+    public String getSubject() {
+        return subject;
+    }
+
+    @Override
+    public TokenType getTokenType() {
+        return TokenType.KEYCLOAK_TOKEN;
+    }
+
+    @Override
+    public Optional<String> getScope() {
+        return Optional.of("user read write downloadbutton send");
+    }
+
+    @Override
+    public Optional<String> getActingParty() {
+        return Optional.ofNullable(actingParty);
+    }
+
+    @Override
+    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
+        return new UserPrincipal(user, actingParty, token);
+    }
+
+    @Override
+    public Optional<String> getIssuer() { return Optional.ofNullable(issuer); }
+
 }

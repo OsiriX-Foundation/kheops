@@ -1,15 +1,8 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.keycloak.Keycloak;
-import online.kheops.auth_server.keycloak.KeycloakException;
-import online.kheops.auth_server.user.IdToken;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponseBuilder;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -72,12 +65,6 @@ public class User {
 
     public User(String keycloakId) {
         this.keycloakId = keycloakId;
-    }
-
-    public User(IdToken idToken) {
-        keycloakId = idToken.getSub();
-        email = idToken.getEmail();
-        name = idToken.getName();
     }
 
     public long getPk() {
