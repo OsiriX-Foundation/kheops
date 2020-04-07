@@ -98,14 +98,15 @@ public class Users {
                 u.setName(name);
                 tx.commit();
                 return u;
-            } catch (UserNotFoundException unused) { /*empty*/ }
+            } catch (UserNotFoundException unused) {
+                throw new IllegalStateException();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return null;
     }
 
     public static List<UserResponse> searchUsersInAlbum(String search, String albumId, Integer limit, Integer offset)
