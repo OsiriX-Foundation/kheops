@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet author="kheops" id="v1.1-0.1">
-        <preConditions onFail="WARN">
+        <preConditions onFail="CONTINUE">
             <sqlCheck expectedResult="1">select count(*) from information_schema.role_table_grants where table_name='pg_extension' and privilege_type = 'INSERT'</sqlCheck>
         </preConditions>
         <sql>CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA public</sql>

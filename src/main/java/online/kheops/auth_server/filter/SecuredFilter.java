@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.WWW_AUTHENTICATE;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
 
 @Secured
@@ -61,7 +61,7 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final User user;
         try {
-            user = getOrCreateUser(accessToken.getSubject());
+            user = getUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             LOG.log(Level.WARNING, "User not found" + requestContext.getUriInfo().getRequestUri(), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());

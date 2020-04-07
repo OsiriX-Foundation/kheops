@@ -5,7 +5,6 @@
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-
     <servlet>
         <display-name>Kheops Authentication</display-name>
         <!--suppress ServletWithoutMappingInspection -->
@@ -16,12 +15,23 @@
         </init-param>
     </servlet>
 
+
     <listener>
         <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
     </listener>
     <listener>
+        <listener-class>online.kheops.auth_server.OIDCProviderContextListener</listener-class>
+    </listener>
+    <listener>
         <listener-class>online.kheops.auth_server.liquibase.LiquibaseContextListener</listener-class>
     </listener>
+    <listener>
+        <listener-class>online.kheops.auth_server.EntityManagerListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>online.kheops.auth_server.database.UpdateUsersTableContextListener</listener-class>
+    </listener>
+
 
     <context-param>
         <description>HMAC shared secret used to sign tokens</description>
@@ -69,6 +79,11 @@
         <param-value>https://keycloak.kheops.online</param-value>
     </context-param>
     <context-param>
+        <description>Uri for the keycloak API</description>
+        <param-name>online.kheops.oidc.provider</param-name>
+        <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
+    </context-param>
+    <context-param>
         <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
         <param-name>online.kheops.client.dicomwebproxyclientid</param-name>
         <param-value>DICOMWebProxy</param-value>
@@ -93,4 +108,10 @@
         <param-name>online.kheops.keycloak.realms</param-name>
         <param-value>travis</param-value>
     </context-param>
+    <context-param>
+        <description>Define if the scope 'kheosp' must be present in the access_token</description>
+        <param-name>online.kheops.use.scope</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
 </web-app>

@@ -1,25 +1,36 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
+import online.kheops.auth_server.accesstoken.OidcAccessToken;
+import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
-import online.kheops.auth_server.keycloak.Keycloak;
-import online.kheops.auth_server.keycloak.KeycloakException;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponse;
-import online.kheops.auth_server.user.UserResponseBuilder;
+import online.kheops.auth_server.user.*;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,8 +44,7 @@ import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
 import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.*;
-import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
-import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
+import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 
 @Path("/")
 public class UserResource {
@@ -45,23 +55,17 @@ public class UserResource {
         public String sub;
         @XmlElement(name = "name")
         public String name;
-        @XmlElement(name = "given_name")
-        public String givenName;
-        @XmlElement(name = "family_name")
-        public String familyName;
         @XmlElement(name = "email")
         public String email;
         @XmlElement(name = "preferred_username")
         public String preferredUsername;
 
-        private static OIDCUserInfo from(Keycloak.UserRepresentation userRepresentation) {
+        private static OIDCUserInfo from(User user) {
             OIDCUserInfo userInfo = new OIDCUserInfo();
-            userInfo.sub = userRepresentation.getId();
-            userInfo.name = userRepresentation.getFirstName() + " " + userRepresentation.getLastName();
-            userInfo.givenName = userRepresentation.getFirstName();
-            userInfo.familyName = userRepresentation.getLastName();
-            userInfo.email = userRepresentation.getEmail();
-            userInfo.preferredUsername = userRepresentation.getUsername();
+            userInfo.sub = user.getKeycloakId();
+            userInfo.name = user.getName();
+            userInfo.email = user.getEmail();
+            userInfo.preferredUsername = user.getName();
             return userInfo;
         }
     }
@@ -88,7 +92,8 @@ public class UserResource {
                                 @QueryParam("studyInstanceUID") @UIDValidator String studyInstanceUID,
                                 @QueryParam("search") String search,
                                 @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
+                                @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
         final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
@@ -104,43 +109,40 @@ public class UserResource {
 
             kheopsLogBuilder.action(ActionType.USERS_LIST);
 
-            try {
-                final List<UserResponse> result;
+            final List<UserResponse> result;
 
-                if (albumId != null) {
-                    result = searchUsersInAlbum(search, albumId, limit, offset);
-                } else if (studyInstanceUID != null) {
-                    if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
-                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                                .message(STUDY_NOT_FOUND)
-                                .detail("The study does not exist or you don't have access")
-                                .build();
-                        return Response.status(NOT_FOUND).entity(errorResponse).build();
-                    }
-                    result = searchUsersInStudy(search, studyInstanceUID, limit, offset);
-                } else {
-                    result = searchUsers(search, limit, offset);
+            if (albumId != null) {
+                result = searchUsersInAlbum(search, albumId, limit, offset);
+            } else if (studyInstanceUID != null) {
+                if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message(STUDY_NOT_FOUND)
+                            .detail("The study does not exist or you don't have access")
+                            .build();
+                    return Response.status(NOT_FOUND).entity(errorResponse).build();
                 }
-
-                kheopsLogBuilder.log();
-
-                if(result.isEmpty()) {
-                    return Response.status(NO_CONTENT).build();
-                }
-
-                final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<List<UserResponse>>(result) {};
-                return Response.status(OK).entity(genericUsersResponsesList).build();
-            } catch (KeycloakException e) {
-                LOG.log(Level.WARNING, "Keycloak error", e);
-                return Response.status(BAD_GATEWAY).entity(e.getErrorResponse()).build();
+                result = searchUsersInStudy(search, studyInstanceUID, limit, offset);
+            } else {
+                result = searchUsers(search, limit, offset);
             }
+
+            kheopsLogBuilder.log();
+
+            if(result.isEmpty()) {
+                return Response.status(NO_CONTENT).build();
+            }
+
+            final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<List<UserResponse>>(result) {};
+            return Response.status(OK).entity(genericUsersResponsesList).build();
         } else if(reference != null && search == null) {
             final UserResponseBuilder userResponseBuilder;
             kheopsLogBuilder.action(ActionType.TEST_USER);
 
             try {
-                final Keycloak keycloak = Keycloak.getInstance();
-                userResponseBuilder = keycloak.getUser(reference);
+                final User user = getUser(reference);
+                userResponseBuilder = new UserResponseBuilder().setName(user.getName())
+                        .setSub(user.getKeycloakId())
+                        .setEmail(user.getEmail());
 
                 if(albumId != null) {
                     kheopsLogBuilder.album(albumId);
@@ -156,12 +158,90 @@ public class UserResource {
                 return Response.status(OK).entity(userResponseBuilder.build()).build();
             } catch (UserNotFoundException e) {
                 return Response.status(NO_CONTENT).build();
-            } catch (KeycloakException e) {
-                LOG.log(Level.WARNING, "Keycloak error", e);
-                return Response.status(BAD_GATEWAY).entity(e.getMessage()).build();
             }
         } else {
             return Response.status(BAD_REQUEST).entity("Use query param 'search' xor 'reference'").build();
+        }
+    }
+
+    private static class ConfigurationEntity {
+        @XmlElement(name="userinfo_endpoint")
+        String userinfoEndpoint;
+    }
+    private static class UserInfoEntity {
+        @XmlElement(name="name")
+        String name;
+        @XmlElement(name="sub")
+        String sub;
+        @XmlElement(name="email")
+        String email;
+    }
+    private static final Client CLIENT = ClientBuilder.newClient();
+
+    private static final String USER_INFO_URLS_CACHE_ALIAS = "userInfoURLsCache";
+    private static CacheManager userInfoCacheManager = getUserInfoCacheManager();
+    private static Cache<String, String> userInfoURLsCache = userInfoCacheManager.getCache(USER_INFO_URLS_CACHE_ALIAS, String.class, String.class);
+
+    private static CacheManager getUserInfoCacheManager() {
+        CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                .withCache(USER_INFO_URLS_CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10))
+                        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(10))))
+                .build();
+        cacheManager.init();
+        return cacheManager;
+    }
+
+    @POST
+    @Path("register")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response register2(@FormParam("access_token") String token) {
+
+        if (token == null || token.isEmpty()) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Param 'access_token' must be set")
+                    .build();
+            return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
+
+
+        final OidcAccessToken accessToken;
+        try {
+            accessToken = new OidcAccessToken.Builder(servletContext).build(token);
+        } catch (AccessTokenVerificationException e) {
+            return Response.status(BAD_REQUEST).build();
+        }
+
+
+        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer().get());
+        if (userInfoUrl == null) {
+            final String openidConfiguration = accessToken.getIssuer().get() + "/.well-known/openid-configuration";
+            final URI openidConfigurationURI;
+
+            try {
+                openidConfigurationURI = new URI(openidConfiguration);
+                ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
+                userInfoUrl = res.userinfoEndpoint;
+                userInfoURLsCache.put(accessToken.getIssuer().get(), userInfoUrl);
+            } catch (ProcessingException | WebApplicationException e) {
+                return Response.status(BAD_GATEWAY).build();
+            } catch (URISyntaxException e) {
+                return Response.status(BAD_REQUEST).build();
+            }
+        }
+        try {
+            final URI userinfoEndpointURI;
+            userinfoEndpointURI = new URI(userInfoUrl);
+            UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token).get(UserInfoEntity.class);
+
+            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
+            final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
+            return Response.ok().entity(userResponse).build();
+        } catch (ProcessingException | WebApplicationException e) {
+            return Response.status(BAD_GATEWAY).build();
+        } catch (URISyntaxException e) {
+            return Response.status(BAD_REQUEST).build();
         }
     }
 
@@ -182,7 +262,7 @@ public class UserResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
-        } catch (AccessTokenVerificationException e) {
+        } catch (online.kheops.auth_server.accesstoken.AccessTokenVerificationException e) {
             LOG.log(Level.INFO, "bad accesstoken", e);
             throw new NotAuthorizedException("Bad AccessToken");
         }
@@ -198,8 +278,9 @@ public class UserResource {
                     .action(ActionType.USER_INFO)
                     .tokenType(accessToken.getTokenType())
                     .log();
-            return OIDCUserInfo.from(Keycloak.getInstance().getUserRepresentation(accessToken.getSubject()));
-        } catch (UserNotFoundException | KeycloakException e) {
+            final User user = getUser(accessToken.getSubject());
+            return OIDCUserInfo.from(user);
+        } catch (UserNotFoundException e) {
             LOG.log(Level.INFO, "Unable to get the user info", e);
             throw new ServerErrorException("Unable to get the user info", BAD_GATEWAY, e);
         }

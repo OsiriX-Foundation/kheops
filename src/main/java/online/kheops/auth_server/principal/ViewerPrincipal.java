@@ -12,6 +12,7 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
+import online.kheops.auth_server.user.Users;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -26,7 +27,6 @@ import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
 
 public class ViewerPrincipal implements KheopsPrincipal {
 
@@ -42,7 +42,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
 
         final User user;
         try {
-            user = getOrCreateUser(accessToken.getSubject());
+            user = Users.getUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
             throw new IllegalStateException(e);
         }

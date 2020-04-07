@@ -33,7 +33,7 @@ public class Series {
 
     public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
             throws SeriesNotFoundException{
-        return findSeriesByStudyUIDandSeriesUID(studyInstanceUID,  seriesInstanceUID, em);
+        return findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
     }
 
     public static online.kheops.auth_server.entity.Series getOrCreateSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)

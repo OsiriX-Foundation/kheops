@@ -8,6 +8,7 @@ public class UserResponseBuilder {
     private String email;
     private String firstName;
     private String lastName;
+    private String name;
     private String sub;
     private Boolean albumAccess;
     private Boolean studyAccess;
@@ -33,12 +34,15 @@ public class UserResponseBuilder {
         return this;
     }
 
+    public UserResponseBuilder setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public UserResponseBuilder setUser(User user) {
         sub = user.getKeycloakId();
-        lastName = user.getLastName();
-        firstName = user.getFirstName();
+        name = user.getName();
         email = user.getEmail();
-
         return this;
     }
 
@@ -65,12 +69,9 @@ public class UserResponseBuilder {
     public String getEmail() { return email; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
-
+    public String getName() { return name; }
     public String getSub() { return sub; }
-
     public Boolean getAlbumAccess() { return albumAccess; }
-
     public Boolean getStudyAccess() { return studyAccess; }
-
     public Optional<Boolean> getCanAccess() { return canAccess; }
 }

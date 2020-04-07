@@ -1,14 +1,8 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.keycloak.Keycloak;
-import online.kheops.auth_server.keycloak.KeycloakException;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponseBuilder;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -27,6 +21,14 @@ public class User {
     @Basic(optional = false)
     @Column(name = "keycloak_id")
     private String keycloakId;
+
+    @Basic()
+    @Column(name = "email")
+    private String email;
+
+    @Basic()
+    @Column(name = "name")
+    private String name;
 
     @OneToMany
     @JoinColumn (name = "user_fk", nullable=false)
@@ -74,34 +76,7 @@ public class User {
     }
 
     public String getEmail() {
-        try {
-            final Keycloak keycloak = Keycloak.getInstance();
-            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
-            return userResponseBuilder.getEmail();
-        } catch (UserNotFoundException | KeycloakException e) {
-            LOG.log(Level.SEVERE, "Error getting email", e);
-            return "UNKNOWN";//TODO
-        }
-    }
-    public String getLastName() {
-        try {
-            final Keycloak keycloak = Keycloak.getInstance();
-            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
-            return userResponseBuilder.getLastName();
-        } catch (UserNotFoundException | KeycloakException e) {
-            LOG.log(Level.SEVERE, "Error getting lastName", e);
-            return "UNKNOWN";//TODO
-        }
-    }
-    public String getFirstName() {
-        try {
-            final Keycloak keycloak = Keycloak.getInstance();
-            final UserResponseBuilder userResponseBuilder = keycloak.getUser(keycloakId);
-            return userResponseBuilder.getFirstName();
-        } catch (UserNotFoundException | KeycloakException e) {
-            LOG.log(Level.SEVERE, "Error getting firstName", e);
-            return "UNKNOWN";//TODO
-        }
+        return email;
     }
 
     public Set<Capability> getCapabilities() {
@@ -136,8 +111,15 @@ public class User {
 
     public void addWebhook(Webhook webhook) { this.webhooks.add(webhook); }
 
+    public void setEmail(String email) { this.email = email; }
+
+    public void setName(String name) { this.name = name; }
+
+    public String getName() { return this.name; }
+
+
     @Override
     public String toString() {
-        return "[User keycloak_id:" + getKeycloakId() +/* " email:" + getEmail() +*/ "]";
+        return "[User keycloak_id:" + getKeycloakId() + " email:" + getEmail() + "]";
     }
 }

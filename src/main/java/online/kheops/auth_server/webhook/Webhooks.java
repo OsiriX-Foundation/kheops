@@ -27,7 +27,7 @@ import static online.kheops.auth_server.event.Events.MutationType.*;
 import static online.kheops.auth_server.event.Events.MutationType.EDIT_WEBHOOK;
 import static online.kheops.auth_server.event.Events.MutationType.TRIGGER_WEBHOOK;
 import static online.kheops.auth_server.series.Series.getSeries;
-import static online.kheops.auth_server.user.Users.getOrCreateUser;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.Consts.VALID_SCHEMES_WEBHOOK_URL;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
@@ -321,7 +321,7 @@ public class Webhooks {
             final Webhook webhook = WebhookQueries.getWebhook(webhookID, album, em);
             final AlbumUser albumCallingUser = getAlbumUser(album, callingUser, em);
 
-            final User targetUser = getOrCreateUser(user);
+            final User targetUser = getUser(user, em);
             final AlbumUser albumTargetUser = getAlbumUser(album, targetUser, em);
             final NewUserWebhook newUserWebhook;
             final WebhookTrigger webhookTrigger;
