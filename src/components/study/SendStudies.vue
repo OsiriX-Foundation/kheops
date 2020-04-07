@@ -141,7 +141,7 @@
             v-if="UI.cancel === false"
           >
             <b-progress-bar
-              :value="countSentFiles+progress"
+              :value="progress"
               :max="totalSize"
               show-progress
               animated
@@ -330,7 +330,7 @@ export default {
             Accept: 'application/dicom+json',
           },
           onUploadProgress: (progressEvent) => {
-            this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total);
+            this.progress = this.countSentFiles + (this.currentFilesLength * (progressEvent.loaded / progressEvent.total));
           },
         },
         dicomizeData: {
