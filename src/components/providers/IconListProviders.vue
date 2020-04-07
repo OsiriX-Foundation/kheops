@@ -29,7 +29,7 @@
             type="text"
             hidden
             name="access_token"
-            :value="accessToken"
+            :value="oidcAccessToken"
           />
           <b-form-input
             v-if="checkProviderModalities(study, provider)"

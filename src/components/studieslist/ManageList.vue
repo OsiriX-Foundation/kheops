@@ -75,12 +75,14 @@ import StudiesList from '@/components/studieslist/StudiesList';
 import ListHeaders from '@/components/studieslist/ListHeaders';
 import StudyInputFile from '@/components/study/StudyInputFile';
 import StudyInputDirectory from '@/components/study/StudyInputDirectory';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'ManageList',
   components: {
     ListHeaders, InfiniteLoading, Loading, StudiesList, StudyInputFile, StudyInputDirectory,
   },
+  mixins: [CurrentUser],
   props: {
     permissions: {
       type: Object,

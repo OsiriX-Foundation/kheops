@@ -221,6 +221,7 @@
                 slot="reportprovider"
               >
                 <manage-providers
+                  v-if="oidcIsAuthenticated === true"
                   :study="row.item"
                   :source="source"
                 />
@@ -412,6 +413,9 @@ export default {
       showFilters: 'showFilters',
       filters: 'filters',
     }),
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     mobiledetect() {
       return mobiledetect.mobileAndTabletcheck();
     },

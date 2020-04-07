@@ -28,6 +28,7 @@ export default {
   computed: {
     ...mapGetters({
       providers: 'providers',
+      studies: 'studies',
     }),
     providersEnable() {
       return this.providers.filter((provider) => provider.stateURL.checkURL === true);
@@ -42,5 +43,5 @@ export default {
       this.studies[studyIndex].showIcons = value;
     },
   },
-}
+};
 </script>
