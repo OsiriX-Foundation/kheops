@@ -44,13 +44,13 @@ public class UserResponse  implements Comparable<UserResponse> {
     public UserResponse(AlbumUser albumUser) {
         email = albumUser.getUser().getEmail();
         isAdmin = albumUser.isAdmin();
-        sub = albumUser.getUser().getKeycloakId();
+        sub = albumUser.getUser().getSub();
         name = albumUser.getUser().getName();
     }
 
     public UserResponse(User user) {
         email = user.getEmail();
-        sub = user.getKeycloakId();
+        sub = user.getSub();
         name = user.getName();
     }
 

@@ -66,7 +66,7 @@ public class Users {
                 user.setName(name);
                 tx.commit();
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
-                kheopsLogBuilder.user(user.getKeycloakId());
+                kheopsLogBuilder.user(user.getSub());
                 return user;
             } catch (UserNotFoundException unused) { /*empty*/ }
 
@@ -91,7 +91,7 @@ public class Users {
 
             tx.commit();
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.NEW_USER);
-            kheopsLogBuilder.user(user.getKeycloakId());
+            kheopsLogBuilder.user(user.getSub());
             return user;
 
         } catch (PersistenceException e) {
@@ -103,7 +103,7 @@ public class Users {
                 user.setName(name);
                 tx.commit();
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
-                kheopsLogBuilder.user(user.getKeycloakId());
+                kheopsLogBuilder.user(user.getSub());
                 return user;
             } catch (UserNotFoundException unused) {
                 throw new IllegalStateException();

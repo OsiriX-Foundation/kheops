@@ -45,7 +45,7 @@
     <context-param>
         <description>URL for the connection to the PostgreSQL database</description>
         <param-name>online.kheops.jdbc.url</param-name>
-        <param-value>jdbc:postgresql://localhost/kheops</param-value>
+        <param-value>jdbc:postgresql://172.17.43.167/kheops</param-value>
     </context-param>
     <context-param>
         <description>User name for the PostgreSQL databse</description>

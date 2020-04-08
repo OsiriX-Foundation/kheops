@@ -7,5 +7,6 @@
    <include file="kheopsChangeLog-v2.1.xml"/>
    <include file="kheopsChangeLog-v2.2.xml"/>
    <include file="kheopsChangeLog-v3.0.xml"/>
+   <include file="kheopsChangeLog-v3.1.xml"/>
 
 </databaseChangeLog>

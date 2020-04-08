@@ -137,17 +137,17 @@ public class Events {
             final HashMap<String, Boolean> userMember = new HashMap<>();
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
-                if (!userMember.containsKey(e.getUser().getKeycloakId())) {
-                    userMember.put(e.getUser().getKeycloakId(), isMemberOfAlbum(e.getUser(), album, em));
+                if (!userMember.containsKey(e.getUser().getSub())) {
+                    userMember.put(e.getUser().getSub(), isMemberOfAlbum(e.getUser(), album, em));
                 }
                 if (e instanceof Comment) {
-                    if (e.getPrivateTargetUser() != null && !userMember.containsKey(e.getPrivateTargetUser().getKeycloakId())) {
-                        userMember.put(e.getPrivateTargetUser().getKeycloakId(), isMemberOfAlbum(e.getPrivateTargetUser(), album, em));
+                    if (e.getPrivateTargetUser() != null && !userMember.containsKey(e.getPrivateTargetUser().getSub())) {
+                        userMember.put(e.getPrivateTargetUser().getSub(), isMemberOfAlbum(e.getPrivateTargetUser(), album, em));
                     }
                     eventResponses.add(new EventResponse((Comment)e, userMember));
                 } else if (e instanceof Mutation) {
-                    if (((Mutation) e).getToUser() != null && !userMember.containsKey(((Mutation) e).getToUser().getKeycloakId())) {
-                        userMember.put(((Mutation) e).getToUser().getKeycloakId(), isMemberOfAlbum(((Mutation) e).getToUser(), album, em));
+                    if (((Mutation) e).getToUser() != null && !userMember.containsKey(((Mutation) e).getToUser().getSub())) {
+                        userMember.put(((Mutation) e).getToUser().getSub(), isMemberOfAlbum(((Mutation) e).getToUser(), album, em));
                     }
                     eventResponses.add(new EventResponse((Mutation) e, userMember));
                 }
@@ -173,11 +173,11 @@ public class Events {
             final HashMap<String, Boolean> userMember = new HashMap<>();
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                if (!userMember.containsKey(m.getUser().getKeycloakId())) {
-                    userMember.put(m.getUser().getKeycloakId(), isMemberOfAlbum(m.getUser(), album, em));
+                if (!userMember.containsKey(m.getUser().getSub())) {
+                    userMember.put(m.getUser().getSub(), isMemberOfAlbum(m.getUser(), album, em));
                 }
-                if (m.getToUser() != null && !userMember.containsKey(m.getToUser().getKeycloakId())) {
-                    userMember.put(m.getToUser().getKeycloakId(), isMemberOfAlbum(m.getToUser(), album, em));
+                if (m.getToUser() != null && !userMember.containsKey(m.getToUser().getSub())) {
+                    userMember.put(m.getToUser().getSub(), isMemberOfAlbum(m.getToUser(), album, em));
                 }
                     eventResponses.add(new EventResponse(m, userMember));
             }
@@ -203,11 +203,11 @@ public class Events {
             final Album album = getAlbum(albumId, em);
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
-                if (!userMember.containsKey(c.getUser().getKeycloakId())) {
-                    userMember.put(c.getUser().getKeycloakId(), isMemberOfAlbum(c.getUser(), album, em));
+                if (!userMember.containsKey(c.getUser().getSub())) {
+                    userMember.put(c.getUser().getSub(), isMemberOfAlbum(c.getUser(), album, em));
                 }
-                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
-                    userMember.put(c.getPrivateTargetUser().getKeycloakId(), isMemberOfAlbum(c.getPrivateTargetUser(), album, em));
+                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getSub())) {
+                    userMember.put(c.getPrivateTargetUser().getSub(), isMemberOfAlbum(c.getPrivateTargetUser(), album, em));
                 }
                 eventResponses.add(new EventResponse(c, userMember));
             }
@@ -241,11 +241,11 @@ public class Events {
             }
 
             for (Comment c : comments) {
-                if (!userMember.containsKey(c.getUser().getKeycloakId())) {
-                    userMember.put(c.getUser().getKeycloakId(), canAccessStudy(c.getUser(), c.getStudy(), em));
+                if (!userMember.containsKey(c.getUser().getSub())) {
+                    userMember.put(c.getUser().getSub(), canAccessStudy(c.getUser(), c.getStudy(), em));
                 }
-                if (c.getPrivateTargetUser() != null && isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
-                    userMember.put(c.getPrivateTargetUser().getKeycloakId(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
+                if (c.getPrivateTargetUser() != null && isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub())) {
+                    userMember.put(c.getPrivateTargetUser().getSub(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
                 }
                 eventResponses.add(new EventResponse(c, userMember));
             }

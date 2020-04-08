@@ -54,13 +54,13 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
         kheopsLogBuilder = new KheopsLogBuilder()
                 .provenance(this)
-                .user(getUser().getKeycloakId())
+                .user(getUser().getSub())
                 .clientID(clientId)
                 .tokenType(TokenType.REPORT_PROVIDER_TOKEN);
     }
 
     @Override
-    public String getName() { return user.getKeycloakId(); }
+    public String getName() { return user.getSub(); }
 
     @Override
     public boolean hasUserAccess() { return false; }

@@ -77,7 +77,7 @@ public class EventResponse {
         eventType = "Comment";
         origin = new UserResponseBuilder()
                 .setUser(comment.getUser())
-                .setCanAccess(userMember.get(comment.getUser().getKeycloakId()))
+                .setCanAccess(userMember.get(comment.getUser().getSub()))
                 .build();
         this.comment = comment.getComment();
         postDate = comment.getEventTime();
@@ -85,7 +85,7 @@ public class EventResponse {
             privateComment = true;
             target = new UserResponseBuilder()
                     .setUser(comment.getPrivateTargetUser())
-                    .setCanAccess(userMember.get(comment.getPrivateTargetUser().getKeycloakId()))
+                    .setCanAccess(userMember.get(comment.getPrivateTargetUser().getSub()))
                     .build();
         } else {
             privateComment = false;
@@ -98,7 +98,7 @@ public class EventResponse {
 
         origin = new UserResponseBuilder()
                 .setUser(mutation.getUser())
-                .setCanAccess(userMember.get(mutation.getUser().getKeycloakId()))
+                .setCanAccess(userMember.get(mutation.getUser().getSub()))
                 .build();
         postDate = mutation.getEventTime();
         mutationType = mutation.getMutationType();
@@ -110,7 +110,7 @@ public class EventResponse {
                 mutationType.equals(Events.MutationType.REMOVE_USER.toString())) {
             target = new UserResponseBuilder()
                     .setUser(mutation.getToUser())
-                    .setCanAccess(userMember.get(mutation.getToUser().getKeycloakId()))
+                    .setCanAccess(userMember.get(mutation.getToUser().getSub()))
                     .build();
         }
         if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
