@@ -8,10 +8,13 @@
     <nav-bar
       v-if="oidcIsAuthenticated"
     />
-
     <!-- content -->
     <router-view
+      v-if="userSend"
       :style="oidcIsAuthenticated ? 'margin: 25px auto' : 'margin: 75px auto'"
+    />
+    <loading
+      v-else
     />
     <send-studies />
     <!-- footer -->
@@ -26,10 +29,16 @@ import navHeader from '@/components/navheader';
 import navBar from '@/components/navbar';
 import SendStudies from '@/components/study/SendStudies';
 import { CurrentUser } from '@/mixins/currentuser.js';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'App',
-  components: { navHeader, navBar, SendStudies },
+  components: {
+    navHeader,
+    navBar,
+    SendStudies,
+    Loading,
+  },
   mixins: [CurrentUser],
   data() {
     return {
@@ -83,6 +92,7 @@ export default {
               this.userSend = true;
             }
           }).catch((err) => {
+            this.userSend = true;
             console.log(err);
           });
         }
