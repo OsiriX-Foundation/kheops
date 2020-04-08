@@ -10,7 +10,7 @@
     />
     <!-- content -->
     <router-view
-      v-if="userSend"
+      v-if="userSend === true || oidcIsAuthenticated === false"
       :style="oidcIsAuthenticated ? 'margin: 25px auto' : 'margin: 75px auto'"
     />
     <loading
