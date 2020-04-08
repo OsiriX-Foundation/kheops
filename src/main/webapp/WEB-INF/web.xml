@@ -17,9 +17,6 @@
 
 
     <listener>
-        <listener-class>online.kheops.auth_server.keycloak.KeycloakContextListener</listener-class>
-    </listener>
-    <listener>
         <listener-class>online.kheops.auth_server.OIDCProviderContextListener</listener-class>
     </listener>
     <listener>
@@ -27,9 +24,6 @@
     </listener>
     <listener>
         <listener-class>online.kheops.auth_server.EntityManagerListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>online.kheops.auth_server.database.UpdateUsersTableContextListener</listener-class>
     </listener>
 
 
@@ -64,26 +58,6 @@
         <param-value>mypwd</param-value>
     </context-param>
     <context-param>
-        <description>Client ID for the keycloak API</description>
-        <param-name>online.kheops.keycloak.clientid</param-name>
-        <param-value>kheopsAuthorization</param-value>
-    </context-param>
-    <context-param>
-        <description>Client secret for the keycloak API</description>
-        <param-name>online.kheops.keycloak.clientsecret</param-name>
-        <param-value>b227ef2b-f4d9-4c8b-a25c-2005cd083ebf</param-value>
-    </context-param>
-    <context-param>
-        <description>Uri for the keycloak API</description>
-        <param-name>online.kheops.keycloak.uri</param-name>
-        <param-value>https://keycloak.kheops.online</param-value>
-    </context-param>
-    <context-param>
-        <description>Uri for the keycloak API</description>
-        <param-name>online.kheops.oidc.provider</param-name>
-        <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
-    </context-param>
-    <context-param>
         <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
         <param-name>online.kheops.client.dicomwebproxyclientid</param-name>
         <param-value>DICOMWebProxy</param-value>
@@ -104,9 +78,9 @@
         <param-value>zipperclientpassword</param-value>
     </context-param>
     <context-param>
-        <description>Realms for the keycloak API</description>
-        <param-name>online.kheops.keycloak.realms</param-name>
-        <param-value>travis</param-value>
+        <description>Uri for the OIDC provider</description>
+        <param-name>online.kheops.oidc.provider</param-name>
+        <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
     </context-param>
     <context-param>
         <description>Define if the scope 'kheosp' must be present in the access_token</description>
