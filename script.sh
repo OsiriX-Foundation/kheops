@@ -132,7 +132,12 @@ port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[
 # extract the path (if any)
 path="$(echo $url | grep / | cut -d/ -f2-)"
 
-
+echo "url: $url"
+echo "  proto: $proto"
+echo "  user: $user"
+echo "  host: $host"
+echo "  port: $port"
+echo "  path: $path"
 
 #get env var
 chmod a+w /etc/nginx/conf.d/kheops.conf
