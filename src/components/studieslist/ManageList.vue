@@ -108,7 +108,7 @@ export default {
       },
       headerID: 'listheaders',
       topstyle: null,
-      defaulttop: 69,
+      defaulttop: 65,
       tmpFilters: {},
       sortable: [
         'StudyDate',
