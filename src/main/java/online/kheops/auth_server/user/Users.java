@@ -7,6 +7,7 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -51,7 +52,7 @@ public class Users {
         }
     }
 
-    public static User upsertUser(String sub, String name, String email) {
+    public static User upsertUser(String sub, String name, String email, KheopsLogBuilder kheopsLogBuilder) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -64,6 +65,8 @@ public class Users {
                 user.setEmail(email);
                 user.setName(name);
                 tx.commit();
+                kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
+                kheopsLogBuilder.user(user.getKeycloakId());
                 return user;
             } catch (UserNotFoundException unused) { /*empty*/ }
 
@@ -87,17 +90,21 @@ public class Users {
             em.persist(albumUser);
 
             tx.commit();
+            kheopsLogBuilder.action(KheopsLogBuilder.ActionType.NEW_USER);
+            kheopsLogBuilder.user(user.getKeycloakId());
             return user;
 
         } catch (PersistenceException e) {
             try {
                 tx.rollback();
                 tx.begin();
-                final User u = getUser(sub, em);
-                u.setEmail(email);
-                u.setName(name);
+                final User user = getUser(sub, em);
+                user.setEmail(email);
+                user.setName(name);
                 tx.commit();
-                return u;
+                kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
+                kheopsLogBuilder.user(user.getKeycloakId());
+                return user;
             } catch (UserNotFoundException unused) {
                 throw new IllegalStateException();
             }
