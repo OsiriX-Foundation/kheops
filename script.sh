@@ -102,11 +102,11 @@ else
    echo -e "environment variable KHEOPS_UI_PORT \e[92mOK\e[0m"
 fi
 
-if [[ -z $KHEOPS_KEYCLOAK_URI ]]; then
-  echo "Missing KHEOPS_KEYCLOAK_URI environment variable"
+if [[ -z $KHEOPS_OIDC_PROVIDER ]]; then
+  echo "Missing KHEOPS_OIDC_PROVIDER environment variable"
   missing_env_var_secret=true
 else
-   echo -e "environment variable KHEOPS_KEYCLOAK_URI \e[92mOK\e[0m"
+   echo -e "environment variable KHEOPS_OIDC_PROVIDER \e[92mOK\e[0m"
 fi
 
 #if missing env var or secret => exit
@@ -115,6 +115,24 @@ if [[ $missing_env_var_secret = true ]]; then
 else
    echo -e "all nginx secrets and all env var \e[92mOK\e[0m"
 fi
+
+
+# extract the protocol
+proto="$(echo $KHEOPS_OIDC_PROVIDER | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+# remove the protocol
+url="$(echo ${1/$proto/})"
+# extract the user (if any)
+user="$(echo $url | grep @ | cut -d@ -f1)"
+# extract the host and port
+hostport="$(echo ${url/$user@/} | cut -d/ -f1)"
+# by request host without port    
+host="$(echo $hostport | sed -e 's,:.*,,g')"
+# by request - try to extract the port
+port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+# extract the path (if any)
+path="$(echo $url | grep / | cut -d/ -f2-)"
+
+
 
 #get env var
 chmod a+w /etc/nginx/conf.d/kheops.conf
@@ -127,7 +145,7 @@ sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|g"
 sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|g" /etc/nginx/conf.d/kheops.conf
 
 sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|g" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${keycloak_url}|$KHEOPS_KEYCLOAK_URI|g" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${keycloak_url}|$proto$host|g" /etc/nginx/conf.d/kheops.conf
 
 echo "Ending setup NGINX secrets and env var"
 
