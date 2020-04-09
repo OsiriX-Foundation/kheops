@@ -109,9 +109,14 @@
         <param-value>travis</param-value>
     </context-param>
     <context-param>
-        <description>Define if the scope 'kheosp' must be present in the access_token</description>
+        <description>Define if the scope 'kheops' must be present in the access_token</description>
         <param-name>online.kheops.use.scope</param-name>
         <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <description>Use a welcome bot at the fisrt user registration. Default null or the webhook url if required</description>
+        <param-name>online.kheops.welcomebot.webhook</param-name>
+        <param-value></param-value>
     </context-param>
 
 </web-app>

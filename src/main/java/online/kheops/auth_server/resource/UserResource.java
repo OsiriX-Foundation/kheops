@@ -235,7 +235,8 @@ public class UserResource {
             userinfoEndpointURI = new URI(userInfoUrl);
             UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token).get(UserInfoEntity.class);
 
-            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
+            final String welcomebotWebhook = servletContext.getInitParameter("online.kheops.welcomebot.webhook");
+            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email, welcomebotWebhook);
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
             return Response.ok().entity(userResponse).build();
         } catch (ProcessingException | WebApplicationException e) {

@@ -84,6 +84,13 @@ if [ -z "$KHEOPS_CLIENT_ZIPPERCLIENTID" ]; then
     missing_env_var=true
 fi
 
+kheops_welcomebot_webhook=""
+if [ -z "$KHEOPS_WELCOMEBOT_WEBHOOK" ]; then
+    echo "No KHEOPS_WELCOMEBOT_WEBHOOK environment variable, welcomebot is disable"
+else
+    kheops_welcomebot_webhook=$KHEOPS_WELCOMEBOT_WEBHOOK
+fi
+
 use_scope=true
 if [ -z "$KHEOPS_USE_KHEOPS_SCOPE" ]; then
     echo "KHEOPS_USE_KHEOPS_SCOPE not set default value is 'true'"
@@ -136,6 +143,7 @@ sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCL
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_use_kheops_scope}|$use_scope|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_welcomebot_webhook}|$KHEOPS_WELCOMEBOT_WEBHOOK|" ${REPLACE_FILE_PATH}
 
 
 

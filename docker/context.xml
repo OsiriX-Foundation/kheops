@@ -31,4 +31,6 @@
                override="false"/>
     <Parameter name="online.kheops.use.scope" value="${kheops_use_kheops_scope}"
                override="false"/>
+    <Parameter name="online.kheops.welcomebot.webhook" value="${kheops_welcomebot_webhook}"
+               override="false"/>
 </Context>

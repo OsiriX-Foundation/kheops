@@ -59,7 +59,7 @@ public class Users {
         }
     }
 
-    public static User upsertUser(String sub, String name, String email) {
+    public static User upsertUser(String sub, String name, String email, String welcomebotWebhook) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -96,19 +96,22 @@ public class Users {
 
             tx.commit();
 
-            // Demo specific, go tickle the welcomebot when a new user is added.
+            // Go tickle the welcomebot when a new user is added.
             // Block until the reply so that the welcome bot has an opportunity to call back to the
             // Authorization server and share series/albums.
-            try {
-                LOG.log(INFO, "About to try to share with the welcomebot");
-                CLIENT.target("http://welcomebot:8080/share")
-                        .queryParam("user", user.getKeycloakId())
-                        .request()
-                        .post(Entity.text(""));
-            } catch (ProcessingException | WebApplicationException e) {
-                LOG.log(SEVERE, "Unable to communicate with the welcomebot", e);
+
+            if(welcomebotWebhook != null && welcomebotWebhook.compareTo("") != 0) {
+                try {
+                    LOG.log(INFO, "About to try to share with the welcomebot");
+                    CLIENT.target(welcomebotWebhook)
+                            .queryParam("user", user.getKeycloakId())
+                            .request()
+                            .post(Entity.text(""));
+                } catch (ProcessingException | WebApplicationException e) {
+                    LOG.log(SEVERE, "Unable to communicate with the welcomebot", e);
+                }
+                LOG.log(INFO, "Finished sharing with the welcomebot");
             }
-            LOG.log(INFO, "Finished sharing with the welcomebot");
 
             return user;
         } catch (PersistenceException e) {
