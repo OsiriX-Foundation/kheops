@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.KEYCLOAK_TOKEN;
 import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT_PROVIDER_TOKEN;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
@@ -45,6 +46,7 @@ import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
 import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
+import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 
 @Path("/")
 public class UserResource {
@@ -78,6 +80,9 @@ public class UserResource {
 
     @Context
     private ServletContext servletContext;
+
+    @HeaderParam(X_FORWARDED_FOR)
+    private String headerXForwardedFor;
 
     @GET
     @Secured
@@ -205,14 +210,12 @@ public class UserResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-
         final OidcAccessToken accessToken;
         try {
             accessToken = new OidcAccessToken.Builder(servletContext).build(token);
         } catch (AccessTokenVerificationException e) {
             return Response.status(BAD_REQUEST).build();
         }
-
 
         String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer().get());
         if (userInfoUrl == null) {
@@ -236,8 +239,18 @@ public class UserResource {
             UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token).get(UserInfoEntity.class);
 
             final String welcomebotWebhook = servletContext.getInitParameter("online.kheops.welcomebot.webhook");
-            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email, welcomebotWebhook);
+            final KheopsLogBuilder logBuilder = new KheopsLogBuilder();
+            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email, welcomebotWebhook, logBuilder);
+
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
+
+            logBuilder.tokenType(KEYCLOAK_TOKEN);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
+            }
+            logBuilder.provenance(accessToken);
+            logBuilder.log();
+
             return Response.ok().entity(userResponse).build();
         } catch (ProcessingException | WebApplicationException e) {
             return Response.status(BAD_GATEWAY).build();

@@ -7,6 +7,7 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -59,7 +60,8 @@ public class Users {
         }
     }
 
-    public static User upsertUser(String sub, String name, String email, String welcomebotWebhook) {
+
+    public static User upsertUser(String sub, String name, String email, String welcomebotWebhook, KheopsLogBuilder kheopsLogBuilder) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -72,6 +74,8 @@ public class Users {
                 user.setEmail(email);
                 user.setName(name);
                 tx.commit();
+                kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
+                kheopsLogBuilder.user(user.getKeycloakId());
                 return user;
             } catch (UserNotFoundException unused) { /*empty*/ }
 
@@ -96,6 +100,9 @@ public class Users {
 
             tx.commit();
 
+            kheopsLogBuilder.action(KheopsLogBuilder.ActionType.NEW_USER);
+            kheopsLogBuilder.user(user.getKeycloakId());
+
             // Go tickle the welcomebot when a new user is added.
             // Block until the reply so that the welcome bot has an opportunity to call back to the
             // Authorization server and share series/albums.
@@ -118,19 +125,22 @@ public class Users {
             try {
                 tx.rollback();
                 tx.begin();
-                final User u = getUser(sub, em);
-                u.setEmail(email);
-                u.setName(name);
+                final User user = getUser(sub, em);
+                user.setEmail(email);
+                user.setName(name);
                 tx.commit();
-                return u;
-            } catch (UserNotFoundException unused) { /*empty*/ }
+                kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
+                kheopsLogBuilder.user(user.getKeycloakId());
+                return user;
+            } catch (UserNotFoundException unused) {
+                throw new IllegalStateException();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return null;
     }
 
     public static List<UserResponse> searchUsersInAlbum(String search, String albumId, Integer limit, Integer offset)
