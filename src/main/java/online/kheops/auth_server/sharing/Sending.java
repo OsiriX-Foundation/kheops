@@ -402,7 +402,7 @@ public class Sending {
             } else {
                 kheopsLogBuilder.fromAlbum("inbox");
             }
-            kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
+            kheopsLogBuilder.targetUser(targetUser.getSub())
                     .action(ActionType.SHARE_STUDY_WITH_USER)
                     .study(studyInstanceUID)
                     .log();
@@ -427,7 +427,7 @@ public class Sending {
             final User targetUser = getUser(targetUsername, em);
             callingUser = em.merge(callingUser);
 
-            kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
+            kheopsLogBuilder.targetUser(targetUser.getSub())
                     .action(ActionType.SHARE_SERIES_WITH_USER)
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID);

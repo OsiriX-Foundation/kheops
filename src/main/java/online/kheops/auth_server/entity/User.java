@@ -19,8 +19,8 @@ public class User {
     private long pk;
 
     @Basic(optional = false)
-    @Column(name = "keycloak_id")
-    private String keycloakId;
+    @Column(name = "sub")
+    private String sub;
 
     @Basic()
     @Column(name = "email")
@@ -63,16 +63,16 @@ public class User {
 
     public User() {}
 
-    public User(String keycloakId) {
-        this.keycloakId = keycloakId;
+    public User(String sub) {
+        this.sub = sub;
     }
 
     public long getPk() {
         return pk;
     }
 
-    public String getKeycloakId() {
-        return keycloakId;
+    public String getSub() {
+        return sub;
     }
 
     public String getEmail() {
@@ -120,6 +120,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "[User keycloak_id:" + getKeycloakId() + " email:" + getEmail() + "]";
+        return "[User sub:" + getSub() + " email:" + getEmail() + "]";
     }
 }

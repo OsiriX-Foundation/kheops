@@ -75,7 +75,7 @@ public class Users {
                 user.setName(name);
                 tx.commit();
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
-                kheopsLogBuilder.user(user.getKeycloakId());
+                kheopsLogBuilder.user(user.getSub());
                 return user;
             } catch (UserNotFoundException unused) { /*empty*/ }
 
@@ -101,7 +101,7 @@ public class Users {
             tx.commit();
 
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.NEW_USER);
-            kheopsLogBuilder.user(user.getKeycloakId());
+            kheopsLogBuilder.user(user.getSub());
 
             // Go tickle the welcomebot when a new user is added.
             // Block until the reply so that the welcome bot has an opportunity to call back to the
@@ -111,7 +111,7 @@ public class Users {
                 try {
                     LOG.log(INFO, "About to try to share with the welcomebot");
                     CLIENT.target(welcomebotWebhook)
-                            .queryParam("user", user.getKeycloakId())
+                            .queryParam("user", user.getSub())
                             .request()
                             .post(Entity.text(""));
                 } catch (ProcessingException | WebApplicationException e) {
@@ -130,7 +130,7 @@ public class Users {
                 user.setName(name);
                 tx.commit();
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
-                kheopsLogBuilder.user(user.getKeycloakId());
+                kheopsLogBuilder.user(user.getSub());
                 return user;
             } catch (UserNotFoundException unused) {
                 throw new IllegalStateException();

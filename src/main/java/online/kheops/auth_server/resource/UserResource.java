@@ -64,7 +64,7 @@ public class UserResource {
 
         private static OIDCUserInfo from(User user) {
             OIDCUserInfo userInfo = new OIDCUserInfo();
-            userInfo.sub = user.getKeycloakId();
+            userInfo.sub = user.getSub();
             userInfo.name = user.getName();
             userInfo.email = user.getEmail();
             userInfo.preferredUsername = user.getName();
@@ -146,7 +146,7 @@ public class UserResource {
             try {
                 final User user = getUser(reference);
                 userResponseBuilder = new UserResponseBuilder().setName(user.getName())
-                        .setSub(user.getKeycloakId())
+                        .setSub(user.getSub())
                         .setEmail(user.getEmail());
 
                 if(albumId != null) {

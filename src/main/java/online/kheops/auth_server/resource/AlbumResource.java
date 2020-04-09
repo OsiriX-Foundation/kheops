@@ -317,7 +317,7 @@ public class AlbumResource {
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.ADD_USER)
-                .targetUser(targetUser.getKeycloakId())
+                .targetUser(targetUser.getSub())
                 .log();
         return Response.status(CREATED).build();
     }
@@ -345,7 +345,7 @@ public class AlbumResource {
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.ADD_ADMIN)
-                .targetUser(targetUser.getKeycloakId())
+                .targetUser(targetUser.getSub())
                 .log();
         return Response.status(NO_CONTENT).build();//todo NO_CONTENT => CREATED ????
     }
@@ -374,7 +374,7 @@ public class AlbumResource {
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.REMOVE_ADMIN)
-                .targetUser(targetUser.getKeycloakId())
+                .targetUser(targetUser.getSub())
                 .log();
         return Response.status(NO_CONTENT).build();
     }
@@ -402,7 +402,7 @@ public class AlbumResource {
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
                 .action(ActionType.REMOVE_USER)
-                .targetUser(targetUser.getKeycloakId())
+                .targetUser(targetUser.getSub())
                 .log();
         return Response.status(NO_CONTENT).build();
     }

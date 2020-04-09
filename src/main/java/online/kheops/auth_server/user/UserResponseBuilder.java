@@ -40,7 +40,7 @@ public class UserResponseBuilder {
     }
 
     public UserResponseBuilder setUser(User user) {
-        sub = user.getKeycloakId();
+        sub = user.getSub();
         name = user.getName();
         email = user.getEmail();
         return this;
