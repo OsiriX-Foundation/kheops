@@ -1,10 +1,11 @@
 plugins {
   id "org.sonarqube" version "2.6.2"
+  id "org.gretty" version "2.3.1"
 }
 
 apply plugin: 'java'
 apply plugin: 'war'
-apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
+// apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
 apply plugin: "jacoco"
 
 // Enable debugging of gretty started webapp in IDEA
