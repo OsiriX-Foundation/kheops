@@ -1,82 +1,6 @@
 <!--
   TODO: Remove settimeout when load studies.
 -->
-<i18n>
-{
-  "en": {
-    "selectednbstudies": "{count} study is selected | {count} study is selected | {count} studies are selected",
-    "addalbum": "Add to an album",
-    "download": "Download",
-    "addfavorite": "Add to favorites",
-    "removefavorite": "Remove to favorites",
-    "PatientName": "Patient Name",
-    "Modality": "Modality",
-    "StudyDate": "Study Date",
-    "StudyDescription": "Study Description",
-    "PatientID": "Patient ID",
-    "filter": "Filter",
-    "fromDate": "From",
-    "toDate": "To",
-    "studyputtoalbum": "Studies successfully added to the album",
-    "includeseriesfromalbum": "Include series in albums",
-    "send": "Send",
-    "delete": "Delete",
-    "comments": "comments",
-    "series": "series",
-    "study": "study",
-    "nostudy": "No studies found",
-    "studiessend": "studies send to inbox",
-    "confirmDelete": "Are you sure you want to delete {count} study | Are you sure you want to delete {count} studies",
-    "confirmDeleteSeries": "containing {count} serie? Once deleted, you will not be able to re-upload any series if other users still have access to them. | containing {count} series? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
-    "cancel": "Cancel",
-    "importdir": "Import directory",
-    "importfiles": "Import files",
-    "draganddrop": "Or drag and drop",
-    "favorites": "Favorites",
-    "nomorestudies": "No more studies",
-    "noresults": "No study found",
-    "error": "An error occur please reload the studies.",
-    "reload": "Reload",
-    "nopermissions": "You don't have the permissions to show the studies list."
-  },
-  "fr": {
-    "selectednbstudies": "{count} étude est sélectionnée | {count} étude est sélectionnée | {count} études sont sélectionnées",
-    "addalbum": "Ajouter à un album",
-    "download": "Télécharger",
-    "addfavorite": "Ajouter aux favoris",
-    "removefavorite": "Supprimer des favoris",
-    "PatientName": "Nom du patient",
-    "Modality": "Modalité",
-    "StudyDate": "Date de l'étude",
-    "StudyDescription": "Description de l'étude",
-    "PatientID": "Patient ID",
-    "filter": "Filtrer",
-    "fromDate": "De",
-    "toDate": "A",
-    "studyputtoalbum": "L'étude a été enregistrée dans l'album avec succès",
-    "includeseriesfromalbum": "inclure des séries présentes dans les albums",
-    "send": "Envoyer",
-    "delete": "Supprimer",
-    "comments": "commentaire",
-    "series": "séries",
-    "study": "étude",
-    "nostudy": "Aucne étude trouvée",
-    "studiessend": "études envoyées dans votre boîte de réception",
-    "confirmDelete": "Etes vous de sûr de vouloir supprimer ? ",
-    "cancel": "Annuler",
-    "importdir": "Importer un dossier",
-    "importfiles": "Importer des fichiers",
-    "draganddrop": "Ou Drag and Drop",
-    "favorites": "Favorites",
-    "nomorestudies": "Plus d'études",
-    "noresults": "Aucune étude trouvée.",
-    "error": "Une erreur s'est produite, veuillez recharger les études.",
-    "reload": "Recharger",
-    "nopermissions": "Vous n'avez pas les autorisations pour afficher la liste des études."
-  }
-}
-</i18n>
-
 <template>
   <div>
     <input
@@ -102,7 +26,6 @@
     <list-headers
       :id="headerID"
       :studies="studies"
-      :albums="albums"
       :show-send-button="permissions.send_series"
       :show-album-button="permissions.send_series"
       :show-favorite-button="permissions.add_series && $route.name !== 'viewnologin'"
@@ -156,14 +79,14 @@
                   v-focus
                   type="search"
                   class="form-control form-control-sm"
-                  :placeholder="$t('filter')"
+                  :placeholder="$t('study.filter')"
                 >
               </div>
               <span>
                 <select
                   v-model="filters.ModalitiesInStudy"
                   class="form-control form-control-sm d-block d-sm-none"
-                  :placeholder="$t('filter')"
+                  :placeholder="$t('study.filter')"
                 >
                   <option value="" />
                   <option
@@ -197,7 +120,7 @@
               v-model="filters.PatientID"
               type="search"
               class="form-control form-control-sm"
-              :placeholder="$t('filter')"
+              :placeholder="$t('study.filter')"
             > <br>
           </div>
           <sort-list
@@ -219,7 +142,7 @@
               v-model="filters.StudyDescription"
               type="search"
               class="form-control form-control-sm"
-              :placeholder="$t('filter')"
+              :placeholder="$t('study.filter')"
             > <br>
           </div>
           {{ data.label }}
@@ -241,7 +164,7 @@
                   input-class="form-control form-control-sm  search-calendar"
                   wrapper-class="wrapper-class"
                   calendar-class="calendar-class"
-                  :placeholder="$t('fromDate')"
+                  :placeholder="$t('study.fromDate')"
                   :clear-button="true"
                   :typeable="true"
                 />
@@ -256,7 +179,7 @@
                   input-class="form-control form-control-sm search-calendar"
                   wrapper-class="wrapper-class"
                   calendar-class="calendar-class"
-                  :placeholder="$t('toDate')"
+                  :placeholder="$t('study.toDate')"
                   :clear-button="true"
                   :typeable="true"
                 />
@@ -400,21 +323,21 @@
         <loading />
       </div>
       <div slot="no-more">
-        {{ $t('nomorestudies') }}
+        {{ $t('study.nomorestudies') }}
       </div>
       <div slot="no-results">
-        {{ $t('noresults') }}
+        {{ $t('study.noresults') }}
       </div>
       <div slot="error">
         <span
           v-if="statusList === 401 || statusList === 403"
         >
-          {{ $t('nopermissions') }}
+          {{ $t('study.nopermissions') }}
         </span>
         <span
           v-else
         >
-          {{ $t('error') }} <br> <br>
+          {{ $t('study.error') }} <br> <br>
           <button
             type="button"
             class=" btn btn-md"
@@ -470,6 +393,7 @@ export default {
       showIcons: false,
       statusList: 200,
       headerID: 'listheaders',
+      defaultSortAlbums: '-last_event_time',
       firstScrollTo: '',
       sortable: [
         'StudyDate',
@@ -495,7 +419,7 @@ export default {
         },
         {
           key: 'PatientName',
-          label: this.$t('PatientName'),
+          label: this.$t('study.PatientName'),
           sortable: true,
           thClass: 'pointer table-header',
           tdClass: 'word-break',
@@ -511,7 +435,7 @@ export default {
         },
         {
           key: 'PatientID',
-          label: this.$t('PatientID'),
+          label: this.$t('study.PatientID'),
           sortable: true,
           thClass: 'pointer table-header',
           tdClass: 'word-break',
@@ -528,7 +452,7 @@ export default {
         },
         {
           key: 'StudyDescription',
-          label: this.$t('StudyDescription'),
+          label: this.$t('study.StudyDescription'),
           sortable: false,
           thClass: 'pointer table-header',
           tdClass: 'word-break',
@@ -545,7 +469,7 @@ export default {
         },
         {
           key: 'StudyDate',
-          label: this.$t('StudyDate'),
+          label: this.$t('study.StudyDate'),
           sortable: true,
           thClass: 'pointer table-header',
           tdClass: 'word-break',
@@ -562,7 +486,7 @@ export default {
         },
         {
           key: 'ModalitiesInStudy',
-          label: this.$t('Modality'),
+          label: this.$t('study.Modality'),
           sortable: false,
           thClass: 'pointer table-header',
           tdClass: 'word-break',
@@ -592,7 +516,6 @@ export default {
     ...mapGetters({
       studies: 'studies',
       series: 'series',
-      albums: 'albums',
       sendingFiles: 'sending',
       providers: 'providers',
       modalities: 'modalities',
@@ -657,15 +580,13 @@ export default {
   },
   created() {
     this.initData();
-    setTimeout(() => this.setAlbumsList(), this.defaultTimeOut);
-    setTimeout(() => this.setAlbumInbox(), this.defaultTimeOut);
+    this.setAlbumInbox();
     this.setFilters();
     this.setQueryParams();
   },
-  destroyed() {
+  beforeDestroyed() {
     this.$store.dispatch('initStudies', {});
     this.$store.dispatch('initSeries');
-    this.$store.dispatch('initAlbums', {});
   },
   mounted() {
   },
@@ -738,7 +659,7 @@ export default {
             const elStickyHeader = this.$el.querySelector(`[id='${this.headerID}']`);
             let offset = 0;
             if (el !== null) {
-              offset = el.offsetHeight + 75;
+              offset = el.offsetHeight + 125;
             }
             if (elStickyHeader !== null) {
               offset += elStickyHeader.offsetHeight;
@@ -758,10 +679,10 @@ export default {
       });
     },
     initData() {
-      this.$store.dispatch('initStudies', {});
+      const source = this.albumID === undefined ? 'inbox' : this.albumID;
+      this.$store.dispatch('initStudies', source);
       this.$store.dispatch('initSeries');
       this.$store.dispatch('initModalities');
-      this.$store.dispatch('initAlbums', {});
     },
     reloadStudies() {
       this.searchStudies();
@@ -778,17 +699,6 @@ export default {
         this.$router.push('/albums');
         return err;
       });
-    },
-    setAlbumsList() {
-      if (this.currentuserKeycloakToken !== null) {
-        const queriesAlbums = {
-          canAddSeries: true,
-        };
-        const headers = {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
-        };
-        this.$store.dispatch('getAlbums', { queries: queriesAlbums, headers });
-      }
     },
     setAlbumInbox() {
       if (this.albumID !== undefined) {

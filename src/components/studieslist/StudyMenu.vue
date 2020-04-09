@@ -1,17 +1,3 @@
-<i18n>
-{
-  "en": {
-    "series": "Series",
-    "comments": "Comments",
-    "metadata": "Metadata"
-  },
-  "fr": {
-    "series": "Séries",
-    "comments": "Commentaires",
-    "metadata": "Métadonnées"
-  }
-}
-</i18n>
 <template>
   <nav class="nav nav-pills nav-justified flex-column text-center text-xl-left">
     <a
@@ -19,21 +5,21 @@
       :class="(study.flag.view === 'series')?'active':''"
       @click="setViewDetails(study.StudyInstanceUID.Value[0], 'series')"
     >
-      {{ $t('series') }}
+      {{ $t('study.series') }}
     </a>
     <a
       class="nav-link"
       :class="(study.flag.view === 'comments')?'active':''"
       @click="setViewDetails(study.StudyInstanceUID.Value[0], 'comments')"
     >
-      {{ $t('comments') }}
+      {{ $t('study.comments') }}
     </a>
     <a
       class="nav-link"
       :class="(study.flag.view === 'study')?'active':''"
       @click="setViewDetails(study.StudyInstanceUID.Value[0], 'study')"
     >
-      {{ $t('metadata') }}
+      {{ $t('study.metadata') }}
     </a>
   </nav>
 </template>

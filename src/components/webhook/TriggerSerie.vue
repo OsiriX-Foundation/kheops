@@ -1,28 +1,10 @@
-<i18n>
-{
-  "en": {
-    "informationtrigger": "The below series will be delivered to {url} using the current webhook configuraton.",
-    "errortrigger": "You can't redeliver this trigger.",
-    "warningtrigger": "Please verifiy if you have always access at the studies or the series from this album.",
-    "errorseries": "The following series can't be loaded :",
-    "seriepresent": "The following series are always present in your album."
-  },
-  "fr": {
-    "informationtrigger": "Les séries ci-dessous seront livrées à {url} en utilisant la configuration actuelle.",
-    "errortrigger": "Vous ne pouvez pas rédéclencher cet évènement.",
-    "warningtrigger": "Veuillez vérifier si vous avez toujours accès à l'étude ou aux séries depuis cet album.",
-    "errorseries": "Les séries suivant ne peux pas être chargée :",
-    "seriepresent": "Les séries suivantes sont toujours présentes dans l'album."
-  }
-}
-</i18n>
 <template>
   <span>
     <p
       v-if="errorSerie === false"
       class="word-break"
     >
-      {{ $t('informationtrigger', { url: url }) }}
+      {{ $t('webhook.informationtrigger', { url: url }) }}
     </p>
     <span
       v-if="errorSerie === true"
@@ -30,17 +12,17 @@
       <div
         class="text-warning mb-2"
       >
-        {{ $t('errortrigger') }}
+        {{ $t('webhook.errortrigger') }}
       </div>
       <div
         class="mb-2"
       >
-        {{ $t('warningtrigger') }}
+        {{ $t('webhook.warningtrigger') }}
       </div>
       <div
         class="text-warning mb-2"
       >
-        {{ $t('errorseries') }}
+        {{ $t('webhook.errorseries') }}
       </div>
       <ul
         class="mt-2"
@@ -56,7 +38,7 @@
       <p
         v-if="errorSerieUIDS.length !== seriesUIDS.length"
       >
-        {{ $t('seriepresent') }}
+        {{ $t('webhook.seriepresent') }}
       </p>
     </span>
     <details-series
@@ -117,5 +99,5 @@ export default {
       this.$emit('missingseries');
     },
   },
-}
+};
 </script>

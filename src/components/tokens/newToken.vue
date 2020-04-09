@@ -1,50 +1,3 @@
-<i18n>
-{
-  "en": {
-    "newtoken": "New token",
-    "description": "Description",
-    "scope": "Scope",
-    "album": "album",
-    "permission": "Permission",
-    "write": "write",
-    "read": "read",
-    "download": "show download button",
-    "appropriate": "sharing",
-    "expirationdate": "Expiration date",
-    "copysuccess": "Successfully copied",
-    "sorryerror": "Sorry, an error occured",
-    "tokenvalue": "Token value",
-    "urlvalue": "Access data url",
-    "warning": "WARNING: You only see once the token value !",
-    "user_permission": "What the token can do with the studies in the album.",
-    "read_permission": "Read studies (Show the studies list and their metadata)",
-    "write_permission": "Add new studies or series in existant study",
-    "appropriate_permission": "Share studies (Send to another user, to the inbox, to another album)",
-    "download_permission": "Show download button",
-    "delete_permission": "Delete studies (Is enable only if read and write permission enable)",
-    "warningpermissions": "Please select minimum one permission"
-  },
-  "fr": {
-    "newtoken": "Nouveau token",
-    "description": "Description",
-    "scope": "Applicable à",
-    "album": "album",
-    "permission": "Permission",
-    "write": "écriture",
-    "read": "lecture",
-    "download": "montrer le bouton de téléchargement",
-    "appropriate": "partager",
-    "expirationdate": "Date d'expiration",
-    "copysuccess": "Copié avec succès",
-    "sorryerror": "Désolé, une erreur est survenue",
-    "tokenvalue": "Valeur du token",
-    "urlvalue": "Url d'accès aux données",
-    "warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !",
-    "warningpermissions": "SVP choississez minimum une permission"
-  }
-}
-</i18n>
-
 <template>
   <div id="newToken">
     <div
@@ -63,21 +16,21 @@
             />
           </span>
         </button>
-        {{ $t('newtoken') }}
+        {{ $t('token.newtoken') }}
       </h4>
     </div>
     <form @submit.prevent="createToken">
       <fieldset>
         <div class="row">
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
-            <b>{{ $t('description') }}</b>
+            <b>{{ $t('token.description') }}</b>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-10 mb-3">
             <input
               v-model="token.title"
               v-focus
               type="text"
-              :placeholder="$t('description')"
+              :placeholder="$t('token.description')"
               class="form-control"
               required
               maxlength="255"
@@ -92,7 +45,7 @@
           class="row"
         >
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
-            <b>{{ $t('scope') }}</b>
+            <b>{{ $t('token.scope') }}</b>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-4 mb-3">
             <select
@@ -104,7 +57,7 @@
                 :key="idx"
                 :value="option_scope"
               >
-                {{ $t(option_scope) }}
+                {{ $t(`token.${option_scope}`) }}
               </option>
             </select>
             <field-obligatory
@@ -117,7 +70,7 @@
           class="row"
         >
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
-            <b>{{ $t('album') }}</b>
+            <b>{{ $t('token.album') }}</b>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-4 mb-3">
             <select
@@ -142,7 +95,7 @@
           class="row"
         >
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
-            <b>{{ $t('permission') }}</b>
+            <b>{{ $t('token.permission') }}</b>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-10">
             <toggle-button
@@ -152,7 +105,7 @@
             <label
               class="token-props"
             >
-              {{ $t('write') }}
+              {{ $t('token.write') }}
             </label><br>
             <toggle-button
               v-model="permissions.read_permission"
@@ -162,12 +115,12 @@
             <label
               class="token-props"
             >
-              {{ $t('read') }}
+              {{ $t('token.read') }}
             </label>
             <field-obligatory
               class="mb-3"
               :state="warningPermissions"
-              :text="$t('warningpermissions')"
+              :text="$t('token.warningpermissions')"
             />
             <span
               v-if="permissions.read_permission"
@@ -183,7 +136,7 @@
                 v-if="permissions.read_permission"
                 class="token-props"
               >
-                {{ $t('download') }}
+                {{ $t('token.download') }}
               </label> <br>
               <toggle-button
                 v-if="permissions.read_permission"
@@ -195,14 +148,14 @@
                 v-if="permissions.read_permission"
                 class="token-props"
               >
-                {{ $t('appropriate') }}
+                {{ $t('token.appropriate') }}
               </label>
             </span>
           </div>
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-12 col-md-2 mb-1">
-            <b>{{ $t('expirationdate') }}</b>
+            <b>{{ $t('token.expirationdate') }}</b>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-10 mb-3">
             <datepicker
@@ -212,7 +165,7 @@
               :calendar-button="false"
               calendar-button-icon=""
               wrapper-class="calendar-wrapper"
-              :placeholder="$t('expirationdate')"
+              :placeholder="$t('token.expirationdate')"
               :clear-button="true"
               clear-button-icon="fa fa-times"
             />
@@ -269,7 +222,7 @@
       </template>
       <dl class="my-2 row">
         <dt class="col-12 text-warning font-large">
-          {{ $t('warning') }}
+          {{ $t('token.warning') }}
         </dt>
       </dl>
       <dl
@@ -277,7 +230,7 @@
         class="my-2 row"
       >
         <dt class="col-xs-12 col-sm-3 token-title">
-          {{ $t('urlvalue') }}
+          {{ $t('token.urlvalue') }}
         </dt>
         <dd class="col-xs-10 col-sm-8">
           <input
@@ -304,7 +257,7 @@
       </dl>
       <dl class="my-2 row">
         <dt class="col-xs-12 col-sm-3 token-title">
-          {{ $t('tokenvalue') }}
+          {{ $t('token.tokenvalue') }}
         </dt>
         <dd class="col-xs-10 col-sm-8">
           <input
@@ -336,7 +289,6 @@
 <script>
 import moment from 'moment';
 import Datepicker from 'vuejs-datepicker';
-import { mapGetters } from 'vuex';
 import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 
@@ -356,6 +308,7 @@ export default {
   },
   data() {
     return {
+      albumsKey: 'canCreateCapabilityToken',
       token: {
         title: '',
         scope_type: this.scope,
@@ -376,9 +329,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      albums: 'albums',
-    }),
+    albums() {
+      return this.$store.getters.getAlbumsByKey(this.albumsKey);
+    },
     disabledCreateToken() {
       return (
         !this.token.title
@@ -415,11 +368,12 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('getAlbums', { queries: { canCreateCapabilityToken: 'true' } });
+    const queries = { canCreateCapabilityToken: true };
+    this.$store.dispatch('getAlbums', { queries, key: this.albumsKey });
   },
   destroyed() {
     if (this.albums.length > 0) {
-      this.$store.dispatch('initAlbums', {});
+      this.$store.dispatch('initAlbums', { key: this.albumsKey });
     }
   },
   methods: {

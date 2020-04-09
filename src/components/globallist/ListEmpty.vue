@@ -1,13 +1,3 @@
-<i18n>
-{
-  "en": {
-    "reload": "Reload"
-  },
-  "fr": {
-    "reload": "Recharger"
-  }
-}
-</i18n>
 <template>
   <span
     v-if="status === -1"

@@ -1,11 +1,11 @@
 /* eslint-disable */
 import Vue from 'vue';
+import store from '@/store';
+import { HTTP } from '@/router/http';
+import httpoperations from '@/mixins/httpoperations';
 
 export const CurrentUser = {
   computed: {
-    authenticated() {
-      return Vue.prototype.$keycloak.authenticated;
-    },
     currentuserOnView() {
       return window.location.pathname.includes('view');
     },
@@ -16,28 +16,34 @@ export const CurrentUser = {
       }
       return undefined;
     },
-    currentuserKeycloakToken() {
-      return Vue.prototype.$keycloak.token;
+    currentuserAccessToken() {
+      return store.state.oidcStore.access_token;
     },
     currentuserSub() {
-      return Vue.prototype.$keycloak.idTokenParsed !== null ? Vue.prototype.$keycloak.idTokenParsed.sub : null;
+      return store.state.oidcStore.user !== null ? store.state.oidcStore.user.sub : null;
     },
     currentuserEmail() {
-      return Vue.prototype.$keycloak.idTokenParsed !== null ? Vue.prototype.$keycloak.idTokenParsed.email : null;
+      return store.state.oidcStore.user !== null ? store.state.oidcStore.user.email : null;
     },
     currentuserFullname() {
-      return Vue.prototype.$keycloak.idTokenParsed !== null ? Vue.prototype.$keycloak.idTokenParsed.name : null;
+      console.log(store.state.oidcStore.user.name)
+      return store.state.oidcStore.user !== null ? store.state.oidcStore.user.name : null;
     },
   },
   methods: {
-    currentuserAccessToken() {
+    getCurrentuserAccessToken(authenticated) {
       if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
         return token;
-      } if (Vue.prototype.$keycloak.authenticated) {
-        return Vue.prototype.$keycloak.token;
+      } if (authenticated) {
+        return this.currentuserAccessToken;
       }
       return '';
+    },
+    postAccessToken(access_token) {
+      const url = '/register';
+      const formData = httpoperations.getFormData({ access_token });
+      return HTTP.post(url, formData);
     },
   },
 };

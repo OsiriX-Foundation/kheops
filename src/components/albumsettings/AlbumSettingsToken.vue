@@ -1,14 +1,3 @@
-<i18n>
-{
-  "en": {
-    "view": "View"
-  },
-  "fr": {
-    "view": "Vue"
-  }
-}
-</i18n>
-
 <template>
   <div class="container albumSettingsToken">
     <tokens

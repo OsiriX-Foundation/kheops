@@ -1,53 +1,3 @@
-<i18n>
-{
-  "en": {
-    "filesSend": "{count} files have been sent | {count} file has been sent | {count} files have been sent",
-    "locationSend": ". | in an",
-    "album": "album.",
-    "filesErrors": "{count} files produced an error. | {count} file produced an error. | {count} files produced an error.",
-    "showError": "Show errors",
-    "hideError": "Hide errors",
-    "cancel": "Cancel",
-    "titleBoxSending": "Sending files",
-    "titleBoxSended": "Files sent",
-    "titleBoxDicomize": "Waiting for your input",
-    "unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
-    "errorcode": "Error code",
-    "authorizationerror": "Authorization Error",
-    "processingfailure": "Processing failure",
-    "sopnotsupported": "Referenced SOP Class not supported",
-    "transfersyntaxnotsupported":"Referenced Transfer Syntax not supported",
-    "refused": "Refused out of Resources",
-    "notmatchsop": "Error: Data Set does not match SOP Class",
-    "cannotunderstand": "Error: Cannot understand",
-    "unknownerror": "Unknown Error",
-    "reload": "Reload erroneous files"
-  },
-  "fr": {
-    "filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
-    "locationSend": ". | dans un",
-    "album": "album.",
-    "filesErrors": "{count} fichier a rencontré une erreur. | {count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
-    "showError": "Montrer les erreurs",
-    "hideError": "Cacher les erreurs",
-    "cancel": "Annuler",
-    "titleBoxSending": "Fichiers en cours d'envois",
-    "titleBoxSended": "Fichiers envoyés",
-    "titleBoxDicomize": "En attente d'informations",
-    "unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
-    "errorcode": "Code d'erreur",
-    "authorizationerror": "Erreur d'authorisation",
-    "processingfailure": "Echec de traitement",
-    "sopnotsupported": "Classe SOP référencée non prise en charge",
-    "transfersyntaxnotsupported":"Syntaxe de transfert référencée non prise en charge",
-    "refused": "Refusé: Plus de ressources",
-    "notmatchsop": "Erreur: L'ensemble de données ne correspond pas à la classe SOP",
-    "cannotunderstand": "Erreur: Incompréhensible",
-    "unknownerror": "Erreur inconnue",
-    "reload": "Recharger les fichiers erronés"
-  }
-}
-</i18n>
 <template>
   <div>
     <div
@@ -107,17 +57,17 @@
           <span
             v-if="sending === true && UI.getInfo === false"
           >
-            {{ $t("titleBoxSending") }}
+            {{ $t("upload.titleBoxSending") }}
           </span>
           <span
             v-else-if="sending === false && UI.getInfo === false"
           >
-            {{ $t("titleBoxSended") }}
+            {{ $t("upload.titleBoxSended") }}
           </span>
           <span
             v-else-if="UI.getInfo === true"
           >
-            {{ $t("titleBoxDicomize") }}
+            {{ $t("upload.titleBoxDicomize") }}
           </span>
         </div>
         <!--
@@ -191,7 +141,7 @@
             v-if="UI.cancel === false"
           >
             <b-progress-bar
-              :value="countSentFiles+progress"
+              :value="progress"
               :max="totalSize"
               show-progress
               animated
@@ -238,15 +188,15 @@
           <div
             class="col-11 mt-2 mb-2 ml-3"
           >
-            {{ $tc("filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
-            {{ $tc("locationSend", sourceIsAlbum ? 0 : 1) }}
+            {{ $tc("upload.filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
+            {{ $tc("upload.locationSend", sourceIsAlbum ? 0 : 1) }}
             <span
               v-if="sourceIsAlbum"
             >
               <router-link
                 :to="{ name: 'album', params: { album_id: sourceSending.value }}"
               >
-                {{ $t("album") }}
+                {{ $t("upload.album") }}
               </router-link>
             </span>
 
@@ -264,7 +214,7 @@
                 v-for="(item, key) in listErrorUnknownFiles"
                 :key="item.key"
               >
-                {{ $tc("unknownError", item, {count: item }) }} <br>
+                {{ $tc("upload.unknownError", item, {count: item }) }} <br>
                 <span
                   class="text-warning"
                 >
@@ -280,7 +230,7 @@
                 class="mb-1"
               >
                 <span>
-                  {{ $tc("filesErrors", error.length, {count: error.length}) }}
+                  {{ $tc("upload.filesErrors", error.length, {count: error.length}) }}
                 </span>
               </div>
               <div
@@ -290,7 +240,7 @@
                   class="text-center text-neutral"
                   @click="retry"
                 >
-                  {{ $t('reload') }}
+                  {{ $t('upload.reload') }}
                 </a>
               </div>
               <a
@@ -298,10 +248,10 @@
                 @click="UI.showErrors=!UI.showErrors"
               >
                 <span v-if="!UI.showErrors">
-                  {{ $t("showError") }}
+                  {{ $t("upload.showError") }}
                 </span>
                 <span v-else>
-                  {{ $t("hideError") }}
+                  {{ $t("upload.hideError") }}
                 </span>
                 <error-icon
                   :height="UI.SVGheight"
@@ -380,7 +330,7 @@ export default {
             Accept: 'application/dicom+json',
           },
           onUploadProgress: (progressEvent) => {
-            this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total);
+            this.progress = this.countSentFiles + (this.currentFilesLength * (progressEvent.loaded / progressEvent.total));
           },
         },
         dicomizeData: {
@@ -390,27 +340,27 @@ export default {
         },
       },
       errorValues: {
-        0xC122: 'transfersyntaxnotsupported',
-        292: 'authorizationerror',
-        290: 'sopnotsupported',
-        272: 'processingfailure',
-        0: 'unknownerror',
+        0xC122: 'upload.transfersyntaxnotsupported',
+        292: 'upload.authorizationerror',
+        290: 'upload.sopnotsupported',
+        272: 'upload.processingfailure',
+        0: 'upload.unknownerror',
       },
       hexErrorValues: [
         {
           pattern: 255,
           value: 0xA7FF,
-          error: 'refused',
+          error: 'upload.refused',
         },
         {
           pattern: 255,
           value: 0xA9FF,
-          error: 'notmatchsop',
+          error: 'upload.notmatchsop',
         },
         {
           pattern: 4095,
           value: 0xCFFF,
-          error: 'cannotunderstand',
+          error: 'upload.cannotunderstand',
         },
       ],
       errorDicom: {
@@ -436,6 +386,9 @@ export default {
       sourceSending: 'sourceSending',
       studyUIDToSend: 'studyUIDToSend',
     }),
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     totalSizeFiles() {
       return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
     },
@@ -576,8 +529,8 @@ export default {
     },
     setAuthorizationHeader() {
       const headers = {};
-      if (this.currentuserAccessToken() !== '') {
-        headers.Authorization = `Bearer ${this.currentuserAccessToken()}`;
+      if (this.getCurrentuserAccessToken(this.oidcIsAuthenticated) !== '') {
+        headers.Authorization = `Bearer ${this.getCurrentuserAccessToken(this.oidcIsAuthenticated)}`;
       }
       return headers;
     },
@@ -686,7 +639,7 @@ export default {
       error.forEach((errorCode, id) => {
         const fileError = this.copyFiles.find((file) => file.id === id);
         if (fileError) {
-          const textError = this.errorValues[errorCode] !== undefined ? `${this.$t(this.errorValues[errorCode])} (${errorCode})` : `${this.$t('errorcode')}: ${errorCode}`;
+          const textError = this.errorValues[errorCode] !== undefined ? `${this.$t(this.errorValues[errorCode])} (${errorCode})` : `${this.$t('upload.errorcode')}: ${errorCode}`;
           this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError) });
         } else {
           this.updateListUnknownError(errorCode);
@@ -724,7 +677,7 @@ export default {
       if (errorText !== '') {
         return errorText;
       }
-      return `${this.$t('unknownerror')} (${errorCode})`;
+      return `${this.$t('upload.unknownerror')} (${errorCode})`;
     },
     dicom2map(dicom, dicomTagFile) {
       const map = new Map();

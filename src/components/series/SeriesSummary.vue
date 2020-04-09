@@ -1,25 +1,3 @@
-<i18n>{
-  "en": {
-    "modality": "Modality",
-    "numberimages": "Number of images",
-    "description": "Description",
-    "seriesdate": "Series date",
-    "seriestime": "Series time",
-    "openviewer": "Open OHIF viewer",
-    "applicationentity": "Application entity"
-  },
-  "fr": {
-    "modality": "Modalité",
-    "numberimages": "Nombre d'images",
-    "description": "Description",
-    "seriesdate": "Date de la série",
-    "seriestime": "Heure de la série",
-    "openviewer": "Ouvrir la visionneuse OHIF",
-    "applicationentity": "Application entity"
-  }
-}
-</i18n>
-
 <template>
   <div class="seriesSummaryContainer">
     <div class="row justify-content-center">
@@ -93,7 +71,11 @@ export default {
     ...mapGetters({
       studies: 'studies',
       series: 'series',
+      album: 'album',
     }),
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     imageTitle() {
       let modality = '';
       let description = '';
@@ -222,11 +204,12 @@ export default {
     },
     openTab(series) {
       const SOPPdf = '1.2.840.10008.5.1.4.1.1.104.1';
-      const token = this.currentuserAccessToken();
+      const token = this.getCurrentuserAccessToken(this.oidcIsAuthenticated);
       const windowProps = this.setWindowsProps(series);
       const openWindow = window.open('', windowProps.name);
+      const scope = this.setScope(this.source.key, this.album);
 
-      this.getViewerToken(token, this.studyInstanceUID, this.source).then((res) => {
+      this.getViewerToken(token, this.studyInstanceUID, this.source, scope).then((res) => {
         const viewerToken = res.data.access_token;
         let url = '';
         if (windowProps.id === 'WADO') {

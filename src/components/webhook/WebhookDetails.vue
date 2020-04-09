@@ -1,43 +1,3 @@
-<i18n>
-{
-  "en": {
-    "webhook": "Webhook",
-    "urlwebhook": "URL of the webhook",
-    "secret": "Secret",
-    "event": "Event",
-    "nosecret": "No secret defined",
-    "secretdefined": "A secret has been defined",
-    "enabled": "Enabled",
-    "new_series": "New series",
-    "new_user": "New user",
-    "noevent": "No event defined",
-    "numbertriggers": "Number of triggers",
-    "warningremove": "Are you sure to remove this webhook ?",
-    "edit": "Edit",
-    "webhookdisabled": "This webhook is disabled",
-    "webhookenabled": "This webhook is enabled",
-    "state": "State"
-  },
-  "fr": {
-    "webhook": "Webhook",
-    "urlwebhook": "URL du webhook",
-    "secret": "Secret",
-    "event": "Evènement",
-    "nosecret": "Pas de secret défini",
-    "secretdefined": "Un secret a été défini",
-    "enabled": "Activé",
-    "new_series": "Nouvelles séries",
-    "new_user": "Nouvel utilisateur",
-    "noevent": "Pas d'évèment défini",
-    "numbertriggers": "Nombre déclenchements",
-    "warningremove": "Etes-vous sûre de vouloir supprimer ce webhook ?",
-    "edit": "Editer",
-    "webhookdisabled": "Ce webhook est désactivé",
-    "webhookenabled": "Ce webhook est activé",
-    "state": "Etat"
-  }
-}
-</i18n>
 <template>
   <span
     v-if="Object.entries(webhook).length > 0"
@@ -63,7 +23,7 @@
     </div>
     <div class="row mb-3">
       <div :class="classColRight">
-        <b>{{ $t('urlwebhook') }}</b>
+        <b>{{ $t('webhook.urlwebhook') }}</b>
       </div>
       <div :class="classColLeft">
         {{ webhook.url }}
@@ -71,24 +31,24 @@
     </div>
     <div class="row mb-3">
       <div :class="classColRight">
-        <b>{{ $t('secret') }}</b>
+        <b>{{ $t('webhook.secret') }}</b>
       </div>
       <div :class="classColLeft">
         <span
           v-if="webhook.use_secret === true"
         >
-          {{ $t('secretdefined') }}
+          {{ $t('webhook.secretdefined') }}
         </span>
         <span
           v-else-if="webhook.use_secret === false"
         >
-          {{ $t('nosecret') }}
+          {{ $t('webhook.nosecret') }}
         </span>
       </div>
     </div>
     <div class="row mb-3">
       <div :class="classColRight">
-        <b>{{ $t('event') }}</b>
+        <b>{{ $t('webhook.event') }}</b>
       </div>
       <div :class="classColLeft">
         <span
@@ -98,30 +58,30 @@
             v-for="event in webhook.events"
             :key="event.id"
           >
-            {{ $t(event) }}
+            {{ $t(`webhook.${event}`) }}
           </li>
         </span>
         <span
           v-else-if="webhook.events.length === 0"
         >
-          {{ $t('noevent') }}
+          {{ $t('webhook.noevent') }}
         </span>
       </div>
     </div>
     <div class="row mb-3">
       <div :class="classColRight">
-        <b>{{ $t('state') }}</b>
+        <b>{{ $t('webhook.state') }}</b>
       </div>
       <div :class="classColLeft">
         <b
           v-if="webhook.enabled === true"
         >
-          {{ $t('webhookenabled') }}
+          {{ $t('webhook.webhookenabled') }}
         </b>
         <b
           v-else-if="webhook.enabled === false"
         >
-          {{ $t('webhookdisabled') }}
+          {{ $t('webhook.webhookdisabled') }}
         </b>
       </div>
     </div>

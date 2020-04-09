@@ -1,54 +1,3 @@
-<i18n>
-{
-  "en": {
-    "token": "token",
-    "description": "description",
-    "scope": "scope",
-    "album": "album",
-    "permission": "permission",
-    "write": "write",
-    "read": "read",
-    "download": "show download button",
-    "appropriate": "send to user / album",
-    "expirationdate": "expiration date",
-    "startdate": "start date",
-    "creationdate": "creation date",
-    "revokeddate": "revoke date",
-    "revoke": "Revoke",
-    "thistokenrevoked": "this token is revoked",
-    "lastuse": "last use date",
-    "back": "back",
-    "warningrevoke": "Are you sure you want to revoke this token ?",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "createdby": "Created by"
-  },
-  "fr": {
-    "token": "token",
-    "description": "description",
-    "scope": "applicable à",
-    "album": "album",
-    "permission": "permission",
-    "write": "écriture",
-    "read": "lecture",
-    "download": "bouton téléchargement",
-    "appropriate": "envoyer à un utlisateur ou album",
-    "expirationdate": "date d'expiration",
-    "startdate": "date de début",
-    "creationdate": "date de création",
-    "revokeddate": "date de révoquation",
-    "revoke": "Révoquer",
-    "thistokenrevoked": "ce token a été revoqué",
-    "lastuse": "dernière utilisation",
-    "back": "retour",
-    "warningrevoke": "Etes-vous sûr de vouloir revoquer ce token ?",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "createdby": "Créé par"
-  }
-}
-</i18n>
-
 <template>
   <div class="token">
     <div
@@ -76,13 +25,13 @@
       v-if="token.revoked"
       class="py-3 text-danger"
     >
-      {{ $t('thistokenrevoked') }}
+      {{ $t('token.thistokenrevoked') }}
     </p>
     <div>
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('scope') }}
+            {{ $t('token.scope') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9">
@@ -97,7 +46,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('album') }}
+            {{ $t('token.album') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9 word-break">
@@ -115,7 +64,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('createdby') }}
+            {{ $t('token.createdby') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9 word-break">
@@ -130,7 +79,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('permission') }}
+            {{ $t('token.permission') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9">
@@ -140,7 +89,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('expirationdate') }}
+            {{ $t('token.expirationdate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -152,7 +101,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('startdate') }}
+            {{ $t('token.startdate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -164,7 +113,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('creationdate') }}
+            {{ $t('token.creationdate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -179,7 +128,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('lastuse') }}
+            {{ $t('token.lastuse') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -194,7 +143,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('revokeddate') }}
+            {{ $t('token.revokeddate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -207,8 +156,8 @@
         class-row="mt-2"
         class-col="offset-md-3 col-sm-12 col-md-4 col-lg-2 d-block"
         class-col-warning-remove="offset-md-3 col-12 col-md-9"
-        :text-warning-remove="$t('warningrevoke')"
-        :text-button-remove="$t('revoke')"
+        :text-warning-remove="$t('token.warningrevoke')"
+        :text-button-remove="$t('disable')"
         :show-done="false"
         :loading="onloading"
         @remove="revoke"

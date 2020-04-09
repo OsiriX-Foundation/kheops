@@ -1,13 +1,3 @@
-<i18n>
-{
-  "en": {
-    "newtoken": "New token"
-  },
-  "fr": {
-    "newtoken": "Nouveau token"
-  }
-}
-</i18n>
 <template>
   <div
     v-if="writePermission"
@@ -28,7 +18,7 @@
           name="plus"
           class="mr-2"
         />
-        {{ $t('newtoken') }}
+        {{ $t('token.newtoken') }}
       </router-link>
     </div>
     <div

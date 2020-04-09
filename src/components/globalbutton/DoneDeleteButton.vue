@@ -1,15 +1,3 @@
-<i18n>
-{
-  "en": {
-    "remove": "Remove",
-    "confirm": "Confirm"
-  },
-  "fr": {
-    "remove": "Supprimer",
-    "confirm": "Confirmer"
-  }
-}
-</i18n>
 <template>
   <div
     v-if="loading === true"

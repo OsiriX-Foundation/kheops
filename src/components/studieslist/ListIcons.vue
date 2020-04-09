@@ -1,29 +1,3 @@
-<i18n>
-{
-  "en": {
-    "download": "Download",
-    "osirix": "Open OsiriX",
-    "ohif": "Open OHIF",
-    "weasis": "Open Weasis",
-    "slicer": "Open 3D Slicer",
-    "import": "Import data",
-    "comments": "Open comments",
-    "favorite": "Favorite"
-  },
-  "fr": {
-    "download": "Télécharger",
-    "osirix": "Ouvrir OsiriX",
-    "ohif": "Ouvrir OHIF",
-    "weasis": "Ouvrir Weasis",
-    "slicer": "Ouvrir 3D Slicer",
-    "import": "Importer des données",
-    "comments": "Ouvrir les commentaires",
-    "favorite": "Favori"
-  }
-}
-
-</i18n>
-
 <template>
   <span>
     <span
@@ -44,7 +18,7 @@
       <span
         v-if="OS.match(/(Mac|iPhone|iPod|iPad)/i) && showViewerIcon"
         class="ml-1"
-        :title="$t('osirix')"
+        :title="$t('viewer.osirix')"
         @click.stop="openViewer('Osirix')"
       >
         <osirix-icon
@@ -55,7 +29,7 @@
       <span
         v-if="showWeasisIcon"
         class="ml-1"
-        :title="$t('weasis')"
+        :title="$t('viewer.weasis')"
         @click.stop="openViewer('Weasis')"
       >
         <weasis-icon
@@ -66,7 +40,7 @@
       <span
         v-if="showSlicerIcon"
         class="ml-1"
-        :title="$t('slicer')"
+        :title="$t('viewer.slicer')"
         @click.stop="openViewer('Slicer')"
       >
         <slicer-icon
@@ -77,7 +51,7 @@
       <span
         v-if="showViewerIcon"
         class="ml-1"
-        :title="$t('ohif')"
+        :title="$t('viewer.ohif')"
         @click.stop="openViewer('default')"
       >
         <visibility-icon
@@ -89,7 +63,7 @@
         v-if="showImportIcon"
         for="file"
         class="ml-1 pointer display-inline"
-        :title="$t('import')"
+        :title="$t('study.import')"
         @click="setStudyUID()"
       >
         <v-icon
@@ -115,7 +89,7 @@
         class="align-middle icon-margin kheopsicon"
         name="comment-dots"
         :class="study.flag.is_commented ? 'bg-neutral fill-neutral' : ''"
-        :title="$t('comments')"
+        :title="$t('study.opencomments')"
       />
     </span>
     <span
@@ -134,7 +108,7 @@
   </span>
 </template>
 <script>
-import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import OsirixIcon from '@/components/kheopsSVG/OsirixIcon.vue';
 import SlicerIcon from '@/components/kheopsSVG/SlicerIcon.vue';
 import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
@@ -216,12 +190,19 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+      'oidcAccessToken',
+    ]),
+    ...mapGetters({
+      album: 'album',
+    }),
     OS() {
       return navigator.platform;
     },
     access_token() {
-      if (this.$keycloak.authenticated) {
-        return Vue.prototype.$keycloak.token;
+      if (this.oidcIsAuthenticated) {
+        return this.oidcAccessToken;
       }
       if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
@@ -276,7 +257,7 @@ export default {
     getURLDownload() {
       const sourceQuery = this.getSourceQueries();
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
-      const token = this.currentuserAccessToken();
+      const token = this.getCurrentuserAccessToken(this.oidcIsAuthenticated);
       this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
@@ -289,9 +270,10 @@ export default {
       const StudyInstanceUID = this.study.StudyInstanceUID.Value[0];
       const sourceQuery = this.getSourceQueries();
       const openWindow = this.setWindowsProps(viewer, StudyInstanceUID);
-      const token = this.currentuserAccessToken();
 
-      this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
+      const token = this.getCurrentuserAccessToken(this.oidcIsAuthenticated);
+      const scope = this.setScope(this.source.key, this.album);
+      this.getViewerToken(token, StudyInstanceUID, this.source, scope).then((res) => {
         const viewerToken = res.data.access_token;
         let url = '';
         if (viewer === 'Osirix') {

@@ -10,12 +10,22 @@ export const ViewerToken = {
     };
   },
   methods: {
-    getViewerToken(token, studyInstanceUID, source) {
+    setScope(source, album) {
+      const defaultScope = 'viewer read';
+      if (source === 'album') {
+        return album.add_series === true ? `${defaultScope} write` : defaultScope;
+      }
+      if (source === 'inbox') {
+        return `${defaultScope} write`;
+      }
+      return defaultScope;
+    },
+    getViewerToken(token, studyInstanceUID, source, scope='viewer read') {
       const body = {
         grant_type: this.grant_type,
         subject_token: token,
         subject_token_type: this.subject_token_type,
-        scope: this.scope,
+        scope: scope,
         studyUID: studyInstanceUID,
       };
       if (Object.keys(source).length > 0) {

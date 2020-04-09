@@ -1,34 +1,3 @@
-<i18n>
-{
-  "en": {
-    "newwebhook": "New webhook",
-    "namewebhook": "Name of the webhook",
-    "urlwebhook": "Payload URL",
-    "secret": "Secret",
-    "event": "Event",
-    "enabled": "Enabled the webhook",
-    "new_series": "New serie/s",
-    "new_user": "New user",
-    "invalidevent": "Please select minimum one event",
-    "urlnotvalid": "This url is not valid",
-    "unauthorized": "You don't have the permission to create a webhook"
-  },
-  "fr": {
-    "newwebhook": "Nouveau webhook",
-    "namewebhook": "Nom du webhook",
-    "urlwebhook": "URL du webhook",
-    "secret": "Secret",
-    "event": "Evènement",
-    "enabled": "Activer le webhook",
-    "new_series": "Nouvelle/s serie/s",
-    "new_user": "Nouvel utilisateur",
-    "invalidevent": "SVP choississez minimum une évènement",
-    "urlnotvalid": "Cette url n'est pas valide",
-    "unauthorized": "Vous n'avez pas les permissions de créer un webhook"
-  }
-}
-</i18n>
-
 <template>
   <div>
     <div
@@ -47,20 +16,20 @@
             />
           </span>
         </button>
-        {{ $t('newwebhook') }}
+        {{ $t('webhook.newwebhook') }}
       </h4>
     </div>
     <form @submit.prevent="createWebhook">
       <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('namewebhook') }}</b>
+          <b>{{ $t('webhook.namewebhook') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <input
             v-model="webhook.name"
             v-focus
             type="text"
-            :placeholder="$t('namewebhook')"
+            :placeholder="$t('webhook.namewebhook')"
             class="form-control"
             required
             maxlength="255"
@@ -70,13 +39,13 @@
       </div>
       <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('urlwebhook') }}</b>
+          <b>{{ $t('webhook.urlwebhook') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <input
             v-model="webhook.url"
             type="text"
-            :placeholder="$t('urlwebhook')"
+            :placeholder="$t('webhook.urlwebhook')"
             class="form-control"
             required
             maxlength="1024"
@@ -91,13 +60,13 @@
       </div>
       <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('secret') }}</b>
+          <b>{{ $t('webhook.secret') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <input
             v-model="webhook.secret"
             type="text"
-            :placeholder="$t('secret')"
+            :placeholder="$t('webhook.secret')"
             class="form-control"
             maxlength="1024"
           >
@@ -105,7 +74,7 @@
       </div>
       <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('event') }}</b>
+          <b>{{ $t('webhook.event') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9">
           <b-form-checkbox-group
@@ -127,7 +96,7 @@
           <b-form-checkbox
             v-model="webhook.enabled"
           >
-            <b>{{ $t('enabled') }}</b>
+            <b>{{ $t('webhook.enabled') }}</b>
           </b-form-checkbox>
         </div>
       </div>
@@ -162,8 +131,8 @@ export default {
   data() {
     return {
       eventsDefined: [
-        { value: 'new_series', text: this.$t('new_series') },
-        { value: 'new_user', text: this.$t('new_user') },
+        { value: 'new_series', text: this.$t('webhook.new_series') },
+        { value: 'new_user', text: this.$t('webhook.new_user') },
       ],
       webhook: {
         url: '',
@@ -198,7 +167,7 @@ export default {
       }).catch((err) => {
         const status = httpoperations.getStatusError(err);
         if (status === 401 || status === 403) {
-          this.$snotify.error(this.$t('unauthorized'));
+          this.$snotify.error(this.$t('texterror.unauthorized'));
         } else {
           this.$snotify.error(this.$t('sorryerror'));
         }

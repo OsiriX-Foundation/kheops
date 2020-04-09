@@ -1,28 +1,9 @@
-<i18n>
-{
-  "en":{
-    "albumname": "Album name",
-    "albumdescription": "Album description",
-    "notification": "Notifications",
-    "cancel": "Cancel",
-    "update": "Update"
-  },
-  "fr": {
-    "albumname": "Nom de l'album",
-    "albumdescription": "Description de l'album",
-    "notification": "Notifications",
-    "cancel": "Annuler",
-    "update": "Mettre à jour"
-  }
-}
-</i18n>
-
 <template>
   <div class="container">
     <dl
       class="font-large word-break-all"
     >
-      <dt>{{ $t('albumname') }}</dt>
+      <dt>{{ $t('albumsettings.albumname') }}</dt>
       <dd>
         <div v-if="edit.name === '-1'">
           {{ album.name }} <span
@@ -80,7 +61,7 @@
         </div>
       </dd>
       <dt>
-        {{ $t('albumdescription') }}
+        {{ $t('albumsettings.albumdescription') }}
         <span
           v-if="album.is_admin && edit.description === '-1'"
           class="icon-edit float-right"

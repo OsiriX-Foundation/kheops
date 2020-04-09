@@ -1,21 +1,3 @@
-<i18n>
-{
-  "en": {
-    "newprovider": "New provider",
-    "nameProvider": "Name of the provider",
-    "urlProvider": "Configuration URL of the provider",
-    "urlnotvalid": "This url is not valid"
-
-  },
-  "fr": {
-    "newprovider": "Nouveau provider",
-    "nameProvider": "Nom du provider",
-    "urlProvider": "URL de configuration",
-    "urlnotvalid": "Cette url n'est pas valide"
-  }
-}
-</i18n>
-
 <template>
   <div>
     <div
@@ -34,20 +16,20 @@
             />
           </span>
         </button>
-        {{ $t('newprovider') }}
+        {{ $t('provider.newprovider') }}
       </h4>
     </div>
     <form @submit.prevent="createProvider">
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('nameProvider') }}</b>
+          <b>{{ $t('provider.nameProvider') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9 mb-3">
           <input
             v-model="provider.name"
             v-focus
             type="text"
-            :placeholder="$t('nameProvider')"
+            :placeholder="$t('provider.nameProvider')"
             class="form-control"
             required
             maxlength="1024"
@@ -59,14 +41,14 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-3">
-          <b>{{ $t('urlProvider') }}</b>
+          <b>{{ $t('provider.urlProvider') }}</b>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9 mb-3">
           <div class="input-group mb-3">
             <input
               v-model="provider.url"
               type="text"
-              :placeholder="$t('urlProvider')"
+              :placeholder="$t('provider.urlProvider')"
               class="form-control"
               required
               maxlength="1024"

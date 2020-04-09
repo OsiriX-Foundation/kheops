@@ -1,39 +1,9 @@
-<i18n>
-{
-  "en": {
-    "nowebhooks": "There are no webhook to show",
-    "name": "Description",
-    "url": "URL",
-    "events": "Events",
-    "enabled": "Enabled",
-    "new_series": "New series",
-    "new_user": "New user",
-    "edit": "Edit",
-    "refresh": "Refresh",
-    "webhook": "Webhook",
-    "reload": "Reload"
-  },
-  "fr": {
-    "nowebhooks": "Aucun webhook créé",
-    "name": "Description",
-    "url": "URL",
-    "events": "Evènements",
-    "enabled": "Activé",
-    "new_series": "Nouvelles séries",
-    "new_user": "Nouvel utilisateur",
-    "edit": "Editer",
-    "refresh": "Rafraîchir",
-    "webhook": "Webhook",
-    "reload": "Recharger"
-  }
-}
-</i18n>
 <template>
   <div>
     <div class="d-flex">
       <div>
         <h4>
-          {{ $t('webhook') }}
+          {{ $t('webhook.webhook') }}
         </h4>
       </div>
       <div class="ml-auto">
@@ -49,6 +19,7 @@
       striped
       hover
       show-empty
+      sort-icon-left
       :items="webhooks"
       :fields="fields"
       :busy="loadingData"
@@ -64,7 +35,7 @@
         >
           <list-empty
             :status="status"
-            :text-empty="$t('nowebhooks')"
+            :text-empty="$t('webhook.nowebhooks')"
             @reload="getWebhooks()"
           />
         </div>
@@ -73,7 +44,7 @@
         <div
           class="text-warning text-center"
         >
-          {{ $t('nowebhooks') }}
+          {{ $t('webhook.nowebhooks') }}
         </div>
       </template>
       <template v-slot:cell(enabled)="row">
@@ -133,31 +104,31 @@ export default {
         {
           key: 'statuswebhook',
           label: '',
-          sortable: true,
+          sortable: false,
           tdClass: 'word-break',
         },
         {
           key: 'name',
-          label: this.$t('name'),
+          label: this.$t('webhook.name'),
           sortable: true,
           tdClass: 'word-break',
         },
         {
           key: 'url',
-          label: this.$t('url'),
+          label: this.$t('webhook.url'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-sm-table-cell',
         },
         {
           key: 'events',
-          label: this.$t('events'),
+          label: this.$t('webhook.events'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-lg-table-cell',
           formatter: (values) => {
             if (Array.isArray(values)) {
-              return values.map((value) => this.$t(value)).join(', ');
+              return values.map((value) => this.$t(`webhook.${value}`)).join(', ');
             }
             return '';
           },

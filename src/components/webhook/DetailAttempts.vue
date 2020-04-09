@@ -1,43 +1,15 @@
-<i18n>
-{
-  "en": {
-    "new_series": "new serie",
-    "new_user": "new user",
-    "activate": "Trigger by adding {event}",
-    "manualtrigger": "Manual trigger",
-    "attempt":"Attempt",
-    "status": "Status",
-    "date": "Date",
-    "-1": "An error occur",
-    "redeliver": "Redeliver",
-    "studies": "Study"
-  },
-  "fr": {
-    "new_series": "nouvelles série",
-    "new_user": "nouvel utilisateur",
-    "activate": "Déclenché par l'ajout de {event}",
-    "manualtrigger": "Déclenchement manuel",
-    "attempt":"Tentative",
-    "status": "Status",
-    "date": "Date",
-    "-1": "Une erreur est survenue",
-    "redeliver": "Redéclencher",
-    "studies": "Etude"
-  }
-}
-</i18n>
 <template>
   <span>
     <p
       v-if="trigger.is_manual_trigger === true"
     >
-      {{ $t('manualtrigger') }}
+      {{ $t('webhook.manualtrigger') }}
     </p>
     <div class="d-flex mb-2">
       <div
         class="word-break"
       >
-        {{ $t('activate', {event: $t(trigger.event)}) }}
+        {{ $t('webhook.activate', {event: $t(`webhook.event_${trigger.event}`)}) }}
         <span
           v-if="trigger.event === 'new_series'"
         >
@@ -47,7 +19,7 @@
             taget="_blank"
             active-class="active"
           >
-            {{ $t('studies') }}
+            {{ $t('webhook.studies') }}
           </router-link>
         </span>
         <span
@@ -62,7 +34,7 @@
           :disabled="disabledTrigger"
           @click="showTrigger"
         >
-          {{ $t('redeliver') }}
+          {{ $t('webhook.redeliver') }}
         </button>
       </div>
     </div>
@@ -74,9 +46,9 @@
         :key="attempt.id"
         class="p-2 bd-highlight"
       >
-        <b>{{ $t('attempt') }} {{ attempt.attempt }}</b> <br>
-        {{ $t('status') }}: {{ $t(attempt.status) }}<br>
-        {{ $t('date') }}: {{ attempt.time | formatDateTimeDetails }}<br>
+        <b>{{ $t('webhook.attempt') }} {{ attempt.attempt }}</b> <br>
+        {{ $t('webhook.status') }}: {{ $t(attempt.status) }}<br>
+        {{ $t('webhook.date') }}: {{ attempt.time | formatDateTimeDetails }}<br>
         <br>
       </span>
     </span>
@@ -101,7 +73,7 @@
             :warning="errorTrigger === true"
           />
         </span>
-        {{ $t('manualtrigger') }}
+        {{ $t('webhook.manualtrigger') }}
       </template>
       <trigger-serie
         v-if="trigger.event === 'new_series'"
@@ -123,7 +95,7 @@
           :disabled="disabledTrigger || errorTrigger"
           @click="triggerWebhook"
         >
-          {{ $t('redeliver') }}
+          {{ $t('webhook.redeliver') }}
         </button>
       </div>
     </b-modal>

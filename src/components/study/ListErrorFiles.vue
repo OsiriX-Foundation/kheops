@@ -8,16 +8,6 @@
     send emit "remove-file-ui" to the parent when :
       - when the user delete an error file
 -->
-<i18n>
-{
-  "en": {
-    "hideError": "Hide errors"
-  },
-  "fr": {
-    "hideError": "Cacher les erreurs"
-  }
-}
-</i18n>
 <template>
   <div>
     <div
@@ -54,7 +44,7 @@
         class="btn btn-primary"
         @click="hideErrors"
       >
-        <span>{{ $t('hideError') }}</span>
+        <span>{{ $t('upload.hideError') }}</span>
       </button>
     </div>
   </div>

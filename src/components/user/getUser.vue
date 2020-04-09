@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en": {
-    "username": "User name",
-    "user": "user",
-    "send": "Send",
-    "cancel": "Cancel"
-  },
-  "fr": {
-    "username": "Utilisateur",
-    "user": "Utilisateur",
-    "send": "Envoyer",
-    "cancel": "Annuler"
-  }
-}
-</i18n>
-
 <template>
   <div class="card">
     <div class="card-body">
@@ -26,7 +9,7 @@
               v-focus
               type="email"
               class="form-control"
-              :placeholder="'email '+$t('user')"
+              :placeholder="$t('user.emailuser')"
             >
           </div>
           <div class="input-group-append">
@@ -54,6 +37,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
@@ -63,6 +47,11 @@ export default {
     return {
       new_user_name: '',
     };
+  },
+  computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
   },
   methods: {
     validEmail(email) {
@@ -80,9 +69,9 @@ export default {
       });
     },
     getHeaders() {
-      if (this.authenticated) {
+      if (this.oidcIsAuthenticated) {
         return {
-          Authorization: `Bearer ${this.currentuserKeycloakToken}`,
+          Authorization: `Bearer ${this.currentuserAccessToken}`,
           Accept: 'application/json',
         };
       }

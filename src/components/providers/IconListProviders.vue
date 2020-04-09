@@ -29,7 +29,7 @@
             type="text"
             hidden
             name="access_token"
-            :value="accessToken"
+            :value="oidcAccessToken"
           />
           <b-form-input
             v-if="checkProviderModalities(study, provider)"
@@ -65,9 +65,7 @@
   </span>
 </template>
 <script>
-
-import Vue from 'vue';
-import { serverURL } from '@/app_config';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'IconListProviders',
@@ -92,13 +90,15 @@ export default {
   },
   data() {
     return {
-      serverURL,
       show: false,
     };
   },
   computed: {
-    accessToken() {
-      return Vue.prototype.$keycloak.token;
+    ...mapGetters('oidcStore', [
+      'oidcAccessToken',
+    ]),
+    serverURL() {
+      return process.env.VUE_APP_URL_API;
     },
     returnuri() {
       return `${process.env.VUE_APP_URL_ROOT}/albums/${this.albumId}?StudyInstanceUID=${encodeURIComponent(this.study.StudyInstanceUID.Value[0])}`;

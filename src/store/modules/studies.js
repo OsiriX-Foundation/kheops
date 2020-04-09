@@ -15,6 +15,7 @@ const state = {
     is_indeterminate: false,
     view: '',
   },
+  source: '',
   modalities: [],
 };
 
@@ -40,7 +41,12 @@ const getters = {
 
 // actions
 const actions = {
-  initStudies({ commit }) {
+  initStudies({ commit }, source) {
+    if (source !== undefined && typeof source === 'string') {
+      state.source = source;
+    } else {
+      state.source = '';
+    }
     commit('INIT_STUDIES');
   },
   getStudies({ commit }, params) {
@@ -152,7 +158,7 @@ const actions = {
   deleteStudy({ commit }, params) {
     const request = `/studies/${params.StudyInstanceUID}`;
     return HTTP.delete(request).then(() => {
-      commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
+      commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID, source: params.source });
       commit('DELETE_SERIE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
       return true;
     }).catch((err) => {
@@ -246,14 +252,18 @@ const mutations = {
     }
   },
   SET_STUDY_FLAG(state, params) {
-    const study = state.studies[params.index];
-    study.flag[params.flag] = params.value;
-    Vue.set(state.studies, params.index, study);
+    if (params.index !== -1 && state.studies[params.index] !== undefined) {
+      const study = state.studies[params.index];
+      study.flag[params.flag] = params.value;
+      Vue.set(state.studies, params.index, study);
+    }
   },
   DELETE_STUDY(state, params) {
-    const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
-    if (studyIdx > -1) {
-      Vue.delete(state.studies, studyIdx);
+    if (state.source === '' || state.source === params.source) {
+      const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
+      if (studyIdx > -1) {
+        Vue.delete(state.studies, studyIdx);
+      }
     }
   },
   SET_STUDY_SHOW_DETAILS(state, params) {

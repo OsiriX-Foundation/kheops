@@ -52,8 +52,8 @@ Vue.filter('maxTextLength', (value, maxlength) => {
 
 Vue.filter('getUsername', (value) => {
   if (value !== undefined) {
-    if (value.first_name !== undefined && value.last_name !== undefined) {
-      return `${value.first_name} ${value.last_name}`;
+    if (value.name !== undefined) {
+      return `${value.name}`;
     } if (value.email !== undefined) {
       return `${value.email}`;
     }

@@ -1,42 +1,3 @@
-<i18n>
-{
-  "en": {
-    "albumName": "Album Name",
-    "albumDescription": "Album Description",
-    "users": "Users",
-    "addUser": "Invite a user",
-    "addSeries": "Add studies / series",
-    "downloadSeries": "Show download button",
-    "sendSeries": "Sharing",
-    "deleteSeries": "Remove studies / series",
-    "writeComments": "Write comments",
-    "create": "Create",
-    "cancel": "Cancel",
-    "newalbum": "New album",
-    "usersettings": "Album user settings",
-    "authorizationerror": "You don't have the permissions to add the study {study}",
-    "studynotfound": "The study {study} is not found"
-  },
-  "fr": {
-    "albumName": "Nom de l'album",
-    "albumDescription": "Description de l'album",
-    "users": "Utilisateurs",
-    "addUser": "Inviter un utilisateur",
-    "addSeries": "Ajouter une étude / série",
-    "downloadSeries": "Montrer le bouton de téléchargement",
-    "sendSeries": "Partager",
-    "deleteSeries": "Supprimer une étude / série",
-    "writeComments": "Commenter",
-    "create": "Créer",
-    "cancel": "Annuler",
-    "newalbum": "Nouvel album",
-    "usersettings": "Réglages des utilisateurs de l'album",
-    "authorizationerror": "Vous n'avez pas les droits d'ajouter l'étude {study}",
-    "studynotfound": "l'étude {study} n'a pas été trouvée"
-  }
-}
-</i18n>
-
 <template>
   <div class="container">
     <h3
@@ -49,9 +10,9 @@
         <div class="row">
           <div class="col-xs-12 col-sm-3">
             <dt class="d-none d-sm-block edit-title">
-              {{ $t('albumName') }}
+              {{ $t('newalbum.albumName') }}
             </dt>
-            <b class="d-block d-sm-none">{{ $t('albumName') }}</b>
+            <b class="d-block d-sm-none">{{ $t('newalbum.albumName') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -59,7 +20,7 @@
                 v-model="album.name"
                 v-focus
                 type="text"
-                :placeholder="$t('albumName')"
+                :placeholder="$t('newalbum.albumName')"
                 class="form-control"
                 maxlength="255"
               >
@@ -70,9 +31,9 @@
         <div class="row">
           <div class="col-xs-12 col-sm-3">
             <dt class="d-none d-sm-block edit-title">
-              {{ $t('albumDescription') }}
+              {{ $t('newalbum.albumDescription') }}
             </dt>
-            <b class="d-block d-sm-none">{{ $t('albumDescription') }}</b>
+            <b class="d-block d-sm-none">{{ $t('newalbum.albumDescription') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -80,7 +41,7 @@
                 v-model="album.description"
                 rows="5"
                 class="form-control"
-                :placeholder="$t('albumDescription')"
+                :placeholder="$t('newalbum.albumDescription')"
                 maxlength="2048"
               />
             </dd>
@@ -89,9 +50,9 @@
         <div class="row">
           <div class="col-xs-12 col-sm-3">
             <dt class="d-none d-sm-block edit-title">
-              {{ $t('users') }}
+              {{ $t('newalbum.users') }}
             </dt>
-            <b class="d-block d-sm-none">{{ $t('users') }}</b>
+            <b class="d-block d-sm-none">{{ $t('newalbum.users') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -149,7 +110,7 @@
               <h4
                 class="mt-3 mb-3 ml-2"
               >
-                {{ $t('usersettings') }}
+                {{ $t('albumusersettings.usersettings') }}
               </h4>
             </div>
           </div>
@@ -179,7 +140,7 @@
                   <label
                     class="user-settings ml-2 mt-2 word-break"
                   >
-                    {{ $t(valuey[0]) }}
+                    {{ $t(`albumusersettings.${valuey[0]}`) }}
                   </label>
                 </div>
               </span>
@@ -209,7 +170,9 @@ import NewAlbumUser from '@/components/albums/NewAlbumUser';
 
 export default {
   name: 'NewAlbum',
-  components: { CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser },
+  components: {
+    CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser,
+  },
   data() {
     return {
       album: {
@@ -240,7 +203,7 @@ export default {
   },
   computed: {
     displayName() {
-      return (!this.album.album_id) ? this.$t('newalbum') : this.album.name;
+      return (!this.album.album_id) ? this.$t('newalbum.newalbum') : this.album.name;
     },
     userSettingsLength() {
       return Object.keys(this.album.userSettings).length;
@@ -400,7 +363,7 @@ export default {
       return data;
     },
     cancel() {
-      this.$router.push({ name: 'albums' });
+      this.$router.go(-1);
     },
   },
 };

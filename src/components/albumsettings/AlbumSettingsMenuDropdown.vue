@@ -1,28 +1,8 @@
-<i18n>
-{
-  "en": {
-    "general": "General",
-    "user": "Users",
-    "tokens": "Tokens",
-    "providerSR": "Report Providers",
-    "socialmedia": "Social Media",
-    "webhooks": "Webhooks"
-  },
-  "fr": {
-    "general": "Général",
-    "user": "Utilisateurs",
-    "tokens": "Tokens",
-    "providerSR": "Report Providers",
-    "socialmedia": "Réseaux sociaux",
-    "webhooks": "Webhooks"
-  }
-}
-</i18n>
 <template>
   <nav class="nav nav-pills nav-justified flex-column">
     <b-dropdown
       id="dropdown-right"
-      :text="$t(currentCategory)"
+      :text="$t(`albumsettingsmenu.${currentCategory}`)"
       variant="primary"
       class="m-2 p-2 d-flex justify-content-center"
       toggle-class="col-12"
@@ -38,7 +18,7 @@
           :to="{ name: 'albumsettings', params: { category: cat }}"
           class="nav-link font-white"
         >
-          {{ $t(cat) }}
+          {{ $t(`albumsettingsmenu.${cat}`) }}
         </router-link>
       </b-dropdown-item>
     </b-dropdown>

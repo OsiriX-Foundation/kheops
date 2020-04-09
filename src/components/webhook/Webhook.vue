@@ -1,46 +1,3 @@
-<i18n>
-{
-  "en": {
-    "webhook": "Webhook",
-    "urlwebhook": "URL of the webhook",
-    "secret": "Secret",
-    "event": "Event",
-    "nosecret": "No secret defined",
-    "secretdefined": "A secret has been defined",
-    "enabled": "Enabled",
-    "new_series": "New series",
-    "new_user": "New user",
-    "noevent": "No event defined",
-    "numbertriggers": "Number of triggers",
-    "warningremove": "Are you sure to remove this webhook ?",
-    "edit": "Edit",
-    "webhookdisabled": "This webhook is disabled",
-    "webhookenabled": "This webhook is enabled",
-    "state": "State",
-    "unauthorized": "You don't have the permissions"
-  },
-  "fr": {
-    "webhook": "Webhook",
-    "urlwebhook": "URL du webhook",
-    "secret": "Secret",
-    "event": "Evènement",
-    "nosecret": "Pas de secret défini",
-    "secretdefined": "Un secret a été défini",
-    "enabled": "Activé",
-    "new_series": "Nouvelles séries",
-    "new_user": "Nouvel utilisateur",
-    "noevent": "Pas d'évèment défini",
-    "numbertriggers": "Nombre déclenchements",
-    "warningremove": "Etes-vous sûre de vouloir supprimer ce webhook ?",
-    "edit": "Editer",
-    "webhookdisabled": "Ce webhook est désactivé",
-    "webhookenabled": "Ce webhook est activé",
-    "state": "Etat",
-    "unauthorized": "Vous n'avez pas les permissions"
-  }
-}
-</i18n>
-
 <template>
   <div>
     <div
@@ -181,7 +138,7 @@ export default {
     manageError(err) {
       const status = httpoperations.getStatusError(err);
       if (status === 401 || status === 403) {
-        this.$snotify.error(this.$t('unauthorized'));
+        this.$snotify.error(this.$t('texterror.unauthorized'));
       } else {
         this.$snotify.error(this.$t('sorryerror'));
       }

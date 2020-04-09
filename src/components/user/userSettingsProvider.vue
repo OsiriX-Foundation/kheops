@@ -1,12 +1,3 @@
-<i18n>
-{
-  "en": {
-  },
-  "fr": {
-  }
-}
-</i18n>
-
 <template>
   <div id="userSettingsProvider">
     <p>userSettingsProvider</p>

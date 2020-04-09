@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en": {
-    "cantUpload": "You can't upload when files are sending",
-    "upload": "Drop your files / directories !",
-    "cantUploadPermission": "You do not have the required permissions to upload studies.",
-    "cancel": "Cancel"
-  },
-  "fr": {
-    "cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
-    "upload": "Lâcher vos fichiers / dossiers !",
-    "cantUploadPermission": "Vous n'avez pas les permissions requises pour charger des études.",
-    "cancel": "Annuler"
-  }
-}
-</i18n>
-
 <template>
   <div
     id="file-drag-drop"
@@ -40,19 +23,19 @@
           <p
             v-if="!canUpload"
           >
-            {{ $t("cantUploadPermission") }}
+            {{ $t("upload.cantUploadPermission") }}
           </p>
           <p
             v-else-if="sending && files.length > 0"
           >
             <span>
-              {{ $t("cantUpload") }}
+              {{ $t("upload.cantUpload") }}
             </span>
           </p>
           <p
             v-else
           >
-            {{ $t("upload") }}
+            {{ $t("upload.upload") }}
           </p>
         </div>
         <div
@@ -69,7 +52,16 @@
           :class="['dropzone-area', classDragIn]"
         >
           <slot name="dropzone-content">
+            <!--
             <list
+              ref="list"
+              :permissions="permissions"
+              :album-i-d="albumID"
+              @loadfiles="inputLoadFiles"
+              @loaddirectories="inputLoadFiles"
+            />
+            -->
+            <manage-list
               ref="list"
               :permissions="permissions"
               :album-i-d="albumID"
@@ -87,11 +79,12 @@
 import { mapGetters } from 'vuex';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import List from '@/components/studieslist/List';
+import ManageList from '@/components/studieslist/ManageList';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
   name: 'ComponentDragAndDrop',
-  components: { KheopsClipLoader, List },
+  components: { KheopsClipLoader, List, ManageList },
   props: {
     permissions: {
       type: Object,

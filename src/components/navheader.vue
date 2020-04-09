@@ -1,22 +1,3 @@
-<i18n>
-{
-  "en": {
-    "welcome": "Welcome",
-    "lang": "lang",
-    "tooltipHelp": "Help",
-    "tooltipLogout": "Logout",
-    "tooltipLogin": "Login"
-  },
-  "fr": {
-    "welcome": "Bienvenue",
-    "lang": "lang",
-    "tooltipHelp": "Aide",
-    "tooltipLogout": "Déconnexion",
-    "tooltipLogin": "Se connecter"
-  }
-}
-</i18n>
-
 <template>
   <!--
     Navbar
@@ -53,56 +34,55 @@
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav right>
           <b-nav-item
-            v-if="logged"
-            v-access="'active'"
+            v-if="logged === true"
             class="font-kheops active"
           >
             <router-link
               to="/user"
             >
-              {{ currentuserFullname !== undefined ? currentuserFullname : currentuserEmail }}
+              {{ oidcUser.name }}
             </router-link>
           </b-nav-item>
           <b-nav-item
             v-else-if="logged === false"
             class="active pointer"
-            :title="$t('tooltipLogin')"
+            :title="$t('navbar.tooltipLogin')"
             @click="login()"
           >
             <span
               class="font-white"
             >
-              {{ $t('tooltipLogin') }}
+              {{ $t('navbar.tooltipLogin') }}
             </span>
           </b-nav-item>
           <b-nav-item
             class="active pointer"
-            :title="$t('tooltipHelp')"
+            :title="$t('navbar.tooltipHelp')"
             target="_blank"
-            @click="redirect('https://docs.kheops.online')"
+            @click="redirectOn('https://docs.kheops.online')"
           >
             <span
               class="font-white"
             >
-              {{ $t('tooltipHelp') }}
+              {{ $t('navbar.tooltipHelp') }}
               <v-icon name="help" />
             </span>
           </b-nav-item>
           <b-nav-item
             v-if="logged"
-            :title="$t('tooltipLogout')"
+            :title="$t('navbar.tooltipLogout')"
             class="active pointer"
-            @click="logout()"
           >
-            <span
+            <router-link
+              :to="{ path: '/oidc-logout', name: 'oidcLogout', params: {redirect: redirect} }"
               class="font-white"
             >
-              {{ $t('tooltipLogout') }}
+              {{ $t('navbar.tooltipLogout') }}
               <v-icon name="sign-out-alt" />
-            </span>
+            </router-link>
           </b-nav-item>
           <b-nav-item-dropdown
-            :text="`${$t('lang')}: ${lang}`"
+            :text="`${$t('navbar.lang')}: ${lang}`"
             toggle-class="font-white"
             right
             class="active"
@@ -127,16 +107,14 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import store from '@/store';
-import { CurrentUser } from '@/mixins/currentuser.js';
+import { mapActions, mapGetters } from 'vuex';
+import { loadLanguageAsync } from '@/setup/i18n-setup';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
 import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
 
 export default {
   name: 'NavHeader',
   components: { KheopsPyramid, KheopsFont },
-  mixins: [CurrentUser],
   props: {
     logged: {
       type: Boolean,
@@ -153,14 +131,26 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcUser',
+    ]),
     lang() {
       return this.$i18n.locale;
+    },
+    redirect: {
+      get() {
+        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      },
+      set() {
+        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      },
     },
   },
   created() {
     this.setFromLocalStorage();
   },
   methods: {
+    ...mapActions('oidcStore', ['authenticateOidcSilent', 'signOutOidc', 'authenticateOidc']),
     setFromLocalStorage() {
       const storageLanguage = localStorage.getItem('language');
       const navigatorLanguage = (navigator.language || navigator.userLanguage).split('-')[0];
@@ -170,22 +160,20 @@ export default {
         this.changeLang(navigatorLanguage);
       }
     },
-    logout() {
-      store.dispatch('logout').then(() => {
-        Vue.prototype.$keycloak.logoutFn();
-      });
-    },
-    login() {
-      Vue.prototype.$keycloak.loginFn();
-    },
     changeLang(value) {
       if (this.availableLanguage.includes(value)) {
         localStorage.setItem('language', value);
-        this.$root.$i18n.locale = value;
+        loadLanguageAsync(value);
       }
     },
-    redirect(href) {
+    redirectOn(href) {
       window.open(href, '_blank');
+    },
+    login() {
+      const payload = {
+        redirectPath: this.$route.path,
+      };
+      this.authenticateOidc(payload);
     },
   },
 };
