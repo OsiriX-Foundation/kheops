@@ -158,6 +158,7 @@
 		"warningtoggledelete": "Do you realy want to delete this user ?"
 	},
 	"albumusersettings": {
+		"add_user": "Invite a user",
 		"userlist": "List of users",
 		"allreadypresent": "This user is already present in the album",
 		"usersettings": "Album user settings",
