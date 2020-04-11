@@ -2,7 +2,7 @@
 
 ## Docker environment variables
 
-#### `KHEOPS_UI_AUTHORITY`
+#### `KHEOPS_OIDC_PROVIDER`
 
 The URL of the OIDC/OAuth2 provider.
 

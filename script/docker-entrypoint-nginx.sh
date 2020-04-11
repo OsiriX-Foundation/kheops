@@ -11,8 +11,8 @@ if [ -z "$KHEOPS_UI_CLIENTID" ]; then
     missing_env_var_secret=true
 fi
 
-if [ -z "$KHEOPS_UI_AUTHORITY" ]; then
-    echo "Missing KHEOPS_UI_AUTHORITY environment variable"
+if [ -z "$KHEOPS_OIDC_PROVIDER" ]; then
+    echo "Missing KHEOPS_OIDC_PROVIDER environment variable"
     missing_env_var_secret=true
 fi
 
@@ -55,7 +55,7 @@ if [ "$missing_env_var_secret" = true ]; then
     exit 1
 fi
 
-sed -i "s|\%{kheops_ui_authority}|$KHEOPS_UI_AUTHORITY|g" $FILENAME
+sed -i "s|\%{kheops_ui_authority}|$KHEOPS_OIDC_PROVIDER|g" $FILENAME
 sed -i "s|\%{kheops_ui_clientid}|$KHEOPS_UI_CLIENTID|g" $FILENAME
 sed -i "s|\%{kheops_api_url}|$api|g" $FILENAME
 sed -i "s|\%{kheops_ui_viewer_sm_url}|$KHEOPS_UI_VIEWER_SM_URL|g" $FILENAME
