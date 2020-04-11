@@ -157,6 +157,7 @@
 		"warningtoggledelete": "*ALBUMSUSER.WARNINGTOGGLEDELETE*"
 	},
 	"albumusersettings": {
+		"add_user": "ALBUMUSERSETTINGS.ADD_USER",
 		"userlist": "*ALBUMUSERSETTINGS.USERLIST*",
 		"allreadypresent": "*ALBUMUSERSETTINGS.ALLREADYPRESENT*",
 		"usersettings": "*ALBUMUSERSETTINGS.USERSETTINGS*",
