@@ -26,9 +26,9 @@ Viewer URL for SM modalities (optional)
 
 Set this variable to true, to disable uploading from the UI (optional, default is false)
 
-#### `KHEOPS_UI_USER_MANAGEMENT_URL`(optional, default is false)
+#### `KHEOPS_UI_USER_MANAGEMENT_URL`
 
-User management URL.
+User management URL. (optional, default is false)
 
 ### API
 
