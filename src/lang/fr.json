@@ -15,6 +15,7 @@
 	"permissiondenied": "Permission refusée",
     "invalidevent": "SVP choississez minimum une évènement",
 	"sorryerror": "Désolé, une erreur est survenue",
+    "copysuccess": "Copié avec succès",
 	"add": "Ajouter",
     "reload": "Recharger",
     "refresh": "Rafraîchir",
@@ -187,12 +188,7 @@
 		"sendSeries": "Partager",
 		"deleteSeries": "Supprimer une étude / série",
 		"writeComments": "Commenter",
-		"add_user": "Inviter un utilisateur",
-		"add_series": "Ajouter une étude / série",
-		"download_series": "Montrer le bouton de téléchargement",
-		"send_series": "Partager",
-		"delete_series": "Supprimer une étude / série",
-		"write_comments": "Commenter"
+		"add_user": "Inviter un utilisateur"
 	},
 	"comment": {
 		"includenotifications": "inclure les notifications",
@@ -269,8 +265,6 @@
 		"download": "montrer le bouton de téléchargement",
 		"appropriate": "partager",
 		"expirationdate": "Date d'expiration",
-		"copysuccess": "Copié avec succès",
-		"sorryerror": "Désolé, une erreur est survenue",
 		"tokenvalue": "Valeur du token",
 		"urlvalue": "Url d'accès aux données",
 		"warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !",

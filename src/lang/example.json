@@ -30,6 +30,7 @@
 		"albums": "*NAVBAR.ALBUMS*"
 	},
 	"user": {
+		"name": "*USER.NAME*",
 		"mail": "*USER.EMAIL*",
 		"lastname": "*USER.LASTNAME*",
 		"firstname": "*USER.FIRSTNAME*",
