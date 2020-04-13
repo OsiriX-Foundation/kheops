@@ -337,6 +337,9 @@ export default {
           headers: {
             'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary',
           },
+          onUploadProgress: (progressEvent) => {
+            this.progress = this.countSentFiles + (this.currentFilesLength * (progressEvent.loaded / progressEvent.total));
+          },
         },
       },
       errorValues: {
@@ -508,16 +511,19 @@ export default {
     },
     sendDicomizeDataPromise(idFile, data) {
       return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append(idFile, data);
-        const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
-        const headers = this.setAuthorizationHeader();
-        this.config.dicomizeData.headers = { ...this.config.dicomizeData.headers, ...headers };
-        HTTP.post(request, data, this.config.dicomizeData).then((res) => {
-          resolve(res);
-        }).catch((err) => {
-          reject(err);
-        });
+        if (!this.UI.cancel && this.files.length > 0) {
+          const formData = new FormData();
+          this.currentFilesLength = 1;
+          formData.append(idFile, data);
+          const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
+          const headers = this.setAuthorizationHeader();
+          this.config.dicomizeData.headers = { ...this.config.dicomizeData.headers, ...headers };
+          HTTP.post(request, data, this.config.dicomizeData).then((res) => {
+            resolve(res);
+          }).catch((err) => {
+            reject(err);
+          });
+        }
       });
     },
     sendFormData(files) {
