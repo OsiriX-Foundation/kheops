@@ -124,12 +124,12 @@ Now you can begin your translation for KHEOPS. To see all translations used in t
 
 #### Display your language in the UI
 
-In the file [KheopsUI/src/components/navheader.vue](src/components/navheader.vue) add the new language in the `availableLanguage` data. The new language will be loaded when it is selected. For example on adding `es` in `availableLanguage`, the file `es.js` will be loaded when the language spanish selected.
+In the file [KheopsUI/src/lang/availablelanguage.js](src/lang/availablelanguage.js) add the new language in the `availableLanguage` const. The new language will be loaded when it is selected. For example on adding `es` in `availableLanguage`, the file `es.js` will be loaded when the language spanish selected.
 
 ```
-availableLanguage: [
-    'en',
-    'fr',
-    'es',
-],
+const availableLanguage = [
+  'en',
+  'fr',
+  'es',
+];
 ```

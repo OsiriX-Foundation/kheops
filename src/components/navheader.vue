@@ -111,6 +111,7 @@ import { mapActions, mapGetters } from 'vuex';
 import { loadLanguageAsync } from '@/setup/i18n-setup';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
 import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
+import availableLanguage from '@/lang/availablelanguage';
 
 export default {
   name: 'NavHeader',
@@ -122,18 +123,13 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      availableLanguage: [
-        'en',
-        'fr',
-      ],
-    };
-  },
   computed: {
     ...mapGetters('oidcStore', [
       'oidcUser',
     ]),
+    availableLanguage() {
+      return availableLanguage;
+    },
     lang() {
       return this.$i18n.locale;
     },
