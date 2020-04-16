@@ -18,18 +18,11 @@ fi
 
 
 #Verify environment variables
-if [[ -z $KHEOPS_ROOT_SCHEME ]]; then
-  echo "Missing KHEOPS_ROOT_SCHEME environment variable"
+if [[ -z $KHEOPS_ROOT_URL ]]; then
+  echo "Missing KHEOPS_ROOT_URL environment variable"
   missing_env_var_secret=true
 else
-   echo -e "environment variable KHEOPS_ROOT_SCHEME \e[92mOK\e[0m"
-fi
-
-if [[ -z $KHEOPS_ROOT_HOST ]]; then
-  echo "Missing KHEOPS_ROOT_HOST environment variable"
-  missing_env_var_secret=true
-else
-   echo -e "environment variable KHEOPS_ROOT_HOST \e[92mOK\e[0m"
+   echo -e "environment variable KHEOPS_ROOT_URL \e[92mOK\e[0m"
 fi
 
 if [[ -z $KHEOPS_DICOMWEB_PROXY_HOST ]]; then
@@ -132,9 +125,11 @@ port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[
 # extract the path (if any)
 path="$(echo $url | grep / | cut -d/ -f2-)"
 
+roothost="$(awk -F/ '{sub("^[^@]+@","",$3); print $3}' <<<$KHEOPS_ROOT_URL)"
+
 #get env var
 chmod a+w /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST|g" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${root_url}|$KHEOPS_ROOT_URL|g" /etc/nginx/conf.d/kheops.conf
 
 sed -i "s|\${DICOMWebProxy_url}|http://$KHEOPS_DICOMWEB_PROXY_HOST:$KHEOPS_DICOMWEB_PROXY_PORT|g" /etc/nginx/conf.d/kheops.conf
 sed -i "s|\${kheopsAuthorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|g" /etc/nginx/conf.d/kheops.conf
@@ -142,7 +137,7 @@ sed -i "s|\${kheopsAuthorizationProxy_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_
 sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|g" /etc/nginx/conf.d/kheops.conf
 sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|g" /etc/nginx/conf.d/kheops.conf
 
-sed -i "s|\${server_name}|$KHEOPS_ROOT_HOST|g" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${server_name}|$roothost|g" /etc/nginx/conf.d/kheops.conf
 sed -i "s|\${keycloak_url}|$proto$host|g" /etc/nginx/conf.d/kheops.conf
 
 echo "Ending setup NGINX secrets and env var"
