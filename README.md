@@ -10,7 +10,7 @@ The URL of the OIDC/OAuth2 provider.
 
 The client application's identifier as registered with the OIDC/OAuth2 provider.
 
-#### `KHEOPS_UI_ROOT_URL`
+#### `KHEOPS_ROOT_URL`
 
 User interface URL. Use the following example to avoid any problem. `https://demo.kheops.online`
 
