@@ -22,26 +22,11 @@ if [ -z "$KHEOPS_ROOT_URL" ]; then
 fi
 
 if [ -z "$KHEOPS_API_URL" ]; then
-    if [ -z "$KHEOPS_ROOT_SCHEME" ]; then
-        echo "Missing KHEOPS_ROOT_SCHEME environment variable"
-        missing_env_var_secret=true
-    fi
-
-    if [ -z "$KHEOPS_ROOT_HOST" ]; then
-        echo "Missing KHEOPS_ROOT_HOST environment variable"
-        missing_env_var_secret=true
-    fi
-
-    if [ -z "$KHEOPS_ROOT_PORT" ]; then
-        echo "Missing KHEOPS_ROOT_PORT environment variable"
-        missing_env_var_secret=true
-    fi
-
     if [ -z "$KHEOPS_API_PATH" ]; then
         echo "Missing KHEOPS_API_PATH environment variable"
         missing_env_var_secret=true
     fi
-    api="${KHEOPS_ROOT_SCHEME}://${KHEOPS_ROOT_HOST}:${KHEOPS_ROOT_PORT}${KHEOPS_API_PATH}"
+    api="${KHEOPS_ROOT_URL}${KHEOPS_API_PATH}"
 else
     if [ -z "$KHEOPS_API_URL" ]; then
         echo "Missing KHEOPS_API_URL environment variable"
