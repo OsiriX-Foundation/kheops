@@ -20,8 +20,6 @@ if ! [ -f ${SECRET_FILE_PATH}/kheops_client_zippersecret ]; then
     missing_env_var_secret=true
 fi
 
-
-
 #Verify environment variables
 if [ -z "$KHEOPS_AUTHDB_USER" ]; then
     echo "Missing KHEOPS_AUTHDB_USER environment variable"
@@ -35,16 +33,8 @@ if [ -z "$KHEOPS_AUTHDB_NAME" ]; then
     echo "Missing KHEOPS_AUTHDB_NAME environment variable"
     missing_env_var_secret=true
 fi
-if [ -z "KHEOPS_ROOT_SCHEME" ]; then
-    echo "Missing KHEOPS_ROOT_SCHEME environment variable"
-    missing_env_var_secret=true
-fi
-if [ -z "KHEOPS_ROOT_HOST" ]; then
-    echo "Missing KHEOPS_ROOT_HOST environment variable"
-    missing_env_var_secret=true
-fi
-if [ -z "KHEOPS_ROOT_PORT" ]; then
-    echo "Missing KHEOPS_ROOT_PORT environment variable"
+if [ -z "$KHEOPS_ROOT_URL" ]; then
+    echo "Missing KHEOPS_ROOT_URL environment variable"
     missing_env_var_secret=true
 fi
 if [ -z "$KHEOPS_PACS_PEP_HOST" ]; then
@@ -111,11 +101,8 @@ done
 
 
 #get env var
-if { [ "$KHEOPS_ROOT_SCHEME" = "http" ] && [ "$KHEOPS_ROOT_PORT" = "80" ]; } || { [ "$KHEOPS_ROOT_SCHEME" = "https" ] && [ "$KHEOPS_ROOT_PORT" = "443" ]; }; then
-    sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST|" ${REPLACE_FILE_PATH}
-else
-    sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_SCHEME://$KHEOPS_ROOT_HOST:$KHEOPS_ROOT_PORT|" ${REPLACE_FILE_PATH}
-fi
+
+sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_URL|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_user}|$KHEOPS_AUTHDB_USER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_postgresql_url}|$KHEOPS_AUTHDB_URL/$KHEOPS_AUTHDB_NAME|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
