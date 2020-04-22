@@ -11,7 +11,7 @@
         :key="user.email"
       >
         <td>
-          {{ user|getUsername }} {{ user.email !== undefined ? `- ${user.email}` : '' }}
+          {{ user|getUsername }}
           <span
             v-if="user.is_admin"
           >

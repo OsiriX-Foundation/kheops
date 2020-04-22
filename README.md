@@ -10,7 +10,7 @@ The URL of the OIDC/OAuth2 provider.
 
 The client application's identifier as registered with the OIDC/OAuth2 provider.
 
-#### `KHEOPS_UI_ROOT_URL`
+#### `KHEOPS_ROOT_URL`
 
 User interface URL. Use the following example to avoid any problem. `https://demo.kheops.online`
 
@@ -32,27 +32,15 @@ User management URL. (optional, default is false)
 
 ### API
 
-You have two ways to define the API URL. You must use one.
+There are two ways to define the API URL. One must be used.
 
-**The first is to use the defined environment variable of the KHEOPS API.**
-
-#### `KHEOPS_ROOT_SCHEME`
-
-The API scheme
-
-#### `KHEOPS_ROOT_HOST`
-
-The API hostname
-
-#### `KHEOPS_ROOT_PORT`
-
-The API port
+**The first is to define a path relative to the KHEOPS_ROOT_URL.**
 
 #### `KHEOPS_API_PATH`
 
 The API pathname. Start with `/` to avoid any problems.
 
-**The second is following below.**
+**The second is to define the absolute URL to the KHEOPS backend API.**
 
 #### `KHEOPS_API_URL`
 
