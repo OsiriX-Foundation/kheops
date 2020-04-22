@@ -51,12 +51,8 @@ Vue.filter('maxTextLength', (value, maxlength) => {
 });
 
 Vue.filter('getUsername', (value) => {
-  if (value !== undefined) {
-    if (value.name !== undefined) {
-      return `${value.name}`;
-    } if (value.email !== undefined) {
-      return `${value.email}`;
-    }
+  if (value !== undefined && value.email !== undefined) {
+    return `${value.email}`;
   }
   return 'bad value';
 });
