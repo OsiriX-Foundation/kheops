@@ -386,7 +386,6 @@ export default {
   },
   data() {
     return {
-      defaultTimeOut: 300,
       selectedDate: null,
       infiniteId: 0,
       showFilters: false,
