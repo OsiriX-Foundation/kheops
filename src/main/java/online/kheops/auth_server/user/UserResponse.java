@@ -64,9 +64,8 @@ public class UserResponse  implements Comparable<UserResponse> {
         userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
     }
 
-    public void setReportProvider(ReportProvider reportProvider) {
-        this.reportProvider = new ReportProviderResponse(reportProvider);
-        this.reportProvider.webhookResponse();
+    public void setReportProvider(ReportProvider reportProvider, ReportProviderResponse.Type type) {
+        this.reportProvider = new ReportProviderResponse(reportProvider, type);
     }
 
     public void setCapabilityToken(Capability capability) {
