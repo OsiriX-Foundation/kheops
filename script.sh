@@ -187,8 +187,12 @@ if [[ ! -f /usr/share/nginx/certificates/fullchain.pem ]];then
     mkdir -p /usr/share/nginx/certificates
 fi
 
-### If certificates don't exist yet we must ensure we create them to start nginx
-if [[ ! -f /usr/share/nginx/certificates/fullchain.pem ]]; then
+### If we already have certbot generated certificates, copy them over
+if [[ -f "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/privkey.pem" ]]; then
+    cp "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/privkey.pem" /usr/share/nginx/certificates/privkey.pem
+    cp "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/fullchain.pem" /usr/share/nginx/certificates/fullchain.pem
+    cp "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/chain.pem" /usr/share/nginx/certificates/chain.pem
+else
     openssl genrsa -out /usr/share/nginx/certificates/privkey.pem 4096
     openssl req -new -key /usr/share/nginx/certificates/privkey.pem -out /usr/share/nginx/certificates/cert.csr -nodes -subj \
     "/C=PT/ST=World/L=World/O=$roothost/OU=kheops lda/CN=${roothost}"
