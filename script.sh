@@ -2,21 +2,6 @@
 
 missing_env_var_secret=false
 
-#Verify secrets
-if ! [ -f ${SECRET_FILE_PATH}/privkey1.pem ]; then
-    echo "Missing privkey1.pem secret"
-    missing_env_var_secret=true
-else
-   echo -e "secret privkey1.pem \e[92mOK\e[0m"
-fi
-if ! [ -f ${SECRET_FILE_PATH}/fullchain1.pem ]; then
-    echo "Missing fullchain1.pem secret"
-    missing_env_var_secret=true
-else
-   echo -e "secret fullchain1.pem \e[92mOK\e[0m"
-fi
-
-
 #Verify environment variables
 if [[ -z $KHEOPS_ROOT_URL ]]; then
   echo "Missing KHEOPS_ROOT_URL environment variable"
@@ -102,6 +87,13 @@ else
    echo -e "environment variable KHEOPS_OIDC_PROVIDER \e[92mOK\e[0m"
 fi
 
+if [[ -z $LETS_ENCRYPT_EMAIL ]]; then
+  echo "Missing LETS_ENCRYPT_EMAIL environment variable"
+  missing_env_var_secret=true
+else
+   echo -e "environment variable LETS_ENCRYPT_EMAIL \e[92mOK\e[0m"
+fi
+
 #if missing env var or secret => exit
 if [[ $missing_env_var_secret = true ]]; then
   exit 1
@@ -125,7 +117,7 @@ port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[
 # extract the path (if any)
 path="$(echo $url | grep / | cut -d/ -f2-)"
 
-roothost="$(awk -F/ '{sub("^[^@]+@","",$3); print $3}' <<<$KHEOPS_ROOT_URL)"
+export roothost="$(awk -F/ '{sub("^[^@]+@","",$3); print $3}' <<<$KHEOPS_ROOT_URL)"
 
 #get env var
 chmod a+w /etc/nginx/conf.d/kheops.conf
@@ -183,6 +175,33 @@ if ! [ -z "$KHEOPS_REVERSE_PROXY_ENABLE_ELASTIC" ]; then
 else
     echo "[INFO] : Missing KHEOPS_REVERSE_PPROXY_ENABLE_ELASTIC environment variable. Elastic is not enable."
 fi
+
+### Let's Encrypt
+# based on https://ilhicas.com/2019/03/02/Nginx-Letsencrypt-Docker.html
+# Create a self signed default certificate, so Ngix can start before we have
+# any real certificates.
+
+#Ensure we have folders available
+
+if [[ ! -f /usr/share/nginx/certificates/fullchain.pem ]];then
+    mkdir -p /usr/share/nginx/certificates
+fi
+
+### If certificates don't exist yet we must ensure we create them to start nginx
+if [[ ! -f /usr/share/nginx/certificates/fullchain.pem ]]; then
+    openssl genrsa -out /usr/share/nginx/certificates/privkey.pem 4096
+    openssl req -new -key /usr/share/nginx/certificates/privkey.pem -out /usr/share/nginx/certificates/cert.csr -nodes -subj \
+    "/C=PT/ST=World/L=World/O=$roothost/OU=kheops lda/CN=${roothost}"
+    openssl x509 -req -days 365 -in /usr/share/nginx/certificates/cert.csr -signkey /usr/share/nginx/certificates/privkey.pem -out /usr/share/nginx/certificates/fullchain.pem
+    cp /usr/share/nginx/certificates/fullchain.pem /usr/share/nginx/certificates/chain.pem
+fi
+
+### Send certbot Emission/Renewal to background
+$(while :; do /opt/certbot.sh; sleep "12h"; done;) &
+
+### Check for changes in the certificate (i.e renewals or first start) and send this process to background
+$(while inotifywait -e close_write /usr/share/nginx/certificates; do nginx -s reload; done) &
+
 
 #######################################################################################
 
