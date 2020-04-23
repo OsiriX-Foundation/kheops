@@ -62,6 +62,8 @@ public class UserResponse  implements Comparable<UserResponse> {
         albumAccess = userResponseBuilder.getAlbumAccess();
         studyAccess = userResponseBuilder.getStudyAccess();
         userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
+        userResponseBuilder.getIsAdmin().ifPresent(value -> isAdmin = value);
+
     }
 
     public void setReportProvider(ReportProvider reportProvider, ReportProviderResponse.Type type) {

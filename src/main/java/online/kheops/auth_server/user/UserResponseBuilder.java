@@ -11,7 +11,7 @@ public class UserResponseBuilder {
     private Boolean albumAccess;
     private Boolean studyAccess;
     private Optional<Boolean> canAccess = Optional.empty();
-    private Boolean isAdmin;
+    private Optional<Boolean> isAdmin = Optional.empty();
 
     public UserResponseBuilder() {/*empty*/}
 
@@ -42,7 +42,7 @@ public class UserResponseBuilder {
         return this;
     }
     public UserResponseBuilder isAdmin(Boolean isAdmin) {
-        this.isAdmin = isAdmin;
+        this.isAdmin =  Optional.ofNullable(isAdmin);
         return this;
     }
 
@@ -65,6 +65,6 @@ public class UserResponseBuilder {
     public String getSub() { return sub; }
     public Boolean getAlbumAccess() { return albumAccess; }
     public Boolean getStudyAccess() { return studyAccess; }
-    public Boolean getisAdmin() { return isAdmin; }
+    public Optional<Boolean> getIsAdmin() { return isAdmin; }
     public Optional<Boolean> getCanAccess() { return canAccess; }
 }

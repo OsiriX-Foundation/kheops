@@ -149,7 +149,7 @@ public class EventResponse {
             mutation.getReportProvider().ifPresent(mutationReportProvider -> {
                 reportProvider = new ReportProviderResponse(mutationReportProvider, ReportProviderResponse.Type.EVENT);
             });
-        }   
+        }
         if (mutationType.equals(Events.MutationType.NEW_REPORT.toString())) {
             mutation.getReportProvider().ifPresent(mutationReportProvider -> {
                 source.setReportProvider(mutationReportProvider, ReportProviderResponse.Type.EVENT);
