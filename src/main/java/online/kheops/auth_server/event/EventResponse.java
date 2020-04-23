@@ -119,14 +119,15 @@ public class EventResponse {
 
         }
         if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.NEW_REPORT.toString())) {
+                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString())) {
             series = new SeriesResponse();
             study = new StudyResponse();
             series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
             series.seriesDescription = mutation.getSeries().getSeriesDescription();
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
+            mutation.getReportProvider().ifPresent(mutationReportProvider ->
+                    source.setReportProvider(mutationReportProvider, ReportProviderResponse.Type.EVENT));
         }
         if (mutationType.equals(Events.MutationType.ADD_FAV.toString()) ||
                 mutationType.equals(Events.MutationType.REMOVE_FAV.toString())) {
@@ -149,14 +150,8 @@ public class EventResponse {
         if (mutationType.equals(Events.MutationType.CREATE_REPORT_PROVIDER.toString()) ||
                 mutationType.equals(Events.MutationType.DELETE_REPORT_PROVIDER.toString()) ||
                 mutationType.equals(Events.MutationType.EDIT_REPORT_PROVIDER.toString())) {
-            mutation.getReportProvider().ifPresent(mutationReportProvider -> {
-                reportProvider = new ReportProviderResponse(mutationReportProvider, ReportProviderResponse.Type.EVENT);
-            });
-        }
-        if (mutationType.equals(Events.MutationType.NEW_REPORT.toString())) {
-            mutation.getReportProvider().ifPresent(mutationReportProvider -> {
-                source.setReportProvider(mutationReportProvider, ReportProviderResponse.Type.EVENT);
-            });
+            mutation.getReportProvider().ifPresent(mutationReportProvider ->
+                    reportProvider = new ReportProviderResponse(mutationReportProvider, ReportProviderResponse.Type.EVENT));
         }
 
         mutation.getCapability().ifPresent(mutationCapability -> source.setCapabilityToken(mutationCapability));
