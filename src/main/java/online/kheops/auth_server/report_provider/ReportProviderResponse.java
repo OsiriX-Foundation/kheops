@@ -23,7 +23,6 @@ public class ReportProviderResponse {
             public void buildResponse(ReportProviderResponse response, ReportProvider reportProvider) {
                 response.name = reportProvider.getName();
                 response.clientId = reportProvider.getClientId();
-                response.isRemoved = reportProvider.isRemoved();
             }
         },
         EVENT{
@@ -31,6 +30,7 @@ public class ReportProviderResponse {
             public void buildResponse (ReportProviderResponse response, ReportProvider reportProvider) {
                 response.name = reportProvider.getName();
                 response.clientId = reportProvider.getClientId();
+                response.isRemoved = reportProvider.isRemoved();
             }
         };
 
