@@ -27,27 +27,6 @@ public class EventResponse {
         private String studyDescription;
     }
 
-    private static class EventCapabilityResponse {
-        @XmlElement(name = "title")
-        private String title;
-        @XmlElement(name = "id")
-        private String id;
-    }
-
-    private static class EventReportProviderResponse {
-        @XmlElement(name = "name")
-        private String name;
-        @XmlElement(name = "id")
-        private String id;
-        @XmlElement(name = "is_removed")
-        private boolean removed;
-
-    }
-
-    private static class EventSourceResponse {
-
-    }
-
 
     @XmlElement(name = "event_type")
     private String eventType;
@@ -72,10 +51,8 @@ public class EventResponse {
     private SeriesResponse series;
     @XmlElement(name = "study")
     private StudyResponse study;
-    @XmlElement(name = "capability")
-    private EventCapabilityResponse capability;
     @XmlElement(name = "report_provider")
-    private EventReportProviderResponse reportProvider;
+    private ReportProviderResponse reportProvider;
 
     private EventResponse() { /*empty*/ }
 
@@ -165,9 +142,20 @@ public class EventResponse {
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
         }
-        mutation.getReportProvider().ifPresent(mutationReportProvider -> {
-            source.setReportProvider(mutationReportProvider, ReportProviderResponse.Type.EVENT);
-        });
+
+        if (mutationType.equals(Events.MutationType.CREATE_REPORT_PROVIDER.toString()) ||
+                mutationType.equals(Events.MutationType.DELETE_REPORT_PROVIDER.toString()) ||
+                mutationType.equals(Events.MutationType.EDIT_REPORT_PROVIDER.toString())) {
+            mutation.getReportProvider().ifPresent(mutationReportProvider -> {
+                reportProvider = new ReportProviderResponse(mutationReportProvider, ReportProviderResponse.Type.EVENT);
+            });
+        }   
+        if (mutationType.equals(Events.MutationType.NEW_REPORT.toString())) {
+            mutation.getReportProvider().ifPresent(mutationReportProvider -> {
+                source.setReportProvider(mutationReportProvider, ReportProviderResponse.Type.EVENT);
+            });
+        }
+
         mutation.getCapability().ifPresent(mutationCapability -> source.setCapabilityToken(mutationCapability));
     }
 }
