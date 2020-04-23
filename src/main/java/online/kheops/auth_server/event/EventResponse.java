@@ -78,10 +78,13 @@ public class EventResponse {
         postDate = comment.getEventTime();
         if (comment.getPrivateTargetUser() != null) {
             privateComment = true;
-            target = new UserResponseBuilder()
+            final UserResponseBuilder targetResponseBuilder = new UserResponseBuilder()
                     .setUser(comment.getPrivateTargetUser())
-                    .setCanAccess(userMember.containsKey(comment.getPrivateTargetUser().getSub()))
-                    .build();
+                    .setCanAccess(userMember.containsKey(comment.getPrivateTargetUser().getSub()));
+            if (comment.getAlbum() != null && userMember.containsKey(comment.getPrivateTargetUser().getSub())) {
+                targetResponseBuilder.isAdmin(userMember.get(comment.getPrivateTargetUser().getSub()));
+            }
+            target = targetResponseBuilder.build();
         } else {
             privateComment = false;
         }
