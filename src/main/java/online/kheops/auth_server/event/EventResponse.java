@@ -80,7 +80,7 @@ public class EventResponse {
             privateComment = true;
             target = new UserResponseBuilder()
                     .setUser(comment.getPrivateTargetUser())
-                    .setCanAccess(userMember.get(comment.getPrivateTargetUser().getSub()))
+                    .setCanAccess(userMember.containsKey(comment.getPrivateTargetUser().getSub()))
                     .build();
         } else {
             privateComment = false;
