@@ -24,7 +24,7 @@ public class OIDCProviderContextListener implements ServletContextListener {
         }
     }
 
-    private static String getOIDCProvider() {
+    public static String getOIDCProvider() {
         verifyState();
         return servletContext.getInitParameter("online.kheops.oidc.provider");
     }
