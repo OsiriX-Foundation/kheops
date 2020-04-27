@@ -21,7 +21,7 @@ Props :
           :key="user.email"
         >
           <td>
-            {{ user|getUsername }}
+            {{ user|getUsername }} {{ user.name !== undefined ? `- ( ${user.name} )` : '' }}
             <span
               v-if="user.is_admin"
             >
