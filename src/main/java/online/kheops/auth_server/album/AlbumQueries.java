@@ -1,17 +1,18 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumSeries;
-import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
+import org.jooq.JoinType;
 import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -300,6 +301,39 @@ public class AlbumQueries {
         } catch (Exception e) {
             throw new JOOQException("Error during request");
         }
+    }
+
+    public static AlbumResponse findAlbumByAlbumIdCriteria(String albumId, EntityManager em) {
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery c = cb.createQuery();
+        Root<Album> album = c.from(Album.class);
+
+        Join<Album, AlbumSeries> albumSeries = album.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
+        Join<AlbumSeries, Series> series = albumSeries.join("series", javax.persistence.criteria.JoinType.LEFT);
+        Join<Series, Study> study = series.join("study", javax.persistence.criteria.JoinType.LEFT);
+
+        c.multiselect(album.get("pk"), album.get("id"), album.get("name"), album.get("description"),
+                cb.countDistinct(study.get("pk")),
+                cb.countDistinct(series.get("pk")),
+                cb.function("string_agg", String.class,  cb.literal("series.modality"), cb.literal(",")),
+                //cb.function("sum", String.class,  series.get("numberOfSeriesRelatedInstances")),
+                cb.sum(series.get("numberOfSeriesRelatedInstances"))
+        );
+
+
+        ParameterExpression<String> p = cb.parameter(String.class, "albumId");
+        Predicate condition = cb.equal(album.get("id"), p);
+        c.where(condition);
+
+        c.groupBy(album.get("pk"));
+
+        javax.persistence.Query q = em.createQuery(c);
+        q.setParameter("albumId", albumId);
+        List res = q.getResultList();
+
+        return null;
+
     }
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
