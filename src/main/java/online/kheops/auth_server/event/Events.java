@@ -135,22 +135,12 @@ public class Events {
             final Album album = getAlbum(albumId, em);
 
             final HashMap<String, Boolean> userMember = new HashMap<>();
+            for(AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
+            }
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
-                if (!userMember.containsKey(e.getUser().getKeycloakId())) {
-                    userMember.put(e.getUser().getKeycloakId(), isMemberOfAlbum(e.getUser(), album, em));
-                }
-                if (e instanceof Comment) {
-                    if (e.getPrivateTargetUser() != null && !userMember.containsKey(e.getPrivateTargetUser().getKeycloakId())) {
-                        userMember.put(e.getPrivateTargetUser().getKeycloakId(), isMemberOfAlbum(e.getPrivateTargetUser(), album, em));
-                    }
-                    eventResponses.add(new EventResponse((Comment)e, userMember));
-                } else if (e instanceof Mutation) {
-                    if (((Mutation) e).getToUser() != null && !userMember.containsKey(((Mutation) e).getToUser().getKeycloakId())) {
-                        userMember.put(((Mutation) e).getToUser().getKeycloakId(), isMemberOfAlbum(((Mutation) e).getToUser(), album, em));
-                    }
-                    eventResponses.add(new EventResponse((Mutation) e, userMember));
-                }
+                eventResponses.add(new EventResponse(e, userMember));
             }
 
             XTotalCount = EventQueries.getTotalEventsByAlbum(callingUser, album, em);
@@ -171,15 +161,12 @@ public class Events {
         try {
             final Album album = getAlbum(albumId, em);
             final HashMap<String, Boolean> userMember = new HashMap<>();
+            for(AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
+            }
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                if (!userMember.containsKey(m.getUser().getKeycloakId())) {
-                    userMember.put(m.getUser().getKeycloakId(), isMemberOfAlbum(m.getUser(), album, em));
-                }
-                if (m.getToUser() != null && !userMember.containsKey(m.getToUser().getKeycloakId())) {
-                    userMember.put(m.getToUser().getKeycloakId(), isMemberOfAlbum(m.getToUser(), album, em));
-                }
-                    eventResponses.add(new EventResponse(m, userMember));
+                eventResponses.add(new EventResponse(m, userMember));
             }
 
             XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
@@ -196,19 +183,17 @@ public class Events {
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final HashMap<String, Boolean> userMember = new HashMap<>();
 
         try {
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
+            final HashMap<String, Boolean> userMember = new HashMap<>();
+            for(AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
+            }
+
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
-                if (!userMember.containsKey(c.getUser().getKeycloakId())) {
-                    userMember.put(c.getUser().getKeycloakId(), isMemberOfAlbum(c.getUser(), album, em));
-                }
-                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
-                    userMember.put(c.getPrivateTargetUser().getKeycloakId(), isMemberOfAlbum(c.getPrivateTargetUser(), album, em));
-                }
                 eventResponses.add(new EventResponse(c, userMember));
             }
             XTotalCount = EventQueries.getTotalCommentsByAlbum(callingUser, album, em);
@@ -241,11 +226,11 @@ public class Events {
             }
 
             for (Comment c : comments) {
-                if (!userMember.containsKey(c.getUser().getKeycloakId())) {
-                    userMember.put(c.getUser().getKeycloakId(), canAccessStudy(c.getUser(), c.getStudy(), em));
+                if (!userMember.containsKey(c.getUser().getSub()) && canAccessStudy(c.getUser(), c.getStudy(), em)) {
+                    userMember.put(c.getUser().getSub(), null);
                 }
-                if (c.getPrivateTargetUser() != null && isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getKeycloakId())) {
-                    userMember.put(c.getPrivateTargetUser().getKeycloakId(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
+                if (c.getPrivateTargetUser() != null && !isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub()) && canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em)) {
+                    userMember.put(c.getPrivateTargetUser().getSub(), null);
                 }
                 eventResponses.add(new EventResponse(c, userMember));
             }

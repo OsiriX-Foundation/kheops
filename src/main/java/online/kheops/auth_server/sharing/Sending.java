@@ -237,7 +237,7 @@ public class Sending {
                 ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
                 reportProvider = em.merge(reportProvider);
                 newSeriesWebhook.setReportProvider(reportProvider);
-                mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
+                mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.IMPORT_SERIES, availableSeries);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             }
@@ -402,7 +402,7 @@ public class Sending {
             } else {
                 kheopsLogBuilder.fromAlbum("inbox");
             }
-            kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
+            kheopsLogBuilder.targetUser(targetUser.getSub())
                     .action(ActionType.SHARE_STUDY_WITH_USER)
                     .study(studyInstanceUID)
                     .log();
@@ -427,7 +427,7 @@ public class Sending {
             final User targetUser = getUser(targetUsername, em);
             callingUser = em.merge(callingUser);
 
-            kheopsLogBuilder.targetUser(targetUser.getKeycloakId())
+            kheopsLogBuilder.targetUser(targetUser.getSub())
                     .action(ActionType.SHARE_SERIES_WITH_USER)
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID);

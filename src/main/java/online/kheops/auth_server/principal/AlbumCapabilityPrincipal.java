@@ -38,14 +38,14 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
         kheopsLogBuilder = new KheopsLogBuilder()
                 .provenance(this)
-                .user(user.getKeycloakId())
+                .user(user.getSub())
                 .albumScope(capability.getAlbum().getId())
                 .tokenType(getTokenType());
     }
 
     @Override
     public String getName() {
-        return user.getKeycloakId();
+        return user.getSub();
     }
 
     @Override

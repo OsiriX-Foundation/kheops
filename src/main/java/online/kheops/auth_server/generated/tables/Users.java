@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = -774889861;
+    private static final long serialVersionUID = -94989383;
 
     /**
      * The reference instance of <code>public.users</code>
@@ -61,14 +61,24 @@ public class Users extends TableImpl<UsersRecord> {
     public final TableField<UsersRecord, Long> PK = createField("pk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.users.keycloak_id</code>.
+     * The column <code>public.users.sub</code>.
      */
-    public final TableField<UsersRecord, String> KEYCLOAK_ID = createField("keycloak_id", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<UsersRecord, String> SUB = createField("sub", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.users.inbox_fk</code>.
      */
     public final TableField<UsersRecord, Long> INBOX_FK = createField("inbox_fk", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.users.email</code>.
+     */
+    public final TableField<UsersRecord, String> EMAIL = createField("email", org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
+
+    /**
+     * The column <code>public.users.name</code>.
+     */
+    public final TableField<UsersRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
 
     /**
      * Create a <code>public.users</code> table reference
@@ -116,7 +126,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.INBOX_FK_UNIQUE, Indexes.KEYCLOAK_ID_UNIQUE, Indexes.USERS_INBOX_FK_INDEX, Indexes.USERS_PK);
+        return Arrays.<Index>asList(Indexes.INBOX_FK_UNIQUE, Indexes.SUB_UNIQUE, Indexes.USERS_EMAIL_INDEX, Indexes.USERS_EMAIL_KEY, Indexes.USERS_INBOX_FK_INDEX, Indexes.USERS_PK);
     }
 
     /**
@@ -132,7 +142,7 @@ public class Users extends TableImpl<UsersRecord> {
      */
     @Override
     public List<UniqueKey<UsersRecord>> getKeys() {
-        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.KEYCLOAK_ID_UNIQUE, Keys.INBOX_FK_UNIQUE);
+        return Arrays.<UniqueKey<UsersRecord>>asList(Keys.USERS_PK, Keys.SUB_UNIQUE, Keys.INBOX_FK_UNIQUE, Keys.USERS_EMAIL_KEY);
     }
 
     /**

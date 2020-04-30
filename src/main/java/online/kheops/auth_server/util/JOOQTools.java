@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.OptionalInt;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -138,9 +139,24 @@ public abstract class JOOQTools {
         if (!iterator.hasNext()) {
             throw new IllegalStateException("No C3P0 DataSource available");
         }
+
         DataSource dataSource = (DataSource) iterator.next();
         if (iterator.hasNext()) {
-            LOG.log(Level.SEVERE, "More than one C3P0 Datasource present, picked the first one");
+            LOG.log(Level.SEVERE, () -> {
+                StringBuilder logMessage = new StringBuilder("More than one C3P0 Datasource present, picked the first one\n");
+
+                Consumer<DataSource> datasourceAppender = (extraDatasource) -> {
+                    logMessage.append("DataSource:\n");
+                    logMessage.append(extraDatasource.toString());
+                    logMessage.append('\n');
+                };
+                datasourceAppender.accept(dataSource);
+                while (iterator.hasNext()) {
+                    datasourceAppender.accept((DataSource) iterator.next());
+                }
+
+                return logMessage.toString();
+            });
         }
 
         return dataSource;

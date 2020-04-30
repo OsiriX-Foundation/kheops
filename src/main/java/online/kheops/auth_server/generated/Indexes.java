@@ -10,7 +10,6 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
-import online.kheops.auth_server.generated.tables.Databasechangeloglock;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
@@ -59,7 +58,6 @@ public class Indexes {
     public static final Index CAPABILITIES_PK = Indexes0.CAPABILITIES_PK;
     public static final Index CAPABILITIES_SECRET_UNIQUE = Indexes0.CAPABILITIES_SECRET_UNIQUE;
     public static final Index CAPABILITIES_USER_FK_INDEX = Indexes0.CAPABILITIES_USER_FK_INDEX;
-    public static final Index DATABASECHANGELOGLOCK_PKEY = Indexes0.DATABASECHANGELOGLOCK_PKEY;
     public static final Index EVENT_PK = Indexes0.EVENT_PK;
     public static final Index EVENTS_SERIES_FK_INDEX = Indexes0.EVENTS_SERIES_FK_INDEX;
     public static final Index EVENTS_USER_FK_INDEX = Indexes0.EVENTS_USER_FK_INDEX;
@@ -82,7 +80,9 @@ public class Indexes {
     public static final Index STUDY_TIME_INDEX = Indexes0.STUDY_TIME_INDEX;
     public static final Index STUDY_UID_UNIQUE = Indexes0.STUDY_UID_UNIQUE;
     public static final Index INBOX_FK_UNIQUE = Indexes0.INBOX_FK_UNIQUE;
-    public static final Index KEYCLOAK_ID_UNIQUE = Indexes0.KEYCLOAK_ID_UNIQUE;
+    public static final Index SUB_UNIQUE = Indexes0.SUB_UNIQUE;
+    public static final Index USERS_EMAIL_INDEX = Indexes0.USERS_EMAIL_INDEX;
+    public static final Index USERS_EMAIL_KEY = Indexes0.USERS_EMAIL_KEY;
     public static final Index USERS_INBOX_FK_INDEX = Indexes0.USERS_INBOX_FK_INDEX;
     public static final Index USERS_PK = Indexes0.USERS_PK;
     public static final Index WEBHOOK_ATTEMPT_PK = Indexes0.WEBHOOK_ATTEMPT_PK;
@@ -120,7 +120,6 @@ public class Indexes {
         public static Index CAPABILITIES_PK = Internal.createIndex("capabilities_pk", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.PK }, true);
         public static Index CAPABILITIES_SECRET_UNIQUE = Internal.createIndex("capabilities_secret_unique", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.SECRET }, true);
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("capabilities_user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
-        public static Index DATABASECHANGELOGLOCK_PKEY = Internal.createIndex("databasechangeloglock_pkey", Databasechangeloglock.DATABASECHANGELOGLOCK, new OrderField[] { Databasechangeloglock.DATABASECHANGELOGLOCK.ID }, true);
         public static Index EVENT_PK = Internal.createIndex("event_pk", Events.EVENTS, new OrderField[] { Events.EVENTS.PK }, true);
         public static Index EVENTS_SERIES_FK_INDEX = Internal.createIndex("events_series_fk_index", Events.EVENTS, new OrderField[] { Events.EVENTS.SERIES_FK }, false);
         public static Index EVENTS_USER_FK_INDEX = Internal.createIndex("events_user_fk_index", Events.EVENTS, new OrderField[] { Events.EVENTS.USER_FK }, false);
@@ -143,7 +142,9 @@ public class Indexes {
         public static Index STUDY_TIME_INDEX = Internal.createIndex("study_time_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_TIME }, false);
         public static Index STUDY_UID_UNIQUE = Internal.createIndex("study_uid_unique", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_UID }, true);
         public static Index INBOX_FK_UNIQUE = Internal.createIndex("inbox_fk_unique", Users.USERS, new OrderField[] { Users.USERS.INBOX_FK }, true);
-        public static Index KEYCLOAK_ID_UNIQUE = Internal.createIndex("keycloak_id_unique", Users.USERS, new OrderField[] { Users.USERS.KEYCLOAK_ID }, true);
+        public static Index SUB_UNIQUE = Internal.createIndex("sub_unique", Users.USERS, new OrderField[] { Users.USERS.SUB }, true);
+        public static Index USERS_EMAIL_INDEX = Internal.createIndex("users_email_index", Users.USERS, new OrderField[] { Users.USERS.EMAIL }, false);
+        public static Index USERS_EMAIL_KEY = Internal.createIndex("users_email_key", Users.USERS, new OrderField[] { Users.USERS.EMAIL }, true);
         public static Index USERS_INBOX_FK_INDEX = Internal.createIndex("users_inbox_fk_index", Users.USERS, new OrderField[] { Users.USERS.INBOX_FK }, false);
         public static Index USERS_PK = Internal.createIndex("users_pk", Users.USERS, new OrderField[] { Users.USERS.PK }, true);
         public static Index WEBHOOK_ATTEMPT_PK = Internal.createIndex("webhook_attempt_pk", WebhookAttempts.WEBHOOK_ATTEMPTS, new OrderField[] { WebhookAttempts.WEBHOOK_ATTEMPTS.PK }, true);

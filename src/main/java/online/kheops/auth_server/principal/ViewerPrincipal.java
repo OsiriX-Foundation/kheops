@@ -53,7 +53,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
 
         kheopsLogBuilder = new KheopsLogBuilder()
                 .provenance(this)
-                .user(getUser().getKeycloakId())
+                .user(getUser().getSub())
                 .tokenType(AccessToken.TokenType.VIEWER_TOKEN);
     }
 

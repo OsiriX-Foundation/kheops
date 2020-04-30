@@ -254,7 +254,7 @@ public class QIDOResource {
         String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
-                .withSubject(kheopsPrincipal.getUser().getKeycloakId())
+                .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
 
         WebTarget webTarget = CLIENT.target(uri);
@@ -417,7 +417,7 @@ public class QIDOResource {
         String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
-                .withSubject(kheopsPrincipal.getUser().getKeycloakId())
+                .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
         final Response upstreamResponse;
         try {

@@ -40,13 +40,13 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
         kheopsLogBuilder = new KheopsLogBuilder()
                 .provenance(this)
-                .user(user.getKeycloakId())
+                .user(user.getSub())
                 .tokenType(getTokenType());
     }
 
     @Override
     public String getName() {
-        return user.getKeycloakId();
+        return user.getSub();
     }
 
     @Override

@@ -38,7 +38,7 @@ final class CapabilityAccessToken implements AccessToken {
 
                 capability.isValid();
 
-                final String sub = capability.getUser().getKeycloakId();
+                final String sub = capability.getUser().getSub();
 
                 capability.setLastUsed();
 

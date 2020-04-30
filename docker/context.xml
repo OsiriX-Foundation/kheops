@@ -9,14 +9,6 @@
                override="false"/>
     <Parameter name="online.kheops.jdbc.password" value="${kheops_authdb_pass}"
                override="false"/>
-    <Parameter name="online.kheops.keycloak.clientsecret" value="${kheops_keycloak_clientsecret}"
-               override="false"/>
-    <Parameter name="online.kheops.keycloak.clientid" value="${kheops_keycloak_clientid}"
-               override="false"/>
-    <Parameter name="online.kheops.keycloak.uri" value="${kheops_keycloak_uri}"
-               override="false"/>
-    <Parameter name="online.kheops.keycloak.realms" value="${kheops_keycloak_realms}"
-               override="false"/>
     <Parameter name="online.kheops.oidc.provider" value="${kheops_oidc_provider}"
                override="false"/>
     <Parameter name="online.kheops.root.uri" value="${kheops_root_url}"
@@ -30,5 +22,7 @@
     <Parameter name="online.kheops.client.zippersecret" value="${kheops_client_zippersecret}"
                override="false"/>
     <Parameter name="online.kheops.use.scope" value="${kheops_use_kheops_scope}"
+               override="false"/>
+    <Parameter name="online.kheops.welcomebot.webhook" value="${kheops_welcomebot_webhook}"
                override="false"/>
 </Context>

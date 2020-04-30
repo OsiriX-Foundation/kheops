@@ -44,13 +44,13 @@ public class UserResponse  implements Comparable<UserResponse> {
     public UserResponse(AlbumUser albumUser) {
         email = albumUser.getUser().getEmail();
         isAdmin = albumUser.isAdmin();
-        sub = albumUser.getUser().getKeycloakId();
+        sub = albumUser.getUser().getSub();
         name = albumUser.getUser().getName();
     }
 
     public UserResponse(User user) {
         email = user.getEmail();
-        sub = user.getKeycloakId();
+        sub = user.getSub();
         name = user.getName();
     }
 
@@ -62,11 +62,12 @@ public class UserResponse  implements Comparable<UserResponse> {
         albumAccess = userResponseBuilder.getAlbumAccess();
         studyAccess = userResponseBuilder.getStudyAccess();
         userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
+        userResponseBuilder.getIsAdmin().ifPresent(value -> isAdmin = value);
+
     }
 
-    public void setReportProvider(ReportProvider reportProvider) {
-        this.reportProvider = new ReportProviderResponse(reportProvider);
-        this.reportProvider.webhookResponse();
+    public void setReportProvider(ReportProvider reportProvider, ReportProviderResponse.Type type) {
+        this.reportProvider = new ReportProviderResponse(reportProvider, type);
     }
 
     public void setCapabilityToken(Capability capability) {

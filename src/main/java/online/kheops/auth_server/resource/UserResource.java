@@ -1,11 +1,12 @@
 package online.kheops.auth_server.resource;
 
+import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
+import online.kheops.auth_server.accesstoken.OidcAccessToken;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.*;
@@ -24,7 +25,6 @@ import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.KEYCLOAK_TOKEN;
 import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.REPORT_PROVIDER_TOKEN;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
@@ -45,6 +46,7 @@ import static online.kheops.auth_server.user.AlbumUserPermissions.LIST_USERS;
 import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
+import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 
 @Path("/")
 public class UserResource {
@@ -62,7 +64,7 @@ public class UserResource {
 
         private static OIDCUserInfo from(User user) {
             OIDCUserInfo userInfo = new OIDCUserInfo();
-            userInfo.sub = user.getKeycloakId();
+            userInfo.sub = user.getSub();
             userInfo.name = user.getName();
             userInfo.email = user.getEmail();
             userInfo.preferredUsername = user.getName();
@@ -78,6 +80,9 @@ public class UserResource {
 
     @Context
     private ServletContext servletContext;
+
+    @HeaderParam(X_FORWARDED_FOR)
+    private String headerXForwardedFor;
 
     @GET
     @Secured
@@ -141,7 +146,7 @@ public class UserResource {
             try {
                 final User user = getUser(reference);
                 userResponseBuilder = new UserResponseBuilder().setName(user.getName())
-                        .setSub(user.getKeycloakId())
+                        .setSub(user.getSub())
                         .setEmail(user.getEmail());
 
                 if(albumId != null) {
@@ -205,25 +210,23 @@ public class UserResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-
-        final online.kheops.auth_server.user.AccessToken accessToken;
+        final OidcAccessToken accessToken;
         try {
-            accessToken = new online.kheops.auth_server.user.AccessToken.Builder(servletContext).build(token);
-        } catch (IdTokenVerificationException e) {
+            accessToken = new OidcAccessToken.Builder(servletContext).build(token);
+        } catch (AccessTokenVerificationException e) {
             return Response.status(BAD_REQUEST).build();
         }
 
-
-        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer());
+        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer().get());
         if (userInfoUrl == null) {
-            final String openidConfiguration = accessToken.getIssuer() + "/.well-known/openid-configuration";
+            final String openidConfiguration = accessToken.getIssuer().get() + "/.well-known/openid-configuration";
             final URI openidConfigurationURI;
 
             try {
                 openidConfigurationURI = new URI(openidConfiguration);
                 ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
                 userInfoUrl = res.userinfoEndpoint;
-                userInfoURLsCache.put(accessToken.getIssuer(), userInfoUrl);
+                userInfoURLsCache.put(accessToken.getIssuer().get(), userInfoUrl);
             } catch (ProcessingException | WebApplicationException e) {
                 return Response.status(BAD_GATEWAY).build();
             } catch (URISyntaxException e) {
@@ -235,8 +238,19 @@ public class UserResource {
             userinfoEndpointURI = new URI(userInfoUrl);
             UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token).get(UserInfoEntity.class);
 
-            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email);
+            final String welcomebotWebhook = servletContext.getInitParameter("online.kheops.welcomebot.webhook");
+            final KheopsLogBuilder logBuilder = new KheopsLogBuilder();
+            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email, welcomebotWebhook, logBuilder);
+
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
+
+            logBuilder.tokenType(KEYCLOAK_TOKEN);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
+            }
+            logBuilder.provenance(accessToken);
+            logBuilder.log();
+
             return Response.ok().entity(userResponse).build();
 
         } catch (NotAuthorizedException e) {
@@ -265,9 +279,9 @@ public class UserResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
-        } catch (AccessTokenVerificationException e) {
+        } catch (online.kheops.auth_server.accesstoken.AccessTokenVerificationException e) {
             LOG.log(Level.INFO, "bad accesstoken", e);
-            throw new ForbiddenException("Bad AccessToken");
+            throw new NotAuthorizedException("Bad AccessToken");
         }
 
         if (!accessToken.getTokenType().equals(REPORT_PROVIDER_TOKEN)) {

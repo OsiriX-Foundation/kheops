@@ -1,17 +1,10 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.keycloak.Keycloak;
-import online.kheops.auth_server.keycloak.KeycloakException;
-import online.kheops.auth_server.user.IdToken;
-import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.user.UserResponseBuilder;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -28,8 +21,8 @@ public class User {
     private long pk;
 
     @Basic(optional = false)
-    @Column(name = "keycloak_id")
-    private String keycloakId;
+    @Column(name = "sub")
+    private String sub;
 
     @Basic()
     @Column(name = "email")
@@ -66,22 +59,16 @@ public class User {
 
     public User() {}
 
-    public User(String keycloakId) {
-        this.keycloakId = keycloakId;
-    }
-
-    public User(IdToken idToken) {
-        keycloakId = idToken.getSub();
-        email = idToken.getEmail();
-        name = idToken.getName();
+    public User(String sub) {
+        this.sub = sub;
     }
 
     public long getPk() {
         return pk;
     }
 
-    public String getKeycloakId() {
-        return keycloakId;
+    public String getSub() {
+        return sub;
     }
 
     public String getEmail() {
@@ -127,6 +114,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "[User keycloak_id:" + getKeycloakId() + " email:" + getEmail() + "]";
+        return "[User sub:" + getSub() + " email:" + getEmail() + "]";
     }
 }

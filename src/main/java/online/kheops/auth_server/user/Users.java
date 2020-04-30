@@ -8,20 +8,29 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.UserPermission;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.user.UserQueries.*;
 
 public class Users {
     private static final Logger LOG = Logger.getLogger(Users.class.getName());
+    private static final Client CLIENT = ClientBuilder.newClient();
 
     private Users() {
         throw new IllegalStateException("Utility class");
@@ -52,7 +61,8 @@ public class Users {
         }
     }
 
-    public static User upsertUser(String sub, String name, String email) {
+
+    public static User upsertUser(String sub, String name, String email, String welcomebotWebhook, KheopsLogBuilder kheopsLogBuilder) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -65,6 +75,8 @@ public class Users {
                 user.setEmail(email);
                 user.setName(name);
                 tx.commit();
+                kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
+                kheopsLogBuilder.user(user.getSub());
                 return user;
             } catch (UserNotFoundException unused) { /*empty*/ }
 
@@ -89,25 +101,48 @@ public class Users {
             em.persist(albumUser);
 
             tx.commit();
-            return user;
 
+            kheopsLogBuilder.action(KheopsLogBuilder.ActionType.NEW_USER);
+            kheopsLogBuilder.user(user.getSub());
+
+            // Go tickle the welcomebot when a new user is added.
+            // Block until the reply so that the welcome bot has an opportunity to call back to the
+            // Authorization server and share series/albums.
+
+            if(welcomebotWebhook != null && welcomebotWebhook.compareTo("") != 0) {
+                try {
+                    LOG.log(INFO, "About to try to share with the welcomebot");
+                    CLIENT.target(welcomebotWebhook)
+                            .queryParam("user", user.getSub())
+                            .request()
+                            .post(Entity.text(""));
+                } catch (ProcessingException | WebApplicationException e) {
+                    LOG.log(SEVERE, "Unable to communicate with the welcomebot", e);
+                }
+                LOG.log(INFO, "Finished sharing with the welcomebot");
+            }
+
+            return user;
         } catch (PersistenceException e) {
             try {
                 tx.rollback();
                 tx.begin();
-                final User u = getUser(sub, em);
-                u.setEmail(email);
-                u.setName(name);
+                final User user = getUser(sub, em);
+                user.setEmail(email);
+                user.setName(name);
                 tx.commit();
-                return u;
-            } catch (UserNotFoundException unused) { /*empty*/ }
+                kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
+                kheopsLogBuilder.user(user.getSub());
+                return user;
+            } catch (UserNotFoundException unused) {
+                throw new IllegalStateException();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return null;
     }
 
     public static List<UserResponse> searchUsersInAlbum(String search, String albumId, Integer limit, Integer offset)
