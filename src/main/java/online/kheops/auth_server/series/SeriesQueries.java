@@ -10,9 +10,7 @@ import online.kheops.auth_server.util.ErrorResponse;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
@@ -194,15 +192,19 @@ public class SeriesQueries {
         }
     }
 
-    public static Set<String> findAllSeriesInstanceUIDbyStudyUIDfromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em)
+    public static Map<String, Boolean> findAllSeriesInstanceUIDbyStudyUIDfromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em)
             throws StudyNotFoundException {
-
         try {
-            TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox <> a and :user = u and a = :album", String.class);
+            TypedQuery<SeriesUIDFavoritePair> query = em.createQuery("select new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID, alS.favorite) from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox <> a and :user = u and a = :album", SeriesUIDFavoritePair.class);
             query.setParameter("album", album);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
-            return new HashSet<>(query.getResultList());
+            Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
+            final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
+            for(SeriesUIDFavoritePair seriesUIDFavoritePair : seriesUIDFavoritePairSet) {
+                seriesUIDFavoritePairMap.put(seriesUIDFavoritePair.getSeriesUID(), seriesUIDFavoritePair.favorite);
+            }
+            return seriesUIDFavoritePairMap;
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
@@ -212,14 +214,19 @@ public class SeriesQueries {
         }
     }
 
-    public static Set<String> findAllSeriesInstanceUIDbySeriesIUIDfromInbox(User callingUser, String studyInstanceUID, EntityManager em)
+    public static Map<String, Boolean> findAllSeriesInstanceUIDbySeriesIUIDfromInbox(User callingUser, String studyInstanceUID, EntityManager em)
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox = a and :user = u", String.class);
+            TypedQuery<SeriesUIDFavoritePair> query = em.createQuery("select new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID, alS.favorite) from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox = a and :user = u", SeriesUIDFavoritePair.class);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
-            return new HashSet<>(query.getResultList());
+            Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
+            final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
+            for(SeriesUIDFavoritePair seriesUIDFavoritePair : seriesUIDFavoritePairSet) {
+                seriesUIDFavoritePairMap.put(seriesUIDFavoritePair.getSeriesUID(), seriesUIDFavoritePair.favorite);
+            }
+            return seriesUIDFavoritePairMap;
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
@@ -229,14 +236,19 @@ public class SeriesQueries {
         }
     }
 
-    public static Set<String> findAllSeriesInstanceUIDbySeriesIUIDfromAlbumandInbox(User callingUser, String studyInstanceUID, EntityManager em)
+    public static Map<String, Boolean> findAllSeriesInstanceUIDbySeriesIUIDfromAlbumandInbox(User callingUser, String studyInstanceUID, EntityManager em)
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and :user = u", String.class);
+            TypedQuery<SeriesUIDFavoritePair> query = em.createQuery("select new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID) from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and :user = u", SeriesUIDFavoritePair.class);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
-            return new HashSet<>(query.getResultList());
+            Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
+            final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
+            for(SeriesUIDFavoritePair seriesUIDFavoritePair : seriesUIDFavoritePairSet) {
+                seriesUIDFavoritePairMap.put(seriesUIDFavoritePair.getSeriesUID(), seriesUIDFavoritePair.favorite);
+            }
+            return seriesUIDFavoritePairMap;
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)

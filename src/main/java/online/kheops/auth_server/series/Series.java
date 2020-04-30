@@ -152,45 +152,6 @@ public class Series {
         albumSeries.setFavorite(favorite);
     }
 
-    public static boolean isFavorite(String seriesUID, User callingUser) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        final boolean isFavorite;
-
-        try {
-            callingUser = em.merge(callingUser);
-            isFavorite = isFavorite(seriesUID, callingUser.getInbox().getId(), em);
-        } finally {
-            em.close();
-        }
-        return isFavorite;
-    }
-
-    private static boolean isFavorite(String seriesUID, String albumID, EntityManager em) {
-
-        final AlbumSeries albumSeries;
-        try {
-            albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
-        } catch (SeriesNotFoundException e) {
-            throw new IllegalStateException("SeriesUID: "+seriesUID+" Not found inside the albumID: "+albumID);
-        }
-        return albumSeries.isFavorite();
-    }
-
-    public static boolean isFavorite(String seriesUID, String albumID) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        final AlbumSeries albumSeries;
-        try {
-            albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
-        } catch (SeriesNotFoundException e) {
-            throw new IllegalStateException("SeriesUID: "+seriesUID+" Not found inside the albumID: "+albumID);
-        } finally {
-            em.close();
-        }
-        return albumSeries.isFavorite();
-    }
-
     public static boolean isSeriesInInbox(User callingUser, online.kheops.auth_server.entity.Series series, EntityManager em) {
         try {
             findSeriesBySeriesAndUserInbox(callingUser, series, em);

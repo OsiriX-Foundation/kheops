@@ -9,6 +9,7 @@ import online.kheops.auth_server.event.Events;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.series.SeriesUIDFavoritePair;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -25,6 +26,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.BadRequestException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
@@ -509,7 +511,6 @@ public class Sending {
             final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
             em.persist(series);
             em.persist(inboxSeries);
-
             tx.commit();
             kheopsLogBuilder.log();
         } finally {
@@ -593,9 +594,9 @@ public class Sending {
         }
     }
 
-    public static Set<String> availableSeriesUIDs(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
+    public static Map<String, Boolean> availableSeriesUIDs(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox)
             throws AlbumNotFoundException, StudyNotFoundException {
-        Set<String> availableSeriesUIDs;
+        Map<String, Boolean> availableSeriesUIDs;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
 

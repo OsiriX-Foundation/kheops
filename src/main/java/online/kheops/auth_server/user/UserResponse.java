@@ -78,7 +78,14 @@ public class UserResponse  implements Comparable<UserResponse> {
 
     @Override
     public int compareTo(UserResponse userResponse) {
-        return email.compareTo(userResponse.email);
+       int res = email.compareTo(userResponse.email);
+       if (res == 0) {
+           res = sub.compareTo(userResponse.sub);
+           if (res == 0) {
+               res = name.compareTo(userResponse.name);
+           }
+       }
+       return res;
     }
 
     @Override
