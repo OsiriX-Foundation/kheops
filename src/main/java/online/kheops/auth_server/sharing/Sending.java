@@ -512,8 +512,6 @@ public class Sending {
 
             tx.commit();
             kheopsLogBuilder.log();
-        }catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

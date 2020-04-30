@@ -160,8 +160,8 @@ public class Albums {
                 em.remove(capability);
             }
 
-            for(Series series : album.getSeriesMap().keySet()) {
-                album.removeSeries(series, em);
+            for (AlbumSeries albumSeries:album.getAlbumSeries()) {
+                em.remove(albumSeries);
             }
 
             for (Webhook webhook:album.getWebhooks()) {
