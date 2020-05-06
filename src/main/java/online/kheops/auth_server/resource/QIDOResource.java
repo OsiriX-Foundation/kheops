@@ -9,8 +9,6 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.principal.KheopsPrincipal;
-import online.kheops.auth_server.series.Series;
-import online.kheops.auth_server.series.SeriesUIDFavoritePair;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.util.*;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
@@ -206,7 +204,7 @@ public class QIDOResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY)
+        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_SERIES)
                 .study(studyInstanceUID);
 
         if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
