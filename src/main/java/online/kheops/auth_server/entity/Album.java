@@ -5,12 +5,16 @@ import online.kheops.auth_server.user.UsersPermission;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "Albums.findById",
+        query = "SELECT a FROM Album a WHERE :albumId = a.id")
+})
+
 @Entity
 @Table(name = "albums")
 public class Album {

@@ -22,7 +22,7 @@ public class StudyQueries {
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<Study> query = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
+            TypedQuery<Study> query = em.createNamedQuery("Study.findByUID", Study.class);
             query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -38,7 +38,7 @@ public class StudyQueries {
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study", Study.class);
+            TypedQuery<Study> query = em.createNamedQuery("Study.findByUIDAndUser", Study.class);
             query.setParameter("study", study);
             query.setParameter("user", user);
             return query.getSingleResult();
@@ -51,28 +51,11 @@ public class StudyQueries {
         }
     }
 
-    public static Study findStudyByStudyandUserInbox(Study study, User user, EntityManager em)
-            throws StudyNotFoundException {
-
-        try {
-            TypedQuery<Study> query = em.createQuery("select st from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s join s.study st where u=:user and st = :study and a = u.inbox", Study.class);
-            query.setParameter("study", study);
-            query.setParameter("user", user);
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(STUDY_NOT_FOUND)
-                    .detail("Study not found in the inbox")
-                    .build();
-            throw new StudyNotFoundException(errorResponse);
-        }
-    }
-
     public static Study findStudyByStudyandAlbum(Study study, Album album, EntityManager em)
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<Study> query = em.createQuery("select st from Album a join a.albumSeries alS join alS.series s join s.study st where a=:album and st = :study", Study.class);
+            TypedQuery<Study> query = em.createNamedQuery("Study.findByStudyAndAlbum", Study.class);
             query.setParameter("study", study);
             query.setParameter("album", album);
             return query.getSingleResult();
@@ -89,7 +72,7 @@ public class StudyQueries {
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<Study> query = em.createQuery("select st from Album a join a.albumSeries alS join alS.series s join s.study st where a=:album and st.studyInstanceUID = :studyUID", Study.class);
+            TypedQuery<Study> query = em.createNamedQuery("Study.findByUIDAndAlbum", Study.class);
             query.setParameter("studyUID", studyUID);
             query.setParameter("album", album);
             return query.getSingleResult();

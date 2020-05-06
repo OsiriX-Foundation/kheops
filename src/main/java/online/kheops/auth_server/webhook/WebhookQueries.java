@@ -18,7 +18,7 @@ public class WebhookQueries {
             throws WebhookNotFoundException {
 
         try {
-            return em.createQuery("SELECT w from Webhook w where :webhookId = w.id", Webhook.class)
+            return em.createNamedQuery("Webhook.findById", Webhook.class)
                     .setParameter("webhookId", webhookID)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -30,7 +30,7 @@ public class WebhookQueries {
             throws WebhookNotFoundException {
 
         try {
-            return em.createQuery("SELECT w from WebhookTrigger w where :webhookTriggerId = w.id", WebhookTrigger.class)
+            return em.createNamedQuery("WebhookTrigger.findById", WebhookTrigger.class)
                     .setParameter("webhookTriggerId", webhookTriggerID)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -41,7 +41,7 @@ public class WebhookQueries {
     public static Webhook getWebhook(String webhookID, Album album, EntityManager em)
             throws WebhookNotFoundException {
         try {
-            return em.createQuery("SELECT w from Webhook w join w.album a where :webhookId = w.id and a = :album", Webhook.class)
+            return em.createNamedQuery("Webhook.findByIdAndAlbum", Webhook.class)
                     .setParameter("webhookId", webhookID)
                     .setParameter("album", album)
                     .getSingleResult();
@@ -51,7 +51,7 @@ public class WebhookQueries {
     }
 
     public static List<Webhook> getWebhooks(Album album, Integer limit, Integer offset, EntityManager em) {
-            return em.createQuery("SELECT w from Webhook w join w.album a where a = :album order by w.creationTime desc", Webhook.class)
+            return em.createNamedQuery("Webhook.findAllByAlbum", Webhook.class)
                     .setParameter("album", album)
                     .setFirstResult(offset)
                     .setMaxResults(limit)
@@ -59,7 +59,7 @@ public class WebhookQueries {
     }
 
     public static List<Webhook> getWebhooks(Album album, Integer limit, String url, Integer offset, EntityManager em) {
-            return em.createQuery("SELECT w from Webhook w join w.album a where a = :album and w.url = :url order by w.creationTime desc", Webhook.class)
+            return em.createNamedQuery("Webhook.findAllByAlbumAndUrl", Webhook.class)
                     .setParameter("album", album)
                     .setParameter("url", url)
                     .setFirstResult(offset)
@@ -68,12 +68,12 @@ public class WebhookQueries {
     }
 
     public static Long getNumberOfWebhooks( Album album, EntityManager em) {
-        return em.createQuery("SELECT count(w) from Webhook w join w.album a where a = :album", Long.class)
+        return em.createNamedQuery("Webhook.countByAlbum", Long.class)
                 .setParameter("album", album)
                 .getSingleResult();
     }
     public static Long getNumberOfWebhooks( Album album, String url, EntityManager em) {
-        return em.createQuery("SELECT count(w) from Webhook w join w.album a where a = :album and w.url = :url", Long.class)
+        return em.createNamedQuery("Webhook.countByAlbumAndUrl", Long.class)
                 .setParameter("album", album)
                 .setParameter("url", url)
                 .getSingleResult();

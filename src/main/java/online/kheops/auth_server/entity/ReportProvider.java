@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.report_provider.ClientId;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,6 +8,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings("unused")
+
+@NamedQueries({
+        @NamedQuery(name = "ReportProvider.findByClientId",
+                query = "SELECT dsr FROM ReportProvider dsr WHERE :clientId = dsr.clientId AND dsr.removed = false"),
+        @NamedQuery(name = "ReportProvider.findAllByAlbumId",
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
+        @NamedQuery(name = "ReportProvider.countAllByAlbumId",
+                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false")
+})
+
 @Entity
 @Table(name = "report_providers")
 

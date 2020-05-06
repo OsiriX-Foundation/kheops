@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.webhook.WebhookId;
 import online.kheops.auth_server.webhook.WebhookPostParameters;
 
 import javax.persistence.*;
@@ -9,6 +8,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "Webhook.findById", 
+        query = "SELECT w FROM Webhook w WHERE :webhookId = w.id"),
+        @NamedQuery(name = "Webhook.findByIdAndAlbum",
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE :webhookId = w.id AND a = :album"),
+        @NamedQuery(name = "Webhook.findAllByAlbum",
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :album ORDER BY w.creationTime desc"),
+        @NamedQuery(name = "Webhook.findAllByAlbumAndUrl",
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url ORDER BY w.creationTime desc"),
+        @NamedQuery(name = "Webhook.countByAlbum",
+        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album"),
+        @NamedQuery(name = "Webhook.countByAlbumAndUrl",
+        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url")
+})
+
 @Entity
 @Table(name = "webhooks")
 public class Webhook {
@@ -60,7 +75,7 @@ public class Webhook {
     @OrderBy("pk DESC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
-    private Webhook() {}
+    public Webhook() {}
 
     public Webhook(WebhookPostParameters webhookPostParameters, String id, Album album, User user) {
         this.name = webhookPostParameters.getName();

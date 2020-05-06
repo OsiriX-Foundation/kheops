@@ -13,6 +13,18 @@ import java.util.Set;
 import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "Study.findByUID",
+        query = "SELECT s FROM Study s WHERE s.studyInstanceUID = :StudyInstanceUID"),
+        @NamedQuery(name = "Study.findByUIDAndUser",
+        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:user AND st = :study"),
+        @NamedQuery(name = "Study.findByStudyAndAlbum",
+        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:album AND st = :study"),
+        @NamedQuery(name = "Study.findByUIDAndAlbum",
+        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:album AND st.studyInstanceUID = :studyUID")
+})
+
 @Entity
 @Table(name = "studies")
 

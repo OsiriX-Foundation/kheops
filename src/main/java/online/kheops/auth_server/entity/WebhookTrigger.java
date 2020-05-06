@@ -8,6 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "WebhookTrigger.findById",
+                query = "SELECT w FROM WebhookTrigger w WHERE :webhookTriggerId = w.id")
+})
+
 @Entity
 @Table(name = "webhook_triggers")
 public class WebhookTrigger {

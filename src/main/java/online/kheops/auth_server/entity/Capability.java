@@ -14,6 +14,32 @@ import static online.kheops.auth_server.capability.CapabilityToken.hashCapabilit
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
 @SuppressWarnings("unused")
+
+@NamedQueries({
+        @NamedQuery(name = "Capability.findBySecret",
+        query = "SELECT c FROM Capability c WHERE c.secret = :secret"),
+        @NamedQuery(name = "Capability.findByIdANDUser",
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id"),
+        @NamedQuery(name = "Capability.findById",
+        query = "SELECT c FROM Capability c WHERE :capabilityId = c.id"),
+        @NamedQuery(name = "Capability.findAllByUser",
+        query = "SELECT c FROM Capability c WHERE :user = c.user ORDER BY c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.findAllValidByUser",
+        query = "SELECT c FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow  ORDER BY c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.findAllByAlbum",
+        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id order by c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.findAllValidByAlbum",
+        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow ORDER BY c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.countAllByUser",
+        query = "SELECT count(c) FROM Capability c WHERE :user = c.user"),
+        @NamedQuery(name = "Capability.countAllValidByUser",
+        query = "SELECT count(c) FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow"),
+        @NamedQuery(name = "Capability.countAllByAlbum",
+        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id"),
+        @NamedQuery(name = "Capability.countAllValidByAlbum",
+        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow")
+})
+
 @Entity
 @Table(name = "capabilities")
 
@@ -105,7 +131,7 @@ public class Capability {
         updatedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
-    private Capability() {}
+    public Capability() {}
 
     private Capability(CapabilityBuilder builder) throws BadQueryParametersException {
         this.secretBeforeHash = builder.secretBeforeHash;

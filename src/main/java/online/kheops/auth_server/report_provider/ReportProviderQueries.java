@@ -14,14 +14,13 @@ public class ReportProviderQueries {
 
     public static ReportProvider getReportProviderWithClientId(String clientId, EntityManager em) {
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr where :clientId = dsr.clientId and dsr.removed = false", ReportProvider.class)
+        return em.createNamedQuery("ReportProvider.findByClientId", ReportProvider.class)
                 .setParameter("clientId", clientId)
                 .getSingleResult();
     }
 
     public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, Integer limit, Integer offset, EntityManager em) {
-
-        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false order by dsr.creationTime desc", ReportProvider.class)
+        return em.createNamedQuery("ReportProvider.findAllByAlbumId", ReportProvider.class)
                 .setParameter("albumId", albumId)
                 .setMaxResults(limit)
                 .setFirstResult(offset)
@@ -29,8 +28,7 @@ public class ReportProviderQueries {
     }
 
     public static long countReportProviderWithAlbumId(String albumId, EntityManager em) {
-
-        return em.createQuery("SELECT count(dsr) from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false", Long.class)
+        return em.createNamedQuery("ReportProvider.countAllByAlbumId", Long.class)
                 .setParameter("albumId", albumId)
                 .getSingleResult();
     }

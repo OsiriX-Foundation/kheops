@@ -23,21 +23,21 @@ public class SeriesQueries {
     }
 
     public static List<Series> findSeriesListByStudyUIDFromInbox(User callingUser, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInbox", Series.class);
         query.setParameter(StudyInstanceUID, studyInstanceUID);
         query.setParameter("callingUser", callingUser);
         return query.getResultList();
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbum(Album album, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from Album a join a.albumSeries alS join alS.series s where :album = a and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class);
         query.setParameter(StudyInstanceUID,studyInstanceUID);
         query.setParameter("album",album);
         return query.getResultList();
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbumAndInbox(User callingUser, String studyInstanceUID, EntityManager em) {
-        TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID", Series.class);
+        TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInboxAndAlbum", Series.class);
         query.setParameter(StudyInstanceUID,studyInstanceUID);
         query.setParameter("callingUser",callingUser);
         return query.getResultList();
@@ -47,7 +47,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where a = u.inbox and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findByStudyUIDFromInbox", Series.class);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter("callingUser", callingUser);
@@ -65,7 +65,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from Album a join a.albumSeries alS join alS.series s where :album = a and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findByStudyUIDFromAlbum", Series.class);
             query.setParameter("album", album);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
@@ -82,7 +82,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUIDAndStudyUIDAndUser", Series.class);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter("callingUser", callingUser);
@@ -100,7 +100,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> seriesQuery = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where (a = u.inbox or au.admin = true or a.userPermission.sendSeries = true)and u=:callingUser and s.study.studyInstanceUID = :StudyInstanceUID and s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            TypedQuery<Series> seriesQuery = em.createNamedQuery("Series.findBySeriesUIDAndStudyUIDAndUserWithSharePermission", Series.class);
             seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
             seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             seriesQuery.setParameter("callingUser", callingUser);
@@ -118,7 +118,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from Series s join s.study st where s.seriesInstanceUID = :SeriesInstanceUID and st.studyInstanceUID = :StudyInstanceUID", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUIDAndStudyUID", Series.class);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             return query.getSingleResult();
@@ -135,7 +135,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from Series s where s.seriesInstanceUID = :SeriesInstanceUID", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUID", Series.class);
             query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -151,7 +151,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and (au.admin = true or a.userPermission.sendSeries = true)", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.xxx", Series.class);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
@@ -168,7 +168,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where u=:callingUser and s = :series and a = u.inbox", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesFromInbox", Series.class);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();
@@ -183,7 +183,7 @@ public class SeriesQueries {
 
     public static boolean isOrphan(Series series, EntityManager em) {
         try {
-            TypedQuery<Series> query = em.createQuery("select s from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s = :series", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.isOrphan", Series.class);
             query.setParameter("series", series);
             query.getSingleResult();
             return false;
@@ -195,7 +195,7 @@ public class SeriesQueries {
     public static Map<String, Boolean> findAllSeriesInstanceUIDbyStudyUIDfromAlbum(User callingUser, Album album, String studyInstanceUID, EntityManager em)
             throws StudyNotFoundException {
         try {
-            TypedQuery<SeriesUIDFavoritePair> query = em.createQuery("select new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID, alS.favorite) from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox <> a and :user = u and a = :album", SeriesUIDFavoritePair.class);
+            TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromAlbum", SeriesUIDFavoritePair.class);
             query.setParameter("album", album);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
@@ -218,7 +218,7 @@ public class SeriesQueries {
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<SeriesUIDFavoritePair> query = em.createQuery("select new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID, alS.favorite) from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and u.inbox = a and :user = u", SeriesUIDFavoritePair.class);
+            TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromInbox", SeriesUIDFavoritePair.class);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
@@ -240,7 +240,7 @@ public class SeriesQueries {
             throws StudyNotFoundException {
 
         try {
-            TypedQuery<SeriesUIDFavoritePair> query = em.createQuery("select new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID) from User u join u.albumUser au join au.album a join a.albumSeries alS join alS.series s where s.study.studyInstanceUID = :StudyInstanceUID and :user = u", SeriesUIDFavoritePair.class);
+            TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromInboxAndAlbum", SeriesUIDFavoritePair.class);
             query.setParameter(StudyInstanceUID, studyInstanceUID);
             query.setParameter("user", callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());

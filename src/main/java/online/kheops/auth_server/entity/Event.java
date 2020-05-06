@@ -4,6 +4,13 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+@NamedQueries({
+        @NamedQuery(name = "Event.findAllByAlbum",
+        query = "SELECT e FROM Event e WHERE :album = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :user OR e.user = :user) ORDER BY e.eventTime desc"),
+        @NamedQuery(name = "Event.countAllByAlbumAndUser",
+        query = "SELECT count(e) FROM Event e WHERE :album = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :user OR e.user = :user)")
+})
+
 @Entity
 @Table(name = "events")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

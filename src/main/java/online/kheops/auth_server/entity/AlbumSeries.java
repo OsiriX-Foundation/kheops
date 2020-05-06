@@ -4,6 +4,11 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+@NamedQueries({
+        @NamedQuery(name = "AlbumSeries.findByAlbumIdAndSeriesUID",
+                query = "SELECT aSeries FROM Album a JOIN a.albumSeries aSeries JOIN aSeries.series s WHERE :seriesUID = s.seriesInstanceUID AND :albumID = a.id")
+})
+
 @Entity
 @Table(name = "album_series")
 public class AlbumSeries {

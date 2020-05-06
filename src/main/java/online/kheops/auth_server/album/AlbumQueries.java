@@ -15,6 +15,8 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Tuple;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -46,7 +48,7 @@ public class AlbumQueries {
             throws AlbumNotFoundException {
 
         try {
-            return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
+            return em.createNamedQuery("Albums.findById", Album.class)
                     .setParameter("albumId", albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -58,7 +60,7 @@ public class AlbumQueries {
             throws UserNotMemberException {
 
         try {
-            return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
+            return em.createNamedQuery("AlbumUser.findByAlbumIdAndUser", AlbumUser.class)
                     .setParameter("targetUser", user)
                     .setParameter("targetAlbum", album)
                     .getSingleResult();
@@ -70,7 +72,7 @@ public class AlbumQueries {
     public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em)
             throws SeriesNotFoundException {
         try {
-            return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
+            return em.createNamedQuery("AlbumSeries.findByAlbumIdAndSeriesUID", AlbumSeries.class)
                     .setParameter("seriesUID", seriesUID)
                     .setParameter("albumID", albumID)
                     .getSingleResult();
@@ -306,70 +308,6 @@ public class AlbumQueries {
         }
     }
 
-
-    public static AlbumResponse findAlbumByAlbumIdCriteria(String albumId, EntityManager em) {
-
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery c = cb.createQuery();
-
-        Root<Album> album = c.from(Album.class);
-
-        Join<Album, AlbumSeries> albumSeries = album.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        Join<AlbumSeries, Series> series = albumSeries.join("series", javax.persistence.criteria.JoinType.LEFT);
-        Join<Series, Study> study = series.join("study", javax.persistence.criteria.JoinType.LEFT);
-
-        ParameterExpression<String> p = cb.parameter(String.class, "albumId");
-        Predicate condition = cb.equal(album.get("id"), p);
-
-        Subquery<Long> nbStudy = c.subquery(Long.class);
-        Root<Album> albumNbStudy = nbStudy.from(Album.class);
-        Join<Album, AlbumSeries> albumSeriesNbStudy = albumNbStudy.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        Join<AlbumSeries, Series> seriesNbStudy = albumSeriesNbStudy.join("series", javax.persistence.criteria.JoinType.LEFT);
-        Join<Series, Study> studyNbStudy = seriesNbStudy.join("study", javax.persistence.criteria.JoinType.LEFT);
-        nbStudy.select(cb.countDistinct(studyNbStudy.get("pk")));
-        nbStudy.where(cb.isTrue(studyNbStudy.get("populated")), condition);
-
-
-        Subquery<Long> nbSeries = c.subquery(Long.class);
-        Root<Album> albumNbSeries = nbSeries.from(Album.class);
-        Join<Album, AlbumSeries> albumSeriesNbSeries = albumNbSeries.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        Join<AlbumSeries, Series> seriesNbSeries = albumSeriesNbSeries.join("series", javax.persistence.criteria.JoinType.LEFT);
-        Join<Series, Study> studyNbSeries = seriesNbSeries.join("study", javax.persistence.criteria.JoinType.LEFT);
-        nbSeries.select(cb.countDistinct(studyNbSeries.get("pk")));
-        nbSeries.where(cb.isTrue(seriesNbSeries.get("populated")), cb.isTrue(studyNbSeries.get("populated")), condition);
-
-
-        Subquery<Long> nbInstances = c.subquery(Long.class);
-        Root<Album> albumNbInstances = nbInstances.from(Album.class);
-        Join<Album, AlbumSeries> albumSeriesNbInstances = albumNbInstances.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        Join<AlbumSeries, Series> seriesNbInstances = albumSeriesNbInstances.join("series", javax.persistence.criteria.JoinType.LEFT);
-        Join<Series, Study> studyNbInstances = seriesNbInstances.join("study", javax.persistence.criteria.JoinType.LEFT);
-        nbInstances.select(cb.sum(seriesNbInstances.get("numberOfSeriesRelatedInstances")));
-        nbInstances.where(cb.isTrue(seriesNbInstances.get("populated")), cb.isTrue(studyNbInstances.get("populated")), condition);
-
-
-        Expression<String> functionStringAgg = cb.function( "string_agg", String.class,
-                series.get("modality"), cb.literal(","));
-
-
-        c.multiselect(album.get("pk"), album.get("id"), album.get("name"), album.get("description"),
-                nbStudy,
-                nbSeries,
-                nbInstances,
-                functionStringAgg
-        );
-
-        c.where(condition);
-
-        c.groupBy(album.get("pk"));
-
-        javax.persistence.Query q = em.createQuery(c);
-        q.setParameter("albumId", albumId);
-        List res = q.getResultList();
-
-        return null;
-
-    }
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
         final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);

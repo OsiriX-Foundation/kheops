@@ -5,6 +5,13 @@ import online.kheops.auth_server.event.Events;
 import javax.persistence.*;
 import java.util.Optional;
 
+@NamedQueries({
+        @NamedQuery(name = "Mutation.findAllByAlbum",
+                query = "SELECT m FROM Mutation m WHERE :album = m.album ORDER BY m.eventTime desc"),
+        @NamedQuery(name = "Mutation.countAllByAlbum",
+                query = "SELECT count(m) FROM Mutation m WHERE :album = m.album")
+})
+
 @Entity(name = "Mutation")
 @DiscriminatorValue("Mutation")
 public class Mutation extends Event{

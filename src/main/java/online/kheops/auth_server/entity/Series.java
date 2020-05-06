@@ -13,6 +13,40 @@ import java.util.Set;
 import static online.kheops.auth_server.series.Series.safeAttributeSetString;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "Series.findAllByStudyUIDFromInbox",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE a = u.inbox AND u=:callingUser AND s.study.studyInstanceUID = :StudyInstanceUID"),
+        @NamedQuery(name = "Series.findAllByStudyUIDFromAlbum",
+                query = "SELECT s FROM Album a JOIN a.albumSeries alS JOIN alS.series s WHERE :album = a AND s.study.studyInstanceUID = :StudyInstanceUID"),
+        @NamedQuery(name = "Series.findAllByStudyUIDFromInboxAndAlbum",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE u=:callingUser AND s.study.studyInstanceUID = :StudyInstanceUID"),
+        @NamedQuery(name = "Series.findByStudyUIDFromInbox",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE a = u.inbox AND u=:callingUser AND s.study.studyInstanceUID = :StudyInstanceUID AND s.seriesInstanceUID = :SeriesInstanceUID"),
+        @NamedQuery(name = "Series.findByStudyUIDFromAlbum",
+                query = "SELECT s FROM Album a JOIN a.albumSeries alS JOIN alS.series s WHERE :album = a AND s.study.studyInstanceUID = :StudyInstanceUID AND s.seriesInstanceUID = :SeriesInstanceUID"),
+        @NamedQuery(name = "Series.findBySeriesUIDAndStudyUIDAndUser",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE u=:callingUser AND s.study.studyInstanceUID = :StudyInstanceUID AND s.seriesInstanceUID = :SeriesInstanceUID"),
+        @NamedQuery(name = "Series.findBySeriesUIDAndStudyUIDAndUserWithSharePermission",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE (a = u.inbox or au.admin = true or a.userPermission.sendSeries = true)AND u=:callingUser AND s.study.studyInstanceUID = :StudyInstanceUID AND s.seriesInstanceUID = :SeriesInstanceUID"),
+        @NamedQuery(name = "Series.findBySeriesUIDAndStudyUID",
+                query = "SELECT s FROM Series s JOIN s.study st WHERE s.seriesInstanceUID = :SeriesInstanceUID AND st.studyInstanceUID = :StudyInstanceUID"),
+        @NamedQuery(name = "Series.findBySeriesUID",
+                query = "SELECT s FROM Series s WHERE s.seriesInstanceUID = :SeriesInstanceUID"),
+        @NamedQuery(name = "Series.xxx",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE u=:callingUser AND s = :series AND (au.admin = true or a.userPermission.sendSeries = true)"),
+        @NamedQuery(name = "Series.findBySeriesFromInbox",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE u=:callingUser AND s = :series AND a = u.inbox"),
+        @NamedQuery(name = "Series.isOrphan",
+                query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE s = :series"),
+        @NamedQuery(name = "Series.findAllUIDByStudyUIDFromAlbum",
+                query = "SELECT new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID, alS.favorite) FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE s.study.studyInstanceUID = :StudyInstanceUID AND u.inbox <> a AND :user = u AND a = :album"),
+        @NamedQuery(name = "Series.findAllUIDByStudyUIDFromInbox",
+                query = "SELECT new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID, alS.favorite) FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE s.study.studyInstanceUID = :StudyInstanceUID AND u.inbox = a AND :user = u"),
+        @NamedQuery(name = "Series.findAllUIDByStudyUIDFromInboxAndAlbum",
+                query = "SELECT new online.kheops.auth_server.series.SeriesUIDFavoritePair(s.seriesInstanceUID) FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE s.study.studyInstanceUID = :StudyInstanceUID AND :user = u")
+})
+
 @Entity
 @Table(name = "series")
 public class Series {

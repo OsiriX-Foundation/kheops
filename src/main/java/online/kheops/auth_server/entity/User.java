@@ -9,6 +9,20 @@ import java.util.logging.Logger;
 
 
 @SuppressWarnings("unused")
+
+@NamedQueries({
+        @NamedQuery(name = "User.findById",
+                query = "SELECT u FROM User u WHERE u.sub = :userId"),
+        @NamedQuery(name = "User.findByEmail",
+                query = "SELECT u FROM User u WHERE u.email = :email"),
+        @NamedQuery(name = "User.searchByEmailInAlbumId",
+                query = "SELECT u FROM User u JOIN AlbumUser au WHERE au.id = :albumId AND u.email LIKE :search"),
+        @NamedQuery(name = "User.searchByEmailWithStudyAccess",
+                query = "SELECT u FROM User u JOIN AlbumUser au JOIN Album a JOIN AlbumSeries als JOIN Series se JOIN Study st WHERE st.studyInstanceUID = :studyUID AND u.email LIKE :search"),
+        @NamedQuery(name = "User.searchByEmail",
+                query = "SELECT u FROM User u WHERE u.email LIKE :search")
+})
+
 @Entity
 @Table(name = "users")
 
