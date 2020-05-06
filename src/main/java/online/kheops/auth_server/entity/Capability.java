@@ -18,7 +18,7 @@ import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 @NamedQueries({
         @NamedQuery(name = "Capability.findBySecret",
         query = "SELECT c FROM Capability c WHERE c.secret = :secret"),
-        @NamedQuery(name = "Capability.findByIdANDUser",
+        @NamedQuery(name = "Capability.findByIdAndUser",
         query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id"),
         @NamedQuery(name = "Capability.findById",
         query = "SELECT c FROM Capability c WHERE :capabilityId = c.id"),
