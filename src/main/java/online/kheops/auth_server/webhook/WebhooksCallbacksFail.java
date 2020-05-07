@@ -6,8 +6,6 @@ import online.kheops.auth_server.entity.WebhookTrigger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.core.Response;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

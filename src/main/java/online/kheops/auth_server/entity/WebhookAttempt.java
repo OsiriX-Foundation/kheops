@@ -27,7 +27,7 @@ public class WebhookAttempt {
     @JoinColumn (name = "webhook_trigger_fk", nullable=false, insertable = true, updatable = false)
     private WebhookTrigger webhookTrigger;
 
-    private WebhookAttempt() {}
+    public WebhookAttempt() {}
 
     public WebhookAttempt(int status, int attempt, WebhookTrigger webhookTrigger) {
         this.status = status;

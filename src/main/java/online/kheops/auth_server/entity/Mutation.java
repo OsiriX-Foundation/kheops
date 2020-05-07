@@ -34,23 +34,24 @@ public class Mutation extends Event{
 
     @Basic(optional = false)
     @Column(name = "mutation_type", updatable = false)
-    private String mutationType;
+    @Enumerated(value = EnumType.STRING)
+    private Events.MutationType mutationType;
 
     public User getToUser() { return toUser; }
 
     public Series getSeries() { return series; }
 
-    public String getMutationType() { return mutationType; }
+    public Events.MutationType getMutationType() { return mutationType; }
 
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
 
     public Optional<ReportProvider> getReportProvider() { return Optional.ofNullable(reportProvider); }
 
-    public Mutation(){}
+    public Mutation() {}
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, User targetUser) {
         super(callingUser, album);
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
         toUser = targetUser;
 
         targetUser.addMutation(this);
@@ -58,12 +59,12 @@ public class Mutation extends Event{
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType) {
         super(callingUser, album);
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
     }
 
     public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
         super(callingUser, album);
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
         this.reportProvider = reportProvider;
 
         reportProvider.addMutation(this);
@@ -78,7 +79,7 @@ public class Mutation extends Event{
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Series series) {
         super(callingUser, album, series.getStudy());
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
         this.series = series;
 
         series.addMutation(this);
@@ -86,12 +87,12 @@ public class Mutation extends Event{
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Study study) {
         super(callingUser, album, study);
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
     }
 
     public Mutation(Capability capability, Album album, Events.MutationType mutationType, Study study) {
         super(capability.getUser(), album, study);
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
         this.capability = capability;
 
         capability.addMutation(this);
@@ -99,7 +100,7 @@ public class Mutation extends Event{
 
     public Mutation (Capability capability, Album album, Events.MutationType mutationType, Series series) {
         super(capability.getUser(), album, series.getStudy());
-        this.mutationType = mutationType.toString();
+        this.mutationType = mutationType;
         this.series = series;
         this.capability = capability;
 

@@ -61,7 +61,6 @@ public class ReportProvider {
         this.removed = false;
     }
 
-
     public ReportProvider() {}
 
     public ReportProvider(String url, String name, Album album, String clientId) {

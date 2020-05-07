@@ -102,13 +102,14 @@ public class EventResponse {
         }
         source = userResponseBuilder.build();
         postDate = mutation.getEventTime();
-        mutationType = mutation.getMutationType();
+        mutationType = mutation.getMutationType().toString();
+        final Events.MutationType mutationType_ = mutation.getMutationType();
 
-        if (mutationType.equals(Events.MutationType.PROMOTE_ADMIN.toString()) ||
-                mutationType.equals(Events.MutationType.DEMOTE_ADMIN.toString()) ||
-                mutationType.equals(Events.MutationType.ADD_USER.toString()) ||
-                mutationType.equals(Events.MutationType.ADD_ADMIN.toString()) ||
-                mutationType.equals(Events.MutationType.REMOVE_USER.toString())) {
+        if (mutationType_.equals(Events.MutationType.PROMOTE_ADMIN) ||
+                mutationType_.equals(Events.MutationType.DEMOTE_ADMIN) ||
+                mutationType_.equals(Events.MutationType.ADD_USER) ||
+                mutationType_.equals(Events.MutationType.ADD_ADMIN) ||
+                mutationType_.equals(Events.MutationType.REMOVE_USER)) {
             final UserResponseBuilder targetUserResponseBuilder = new UserResponseBuilder()
                     .setUser(mutation.getToUser())
                     .setCanAccess(userMember.containsKey(mutation.getToUser().getSub()));
@@ -118,8 +119,8 @@ public class EventResponse {
             target = targetUserResponseBuilder.build();
 
         }
-        if (mutationType.equals(Events.MutationType.IMPORT_SERIES.toString()) ||
-                mutation.getMutationType().equals(Events.MutationType.REMOVE_SERIES.toString())) {
+        if (mutationType_.equals(Events.MutationType.IMPORT_SERIES) ||
+                mutationType_.equals(Events.MutationType.REMOVE_SERIES)) {
             series = new SeriesResponse();
             study = new StudyResponse();
             series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
@@ -129,8 +130,8 @@ public class EventResponse {
             mutation.getReportProvider().ifPresent(mutationReportProvider ->
                     source.setReportProvider(mutationReportProvider, ReportProviderResponse.Type.EVENT));
         }
-        if (mutationType.equals(Events.MutationType.ADD_FAV.toString()) ||
-                mutationType.equals(Events.MutationType.REMOVE_FAV.toString())) {
+        if (mutationType_.equals(Events.MutationType.ADD_FAV) ||
+                mutationType_.equals(Events.MutationType.REMOVE_FAV)) {
             if (mutation.getSeries() != null) {
                 series = new SeriesResponse();
                 series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
@@ -140,16 +141,16 @@ public class EventResponse {
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
         }
-        if (mutationType.equals(Events.MutationType.IMPORT_STUDY.toString()) ||
-                mutationType.equals(Events.MutationType.REMOVE_STUDY.toString())) {
+        if (mutationType_.equals(Events.MutationType.IMPORT_STUDY) ||
+                mutationType_.equals(Events.MutationType.REMOVE_STUDY)) {
             study = new StudyResponse();
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
         }
 
-        if (mutationType.equals(Events.MutationType.CREATE_REPORT_PROVIDER.toString()) ||
-                mutationType.equals(Events.MutationType.DELETE_REPORT_PROVIDER.toString()) ||
-                mutationType.equals(Events.MutationType.EDIT_REPORT_PROVIDER.toString())) {
+        if (mutationType_.equals(Events.MutationType.CREATE_REPORT_PROVIDER) ||
+                mutationType_.equals(Events.MutationType.DELETE_REPORT_PROVIDER) ||
+                mutationType_.equals(Events.MutationType.EDIT_REPORT_PROVIDER)) {
             mutation.getReportProvider().ifPresent(mutationReportProvider ->
                     reportProvider = new ReportProviderResponse(mutationReportProvider, ReportProviderResponse.Type.EVENT));
         }

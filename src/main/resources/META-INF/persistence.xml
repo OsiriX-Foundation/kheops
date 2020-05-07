@@ -4,6 +4,7 @@
     <persistence-unit name="online.kheops">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>online.kheops.auth_server.entity.Album</class>
+        <class>online.kheops.auth_server.entity.UserPermission</class>
         <class>online.kheops.auth_server.entity.User</class>
         <class>online.kheops.auth_server.entity.Series</class>
         <class>online.kheops.auth_server.entity.Study</class>
