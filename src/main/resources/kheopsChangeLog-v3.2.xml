@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet author="kheops" id="v3.2-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mutation_series" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="event_series">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="event_series_pk"/>
+            </column>
+            <column name="event_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="series_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v3.2-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='event_series_unique'</sqlCheck>
+        </preConditions>
+        <addUniqueConstraint columnNames="event_fk, series_fk" constraintName="event_series_unique" tableName="event_series"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v3.2-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="event_series_event_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="event_fk" baseTableName="event_series" constraintName="event_series_event_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="events" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v3.2-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="event_series_series_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="series_fk" baseTableName="event_series" constraintName="event_series_series_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="series" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v3.2-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="event_series_event_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="event_series_event_fk_index" tableName="event_series">
+            <column name="event_fk"/>
+        </createIndex>
+    </changeSet>
+
+
+
+    <changeSet author="kheops" id="v3.2-6">
+       <tagDatabase tag="v3.2"/>
+    </changeSet>
+
+</databaseChangeLog>

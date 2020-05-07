@@ -292,6 +292,7 @@ public class Sending {
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
             final List<Series> seriesListWebhook = new ArrayList<>();
+            final List<Series> seriesListEvent = new ArrayList<>();
 
             boolean allSeriesAlreadyExist = true;
             for (Series series: availableSeries) {
@@ -303,6 +304,7 @@ public class Sending {
                         newSeriesWebhook.addSeries(series);
                         seriesListWebhook.add(series);
                     }
+                    seriesListEvent.add(series);
                 }
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
@@ -328,7 +330,15 @@ public class Sending {
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
             }
+
             em.persist(mutation);
+
+            for(Series series : seriesListEvent) {
+                final EventSeries eventSeries = new EventSeries(mutation, series);
+                em.persist(eventSeries);
+            }
+
+
             targetAlbum.updateLastEventTime();
 
             if(fromAlbumId != null) {

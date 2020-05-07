@@ -102,6 +102,9 @@ public class Series {
     @OneToMany(mappedBy = "series")
     private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
+    @OneToMany(mappedBy = "series")
+    private Set<EventSeries> eventSeries = new HashSet<>();
+
     public Series() {}
 
     public Series(String newSeriesInstanceUID) {
@@ -232,6 +235,8 @@ public class Series {
     public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
 
     public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
+
+    public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
 
     public String getBodyPartExamined() { return bodyPartExamined; }
 

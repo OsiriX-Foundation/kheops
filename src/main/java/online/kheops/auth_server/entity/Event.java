@@ -3,6 +3,8 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.Set;
 
 @NamedQueries({
         @NamedQuery(name = "Event.findAllByAlbum",
@@ -40,6 +42,9 @@ public abstract class Event {
     @ManyToOne
     @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = true, updatable = false)
     private User privateTargetUser;
+
+    @OneToMany(mappedBy = "series")
+    private Set<EventSeries> eventSeries = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -89,4 +94,8 @@ public abstract class Event {
     public User getPrivateTargetUser() {  return privateTargetUser; }
 
     public void setPrivateTargetUser(User privateTargetUser) { this.privateTargetUser = privateTargetUser; }
+
+    public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
+
+    public Set<EventSeries> getEventSeries() { return eventSeries; }
 }

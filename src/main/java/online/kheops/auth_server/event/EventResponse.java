@@ -2,6 +2,7 @@ package online.kheops.auth_server.event;
 
 import online.kheops.auth_server.entity.Comment;
 import online.kheops.auth_server.entity.Event;
+import online.kheops.auth_server.entity.EventSeries;
 import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.user.UserResponse;
@@ -9,6 +10,8 @@ import online.kheops.auth_server.user.UserResponseBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EventResponse {
@@ -53,6 +56,8 @@ public class EventResponse {
     private StudyResponse study;
     @XmlElement(name = "report_provider")
     private ReportProviderResponse reportProvider;
+    @XmlElement(name = "debug")
+    private List<String> uidlst;
 
     private EventResponse() { /*empty*/ }
 
@@ -146,6 +151,10 @@ public class EventResponse {
             study = new StudyResponse();
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
+            uidlst = new ArrayList<>();
+            for(EventSeries eventSeries : mutation.getEventSeries()) {
+                uidlst.add(eventSeries.getSeries().getSeriesInstanceUID());
+            }
         }
 
         if (mutationType_.equals(Events.MutationType.CREATE_REPORT_PROVIDER) ||
