@@ -43,7 +43,7 @@ public abstract class Event {
     @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = true, updatable = false)
     private User privateTargetUser;
 
-    @OneToMany(mappedBy = "series")
+    @OneToMany(mappedBy = "series", fetch = FetchType.EAGER)
     private Set<EventSeries> eventSeries = new HashSet<>();
 
     @PrePersist
